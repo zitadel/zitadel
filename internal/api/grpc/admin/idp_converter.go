@@ -229,6 +229,7 @@ func updateGenericOAuthProviderToCommand(req *admin_pb.UpdateGenericOAuthProvide
 
 func addGitHubProviderToCommand(req *admin_pb.AddGitHubProviderRequest) command.GitHubProvider {
 	return command.GitHubProvider{
+		Name:         req.Name,
 		ClientID:     req.ClientId,
 		ClientSecret: req.ClientSecret,
 		Scopes:       req.Scopes,
@@ -238,6 +239,7 @@ func addGitHubProviderToCommand(req *admin_pb.AddGitHubProviderRequest) command.
 
 func updateGitHubProviderToCommand(req *admin_pb.UpdateGitHubProviderRequest) command.GitHubProvider {
 	return command.GitHubProvider{
+		Name:         req.Name,
 		ClientID:     req.ClientId,
 		ClientSecret: req.ClientSecret,
 		Scopes:       req.Scopes,

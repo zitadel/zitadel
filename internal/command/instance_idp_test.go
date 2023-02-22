@@ -618,6 +618,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 								"instance1",
 								instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 									"id1",
+									"",
 									"clientID",
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
@@ -657,6 +658,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 								"instance1",
 								instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 									"id1",
+									"name",
 									"clientID",
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
@@ -681,6 +683,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				provider: GitHubProvider{
+					Name:         "name",
 					ClientID:     "clientID",
 					ClientSecret: "clientSecret",
 					Scopes:       []string{"openid"},
@@ -793,6 +796,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -825,6 +829,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 								"id1",
+								"name",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -845,6 +850,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 									event, _ := instance.NewGitHubIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 										"id1",
 										[]idp.OAuthIDPChanges{
+											idp.ChangeOAuthName("new name"),
 											idp.ChangeOAuthClientID("new clientID"),
 											idp.ChangeOAuthClientSecret(&crypto.CryptoValue{
 												CryptoType: crypto.TypeEncryption,
@@ -873,6 +879,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: GitHubProvider{
+					Name:         "new name",
 					ClientID:     "new clientID",
 					ClientSecret: "new clientSecret",
 					Scopes:       []string{"openid", "profile"},

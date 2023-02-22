@@ -326,7 +326,16 @@ func (c *Commands) prepareAddOrgGitHubProvider(a *org.Aggregate, resourceOwner, 
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewGitHubIDPAddedEvent(ctx, &a.Aggregate, id, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
+				org.NewGitHubIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					id,
+					provider.Name,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.IDPOptions,
+				),
 			}, nil
 		}, nil
 	}
@@ -357,6 +366,7 @@ func (c *Commands) prepareUpdateOrgGitHubProvider(a *org.Aggregate, resourceOwne
 				ctx,
 				&a.Aggregate,
 				id,
+				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,
 				c.idpConfigEncryption,

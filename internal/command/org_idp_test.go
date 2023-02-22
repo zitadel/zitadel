@@ -627,6 +627,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 						eventPusherToEvents(
 							org.NewGitHubIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -664,6 +665,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 						eventPusherToEvents(
 							org.NewGitHubIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"name",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -688,6 +690,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				provider: GitHubProvider{
+					Name:         "name",
 					ClientID:     "clientID",
 					ClientSecret: "clientSecret",
 					Scopes:       []string{"openid"},
@@ -804,6 +807,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewGitHubIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -837,6 +841,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewGitHubIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"name",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -855,6 +860,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 								event, _ := org.NewGitHubIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 									"id1",
 									[]idp.OAuthIDPChanges{
+										idp.ChangeOAuthName("new name"),
 										idp.ChangeOAuthClientID("new clientID"),
 										idp.ChangeOAuthClientSecret(&crypto.CryptoValue{
 											CryptoType: crypto.TypeEncryption,
@@ -883,6 +889,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 				resourceOwner: "org1",
 				id:            "id1",
 				provider: GitHubProvider{
+					Name:         "new name",
 					ClientID:     "new clientID",
 					ClientSecret: "new clientSecret",
 					Scopes:       []string{"openid", "profile"},

@@ -14,6 +14,7 @@ type GitHubIDPAddedEvent struct {
 func NewGitHubIDPAddedEvent(
 	base *eventstore.BaseEvent,
 	id,
+	name,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
@@ -23,6 +24,7 @@ func NewGitHubIDPAddedEvent(
 		OAuthIDPAddedEvent: OAuthIDPAddedEvent{
 			BaseEvent:    *base,
 			ID:           id,
+			Name:         name,
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
 			Scopes:       scopes,

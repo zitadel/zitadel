@@ -146,6 +146,7 @@ func (wm *InstanceGitHubIDPWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
+	name,
 	clientID string,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
@@ -153,7 +154,7 @@ func (wm *InstanceGitHubIDPWriteModel) NewChangedEvent(
 	options idp.Options,
 ) (*instance.GitHubIDPChangedEvent, error) {
 
-	changes, err := wm.GitHubIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, scopes, options)
+	changes, err := wm.GitHubIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
 	if err != nil {
 		return nil, err
 	}
@@ -437,6 +438,14 @@ func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) 
 			wm.IDPRemoveWriteModel.AppendEvents(&e.OAuthIDPAddedEvent)
 		case *instance.OAuthIDPChangedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.OAuthIDPChangedEvent)
+		case *instance.GitHubIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubIDPAddedEvent)
+		case *instance.GitHubIDPChangedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubIDPChangedEvent)
+		case *instance.GitHubEnterpriseIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubEnterpriseIDPAddedEvent)
+		case *instance.GitHubEnterpriseIDPChangedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubEnterpriseIDPChangedEvent)
 		case *instance.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *instance.GoogleIDPChangedEvent:
@@ -462,6 +471,10 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			instance.OAuthIDPAddedEventType,
 			instance.OAuthIDPChangedEventType,
+			instance.GitHubIDPAddedEventType,
+			instance.GitHubIDPChangedEventType,
+			instance.GitHubEnterpriseIDPAddedEventType,
+			instance.GitHubEnterpriseIDPChangedEventType,
 			instance.GoogleIDPAddedEventType,
 			instance.GoogleIDPChangedEventType,
 			instance.LDAPIDPAddedEventType,

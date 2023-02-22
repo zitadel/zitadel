@@ -14,6 +14,7 @@ type GenericOAuthProvider struct {
 }
 
 type GitHubProvider struct {
+	Name         string
 	ClientID     string
 	ClientSecret string
 	Scopes       []string
