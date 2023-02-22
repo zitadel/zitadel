@@ -112,6 +112,7 @@ export class ProviderGoogleCreateComponent implements OnInit {
         })
         .catch((error) => {
           this.toast.showError(error);
+          this.loading = false;
         });
     } else if (PolicyComponentServiceType.ADMIN) {
       const req = new AdminAddGoogleProviderRequest();

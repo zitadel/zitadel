@@ -1,0 +1,60 @@
+<cnsl-create-layout
+  title="{{ 'IDP.CREATE.TITLE' | translate }}"
+  [createSteps]="createSteps"
+  [currentCreateStep]="currentCreateStep"
+  (closed)="close()"
+>
+  <div class="idp-create-content">
+    <h1>{{ 'IDP.CREATE.TITLE' | translate }}</h1>
+
+    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+
+    <p class="desc cnsl-secondary-text">{{ 'IDP.JWT.DESCRIPTION' | translate }}</p>
+
+    <form [formGroup]="jwtFormGroup" (ngSubmit)="addJWTIdp()">
+      <div class="idp-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="jwtName" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.JWT.HEADERNAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="jwtHeaderName" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
+          <input cnslInput formControlName="jwtIssuer" />
+        </cnsl-form-field>
+      </div>
+
+      <cnsl-info-section class="auto-reg-info">
+        <div>
+          <p class="auto-reg-desc">{{ 'IDP.AUTOREGISTER_DESC' | translate }}</p>
+          <mat-checkbox formControlName="jwtAutoRegister">
+            {{ 'IDP.AUTOREGISTER' | translate }}
+          </mat-checkbox>
+        </div>
+      </cnsl-info-section>
+
+      <div class="idp-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.JWT.JWTENDPOINT' | translate }}</cnsl-label>
+          <input cnslInput formControlName="jwtEndpoint" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.JWT.JWTKEYSENDPOINT' | translate }}</cnsl-label>
+          <input cnslInput formControlName="jwtKeysEndpoint" />
+        </cnsl-form-field>
+      </div>
+
+      <div class="idp-create-actions">
+        <button color="primary" (click)="currentCreateStep = 1" mat-stroked-button class="back-button" type="button">
+          {{ 'ACTIONS.BACK' | translate }}
+        </button>
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="jwtFormGroup.invalid" type="submit">
+          {{ 'ACTIONS.SAVE' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</cnsl-create-layout>

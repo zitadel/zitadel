@@ -10,7 +10,6 @@
 <div class="new-idp-wrapper">
   <a
     class="item card"
-    (click)="createGoogle()"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'idp', 'google-create']
@@ -45,4 +44,36 @@
       <span class="title">GitLab</span>
     </div>
   </div>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'idp', 'oidc-create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/instance', 'idp', 'oidc-create']
+        : []
+    "
+  >
+    <mat-icon class="idp-icon" svgIcon="mdi_openid" alt="openid" />
+    <div class="text-container">
+      <span class="title">Generic OIDC provider</span>
+    </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'idp', 'jwt-create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/instance', 'idp', 'jwt-create']
+        : []
+    "
+  >
+    <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
+    <div class="text-container">
+      <span class="title">Generic JWT provider</span>
+    </div>
+  </a>
 </div>

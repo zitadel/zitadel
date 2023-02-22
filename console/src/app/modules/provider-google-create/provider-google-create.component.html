@@ -1,13 +1,16 @@
 <cnsl-create-layout title="{{ 'IDP.CREATE.TITLE' | translate }}" (closed)="close()">
-  <div class="idp-create-content">
-    <h1>{{ 'IDP.CREATE.GOOGLE.TITLE' | translate }}</h1>
+  <div class="google-create-content">
+    <div class="title-row">
+      <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
+      <h1>{{ 'IDP.CREATE.GOOGLE.TITLE' | translate }}</h1>
+    </div>
 
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
     <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.GOOGLE.DESCRIPTION' | translate }}</p>
 
     <form [formGroup]="form" (ngSubmit)="addOIDCIdp()">
-      <div class="idp-content">
+      <div class="google-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
           <input cnslInput formControlName="name" />
@@ -56,7 +59,7 @@
         </cnsl-card>
       </div>
 
-      <div class="idp-create-actions">
+      <div class="google-create-actions">
         <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
           {{ 'ACTIONS.SAVE' | translate }}
         </button>
