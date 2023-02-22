@@ -22,6 +22,10 @@ func (l *Login) getIDPConfigByID(r *http.Request, idpConfigID string) (*iam_mode
 	return l.authRepo.GetIDPConfigByID(r.Context(), idpConfigID)
 }
 
+func (l *Login) getIDPByID(r *http.Request, id string) (*query.IDPTemplate, error) {
+	return l.query.IDPTemplateByIDAndResourceOwner(r.Context(), false, id, "", false)
+}
+
 func (l *Login) getLoginPolicy(r *http.Request, orgID string) (*query.LoginPolicy, error) {
 	if orgID == "" {
 		return l.query.DefaultLoginPolicy(r.Context())
