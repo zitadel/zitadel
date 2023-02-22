@@ -165,8 +165,8 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(GitHubEnterpriseUserEndpointCol, crdb.ColumnTypeText),
 			crdb.NewColumn(GitHubEnterpriseScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(OAuthInstanceIDCol, OAuthIDCol),
-			IDPTemplateOAuthSuffix,
+			crdb.NewPrimaryKey(GitHubEnterpriseInstanceIDCol, GitHubEnterpriseIDCol),
+			IDPTemplateGitHubEnterpriseSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
@@ -279,6 +279,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.OAuthIDPChangedEventType,
 					Reduce: p.reduceOAuthIDPChanged,
+				},
+				{
+					Event:  org.GitHubIDPAddedEventType,
+					Reduce: p.reduceGitHubIDPAdded,
+				},
+				{
+					Event:  org.GitHubIDPChangedEventType,
+					Reduce: p.reduceGitHubIDPChanged,
 				},
 				{
 					Event:  org.GitHubEnterpriseIDPAddedEventType,
