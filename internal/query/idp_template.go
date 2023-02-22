@@ -572,14 +572,16 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					UserEndpoint:          oauthUserEndpoint.String,
 					Scopes:                oauthScopes,
 				}
-			} else if googleID.Valid {
+			}
+			if googleID.Valid {
 				idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
 					IDPID:        googleID.String,
 					ClientID:     googleClientID.String,
 					ClientSecret: googleClientSecret,
 					Scopes:       googleScopes,
 				}
-			} else if ldapID.Valid {
+			}
+			if ldapID.Valid {
 				idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 					IDPID:               ldapID.String,
 					Host:                ldapHost.String,
@@ -782,14 +784,16 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						UserEndpoint:          oauthUserEndpoint.String,
 						Scopes:                oauthScopes,
 					}
-				} else if googleID.Valid {
+				}
+				if googleID.Valid {
 					idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
 						IDPID:        googleID.String,
 						ClientID:     googleClientID.String,
 						ClientSecret: googleClientSecret,
 						Scopes:       googleScopes,
 					}
-				} else if ldapID.Valid {
+				}
+				if ldapID.Valid {
 					idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 						IDPID:               ldapID.String,
 						Host:                ldapHost.String,
