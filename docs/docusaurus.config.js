@@ -65,16 +65,10 @@ module.exports = {
       items: [
         {
           type: "doc",
-          label: "Guides",
+          label: "Documentation",
           docId: "guides/overview",
           position: "left",
-        },
-        {
-          type: "doc",
-          label: "Examples",
-          docId: "examples/introduction",
-          position: "left",
-        },
+        }, 
         {
           type: "doc",
           label: "APIs",
@@ -89,14 +83,8 @@ module.exports = {
         },
         {
           type: "doc",
-          docId: "concepts/introduction",
-          label: "Concepts",
-          position: "left",
-        },
-        {
-          type: "doc",
-          docId: "manuals/introduction",
-          label: "Help",
+          docId: "support/introduction",
+          label: "Support",
           position: "left",
         },
         {
