@@ -32,14 +32,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
     };
   };
-  tags: [
-    {
-        name: "Deprecated"
-    },
-    {
-        name: "General"
-    }
-  ];
+
   schemes: HTTPS;
   schemes: HTTP;
 
