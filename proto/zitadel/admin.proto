@@ -50,7 +50,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Branding",
-            description: "Defines the look of the login UI, E-Mails and ZITADEL Console. For adding assets like logo, icon and font, have a look at the assets API."
+            description: "Defines the look of the login UI, E-Mails, and ZITADEL Console. For adding assets like logo, icon and font, have a look at the assets API."
         },
         {
             name: "Deprecated"
@@ -287,7 +287,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "Get My Instance";
-            description: "Returns the details about the current instance such as the name, version and the domains, etc."
+            description: "Returns the details about the current instance such as the name, version, domains, etc."
         };
     }
 
@@ -299,7 +299,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
             summary: "List Instance Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. This domains are the URLs where ZITADEL is running."
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running."
         };
     }
 
@@ -316,7 +316,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Secrets";
             summary: "List Secret Generators";
-            description: "Lists all the configured secret generators. The generators define how a secret should look like when generating in ZITADEL. E.g Email verification code, phone verification code, etc."
+            description: "Lists all the configured secret generators. The generators define how a secret should look when generated in ZITADEL. E.g Email verification code, phone verification code, etc."
         };
     }
 
@@ -332,7 +332,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Secrets";
             summary: "Get Secret Generator";
-            description: "Get a specific secret generator by its type (e.g PasswordResetCode). A generator defines how a secret should look like when generating in ZITADEL."
+            description: "Get a specific secret generator by its type (e.g PasswordResetCode). A generator defines how a secret should look when generating in ZITADEL."
         };
     }
 
@@ -349,7 +349,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Secrets";
             summary: "Update Secret Generator";
-            description: "Change a specific secret generator configuration by its type (e.g PasswordResetCode). A generator defines how a secret should look like when generating in ZITADEL."
+            description: "Change a specific secret generator configuration by its type (e.g PasswordResetCode). A generator defines how a secret should look when generating in ZITADEL."
         };
     }
 
@@ -399,7 +399,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "SMTP";
             summary: "Update SMTP Configuration";
-            description: "Update the SMTP configuration, be aware that this will be activated as soon as it is saved. So the users will get notifications from the new configured SMTP."
+            description: "Update the SMTP configuration, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
         };
     }
 
@@ -416,7 +416,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "SMTP";
             summary: "Update SMTP Password";
-            description: "Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the new configured SMTP."
+            description: "Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
         };
     }
 
@@ -499,7 +499,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "SMS Provider";
             summary: "Update Twilio SMS Provider";
-            description: "Change the configuration of a SMS provider of the type Twilio.  A provider has to be activated to be able to send notifications."
+            description: "Change the configuration of an SMS provider of the type Twilio.  A provider has to be activated to be able to send notifications."
         };
     }
 
@@ -533,7 +533,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "SMS Provider";
             summary: "Activate SMS Provider";
-            description: "Activate a SMS provider. After activating a provider, the users will be able to receive SMS notifications."
+            description: "Activate an SMS provider. After activating a provider, the users will be able to receive SMS notifications."
         };
     }
 
@@ -550,7 +550,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "SMS Provider";
             summary: "Deactivate SMS Provider";
-            description: "Deactivate a SMS provider. After deactivating the provider, the users will not be able to receive SMS notifications from that provider anymore. If it was the last activated they will not get notifications at all"
+            description: "Deactivate an SMS provider. After deactivating the provider, the users will not be able to receive SMS notifications from that provider anymore. If it was the last activated they will not get notifications at all"
         };
     }
 
@@ -632,7 +632,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Notification Providers";
             summary: "Get Notification Provider Filesystem";
-            description: "Returns a filesystem notification provider if configured. This provider is only used for testing purpose. The notifications will be written to the filesystem."
+            description: "Returns a filesystem notification provider if configured. This provider is only used for testing purposes. The notifications will be written to the filesystem."
         };
     }
 
@@ -648,7 +648,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Notification Providers";
             summary: "Get Notification Provider Log";
-            description: "Returns a log notification provider if configured. This provider is only used for testing purpose. The notifications will be written to the logs."
+            description: "Returns a log notification provider if configured. This provider is only used for testing purposes. The notifications will be written to the logs."
         };
     }
 
@@ -664,7 +664,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Get Security Settings";
-            description: "Returns the security settings of the ZITADEL instance. The settings define if iframe is allowed and from which origins."
+            description: "Returns the security settings of the ZITADEL instance. The settings define if the iframe is allowed and from which origins."
         };
     }
 
@@ -681,7 +681,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Set Security Settings";
-            description: "Set the security settings of the ZITADEL instance. The settings define if iframe is allowed and from which origins."
+            description: "Set the security settings of the ZITADEL instance. The settings define if the iframe is allowed and from which origins."
         };
     }
 
@@ -786,7 +786,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "list of organisations matching the query";
+                    description: "list of organizations matching the query";
                 };
             };
             responses: {
@@ -816,7 +816,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Setup Organization";
-            description: "Create a new organization with an administration user. If no specific roles are sent for the first user, the user will get the role ORG_OWNER."
+            description: "Create a new organization with an administrative user. If no specific roles are sent for the first user, the user will get the role ORG_OWNER."
             responses: {
                 key: "200";
                 value: {
@@ -848,7 +848,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Remove Organization";
-            description: "Sets the state of the organisation and all its resource (Users, Projects, Grants to and from the org) to removed. Users of this organisation will not be able login."
+            description: "Sets the state of the organization and all its resource (Users, Projects, Grants to and from the org) to remove. Users of this organization will not be able to log in."
             responses: {
                 key: "200";
                 value: {
@@ -886,7 +886,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "idp found";
+                    description: "IDP found";
                 };
             };
             responses: {
@@ -916,7 +916,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Search Identity Providers (IDP)";
-            description: "Returns a list of identity provider (social/enterprise login) configured on an instance level. e.g Google, AzureAD, etc."
+            description: "Returns a list of identity providers (social/enterprise login) configured on an instance level. e.g Google, AzureAD, etc."
             responses: {
                 key: "200";
                 value: {
@@ -950,7 +950,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Add OIDC Identity Provider (IDP)";
-            description: "Create a new identity provider configuration to enable your users to login with social/enterprise login. The provider has to be OIDC compliant."
+            description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. The provider has to be OIDC compliant."
             responses: {
                 key: "200";
                 value: {
@@ -984,7 +984,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Add JWT Identity Provider (IDP)";
-            description: "Create a new identity provider configuration to enable your users to login with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token."
+            description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token."
             responses: {
                 key: "200";
                 value: {
@@ -1018,7 +1018,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Update Identity Provider (IDP)";
-            description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterwards."
+            description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterward."
             responses: {
                 key: "200";
                 value: {
@@ -1051,7 +1051,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Deactivate Identity Provider (IDP)";
-            description: "Sets the state of the provider to inactive. It can only be called for provider with the state active. Users will not be able to login with the given provider afterwards. It might cause troubles, if it is the only authentication method of the user."
+            description: "Sets the state of the provider to inactive. It can only be called for the provider with the state active. Users will not be able to log in with the given provider afterward. It might cause troubles if it is the only authentication method of the user."
             responses: {
                 key: "200";
                 value: {
@@ -1061,7 +1061,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "unable to deactivate idp";
+                    description: "Unable to deactivate IDP";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -1084,7 +1084,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Reactivate Identity Provider (IDP)";
-            description: "Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to login again with the given provider."
+            description: "Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to log in again with the given provider."
             responses: {
                 key: "200";
                 value: {
@@ -1094,7 +1094,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "unable to reactivate idp";
+                    description: "unable to reactivate IDP";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -1117,7 +1117,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Remove Identity Provider (IDP)";
-            description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to login with the provider afterwards. If it is there only authentication possibility it might cause problems.."
+            description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to log in with the provider afterward. If it is their only authentication possibility it might cause problems."
             responses: {
                 key: "200";
                 value: {
@@ -1127,7 +1127,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "unable to remove idp";
+                    description: "unable to remove IDP";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -1151,11 +1151,11 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Update OIDC Identity Provider (IDP)";
-            description: "Update the OIDC specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterwards."
+            description: "Update the OIDC-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward."
             responses: {
                 key: "200";
                 value: {
-                    description: "oidc config updated";
+                    description: "OIDC config updated";
                 };
             };
             responses: {
@@ -1196,11 +1196,11 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Update JWT Identity Provider (IDP)";
-            description: "Update the JWT specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterwards."
+            description: "Update the JWT-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward."
             responses: {
                 key: "200";
                 value: {
-                    description: "jwt config updated";
+                    description: "JWT config updated";
                 };
             };
             responses: {
@@ -1263,7 +1263,7 @@ service AdminService {
     }
 
     //deprecated: please use DomainPolicy instead
-    //Returns the customised policy or the default if not customised
+    //Returns the customized policy or the default if not customized
     rpc GetCustomOrgIAMPolicy(GetCustomOrgIAMPolicyRequest) returns (GetCustomOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/orgs/{org_id}/policies/orgiam";
@@ -1313,7 +1313,7 @@ service AdminService {
     }
 
     //deprecated: please use DomainPolicy instead
-    //Resets the org iam policy of the organisation to default
+    //Resets the org iam policy of the organization to default
     // ZITADEL will fallback to the default policy defined by the ZITADEL administrators
     rpc ResetCustomOrgIAMPolicyToDefault(ResetCustomOrgIAMPolicyToDefaultRequest) returns (ResetCustomOrgIAMPolicyToDefaultResponse) {
         option (google.api.http) = {
@@ -1342,7 +1342,7 @@ service AdminService {
             tags: "Settings";
             tags: "Domain Settings";
             summary: "Get Domain Settings";
-            description: "Returns the domains settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation.."
+            description: "Returns the domain settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation.."
             responses: {
                 key: "200";
                 value: {
@@ -1366,7 +1366,7 @@ service AdminService {
             tags: "Settings";
             tags: "Domain Settings";
             summary: "Update Domain Settings";
-            description: "Update the domain settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation. It affects all organization that do not have a overwritten the settings."
+            description: "Update the domain settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, usernames, emails and validation. It affects all organizations that do not have overwritten settings."
             responses: {
                 key: "200";
                 value: {
@@ -1390,7 +1390,7 @@ service AdminService {
             tags: "Domain Settings";
             tags: "Organizations";
             summary: "Get Domain Settings for Organization";
-            description: "Get the domains settings configured on a specific organization. If the organization doesn't have a custom setting, the default will be returned. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation."
+            description: "Get the domain settings configured on a specific organization. If the organization doesn't have a custom setting, the default will be returned. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -1415,7 +1415,7 @@ service AdminService {
             tags: "Domain Settings";
             tags: "Organizations";
             summary: "Get Domain Settings for Organization";
-            description: "Create the domains settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation."
+            description: "Create the domain settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -1440,7 +1440,7 @@ service AdminService {
             tags: "Domain Settings";
             tags: "Organizations";
             summary: "Get Domain Settings for Organization";
-            description: "Update the domains settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation."
+            description: "Update the domain settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -1464,11 +1464,11 @@ service AdminService {
             tags: "Domain Settings";
             tags: "Organizations";
             summary: "Reset Domain Settings of Organization";
-            description: "Resets the domains settings configured on a specific organization to the settings configured on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation."
+            description: "Resets the domain settings configured on a specific organization to the settings configured on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
-                    description: "resets the custom domainpolicy to the default policy";
+                    description: "resets the custom domain policy to the default policy";
                 };
             };
         };
@@ -1487,7 +1487,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Private Labeling/Branding Settings";
-            description: "Returns the currently active private labeling / branding configured on the instance level. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the currently active private labeling/branding configured on the instance level. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             responses: {
                 key: "200";
                 value: {
@@ -1510,7 +1510,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Get Preview Private Labeling/Branding Settings";
-            description: "Returns the preview private labeling / branding configured on the instance level. The preview is used to show you how it will look like, and not activate it directly for your users. In the future it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Returns the preview private labeling/branding configured on the instance level. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             responses: {
                 key: "200";
                 value: {
@@ -1534,7 +1534,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Update Labeling/Branding Settings";
-            description: "Update the preview private labeling / branding configured on the instance level. It affects all organizations, that don't overwrite the settings. The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Update the preview private labeling/branding configured on the instance level. It affects all organizations, that don't overwrite the settings. The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             responses: {
                 key: "200";
                 value: {
@@ -1558,7 +1558,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Activate Labeling/Branding Settings";
-            description: "Activates  the preview private labeling / branding configured on the instance level. It will be shown to the users afterwards. It affects all organizations, that don't overwrite the settings.. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            description: "Activates the preview private labeling/branding configured on the instance level. It will be shown to the users afterward. It affects all organizations, that don't overwrite the settings. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
         };
     }
 
@@ -1575,7 +1575,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Remove Logo Light";
-            description: "Removes the logo of the light theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+            description: "Removes the logo of the light theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
     }
 
@@ -1592,7 +1592,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Remove Logo Dark";
-            description: "Removes the logo of the dark theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+            description: "Removes the logo of the dark theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
     }
 
@@ -1609,7 +1609,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Remove Icon Light";
-            description: "Removes the icon of the light theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+            description: "Removes the icon of the light theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
     }
 
@@ -1626,7 +1626,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Remove Icon Dark";
-            description: "Removes the icon of the dark theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+            description: "Removes the icon of the dark theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
     }
 
@@ -1643,7 +1643,7 @@ service AdminService {
             tags: "Settings";
             tags: "Branding";
             summary: "Remove Font";
-            description: "Removes the font from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+            description: "Removes the font from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
     }
 
@@ -1660,7 +1660,7 @@ service AdminService {
             tags: "Settings";
             tags: "Login Settings";
             summary: "Get Login Settings";
-            description: "Returns the login settings defined on the instance level. It will trigger for all organizations, that don't overwrite the settings. The login policy definges what kind of authentication possibilities the user should have. Generally speaking the behaviour of the login and register UI."
+            description: "Returns the login settings defined on the instance level. It will trigger for all organizations, that don't overwrite the settings. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI."
             responses: {
                 key: "200";
                 value: {
@@ -1684,7 +1684,7 @@ service AdminService {
             tags: "Settings";
             tags: "Login Settings";
             summary: "Update Login Settings";
-            description: "Update the default login settings defined on the instance level. It will trigger for all organizations, that don't overwrite the settings. The login policy definges what kind of authentication possibilities the user should have. Generally speaking the behaviour of the login and register UI."
+            description: "Update the default login settings defined on the instance level. It will trigger for all organizations, that don't overwrite the settings. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI."
             responses: {
                 key: "200";
                 value: {
@@ -1713,7 +1713,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "identity poviders of default login policy";
+                    description: "Identity providers of default login policy";
                 };
             };
         };
@@ -1738,7 +1738,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "identity poviders added to default login policy";
+                    description: "Identity providers added to default login policy";
                 };
             };
         };
@@ -1762,7 +1762,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "identity poviders removed from default login policy";
+                    description: "Identity providers removed from default login policy";
                 };
             };
         };
@@ -1782,7 +1782,7 @@ service AdminService {
             tags: "Login Settings";
             tags: "Authentication Methods"
             summary: "List Second Factors (2FA)";
-            description: "Returns a list of second factors (2FA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition it is called second factor as it is used as second authentication after a password. In the UI we generalize it as multi factor."
+            description: "Returns a list of second factors (2FA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called the second factor as it is used after a password. In the UI we generalize it as multi-factor."
             responses: {
                 key: "200";
                 value: {
@@ -1807,7 +1807,7 @@ service AdminService {
             tags: "Login Settings";
             tags: "Authentication Methods"
             summary: "Add Second Factor (2FA)";
-            description: "Add a new second factors (2FA) to the login settings of the instance. Users will have the possibility to authenticate with the configured factor afterwards. It affects all organizations, without custom login settings. Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition it is called second factor as it is used as second authentication after a password. In the UI we generalize it as multi factor."
+            description: "Add a new second factor (2FA) to the login settings of the instance. Users will have the possibility to authenticate with the configured factor afterward. It affects all organizations, without custom login settings. Authentication factors are used as an additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called a second factor as it is used as an additional authentication after a password. In the UI we generalize this as multi-factor."
             responses: {
                 key: "200";
                 value: {
@@ -1817,7 +1817,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "invalid second factor type";
+                    description: "invalid second-factor type";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -1842,7 +1842,7 @@ service AdminService {
             tags: "Login Settings";
             tags: "Authentication Methods"
             summary: "Remove Second Factor (2FA)";
-            description: "Remove a configured second factors (2FA) from the login settings of the instance. It affects all organizations, without custom login settings. Users will not be able to authenticate with the configured factor afterwards. Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition it is called second factor as it is used as second authentication after a password. In the UI we generalize it as multi factor."
+            description: "Remove a configured second factor (2FA) from the login settings of the instance. It affects all organizations, without custom login settings. Users will not be able to authenticate with the configured factor afterward. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called the second factor as it is used after a password. In the UI we generalize it as multi-factor."
             responses: {
                 key: "200";
                 value: {
@@ -1852,7 +1852,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "invalid second factor type";
+                    description: "Invalid second-factor type";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -1877,7 +1877,7 @@ service AdminService {
             tags: "Login Settings";
             tags: "Authentication Methods"
             summary: "List Multi Factors (MFA)";
-            description: "Returns a list of multi factors (MFA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            description: "Returns a list of multi factors (MFA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
                 key: "200";
                 value: {
@@ -1901,18 +1901,18 @@ service AdminService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Authentication Methods"
-            summary: "Add Multi Factor (MFA)";
-            description: "Add a multi factors (MFA) to the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            summary: "Add Multi-Factor (MFA)";
+            description: "Add a multi-factor (MFA) to the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
                 key: "200";
                 value: {
-                    description: "multi factor added to default login policy";
+                    description: "multi-factor added to default login policy";
                 };
             };
             responses: {
                 key: "400";
                 value: {
-                    description: "invalid multi factor type";
+                    description: "invalid multi-factor type";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -1937,7 +1937,7 @@ service AdminService {
             tags: "Login Settings";
             tags: "Authentication Methods"
             summary: "Remove Multi Factor (MFA)";
-            description: "Remove a multi factors (MFA) from the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            description: "Remove a multi-factor (MFA) from the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
                 key: "200";
                 value: {
@@ -1947,7 +1947,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "multi factor type not defined on policy";
+                    description: "multi-factor type not defined on policy";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -1971,7 +1971,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Password Complexity Settings";
-            description: "Returns the password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify how a password should look like (characters, length, etc.)"
+            description: "Returns the password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify how a password should look (characters, length, etc.)"
             responses: {
                 key: "200";
                 value: {
@@ -1995,7 +1995,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Update Password Complexity Settings";
-            description: "Updates the default password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify how a password should look like (characters, length, etc.)"
+            description: "Updates the default password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify how a password should look (characters, length, etc.)"
             responses: {
                 key: "200";
                 value: {
@@ -2087,7 +2087,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Password Lockout Settings";
-            description: "Returns the password lockout settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterwards."
+            description: "Returns the password lockout settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
             responses: {
                 key: "200";
                 value: {
@@ -2111,7 +2111,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Update Password Lockout Settings";
-            description: "Update the password lockout settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterwards."
+            description: "Update the password lockout settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
         };
     }
 
@@ -2187,7 +2187,7 @@ service AdminService {
             tags: "Settings";
             tags: "Notification Settings";
             summary: "Add Notification Settings";
-            description: "Add new the notification settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
+            description: "Add new notification settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             responses: {
                 key: "200";
                 value: {
@@ -2267,7 +2267,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Init Message Text";
-            description: "Get the default text of the initialize user message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non verified email address."
+            description: "Get the default text of the initialize-user message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non-verified email address."
         };
     }
 
@@ -2283,7 +2283,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Custom Init Message Text";
-            description: "Get the custom text of the initialize user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non verified email address."
+            description: "Get the custom text of the initialize-user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non-verified email address."
         };
     }
 
@@ -2300,7 +2300,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Set Default Custom Init Message Text";
-            description: "Set the custom text of the initialize user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non verified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            description: "Set the custom text of the initialize-user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non-verified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -2316,7 +2316,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Init Message Text to Default";
-            description: "Removes the custom text of the initialize user message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the initialize-user message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -2332,7 +2332,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Password Reset Message Text";
-            description: "Get the default text of the password reset message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot request."
+            description: "Get the default text of the password reset message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot-request."
         };
     }
 
@@ -2348,7 +2348,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Custom Password Reset Message Text";
-            description: "Get the custom text of the password reset message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot request."
+            description: "Get the custom text of the password reset message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot-request."
         };
     }
 
@@ -2365,7 +2365,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Set Default Custom Password Reset Message Text";
-            description: "Set the custom text of the password reset user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot request. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            description: "Set the custom text of the password reset user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot-request. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -2397,7 +2397,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Verify Email Message Text";
-            description: "Get the default text of the verify email message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new non verified email address."
+            description: "Get the default text of the verify-email message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new non-verified email address."
         };
     }
 
@@ -2413,7 +2413,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Custom Verify Email Message Text";
-            description: "Get the custom text of the verify email message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new non verified email address."
+            description: "Get the custom text of the verify-email message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new non-verified email address."
         };
     }
 
@@ -2430,7 +2430,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Set Default Verify Email Reset Message Text";
-            description: "Set the custom text of the verify email user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new non verified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            description: "Set the custom text of the verify email user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new nonverified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -2462,7 +2462,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Verify Phone Message Text";
-            description: "Get the default text of the verify phone message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non verified phone number and a notification provider is configured."
+            description: "Get the default text of the verify-phone message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
         };
     }
 
@@ -2478,7 +2478,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Custom Verify Phone Message Text";
-            description: "Get the custom text of the verify phone message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non verified phone number and a notification provider is configured."
+            description: "Get the custom text of the verify-phone message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
         };
     }
 
@@ -2495,7 +2495,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Set Default Verify Phone Reset Message Text";
-            description: "Set the custom text of the verify phone user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non verified phone number and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            description: "Set the custom text of the verify-phone user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non-verified phone number and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -2511,7 +2511,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Verify Phone Message Text to Default";
-            description: "Removes the custom text of the verify phone message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the verify-phone message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -2625,7 +2625,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Set Default Passwordless Registration Message Text";
-            description: "Set the custom text of the passwordless/passkey registration message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message/email is sent when user requests passwordless/passkey registration as email, to be able to configure on another device.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            description: "Set the custom text of the passwordless/passkey registration message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message/email is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -2657,7 +2657,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Default Password Change Message Text";
-            description: "Get the default text of the password changed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when the password of a user has been changed."
+            description: "Get the default text of the password-changed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when the password of a user has been changed."
         };
     }
 
@@ -2673,7 +2673,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Custom Password Change Message Text";
-            description: "Get the custom text of the password changed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when the password of a user has been changed."
+            description: "Get the custom text of the password-changed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when the password of a user has been changed."
         };
     }
 
@@ -2690,7 +2690,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Set Default Password Changed Message Text";
-            description: "Set the custom text of the password changed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message/email is sent when the password of a user has been changed.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            description: "Set the custom text of the password-changed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message/email is sent when the password of a user has been changed.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
     }
 
@@ -2706,7 +2706,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Password Changed Message Text to Default";
-            description: "Removes the custom text of the password changed message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom text of the password-changed message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -2722,7 +2722,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Get Default Login Text";
-            description: "Get the default texts for the login and register ui of ZITADEL, that are stored as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
+            description: "Get the default texts for the login and register U of ZITADEL, which are stored as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -2738,7 +2738,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Get Custom Login Text";
-            description: "Get the custom texts for the login and register ui of ZITADEL, that are overwritten on the instance as settings/database. The text will be shown to the users of all organizations, that do not have a custom text configured."
+            description: "Get the custom texts for the login and register UI of ZITADEL, which is overwritten on the instance as settings/database. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -2755,7 +2755,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Set Default Login Text";
-            description: "Set the custom texts for the login and register ui of ZITADEL, that are overwritten on the instance as settings/database. The text will be shown to the users of all organizations, that do not have a custom text configured."
+            description: "Set the custom texts for the login and register UI of ZITADEL, which is overwritten on the instance as settings/database. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -2771,7 +2771,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Reset Custom Login Text to Default";
-            description: "Removes the custom texts for the login and register ui of ZITADEL, that are overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
+            description: "Removes the custom texts for the login and register UI of ZITADEL, which is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -2788,7 +2788,7 @@ service AdminService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "List IAM Member Roles";
-            description: "Members are users with permissions to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the instance level."
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the instance level."
             responses: {
                 key: "200";
                 value: {
@@ -2812,7 +2812,7 @@ service AdminService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "List IAM Members";
-            description: "Members are users with permissions to administrate ZITADEL on different levels. This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked."
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked."
             responses: {
                 key: "200";
                 value: {
@@ -2838,7 +2838,7 @@ service AdminService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "Add IAM Member";
-            description: "Members are users with permissions to administrate ZITADEL on different levels. This request adds a new user to the members list with one or multiple roles."
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list with one or multiple roles."
             responses: {
                 key: "200";
                 value: {
@@ -2873,7 +2873,7 @@ service AdminService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "Update IAM Member";
-            description: "Members are users with permissions to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will updated. Make sure to include roles that you don't want to change (remove)."
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
             responses: {
                 key: "200";
                 value: {
@@ -2907,7 +2907,7 @@ service AdminService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "Remove IAM Member";
-            description: "Members are users with permissions to administrate ZITADEL on different levels. This request removes a user of the members list on an instance level. The user can still have roles on an other level (organization, project)"
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (organization, project)"
             responses: {
                 key: "200";
                 value: {
@@ -2940,7 +2940,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Views/Projections";
             summary: "List Views/Projections";
-            description: "Returns all stored read models of ZITADEL. Views are used for search optimisation and optimise request latencies. They represent the delta of the event happend on the objects"
+            description: "Returns all stored read models of ZITADEL. Views are used for search optimization and optimizing request latencies. They represent the delta of the event that happened on the objects"
             responses: {
                 key: "200";
                 value: {
@@ -2962,7 +2962,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Failed Events";
             summary: "List Failed Events";
-            description: "Returns a list of events that could not be proceeded in the views/projections. Some events need an amount of retries till they succeed. For example if the SMTP-API wasn't able to send an email at the first time."
+            description: "Returns a list of events that could not be proceeded in the views/projections. Some events need several retries till they succeed. For example, if the SMTP-API wasn't able to send an email the first time."
             responses: {
                 key: "200";
                 value: {
@@ -2984,7 +2984,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Failed Events";
             summary: "Remove Failed Events";
-            description: "Removes the event from the failed evens view, but not from the change stream. This call is useful if the system was able to process the event after some retries. e.g. if the second try of sending an email was successful. the first try produced an failed event. You can find out if it worked on the `failure_count` "
+            description: "Removes the event from the failed evens view, but not from the change stream. This call is useful if the system was able to process the event after some retries. e.g. if the second try of sending an email was successful. the first try produced a failed event. You can find out if it worked on the `failure_count` "
             responses: {
                 key: "200";
                 value: {
@@ -3005,7 +3005,7 @@ service AdminService {
         };
     }
 
-    // Imports data into instance and creates different objects
+    // Imports data into an instance and creates different objects
     rpc ImportData(ImportDataRequest) returns (ImportDataResponse) {
         option (google.api.http) = {
             post: "/import";
@@ -3053,7 +3053,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Events";
             summary: "Event types";
-            description: "Returns a list of the possible event types in ZITADEL. This is used to filter the event types in the list events reqeust."
+            description: "Returns a list of the possible event types in ZITADEL. This is used to filter the event types in the list events request."
         };
     }
 
@@ -3163,7 +3163,7 @@ message ListInstanceDomainsRequest {
     zitadel.v1.ListQuery query = 1;
     // the field the result is sorted
     zitadel.instance.v1.DomainFieldName sorting_column = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.instance.v1.DomainSearchQuery queries = 3;
 }
 
@@ -3176,7 +3176,7 @@ message ListInstanceDomainsResponse {
 message ListSecretGeneratorsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.settings.v1.SecretGeneratorQuery queries = 2;
 }
 
@@ -3321,7 +3321,7 @@ message UpdateSMTPConfigPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//this is en empty request
+//this is an empty request
 message RemoveSMTPConfigRequest {}
 
 message RemoveSMTPConfigResponse {
@@ -3492,7 +3492,7 @@ message GetSecurityPolicyResponse{
 message SetSecurityPolicyRequest{
     // states if iframe embedding is enabled or disabled
    bool enable_iframe_embedding = 1;
-   // origins allowed to load ZITADEL in an iframe if enable_iframe_embedding is true
+   // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
    repeated string allowed_origins = 2;
 }
 
@@ -3505,7 +3505,7 @@ message SetSecurityPolicyResponse{
 message IsOrgUniqueRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
-			description: "All unique fields of an organisation";
+			description: "All unique fields of an organization";
 			required: ["name", "domain"]
 		};
 	};
@@ -3557,7 +3557,7 @@ message ListOrgsRequest {
     zitadel.v1.ListQuery query = 1;
     // the field the result is sorted
     zitadel.org.v1.OrgFieldName sorting_column = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.org.v1.OrgQuery queries = 3;
 }
 
@@ -3570,7 +3570,7 @@ message ListOrgsResponse {
 message SetUpOrgRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
-			description: "Request to set up an organisation. User is required";
+			description: "Request to set up an organization. User is required";
 			required: ["org", "user"]
 		};
 	};
@@ -3592,7 +3592,7 @@ message SetUpOrgRequest {
         string domain = 2 [
             (validate.rules).string = {max_len: 200},
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "ZITADEL generates a domain (<org-name>.zitadel.ch) for an organisation, the field is not required";
+                description: "ZITADEL generates a domain (<org-name>.zitadel.ch) for an organization, the field is not required";
                 max_length: 200;
                 example: "\"zitadel.cloud\"";
             }
@@ -3639,7 +3639,7 @@ message SetUpOrgRequest {
             string display_name = 4 [
                 (validate.rules).string = {max_len: 200},
                 (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                    description: "a user can set his display name, if nothing is set ZITADEL computes \"first_name last_name\"";
+                    description: "a user can set his display name if nothing is set ZITADEL computes \"first_name last_name\"";
                     max_length: 200;
                     example: "\"Gigi Giraffe\"";
                 }
@@ -3715,7 +3715,7 @@ message SetUpOrgRequest {
     oneof user {
         option (validate.required) = true;
 
-        // oneof field for the user managing the organisation
+        // oneof field for the user managing the organization
         Human human = 2;
     }
     // specify Org Member Roles for the provided user (default is ORG_OWNER if roles are empty)
@@ -3770,7 +3770,7 @@ message ListIDPsRequest {
     zitadel.v1.ListQuery query = 1;
     // the field the result is sorted
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated IDPQuery queries = 3;
 }
 
@@ -3905,7 +3905,7 @@ message AddJWTIDPRequest {
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.custom.com/keys\"";
-            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            description: "the endpoint to the key (JWK) which is used to sign the JWT with";
             min_length: 1;
             max_length: 200;
         }
@@ -3935,7 +3935,7 @@ message AddJWTIDPResponse {
 message UpdateIDPRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
-			description: "Updates fields of an idp";
+			description: "Updates fields of an IDP";
 			required: ["idp_id", "name"]
 		};
 	};
@@ -4123,7 +4123,7 @@ message UpdateIDPJWTConfigRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.custom.com/keys\"";
-            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            description: "the endpoint to the key (JWK) which is used to sign the JWT with";
             min_length: 1;
             max_length: 200;
         }
@@ -4195,9 +4195,9 @@ message AddCustomOrgIAMPolicyRequest {
     ];
     bool user_login_must_be_domain = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the username has to end with the domain of it's organisation"
+            description: "the username has to end with the domain of its organization"
         }
-    ]; // the username has to end with the domain of it's organisation (uniqueness is organisation based)
+    ]; // the username has to end with the domain of its organization (uniqueness is organization based)
 }
 
 message AddCustomOrgIAMPolicyResponse {
@@ -4221,7 +4221,7 @@ message UpdateCustomOrgIAMPolicyRequest {
     ];
     bool user_login_must_be_domain = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the username has to end with the domain of it's organisation"
+            description: "the username has to end with the domain of its organization"
         }
     ];
 }
@@ -4306,17 +4306,17 @@ message AddCustomDomainPolicyRequest {
     ];
     bool user_login_must_be_domain = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the username has to end with the domain of it's organisation"
+            description: "the username has to end with the domain of its organization"
         }
-    ]; // the username has to end with the domain of it's organisation (uniqueness is organisation based)
+    ]; // the username has to end with the domain of its organization (uniqueness is organization based)
     bool validate_org_domains = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if organisation domains should be validated org count as validated automatically"
+            description: "defines if organization domains should be validated org count as validated automatically"
         }
     ];
     bool smtp_sender_address_matches_instance_domain = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the smtp sender address domain should match an existing domain on the instance"
+            description: "defines if the SMTP sender address domain should match an existing domain on the instance"
         }
     ];
 }
@@ -4342,17 +4342,17 @@ message UpdateCustomDomainPolicyRequest {
     ];
     bool user_login_must_be_domain = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the username has to end with the domain of it's organisation"
+            description: "the username has to end with the domain of its organization"
         }
     ];
     bool validate_org_domains = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if organisation domains should be validated org count as validated automatically"
+            description: "defines if organization domains should be validated org count as validated automatically"
         }
     ];
     bool smtp_sender_address_matches_instance_domain = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the smtp sender address domain should match an existing domain on the instance"
+            description: "defines if the SMTP sender address domain should match an existing domain on the instance"
         }
     ];
 }
@@ -4476,12 +4476,12 @@ message GetLoginPolicyResponse {
 message UpdateLoginPolicyRequest {
     bool allow_username_password = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if a user is allowed to login with his username and password"
+            description: "defines if a user is allowed to log in with his username and password"
         }
     ];
     bool allow_register = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if a person is allowed to register a user on this organisation"
+            description: "defines if a person is allowed to register a user on this organization"
         }
     ];
     bool allow_external_idp = 3 [
@@ -4491,7 +4491,7 @@ message UpdateLoginPolicyRequest {
     ];
     bool force_mfa = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if a user MUST use a multi factor to log in"
+            description: "defines if a user MUST use a multi-factor to log in"
         }
     ];
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [
@@ -4506,7 +4506,7 @@ message UpdateLoginPolicyRequest {
     ];
     bool ignore_unknown_usernames = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+            description: "defines if unknown username on login screen directly returns an error or always displays the password screen"
         }
     ];
     string default_redirect_uri = 8 [
@@ -4519,20 +4519,20 @@ message UpdateLoginPolicyRequest {
     google.protobuf.Duration mfa_init_skip_lifetime = 11;
     google.protobuf.Duration second_factor_check_lifetime = 12;
     google.protobuf.Duration multi_factor_check_lifetime = 13;
-    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success.
     bool allow_domain_discovery = 14 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
+            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
         }
     ];
     bool disable_login_with_email = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if user can additionally (to the loginname) be identified by their verified email address"
+            description: "defines if the user can additionally (to the login name) be identified by their verified email address"
         }
     ];
     bool disable_login_with_phone = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if user can additionally (to the loginname) be identified by their verified phone number"
+            description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
         }
     ];
 }
@@ -4686,12 +4686,12 @@ message UpdatePasswordComplexityPolicyRequest {
     ];
     bool has_lowercase = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the password MUST contain a lower case letter"
+            description: "defines if the password MUST contain a lowercase letter"
         }
     ];
     bool has_number = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the password MUST contain a numer"
+            description: "defines if the password MUST contain a number"
         }
     ];
     bool has_symbol = 5 [
@@ -4742,7 +4742,7 @@ message UpdateLockoutPolicyRequest {
     // failed attempts until a user gets locked
     uint32 max_password_attempts = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
+            description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset."
             example: "\"10\""
         }
     ];
@@ -4861,7 +4861,7 @@ message SetDefaultInitMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_len: 1000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"This user was created in Zitadel. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.\""
+            example: "\"This user was created in Zitadel. Use the username {{.PreferredLoginName}} to log in. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.\""
             max_length: 1000;
         }
     ];
@@ -5027,7 +5027,7 @@ message SetDefaultVerifyEmailMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you din't add a new email, please ignore this email.\""
+            example: "\"A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you didn't add a new email, please ignore this email.\""
             max_length: 800;
         }
     ];
@@ -5110,7 +5110,7 @@ message SetDefaultVerifyPhoneMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"A new phonenumber has been added. Please use the following code to verify it {{.Code}}.\""
+            example: "\"A new phone number has been added. Please use the following code to verify it {{.Code}}.\""
             max_length: 800;
         }
     ];
@@ -5193,7 +5193,7 @@ message SetDefaultDomainClaimedMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_len: 800},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.\""
+            example: "\"The domain {{.Domain}} has been claimed by an organization. Your current user {{.UserName}} is not part of this organization. Therefore you'll have to change your email when you log in. We have created a temporary username ({{.TempUsername}}) for this login.\""
             max_length: 800;
         }
     ];
@@ -5248,7 +5248,7 @@ message SetDefaultPasswordChangeMessageTextRequest {
     string title = 2 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADEL - Password of user has changed\""
+            example: "\"ZITADEL - Password of the user has changed\""
             max_length: 200;
         }
     ];
@@ -5475,7 +5475,7 @@ message AddIAMMemberRequest {
     repeated string roles = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"IAM_OWNER\"]";
-            description: "If no roles provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights"
         }
     ];
 }
@@ -5502,7 +5502,7 @@ message UpdateIAMMemberRequest {
     repeated string roles = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"IAM_OWNER\"]";
-            description: "If no roles provided the user won't have any rights"
+            description: "If no roles are provided the user won't have any rights"
         }
     ];
 }
@@ -5547,7 +5547,7 @@ message ListIAMMemberRolesResponse {
 message ListIAMMembersRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 2;
 }
 
@@ -5880,7 +5880,7 @@ message ListEventsRequest {
     uint64 sequence = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2\"";
-            description: "Sequence represents the order of events. It's always upcounting. If asc is false sequence is used as less than filter. If asc is true sequence is used as greater than filter. If sequence is 0 the field is ignored."
+            description: "Sequence represents the order of events. It's always counting. If asc is false, the sequence is used as lesser than filter. If asc is true sequence is used as greater than filter. If the sequence is 0 the field is ignored."
         }
     ];
     uint32 limit = 2 [

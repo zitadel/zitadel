@@ -40,7 +40,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Policies",
-            description: "Policies are settings that are made on either an instance or organization level of ZITADEL. The policies will have an impact on what a user is allowed to do or what should be shown to the suer."
+            description: "Policies are settings that are made on either an instance or organization level of ZITADEL. The policies will have an impact on what a user is allowed to do or what should be shown to the user."
         },
         {
             name: "User"
@@ -160,7 +160,7 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get my user";
-            description: "Returns the full blown user object of the authenticated user including the profile, email, phone, etc "
+            description: "Returns the full user object of the authenticated user including the profile, email, phone, etc "
             tags: "User";
         };
     }
@@ -194,7 +194,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User";
             summary: "Get My User History";
-            description: "Returns a list of changes/events that have happend on the authenticated user. It's basically the history of the user. Make sure to send a limit."
+            description: "Returns a list of changes/events that have happened on the authenticated user. It's the history of the user. Make sure to send a limit."
         };
     }
 
@@ -211,7 +211,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User";
             summary: "Get My User Sessions";
-            description: "Returns a list of user session for the user agent of the authenticated user. This can be used to switch accounts in the current application."
+            description: "Returns a list of a user session for the user agent of the authenticated user. This can be used to switch accounts in the current application."
         };
     }
 
@@ -244,7 +244,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Metadata";
             summary: "Get My User Metadata By Key";
-            description: "Returns a of metadata value by a specific key of the authenticated user. Metadata is a key value list with additional information needed on the user."
+            description: "Returns a metadata value by a specific key of the authenticated user. Metadata is a key value list with additional information needed on the user."
         };
     }
 
@@ -294,7 +294,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Tokens";
             summary: "Revoke All Refresh Tokens";
-            description: "Revokes all refresh token of the authenticated user."
+            description: "Revokes all refresh tokens of the authenticated user."
         };
     }
 
@@ -311,7 +311,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             summary: "Change My Username";
-            description: "Changes the username of the authenticated user. The user has to login with the newly created username afterwards."
+            description: "Changes the username of the authenticated user. The user has to log in with the newly created username afterward."
         };
     }
 
@@ -499,7 +499,7 @@ service AuthService {
         };
     }
 
-    // Resends a sms to the last given phone number, to verify it
+    // Resends an sms to the last given phone number, to verify it
     rpc ResendMyPhoneVerification(ResendMyPhoneVerificationRequest) returns (ResendMyPhoneVerificationResponse) {
         option (google.api.http) = {
             post: "/users/me/phone/_resend_verification"
@@ -578,7 +578,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Social Login"
             summary: "Remove Social Login";
-            description: "Remove one of the linked social logins/identity providers of the authenticated user (e.g. Google, Micorsof, AzureAD, etc.). The user will not be able to login with the given provider afterwards. Make sure the user does have other possibilities to authenticate."
+            description: "Remove one of the linked social logins/identity providers of the authenticated user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate."
         };
     }
 
@@ -643,7 +643,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Remove One-Time-Password (OTP)";
-            description: "Remove the configured One-Time-Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. As only one OTP per user is allowed, the user will not have OTP as a second-factor afterwards."
+            description: "Remove the configured One-Time-Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. As only one OTP per user is allowed, the user will not have OTP as a second-factor afterward."
         };
     }
 
@@ -659,7 +659,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Add Universal Second Factor (U2F)";
-            description: "Add a new Universal-Second-Factor (U2F) to the authenticated user. U2F is a device dependent authentication like FingerScan, FaceID, WindowHello, etc. The factor has to be verified after adding. Multiple factors can be added."
+            description: "Add a new Universal-Second-Factor (U2F) to the authenticated user. U2F is a device-dependent authentication like FingerScan, FaceID, WindowHello, etc. The factor has to be verified after adding. Multiple factors can be added."
         };
     }
 
@@ -723,7 +723,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Add passkey";
-            description: "Add a new passkey authentication methods to the authenticated user. Like FingerPrint, FaceID, WindowsHello, HardwareToken, etc. Multiple passkeys can be configured."
+            description: "Add a new passkey authentication method to the authenticated user. Like FingerPrint, FaceID, WindowsHello, HardwareToken, etc. Multiple passkeys can be configured."
         };
     }
 
@@ -788,7 +788,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Remove passkey";
-            description: "Remove a passkey configuration from the authenticated user. The user will not be able to login with that configuration afterwards. Make sure the user has other possibilities to login."
+            description: "Remove a passkey configuration from the authenticated user. The user will not be able to log in with that configuration afterward. Make sure the user has other possibilities to log in."
         };
     }
 
@@ -870,7 +870,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Memberships"
             summary: "List My ZITADEL Permissions";
-            description: "Show all the permissions my user has in ZITADEL (ZITADEL Manager). Limit should always be set, there is a default limit set by the service"
+            description: "Show all the permissions my user has in ZITADEL (ZITADEL Manager). The limit should always be set, there is a default limit set by the service"
         };
     }
 
@@ -902,7 +902,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Policies";
             summary: "Get Privacy Policy";
-            description: "Returns the privacy settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines the tos and terms of service links."
+            description: "Returns the privacy settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines the TOS and terms of service links."
         };
     }
 
@@ -918,7 +918,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Policies";
             summary: "Get Login Policy";
-            description: "Returns the login settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines what possibilities the user has to authenticate and to use in the login, e.g social logins, mfa, passkey, etc."
+            description: "Returns the login settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines what possibilities the user has to authenticate and to use in the login, e.g social logins, MFA, passkey, etc."
         };
     }
 }
@@ -969,7 +969,7 @@ message ListMyUserChangesRequest {
 message ListMyUserChangesResponse {
     reserved 1;
     reserved "details";
-    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary info)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -1262,7 +1262,7 @@ message ListMyLinkedIDPsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
 
-    //PLANNED: queries for idp name and login name
+    //PLANNED: queries for IDP name and login name
 }
 
 message ListMyLinkedIDPsResponse {
@@ -1449,7 +1449,7 @@ message UserGrant {
 message ListMyProjectOrgsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.org.v1.OrgQuery queries = 2;
 }
 
@@ -1483,7 +1483,7 @@ message ListMyProjectPermissionsResponse {
 message ListMyMembershipsRequest {
     //the field the result is sorted
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.user.v1.MembershipQuery queries = 2;
 }
 

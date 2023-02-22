@@ -32,7 +32,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Management API";
         version: "1.0";
-        description: "The management API is as the name states the interface where systems can mutate IAM objects like, organisations, projects, clients, users and so on if they have the necessary access rights.";
+        description: "The management API is as the name states the interface where systems can mutate IAM objects like organizations, projects, clients, users and so on if they have the necessary access rights.";
         contact:{
             name: "ZITADEL"
             url: "https://zitadel.com"
@@ -68,7 +68,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Projects",
-            description: "Projects are a vessels for different applications/clients sharing the same role context."
+            description: "Projects are vessels for different applications/clients sharing the same role context."
         },
         {
             name: "Project Roles"
@@ -202,7 +202,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Instance information";
-            description: "Some needed settings made in ZITADEL like the global organisation id or ZITADEL project ID "
+            description: "Some needed settings made in ZITADEL like the global organization id or ZITADEL project ID "
             tags: "General";
             responses: {
                 key: "200"
@@ -246,7 +246,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "User by ID";
-            description: "Returns the full blown user object (human or machine) including the profile, email, etc."
+            description: "Returns the full user object (human or machine) including the profile, email, etc."
             tags: "Users";
             responses: {
                 key: "200"
@@ -301,7 +301,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             summary: "Search Users";
-            description: "Search for users within an organization. By default we will return users of your own organization. Make sure to include a limit and sorting for pagination."
+            description: "Search for users within an organization. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -343,7 +343,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             summary: "Get User History";
-            description: "Returns a list of changes/events that have happend on the user. It's basically the history of the user. Make sure to send a limit."
+            description: "Returns a list of changes/events that have happened on the user. It's the history of the user. Make sure to send a limit."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -367,7 +367,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             summary: "Check for existing user";
-            description: "Returns if a user with the requested email or username is unique. So you are able to create the user."
+            description: "Returns if a user with the requested email or username is unique. So you can create the user."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -408,7 +408,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to add users to another organization include the header. Make sure the user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to add users to another organization include the header. Make sure the user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -428,7 +428,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create User (Machine)";
-            description: "Create a new user with the type machine for your API, service or device. This users are used for non interactive authentication flows."
+            description: "Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -452,7 +452,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deactivate user";
-            description: "The state of the user will be changed to 'deactivated'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need the access the user data."
+            description: "The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data."
             tags: "Users";
             responses: {
                 key: "200"
@@ -475,7 +475,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Reactivate user";
-            description: "Reactivate a user with the state 'deactivated'. The user will be able to login again afterwards. The endpoint returns an error if the user is not in the state 'deactivated'."
+            description: "Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'."
             tags: "Users";
             responses: {
                 key: "200"
@@ -498,7 +498,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Lock user";
-            description: "The state of the user will be changed to 'locked'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to login temporarly because of an event that happened (wrong password, etc.)"
+            description: "The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)"
             tags: "Users";
             responses: {
                 key: "200"
@@ -521,7 +521,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Unlock user";
-            description: "Unlock a user with the state 'locked'. The user will be able to login again afterwards. The endpoint returns an error if the user is not in the state 'locked'."
+            description: "Unlock a user with the state 'locked'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'locked'."
             tags: "Users";
             responses: {
                 key: "200"
@@ -543,7 +543,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete user";
-            description: "The state of the user will be changed to 'deleted'. The user will not be able to login anymore. Endpoints requesting this user will return an error 'User not found'"
+            description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found"
             tags: "Users";
             responses: {
                 key: "200"
@@ -566,7 +566,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Change user name";
-            description: "Change the username of the user. Be aware that the user has to login with the newly added username afterwards."
+            description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward."
             tags: "Users";
             responses: {
                 key: "200"
@@ -591,7 +591,7 @@ service ManagementService {
             tags: "Users";
             tags: "User Metadata";
             summary: "Set User Metadata";
-            description: "This endpoints either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
+            description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -754,7 +754,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -774,7 +774,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Profile (Human)";
-            description: "Update the profile information from a user. Profile includes basic information like first_name and last_name."
+            description: "Update the profile information from a user. The profile includes basic information like first_name and last_name."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -786,7 +786,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -817,7 +817,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -849,7 +849,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -869,7 +869,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Resend User Initialization Email";
-            description: "A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the users email address, or a newly added addres."
+            description: "A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the user's email address, or a newly added address."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -881,7 +881,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -913,7 +913,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -932,7 +932,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Phone (Human)";
-            description: "Get the phone number and the verification state of the number. The phone number is only for informational purpose and to send messages, not for Authentication (2FA)."
+            description: "Get the phone number and the verification state of the number. The phone number is only for informational purposes and to send messages, not for Authentication (2FA)."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -944,7 +944,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -964,7 +964,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Phone (Human)";
-            description: "Change the phone number of a user. If the state is set to not verified, the user will get an ams to verify (if a notification provider is configured). The phone number is only for informational purpose and to send messages, not for Authentication (2FA)."
+            description: "Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA)."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -976,7 +976,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1007,7 +1007,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1039,7 +1039,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1070,7 +1070,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1107,7 +1107,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Set User Password";
-            description: "Set a new password for a user. Per default the user has to change the password on the next login. You can set no_change_required to true, to avoid the change on the next login."
+            description: "Set a new password for a user. Per default, the user has to change the password on the next login. You can set no_change_required to true, to avoid the change on the next login."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1119,7 +1119,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1151,7 +1151,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1182,7 +1182,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1201,7 +1201,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP";
-            description: "Remove the configured One-Time-Password (OTP) as factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.."
+            description: "Remove the configured One-Time-Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1213,7 +1213,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1232,7 +1232,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor U2F";
-            description: "Remove the configured Universal-Second-Factor (U2F) as factor from the user. U2F is a device dependent factor like FingerPrint, Windows-Hello, etc."
+            description: "Remove the configured Universal-Second-Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1244,7 +1244,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1263,7 +1263,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Search Passwordless/Passkey authentication";
-            description: "Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device dependent authentication like FingerScan, WindowsHello or a Hardware Token."
+            description: "Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1275,7 +1275,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1293,7 +1293,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Add Passwordless/Passkey Registration Link";
-            description: "Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device, if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
+            description: "Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1305,7 +1305,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1324,7 +1324,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Send Passwordless/Passkey Registration Link";
-            description: "Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device, if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
+            description: "Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1336,7 +1336,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1367,7 +1367,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1387,7 +1387,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update Machine User";
-            description: "Change a service account/machine user. It is used for accounts with non-interactive authentication possibilites."
+            description: "Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1399,7 +1399,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1431,7 +1431,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1450,7 +1450,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete Secret of Machine User";
-            description: "Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterwards."
+            description: "Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterward."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1462,7 +1462,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1493,7 +1493,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1513,7 +1513,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get Machine user Key By ID";
-            description: "Get the list of key of a machine user. Machine keys are used to authenticate with jwt profile authentication."
+            description: "Get the list of keys of a machine user. Machine keys are used to authenticate with jwt profile authentication."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1525,7 +1525,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1557,7 +1557,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1576,7 +1576,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create Key for machine user";
-            description: "Delete a specific key from a user. The user will not be able to authenticate with that key afterwards.."
+            description: "Delete a specific key from a user. The user will not be able to authenticate with that key afterward."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1588,7 +1588,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1607,7 +1607,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get a Personal-Access-Token (PAT) by ID";
-            description: "Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready to use tokens and can be sent directly in the authentication header."
+            description: "Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1619,7 +1619,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1639,7 +1639,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get a Personal-Access-Token (PAT) by ID";
-            description: "Returns a list of PATs for a user, currently only available for machine users/service accounts. PATs are ready to use tokens and can be sent directly in the authentication header."
+            description: "Returns a list of PATs for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1651,7 +1651,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1671,7 +1671,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create a Personal-Access-Token (PAT)";
-            description: "Generates a new PAT for the user. Currently only available for machine users. Token will be returned in the response, make sure to store it. PATs are ready to use tokens and can be sent directly in the authentication header."
+            description: "Generates a new PAT for the user. Currently only available for machine users. The token will be returned in the response, make sure to store it. PATs are ready-to-use tokens and can be sent directly in the authentication header."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1683,7 +1683,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1702,7 +1702,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get a Personal-Access-Token (PAT) by ID";
-            description: "Delete a PAT from a user. Afterwards the user will not be able to authenticate with that token anymore."
+            description: "Delete a PAT from a user. Afterward, the user will not be able to authenticate with that token anymore."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1714,7 +1714,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1722,7 +1722,7 @@ service ManagementService {
         };
     }
 
-    // Lists all identity providers (social logins) which a human has configured (e.g Google, Microsoft, AD, etc..)
+    // Lists all identity providers (social logins) that a human has configured (e.g Google, Microsoft, AD, etc..)
     // Limit should always be set, there is a default limit set by the service
     rpc ListHumanLinkedIDPs(ListHumanLinkedIDPsRequest) returns (ListHumanLinkedIDPsResponse) {
         option (google.api.http) = {
@@ -1746,7 +1746,7 @@ service ManagementService {
         };
     }
 
-    // Show all the permissions a user has iin ZITADEL (ZITADEL Manager)
+    // Show all the permissions a user has in ZITADEL (ZITADEL Manager)
     // Limit should always be set, there is a default limit set by the service
     rpc ListUserMemberships(ListUserMembershipsRequest) returns (ListUserMembershipsResponse) {
         option (google.api.http) = {
@@ -1795,7 +1795,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Get Organization By Domain";
-            description: "Search an organization by the domain, over all organizations. The domain must match exactly."
+            description: "Search an organization by the domain, overall organizations. The domain must match exactly."
         };
     }
 
@@ -1812,7 +1812,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Get Organization History";
-            description: "Returns a list of changes/events that have happend on the organization. It's basically the history of the organization. Make sure to send a limit."
+            description: "Returns a list of changes/events that have happened in the organization. It's the history of the organization. Make sure to send a limit."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -1887,7 +1887,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Deactivate Organization";
-            description: "Sets the state of my organisation to deactivated. Users of this organisation will not be able login."
+            description: "Sets the state of my organization to deactivated. Users of this organization will not be able to log in."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -1912,7 +1912,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Reactivate Organization";
-            description: "Set the state of my organisation to active. The state of the organization has to be deactivated to perform the request. Users of this organisation will be able login again."
+            description: "Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -1936,7 +1936,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Delete Organization";
-            description: "Sets the state of my organisation and all its resource (Users, Projects, Grants to and from the org) to removed. Users of this organisation will not be able login."
+            description: "Sets the state of my organization and all its resource (Users, Projects, Grants to and from the org) to remove. Users of this organization will not be able to log in."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -1962,7 +1962,7 @@ service ManagementService {
             tags: "Organizations";
             tags: "Organization Metadata";
             summary: "Set Organization Metadata";
-            description: "This endpoints either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
+            description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -1988,7 +1988,7 @@ service ManagementService {
             tags: "Organizations";
             tags: "Organization Metadata";
             summary: "Bulk Set Organization Metadata";
-            description: "This endpoints sets a list of metadata to the organization. Make sure the values are base64 encoded."
+            description: "This endpoint sets a list of metadata to the organization. Make sure the values are base64 encoded."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2102,7 +2102,7 @@ service ManagementService {
         };
     }
 
-    // Returns all registered domains of my organisation
+    // Returns all registered domains of my organization
     // Limit should always be set, there is a default limit set by the service
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
         option (google.api.http) = {
@@ -2115,7 +2115,7 @@ service ManagementService {
         };
     }
 
-    // Adds a new domain to my organisation
+    // Adds a new domain to my organization
     rpc AddOrgDomain(AddOrgDomainRequest) returns (AddOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains"
@@ -2127,7 +2127,7 @@ service ManagementService {
         };
     }
 
-    // Removed the domain from my organisation
+    // Removed the domain from my organization
     rpc RemoveOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/domains/{domain}"
@@ -2138,7 +2138,7 @@ service ManagementService {
         };
     }
 
-    // Generates a new file to validate you domain
+    // Generates a new file to validate your domain
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_generate"
@@ -2150,7 +2150,7 @@ service ManagementService {
         };
     }
 
-    // Validates your domain with the choosen method
+    // Validates your domain with the chosen method
     // Validated domains must be unique
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
         option (google.api.http) = {
@@ -2163,8 +2163,8 @@ service ManagementService {
         };
     }
 
-    // Sets the domain as primary
-    // Primary domain is shown as suffix on the preferred username on the users of the organisation
+    // Sets the domain as the primary
+    // Primary domain is shown as a suffix on the preferred username of the users of the organization
     rpc SetPrimaryOrgDomain(SetPrimaryOrgDomainRequest) returns (SetPrimaryOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/_set_primary"
@@ -2175,7 +2175,7 @@ service ManagementService {
         };
     }
 
-    // Returns all ZITADEL roles which are for organisation managers
+    // Returns all ZITADEL roles which are for organization managers
     rpc ListOrgMemberRoles(ListOrgMemberRolesRequest) returns (ListOrgMemberRolesResponse) {
         option (google.api.http) = {
             post: "/orgs/members/roles/_search"
@@ -2186,7 +2186,7 @@ service ManagementService {
         };
     }
 
-    // Returns all ZITADEL managers of this organisation (Project and Project Grant managers not included)
+    // Returns all ZITADEL managers of this organization (Project and Project Grant managers not included)
     // Limit should always be set, there is a default limit set by the service
     rpc ListOrgMembers(ListOrgMembersRequest) returns (ListOrgMembersResponse) {
         option (google.api.http) = {
@@ -2199,7 +2199,7 @@ service ManagementService {
         };
     }
 
-    // Adds a new organisation manager, which is allowed to administrate ZITADEL
+    // Adds a new organization manager, which is allowed to administrate ZITADEL
     rpc AddOrgMember(AddOrgMemberRequest) returns (AddOrgMemberResponse) {
         option (google.api.http) = {
             post: "/orgs/me/members"
@@ -2211,7 +2211,7 @@ service ManagementService {
         };
     }
 
-    // Changes the organisation manager
+    // Changes the organization manager
     rpc UpdateOrgMember(UpdateOrgMemberRequest) returns (UpdateOrgMemberResponse) {
         option (google.api.http) = {
             put: "/orgs/me/members/{user_id}"
@@ -2223,7 +2223,7 @@ service ManagementService {
         };
     }
 
-    // Removes an organisation manager
+    // Removes an organization manager
     rpc RemoveOrgMember(RemoveOrgMemberRequest) returns (RemoveOrgMemberResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/members/{user_id}"
@@ -2234,7 +2234,7 @@ service ManagementService {
         };
     }
 
-    // Returns a project from my organisation (no granted projects)
+    // Returns a project from my organization (no granted projects)
     rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{id}"
@@ -2246,7 +2246,7 @@ service ManagementService {
         };
     }
 
-    // returns a project my organisation got granted from another organisation
+    // returns a project my organization got granted from another organization
     rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
         option (google.api.http) = {
             get: "/granted_projects/{project_id}/grants/{grant_id}"
@@ -2283,7 +2283,7 @@ service ManagementService {
         };
     }
 
-    // returns all projects my organisation got granted from another organisation
+    // returns all projects my organization got granted from another organization
     // Limit should always be set, there is a default limit set by the service
     rpc ListGrantedProjects(ListGrantedProjectsRequest) returns (ListGrantedProjectsResponse) {
         option (google.api.http) = {
@@ -2361,7 +2361,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Update Project";
-            description: "Update a project and it settings. A Project is a vessel for different applications sharing the same role context."
+            description: "Update a project and its settings. A Project is a vessel for different applications sharing the same role context."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2387,7 +2387,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Deactivate Project";
-            description: "Set the state of a project to deactivated. Request returns an error if project is already deactivated."
+            description: "Set the state of a project to deactivated. Request returns an error if the project is already deactivated."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2413,7 +2413,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Reactivate Project";
-            description: "Set the state of a project to active. Request returns an error if project is not deactivated."
+            description: "Set the state of a project to active. Request returns an error if the project is not deactivated."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2642,7 +2642,7 @@ service ManagementService {
         };
     }
 
-    // Returns an application (oidc or api)
+    // Returns an application (OIDC or API)
     rpc GetAppByID(GetAppByIDRequest) returns (GetAppByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{project_id}/apps/{app_id}"
@@ -2719,8 +2719,8 @@ service ManagementService {
         };
     }
 
-  // Adds a new saml service provider
-  // Returns a entityID
+  // Adds a new SAML service provider
+  // Returns an entityID
   rpc AddSAMLApp(AddSAMLAppRequest) returns (AddSAMLAppResponse) {
     option (google.api.http) = {
       post: "/projects/{project_id}/apps/saml"
@@ -2733,9 +2733,9 @@ service ManagementService {
     };
   }
 
-  // Adds a new api application
+  // Adds a new API application
   // Returns a client id
-  // Returns a new generated secret if needed (Depending on the configuration)
+  // Returns a newly generated secret if needed (Depending on the configuration)
   rpc AddAPIApp(AddAPIAppRequest) returns (AddAPIAppResponse) {
     option (google.api.http) = {
       post: "/projects/{project_id}/apps/api"
@@ -2761,7 +2761,7 @@ service ManagementService {
         };
     }
 
-    // Changes the configuration of the oidc client
+    // Changes the configuration of the OIDC client
     rpc UpdateOIDCAppConfig(UpdateOIDCAppConfigRequest) returns (UpdateOIDCAppConfigResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/apps/{app_id}/oidc_config"
@@ -2774,7 +2774,7 @@ service ManagementService {
         };
     }
 
-  // Changes the configuration of the saml application
+  // Changes the configuration of the SAML application
   rpc UpdateSAMLAppConfig(UpdateSAMLAppConfigRequest) returns (UpdateSAMLAppConfigResponse) {
     option (google.api.http) = {
       put: "/projects/{project_id}/apps/{app_id}/saml_config"
@@ -2787,7 +2787,7 @@ service ManagementService {
     };
   }
 
-  // Changes the configuration of the api application
+  // Changes the configuration of the API application
   rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
     option (google.api.http) = {
       put: "/projects/{project_id}/apps/{app_id}/api_config"
@@ -2841,7 +2841,7 @@ service ManagementService {
         };
     }
 
-    // Generates a new client secret for the oidc client, make sure to save the response
+    // Generates a new client secret for the OIDC client, make sure to save the response
     rpc RegenerateOIDCClientSecret(RegenerateOIDCClientSecretRequest) returns (RegenerateOIDCClientSecretResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/oidc_config/_generate_client_secret"
@@ -2854,7 +2854,7 @@ service ManagementService {
         };
     }
 
-    // Generates a new client secret for the api application, make sure to save the response
+    // Generates a new client secret for the API application, make sure to save the response
     rpc RegenerateAPIClientSecret(RegenerateAPIClientSecretRequest) returns (RegenerateAPIClientSecretResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/api_config/_generate_client_secret"
@@ -2894,7 +2894,7 @@ service ManagementService {
     }
 
     // Creates a new app key
-    // Will return key details in result, make sure to save it
+    // Will return key details in the result, make sure to save it
     rpc AddAppKey(AddAppKeyRequest) returns (AddAppKeyResponse){
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/keys"
@@ -2932,7 +2932,7 @@ service ManagementService {
         };
     }
 
-    // Returns a project grant (ProjectGrant = Grant another organisation for my project)
+    // Returns a project grant (ProjectGrant = Grant another organization for my project)
     rpc GetProjectGrantByID(GetProjectGrantByIDRequest) returns (GetProjectGrantByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{project_id}/grants/{grant_id}"
@@ -2943,7 +2943,7 @@ service ManagementService {
         };
     }
 
-    // Returns all project grants matching the query, (ProjectGrant = Grant another organisation for my project)
+    // Returns all project grants matching the query, (ProjectGrant = Grant another organization for my project)
     // Limit should always be set, there is a default limit set by the service
     rpc ListProjectGrants(ListProjectGrantsRequest) returns (ListProjectGrantsResponse) {
         option (google.api.http) = {
@@ -2957,7 +2957,7 @@ service ManagementService {
         };
     }
 
-    // Returns all project grants matching the query, (ProjectGrant = Grant another organisation for my project)
+    // Returns all project grants matching the query, (ProjectGrant = Grant another organization for my project)
     // Limit should always be set, there is a default limit set by the service
     rpc ListAllProjectGrants(ListAllProjectGrantsRequest) returns (ListAllProjectGrantsResponse) {
         option (google.api.http) = {
@@ -2970,8 +2970,8 @@ service ManagementService {
         };
     }
 
-    // Add a new project grant (ProjectGrant = Grant another organisation for my project)
-    // Project Grant will be listed in granted project of the other organisation
+    // Add a new project grant (ProjectGrant = Grant another organization for my project)
+    // Project Grant will be listed in the granted project of the other organization
     rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants"
@@ -2983,8 +2983,8 @@ service ManagementService {
         };
     }
 
-    // Change project grant (ProjectGrant = Grant another organisation for my project)
-    // Project Grant will be listed in granted project of the other organisation
+    // Change project grant (ProjectGrant = Grant another organization for my project)
+    // Project Grant will be listed in the granted project of the other organization
     rpc UpdateProjectGrant(UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}"
@@ -2996,7 +2996,7 @@ service ManagementService {
         };
     }
 
-    // Set state of project grant to deactivated (ProjectGrant = Grant another organisation for my project)
+    // Set state of project grant to deactivated (ProjectGrant = Grant another organization for my project)
     // Returns error if project not active
     rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
         option (google.api.http) = {
@@ -3009,7 +3009,7 @@ service ManagementService {
         };
     }
 
-    // Set state of project grant to active (ProjectGrant = Grant another organisation for my project)
+    // Set state of project grant to active (ProjectGrant = Grant another organization for my project)
     // Returns error if project not deactivated
     rpc ReactivateProjectGrant(ReactivateProjectGrantRequest) returns (ReactivateProjectGrantResponse) {
         option (google.api.http) = {
@@ -3103,7 +3103,7 @@ service ManagementService {
         };
     }
 
-    // Returns al user grant matching the query (authorizations of user for projects)
+    // Returns all user grants matching the query (authorizations of a user for the projects)
     // Limit should always be set, there is a default limit set by the service
     rpc ListUserGrants(ListUserGrantRequest) returns (ListUserGrantResponse) {
         option (google.api.http) = {
@@ -3142,7 +3142,7 @@ service ManagementService {
 
     // Sets the state of a user grant to deactivated
     // User will not be able to use the granted project anymore
-    // Returns an error if user grant is already deactivated
+    // Returns an error if the user grant is already deactivated
     rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_deactivate"
@@ -3155,7 +3155,7 @@ service ManagementService {
     }
 
     // Sets the state of a user grant to active
-    // Returns an error if user grant is not deactivated
+    // Returns an error if the user grant is not deactivated
     rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_reactivate"
@@ -3191,7 +3191,7 @@ service ManagementService {
     }
 
     //deprecated: please use DomainPolicy instead
-    // Returns the domain policy (this policy is managed by the iam administrator)
+    // Returns the domain policy (this policy is managed by the IAM administrator)
     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/orgiam"
@@ -3207,7 +3207,7 @@ service ManagementService {
         };
     }
 
-    // Returns the domain policy (this policy is managed by the iam administrator)
+    // Returns the domain policy (this policy is managed by the IAM administrator)
     rpc GetDomainPolicy(GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/domain"
@@ -3218,8 +3218,8 @@ service ManagementService {
         };
     }
 
-    // Returns the login policy of the organisation
-    // With this policy the login gui can be configured
+    // Returns the login policy of the organization
+    // With this policy the login UI can be configured
     rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/login"
@@ -3241,8 +3241,8 @@ service ManagementService {
         };
     }
 
-    // Add a custom login policy for the organisation
-    // With this policy the login gui can be configured
+    // Add a custom login policy for the organization
+    // With this policy the login UI can be configured
     rpc AddCustomLoginPolicy(AddCustomLoginPolicyRequest) returns (AddCustomLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login"
@@ -3254,8 +3254,8 @@ service ManagementService {
         };
     }
 
-    // Change the custom login policy for the organisation
-    // With this policy the login gui can be configured
+    // Change the custom login policy for the organization
+    // With this policy the login UI can be configured
     rpc UpdateCustomLoginPolicy(UpdateCustomLoginPolicyRequest) returns (UpdateCustomLoginPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/login"
@@ -3267,7 +3267,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom login policy of the organisation
+    // Removes the custom login policy of the organization
     // The default policy of the IAM will trigger after
     rpc ResetLoginPolicyToDefault(ResetLoginPolicyToDefaultRequest) returns (ResetLoginPolicyToDefaultResponse) {
         option (google.api.http) = {
@@ -3279,7 +3279,7 @@ service ManagementService {
         };
     }
 
-    // Lists all possible identity providers configured on the organisation
+    // Lists all possible identity providers configured on the organization
     // Limit should always be set, there is a default limit set by the service
     rpc ListLoginPolicyIDPs(ListLoginPolicyIDPsRequest) returns (ListLoginPolicyIDPsResponse) {
         option (google.api.http) = {
@@ -3360,7 +3360,7 @@ service ManagementService {
         };
     }
 
-    // Adds a new multi factor to the custom login policy
+    // Adds a new multi-factor to the custom login policy
     rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/multi_factors"
@@ -3372,7 +3372,7 @@ service ManagementService {
         };
     }
 
-    // Remove a multi factor from the custom login policy
+    // Remove a multi-factor from the custom login policy
     rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/multi_factors/{type}"
@@ -3383,7 +3383,7 @@ service ManagementService {
         };
     }
 
-    // Returns the password complexity policy of the organisation
+    // Returns the password complexity policy of the organization
     // With this policy the password strength can be configured
     rpc GetPasswordComplexityPolicy(GetPasswordComplexityPolicyRequest) returns (GetPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
@@ -3407,7 +3407,7 @@ service ManagementService {
         };
     }
 
-    // Add a custom password complexity policy for the organisation
+    // Add a custom password complexity policy for the organization
     // With this policy the password strength can be configured
     rpc AddCustomPasswordComplexityPolicy(AddCustomPasswordComplexityPolicyRequest) returns (AddCustomPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
@@ -3420,7 +3420,7 @@ service ManagementService {
         };
     }
 
-    // Update the custom password complexity policy for the organisation
+    // Update the custom password complexity policy for the organization
     // With this policy the password strength can be configured
     rpc UpdateCustomPasswordComplexityPolicy(UpdateCustomPasswordComplexityPolicyRequest) returns (UpdateCustomPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
@@ -3433,7 +3433,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom password complexity policy of the organisation
+    // Removes the custom password complexity policy of the organization
     // The default policy of the IAM will trigger after
     rpc ResetPasswordComplexityPolicyToDefault(ResetPasswordComplexityPolicyToDefaultRequest) returns (ResetPasswordComplexityPolicyToDefaultResponse) {
         option (google.api.http) = {
@@ -3554,8 +3554,8 @@ service ManagementService {
         };
     }
 
-    // Returns the privacy policy of the organisation
-    // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Returns the privacy policy of the organization
+    // With this policy privacy relevant things can be configured (e.g. TOS link)
     rpc GetPrivacyPolicy(GetPrivacyPolicyRequest) returns (GetPrivacyPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/privacy"
@@ -3567,7 +3567,7 @@ service ManagementService {
     }
 
     // Returns the default privacy policy of the IAM
-    // With this policy the privacy relevant things can be configured (e.g tos link)
+    // With this policy the privacy-relevant things can be configured (e.g TOS link)
     rpc GetDefaultPrivacyPolicy(GetDefaultPrivacyPolicyRequest) returns (GetDefaultPrivacyPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/privacy"
@@ -3578,8 +3578,8 @@ service ManagementService {
         };
     }
 
-    // Add a custom privacy policy for the organisation
-    // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Add a custom privacy policy for the organization
+    // With this policy privacy relevant things can be configured (e.g. TOS link)
     // Variable {{.Lang}} can be set to have different links based on the language
     rpc AddCustomPrivacyPolicy(AddCustomPrivacyPolicyRequest) returns (AddCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
@@ -3592,8 +3592,8 @@ service ManagementService {
         };
     }
 
-    // Update the privacy policy for the organisation
-    // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Update the privacy policy for the organization
+    // With this policy privacy relevant things can be configured (e.g. TOS link)
     // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdateCustomPrivacyPolicy(UpdateCustomPrivacyPolicyRequest) returns (UpdateCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
@@ -3606,7 +3606,7 @@ service ManagementService {
         };
     }
 
-    // Removes the privacy policy of the organisation
+    // Removes the privacy policy of the organization
     // The default policy of the IAM will trigger after
     rpc ResetPrivacyPolicyToDefault(ResetPrivacyPolicyToDefaultRequest) returns (ResetPrivacyPolicyToDefaultResponse) {
         option (google.api.http) = {
@@ -3618,7 +3618,7 @@ service ManagementService {
         };
     }
 
-    // Returns the notification policy of the organisation
+    // Returns the notification policy of the organization
     // With this notification policy it can be configured how users should be notified
     rpc GetNotificationPolicy(GetNotificationPolicyRequest) returns (GetNotificationPolicyResponse) {
         option (google.api.http) = {
@@ -3642,7 +3642,7 @@ service ManagementService {
         };
     }
 
-    // Add a custom notification policy for the organisation
+    // Add a custom notification policy for the organization
     // With this notification privacy it can be configured how users should be notified
     rpc AddCustomNotificationPolicy(AddCustomNotificationPolicyRequest) returns (AddCustomNotificationPolicyResponse) {
         option (google.api.http) = {
@@ -3655,7 +3655,7 @@ service ManagementService {
         };
     }
 
-    // Update the notification policy for the organisation
+    // Update the notification policy for the organization
     // With this notification privacy it can be configured how users should be notified
     rpc UpdateCustomNotificationPolicy(UpdateCustomNotificationPolicyRequest) returns (UpdateCustomNotificationPolicyResponse) {
         option (google.api.http) = {
@@ -3668,7 +3668,7 @@ service ManagementService {
         };
     }
 
-    // Removes the notification policy of the organisation
+    // Removes the notification policy of the organization
     // The default policy of the IAM will trigger after
     rpc ResetNotificationPolicyToDefault(ResetNotificationPolicyToDefaultRequest) returns (ResetNotificationPolicyToDefaultResponse) {
         option (google.api.http) = {
@@ -3680,8 +3680,8 @@ service ManagementService {
         };
     }
 
-    // Returns the active label policy of the organisation
-    // With this policy the private labeling can be configured (colors, etc.)
+    // Returns the active label policy of the organization
+    // With this policy private labeling can be configured (colors, etc.)
     rpc GetLabelPolicy(GetLabelPolicyRequest) returns (GetLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/label"
@@ -3692,8 +3692,8 @@ service ManagementService {
         };
     }
 
-    // Returns the preview label policy of the organisation
-    // With this policy the private labeling can be configured (colors, etc.)
+    // Returns the preview label policy of the organization
+    // With this policy private labeling can be configured (colors, etc.)
     rpc GetPreviewLabelPolicy(GetPreviewLabelPolicyRequest) returns (GetPreviewLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/label/_preview"
@@ -3705,7 +3705,7 @@ service ManagementService {
     }
 
     // Returns the default label policy of the IAM
-    // With this policy the private labeling can be configured (colors, etc.)
+    // With this policy private labeling can be configured (colors, etc.)
     rpc GetDefaultLabelPolicy(GetDefaultLabelPolicyRequest) returns (GetDefaultLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/label"
@@ -3716,8 +3716,8 @@ service ManagementService {
         };
     }
 
-    // Add a custom label policy for the organisation
-    // With this policy the private labeling can be configured (colors, etc.)
+    // Add a custom label policy for the organization
+    // With this policy private labeling can be configured (colors, etc.)
     rpc AddCustomLabelPolicy(AddCustomLabelPolicyRequest) returns (AddCustomLabelPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/label"
@@ -3729,8 +3729,8 @@ service ManagementService {
         };
     }
 
-    // Changes the custom label policy for the organisation
-    // With this policy the private labeling can be configured (colors, etc.)
+    // Changes the custom label policy for the organization
+    // With this policy private labeling can be configured (colors, etc.)
     rpc UpdateCustomLabelPolicy(UpdateCustomLabelPolicyRequest) returns (UpdateCustomLabelPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/label"
@@ -3742,7 +3742,7 @@ service ManagementService {
         };
     }
 
-    // Activates all changes of the label policy
+    // Activates all changes to the label policy
     rpc ActivateCustomLabelPolicy(ActivateCustomLabelPolicyRequest) returns (ActivateCustomLabelPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/label/_activate"
@@ -3810,7 +3810,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom label policy of the organisation
+    // Removes the custom label policy of the organization
     // The default policy of the IAM will trigger after
     rpc ResetLabelPolicyToDefault(ResetLabelPolicyToDefaultRequest) returns (ResetLabelPolicyToDefaultResponse) {
         option (google.api.http) = {
@@ -3844,7 +3844,7 @@ service ManagementService {
         };
     }
 
-    // Sets the custom text for initial message
+    // Sets the custom text for the initial message
     // The Following Variables can be used:
     // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
     rpc SetCustomInitMessageText(SetCustomInitMessageTextRequest) returns (SetCustomInitMessageTextResponse) {
@@ -3858,7 +3858,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom init message text of the organisation
+    // Removes the custom init message text of the organization
     // The default text of the IAM will trigger after
     rpc ResetCustomInitMessageTextToDefault(ResetCustomInitMessageTextToDefaultRequest) returns (ResetCustomInitMessageTextToDefaultResponse) {
         option (google.api.http) = {
@@ -3905,7 +3905,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom password reset message text of the organisation
+    // Removes the custom password reset message text of the organization
     // The default text of the IAM will trigger after
     rpc ResetCustomPasswordResetMessageTextToDefault(ResetCustomPasswordResetMessageTextToDefaultRequest) returns (ResetCustomPasswordResetMessageTextToDefaultResponse) {
         option (google.api.http) = {
@@ -3939,7 +3939,7 @@ service ManagementService {
         };
     }
 
-    // Sets the custom text for verify email message
+    // Sets the custom text for verifying email messages
     // The Following Variables can be used:
     // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetCustomVerifyEmailMessageText(SetCustomVerifyEmailMessageTextRequest) returns (SetCustomVerifyEmailMessageTextResponse) {
@@ -3953,7 +3953,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom verify email message text of the organisation
+    // Removes the custom verify email message text of the organization
     // The default text of the IAM will trigger after
     rpc ResetCustomVerifyEmailMessageTextToDefault(ResetCustomVerifyEmailMessageTextToDefaultRequest) returns (ResetCustomVerifyEmailMessageTextToDefaultResponse) {
         option (google.api.http) = {
@@ -3987,7 +3987,7 @@ service ManagementService {
         };
     }
 
-    // Sets the default custom text for verify email message
+    // Sets the default custom text for verifying email messages
     // The Following Variables can be used:
     // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetCustomVerifyPhoneMessageText(SetCustomVerifyPhoneMessageTextRequest) returns (SetCustomVerifyPhoneMessageTextResponse) {
@@ -4001,7 +4001,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom verify phone text of the organisation
+    // Removes the custom verify phone text of the organization
     // The default text of the IAM will trigger after
     rpc ResetCustomVerifyPhoneMessageTextToDefault(ResetCustomVerifyPhoneMessageTextToDefaultRequest) returns (ResetCustomVerifyPhoneMessageTextToDefaultResponse) {
         option (google.api.http) = {
@@ -4049,7 +4049,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom domain claimed message text of the organisation
+    // Removes the custom domain claimed message text of the organization
     // The default text of the IAM will trigger after
     rpc ResetCustomDomainClaimedMessageTextToDefault(ResetCustomDomainClaimedMessageTextToDefaultRequest) returns (ResetCustomDomainClaimedMessageTextToDefaultResponse) {
         option (google.api.http) = {
@@ -4097,7 +4097,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom passwordless link message text of the organisation
+    // Removes the custom passwordless link message text of the organization
     // The default text of the IAM will trigger after
     rpc ResetCustomPasswordlessRegistrationMessageTextToDefault(ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest) returns (ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse) {
         option (google.api.http) = {
@@ -4145,7 +4145,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom password change message text of the organisation
+    // Removes the custom password change message text of the organization
     // The default text of the IAM will trigger after
     rpc ResetCustomPasswordChangeMessageTextToDefault(ResetCustomPasswordChangeMessageTextToDefaultRequest) returns (ResetCustomPasswordChangeMessageTextToDefaultResponse) {
         option (google.api.http) = {
@@ -4179,8 +4179,8 @@ service ManagementService {
         };
     }
 
-    //Sets the default custom text for login ui
-    //it impacts all organisations without customized login ui texts
+    //Sets the default custom text for login UI
+    //it impacts all organizations without customized login UI texts
     rpc SetCustomLoginText(SetCustomLoginTextsRequest) returns (SetCustomLoginTextsResponse) {
         option (google.api.http) = {
             put: "/text/login/{language}";
@@ -4192,7 +4192,7 @@ service ManagementService {
         };
     }
 
-    // Removes the custom login text of the organisation
+    // Removes the custom login text of the organization
     // The default text of the IAM will trigger after
     rpc ResetCustomLoginTextToDefault(ResetCustomLoginTextsToDefaultRequest) returns (ResetCustomLoginTextsToDefaultResponse) {
         option (google.api.http) = {
@@ -4204,7 +4204,7 @@ service ManagementService {
         };
     }
 
-    // Returns a identity provider configuration of the organisation
+    // Returns a identity provider configuration of the organization
     rpc GetOrgIDPByID(GetOrgIDPByIDRequest) returns (GetOrgIDPByIDResponse) {
         option (google.api.http) = {
             get: "/idps/{id}"
@@ -4215,7 +4215,7 @@ service ManagementService {
         };
     }
 
-    // Returns all identity provider configuration in the organisation, which match the query
+    // Returns all identity provider configurations in the organization, which match the query
     // Limit should always be set, there is a default limit set by the service
     rpc ListOrgIDPs(ListOrgIDPsRequest) returns (ListOrgIDPsResponse) {
         option (google.api.http) = {
@@ -4228,7 +4228,7 @@ service ManagementService {
         };
     }
 
-    // Add a new identity provider configuration in the organisation
+    // Add a new identity provider configuration in the organization
     // Provider must be OIDC compliant
     rpc AddOrgOIDCIDP(AddOrgOIDCIDPRequest) returns (AddOrgOIDCIDPResponse) {
         option (google.api.http) = {
@@ -4241,7 +4241,7 @@ service ManagementService {
         };
     }
 
-    // Add a new jwt identity provider configuration in the organisation
+    // Add a new jwt identity provider configuration in the organization
     rpc AddOrgJWTIDP(AddOrgJWTIDPRequest) returns (AddOrgJWTIDPResponse) {
         option (google.api.http) = {
             post: "/idps/jwt"
@@ -4292,7 +4292,7 @@ service ManagementService {
         };
     }
 
-    // Change identity provider configuration of the organisation
+    // Change the identity provider configuration of the organization
     rpc UpdateOrgIDP(UpdateOrgIDPRequest) returns (UpdateOrgIDPResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}"
@@ -4304,7 +4304,7 @@ service ManagementService {
         };
     }
 
-    // Change OIDC identity provider configuration of the organisation
+    // Change the OIDC identity provider configuration of the organization
     rpc UpdateOrgIDPOIDCConfig(UpdateOrgIDPOIDCConfigRequest) returns (UpdateOrgIDPOIDCConfigResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}/oidc_config"
@@ -4316,7 +4316,7 @@ service ManagementService {
         };
     }
 
-    // Change JWT identity provider configuration of the organisation
+    // Change the JWT identity provider configuration of the organization
     rpc UpdateOrgIDPJWTConfig(UpdateOrgIDPJWTConfigRequest) returns (UpdateOrgIDPJWTConfigResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}/jwt_config"
@@ -4528,7 +4528,7 @@ message ListUsersRequest {
     zitadel.v1.ListQuery query = 1;
     // the field the result is sorted
     zitadel.user.v1.UserFieldName sorting_column = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.user.v1.SearchQuery queries = 3;
 }
 
@@ -4547,7 +4547,7 @@ message ListUserChangesRequest {
 message ListUserChangesResponse {
     reserved 1;
     reserved "details";
-    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary info)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -4911,7 +4911,7 @@ message ListUserMetadataRequest {
     repeated zitadel.metadata.v1.MetadataQuery queries = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             title: "Medata Query"
-            description: "Metadata object specific queries."
+            description: "Metadata object-specific queries."
         }];
 }
 
@@ -5416,7 +5416,7 @@ message ListUserMembershipsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //the field the result is sorted
     zitadel.v1.ListQuery query = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.user.v1.MembershipQuery queries = 3;
 }
 
@@ -5452,7 +5452,7 @@ message ListOrgChangesRequest {
 message ListOrgChangesResponse {
     reserved 1;
     reserved "details";
-    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary info)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -5520,7 +5520,7 @@ message RemoveOrgResponse {
 message ListOrgDomainsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.org.v1.DomainSearchQuery queries = 2;
 }
 
@@ -5581,14 +5581,14 @@ message ListOrgMemberRolesResponse {
 message ListOrgMembersRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 2;
 }
 
 message ListOrgMembersResponse {
     //list limitations and ordering
     zitadel.v1.ListDetails details = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.member.v1.Member result = 2;
 }
 
@@ -5717,7 +5717,7 @@ message GetGrantedProjectByIDResponse {
 message ListProjectsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
@@ -5729,7 +5729,7 @@ message ListProjectsResponse {
 message ListGrantedProjectsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.project.v1.ProjectQuery queries = 2;
 }
 
@@ -5747,7 +5747,7 @@ message ListProjectChangesRequest {
 message ListProjectChangesResponse {
     reserved 1;
     reserved "details";
-    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary info)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -5763,17 +5763,17 @@ message AddProjectRequest {
     ];
     bool project_role_assertion = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enable this setting to have role information included in the userinfo endpoint. It is also dependent on your application settings to include it in tokens and other types.";
+            description: "Enable this setting to have role information included in the user info endpoint. It is also dependent on your application settings to include it in tokens and other types.";
         }
     ];
     bool project_role_check = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "When enabled ZITADEL will check if a user has a role of this project assigned when login to an application of this project.";
+            description: "When enabled ZITADEL will check if a user has a role of this project assigned when login into an application of this project.";
         }
     ];
     bool has_project_check = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "When enabled ZITADEL will check if a the organization of the user, that is trying to login, has a grant to this project.";
+            description: "When enabled ZITADEL will check if the organization of the user, that is trying to log in, has a grant to this project.";
         }
     ];
     zitadel.project.v1.PrivateLabelingSetting private_labeling_setting = 5 [
@@ -5808,17 +5808,17 @@ message UpdateProjectRequest {
     ];
     bool project_role_assertion = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enable this setting to have role information included in the userinfo endpoint. It is also dependent on your application settings to include it in tokens and other types.";
+            description: "Enable this setting to have role information included in the user info endpoint. It is also dependent on your application settings to include it in tokens and other types.";
         }
     ];
     bool project_role_check = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "When enabled ZITADEL will check if a user has a role of this project assigned when login to an application of this project.";
+            description: "When enabled ZITADEL will check if a user has a role of this project assigned when login into an application of this project.";
         }
     ];
     bool has_project_check = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "When enabled ZITADEL will check if a the organization of the user, that is trying to login, has a grant to this project.";
+            description: "When enabled ZITADEL will check if the organization of the user, that is trying to log in, has a grant to this project.";
         }
     ];
     zitadel.project.v1.PrivateLabelingSetting private_labeling_setting = 6 [
@@ -5893,7 +5893,7 @@ message AddProjectRoleRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_length: 200;
             example: "\"Admins\"";
-            description: "The group is only used for displaying purposes. So you have a better handling, like giving the all the roles from a group to a user.";
+            description: "The group is only used for display purposes. That you have better handling, like giving all the roles from a group to a user.";
         }
     ];
 }
@@ -5948,7 +5948,7 @@ message UpdateProjectRoleRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_length: 200;
             example: "\"Admins\"";
-            description: "The group is only used for displaying purposes. So you have a better handling, like giving the all the roles from a group to a user.";
+            description: "The group is only used for display purposes. That you have better handling, like giving all the roles from a group to a user.";
         }
     ];
 }
@@ -5970,7 +5970,7 @@ message ListProjectRolesRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.project.v1.RoleQuery queries = 3;
 }
 
@@ -5984,7 +5984,7 @@ message ListGrantedProjectRolesRequest {
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
     zitadel.v1.ListQuery query = 3;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.project.v1.RoleQuery queries = 4;
 }
 
@@ -5997,7 +5997,7 @@ message ListProjectMembersRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 3;
 }
 
@@ -6048,7 +6048,7 @@ message ListAppsRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.app.v1.AppQuery queries = 3;
 }
 
@@ -6067,7 +6067,7 @@ message ListAppChangesRequest {
 message ListAppChangesResponse {
     reserved 1;
     reserved "details";
-    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary info)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -6332,7 +6332,7 @@ message ListProjectGrantChangesRequest {
 message ListProjectGrantChangesResponse {
     reserved 1;
     reserved "details";
-    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary info)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -6349,7 +6349,7 @@ message ListProjectGrantsRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.project.v1.ProjectGrantQuery queries = 3;
 }
 
@@ -6361,7 +6361,7 @@ message ListProjectGrantsResponse {
 message ListAllProjectGrantsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.project.v1.AllProjectGrantQuery queries = 2;
 }
 
@@ -6431,7 +6431,7 @@ message ListProjectGrantMembersRequest {
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
     zitadel.v1.ListQuery query = 3;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.member.v1.SearchQuery queries = 4;
 }
 
@@ -6484,7 +6484,7 @@ message GetUserGrantByIDResponse {
 message ListUserGrantRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated zitadel.user.v1.UserGrantQuery queries = 2;
 }
 
@@ -6588,7 +6588,7 @@ message AddCustomLoginPolicyRequest {
     bool hide_password_reset = 6;
     bool ignore_unknown_usernames = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+            description: "defines if unknown username on login screen directly returns an error or always displays the password screen"
         }
     ];
     string default_redirect_uri = 8 [
@@ -6604,20 +6604,20 @@ message AddCustomLoginPolicyRequest {
     repeated zitadel.policy.v1.SecondFactorType second_factors = 14;
     repeated zitadel.policy.v1.MultiFactorType multi_factors = 15;
     repeated IDP idps = 16;
-    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success.
     bool allow_domain_discovery = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
+            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
         }
     ];
     bool disable_login_with_email = 18 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if user can additionally (to the loginname) be identified by their verified email address"
+            description: "defines if the user can additionally (to the login name) be identified by their verified email address"
         }
     ];
     bool disable_login_with_phone = 19 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if user can additionally (to the loginname) be identified by their verified phone number"
+            description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
         }
     ];
 }
@@ -6635,7 +6635,7 @@ message UpdateCustomLoginPolicyRequest {
     bool hide_password_reset = 6;
     bool ignore_unknown_usernames = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+            description: "defines if unknown username on login screen directly returns an error or always displays the password screen"
         }
     ];
     string default_redirect_uri = 8 [
@@ -6648,20 +6648,20 @@ message UpdateCustomLoginPolicyRequest {
     google.protobuf.Duration mfa_init_skip_lifetime = 11;
     google.protobuf.Duration second_factor_check_lifetime = 12;
     google.protobuf.Duration multi_factor_check_lifetime = 13;
-    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success.
     bool allow_domain_discovery = 14 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
+            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
         }
     ];
     bool disable_login_with_email = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if user can additionally (to the loginname) be identified by their verified email address"
+            description: "defines if the user can additionally (to the login name) be identified by their verified email address"
         }
     ];
     bool disable_login_with_phone = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if user can additionally (to the loginname) be identified by their verified phone number"
+            description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
         }
     ];
 }
@@ -7461,7 +7461,7 @@ message ListOrgIDPsRequest {
     zitadel.v1.ListQuery query = 1;
     //the field the result is sorted
     zitadel.idp.v1.IDPFieldName sorting_column = 2;
-    //criterias the client is looking for
+    //criteria the client is looking for
     repeated IDPQuery queries = 3;
 }
 
@@ -7511,7 +7511,7 @@ message AddOrgOIDCIDPRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the oidc issuer of the identity provider";
+            description: "the OIDC issuer of the identity provider";
         }
     ];
     repeated string scopes = 6 [
@@ -7557,7 +7557,7 @@ message AddOrgJWTIDPRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the endpoint where the jwt can be extracted";
+            description: "the endpoint where the JWT can be extracted";
             min_length: 1;
             max_length: 200;
         }
@@ -7566,7 +7566,7 @@ message AddOrgJWTIDPRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the issuer of the jwt (for validation)";
+            description: "the issuer of the JWT (for validation)";
             min_length: 1;
             max_length: 200;
         }
@@ -7575,7 +7575,7 @@ message AddOrgJWTIDPRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/keys\"";
-            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            description: "the endpoint to the key (JWK) which is used to sign the JWT with";
             min_length: 1;
             max_length: 200;
         }
@@ -7664,7 +7664,7 @@ message UpdateOrgIDPOIDCConfigRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the oidc issuer of the identity provider";
+            description: "the OIDC issuer of the identity provider";
         }
     ];
     repeated string scopes = 5 [
@@ -7703,7 +7703,7 @@ message UpdateOrgIDPJWTConfigRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the endpoint where the jwt can be extracted";
+            description: "the endpoint where the JWT can be extracted";
             min_length: 1;
             max_length: 200;
         }
@@ -7712,7 +7712,7 @@ message UpdateOrgIDPJWTConfigRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the issuer of the jwt (for validation)";
+            description: "the issuer of the JWT (for validation)";
             min_length: 1;
             max_length: 200;
         }
@@ -7721,7 +7721,7 @@ message UpdateOrgIDPJWTConfigRequest {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/keys\"";
-            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            description: "the endpoint to the key (JWK) which is used to sign the JWT with";
             min_length: 1;
             max_length: 200;
         }
