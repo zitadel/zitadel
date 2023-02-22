@@ -908,8 +908,8 @@ github.com/zitadel/logging v0.3.4 h1:9hZsTjMMTE3X2LUi0xcF9Q9EdLo+FAezeu52ireBbHM
 github.com/zitadel/logging v0.3.4/go.mod h1:aPpLQhE+v6ocNK0TWrBrd363hZ95KcI17Q1ixAQwZF0=
 github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.7 h1:CGs4gdoSrZZyZM5pGeXCf8FH12r4r8hpJL/wUR3PxRA=
 github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.7/go.mod h1:2jHMP6o/WK0EmcNJkz+FSpjeqcCuQG9YqqqzKZkfgIE=
-github.com/zitadel/saml v0.0.9 h1:q7FRu52Wm2S5rsSGuzR2nYhEClvexga8bwnGrBL7Bbw=
-github.com/zitadel/saml v0.0.9/go.mod h1:DIy/ln32rNYv/bIBA8uOB6Y2JmxjZldDYBeMNn7YyeQ=
+github.com/zitadel/saml v0.0.10 h1:cyKd78Vat9vz55S74lggJrXMSqbAPsnJDrPFTPScNYY=
+github.com/zitadel/saml v0.0.10/go.mod h1:Hze1/zRN9j1uh7U+89vweP/OwLNO8BLHg3zU1Jtycdg=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738/go.mod h1:dnLIgRNXwCJa5e+c6mIZCrds/GIG4ncV9HhK5PX7jPg=
 go.etcd.io/etcd/api/v3 v3.5.1/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
