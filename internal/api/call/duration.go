@@ -5,9 +5,9 @@ import (
 	"time"
 )
 
-type callKey struct{}
+type durationKey struct{}
 
-var key *callKey = (*callKey)(nil)
+var key *durationKey = (*durationKey)(nil)
 
 // WithTimestamp sets [time.Now()] adds the call field to the context
 // if it's not already set

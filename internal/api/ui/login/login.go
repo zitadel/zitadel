@@ -64,7 +64,6 @@ func CreateLogin(config Config,
 	oidcAuthCallbackURL func(context.Context, string) string,
 	samlAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
-	callDurationInterceptor,
 	userAgentCookie,
 	issuerInterceptor,
 	oidcInstanceHandler,
@@ -96,7 +95,7 @@ func CreateLogin(config Config,
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
-	login.router = CreateRouter(login, statikFS, callDurationInterceptor, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
+	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
 	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 	return login, nil
