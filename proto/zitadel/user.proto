@@ -120,7 +120,7 @@ message Profile {
     ];
     string avatar_url = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "avatar url of the user"
+            description: "avatar URL of the user"
             example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
@@ -284,7 +284,7 @@ message LoginNameQuery {
     ];
 }
 
-//UserStateQuery is always equals
+//UserStateQuery always equals
 message StateQuery {
     UserState state = 1 [
         (validate.rules).enum.defined_only = true,
@@ -294,7 +294,7 @@ message StateQuery {
     ];
 }
 
-//UserTypeQuery is always equals
+//UserTypeQuery always equals
 message TypeQuery {
     Type type = 1 [
         (validate.rules).enum.defined_only = true,
@@ -331,12 +331,12 @@ message AuthFactor {
     oneof type {
         AuthFactorOTP otp = 2 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use otp or u2f"
+                description: "one type use OTP or U2F"
             }
         ];
         AuthFactorU2F u2f = 3 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use otp or u2f"
+                description: "one type use OTP or U2F"
             }
         ];
     }
@@ -377,9 +377,9 @@ message WebAuthNVerification {
     bytes public_key_credential = 1 [
         (validate.rules).bytes.min_len = 55,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "json representation of public key credential issued by the webauthn client";
+            description: "JSON representation of public key credential issued by the webauthn client";
             min_length: 55;
-            max_length: 1048576; //1 mb
+            max_length: 1048576; //1 MB
         }
     ];
     string token_name = 2 [
@@ -465,7 +465,7 @@ message MembershipQuery {
     }
 }
 
-// this query is always equals
+// this query always equals
 message MembershipOrgQuery {
     string org_id = 1 [
         (validate.rules).string = {max_len: 200},
@@ -475,7 +475,7 @@ message MembershipOrgQuery {
     ];
 }
 
-// this query is always equals
+// this query always equals
 message MembershipProjectQuery {
     string project_id = 1 [
         (validate.rules).string = {max_len: 200},
@@ -485,7 +485,7 @@ message MembershipProjectQuery {
     ];
 }
 
-// this query is always equals
+// this query always equals
 message MembershipProjectGrantQuery {
     string project_grant_id = 1 [
         (validate.rules).string = {max_len: 200},
@@ -495,7 +495,7 @@ message MembershipProjectGrantQuery {
     ];
 }
 
-// this query is always equals
+// this query always equals
 message MembershipIAMQuery {
     bool iam = 1;
 }
@@ -540,7 +540,7 @@ message Session {
     zitadel.v1.ObjectDetails details = 9;
     string avatar_url = 10 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "avatar url of the user"
+            description: "avatar URL of the user"
             example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
@@ -703,7 +703,7 @@ message UserGrant {
     ];
     string avatar_url = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "avatar url of the user"
+            description: "avatar URL of the user"
             example: "\"{your-domain}/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];

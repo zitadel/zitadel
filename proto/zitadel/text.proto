@@ -18,7 +18,7 @@ message MessageCustomText {
     ];
     string pre_header = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email pre header";
+            description: "custom text for email pre-header";
             example: "\"User Message\"";
         }
     ];
@@ -380,7 +380,7 @@ message ExternalUserNotFoundScreenText {
 
 message SuccessLoginScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
-    // Text to describe that auto redirect should happen after successful login
+    // Text to describe that auto-redirect should happen after successful login
     string auto_redirect_description = 2 [(validate.rules).string = {max_len: 500}];
     // Text to describe that the window can be closed after redirect
     string redirected_description = 3 [(validate.rules).string = {max_len: 100}];

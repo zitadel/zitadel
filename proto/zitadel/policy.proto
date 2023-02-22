@@ -14,12 +14,12 @@ message OrgIAMPolicy {
     zitadel.v1.ObjectDetails details = 1;
     bool user_login_must_be_domain = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the username has to end with the domain of it's organisation"
+            description: "the username has to end with the domain of its organization"
         }
     ];
     bool is_default = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the organisation's admin changed the policy"
+            description: "defines if the organization's admin changed the policy"
         }
     ];
 }
@@ -28,22 +28,22 @@ message DomainPolicy {
     zitadel.v1.ObjectDetails details = 1;
     bool user_login_must_be_domain = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the username has to end with the domain of it's organisation"
+            description: "the username has to end with the domain of its organization"
         }
     ];
     bool is_default = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the organisation's admin changed the policy"
+            description: "defines if the organization's admin changed the policy"
         }
     ];
     bool validate_org_domains = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if organisation domains should be validated org count as validated automatically"
+            description: "defines if organization domains should be validated org count as validated automatically"
         }
     ];
     bool smtp_sender_address_matches_instance_domain = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the smtp sender address domain should match an existing domain on the instance"
+            description: "defines if the SMTP sender address domain should match an existing domain on the instance"
         }
     ];
 }
@@ -57,10 +57,10 @@ message LabelPolicy {
             example: "\"#5469d4\"";
         }
     ];
-    // defines if the organisation's admin changed the policy
+    // defines if the organization's admin changed the policy
     bool is_default = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the organisation's admin changed the policy"
+            description: "defines if the organization's admin changed the policy"
         }
     ];
     // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set
@@ -93,7 +93,7 @@ message LabelPolicy {
     // hex value for primary color dark theme
     string primary_color_dark = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hex value for primary color dark theme";
+            description: "hex value for the primary color dark theme";
             example: "\"#BBBAFA\"";
         }
     ];
@@ -104,10 +104,10 @@ message LabelPolicy {
             example: "\"#111827\"";
         }
     ];
-    // hex value for warn color dark theme
+    // hex value for warning color dark theme
     string warn_color_dark = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hex value for warn color dark theme";
+            description: "hex value for warning color dark theme";
             example: "\"#FF3B5B\"";
         }
     ];
@@ -150,12 +150,12 @@ message LoginPolicy {
     zitadel.v1.ObjectDetails details = 1;
     bool allow_username_password = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if a user is allowed to login with his username and password"
+            description: "defines if a user is allowed to log in with his username and password"
         }
     ];
     bool allow_register = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if a person is allowed to register a user on this organisation"
+            description: "defines if a person is allowed to register a user on this organization"
         }
     ];
     bool allow_external_idp = 4 [
@@ -165,7 +165,7 @@ message LoginPolicy {
     ];
     bool force_mfa = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if a user MUST use a multi factor to log in"
+            description: "defines if a user MUST use a multi-factor to log in"
         }
     ];
     PasswordlessType passwordless_type = 6 [
@@ -175,7 +175,7 @@ message LoginPolicy {
     ];
     bool is_default = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the organisation's admin changed the policy"
+            description: "defines if the organization's admin changed the policy"
         }
     ];
     bool hide_password_reset = 8 [
@@ -185,7 +185,7 @@ message LoginPolicy {
     ];
     bool ignore_unknown_usernames = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+            description: "defines if unknown username on login screen directly returns an error or always displays the password screen"
         }
     ];
     string default_redirect_uri = 10 [
@@ -222,20 +222,20 @@ message LoginPolicy {
     repeated SecondFactorType second_factors = 16;
     repeated MultiFactorType multi_factors = 17;
     repeated zitadel.idp.v1.IDPLoginPolicyLink idps = 18;
-    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success.
     bool allow_domain_discovery = 19 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
+            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
         }
     ];
     bool disable_login_with_email = 20 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if user can additionally (to the loginname) be identified by their verified email address"
+            description: "defines if the user can additionally (to the login name) be identified by their verified email address"
         }
     ];
     bool disable_login_with_phone = 21 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if user can additionally (to the loginname) be identified by their verified phone number"
+            description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
         }
     ];
 }
@@ -271,7 +271,7 @@ message PasswordComplexityPolicy {
     ];
     bool has_lowercase = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the password MUST contain a lower case letter"
+            description: "defines if the password MUST contain a lowercase letter"
         }
     ];
     bool has_number = 5 [
@@ -286,7 +286,7 @@ message PasswordComplexityPolicy {
     ];
     bool is_default = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the organisation's admin changed the policy"
+            description: "defines if the organization's admin changed the policy"
         }
     ];
 }
@@ -307,7 +307,7 @@ message PasswordAgePolicy {
     ];
     bool is_default = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the organisation's admin changed the policy"
+            description: "defines if the organization's admin changed the policy"
         }
     ];
 }
@@ -316,13 +316,13 @@ message LockoutPolicy {
     zitadel.v1.ObjectDetails details = 1;
     uint64 max_password_attempts = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correct or the password is reset."
+            description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset."
             example: "\"10\""
         }
     ];
     bool is_default = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the organisation's admin changed the policy"
+            description: "defines if the organization's admin changed the policy"
         }
     ];
 }

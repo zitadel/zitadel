@@ -17,7 +17,7 @@ message Org {
     zitadel.v1.ObjectDetails details = 2;
     OrgState state = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "current state of the organisation";
+            description: "current state of the organization";
         }
     ];
     string name = 4 [
@@ -103,7 +103,7 @@ message OrgDomainQuery {
     string domain = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"zitadel.cloud\"";
+            example: "\"citadel.cloud\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
@@ -118,7 +118,7 @@ message OrgStateQuery {
     OrgState state = 1 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "current state of the organisation";
+            description: "current state of the organization";
         }
     ];
 }
