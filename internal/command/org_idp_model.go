@@ -91,11 +91,7 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := org.NewOAuthIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return org.NewOAuthIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type OrgGoogleIDPWriteModel struct {
@@ -167,11 +163,7 @@ func (wm *OrgGoogleIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := org.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return org.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type OrgLDAPIDPWriteModel struct {
@@ -198,19 +190,10 @@ func (wm *OrgLDAPIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LDAPIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
 		case *org.LDAPIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.LDAPIDPChangedEvent)
 		case *org.IDPRemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.LDAPIDPWriteModel.AppendEvents(e)
@@ -229,6 +212,7 @@ func (wm *OrgLDAPIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.LDAPIDPChangedEventType,
 			org.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
 
@@ -271,11 +255,7 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := org.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
 }
 
 type OrgIDPRemoveWriteModel struct {
@@ -336,5 +316,6 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.LDAPIDPChangedEventType,
 			org.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }

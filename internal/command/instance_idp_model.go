@@ -89,11 +89,7 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := instance.NewOAuthIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return instance.NewOAuthIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceGoogleIDPWriteModel struct {
@@ -163,11 +159,7 @@ func (wm *InstanceGoogleIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := instance.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return instance.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceLDAPIDPWriteModel struct {
@@ -194,19 +186,10 @@ func (wm *InstanceLDAPIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *instance.LDAPIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
 		case *instance.LDAPIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.LDAPIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.LDAPIDPWriteModel.AppendEvents(e)
@@ -225,6 +208,7 @@ func (wm *InstanceLDAPIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.LDAPIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
 
@@ -267,11 +251,7 @@ func (wm *InstanceLDAPIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := instance.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return instance.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
 }
 
 type InstanceIDPRemoveWriteModel struct {
@@ -332,5 +312,6 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.LDAPIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
