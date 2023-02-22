@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
 	"reflect"
 	"testing"
@@ -466,8 +467,10 @@ func Test_buildQuery(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		ctx := context.Background()
+		db := new(testDB)
 		t.Run(tt.name, func(t *testing.T) {
-			gotQuery, gotLimit, gotValues, gotRowScanner := buildQuery(tt.args.queryFactory)
+			gotQuery, gotLimit, gotValues, gotRowScanner := buildQuery(ctx, db, tt.args.queryFactory)
 			if gotQuery != tt.res.query {
 				t.Errorf("buildQuery() gotQuery = %v, want %v", gotQuery, tt.res.query)
 			}
@@ -489,3 +492,13 @@ func Test_buildQuery(t *testing.T) {
 		})
 	}
 }
+
+type testDB struct{}
+
+func (_ *testDB) Timetravel(time.Duration) string { return "" }
+
+func (*testDB) DatabaseName() string { return "db" }
+
+func (*testDB) Username() string { return "user" }
+
+func (*testDB) Type() string { return "type" }
