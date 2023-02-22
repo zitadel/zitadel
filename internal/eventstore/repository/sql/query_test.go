@@ -10,6 +10,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
@@ -537,8 +538,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: tt.fields.client,
+				DB: &database.DB{
+					DB: tt.fields.client,
+				},
 			}
+			db.SetDatabase(new(testDB))
 
 			// setup initial data for query
 			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
@@ -786,10 +790,11 @@ func Test_query_events_mocked(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			crdb := &CRDB{}
+			crdb := &CRDB{DB: new(database.DB)}
 			if tt.fields.mock != nil {
-				crdb.client = tt.fields.mock.client
+				crdb.DB.DB = tt.fields.mock.client
 			}
+			crdb.DB.SetDatabase(new(testDB))
 
 			err := query(context.Background(), crdb, tt.args.query, tt.args.dest)
 			if (err != nil) != tt.res.wantErr {

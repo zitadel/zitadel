@@ -73,13 +73,13 @@ type OPStorage struct {
 	assetAPIPrefix                    func(ctx context.Context) string
 }
 
-func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *database.DB, userAgentCookie, instanceHandler, accessHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *database.DB, callDurationInterceptor, userAgentCookie, instanceHandler, accessHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
 	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
-	options, err := createOptions(config, externalSecure, userAgentCookie, instanceHandler, accessHandler)
+	options, err := createOptions(config, externalSecure, callDurationInterceptor, userAgentCookie, instanceHandler, accessHandler)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
@@ -117,10 +117,11 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 	return opConfig, nil
 }
 
-func createOptions(config Config, externalSecure bool, userAgentCookie, instanceHandler, accessHandler func(http.Handler) http.Handler) ([]op.Option, error) {
+func createOptions(config Config, externalSecure bool, callDurationInterceptor, userAgentCookie, instanceHandler, accessHandler func(http.Handler) http.Handler) ([]op.Option, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	options := []op.Option{
 		op.WithHttpInterceptors(
+			callDurationInterceptor,
 			middleware.MetricsHandler(metricTypes),
 			middleware.TelemetryHandler(),
 			middleware.NoCacheInterceptor().Handler,

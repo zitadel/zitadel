@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"testing"
 
-	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -324,10 +323,8 @@ func Test_UserPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name: "prepareUserQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery()
-			},
+			name:    "prepareUserQuery no result",
+			prepare: prepareUserQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(userQuery),
@@ -344,10 +341,8 @@ func Test_UserPrepares(t *testing.T) {
 			object: (*User)(nil),
 		},
 		{
-			name: "prepareUserQuery human found",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery()
-			},
+			name:    "prepareUserQuery human found",
+			prepare: prepareUserQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(userQuery),
@@ -413,10 +408,8 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name: "prepareUserQuery machine found",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery()
-			},
+			name:    "prepareUserQuery machine found",
+			prepare: prepareUserQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(userQuery),
@@ -475,10 +468,8 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name: "prepareUserQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery()
-			},
+			name:    "prepareUserQuery sql err",
+			prepare: prepareUserQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(userQuery),
@@ -842,10 +833,8 @@ func Test_UserPrepares(t *testing.T) {
 			object: nil,
 		},
 		{
-			name: "prepareNotifyUserQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery()
-			},
+			name:    "prepareNotifyUserQuery no result",
+			prepare: prepareNotifyUserQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(notifyUserQuery),
@@ -862,10 +851,8 @@ func Test_UserPrepares(t *testing.T) {
 			object: (*NotifyUser)(nil),
 		},
 		{
-			name: "prepareNotifyUserQuery notify found",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery()
-			},
+			name:    "prepareNotifyUserQuery notify found",
+			prepare: prepareNotifyUserQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(notifyUserQuery),
@@ -927,10 +914,8 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name: "prepareNotifyUserQuery not notify found (error)",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery()
-			},
+			name:    "prepareNotifyUserQuery not notify found (error)",
+			prepare: prepareNotifyUserQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(notifyUserQuery),
@@ -974,10 +959,8 @@ func Test_UserPrepares(t *testing.T) {
 			object: (*NotifyUser)(nil),
 		},
 		{
-			name: "prepareNotifyUserQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery()
-			},
+			name:    "prepareNotifyUserQuery sql err",
+			prepare: prepareNotifyUserQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(notifyUserQuery),
@@ -993,10 +976,8 @@ func Test_UserPrepares(t *testing.T) {
 			object: nil,
 		},
 		{
-			name: "prepareUsersQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery()
-			},
+			name:    "prepareUsersQuery no result",
+			prepare: prepareUsersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -1013,10 +994,8 @@ func Test_UserPrepares(t *testing.T) {
 			object: &Users{Users: []*User{}},
 		},
 		{
-			name: "prepareUsersQuery one result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery()
-			},
+			name:    "prepareUsersQuery one result",
+			prepare: prepareUsersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -1090,10 +1069,8 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name: "prepareUsersQuery multiple results",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery()
-			},
+			name:    "prepareUsersQuery multiple results",
+			prepare: prepareUsersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -1216,10 +1193,8 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name: "prepareUsersQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery()
-			},
+			name:    "prepareUsersQuery sql err",
+			prepare: prepareUsersQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(usersQuery),
@@ -1237,7 +1212,7 @@ func Test_UserPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

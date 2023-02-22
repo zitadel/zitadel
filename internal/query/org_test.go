@@ -11,6 +11,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 )
@@ -369,7 +370,7 @@ func Test_OrgPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
@@ -456,8 +457,11 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			q := &Queries{
-				client: client,
+				client: &database.DB{
+					DB: client,
+				},
 			}
+			q.client.SetDatabase(new(prepareDB))
 
 			gotIsUnique, err := q.IsOrgUnique(context.Background(), tt.args.name, tt.args.domain)
 			if (tt.want.err == nil && err != nil) || (err != nil && tt.want.err != nil && !tt.want.err(err)) {

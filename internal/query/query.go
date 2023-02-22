@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
@@ -90,4 +91,8 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *dat
 
 func (q *Queries) Health(ctx context.Context) error {
 	return q.client.Ping()
+}
+
+type prepareDatabase interface {
+	Timetravel(d time.Duration) string
 }

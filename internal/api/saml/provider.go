@@ -39,6 +39,7 @@ func NewProvider(
 	certEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
 	projections *database.DB,
+	callDurationInterceptor,
 	instanceHandler,
 	userAgentCookie,
 	accessHandler func(http.Handler) http.Handler,
@@ -60,6 +61,7 @@ func NewProvider(
 
 	options := []provider.Option{
 		provider.WithHttpInterceptors(
+			callDurationInterceptor,
 			middleware.MetricsHandler(metricTypes),
 			middleware.TelemetryHandler(),
 			middleware.NoCacheInterceptor().Handler,
