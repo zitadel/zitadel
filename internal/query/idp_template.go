@@ -698,14 +698,16 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					UserEndpoint:          oauthUserEndpoint.String,
 					Scopes:                oauthScopes,
 				}
-			} else if githubID.Valid {
+			}
+			if githubID.Valid {
 				idpTemplate.GitHubIDPTemplate = &GitHubIDPTemplate{
 					IDPID:        githubID.String,
 					ClientID:     githubClientID.String,
 					ClientSecret: githubClientSecret,
 					Scopes:       githubScopes,
 				}
-			} else if githubEnterpriseID.Valid {
+			}
+			if githubEnterpriseID.Valid {
 				idpTemplate.GitHubEnterpriseIDPTemplate = &GitHubEnterpriseIDPTemplate{
 					IDPID:                 githubEnterpriseID.String,
 					ClientID:              githubEnterpriseClientID.String,
@@ -715,14 +717,16 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					UserEndpoint:          githubEnterpriseUserEndpoint.String,
 					Scopes:                githubEnterpriseScopes,
 				}
-			} else if googleID.Valid {
+			}
+			if googleID.Valid {
 				idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
 					IDPID:        googleID.String,
 					ClientID:     googleClientID.String,
 					ClientSecret: googleClientSecret,
 					Scopes:       googleScopes,
 				}
-			} else if ldapID.Valid {
+			}
+			if ldapID.Valid {
 				idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 					IDPID:               ldapID.String,
 					Host:                ldapHost.String,
@@ -966,14 +970,16 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						UserEndpoint:          oauthUserEndpoint.String,
 						Scopes:                oauthScopes,
 					}
-				} else if githubID.Valid {
+				}
+				if githubID.Valid {
 					idpTemplate.GitHubIDPTemplate = &GitHubIDPTemplate{
 						IDPID:        githubID.String,
 						ClientID:     githubClientID.String,
 						ClientSecret: githubClientSecret,
 						Scopes:       githubScopes,
 					}
-				} else if githubEnterpriseID.Valid {
+				}
+				if githubEnterpriseID.Valid {
 					idpTemplate.GitHubEnterpriseIDPTemplate = &GitHubEnterpriseIDPTemplate{
 						IDPID:                 githubEnterpriseID.String,
 						ClientID:              githubEnterpriseClientID.String,
@@ -983,14 +989,16 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 						UserEndpoint:          githubEnterpriseUserEndpoint.String,
 						Scopes:                githubEnterpriseScopes,
 					}
-				} else if googleID.Valid {
+				}
+				if googleID.Valid {
 					idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
 						IDPID:        googleID.String,
 						ClientID:     googleClientID.String,
 						ClientSecret: googleClientSecret,
 						Scopes:       googleScopes,
 					}
-				} else if ldapID.Valid {
+				}
+				if ldapID.Valid {
 					idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 						IDPID:               ldapID.String,
 						Host:                ldapHost.String,

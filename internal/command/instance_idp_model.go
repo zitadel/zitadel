@@ -33,19 +33,10 @@ func (wm *InstanceOAuthIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *instance.OAuthIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.OAuthIDPWriteModel.AppendEvents(&e.OAuthIDPAddedEvent)
 		case *instance.OAuthIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.OAuthIDPWriteModel.AppendEvents(&e.OAuthIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.OAuthIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		}
 	}
@@ -62,6 +53,7 @@ func (wm *InstanceOAuthIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.OAuthIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
 
@@ -69,7 +61,6 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
-	oldName,
 	name,
 	clientID,
 	clientSecretString string,
@@ -98,11 +89,7 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := instance.NewOAuthIDPChangedEvent(ctx, aggregate, id, oldName, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return  instance.NewOAuthIDPChangedEvent(ctx, aggregate, id, oldName, changes)
 }
 
 type InstanceGitHubIDPWriteModel struct {
@@ -129,19 +116,10 @@ func (wm *InstanceGitHubIDPWriteModel) AppendEvents(events ...eventstore.Event) 
 	for _, event := range events {
 		switch e := event.(type) {
 		case *instance.GitHubIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GitHubIDPWriteModel.AppendEvents(&e.GitHubIDPAddedEvent)
 		case *instance.GitHubIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GitHubIDPWriteModel.AppendEvents(&e.GitHubIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GitHubIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.GitHubIDPWriteModel.AppendEvents(e)
@@ -160,6 +138,7 @@ func (wm *InstanceGitHubIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.GitHubIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
 
@@ -181,11 +160,7 @@ func (wm *InstanceGitHubIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := instance.NewGitHubIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return instance.NewGitHubIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceGitHubEnterpriseIDPWriteModel struct {
@@ -212,19 +187,10 @@ func (wm *InstanceGitHubEnterpriseIDPWriteModel) AppendEvents(events ...eventsto
 	for _, event := range events {
 		switch e := event.(type) {
 		case *instance.GitHubEnterpriseIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(&e.GitHubEnterpriseIDPAddedEvent)
 		case *instance.GitHubEnterpriseIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(&e.GitHubEnterpriseIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(e)
@@ -243,6 +209,7 @@ func (wm *InstanceGitHubEnterpriseIDPWriteModel) Query() *eventstore.SearchQuery
 			instance.GitHubEnterpriseIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
 
@@ -278,11 +245,7 @@ func (wm *InstanceGitHubEnterpriseIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := instance.NewGitHubEnterpriseIDPChangedEvent(ctx, aggregate, id, wm.Name, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return instance.NewGitHubEnterpriseIDPChangedEvent(ctx, aggregate, id, wm.Name, changes)
 }
 
 type InstanceGoogleIDPWriteModel struct {
@@ -309,19 +272,10 @@ func (wm *InstanceGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) 
 	for _, event := range events {
 		switch e := event.(type) {
 		case *instance.GoogleIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *instance.GoogleIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GoogleIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		}
 	}
@@ -338,6 +292,7 @@ func (wm *InstanceGoogleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.GoogleIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
 
@@ -345,25 +300,22 @@ func (wm *InstanceGoogleIDPWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
-	clientID string,
+	name,
+	clientID,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
 	scopes []string,
 	options idp.Options,
 ) (*instance.GoogleIDPChangedEvent, error) {
 
-	changes, err := wm.GoogleIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, scopes, options)
+	changes, err := wm.GoogleIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
 	if err != nil {
 		return nil, err
 	}
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := instance.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return instance.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceLDAPIDPWriteModel struct {
@@ -390,19 +342,10 @@ func (wm *InstanceLDAPIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *instance.LDAPIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
 		case *instance.LDAPIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.LDAPIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.LDAPIDPWriteModel.AppendEvents(e)
@@ -421,6 +364,7 @@ func (wm *InstanceLDAPIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.LDAPIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
 
@@ -463,11 +407,7 @@ func (wm *InstanceLDAPIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := instance.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return instance.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
 }
 
 type InstanceIDPRemoveWriteModel struct {
@@ -499,6 +439,8 @@ func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) 
 			wm.IDPRemoveWriteModel.AppendEvents(&e.OAuthIDPChangedEvent)
 		case *instance.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
+		case *instance.GoogleIDPChangedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
 		case *instance.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
 		case *instance.LDAPIDPChangedEvent:
@@ -521,9 +463,11 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.OAuthIDPAddedEventType,
 			instance.OAuthIDPChangedEventType,
 			instance.GoogleIDPAddedEventType,
+			instance.GoogleIDPChangedEventType,
 			instance.LDAPIDPAddedEventType,
 			instance.LDAPIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }

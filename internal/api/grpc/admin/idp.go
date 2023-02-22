@@ -175,7 +175,7 @@ func (s *Server) ListProviders(ctx context.Context, req *admin_pb.ListProvidersR
 }
 
 func (s *Server) AddGenericOAuthProvider(ctx context.Context, req *admin_pb.AddGenericOAuthProviderRequest) (*admin_pb.AddGenericOAuthProviderResponse, error) {
-	id, details, err := s.command.AddOrgGenericOAuthProvider(ctx, authz.GetCtxData(ctx).OrgID, addGenericOAuthProviderToCommand(req))
+	id, details, err := s.command.AddInstanceGenericOAuthProvider(ctx, addGenericOAuthProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (s *Server) AddGenericOAuthProvider(ctx context.Context, req *admin_pb.AddG
 }
 
 func (s *Server) UpdateGenericOAuthProvider(ctx context.Context, req *admin_pb.UpdateGenericOAuthProviderRequest) (*admin_pb.UpdateGenericOAuthProviderResponse, error) {
-	details, err := s.command.UpdateOrgGenericOAuthProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGenericOAuthProviderToCommand(req))
+	details, err := s.command.UpdateInstanceGenericOAuthProvider(ctx, req.Id, updateGenericOAuthProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func (s *Server) UpdateGenericOAuthProvider(ctx context.Context, req *admin_pb.U
 }
 
 func (s *Server) AddGitHubProvider(ctx context.Context, req *admin_pb.AddGitHubProviderRequest) (*admin_pb.AddGitHubProviderResponse, error) {
-	id, details, err := s.command.AddOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitHubProviderToCommand(req))
+	id, details, err := s.command.AddInstanceGitHubProvider(ctx, addGitHubProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +207,7 @@ func (s *Server) AddGitHubProvider(ctx context.Context, req *admin_pb.AddGitHubP
 }
 
 func (s *Server) UpdateGitHubProvider(ctx context.Context, req *admin_pb.UpdateGitHubProviderRequest) (*admin_pb.UpdateGitHubProviderResponse, error) {
-	details, err := s.command.UpdateOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitHubProviderToCommand(req))
+	details, err := s.command.UpdateInstanceGitHubProvider(ctx, req.Id, updateGitHubProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (s *Server) UpdateGitHubProvider(ctx context.Context, req *admin_pb.UpdateG
 }
 
 func (s *Server) AddGitHubEnterpriseServerProvider(ctx context.Context, req *admin_pb.AddGitHubEnterpriseServerProviderRequest) (*admin_pb.AddGitHubEnterpriseServerProviderResponse, error) {
-	id, details, err := s.command.AddOrgGitHubEnterpriseProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitHubEnterpriseProviderToCommand(req))
+	id, details, err := s.command.AddInstanceGitHubEnterpriseProvider(ctx, addGitHubEnterpriseProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (s *Server) AddGitHubEnterpriseServerProvider(ctx context.Context, req *adm
 }
 
 func (s *Server) UpdateGitHubEnterpriseServerProvider(ctx context.Context, req *admin_pb.UpdateGitHubEnterpriseServerProviderRequest) (*admin_pb.UpdateGitHubEnterpriseServerProviderResponse, error) {
-	details, err := s.command.UpdateOrgGitHubEnterpriseProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitHubEnterpriseProviderToCommand(req))
+	details, err := s.command.UpdateInstanceGitHubEnterpriseProvider(ctx, req.Id, updateGitHubEnterpriseProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func (s *Server) UpdateGitHubEnterpriseServerProvider(ctx context.Context, req *
 }
 
 func (s *Server) AddGoogleProvider(ctx context.Context, req *admin_pb.AddGoogleProviderRequest) (*admin_pb.AddGoogleProviderResponse, error) {
-	id, details, err := s.command.AddOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, addGoogleProviderToCommand(req))
+	id, details, err := s.command.AddInstanceGoogleProvider(ctx, addGoogleProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +249,7 @@ func (s *Server) AddGoogleProvider(ctx context.Context, req *admin_pb.AddGoogleP
 }
 
 func (s *Server) UpdateGoogleProvider(ctx context.Context, req *admin_pb.UpdateGoogleProviderRequest) (*admin_pb.UpdateGoogleProviderResponse, error) {
-	details, err := s.command.UpdateOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGoogleProviderToCommand(req))
+	details, err := s.command.UpdateInstanceGoogleProvider(ctx, req.Id, updateGoogleProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}

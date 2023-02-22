@@ -173,7 +173,6 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 								nil,
 								idp.Options{},
 							)),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "org1")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -224,7 +223,6 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 									IsAutoUpdate:      true,
 								},
 							)),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "org1")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -493,7 +491,6 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								t := true
 								event, _ := org.NewOAuthIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 									"id1",
-									"name",
 									[]idp.OAuthIDPChanges{
 										idp.ChangeOAuthName("new name"),
 										idp.ChangeOAuthClientID("clientID2"),
@@ -518,8 +515,6 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								return event
 							}(),
 						),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name", "org1")),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("new name", "org1")),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -1538,6 +1533,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 						eventPusherToEvents(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1575,6 +1571,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 						eventPusherToEvents(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1715,6 +1712,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1748,6 +1746,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,

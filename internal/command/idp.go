@@ -32,6 +32,7 @@ type GitHubEnterpriseProvider struct {
 }
 
 type GoogleProvider struct {
+	Name         string
 	ClientID     string
 	ClientSecret string
 	Scopes       []string

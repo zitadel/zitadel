@@ -282,7 +282,6 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, resourceOwner
 				ctx,
 				&a.Aggregate,
 				id,
-				writeModel.Name,
 				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,
@@ -509,7 +508,7 @@ func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, 
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
+				org.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, provider.Name, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
 			}, nil
 		}, nil
 	}
@@ -540,6 +539,7 @@ func (c *Commands) prepareUpdateOrgGoogleProvider(a *org.Aggregate, resourceOwne
 				ctx,
 				&a.Aggregate,
 				id,
+				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,
 				c.idpConfigEncryption,

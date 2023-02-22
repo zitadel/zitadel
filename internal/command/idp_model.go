@@ -30,19 +30,10 @@ func (wm *OAuthIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *idp.OAuthIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.reduceAddedEvent(e)
 		case *idp.OAuthIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.reduceChangedEvent(e)
 		case *idp.RemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.State = domain.IDPStateRemoved
 		}
 	}
@@ -334,6 +325,7 @@ type GoogleIDPWriteModel struct {
 	eventstore.WriteModel
 
 	ID           string
+	Name         string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
 	Scopes       []string
@@ -346,39 +338,43 @@ func (wm *GoogleIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *idp.GoogleIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
-			wm.ClientID = e.ClientID
-			wm.ClientSecret = e.ClientSecret
-			wm.Scopes = e.Scopes
-			wm.State = domain.IDPStateActive
+			wm.reduceAddedEvent(e)
 		case *idp.GoogleIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.reduceChangedEvent(e)
 		case *idp.RemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.State = domain.IDPStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
 }
 
+func (wm *GoogleIDPWriteModel) reduceAddedEvent(e *idp.GoogleIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
 func (wm *GoogleIDPWriteModel) reduceChangedEvent(e *idp.GoogleIDPChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
 	if e.ClientID != nil {
 		wm.ClientID = *e.ClientID
 	}
 	if e.ClientSecret != nil {
 		wm.ClientSecret = e.ClientSecret
 	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
 func (wm *GoogleIDPWriteModel) NewChanges(
+	name string,
 	clientID string,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
@@ -394,6 +390,9 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 			return nil, err
 		}
 		changes = append(changes, idp.ChangeGoogleClientSecret(clientSecret))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeGoogleName(name))
 	}
 	if wm.ClientID != clientID {
 		changes = append(changes, idp.ChangeGoogleClientID(clientID))
@@ -435,7 +434,7 @@ func (wm *LDAPIDPWriteModel) Reduce() error {
 			if wm.ID != e.ID {
 				continue
 			}
-			wm.reduceAddeddEvent(e)
+			wm.reduceAddedEvent(e)
 		case *idp.LDAPIDPChangedEvent:
 			if wm.ID != e.ID {
 				continue
@@ -451,7 +450,7 @@ func (wm *LDAPIDPWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *LDAPIDPWriteModel) reduceAddeddEvent(e *idp.LDAPIDPAddedEvent) {
+func (wm *LDAPIDPWriteModel) reduceAddedEvent(e *idp.LDAPIDPAddedEvent) {
 	wm.Name = e.Name
 	wm.Host = e.Host
 	wm.Port = e.Port
@@ -576,7 +575,9 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 		case *idp.OAuthIDPChangedEvent:
 			wm.reduceChanged(e.ID, e.Name)
 		case *idp.GoogleIDPAddedEvent:
-			wm.reduceAdded(e.ID, "")
+			wm.reduceAdded(e.ID, e.Name)
+		case *idp.GoogleIDPChangedEvent:
+			wm.reduceChanged(e.ID, e.Name)
 		case *idp.LDAPIDPAddedEvent:
 			wm.reduceAdded(e.ID, e.Name)
 		case *idp.LDAPIDPChangedEvent:

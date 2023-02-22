@@ -273,6 +273,7 @@ func updateGitHubEnterpriseProviderToCommand(req *admin_pb.UpdateGitHubEnterpris
 
 func addGoogleProviderToCommand(req *admin_pb.AddGoogleProviderRequest) command.GoogleProvider {
 	return command.GoogleProvider{
+		Name:         req.Name,
 		ClientID:     req.ClientId,
 		ClientSecret: req.ClientSecret,
 		Scopes:       req.Scopes,
@@ -282,6 +283,7 @@ func addGoogleProviderToCommand(req *admin_pb.AddGoogleProviderRequest) command.
 
 func updateGoogleProviderToCommand(req *admin_pb.UpdateGoogleProviderRequest) command.GoogleProvider {
 	return command.GoogleProvider{
+		Name:         req.Name,
 		ClientID:     req.ClientId,
 		ClientSecret: req.ClientSecret,
 		Scopes:       req.Scopes,

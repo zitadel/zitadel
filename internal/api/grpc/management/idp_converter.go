@@ -290,6 +290,7 @@ func updateGitHubEnterpriseProviderToCommand(req *mgmt_pb.UpdateGitHubEnterprise
 
 func addGoogleProviderToCommand(req *mgmt_pb.AddGoogleProviderRequest) command.GoogleProvider {
 	return command.GoogleProvider{
+		Name:         req.Name,
 		ClientID:     req.ClientId,
 		ClientSecret: req.ClientSecret,
 		Scopes:       req.Scopes,
@@ -299,6 +300,7 @@ func addGoogleProviderToCommand(req *mgmt_pb.AddGoogleProviderRequest) command.G
 
 func updateGoogleProviderToCommand(req *mgmt_pb.UpdateGoogleProviderRequest) command.GoogleProvider {
 	return command.GoogleProvider{
+		Name:         req.Name,
 		ClientID:     req.ClientId,
 		ClientSecret: req.ClientSecret,
 		Scopes:       req.Scopes,

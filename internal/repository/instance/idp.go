@@ -77,8 +77,7 @@ type OAuthIDPChangedEvent struct {
 func NewOAuthIDPChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	id,
-	oldName string,
+	id string,
 	changes []idp.OAuthIDPChanges,
 ) (*OAuthIDPChangedEvent, error) {
 
@@ -89,7 +88,6 @@ func NewOAuthIDPChangedEvent(
 			OAuthIDPChangedEventType,
 		),
 		id,
-		oldName,
 		changes,
 	)
 	if err != nil {
@@ -236,7 +234,6 @@ func NewGitHubEnterpriseIDPChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
-	oldName string,
 	changes []idp.OAuthIDPChanges,
 ) (*GitHubEnterpriseIDPChangedEvent, error) {
 
@@ -247,7 +244,6 @@ func NewGitHubEnterpriseIDPChangedEvent(
 			GitHubEnterpriseIDPChangedEventType,
 		),
 		id,
-		oldName,
 		changes,
 	)
 	if err != nil {
@@ -273,6 +269,7 @@ func NewGoogleIDPAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
+	name,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
@@ -287,6 +284,7 @@ func NewGoogleIDPAddedEvent(
 				GoogleIDPAddedEventType,
 			),
 			id,
+			name,
 			clientID,
 			clientSecret,
 			scopes,
