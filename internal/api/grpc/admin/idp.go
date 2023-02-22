@@ -174,6 +174,27 @@ func (s *Server) ListProviders(ctx context.Context, req *admin_pb.ListProvidersR
 	}, nil
 }
 
+func (s *Server) AddGoogleProvider(ctx context.Context, req *admin_pb.AddGoogleProviderRequest) (*admin_pb.AddGoogleProviderResponse, error) {
+	id, details, err := s.command.AddOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, addGoogleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGoogleProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGoogleProvider(ctx context.Context, req *admin_pb.UpdateGoogleProviderRequest) (*admin_pb.UpdateGoogleProviderResponse, error) {
+	details, err := s.command.UpdateOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGoogleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGoogleProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddLDAPProvider(ctx context.Context, req *admin_pb.AddLDAPProviderRequest) (*admin_pb.AddLDAPProviderResponse, error) {
 	id, details, err := s.command.AddInstanceLDAPProvider(ctx, addLDAPProviderToCommand(req))
 	if err != nil {
