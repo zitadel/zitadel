@@ -77,12 +77,44 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     produces: "application/grpc";
     produces: "application/grpc-web+proto";
 
-    host: "*.zitadel.cloud";
+    host: "$ZITADEL_DOMAIN";
     base_path: "/auth/v1";
 
     external_docs: {
         description: "Detailed information about ZITADEL",
         url: "https://zitadel.com/docs"
+    }
+
+    security_definitions: {
+        security: {
+            key: "BasicAuth";
+            value: {
+                type: TYPE_BASIC;
+            }
+        }
+        security: {
+            key: "OAuth2";
+            value: {
+                type: TYPE_OAUTH2;
+                flow: FLOW_ACCESS_CODE;
+                authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
+                token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+                scopes: {
+                    scope: {
+                        key: "openid";
+                        value: "openid";
+                    }
+                }
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "OAuth2";
+            value: {
+                scope: "openid";
+            }
+        }
     }
 };
 
