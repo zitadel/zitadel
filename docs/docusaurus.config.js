@@ -252,28 +252,28 @@ module.exports = {
         config: {
           auth: {
             specPath: ".artifacts/openapi/zitadel/auth.swagger.json",
-            outputDir: "docs/apis/generated/auth",
+            outputDir: "docs/apis/auth",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           mgmt: {
             specPath: ".artifacts/openapi/zitadel/management.swagger.json",
-            outputDir: "docs/apis/generated/mgmt",
+            outputDir: "docs/apis/mgmt",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           admin: {
             specPath: ".artifacts/openapi/zitadel/admin.swagger.json",
-            outputDir: "docs/apis/generated/admin",
+            outputDir: "docs/apis/admin",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           system: {
             specPath: ".artifacts/openapi/zitadel/system.swagger.json",
-            outputDir: "docs/apis/generated/system",
+            outputDir: "docs/apis/system",
             sidebarOptions: {
               groupPathsBy: "tag",
             },

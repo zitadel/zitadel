@@ -179,11 +179,12 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Auth API",
+            slug: "/apis/auth",
             description:
                 "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
-            slug: "/apis/reference/auth",
+                
           },
-          items: require("./docs/apis/generated/auth/sidebar.js"),
+          items: require("./docs/apis/auth/sidebar.js"),
         },
         {
           type: "category",
@@ -191,11 +192,11 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Management API",
+            slug: "/apis/mgmt",
             description:
                 "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
-            slug: "/apis/reference/mgmt",
           },
-          items: require("./docs/apis/generated/mgmt/sidebar.js"),
+          items: require("./docs/apis/mgmt/sidebar.js"),
         },
         {
           type: "category",
@@ -203,11 +204,11 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Admin API",
+            slug: "/apis/admin",
             description:
                 "This API is intended to configure and manage one ZITADEL instance itself.",
-            slug: "/apis/reference/admin",
           },
-          items: require("./docs/apis/generated/admin/sidebar.js"),
+          items: require("./docs/apis/admin/sidebar.js"),
         },
         {
           type: "category",
@@ -215,24 +216,19 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "System API",
+            slug: "/apis/system",
             description:
                 "This API is intended to manage the different ZITADEL instances within the system.\n" +
                 "\n" +
                 "Checkout the guide how to access the ZITADEL System API.",
-            slug: "/apis/reference/system",
           },
-          items: require("./docs/apis/generated/system/sidebar.js"),
+          items: require("./docs/apis/system/sidebar.js"),
         },
         {
           type: "category",
           label: "Assets",
           collapsed: true,
           items: ["apis/assets/assets"],
-        },
-        {
-          type: "doc",
-          label: "gRPC Status Codes",
-          id: "apis/statuscodes"
         },
       ]
     },
@@ -244,7 +240,7 @@ module.exports = {
         {
           type: "category",
           label: "OpenID Connect & OAuth",
-          collapsed: false,
+          collapsed: true,
           items: [
             "apis/openidoauth/endpoints",
             "apis/openidoauth/authrequest",
@@ -257,7 +253,7 @@ module.exports = {
         {
           type: "category",
           label: "SAML 2.0",
-          collapsed: false,
+          collapsed: true,
           items: ["apis/saml/endpoints"],
         },
       ],
@@ -274,6 +270,11 @@ module.exports = {
         "apis/actions/complement-token",
         "apis/actions/objects",
       ]
+    },
+    {
+      type: "doc",
+      label: "gRPC Status Codes",
+      id: "apis/statuscodes"
     },
     {
       type: "category",
