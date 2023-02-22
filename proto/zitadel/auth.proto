@@ -23,7 +23,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Authentication API aka Auth";
         version: "1.0";
-        description: "The authentication API is used for all operations on the currently authenticated in user.";
+        description: "The authentication API is used for all operations on the currently authenticated user.";
         contact:{
             name: "ZITADEL"
             url: "https://zitadel.com"

@@ -422,7 +422,7 @@ service ManagementService {
             summary: "Create User (Machine)";
             description: "Create a new user with the type machine for your API, service or device. This users are used for non interactive authentication flows."
             tags: "Users";
-            tags: "Machine User";
+            tags: "User Machine";
             responses: {
                 key: "200"
                 value: {
