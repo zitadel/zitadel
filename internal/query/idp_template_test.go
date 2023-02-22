@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/idp"
@@ -27,6 +28,10 @@ var (
 		` projections.idp_templates.is_linking_allowed,` +
 		` projections.idp_templates.is_auto_creation,` +
 		` projections.idp_templates.is_auto_update,` +
+		` projections.idp_templates_google.idp_id,` +
+		` projections.idp_templates_google.client_id,` +
+		` projections.idp_templates_google.client_secret,` +
+		` projections.idp_templates_google.scopes,` +
 		` projections.idp_templates_ldap.idp_id,` +
 		` projections.idp_templates_ldap.host,` +
 		` projections.idp_templates_ldap.port,` +
@@ -50,6 +55,7 @@ var (
 		` projections.idp_templates_ldap.avatar_url_attribute,` +
 		` projections.idp_templates_ldap.profile_attribute` +
 		` FROM projections.idp_templates` +
+		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
 		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id`
 	idpTemplateCols = []string{
 		"id",
@@ -65,6 +71,11 @@ var (
 		"is_linking_allowed",
 		"is_auto_creation",
 		"is_auto_update",
+		// google config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
 		// ldap config
 		"idp_id",
 		"host",
@@ -102,6 +113,10 @@ var (
 		` projections.idp_templates.is_linking_allowed,` +
 		` projections.idp_templates.is_auto_creation,` +
 		` projections.idp_templates.is_auto_update,` +
+		` projections.idp_templates_google.idp_id,` +
+		` projections.idp_templates_google.client_id,` +
+		` projections.idp_templates_google.client_secret,` +
+		` projections.idp_templates_google.scopes,` +
 		` projections.idp_templates_ldap.idp_id,` +
 		` projections.idp_templates_ldap.host,` +
 		` projections.idp_templates_ldap.port,` +
@@ -126,6 +141,7 @@ var (
 		` projections.idp_templates_ldap.profile_attribute,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_templates` +
+		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
 		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id`
 	idpTemplatesCols = []string{
 		"id",
@@ -141,6 +157,12 @@ var (
 		"is_linking_allowed",
 		"is_auto_creation",
 		"is_auto_update",
+		// google config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// ldap config
 		"idp_id",
 		"host",
 		"port",
@@ -196,6 +218,81 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 			},
 			object: (*IDPTemplate)(nil),
 		},
+
+		{
+			name:    "prepareIDPTemplateByIDQuery google idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeGoogle,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						// google
+						"idp-id",
+						"client_id",
+						nil,
+						database.StringArray{"profile"},
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeGoogle,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				GoogleIDPTemplate: &GoogleIDPTemplate{
+					IDPID:        "idp-id",
+					ClientID:     "client_id",
+					ClientSecret: nil,
+					Scopes:       []string{"profile"},
+				},
+			},
+		},
 		{
 			name:    "prepareIDPTemplateByIDQuery ldap idp",
 			prepare: prepareIDPTemplateByIDQuery,
@@ -217,6 +314,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
 						// ldap config
 						"idp-id",
 						"host",
@@ -305,6 +407,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						// google config
+						nil,
+						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -404,6 +511,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							// google config
+							nil,
+							nil,
+							nil,
+							nil,
 							// ldap config
 							"idp-id",
 							"host",
@@ -501,6 +613,11 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							// google config
+							nil,
+							nil,
+							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -560,7 +677,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					idpTemplatesCols,
 					[][]driver.Value{
 						{
-							"idp-id-1",
+							"idp-id-ldap",
 							"ro",
 							testNow,
 							testNow,
@@ -573,8 +690,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							// google config
+							nil,
+							nil,
+							nil,
+							nil,
 							// ldap config
-							"idp-id",
+							"idp-id-ldap",
 							"host",
 							"port",
 							true,
@@ -598,19 +720,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"profile",
 						},
 						{
-							"idp-id-2",
+							"idp-id-google",
 							"ro",
 							testNow,
 							testNow,
 							uint64(20211109),
 							domain.IDPConfigStateActive,
 							"idp-name",
-							domain.IDPTypeLDAP,
+							domain.IDPTypeGoogle,
 							domain.IdentityProviderTypeOrg,
 							true,
 							true,
 							true,
 							true,
+							// google
+							"idp-id-google",
+							"client_id",
+							nil,
+							database.StringArray{"profile"},
 							// ldap config
 							nil,
 							nil,
@@ -648,7 +775,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						ChangeDate:        testNow,
 						Sequence:          20211109,
 						ResourceOwner:     "ro",
-						ID:                "idp-id-1",
+						ID:                "idp-id-ldap",
 						State:             domain.IDPStateActive,
 						Name:              "idp-name",
 						Type:              domain.IDPTypeLDAP,
@@ -658,7 +785,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
 						LDAPIDPTemplate: &LDAPIDPTemplate{
-							IDPID:               "idp-id",
+							IDPID:               "idp-id-ldap",
 							Host:                "host",
 							Port:                "port",
 							TLS:                 true,
@@ -688,15 +815,21 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						ChangeDate:        testNow,
 						Sequence:          20211109,
 						ResourceOwner:     "ro",
-						ID:                "idp-id-2",
+						ID:                "idp-id-google",
 						State:             domain.IDPStateActive,
 						Name:              "idp-name",
-						Type:              domain.IDPTypeLDAP,
+						Type:              domain.IDPTypeGoogle,
 						OwnerType:         domain.IdentityProviderTypeOrg,
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
+						GoogleIDPTemplate: &GoogleIDPTemplate{
+							IDPID:        "idp-id-google",
+							ClientID:     "client_id",
+							ClientSecret: nil,
+							Scopes:       []string{"profile"},
+						},
 					},
 				},
 			},
