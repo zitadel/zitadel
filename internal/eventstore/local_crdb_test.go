@@ -24,8 +24,9 @@ func TestMain(m *testing.M) {
 		logging.WithFields("error", err).Fatal("unable to start db")
 	}
 
-	testCRDBClient = new(database.DB)
-	testCRDBClient.SetDatabase(new(testDB))
+	testCRDBClient = &database.DB{
+		Database: new(testDB),
+	}
 
 	testCRDBClient.DB, err = sql.Open("postgres", ts.PGURL().String())
 	if err != nil {

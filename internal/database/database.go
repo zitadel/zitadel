@@ -24,11 +24,6 @@ type DB struct {
 	dialect.Database
 }
 
-// SetDatabase is used for testing purposes
-func (db *DB) SetDatabase(database dialect.Database) {
-	db.Database = database
-}
-
 func Connect(config Config, useAdmin bool) (*DB, error) {
 	client, err := config.connector.Connect(useAdmin)
 	if err != nil {

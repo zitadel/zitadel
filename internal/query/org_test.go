@@ -458,10 +458,10 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			q := &Queries{
 				client: &database.DB{
-					DB: client,
+					DB:       client,
+					Database: new(prepareDB),
 				},
 			}
-			q.client.SetDatabase(new(prepareDB))
 
 			gotIsUnique, err := q.IsOrgUnique(context.Background(), tt.args.name, tt.args.domain)
 			if (tt.want.err == nil && err != nil) || (err != nil && tt.want.err != nil && !tt.want.err(err)) {

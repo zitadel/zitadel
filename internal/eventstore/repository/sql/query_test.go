@@ -539,10 +539,10 @@ func Test_query_events_with_crdb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
 				DB: &database.DB{
-					DB: tt.fields.client,
+					DB:       tt.fields.client,
+					Database: new(testDB),
 				},
 			}
-			db.SetDatabase(new(testDB))
 
 			// setup initial data for query
 			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
@@ -790,11 +790,12 @@ func Test_query_events_mocked(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			crdb := &CRDB{DB: new(database.DB)}
+			crdb := &CRDB{DB: &database.DB{
+				Database: new(testDB),
+			}}
 			if tt.fields.mock != nil {
 				crdb.DB.DB = tt.fields.mock.client
 			}
-			crdb.DB.SetDatabase(new(testDB))
 
 			err := query(context.Background(), crdb, tt.args.query, tt.args.dest)
 			if (err != nil) != tt.res.wantErr {
