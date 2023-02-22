@@ -224,6 +224,16 @@ import {
   AddNotificationPolicyResponse,
   SetDefaultOrgRequest,
   SetDefaultOrgResponse,
+  AddGoogleProviderRequest,
+  AddGoogleProviderResponse,
+  UpdateGoogleProviderRequest,
+  UpdateGoogleProviderResponse,
+  DeleteProviderResponse,
+  DeleteProviderRequest,
+  ListProvidersRequest,
+  ListProvidersResponse,
+  GetProviderByIDResponse,
+  GetProviderByIDRequest,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -860,6 +870,28 @@ export class AdminService {
 
   public updateIDPJWTConfig(req: UpdateIDPJWTConfigRequest): Promise<UpdateIDPJWTConfigResponse.AsObject> {
     return this.grpcService.admin.updateIDPJWTConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  //   idp templates
+
+  public addGoogleProvider(req: AddGoogleProviderRequest): Promise<AddGoogleProviderResponse.AsObject> {
+    return this.grpcService.admin.addGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {
+    return this.grpcService.admin.deleteProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public listProviders(req: ListProvidersRequest): Promise<ListProvidersResponse.AsObject> {
+    return this.grpcService.admin.listProviders(req, null).then((resp) => resp.toObject());
+  }
+
+  public getProviderByID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse.AsObject> {
+    return this.grpcService.admin.getProviderByID(req, null).then((resp) => resp.toObject());
   }
 
   public listIAMMembers(
