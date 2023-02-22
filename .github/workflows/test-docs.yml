@@ -12,6 +12,7 @@ on:
       - 'docs/**'
       - 'guides/**'
       - '**.md'
+      - 'release-channels.yaml'
 
 jobs:
   Build-ZITADEL:

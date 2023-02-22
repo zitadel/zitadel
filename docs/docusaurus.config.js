@@ -36,14 +36,14 @@ module.exports = {
       { property: "og:url", content: "https://www.zitadel.com/docs" },
       {
         property: "og:image",
-        content: "https://www.zitadel.com/images/preview.png",
+        content: "https://www.zitadel.com/docs/img/preview.png",
       },
       { property: "twitter:card", content: "summary_large_image" },
       { property: "twitter:url", content: "https://www.zitadel.com/docs" },
       { property: "twitter:title", content: "ZITADEL Docs" },
       {
         property: "twitter:image",
-        content: "https://www.zitadel.com/images/preview.png",
+        content: "https://www.zitadel.com/docs/img/preview.png",
       },
     ],
     zoom: {

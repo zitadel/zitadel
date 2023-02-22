@@ -1,0 +1,49 @@
+InitCode:
+  Title: ZITADEL - Inicjalizacja użytkownika
+  PreHeader: Inicjalizacja użytkownika
+  Subject: Inicjalizacja użytkownika
+  Greeting: Witaj {{.FirstName}} {{.LastName}},
+  Text: Ten użytkownik został utworzony w ZITADEL. Aby się zalogować, użyj nazwy użytkownika {{.PreferredLoginName}}. Kliknij poniższy przycisk, aby zakończyć proces inicjalizacji. (Kod {{.Code}}) Jeśli nie wystąpiła prośba o ten e-mail, proszę go zignorować.
+  ButtonText: Zakończ inicjalizację
+PasswordReset:
+  Title: ZITADEL - Resetowanie hasła
+  PreHeader: Resetowanie hasła
+  Subject: Resetowanie hasła
+  Greeting: Witaj {{.FirstName}} {{.LastName}},
+  Text: Otrzymaliśmy prośbę o resetowanie hasła. Kliknij poniższy przycisk, aby zresetować swoje hasło. (Kod {{.Code}}) Jeśli nie wystąpiła prośba o ten e-mail, proszę go zignorować.
+  ButtonText: Zresetuj hasło
+VerifyEmail:
+  Title: ZITADEL - Weryfikacja adresu e-mail
+  PreHeader: Weryfikacja adresu e-mail
+  Subject: Weryfikacja adresu e-mail
+  Greeting: Witaj {{.FirstName}} {{.LastName}},
+  Text: Został dodany nowy adres e-mail. Użyj poniższego przycisku, aby zweryfikować swój adres e-mail. (Kod {{.Code}}) Jeśli nie dodałeś nowego adresu e-mail, proszę zignoruj ten e-mail.
+  ButtonText: Zweryfikuj adres e-mail
+VerifyPhone:
+  Title: ZITADEL - Weryfikacja numeru telefonu
+  PreHeader: Weryfikacja numeru telefonu
+  Subject: Weryfikacja numeru telefonu
+  Greeting: Witaj {{.FirstName}} {{.LastName}},
+  Text: Został dodany nowy numer telefonu. Użyj następującego kodu, aby go zweryfikować {{.Code}}
+  ButtonText: Zweryfikuj numer telefonu
+DomainClaimed:
+  Title: ZITADEL - Domena została zarejestrowana
+  PreHeader: Zmiana adresu e-mail / nazwy użytkownika
+  Subject: Domena została zarejestrowana
+  Greeting: Witaj {{.FirstName}} {{.LastName}},
+  Text: Domena {{.Domain}} została zarejestrowana przez organizację. Twój obecny użytkownik {{.Username}} nie jest członkiem tej organizacji. Dlatego będziesz musiał zmienić swój adres e-mail podczas logowania. Stworzyliśmy tymczasową nazwę użytkownika ({{.TempUsername}}) dla tego logowania.
+  ButtonText: Zaloguj się
+PasswordlessRegistration:
+  Title: ZITADEL - Dodaj logowanie bez hasła
+  PreHeader: Dodaj logowanie bez hasła
+  Subject: Dodaj logowanie bez hasła
+  Greeting: Witaj {{.FirstName}} {{.LastName}},
+  Text: Otrzymaliśmy prośbę o dodanie tokenu do logowania bez hasła. Użyj poniższego przycisku, aby dodać swój token lub urządzenie do logowania bez hasła.
+  ButtonText: Dodaj logowanie bez hasła
+PasswordChange:
+  Title: ZITADEL - Hasło użytkownika zostało zmienione
+  PreHeader: Zmiana hasła
+  Subject: Hasło użytkownika zostało zmienione
+  Greeting: Witaj {{.FirstName}} {{.LastName}},
+  Text: Hasło Twojego użytkownika zostało zmienione, jeśli ta zmiana nie została dokonana przez Ciebie, zalecamy natychmiastowe zresetowanie hasła.
+  ButtonText: Zaloguj się

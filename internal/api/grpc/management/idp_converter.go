@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -169,4 +170,102 @@ func userLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 		}
 	}
 	return links
+}
+
+func listProvidersToQuery(ctx context.Context, req *mgmt_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := providerQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	resourceOwnerQuery, err := query.NewIDPTemplateResourceOwnerListSearchQuery(authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, resourceOwnerQuery)
+	return &query.IDPTemplateSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
+}
+
+func providerQueriesToQuery(queries []*mgmt_pb.ProviderQuery) (q []query.SearchQuery, err error) {
+	q = make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = providerQueryToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return q, nil
+}
+
+func providerQueryToQuery(idpQuery *mgmt_pb.ProviderQuery) (query.SearchQuery, error) {
+	switch q := idpQuery.Query.(type) {
+	case *mgmt_pb.ProviderQuery_IdpNameQuery:
+		return query.NewIDPTemplateNameSearchQuery(object.TextMethodToQuery(q.IdpNameQuery.Method), q.IdpNameQuery.Name)
+	case *mgmt_pb.ProviderQuery_IdpIdQuery:
+		return query.NewIDPTemplateIDSearchQuery(q.IdpIdQuery.Id)
+	case *mgmt_pb.ProviderQuery_OwnerTypeQuery:
+		return query.NewIDPTemplateOwnerTypeSearchQuery(idp_grpc.IDPProviderTypeFromPb(q.OwnerTypeQuery.OwnerType))
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "ORG-Dr2aa", "List.Query.Invalid")
+	}
+}
+
+func addGoogleProviderToCommand(req *mgmt_pb.AddGoogleProviderRequest) command.GoogleProvider {
+	return command.GoogleProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGoogleProviderToCommand(req *mgmt_pb.UpdateGoogleProviderRequest) command.GoogleProvider {
+	return command.GoogleProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addLDAPProviderToCommand(req *mgmt_pb.AddLDAPProviderRequest) command.LDAPProvider {
+	return command.LDAPProvider{
+		Name:                req.Name,
+		Host:                req.Host,
+		Port:                req.Port,
+		TLS:                 req.Tls,
+		BaseDN:              req.BaseDn,
+		UserObjectClass:     req.UserObjectClass,
+		UserUniqueAttribute: req.UserUniqueAttribute,
+		Admin:               req.Admin,
+		Password:            req.Password,
+		LDAPAttributes:      idp_grpc.LDAPAttributesToCommand(req.Attributes),
+		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateLDAPProviderToCommand(req *mgmt_pb.UpdateLDAPProviderRequest) command.LDAPProvider {
+	return command.LDAPProvider{
+		Name:                req.Name,
+		Host:                req.Host,
+		Port:                req.Port,
+		TLS:                 req.Tls,
+		BaseDN:              req.BaseDn,
+		UserObjectClass:     req.UserObjectClass,
+		UserUniqueAttribute: req.UserUniqueAttribute,
+		Admin:               req.Admin,
+		Password:            req.Password,
+		LDAPAttributes:      idp_grpc.LDAPAttributesToCommand(req.Attributes),
+		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
 }

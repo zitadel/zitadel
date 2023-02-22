@@ -1,7 +1,5 @@
 {
-    "github": {
-        "silent": true
-    },
+    "cleanUrls": true,
     "rewrites": [
         { "source": "/docs/:match*", "destination": "/:match*" }
     ],

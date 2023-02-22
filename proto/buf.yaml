@@ -9,4 +9,8 @@ breaking:
     - FILE
 lint:
   use:
+<<<<<<< HEAD
     - MINIMAL
+=======
+    - MINIMAL
+>>>>>>> main

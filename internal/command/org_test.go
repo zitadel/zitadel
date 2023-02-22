@@ -1250,6 +1250,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 								"name",
 								"description",
 								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),

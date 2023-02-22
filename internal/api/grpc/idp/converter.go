@@ -5,6 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 )
 
@@ -294,5 +295,152 @@ func ownerTypeToPB(typ domain.IdentityProviderType) idp_pb.IDPOwnerType {
 		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
 	default:
 		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
+	}
+}
+
+func OptionsToCommand(options *idp_pb.Options) idp.Options {
+	if options == nil {
+		return idp.Options{}
+	}
+	return idp.Options{
+		IsCreationAllowed: options.IsCreationAllowed,
+		IsLinkingAllowed:  options.IsLinkingAllowed,
+		IsAutoCreation:    options.IsAutoCreation,
+		IsAutoUpdate:      options.IsAutoUpdate,
+	}
+}
+
+func LDAPAttributesToCommand(attributes *idp_pb.LDAPAttributes) idp.LDAPAttributes {
+	if attributes == nil {
+		return idp.LDAPAttributes{}
+	}
+	return idp.LDAPAttributes{
+		IDAttribute:                attributes.IdAttribute,
+		FirstNameAttribute:         attributes.FirstNameAttribute,
+		LastNameAttribute:          attributes.LastNameAttribute,
+		DisplayNameAttribute:       attributes.DisplayNameAttribute,
+		NickNameAttribute:          attributes.NickNameAttribute,
+		PreferredUsernameAttribute: attributes.PreferredUsernameAttribute,
+		EmailAttribute:             attributes.EmailAttribute,
+		EmailVerifiedAttribute:     attributes.EmailVerifiedAttribute,
+		PhoneAttribute:             attributes.PhoneAttribute,
+		PhoneVerifiedAttribute:     attributes.PhoneVerifiedAttribute,
+		PreferredLanguageAttribute: attributes.PreferredLanguageAttribute,
+		AvatarURLAttribute:         attributes.AvatarUrlAttribute,
+		ProfileAttribute:           attributes.ProfileAttribute,
+	}
+}
+
+func ProvidersToPb(providers []*query.IDPTemplate) []*idp_pb.Provider {
+	list := make([]*idp_pb.Provider, len(providers))
+	for i, provider := range providers {
+		list[i] = ProviderToPb(provider)
+	}
+	return list
+}
+
+func ProviderToPb(provider *query.IDPTemplate) *idp_pb.Provider {
+	return &idp_pb.Provider{
+		Id:      provider.ID,
+		Details: obj_grpc.ToViewDetailsPb(provider.Sequence, provider.CreationDate, provider.ChangeDate, provider.ResourceOwner),
+		State:   providerStateToPb(provider.State),
+		Name:    provider.Name,
+		Owner:   ownerTypeToPB(provider.OwnerType),
+		Type:    providerTypeToPb(provider.Type),
+		Config:  configToPb(provider),
+	}
+}
+
+func providerStateToPb(state domain.IDPState) idp_pb.IDPState {
+	switch state { //nolint:exhaustive
+	case domain.IDPStateActive:
+		return idp_pb.IDPState_IDP_STATE_ACTIVE
+	case domain.IDPStateInactive:
+		return idp_pb.IDPState_IDP_STATE_INACTIVE
+	case domain.IDPStateUnspecified:
+		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
+	default:
+		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
+	}
+}
+
+func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
+	switch idpType {
+	case domain.IDPTypeOIDC:
+		return idp_pb.ProviderType_PROVIDER_TYPE_OIDC
+	case domain.IDPTypeJWT:
+		return idp_pb.ProviderType_PROVIDER_TYPE_JWT
+	case domain.IDPTypeOAuth:
+		return idp_pb.ProviderType_PROVIDER_TYPE_OAUTH
+	case domain.IDPTypeLDAP:
+		return idp_pb.ProviderType_PROVIDER_TYPE_LDAP
+	case domain.IDPTypeAzureAD:
+		return idp_pb.ProviderType_PROVIDER_TYPE_AZURE_AD
+	case domain.IDPTypeGitHub:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB
+	case domain.IDPTypeGitHubEE:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB_EE
+	case domain.IDPTypeGitLab:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITLAB
+	case domain.IDPTypeGitLabSelfHosted:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITLAB_SELF_HOSTED
+	case domain.IDPTypeGoogle:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GOOGLE
+	case domain.IDPTypeUnspecified:
+		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
+	default:
+		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
+	}
+}
+
+func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
+	providerConfig := &idp_pb.ProviderConfig{
+		Options: &idp_pb.Options{
+			IsLinkingAllowed:  config.IsLinkingAllowed,
+			IsCreationAllowed: config.IsCreationAllowed,
+			IsAutoCreation:    config.IsAutoCreation,
+			IsAutoUpdate:      config.IsAutoUpdate,
+		},
+	}
+	if config.GoogleIDPTemplate != nil {
+		providerConfig.Config = &idp_pb.ProviderConfig_Google{
+			Google: &idp_pb.GoogleConfig{
+				ClientId: config.GoogleIDPTemplate.ClientID,
+				Scopes:   config.GoogleIDPTemplate.Scopes,
+			},
+		}
+	}
+	if config.LDAPIDPTemplate != nil {
+		providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
+			Ldap: &idp_pb.LDAPConfig{
+				Host:                config.Host,
+				Port:                config.Port,
+				Tls:                 config.TLS,
+				BaseDn:              config.BaseDN,
+				UserObjectClass:     config.UserObjectClass,
+				UserUniqueAttribute: config.UserUniqueAttribute,
+				Admin:               config.Admin,
+				Attributes:          ldapAttributesToPb(config.LDAPAttributes),
+			},
+		}
+	}
+	return providerConfig
+}
+
+func ldapAttributesToPb(attributes idp.LDAPAttributes) *idp_pb.LDAPAttributes {
+	return &idp_pb.LDAPAttributes{
+		IdAttribute:                attributes.IDAttribute,
+		FirstNameAttribute:         attributes.FirstNameAttribute,
+		LastNameAttribute:          attributes.LastNameAttribute,
+		DisplayNameAttribute:       attributes.DisplayNameAttribute,
+		NickNameAttribute:          attributes.NickNameAttribute,
+		PreferredUsernameAttribute: attributes.PreferredUsernameAttribute,
+		EmailAttribute:             attributes.EmailAttribute,
+		EmailVerifiedAttribute:     attributes.EmailVerifiedAttribute,
+		PhoneAttribute:             attributes.PhoneAttribute,
+		PhoneVerifiedAttribute:     attributes.PhoneVerifiedAttribute,
+		PreferredLanguageAttribute: attributes.PreferredLanguageAttribute,
+		AvatarUrlAttribute:         attributes.AvatarURLAttribute,
+		ProfileAttribute:           attributes.ProfileAttribute,
 	}
 }

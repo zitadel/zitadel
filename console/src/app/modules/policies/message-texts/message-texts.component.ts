@@ -441,7 +441,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
   };
 
   public locale: string = 'en';
-  public LOCALES: string[] = ['en', 'de', 'it'];
+  public LOCALES: string[] = ['en', 'de', 'it', 'fr', 'pl', 'zh'];
   private sub: Subscription = new Subscription();
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN
@@ -596,7 +596,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           return handler((this.service as ManagementService).setCustomDomainClaimedMessageCustomText(this.updateRequest));
         case MESSAGETYPES.PASSWORDLESS:
           return handler(
-            (this.service as ManagementService).getCustomPasswordlessRegistrationMessageText(this.updateRequest),
+            (this.service as ManagementService).setCustomPasswordlessRegistrationMessageCustomText(this.updateRequest),
           );
         case MESSAGETYPES.PASSWORDCHANGE:
           return handler((this.service as ManagementService).getCustomPasswordChangeMessageText(this.updateRequest));
