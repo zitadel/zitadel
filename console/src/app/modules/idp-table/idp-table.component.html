@@ -48,26 +48,6 @@
     >
       {{ 'IDP.ACTIVATE' | translate }}
     </button>
-
-    <a
-      [routerLink]="createRouterLink"
-      class="cnsl-action-button"
-      color="primary"
-      mat-raised-button
-      [disabled]="
-        ([
-          serviceType === PolicyComponentServiceType.ADMIN
-            ? 'iam.idp.write'
-            : serviceType === PolicyComponentServiceType.MGMT
-            ? 'org.idp.write'
-            : ''
-        ]
-          | hasRole
-          | async) === false
-      "
-    >
-      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-    </a>
   </div>
 
   <div class="table-wrapper">

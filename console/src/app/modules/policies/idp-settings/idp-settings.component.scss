@@ -1,47 +1,66 @@
-.cnsl-idp-table-wrapper {
-  display: block;
-}
+@use '@angular/material' as mat;
 
-.new-idp-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0 -1rem;
-  box-sizing: border-box;
+@mixin idp-settings-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
 
-  .item {
-    position: relative;
-    z-index: 100;
-    margin: 1rem;
-    flex-basis: 215px;
+  .cnsl-idp-table-wrapper {
+    display: block;
+  }
+
+  .new-idp-wrapper {
     display: flex;
-    text-decoration: none;
-    cursor: pointer;
-    padding-top: 1rem;
-    padding-right: 1rem;
-    padding-bottom: 1rem;
-    padding-left: 1rem;
-    border-radius: 0.5rem;
+    flex-wrap: wrap;
+    margin: 0 -1rem;
     box-sizing: border-box;
-    transition: box-shadow 0.1s ease-in;
-    align-items: center;
 
-    .idp-logo {
-      margin-right: 1rem;
-      height: 36px;
-      width: 36px;
-    }
-
-    .text-container {
+    .item {
+      position: relative;
+      z-index: 100;
+      margin: 1rem;
+      flex-basis: 215px;
       display: flex;
-      flex-direction: column;
+      text-decoration: none;
+      cursor: pointer;
+      padding-top: 1rem;
+      padding-right: 1rem;
+      padding-bottom: 1rem;
+      padding-left: 1rem;
+      border-radius: 0.5rem;
+      box-sizing: border-box;
+      transition: box-shadow 0.1s ease-in;
+      align-items: center;
+      color: map-get($foreground, text);
 
-      .title {
+      &:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
       }
-    }
 
-    &.disabled {
-      filter: grayscale(1);
-      cursor: not-allowed;
+      .idp-logo {
+        margin-right: 1rem;
+        height: 36px;
+        width: 36px;
+      }
+
+      .text-container {
+        display: flex;
+        flex-direction: column;
+
+        .title {
+        }
+      }
+
+      &.disabled {
+        filter: grayscale(1);
+        cursor: not-allowed;
+
+        &:hover {
+          box-shadow: none;
+        }
+      }
     }
   }
 }

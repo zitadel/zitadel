@@ -51,6 +51,7 @@
 @import 'src/app/modules/sidenav/sidenav.component';
 @import 'src/app/modules/user-grants/user-grants.component.scss';
 @import 'src/app/modules/shortcuts/shortcuts.component.scss';
+@import 'src/app/modules/policies/idp-settings/idp-settings.component.scss';
 @import 'src/app/modules/idp-create/idp-type-radio/idp-type-radio.component.scss';
 @import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
@@ -80,6 +81,7 @@
   @include search-user-autocomplete-theme($theme);
   @include project-role-chips-theme($theme);
   @include card-theme($theme);
+  @include idp-settings-theme($theme);
   @include filter-events-theme($theme);
   @include footer-theme($theme);
   @include table-theme($theme);

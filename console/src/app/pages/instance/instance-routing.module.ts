@@ -36,6 +36,15 @@ const routes: Routes = [
         },
       },
       {
+        path: 'google-create',
+        loadChildren: () => import('src/app/modules/provider-google-create/provider-google-create.module'),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+          roles: ['iam.idp.write'],
+          serviceType: PolicyComponentServiceType.ADMIN,
+        },
+      },
+      {
         path: ':id',
         loadChildren: () => import('src/app/modules/idp/idp.module'),
         canActivate: [AuthGuard, RoleGuard],
