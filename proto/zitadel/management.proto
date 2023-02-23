@@ -67,6 +67,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Organization Metadata"
         },
         {
+            name: "Policies"
+        },
+        {
             name: "Projects",
             description: "Projects are vessels for different applications/clients sharing the same role context."
         },
@@ -388,6 +391,13 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Deprecated: Create User (Human)";
+            description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login."
+            tags: "Users";
+            deprecated: true;
         };
     }
 
@@ -1090,8 +1100,10 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Deprecated";
+            tags: "Users";
+            tags: "User Human";
             summary: "Set Human Initial Password";
+            deprecated: true;
         };
     }
 
@@ -3202,12 +3214,13 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Deprecated";
+            tags: "Policies";
             summary: "Get Organziation IAM Policy";
+            description: "Use Get Domain Policy instead"
+            deprecated: true;
         };
     }
 
-    // Returns the domain policy (this policy is managed by the IAM administrator)
     rpc GetDomainPolicy(GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/domain"
@@ -3215,6 +3228,13 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Policies";
+            summary: "Get Domain Policy";
+            description: "Returns the domain policy (this policy is managed by the IAM administrator)";
+            deprecated: true;
         };
     }
 
@@ -4877,7 +4897,6 @@ message AddMachineUserRequest {
     string description = 3 [
         (validate.rules).string = {max_len: 500},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            min_length: 1;
             max_length: 500;
             example: "\"First machine account used for API XY.\"";
         }
