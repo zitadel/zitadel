@@ -108,10 +108,10 @@ func TestWithTimestamp(t *testing.T) {
 			got := WithTimestamp(tt.args.ctx)
 			val := got.Value(key).(time.Time)
 
-			if !tt.noPrevious && val.Compare(start) != 1 {
+			if !tt.noPrevious && val.Before(start) {
 				t.Errorf("time should be now not %v", val)
 			}
-			if tt.noPrevious && val.Compare(start) != 0 {
+			if tt.noPrevious && val.After(start) {
 				t.Errorf("time should be start not %v", val)
 			}
 		})
