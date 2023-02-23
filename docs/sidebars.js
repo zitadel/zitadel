@@ -112,8 +112,9 @@ module.exports = {
       items: [
         "guides/migrate/introduction",
         "guides/migrate/users",
-        "guides/migrate/export-and-import",
-        "guides/migrate/auth0",
+        "guides/migrate/sources/zitadel-v1",
+        "guides/migrate/sources/auth0",
+        "guides/migrate/sources/keycloak",
       ]
     },
     {
