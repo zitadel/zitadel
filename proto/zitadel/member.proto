@@ -17,7 +17,7 @@ message Member {
     zitadel.v1.ObjectDetails details = 2;
     repeated string roles = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"role.super.man\"]";
+            example: "[\"IAM_OWNER\"]";
             description: "the role keys granted to the user"
         }
     ];
@@ -36,7 +36,7 @@ message Member {
     string first_name = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"Gigi\"";
-            description: "first name of the user"
+            description: "the first name of the user"
         }
     ];
     string last_name = 7 [
@@ -53,7 +53,7 @@ message Member {
     ];
     string avatar_url = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "avatar url of the user"
+            description: "avatar URL of the user"
             example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
