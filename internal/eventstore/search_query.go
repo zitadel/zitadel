@@ -34,7 +34,6 @@ type SearchQuery struct {
 	eventTypes           []EventType
 	eventData            map[string]interface{}
 	creationDateAfter    time.Time
-	allowTimetravel      bool
 }
 
 // Columns defines which fields of the event are needed for the query
