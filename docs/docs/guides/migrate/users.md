@@ -11,14 +11,113 @@ We will also offer more detailed guides how to migrate users from a specific aut
 
 ### Import users
 
-Use our APIs to import users.
-
-For bulk import use this endpoint:
-TODO: tbc. bulk import
-
-Creating individual users can be done with this endpoint: [ImportHumanUser](http://localhost:3000/docs/apis/proto/management#importhumanuser)
-
+Creating individual users can be done with this endpoint: [ImportHumanUser](/docs/apis/mgmt/management-service-import-human-user).
 Please also consult our [guide](/docs/guides/manage/user/reg-create-user) on how to create users.
+
+```json
+{
+  "userName": "test9@test9",
+  "profile": {
+    "firstName": "Road",
+    "lastName": "Runner",
+    "displayName": "Road Runner",
+    "preferredLanguage": "en"
+  },
+  "email": {
+    "email": "test@test.com",
+    "isEmailVerified": false
+  },
+  "hashedPassword": {
+    "value": "$2a$14$aPbwhMVJSVrRRW2NoM/5.esSJO6o/EIGzGxWiM5SAEZlGqCsr9DAK",
+    "algorithm": "bcrypt"
+  },
+  "passwordChangeRequired": false,
+  "otpCode": "testotp",
+  "requestPasswordlessRegistration": false,
+  "idps": [
+    {
+      "configId": "124425861423228496",
+      "externalUserId": "roadrunner@mailonline.com",
+      "displayName": "name"
+    }
+  ]
+}
+```
+
+For bulk import use the [import endpoint](https://zitadel.com/docs/apis/admin/admin-service-import-data) on the admin API:
+
+```json
+{
+  "timeout": "10m",
+  "data_orgs": {
+    "orgs": [
+      {
+        "orgId": "104133391254874632",
+        "org": {
+          "name": "TestFabi"
+        },
+        "humanUsers": [
+          {
+            "userId": "104133391271651848",
+            "user": {
+              "userName": "fabienne",
+              "profile": {
+                "firstName": "Fabienne",
+                "lastName": "Gerschwiler",
+                "displayName": "Fabienne Gerschwiler",
+                "preferredLanguage": "und"
+              },
+              "email": {
+                "email": "fabienne@caos.ch",
+                "isEmailVerified": true
+              },
+              "hashedPassword": {
+                "value": "$2a$14$aPbwhMVJSVrRRW2NoM/5.esSJO6o/EIGzGxWiM5SAEZlGqCsr9DAK",
+                "algorithm": "bcrypt"
+              }
+            }
+          },
+          {
+            "userId": "120080115081209416",
+            "user": {
+              "userName": "testuser",
+              "profile": {
+                "firstName": "Test",
+                "lastName": "User",
+                "displayName": "Test User",
+                "preferredLanguage": "und"
+              },
+              "email": {
+                "email": "fabienne@caos.ch",
+                "isEmailVerified": true
+              },
+              "hashedPassword": {
+                "value": "$2a$14$785Fcdbpo9rn5L7E21nIAOJvGCPgWFrZhIAIfDonYXzWuZIKRAQkO",
+                "algorithm": "bcrypt"
+              }
+            }
+          },
+          {
+            "userId": "145195347319252359",
+            "user": {
+              "userName": "test1",
+              "profile": {
+                "firstName": "Fabienne",
+                "lastName": "Gerschwiler",
+                "displayName": "Fabienne Gerschwiler",
+                "preferredLanguage": "und"
+              },
+              "email": {
+                "email": "fabienne@gmail.com"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 ### Migrate secrets
 
@@ -28,6 +127,20 @@ Besides user data you need to migrate secrets, such as password hashes, OTP seed
 
 Passwords are stored only as hash.
 You can transfer the hashes as long as ZITADEL [supports the same hash algorithm](/docs/concepts/architecture/secrets#hashed-secrets).
+Password change on the next sign-in can be enforced.
+
+```json
+{
+  "userName": "test9@test9",
+    ...,
+    "hashedPassword": {
+        "value": "$2a$14$aPbwhMVJSVrRRW2NoM/5.esSJO6o/EIGzGxWiM5SAEZlGqCsr9DAK",
+        "algorithm": "bcrypt"
+    },
+    "passwordChangeRequired": false,
+    ...,
+}
+```
 
 In case the hashes can't be transferred directly, you always have the option to create a user in ZITADEL without password and prompt users to create a new password.
 
@@ -39,25 +152,56 @@ In case the hash algorithm you are using is not supported by ZITADEL, please let
 
 #### One-time-passwords (OTP)
 
-TODO:
-- How to import OTP
+You can pass the OTP secret when creating users:
+
+```json
+{
+  "userName": "test9@test9",
+    ...,
+    "otpCode": "testotp",
+    ...,
+}
+```
 
 ### Passkeys
 
-TODO:
-- tbc. can passkey material be imported?
-- how to import passkeys data?
+When creating new users, you can trigger a workflow that prompts the users to setup a passkey authenticator.
+
+```json
+{
+  "userName": "test9@test9",
+    ...,
+    "requestPasswordlessRegistration": false,
+    ...,
+}
+```
 
 For passkeys to work on the new system you need to make sure that the new auth server has the same domain as the legacy auth server.
+
+:::info
+Currently it is not possible to migrate passkeys directly from another system.
+:::
 
 ### Users linked to an external IDP
 
 A users `sub` is bound to the external [IDP's Client ID](https://zitadel.com/docs/guides/manage/console/instance-settings#identity-providers).
 This means that the IDP Client ID configured in ZITADEL must be the same ID as in the legacy system.
 
-Users should be imported with their `externalId`.
+Users should be imported with their `externalUserId`.
 
-TODO: how to set externalId? (that's the name in the actions, how is it called in the api calls?)
+```json
+{
+  "userName": "test9@test9",
+    ...,
+    "idps": [
+        {
+        "configId": "124425861423228496",
+        "externalUserId": "roadrunner@mailonline.com",
+        "displayName": "name"
+        }
+    ...,
+}
+```
 
 You can use an Action with [post-creation flow](https://zitadel.com/docs/apis/actions/external-authentication#post-creation) to pull information such as roles from the old system and apply them to the user in ZITADEL.
 
@@ -65,6 +209,10 @@ You can use an Action with [post-creation flow](https://zitadel.com/docs/apis/ac
 
 You can store arbitrary key-value information on a user (or Organization) in ZITADEL.
 Use metadata to store additional attributes of the users, such as organizational unit, backend-id, etc.
+
+:::info
+Metadata must be added to users after the users were created. Currently metadata can't be added during user creation.
+:::
 
 Request metadata from the userinfo endpoint by passing the required [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) in your auth request.
 
