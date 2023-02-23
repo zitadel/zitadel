@@ -1,3 +1,13 @@
+ExternalDomain: localhost
+ExternalSecure: false
+
+Database:
+  cockroach:
+    Host:  host.docker.internal
+
+TLS:
+  Enabled: false
+
 FirstInstance:
   Org:
     Human:
@@ -23,7 +33,7 @@ Quotas:
 
 DefaultInstance:
   LoginPolicy:
-    MfaInitSkipLifetime: 0
+    MfaInitSkipLifetime: "0"
 
 SystemAPIUsers:
 - cypress:

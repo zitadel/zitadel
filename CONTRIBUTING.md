@@ -151,6 +151,10 @@ Also, you can verify the data by running `cockroach sql --database zitadel --ins
 
 As soon as you are ready to battle test your changes, run the end-to-end tests.
 
+#### Running the tests with docker
+
+Running the tests with docker doesn't require you to take care of other dependencies than docker and goreleaser.
+
 ```bash
 # Build the production binary (unit tests are executed, too)
 goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
@@ -163,6 +167,15 @@ DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zit
 
 # Run the tests
 ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/docker-compose.yaml run e2e
+```
+
+#### Running the tests without docker
+
+If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
+```bash
+(cd ./e2e && npm install)
+(cd ./e2e && npm run open:golangangular)
+(cd ./e2e && npm run e2e:golangangular)
 ```
 
 When you are happy with your changes, you can cleanup your environment.
@@ -208,7 +221,7 @@ Run the database and the latest backend locally.
 cd ./console
 
 # You just need the db and the zitadel services to develop the console against.
-docker compose --file ../e2e/docker-compose.yaml up --detach db zitadel
+docker compose --file ../e2e/docker-compose.yaml up --detach zitadel
 ```
 
 When the backend is ready, you have the latest zitadel exposed at http://localhost:8080.
@@ -260,14 +273,20 @@ npm run lint:fix
 npm install
 
 # Run all e2e tests
-npm run e2e:dev -- --headed
+npm run e2e:angular -- --headed
 ```
 
-You can also open the test suite interactively for fast success feedback on specific tests.
+You can also open the test suite interactively for fast feedback on specific tests.
 
 ```bash
 # Run tests interactively
-npm run open:dev
+npm run open:angular
+```
+
+If you also make changes to the backend, you can run the test against your locally built backend code and frontend server
+```bash
+npm run open:golangangular
+npm run e2e:golangangular
 ```
 
 When you are happy with your changes, you can format your code and cleanup your environment
