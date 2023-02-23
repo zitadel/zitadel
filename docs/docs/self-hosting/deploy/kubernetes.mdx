@@ -36,9 +36,7 @@ helm install my-zitadel zitadel/zitadel \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
-  --set replicaCount=1 \
-  --set cockroachdb.single-node=true \
-  --set cockroachdb.statefulset.replicas=1
+  --set replicaCount=1
 ```
 
 <DefaultUser components={props.components} />
@@ -48,14 +46,19 @@ helm install my-zitadel zitadel/zitadel \
 !!!Caution!!! With this setup you only get a service account with a key and no admin account where you can login directly into ZITADEL.
 
 ```bash
+# CockroachDB
+helm install crdb cockroachdb/cockroachdb \
+  --set fullnameOverride=crdb \
+  --set single-node=true \
+  --set statefulset.replicas=1
+
+# ZITADEL
 helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
   --set replicaCount=1 \
-  --set cockroachdb.single-node=true \
-  --set cockroachdb.statefulset.replicas=1 \
   --set zitadel.configmapConfig.FirstInstance.MachineKeyPath="/machinekey/zitadel-admin-sa.json" \
   --set zitadel.configmapConfig.FirstInstance.Org.Machine.Machine.Username="zitadel-admin-sa" \
   --set zitadel.configmapConfig.FirstInstance.Org.Machine.Machine.Name="Admin" \

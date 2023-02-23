@@ -275,7 +275,7 @@ module.exports = {
         "self-hosting/deploy/compose",
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
+        "self-hosting/deploy/loadbalancing-example/loadbalancing-example"
       ],
     },
     {
@@ -292,6 +292,7 @@ module.exports = {
         "self-hosting/manage/tls_modes",
         "self-hosting/manage/database/database",
         "self-hosting/manage/updating_scaling",
+        "self-hosting/manage/quotas"
       ],
     },
   ],
@@ -344,7 +345,10 @@ module.exports = {
       type: "category",
       label: "Features",
       collapsed: false,
-      items: ["concepts/features/actions", "concepts/features/selfservice"],
+      items: [
+        "concepts/features/actions",
+        "concepts/features/selfservice"
+      ],
     },
   ],
   manuals: [

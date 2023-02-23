@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"errors"
+	errs "errors"
 	"fmt"
 	"strings"
 
@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -23,27 +23,36 @@ const (
 	HTTP1Host = "x-zitadel-http1-host"
 )
 
-type InstanceVerifier interface {
-	GetInstance(ctx context.Context)
-}
-
-func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, ignoredServices ...string) grpc.UnaryServerInterceptor {
+func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
 	translator, err := newZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return setInstance(ctx, req, info, handler, verifier, headerName, translator, ignoredServices...)
+		return setInstance(ctx, req, info, handler, verifier, headerName, translator, explicitInstanceIdServices...)
 	}
 }
 
-func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName string, translator *i18n.Translator, ignoredServices ...string) (_ interface{}, err error) {
+func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
 	interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	for _, service := range ignoredServices {
+	for _, service := range idFromRequestsServices {
 		if !strings.HasPrefix(service, "/") {
 			service = "/" + service
 		}
 		if strings.HasPrefix(info.FullMethod, service) {
-			return handler(ctx, req)
+			withInstanceIDProperty, ok := req.(interface{ GetInstanceId() string })
+			if !ok {
+				return handler(ctx, req)
+			}
+			ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
+			instance, err := verifier.InstanceByID(ctx)
+			if err != nil {
+				notFoundErr := new(errors.NotFoundError)
+				if errs.As(err, &notFoundErr) {
+					notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
+				}
+				return nil, status.Error(codes.NotFound, err.Error())
+			}
+			return handler(authz.WithInstance(ctx, instance), req)
 		}
 	}
 
@@ -53,9 +62,9 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
-		caosErr := new(caos_errors.NotFoundError)
-		if errors.As(err, &caosErr) {
-			caosErr.Message = translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil)
+		notFoundErr := new(errors.NotFoundError)
+		if errs.As(err, &notFoundErr) {
+			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
 		return nil, status.Error(codes.NotFound, err.Error())
 	}

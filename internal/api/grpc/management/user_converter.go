@@ -57,6 +57,8 @@ func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 		return query.UserTypeCol
 	case user.UserFieldName_USER_FIELD_NAME_NICK_NAME:
 		return query.HumanNickNameCol
+	case user.UserFieldName_USER_FIELD_NAME_CREATION_DATE:
+		return query.UserCreationDateCol
 	default:
 		return query.UserIDCol
 	}

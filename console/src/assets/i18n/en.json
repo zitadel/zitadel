@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "Select an expiration date",
       "CREATIONDATE": "Creation Date",
       "KEYDETAILS": "Key Details",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Add Key",
         "DESCRIPTION": "Select your key type and choose an optional expiration date."
