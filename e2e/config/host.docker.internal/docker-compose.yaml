@@ -16,7 +16,7 @@ services:
     working_dir: /e2e
     user: '$UID'
     volumes:
-      - .:/e2e
+      - ../../:/e2e
     command: 'sh -c "npm ci --omit=dev && npm run lint && npx wait-on http://zitadel:8080/debug/ready"'
 
   e2e:
@@ -31,7 +31,7 @@ services:
     working_dir: /e2e
     user: '$UID'
     volumes:
-      - .:/e2e
+      - ../../:/e2e
     environment:
       CYPRESS_BASE_URL: http://host.docker.internal:8080
       CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal
