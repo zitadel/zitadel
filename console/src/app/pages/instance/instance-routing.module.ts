@@ -27,8 +27,17 @@ const routes: Routes = [
     path: 'idp',
     children: [
       {
-        path: 'create',
-        loadChildren: () => import('src/app/modules/idp-create/idp-create.module'),
+        path: 'oidc-create',
+        loadChildren: () => import('src/app/modules/providers/provider-oidc-create/provider-oidc-create.module'),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+          roles: ['iam.idp.write'],
+          serviceType: PolicyComponentServiceType.ADMIN,
+        },
+      },
+      {
+        path: 'jwt-create',
+        loadChildren: () => import('src/app/modules/providers/provider-jwt-create/provider-jwt-create.module'),
         canActivate: [AuthGuard, RoleGuard],
         data: {
           roles: ['iam.idp.write'],
@@ -37,7 +46,7 @@ const routes: Routes = [
       },
       {
         path: 'google-create',
-        loadChildren: () => import('src/app/modules/provider-google-create/provider-google-create.module'),
+        loadChildren: () => import('src/app/modules/providers/provider-google-create/provider-google-create.module'),
         canActivate: [AuthGuard, RoleGuard],
         data: {
           roles: ['iam.idp.write'],

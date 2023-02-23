@@ -1578,8 +1578,21 @@
       "ACTIVETITLE": "启用的身份提供者"
     },
     "CREATE": {
-      "TITLE": "创建身份提供者",
-      "DESCRIPTION": "选择以下身份提供者类型之一。"
+      "TITLE": "Add provider",
+      "DESCRIPTION": "Select one ore more of the following providers.",
+      "STEPPERTITLE": "Create Provider",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Enter the required data for your OIDC provider."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Enter the required data for your JWT provider."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+      }
     },
     "DETAIL": {
       "TITLE": "身份提供者",

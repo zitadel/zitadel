@@ -1,18 +1,16 @@
-<cnsl-create-layout
-  title="{{ 'IDP.CREATE.TITLE' | translate }}"
-  [createSteps]="createSteps"
-  [currentCreateStep]="currentCreateStep"
-  (closed)="close()"
->
-  <div class="idp-create-content">
-    <h1>{{ 'IDP.CREATE.TITLE' | translate }}</h1>
+<cnsl-create-layout title="{{ 'IDP.CREATE.STEPPERTITLE' | translate }}" (closed)="close()">
+  <div class="jwt-create-content">
+    <div class="title-row">
+      <mat-icon class="idp-logo" svgIcon="mdi_jwt" alt="jwt" />
+      <h1>{{ 'IDP.CREATE.JWT.TITLE' | translate }}</h1>
+    </div>
 
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
-    <p class="desc cnsl-secondary-text">{{ 'IDP.JWT.DESCRIPTION' | translate }}</p>
+    <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.JWT.DESCRIPTION' | translate }}</p>
 
     <form [formGroup]="jwtFormGroup" (ngSubmit)="addJWTIdp()">
-      <div class="idp-content">
+      <div class="jwt-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
           <input cnslInput formControlName="jwtName" />
@@ -36,7 +34,7 @@
         </div>
       </cnsl-info-section>
 
-      <div class="idp-content">
+      <div class="jwt-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.JWT.JWTENDPOINT' | translate }}</cnsl-label>
           <input cnslInput formControlName="jwtEndpoint" />
@@ -47,10 +45,7 @@
         </cnsl-form-field>
       </div>
 
-      <div class="idp-create-actions">
-        <button color="primary" (click)="currentCreateStep = 1" mat-stroked-button class="back-button" type="button">
-          {{ 'ACTIONS.BACK' | translate }}
-        </button>
+      <div class="jwt-create-actions">
         <button color="primary" mat-raised-button class="continue-button" [disabled]="jwtFormGroup.invalid" type="submit">
           {{ 'ACTIONS.SAVE' | translate }}
         </button>

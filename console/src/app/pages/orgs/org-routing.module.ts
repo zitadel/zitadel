@@ -11,7 +11,7 @@ const routes: Routes = [
     children: [
       {
         path: 'create',
-        loadChildren: () => import('src/app/modules/idp-create/idp-create.module'),
+        loadChildren: () => import('src/app/modules/providers/provider-oidc-create/provider-oidc-create.module'),
         canActivate: [RoleGuard],
         data: {
           roles: ['org.idp.write'],

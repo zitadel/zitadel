@@ -14,15 +14,14 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
-import { JWT, OIDC, RadioItemIdpType } from './idptypes';
+import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
-  selector: 'cnsl-idp-create',
-  templateUrl: './idp-create.component.html',
-  styleUrls: ['./idp-create.component.scss'],
+  selector: 'cnsl-provider-oidc-create',
+  templateUrl: './provider-oidc-create.component.html',
+  styleUrls: ['./provider-oidc-create.component.scss'],
 })
-export class IdpCreateComponent implements OnInit, OnDestroy {
+export class ProviderOIDCCreateComponent implements OnInit, OnDestroy {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -32,18 +31,8 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
   public projectId: string = '';
 
   public oidcFormGroup!: UntypedFormGroup;
-  public jwtFormGroup!: UntypedFormGroup;
 
-  public createSteps: number = 2;
-  public currentCreateStep: number = 1;
   public loading: boolean = false;
-
-  public idpTypes: RadioItemIdpType[] = [OIDC, JWT];
-
-  OIDC: any = OIDC;
-  JWT: any = JWT;
-
-  public idpType!: RadioItemIdpType;
 
   constructor(
     private router: Router,
@@ -62,16 +51,6 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       idpDisplayNameMapping: new UntypedFormControl(0),
       usernameMapping: new UntypedFormControl(0),
       autoRegister: new UntypedFormControl(false),
-    });
-
-    this.jwtFormGroup = new UntypedFormGroup({
-      jwtName: new UntypedFormControl('', [Validators.required]),
-      jwtHeaderName: new UntypedFormControl('', [Validators.required]),
-      jwtIssuer: new UntypedFormControl('', [Validators.required]),
-      jwtEndpoint: new UntypedFormControl('', [Validators.required]),
-      jwtKeysEndpoint: new UntypedFormControl('', [Validators.required]),
-      jwtStylingType: new UntypedFormControl(0),
-      jwtAutoRegister: new UntypedFormControl(false),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -189,72 +168,6 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  public addJWTIdp(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new AddOrgJWTIDPRequest();
-
-      req.setName(this.jwtName?.value);
-      req.setHeaderName(this.jwtHeaderName?.value);
-      req.setIssuer(this.jwtIssuer?.value);
-      req.setJwtEndpoint(this.jwtEndpoint?.value);
-      req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
-      req.setAutoRegister(this.jwtAutoRegister?.value);
-      req.setStylingType(this.jwtStylingType?.value);
-
-      this.loading = true;
-      (this.service as ManagementService)
-        .addOrgJWTIDP(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate([
-              this.serviceType === PolicyComponentServiceType.MGMT
-                ? 'org'
-                : this.serviceType === PolicyComponentServiceType.ADMIN
-                ? 'iam'
-                : '',
-              'policy',
-              'login',
-            ]);
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AddJWTIDPRequest();
-
-      req.setName(this.jwtName?.value);
-      req.setHeaderName(this.jwtHeaderName?.value);
-      req.setIssuer(this.jwtIssuer?.value);
-      req.setJwtEndpoint(this.jwtEndpoint?.value);
-      req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
-      req.setAutoRegister(this.jwtAutoRegister?.value);
-      req.setStylingType(this.jwtStylingType?.value);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addJWTIDP(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate([
-              this.serviceType === PolicyComponentServiceType.MGMT
-                ? 'org'
-                : this.serviceType === PolicyComponentServiceType.ADMIN
-                ? 'iam'
-                : '',
-              'policy',
-              'login',
-            ]);
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
-  }
-
   public close(): void {
     this._location.back();
   }
@@ -313,33 +226,5 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
 
   public get usernameMapping(): AbstractControl | null {
     return this.oidcFormGroup.get('usernameMapping');
-  }
-
-  public get jwtName(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtName');
-  }
-
-  public get jwtHeaderName(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtHeaderName');
-  }
-
-  public get jwtIssuer(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtIssuer');
-  }
-
-  public get jwtEndpoint(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtEndpoint');
-  }
-
-  public get jwtKeysEndpoint(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtKeysEndpoint');
-  }
-
-  public get jwtStylingType(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtStylingType');
-  }
-
-  public get jwtAutoRegister(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtAutoRegister');
   }
 }

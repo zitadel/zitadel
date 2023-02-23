@@ -11,16 +11,16 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 
-import { CardModule } from '../card/card.module';
-import { CreateLayoutModule } from '../create-layout/create-layout.module';
-import { InfoSectionModule } from '../info-section/info-section.module';
-import { ProviderJWTCreateComponent } from './provider-jwt-create.component';
-import { ProviderJWTCreateRoutingModule } from './provider-jwt-create-routing.module';
+import { CardModule } from '../../card/card.module';
+import { CreateLayoutModule } from '../../create-layout/create-layout.module';
+import { InfoSectionModule } from '../../info-section/info-section.module';
+import { ProviderOIDCCreateRoutingModule } from './provider-oidc-create-routing.module';
+import { ProviderOIDCCreateComponent } from './provider-oidc-create.component';
 
 @NgModule({
-  declarations: [ProviderJWTCreateComponent],
+  declarations: [ProviderOIDCCreateComponent],
   imports: [
-    ProviderJWTCreateRoutingModule,
+    ProviderOIDCCreateRoutingModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -38,4 +38,4 @@ import { ProviderJWTCreateRoutingModule } from './provider-jwt-create-routing.mo
     MatProgressBarModule,
   ],
 })
-export default class IdpCreateModule {}
+export default class ProviderOIDCCreateModule {}

@@ -1579,8 +1579,17 @@
       "ACTIVETITLE": "Active Identity Providers"
     },
     "CREATE": {
-      "TITLE": "New Identity Provider",
-      "DESCRIPTION": "Choose one of the following Identity Provider types.",
+      "TITLE": "Add provider",
+      "DESCRIPTION": "Select one ore more of the following providers.",
+      "STEPPERTITLE": "Create Provider",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Enter the required data for your OIDC provider."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Enter the required data for your JWT provider."
+      },
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
@@ -1596,11 +1605,6 @@
       "0": "unknown",
       "1": "Instance",
       "2": "Organization"
-    },
-    "TYPES": {
-      "0": "unknown",
-      "1": "OIDC",
-      "3": "JWT"
     },
     "STATES": {
       "1": "active",

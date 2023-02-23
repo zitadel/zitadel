@@ -11,17 +11,16 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 
-import { CardModule } from '../card/card.module';
-import { CreateLayoutModule } from '../create-layout/create-layout.module';
-import { InfoSectionModule } from '../info-section/info-section.module';
-import { IdpCreateRoutingModule } from './idp-create-routing.module';
-import { IdpCreateComponent } from './idp-create.component';
-import { IdpTypeRadioComponent } from './idp-type-radio/idp-type-radio.component';
+import { CardModule } from '../../card/card.module';
+import { CreateLayoutModule } from '../../create-layout/create-layout.module';
+import { InfoSectionModule } from '../../info-section/info-section.module';
+import { ProviderGoogleCreateComponent } from './provider-google-create.component';
+import { ProviderGoogleCreateRoutingModule } from './provider-google-create-routing.module';
 
 @NgModule({
-  declarations: [IdpCreateComponent, IdpTypeRadioComponent],
+  declarations: [ProviderGoogleCreateComponent],
   imports: [
-    IdpCreateRoutingModule,
+    ProviderGoogleCreateRoutingModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -39,4 +38,4 @@ import { IdpTypeRadioComponent } from './idp-type-radio/idp-type-radio.component
     MatProgressBarModule,
   ],
 })
-export default class IdpCreateModule {}
+export default class ProviderGoogleCreateModule {}

@@ -20,7 +20,23 @@
   }
 }
 
-.idp-create-content {
+.jwt-create-content {
+  .title-row {
+    display: flex;
+    align-items: center;
+
+    .idp-logo {
+      height: 36px;
+      width: 36px;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0;
+    }
+  }
+
   .formfield {
     display: block;
     max-width: 400px;
@@ -40,7 +56,7 @@
     }
   }
 
-  .idp-content {
+  .jwt-content {
     .desc {
       margin-bottom: 1rem;
     }
@@ -67,17 +83,12 @@
   }
 }
 
-.idp-create-actions {
+.jwt-create-actions {
   display: flex;
   margin-top: 1rem;
 
-  button[mat-stroked-button] {
-    border-radius: 0.5rem;
-    margin-right: 1rem;
-  }
-
   button[mat-raised-button] {
     border-radius: 0.5rem;
-    margin-right: 1rem;
+    padding: 0.5rem 4rem;
   }
 }

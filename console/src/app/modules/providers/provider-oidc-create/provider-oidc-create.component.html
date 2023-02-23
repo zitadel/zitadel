@@ -1,0 +1,105 @@
+<cnsl-create-layout title="{{ 'IDP.CREATE.STEPPERTITLE' | translate }}" (closed)="close()">
+  <div class="oidc-create-content">
+    <div class="title-row">
+      <mat-icon class="idp-logo" svgIcon="mdi_openid" alt="openid" />
+      <h1>{{ 'IDP.CREATE.OIDC.TITLE' | translate }}</h1>
+    </div>
+
+    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+
+    <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.OIDC.DESCRIPTION' | translate }}</p>
+
+    <form [formGroup]="oidcFormGroup" (ngSubmit)="addOIDCIdp()">
+      <div class="oidc-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="name" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
+          <input cnslInput formControlName="issuer" />
+        </cnsl-form-field>
+      </div>
+
+      <cnsl-info-section class="auto-reg-info">
+        <div>
+          <p class="auto-reg-desc">{{ 'IDP.AUTOREGISTER_DESC' | translate }}</p>
+          <mat-checkbox formControlName="autoRegister">
+            {{ 'IDP.AUTOREGISTER' | translate }}
+          </mat-checkbox>
+        </div>
+      </cnsl-info-section>
+
+      <div class="oidc-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
+          <input cnslInput formControlName="clientId" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
+          <input cnslInput formControlName="clientSecret" />
+        </cnsl-form-field>
+      </div>
+      <div class="oidc-content">
+        <cnsl-card class="scope-card">
+          <div class="idp-scopes">
+            <div class="flex-line">
+              <cnsl-form-field class="formfield">
+                <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
+
+                <input
+                  cnslInput
+                  [matChipInputFor]="chipScopesList"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  [matChipInputAddOnBlur]="true"
+                  (matChipInputTokenEnd)="addScope($event)"
+                />
+              </cnsl-form-field>
+              <button class="scope-add-button" (click)="addScope($any($event))" mat-icon-button>
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+            <cnsl-form-field class="formfield">
+              <mat-chip-list #chipScopesList aria-label="scope selection">
+                <mat-chip
+                  class="chip"
+                  *ngFor="let scope of scopesList?.value"
+                  selectable="false"
+                  removable
+                  (removed)="removeScope(scope)"
+                >
+                  {{ scope }} <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </cnsl-form-field>
+          </div>
+        </cnsl-card>
+      </div>
+      <div class="oidc-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</cnsl-label>
+          <mat-select formControlName="idpDisplayNameMapping">
+            <mat-option *ngFor="let field of mappingFields" [value]="field">
+              {{ 'IDP.MAPPINGFIELD.' + field | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</cnsl-label>
+          <mat-select formControlName="usernameMapping">
+            <mat-option *ngFor="let field of mappingFields" [value]="field">
+              {{ 'IDP.MAPPINGFIELD.' + field | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+      </div>
+
+      <div class="oidc-create-actions">
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="oidcFormGroup.invalid" type="submit">
+          {{ 'ACTIONS.SAVE' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</cnsl-create-layout>

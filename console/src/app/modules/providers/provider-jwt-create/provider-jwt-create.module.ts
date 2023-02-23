@@ -11,16 +11,16 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 
-import { CardModule } from '../card/card.module';
-import { CreateLayoutModule } from '../create-layout/create-layout.module';
-import { InfoSectionModule } from '../info-section/info-section.module';
-import { ProviderGoogleCreateComponent } from './provider-google-create.component';
-import { ProviderGoogleCreateRoutingModule } from './provider-google-create-routing.module';
+import { CardModule } from '../../card/card.module';
+import { CreateLayoutModule } from '../../create-layout/create-layout.module';
+import { InfoSectionModule } from '../../info-section/info-section.module';
+import { ProviderJWTCreateComponent } from './provider-jwt-create.component';
+import { ProviderJWTCreateRoutingModule } from './provider-jwt-create-routing.module';
 
 @NgModule({
-  declarations: [ProviderGoogleCreateComponent],
+  declarations: [ProviderJWTCreateComponent],
   imports: [
-    ProviderGoogleCreateRoutingModule,
+    ProviderJWTCreateRoutingModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -38,4 +38,4 @@ import { ProviderGoogleCreateRoutingModule } from './provider-google-create-rout
     MatProgressBarModule,
   ],
 })
-export default class ProviderGoogleCreateModule {}
+export default class ProviderJWTCreateModule {}

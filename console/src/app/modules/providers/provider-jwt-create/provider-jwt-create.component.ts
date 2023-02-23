@@ -14,7 +14,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
+import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
   selector: 'cnsl-provider-jwt-create',
@@ -31,9 +31,6 @@ export class ProviderJWTCreateComponent implements OnInit, OnDestroy {
   public projectId: string = '';
 
   public jwtFormGroup!: UntypedFormGroup;
-
-  public createSteps: number = 2;
-  public currentCreateStep: number = 1;
   public loading: boolean = false;
 
   constructor(
