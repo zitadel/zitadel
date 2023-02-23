@@ -170,62 +170,93 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "API Definition",
+      label: "Core Resources",
       collapsed: false,
       items: [
-        "apis/statuscodes",
         {
           type: "category",
-          label: "Proto",
+          label: "Authenticated User",
+          link: {
+            type: "generated-index",
+            title: "Auth API",
+            slug: "/apis/auth",
+            description:
+                "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+                
+          },
+          items: require("./docs/apis/auth/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Organization Objects",
+          link: {
+            type: "generated-index",
+            title: "Management API",
+            slug: "/apis/mgmt",
+            description:
+                "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+          },
+          items: require("./docs/apis/mgmt/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Instance Objects",
+          link: {
+            type: "generated-index",
+            title: "Admin API",
+            slug: "/apis/admin",
+            description:
+                "This API is intended to configure and manage one ZITADEL instance itself.",
+          },
+          items: require("./docs/apis/admin/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Instance Lifecycle",
+          link: {
+            type: "generated-index",
+            title: "System API",
+            slug: "/apis/system",
+            description:
+                "This API is intended to manage the different ZITADEL instances within the system.\n" +
+                "\n" +
+                "Checkout the guide how to access the ZITADEL System API.",
+          },
+          items: require("./docs/apis/system/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Assets",
+          collapsed: true,
+          items: ["apis/assets/assets"],
+        },
+      ]
+    },
+    {
+      type: "category",
+      label: "Sign In Users ",
+      collapsed: false,
+      items: [
+        {
+          type: "category",
+          label: "OpenID Connect & OAuth",
           collapsed: true,
           items: [
-            "apis/proto/auth",
-            "apis/proto/management",
-            "apis/proto/admin",
-            "apis/proto/system",
-            "apis/proto/instance",
-            "apis/proto/org",
-            "apis/proto/user",
-            "apis/proto/app",
-            "apis/proto/policy",
-            "apis/proto/auth_n_key",
-            "apis/proto/change",
-            "apis/proto/idp",
-            "apis/proto/member",
-            "apis/proto/metadata",
-            "apis/proto/message",
-            "apis/proto/text",
-            "apis/proto/action",
-            "apis/proto/object",
-            "apis/proto/options",
+            "apis/openidoauth/endpoints",
+            "apis/openidoauth/authrequest",
+            "apis/openidoauth/scopes",
+            "apis/openidoauth/claims",
+            "apis/openidoauth/authn-methods",
+            "apis/openidoauth/grant-types",
           ],
         },
         {
           type: "category",
-          label: "Assets API",
+          label: "SAML 2.0",
           collapsed: true,
-          items: ["apis/assets/assets"],
+          items: ["apis/saml/endpoints"],
         },
       ],
-    },
-    {
-      type: "category",
-      label: "OpenID Connect & OAuth",
-      collapsed: false,
-      items: [
-        "apis/openidoauth/endpoints",
-        "apis/openidoauth/authrequest",
-        "apis/openidoauth/scopes",
-        "apis/openidoauth/claims",
-        "apis/openidoauth/authn-methods",
-        "apis/openidoauth/grant-types",
-      ],
-    },
-    {
-      type: "category",
-      label: "SAML",
-      collapsed: false,
-      items: ["apis/saml/endpoints"],
     },
     {
       type: "category",
@@ -239,6 +270,11 @@ module.exports = {
         "apis/actions/complement-token",
         "apis/actions/objects",
       ]
+    },
+    {
+      type: "doc",
+      label: "gRPC Status Codes",
+      id: "apis/statuscodes"
     },
     {
       type: "category",

@@ -145,7 +145,7 @@ You should get a successful response with a `totalResult` number of 1 and the de
 }
 ```
 
-With this token you are allowed to access the whole [ZITADEL System API](../../apis/proto/system).
+With this token you are allowed to access the whole [ZITADEL System API](../../apis/system).
 
 ## Summary
 

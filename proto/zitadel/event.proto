@@ -15,34 +15,67 @@ message Event {
     Editor editor = 1;
     Aggregate aggregate = 2;
     uint64 sequence = 3;
-    // The timestamp the event occurred
     google.protobuf.Timestamp creation_date = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2019-04-01T08:45:00.000000Z\"";
+            description: "The timestamp the event occurred";
         }
     ];
-    google.protobuf.Struct payload = 5;
+    google.protobuf.Struct payload = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "{\"firstName\": \"Gigi\", \"lastName\": \"Giraffe\", \"userName\": \"gigi@zitadel.com\", \"displayName\": \"Gigi\"}";
+            description: "Payload contains the data of the event.";
+        }
+    ];
     EventType type = 6;
 }
 
 message Editor {
-    string user_id = 1;
-    string display_name = 2;
-    string service = 3;
+    string user_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"165617389845094785\"";
+        }
+    ];
+    string display_name = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Minnie Mouse\"";
+        }
+    ];
+    string service = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Management-API\"";
+        }
+    ];
 }
 
 message Aggregate {
-    string id = 1;
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"165617850743094785\"";
+        }
+    ];
     AggregateType type = 2;
-    string resource_owner = 3;
+    string resource_owner = 3[
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"165617850930497249\"";
+        }
+    ];
 }
 
 message EventType {
-    string type = 1;
+    string type = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"user.human.added\"";
+        }
+    ];
     zitadel.v1.LocalizedMessage localized = 2;
 }
 
 message AggregateType {
-    string type = 1;
+    string type = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"user\"";
+        }
+    ];
     zitadel.v1.LocalizedMessage localized = 2;
 }
