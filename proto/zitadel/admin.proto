@@ -52,9 +52,6 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             description: "Defines the look of the login UI, E-Mails, and ZITADEL Console. For adding assets like logo, icon and font, have a look at the assets API."
         },
         {
-            name: "Deprecated"
-        },
-        {
             name: "Domain Settings"
         },
         {
