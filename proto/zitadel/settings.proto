@@ -3,6 +3,7 @@ syntax = "proto3";
 import "zitadel/object.proto";
 import "validate/validate.proto";
 import "google/protobuf/duration.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.settings.v1;
 
@@ -11,8 +12,16 @@ option go_package ="github.com/zitadel/zitadel/pkg/grpc/settings";
 message SecretGenerator {
   SecretGeneratorType generator_type = 1;
   zitadel.v1.ObjectDetails details = 2;
-  uint32 length = 3;
-  google.protobuf.Duration  expiry   = 4;
+  uint32 length = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "6";
+    }
+  ];
+  google.protobuf.Duration expiry = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"3600s\"";
+    }
+  ];
   bool include_lower_letters = 5;
   bool include_upper_letters = 6;
   bool include_digits = 7;
@@ -43,11 +52,27 @@ enum SecretGeneratorType {
 
 message SMTPConfig {
   zitadel.v1.ObjectDetails details = 1;
-  string sender_address = 2;
-  string sender_name = 3;
+  string sender_address = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"noreply@m.zitadel.cloud\"";
+    }
+  ];
+  string sender_name = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ZITADEL\"";
+    }
+  ];
   bool tls = 4;
-  string host = 5;
-  string user = 6;
+  string host = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"smtp.postmarkapp.com:587\"";
+    }
+  ];
+  string user = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+    }
+  ];
 }
 
 message SMSProvider {
@@ -88,6 +113,6 @@ message SecurityPolicy {
   zitadel.v1.ObjectDetails details = 1;
   // states if iframe embedding is enabled or disabled
   bool enable_iframe_embedding = 2;
-  // origins allowed to load ZITADEL in an iframe if enable_iframe_embedding is true
+  // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
   repeated string allowed_origins = 3;
 }
