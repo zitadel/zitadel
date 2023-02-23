@@ -172,9 +172,16 @@ ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/docker-compose.yaml run 
 #### Running the tests without docker
 
 If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
+But you will have to install the relevant node dependencies.
+
 ```bash
+# Install dependencies
 (cd ./e2e && npm install)
+
+# Run the tests interactively
 (cd ./e2e && npm run open:golangangular)
+
+# Run the tests non-interactively
 (cd ./e2e && npm run e2e:golangangular)
 ```
 
@@ -283,7 +290,7 @@ You can also open the test suite interactively for fast feedback on specific tes
 npm run open:angular
 ```
 
-If you also make changes to the backend, you can run the test against your locally built backend code and frontend server
+If you also make [changes to the backend code](#backend--login), you can run the test against your locally built backend code and frontend server
 ```bash
 npm run open:golangangular
 npm run e2e:golangangular
