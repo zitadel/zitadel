@@ -220,20 +220,18 @@ With the [complement token flow](/docs/apis/actions/complement-token), you can a
 
 ## Technical Considerations
 
-### Evaluating migration patterns
-
 There will be multiple ways for migrating users from your existing auth system ("legacy") to ZITADEL.
 Which migration pattern to use depends on your requirements.
 
 This section should help you to get an overview of the different migration patterns and help you design an ideal solution for your use case. Your solution might require adjustments from the presented baseline patterns.
 
-#### Batch vs. Just-in-time Migration
+### Batch vs. Just-In-Time
 
 ```mermaid
 %%{init: {'theme':'dark'}}%%
 flowchart LR
     start([Start]) --> downtime{Zero downtime?}
-    downtime -- No --> batch[[Batch migration]]
+    downtime -- No --> batch[[Batch Migration]]
     downtime -- Yes --> clients{Can apps</br>switch</br>at day0?}
     subgraph jit [Just-in-time Migration]
         clients -- Yes --> user_api
@@ -247,7 +245,7 @@ flowchart LR
 
 In case all your applications depend on ZITADEL after the migration date, and ZITADEL is able to retrieve the required user information, including secrets, from the legacy system, then the recommended way is to let [ZITADEL orchestrate the user migration](#just-in-time-zitadel).
 
-#### Legacy System orchestrates migration
+### Legacy System Orchestrates Migration
 
 For all other cases, we recommend that the [legacy system orchestrates the migration](#legacy-system-orchestrates-migration) of users to ZITADEL for more flexibility.
 In this case the migration can also be done as an import job or also allowing to create user session in both the legacy auth solution and ZITADEL in parallel.
@@ -260,7 +258,9 @@ flowchart LR
     parallel -- Yes --> brokering([Identity Brokering + Action])
 ```
 
-### JWT IDP
+### Parallel Sessions
+
+JWT IDP
 
 TODO: 
 
