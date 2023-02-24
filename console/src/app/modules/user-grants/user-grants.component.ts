@@ -93,18 +93,21 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     switch (this.context) {
       case UserGrantContext.OWNED_PROJECT:
         if (this.projectId) {
-          // this.getProjectRoleOptions(this.projectId);
           this.routerLink = ['/grant-create', 'project', this.projectId];
         }
         break;
       case UserGrantContext.GRANTED_PROJECT:
         if (this.grantId) {
           this.routerLink = ['/grant-create', 'project', this.projectId, 'grant', this.grantId];
-          // this.getGrantRoleOptions(this.grantId, this.projectId);
         }
         break;
       case UserGrantContext.USER:
         if (this.userId) {
+          this.routerLink = ['/grant-create', 'user', this.userId];
+        }
+        break;
+      case UserGrantContext.AUTHUSER:
+        if (this.grantId) {
           this.routerLink = ['/grant-create', 'user', this.userId];
         }
         break;
