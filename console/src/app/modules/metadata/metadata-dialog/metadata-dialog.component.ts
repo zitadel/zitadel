@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import {
-  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
   MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
 import { Buffer } from 'buffer';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
