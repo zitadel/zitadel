@@ -169,7 +169,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       : this.dataSource.grantsSubject.value.forEach((row) => this.selection.select(row));
   }
 
-  public openEditDialog(grant: MgmtUserGrant.AsObject): void {
+  public openEditDialog(grant: MgmtUserGrant.AsObject | AuthUserGrant.AsObject): void {
     const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
       data: {
         projectId: grant.projectId,
@@ -183,7 +183,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp && resp.roles) {
         this.userService
-          .updateUserGrant(grant.id, grant.userId, resp.roles)
+          .updateUserGrant(
+            (grant as MgmtUserGrant.AsObject).id ?? (grant as AuthUserGrant.AsObject).grantId,
+            grant.userId,
+            resp.roles,
+          )
           .then(() => {
             this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
             grant.roleKeysList = resp.roles;
