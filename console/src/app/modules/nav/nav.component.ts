@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, merge, Observable, Subject, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, Subject, take, tap } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
