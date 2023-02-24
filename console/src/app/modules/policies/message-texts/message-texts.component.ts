@@ -3,31 +3,39 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacySelectChange as MatSelectChange } from '@angular/material/legacy-select';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import {
-  GetCustomPasswordResetMessageTextRequest as AdminGetCustomPasswordResetMessageTextRequest,
-  GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
-  GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
-  GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
   SetDefaultDomainClaimedMessageTextRequest,
   SetDefaultInitMessageTextRequest,
+  SetDefaultPasswordChangeMessageTextRequest,
   SetDefaultPasswordlessRegistrationMessageTextRequest,
   SetDefaultPasswordResetMessageTextRequest,
   SetDefaultVerifyEmailMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextRequest,
+  GetDefaultPasswordChangeMessageTextRequest as AdminGetDefaultPasswordChangeMessageTextRequest,
+  GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
+  GetDefaultPasswordResetMessageTextRequest as AdminGetDefaultPasswordResetMessageTextRequest,
+  GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextRequest as AdminGetDefaultPasswordlessRegistrationMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
   GetCustomDomainClaimedMessageTextRequest,
+  GetCustomInitMessageTextRequest,
+  GetCustomPasswordChangeMessageTextRequest,
   GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomVerifyEmailMessageTextRequest,
   GetCustomVerifyPhoneMessageTextRequest,
   GetDefaultDomainClaimedMessageTextRequest,
   GetDefaultInitMessageTextRequest,
+  GetDefaultPasswordChangeMessageTextRequest,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultVerifyEmailMessageTextRequest,
   GetDefaultVerifyPhoneMessageTextRequest,
   SetCustomDomainClaimedMessageTextRequest,
   SetCustomInitMessageTextRequest,
+  SetCustomPasswordChangeMessageTextRequest,
   SetCustomPasswordlessRegistrationMessageTextRequest,
   SetCustomPasswordResetMessageTextRequest,
   SetCustomVerifyEmailMessageTextRequest,
@@ -50,12 +58,30 @@ enum MESSAGETYPES {
   PASSWORDRESET = 'PR',
   DOMAINCLAIMED = 'DC',
   PASSWORDLESS = 'PL',
+  PASSWORDCHANGE = 'PC',
 }
 
 const REQUESTMAP = {
   [PolicyComponentServiceType.MGMT]: {
+    [MESSAGETYPES.PASSWORDCHANGE]: {
+      get: new GetCustomPasswordChangeMessageTextRequest(),
+      set: new SetCustomPasswordChangeMessageTextRequest(),
+      getDefault: new GetDefaultPasswordChangeMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomPasswordChangeMessageTextRequest => {
+        const req = new SetCustomPasswordChangeMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      },
+    },
     [MESSAGETYPES.INIT]: {
-      get: new GetDefaultInitMessageTextRequest(),
+      get: new GetCustomInitMessageTextRequest(),
       set: new SetCustomInitMessageTextRequest(),
       getDefault: new GetDefaultInitMessageTextRequest(),
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomInitMessageTextRequest => {
@@ -164,6 +190,22 @@ const REQUESTMAP = {
     },
   },
   [PolicyComponentServiceType.ADMIN]: {
+    [MESSAGETYPES.PASSWORDCHANGE]: {
+      get: new AdminGetDefaultPasswordChangeMessageTextRequest(),
+      set: new SetDefaultPasswordChangeMessageTextRequest(),
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultPasswordChangeMessageTextRequest => {
+        const req = new SetDefaultPasswordChangeMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      },
+    },
     [MESSAGETYPES.INIT]: {
       get: new AdminGetDefaultInitMessageTextRequest(),
       set: new SetDefaultInitMessageTextRequest(),
@@ -213,7 +255,7 @@ const REQUESTMAP = {
       },
     },
     [MESSAGETYPES.PASSWORDRESET]: {
-      get: new AdminGetCustomPasswordResetMessageTextRequest(),
+      get: new AdminGetDefaultPasswordResetMessageTextRequest(),
       set: new SetDefaultPasswordResetMessageTextRequest(),
       setFcn: (
         map: Partial<SetDefaultPasswordResetMessageTextRequest.AsObject>,
@@ -231,7 +273,7 @@ const REQUESTMAP = {
       },
     },
     [MESSAGETYPES.DOMAINCLAIMED]: {
-      get: new GetDefaultDomainClaimedMessageTextRequest(),
+      get: new AdminGetDefaultDomainClaimedMessageTextRequest(),
       set: new SetDefaultDomainClaimedMessageTextRequest(),
       setFcn: (
         map: Partial<SetDefaultDomainClaimedMessageTextRequest.AsObject>,
@@ -249,7 +291,7 @@ const REQUESTMAP = {
       },
     },
     [MESSAGETYPES.PASSWORDLESS]: {
-      get: new GetDefaultPasswordlessRegistrationMessageTextRequest(),
+      get: new AdminGetDefaultPasswordlessRegistrationMessageTextRequest(),
       set: new SetDefaultPasswordlessRegistrationMessageTextRequest(),
       setFcn: (
         map: Partial<SetDefaultPasswordlessRegistrationMessageTextRequest.AsObject>,
@@ -382,10 +424,24 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
     ],
+    [MESSAGETYPES.PASSWORDCHANGE]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+    ],
   };
 
   public locale: string = 'en';
-  public LOCALES: string[] = ['en', 'de', 'it'];
+  public LOCALES: string[] = ['en', 'de', 'it', 'fr', 'pl', 'zh'];
   private sub: Subscription = new Subscription();
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN
@@ -435,6 +491,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
         return this.stripDetails(this.service.getDefaultDomainClaimedMessageText(req));
       case MESSAGETYPES.PASSWORDLESS:
         return this.stripDetails(this.service.getDefaultPasswordlessRegistrationMessageText(req));
+      case MESSAGETYPES.PASSWORDCHANGE:
+        return this.stripDetails(this.service.getDefaultPasswordChangeMessageText(req));
     }
   }
 
@@ -453,6 +511,9 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           return this.stripDetails((this.service as ManagementService).getCustomDomainClaimedMessageText(req));
         case MESSAGETYPES.PASSWORDLESS:
           return this.stripDetails((this.service as ManagementService).getCustomPasswordlessRegistrationMessageText(req));
+        case MESSAGETYPES.PASSWORDCHANGE:
+          return this.stripDetails((this.service as ManagementService).getCustomPasswordChangeMessageText(req));
+
         default:
           return undefined;
       }
@@ -470,6 +531,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           return this.stripDetails((this.service as AdminService).getCustomDomainClaimedMessageText(req));
         case MESSAGETYPES.PASSWORDLESS:
           return this.stripDetails((this.service as AdminService).getCustomPasswordlessRegistrationMessageText(req));
+        case MESSAGETYPES.PASSWORDCHANGE:
+          return this.stripDetails((this.service as AdminService).getCustomPasswordChangeMessageText(req));
         default:
           return undefined;
       }
@@ -533,8 +596,10 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           return handler((this.service as ManagementService).setCustomDomainClaimedMessageCustomText(this.updateRequest));
         case MESSAGETYPES.PASSWORDLESS:
           return handler(
-            (this.service as ManagementService).getCustomPasswordlessRegistrationMessageText(this.updateRequest),
+            (this.service as ManagementService).setCustomPasswordlessRegistrationMessageCustomText(this.updateRequest),
           );
+        case MESSAGETYPES.PASSWORDCHANGE:
+          return handler((this.service as ManagementService).getCustomPasswordChangeMessageText(this.updateRequest));
       }
     } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       switch (this.currentType) {
@@ -550,6 +615,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           return handler((this.service as AdminService).setDefaultDomainClaimedMessageText(this.updateRequest));
         case MESSAGETYPES.PASSWORDLESS:
           return handler((this.service as AdminService).setDefaultPasswordlessRegistrationMessageText(this.updateRequest));
+        case MESSAGETYPES.PASSWORDCHANGE:
+          return handler((this.service as AdminService).setDefaultPasswordChangeMessageText(this.updateRequest));
       }
     }
   }
@@ -595,6 +662,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
             return handler(
               (this.service as ManagementService).resetCustomPasswordlessRegistrationMessageTextToDefault(this.locale),
             );
+          case MESSAGETYPES.PASSWORDCHANGE:
+            return handler((this.service as ManagementService).resetCustomPasswordChangeMessageTextToDefault(this.locale));
           default:
             return Promise.reject();
         }

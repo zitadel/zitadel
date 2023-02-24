@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Event struct {
@@ -22,7 +23,9 @@ type EventEditor struct {
 	Service     string
 }
 
-func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQueryBuilder) ([]*Event, error) {
+func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQueryBuilder) (_ []*Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	events, err := q.eventstore.Filter(ctx, query)
 	if err != nil {
 		return nil, err
@@ -41,21 +44,22 @@ func (q *Queries) SearchAggregateTypes(ctx context.Context) []string {
 
 func (q *Queries) convertEvents(ctx context.Context, events []eventstore.Event) []*Event {
 	result := make([]*Event, len(events))
+	users := make(map[string]string)
 	for i, event := range events {
-		result[i] = q.convertEvent(ctx, event)
+		result[i] = q.convertEvent(ctx, event, users)
 	}
 	return result
 }
 
-func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event) *Event {
-	displayName := event.EditorUser()
-	user, err := q.GetUserByID(ctx, false, event.EditorUser(), false)
-	if err == nil {
-		if user.Human != nil {
-			displayName = user.Human.DisplayName
-		} else if user.Machine != nil {
-			displayName = user.Machine.Name
-		}
+func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event, users map[string]string) *Event {
+	ctx, span := tracing.NewSpan(ctx)
+	var err error
+	defer func() { span.EndWithError(err) }()
+
+	displayName, ok := users[event.EditorUser()]
+	if !ok {
+		displayName = q.editorUserByID(ctx, event.EditorUser())
+		users[event.EditorUser()] = displayName
 	}
 
 	return &Event{
@@ -70,4 +74,17 @@ func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event) *Eve
 		Type:         string(event.Type()),
 		Payload:      event.DataAsBytes(),
 	}
+}
+
+func (q *Queries) editorUserByID(ctx context.Context, userID string) string {
+	user, err := q.GetUserByID(ctx, false, userID, false)
+	if err != nil {
+		return userID
+	}
+	if user.Human != nil {
+		return user.Human.DisplayName
+	} else if user.Machine != nil {
+		return user.Machine.Name
+	}
+	return userID
 }

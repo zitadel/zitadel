@@ -196,6 +196,23 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (
 	return err
 }
 
+func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-pqlm2n", "Errors.User.UserIDMissing")
+	}
+
+	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-x902b2v", "Errors.User.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
+	_, err = c.eventstore.Push(ctx, user.NewHumanPasswordChangeSentEvent(ctx, userAgg))
+	return err
+}
+
 func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest, lockoutPolicy *domain.LockoutPolicy) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

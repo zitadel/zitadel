@@ -3,12 +3,6 @@ title: Service Level
 custom_edit_url: null
 --- 
 
-:::note
-
-This document describes the current version of our offering. For terms regarding to our previous offering, which is being shut down on 31.12.2022, please refer to the [agreements under docs-v1.zitadel.com](https://docs-v1.zitadel.com/).
-
-:::
-
 ## Introduction
 
 This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).

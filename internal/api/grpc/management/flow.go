@@ -17,6 +17,7 @@ func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequ
 		Result: []*action_pb.FlowType{
 			action_grpc.FlowTypeToPb(domain.FlowTypeExternalAuthentication),
 			action_grpc.FlowTypeToPb(domain.FlowTypeCustomiseToken),
+			action_grpc.FlowTypeToPb(domain.FlowTypeInternalAuthentication),
 		},
 	}, nil
 }

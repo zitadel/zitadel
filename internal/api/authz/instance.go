@@ -23,7 +23,8 @@ type Instance interface {
 }
 
 type InstanceVerifier interface {
-	InstanceByHost(context.Context, string) (Instance, error)
+	InstanceByHost(ctx context.Context, host string) (Instance, error)
+	InstanceByID(ctx context.Context) (Instance, error)
 }
 
 type instance struct {

@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
-    "COUNT": "Ergebnisse"
+    "COUNT": "Ergebnisse",
+    "MORE": "mehr"
   },
   "FOOTER": {
     "LINKS": {
@@ -229,6 +230,7 @@
       "CREATE": "Erstellen",
       "MY": "Meine Informationen",
       "LOGINNAMES": "Login-Namen",
+      "LOGINMETHODS": "Anmeldemethoden",
       "LOGINNAMESDESC": "Mit diesen Namen kannst Du Dich anmelden.",
       "NOUSER": "Kein Benutzer",
       "REACTIVATE": "Reaktivieren",
@@ -237,6 +239,8 @@
       "STATE": "Status",
       "DELETE": "Benutzer löschen",
       "UNLOCK": "Benutzer entsperren",
+      "GENERATESECRET": "Client Secret generieren",
+      "REMOVESECRET": "Client Secret löschen",
       "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden.",
       "DELETEACCOUNT": "Account löschen",
       "DELETEACCOUNT_DESC": "Wenn du diese Aktion ausführst, wirst du abgemeldet und danach keinen Zugriff mehr auf dein Konto haben. Diese Aktion kann nicht rückgängig gemacht werden.",
@@ -261,6 +265,10 @@
       "TITLE": "Email Benachrichtigung senden",
       "DESCRIPTION": "Klicken Sie den untenstehenden Button um ein Verifizierung-E-Mail an die aktuelle Adresse zu versenden oder ändern Sie die Emailadresse in dem Feld.",
       "NEWEMAIL": "Neue Email"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Verwahre das Client Secret an einem sicheren Ort, da es nicht mehr angezeigt werden kann, sobald der Dialog geschlossen wird."
     },
     "TABLE": {
       "DEACTIVATE": "Deaktivieren",
@@ -402,6 +410,7 @@
       "TITLE": "Profil",
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
+      "PHONE_HINT": "Verwenden Sie 00 oder das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wählen Sie das Land aus der Dropdown-Liste aus und geben anschließend die Telefonnummer ein",
       "USERNAME": "Benutzername",
       "CHANGEUSERNAME": "bearbeiten",
       "CHANGEUSERNAME_TITLE": "Benutzername ändern",
@@ -421,7 +430,8 @@
         "PREVIEW": "Vorschau",
         "DELETESUCCESS": "Erfolgreich gelöscht!",
         "CROPPERERROR": "Ein Fehler beim hochladen Ihrer Datei ist fehlgeschlagen. Versuchen Sie es mit ggf mit einem anderen Format und Grösse."
-      }
+      },
+      "COUNTRY": "Land"
     },
     "MACHINE": {
       "TITLE": "Details Service-Benutzer",
@@ -439,6 +449,11 @@
       "CHOOSEEXPIRY": "Definiere ein Ablaufdatum",
       "CREATIONDATE": "Erstelldatum",
       "KEYDETAILS": "Schlüssel Details",
+      "ACCESSTOKENTYPE": "Access Token Typ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Schlüssel hinzufügen",
         "DESCRIPTION": "Wähle den Typ und selektiere ein optionales Ablaufdatum."
@@ -586,7 +601,9 @@
       "MACHINEADDED": "Service User erstellt!",
       "DELETED": "Benutzer erfolgreich gelöscht!",
       "UNLOCKED": "Benutzer erfolgreich freigeschaltet!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link via email versendet."
+      "PASSWORDLESSREGISTRATIONSENT": "Link via email versendet.",
+      "SECRETGENERATED": "Secret erfolgreich generiert!",
+      "SECRETREMOVED": "Secret erfolgreich gelöscht!"
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager-Rollen",
@@ -747,6 +764,56 @@
       "DELETE": "Entfernen",
       "DELETESUCCESS": "Gescheiterte Events entfernt."
     },
+    "EVENTS": {
+      "TITLE": "Events",
+      "DESCRIPTION": "Diese Ansicht zeigt alle vorhandenen Events.",
+      "EDITOR": "Editor",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "Aggregate",
+      "AGGREGATEID": "Aggregate ID",
+      "AGGREGATETYPE": "Aggregate Typ",
+      "RESOURCEOWNER": "Resource Owner",
+      "SEQUENCE": "Sequenz",
+      "CREATIONDATE": "Erstelldatum",
+      "TYPE": "Typ",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filter",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Nach Editor filtern"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Typ",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Nach Aggregate filtern"
+        },
+        "TYPE": {
+          "TYPELABEL": "Typ",
+          "CHECKBOX": "Nach Typ filtern"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Nach Resource Owner filtern"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequenz",
+          "CHECKBOX": "Nach Sequenz filtern",
+          "SORT": "Sortierung",
+          "ASC": "aufsteigend",
+          "DESC": "absteigend"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Erstelldatum",
+          "CHECKBOX": "Nach Erstelldatum filtern"
+        },
+        "OTHER": "weiterer",
+        "OTHERS": "weitere"
+      },
+      "DIALOG": {
+        "TITLE": "Event Detail"
+      }
+    },
     "TOAST": {
       "MEMBERREMOVED": "Manager entfernt.",
       "MEMBERSADDED": "Manager hinzugefügt.",
@@ -778,6 +845,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Geben Sie den Namen der neuen Organisation ein.",
       "ORGDETAILUSER_TITLE": "Organisationsbesitzer hinzufügen",
       "DELETE": "Organisation löschen",
+      "DEFAULTLABEL": "Standard",
+      "SETASDEFAULT": "Als Standardorganisation festlegen",
+      "DEFAULTORGSET": "Standardorganisation erfolgreich geändert",
       "RENAME": {
         "ACTION": "Umbenennen",
         "TITLE": "Organisation umbenennen",
@@ -880,7 +950,7 @@
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
       "COMPLEXITY": "Passwordkomplexität",
-      "NOTIFICATIONS": "Benachrichtigungen",
+      "NOTIFICATIONS": "Benachrichtigungseinstellungen",
       "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identity Provider",
@@ -911,7 +981,8 @@
       "en": "English",
       "it": "Italiano",
       "fr": "Français",
-      "zh": "Chinese"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1007,6 +1078,11 @@
       "NUMBERERROR": "Muss eine Ziffer beinhalten.",
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
+    "NOTIFICATION": {
+      "TITLE": "Notification",
+      "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
+      "PASSWORDCHANGE": "Passwordänderung"
+    },
     "PRIVATELABELING": {
       "TITLE": "Branding",
       "DESCRIPTION": "Verleihen Sie dem Login Ihren benutzerdefinierten Style und passen Sie das Verhalten an.",
@@ -1097,7 +1173,8 @@
         "en": "English",
         "it": "Italiano",
         "fr": "Français",
-        "zh": "Chinese"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1146,7 +1223,8 @@
         "VP": "Telefonnummerverifikation",
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
-        "PL": "Passwortlos"
+        "PL": "Passwortlos",
+        "PC": "Passwordwechsel"
       },
       "CHIPS": {
         "firstname": "Vorname",
@@ -1870,7 +1948,8 @@
     "en": "English",
     "it": "Italiano",
     "fr": "Français",
-    "zh": "Chinese"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

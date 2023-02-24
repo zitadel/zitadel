@@ -18,9 +18,11 @@ import { PasswordComplexityViewModule } from 'src/app/modules/password-complexit
 
 import { UserCreateRoutingModule } from './user-create-routing.module';
 import { UserCreateComponent } from './user-create.component';
+import { CountryCallingCodesService } from 'src/app/services/country-calling-codes.service';
 
 @NgModule({
   declarations: [UserCreateComponent],
+  providers: [CountryCallingCodesService],
   imports: [
     UserCreateRoutingModule,
     CommonModule,

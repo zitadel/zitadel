@@ -551,7 +551,7 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 			},
 		},
 		{
-			name: "member not existing, nil result",
+			name: "member not existing, empty object details result",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -565,7 +565,7 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				want: nil,
+				want: &domain.ObjectDetails{},
 			},
 		},
 		{

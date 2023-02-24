@@ -59,6 +59,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, HumanPasswordChangedType, HumanPasswordChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanPasswordCodeAddedType, HumanPasswordCodeAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanPasswordCodeSentType, HumanPasswordCodeSentEventMapper).
+		RegisterFilterEventMapper(AggregateType, HumanPasswordChangeSentType, HumanPasswordChangeSentEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanPasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanPasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserIDPLinkAddedType, UserIDPLinkAddedEventMapper).
@@ -113,5 +114,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, MachineKeyAddedEventType, MachineKeyAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, MachineKeyRemovedEventType, MachineKeyRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, PersonalAccessTokenAddedType, PersonalAccessTokenAddedEventMapper).
-		RegisterFilterEventMapper(AggregateType, PersonalAccessTokenRemovedType, PersonalAccessTokenRemovedEventMapper)
+		RegisterFilterEventMapper(AggregateType, PersonalAccessTokenRemovedType, PersonalAccessTokenRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MachineSecretSetType, MachineSecretSetEventMapper).
+		RegisterFilterEventMapper(AggregateType, MachineSecretRemovedType, MachineSecretRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MachineSecretCheckSucceededType, MachineSecretCheckSucceededEventMapper).
+		RegisterFilterEventMapper(AggregateType, MachineSecretCheckFailedType, MachineSecretCheckFailedEventMapper)
 }

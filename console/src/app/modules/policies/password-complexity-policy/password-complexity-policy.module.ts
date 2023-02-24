@@ -16,13 +16,11 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { CardModule } from '../../card/card.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
-import { PasswordComplexityPolicyRoutingModule } from './password-complexity-policy-routing.module';
 import { PasswordComplexityPolicyComponent } from './password-complexity-policy.component';
 
 @NgModule({
   declarations: [PasswordComplexityPolicyComponent],
   imports: [
-    PasswordComplexityPolicyRoutingModule,
     CommonModule,
     FormsModule,
     InputModule,

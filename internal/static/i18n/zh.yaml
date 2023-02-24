@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: 未找到机器密钥
         AlreadyExisting: 已有的机器钥匙
+      Secret:
+        NotExisting: 秘密并不存在
+        Invalid: 秘密是无效的
+        CouldNotGenerate: 无法生成秘密
     PAT:
       NotFound: 未找到个人访问令牌
     NotHuman: 用户必须是个人
@@ -225,6 +229,10 @@ Errors:
       Empty: 组织 IAM 策略为空
       NotExisting: 组织 IAM 策略不存在
       AlreadyExists: 组织 IAM 策略已存在
+    NotificationPolicy:
+      NotFound: 未找到通知政策
+      NotChanged: 通知政策没有改变
+      AlreadyExists: 已经存在的通知政策
   Project:
     ProjectIDMissing: P缺少项目 ID
     AlreadyExists: 项目以存在于组织中
@@ -351,6 +359,10 @@ Errors:
       NotExisting: 组织 IAM 策略不存在
       AlreadyExists: 组织 IAM 策略已存在
       NotChanged: 组织 IAM 策略未更改
+    NotificationPolicy:
+      NotFound: 没有找到默认的通知政策
+      NotChanged: 默认的通知政策没有改变
+      AlreadyExists: 默认的通知政策已经存在
   Policy:
     AlreadyExists: 策略已存在
     Label:
@@ -425,6 +437,38 @@ Errors:
     CloseRows: SQL 语句无法完成
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
+  Quota:
+    AlreadyExists: 这个单位的配额已经存在
+    NotFound: 没有找到该单位的配额
+    Invalid:
+      CallURL: 配额调用的URL是无效的
+      Percent: 配额百分比低于1
+      Unimplemented: 该单位没有实施配额
+      Amount: 配额数量低于1
+      ResetInterval: 配额重置时间间隔短于1分钟
+      Noop: 没有通知的无限配额没有效果
+    Access:
+      Exhausted: 认证请求的配额已用完
+    Execution:
+      Exhausted: 行动秒数的配额已用完
+  LogStore:
+    Access:
+      StorageFailed: 存储访问日志到数据库失败
+      ScanFailed: 查询已认证请求的使用情况失败
+    Execution:
+      StorageFailed: 将行动执行日志存储到数据库失败
+      ScanFailed: Q查询动作执行秒数的使用情况失败
+
+AggregateTypes:
+  action: 动作
+  instance: 实例
+  key_pair: 密钥对
+  org: 组织
+  project: 项目
+  user: 用户
+  usergrant: 用户授权
+  quota: 配额
+
 EventTypes:
   user:
     added: 已添加用户
@@ -444,7 +488,7 @@ EventTypes:
     email:
       reserved: 电子邮件地址已保留
       released: 电子邮件地址已发布
-      changed:  电子邮件地址已更改
+      changed: 电子邮件地址已更改
       verified: 电子邮件地址已验证
       verification:
         failed: 电子邮件验证失败
@@ -457,6 +501,12 @@ EventTypes:
       key:
         added: 添加服务用户 Key
         removed: 删除服务用户 Key
+      secret:
+        set: 秘密套装
+        removed: 秘密删除
+        check:
+          succeeded: 成功的秘密控制
+          failed: 秘密控制失败
     human:
       added: 添加用户
       selfregistered: 自注册用户
@@ -474,7 +524,7 @@ EventTypes:
         reserved: 保留用户名
         released: 用户名已发布
       email:
-        changed:  电子邮件地址已更改
+        changed: 电子邮件地址已更改
         verified: 电子邮件地址已验证
         verification:
           failed: 电子邮件地址验证失败
@@ -636,7 +686,7 @@ EventTypes:
       changed: 更改组织成员
       removed: 删除组织成员
       cascade:
-        removeD: 已删除组织级联成员
+        removed: 已删除组织级联成员
     iam:
       policy:
         added: 添加系统策略
@@ -715,6 +765,10 @@ EventTypes:
         added: 添加隐私政策和服务条款
         changed: 更改隐私政策和服务条款
         removed: 删除隐私政策和服务条款
+      notification:
+        added: 增加了通知政策
+        changed: 通知政策改变
+        removed: 删除了通知政策
     flow:
       trigger_actions:
         set: 设置动作
@@ -750,7 +804,7 @@ EventTypes:
         changed: 更改访问成员
         removed: 删除访问成员
         cascade:
-          removeD: 删除管理访问级联
+          removed: 删除管理访问级联
     application:
       added: 添加应用
       changed: 更改应用
@@ -924,6 +978,7 @@ Action:
       Unspecified: 未指定的
       ExternalAuthentication: 外部认证
       CustomiseToken: 自定义令牌
+      InternalAuthentication: 内部认证
   TriggerType:
     Unspecified: 未指定的
     PostAuthentication: 后期认证
