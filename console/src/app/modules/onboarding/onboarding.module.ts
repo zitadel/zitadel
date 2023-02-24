@@ -7,10 +7,10 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
 import { TranslateModule } from '@ngx-translate/core';
 import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
-import { OnboardingComponent } from './onboarding.component';
-import { RouterModule } from '@angular/router';
 import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { RouterModule } from '@angular/router';
 import { EventPipeModule } from 'src/app/pipes/event-pipe/event-pipe.module';
+import { OnboardingComponent } from './onboarding.component';
 
 @NgModule({
   declarations: [OnboardingComponent],
