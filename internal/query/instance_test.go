@@ -6,6 +6,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"reflect"
 	"regexp"
 	"testing"
 
@@ -83,16 +84,16 @@ func Test_InstancePrepares(t *testing.T) {
 		err             checkErr
 	}
 	tests := []struct {
-		name    string
-		prepare interface{}
-		want    want
-		object  interface{}
+		name           string
+		prepare        interface{}
+		additionalArgs []reflect.Value
+		want           want
+		object         interface{}
 	}{
 		{
-			name: "prepareInstanceQuery no result",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery(ctx, db, "")
-			},
+			name:           "prepareInstanceQuery no result",
+			additionalArgs: []reflect.Value{reflect.ValueOf("")},
+			prepare:        prepareInstanceQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(instanceQuery),
@@ -109,10 +110,9 @@ func Test_InstancePrepares(t *testing.T) {
 			object: (*Instance)(nil),
 		},
 		{
-			name: "prepareInstanceQuery found",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery(ctx, db, "")
-			},
+			name:           "prepareInstanceQuery found",
+			additionalArgs: []reflect.Value{reflect.ValueOf("")},
+			prepare:        prepareInstanceQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(instanceQuery),
@@ -143,10 +143,9 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 		},
 		{
-			name: "prepareInstanceQuery sql err",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery(ctx, db, "")
-			},
+			name:           "prepareInstanceQuery sql err",
+			additionalArgs: []reflect.Value{reflect.ValueOf("")},
+			prepare:        prepareInstanceQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(instanceQuery),
@@ -396,7 +395,8 @@ func Test_InstancePrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			args := append(defaultPrepareArgs, tt.additionalArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, args...)
 		})
 	}
 }

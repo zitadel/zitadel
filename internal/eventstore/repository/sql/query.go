@@ -94,6 +94,9 @@ func prepareColumns(criteria querier, columns repository.Columns) (string, func(
 }
 
 func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string {
+	if !allow {
+		return ""
+	}
 	took := call.Took(ctx)
 	return criteria.Timetravel(took)
 }

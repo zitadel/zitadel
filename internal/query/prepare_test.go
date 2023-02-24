@@ -192,7 +192,7 @@ func validatePrepare(prepareType reflect.Type) error {
 	if prepareType.Kind() != reflect.Func {
 		return errors.New("prepare is not a function")
 	}
-	if prepareType.NumIn() != 2 {
+	if prepareType.NumIn() < 2 {
 		return fmt.Errorf("prepare: invalid number of inputs: want: 0 got %d", prepareType.NumIn())
 	}
 	if prepareType.NumOut() != 2 {

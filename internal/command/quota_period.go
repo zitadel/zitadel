@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
+// TODO: why is a query implemented on the command side?
 func (c *Commands) GetCurrentQuotaPeriod(ctx context.Context, instanceID string, unit quota.Unit) (*quota.AddedEvent, time.Time, error) {
 	wm, err := c.getQuotaWriteModel(ctx, instanceID, instanceID, unit)
 	if err != nil || !wm.active {

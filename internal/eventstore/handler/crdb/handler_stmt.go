@@ -97,7 +97,7 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 		return nil, 0, err
 	}
 
-	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(h.bulkLimit)
+	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(h.bulkLimit).AllowTimeTravel()
 
 	for _, aggregateType := range h.aggregates {
 		for _, instanceID := range instanceIDs {

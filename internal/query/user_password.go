@@ -116,6 +116,7 @@ func (wm *HumanPasswordReadModel) Reduce() error {
 
 func (wm *HumanPasswordReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AllowTimeTravel().
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
