@@ -4,14 +4,14 @@ import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/lega
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { OverlayModule } from '@angular/cdk/overlay';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
+import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { InputModule } from '../input/input.module';
 import { FilterEventsComponent } from './filter-events.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
-import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
-import { ActionKeysModule } from '../action-keys/action-keys.module';
-import { OverlayModule } from '@angular/cdk/overlay';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [FilterEventsComponent],
