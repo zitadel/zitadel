@@ -17,7 +17,8 @@ var (
 		` projections.idps3.type,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_login_policy_links4` +
-		` LEFT JOIN projections.idps3 ON projections.idp_login_policy_links4.idp_id = projections.idps3.id`)
+		` LEFT JOIN projections.idps3 ON projections.idp_login_policy_links4.idp_id = projections.idps3.id AND projections.idp_login_policy_links4.instance_id = projections.idps3.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	loginPolicyIDPLinksCols = []string{
 		"idp_id",
 		"name",
