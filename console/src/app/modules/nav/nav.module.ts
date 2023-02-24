@@ -13,7 +13,6 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { NavComponent } from './nav.component';
-import { OnboardingCardComponent } from '../onboarding-card/onboarding-card.component';
 import OnboardingCardModule from '../onboarding-card/onboarding-card.module';
 import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
 
