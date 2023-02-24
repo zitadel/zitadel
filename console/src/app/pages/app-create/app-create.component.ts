@@ -10,8 +10,6 @@ import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidato
 import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Project } from 'src/app/proto/generated/zitadel/project_pb';
-import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
-import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
