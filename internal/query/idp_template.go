@@ -34,6 +34,7 @@ type IDPTemplate struct {
 	IsLinkingAllowed  bool
 	IsAutoCreation    bool
 	IsAutoUpdate      bool
+	*OAuthIDPTemplate
 	*GoogleIDPTemplate
 	*LDAPIDPTemplate
 }
@@ -41,6 +42,16 @@ type IDPTemplate struct {
 type IDPTemplates struct {
 	SearchResponse
 	Templates []*IDPTemplate
+}
+
+type OAuthIDPTemplate struct {
+	IDPID                 string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	AuthorizationEndpoint string
+	TokenEndpoint         string
+	UserEndpoint          string
+	Scopes                database.StringArray
 }
 
 type GoogleIDPTemplate struct {
@@ -127,6 +138,45 @@ var (
 	IDPTemplateIsAutoUpdateCol = Column{
 		name:  projection.IDPTemplateIsAutoUpdateCol,
 		table: idpTemplateTable,
+	}
+)
+
+var (
+	oauthIdpTemplateTable = table{
+		name:          projection.IDPTemplateOAuthTable,
+		instanceIDCol: projection.OAuthInstanceIDCol,
+	}
+	OAuthIDCol = Column{
+		name:  projection.OAuthIDCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthInstanceIDCol = Column{
+		name:  projection.OAuthInstanceIDCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthClientIDCol = Column{
+		name:  projection.OAuthClientIDCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthClientSecretCol = Column{
+		name:  projection.OAuthClientSecretCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthAuthorizationEndpointCol = Column{
+		name:  projection.OAuthAuthorizationEndpointCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthTokenEndpointCol = Column{
+		name:  projection.OAuthTokenEndpointCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthUserEndpointCol = Column{
+		name:  projection.OAuthUserEndpointCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthScopesCol = Column{
+		name:  projection.OAuthScopesCol,
+		table: oauthIdpTemplateTable,
 	}
 )
 
@@ -371,10 +421,20 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			// oauth
+			OAuthIDCol.identifier(),
+			OAuthClientIDCol.identifier(),
+			OAuthClientSecretCol.identifier(),
+			OAuthAuthorizationEndpointCol.identifier(),
+			OAuthTokenEndpointCol.identifier(),
+			OAuthUserEndpointCol.identifier(),
+			OAuthScopesCol.identifier(),
+			// google
 			GoogleIDCol.identifier(),
 			GoogleClientIDCol.identifier(),
 			GoogleClientSecretCol.identifier(),
 			GoogleScopesCol.identifier(),
+			// ldap
 			LDAPIDCol.identifier(),
 			LDAPHostCol.identifier(),
 			LDAPPortCol.identifier(),
@@ -398,6 +458,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LDAPAvatarURLAttributeCol.identifier(),
 			LDAPProfileAttributeCol.identifier(),
 		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -405,6 +466,14 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			idpTemplate := new(IDPTemplate)
 
 			name := sql.NullString{}
+
+			oauthID := sql.NullString{}
+			oauthClientID := sql.NullString{}
+			oauthClientSecret := new(crypto.CryptoValue)
+			oauthAuthorizationEndpoint := sql.NullString{}
+			oauthTokenEndpoint := sql.NullString{}
+			oauthUserEndpoint := sql.NullString{}
+			oauthScopes := database.StringArray{}
 
 			googleID := sql.NullString{}
 			googleClientID := sql.NullString{}
@@ -448,10 +517,20 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&idpTemplate.IsLinkingAllowed,
 				&idpTemplate.IsAutoCreation,
 				&idpTemplate.IsAutoUpdate,
+				// oauth
+				&oauthID,
+				&oauthClientID,
+				&oauthClientSecret,
+				&oauthAuthorizationEndpoint,
+				&oauthTokenEndpoint,
+				&oauthUserEndpoint,
+				&oauthScopes,
+				// google
 				&googleID,
 				&googleClientID,
 				&googleClientSecret,
 				&googleScopes,
+				// ldap
 				&ldapID,
 				&ldapHost,
 				&ldapPort,
@@ -484,6 +563,17 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 
 			idpTemplate.Name = name.String
 
+			if oauthID.Valid {
+				idpTemplate.OAuthIDPTemplate = &OAuthIDPTemplate{
+					IDPID:                 oauthID.String,
+					ClientID:              oauthClientID.String,
+					ClientSecret:          oauthClientSecret,
+					AuthorizationEndpoint: oauthAuthorizationEndpoint.String,
+					TokenEndpoint:         oauthTokenEndpoint.String,
+					UserEndpoint:          oauthUserEndpoint.String,
+					Scopes:                oauthScopes,
+				}
+			}
 			if googleID.Valid {
 				idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
 					IDPID:        googleID.String,
@@ -491,7 +581,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					ClientSecret: googleClientSecret,
 					Scopes:       googleScopes,
 				}
-			} else if ldapID.Valid {
+			}
+			if ldapID.Valid {
 				idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 					IDPID:               ldapID.String,
 					Host:                ldapHost.String,
@@ -539,10 +630,20 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			// oauth
+			OAuthIDCol.identifier(),
+			OAuthClientIDCol.identifier(),
+			OAuthClientSecretCol.identifier(),
+			OAuthAuthorizationEndpointCol.identifier(),
+			OAuthTokenEndpointCol.identifier(),
+			OAuthUserEndpointCol.identifier(),
+			OAuthScopesCol.identifier(),
+			// google
 			GoogleIDCol.identifier(),
 			GoogleClientIDCol.identifier(),
 			GoogleClientSecretCol.identifier(),
 			GoogleScopesCol.identifier(),
+			// ldap
 			LDAPIDCol.identifier(),
 			LDAPHostCol.identifier(),
 			LDAPPortCol.identifier(),
@@ -567,6 +668,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LDAPProfileAttributeCol.identifier(),
 			countColumn.identifier(),
 		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -577,6 +679,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				idpTemplate := new(IDPTemplate)
 
 				name := sql.NullString{}
+
+				oauthID := sql.NullString{}
+				oauthClientID := sql.NullString{}
+				oauthClientSecret := new(crypto.CryptoValue)
+				oauthAuthorizationEndpoint := sql.NullString{}
+				oauthTokenEndpoint := sql.NullString{}
+				oauthUserEndpoint := sql.NullString{}
+				oauthScopes := database.StringArray{}
 
 				googleID := sql.NullString{}
 				googleClientID := sql.NullString{}
@@ -620,10 +730,20 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&idpTemplate.IsLinkingAllowed,
 					&idpTemplate.IsAutoCreation,
 					&idpTemplate.IsAutoUpdate,
+					// oauth
+					&oauthID,
+					&oauthClientID,
+					&oauthClientSecret,
+					&oauthAuthorizationEndpoint,
+					&oauthTokenEndpoint,
+					&oauthUserEndpoint,
+					&oauthScopes,
+					// google
 					&googleID,
 					&googleClientID,
 					&googleClientSecret,
 					&googleScopes,
+					// ldap
 					&ldapID,
 					&ldapHost,
 					&ldapPort,
@@ -655,6 +775,17 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 
 				idpTemplate.Name = name.String
 
+				if oauthID.Valid {
+					idpTemplate.OAuthIDPTemplate = &OAuthIDPTemplate{
+						IDPID:                 oauthID.String,
+						ClientID:              oauthClientID.String,
+						ClientSecret:          oauthClientSecret,
+						AuthorizationEndpoint: oauthAuthorizationEndpoint.String,
+						TokenEndpoint:         oauthTokenEndpoint.String,
+						UserEndpoint:          oauthUserEndpoint.String,
+						Scopes:                oauthScopes,
+					}
+				}
 				if googleID.Valid {
 					idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
 						IDPID:        googleID.String,
@@ -662,7 +793,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						ClientSecret: googleClientSecret,
 						Scopes:       googleScopes,
 					}
-				} else if ldapID.Valid {
+				}
+				if ldapID.Valid {
 					idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 						IDPID:               ldapID.String,
 						Host:                ldapHost.String,
