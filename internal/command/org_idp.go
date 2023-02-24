@@ -322,7 +322,6 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, writeModel *O
 	}
 }
 
-func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, writeModel *OrgGoogleIDPWriteModel, provider GoogleProvider) preparation.Validation {
 func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOIDCProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
@@ -517,7 +516,7 @@ func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, resourceOwner, 
 	}
 }
 
-func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, id string, provider GoogleProvider) preparation.Validation {
+func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, writeModel *OrgGoogleIDPWriteModel, provider GoogleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D3fvs", "Errors.Invalid.Argument")
@@ -733,7 +732,7 @@ func (c *Commands) prepareDeleteOrgProvider(a *org.Aggregate, resourceOwner, id 
 			if !writeModel.State.Exists() {
 				return nil, caos_errs.ThrowNotFound(nil, "ORG-Se3tg", "Errors.Org.IDPConfig.NotExisting")
 			}
-			return []eventstore.Command{org.NewIDPRemovedEvent(ctx, &a.Aggregate, id, writeModel.name)}, nil
+			return []eventstore.Command{org.NewIDPRemovedEvent(ctx, &a.Aggregate, id)}, nil
 		}, nil
 	}
 }

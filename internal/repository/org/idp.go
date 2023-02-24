@@ -435,7 +435,6 @@ func NewIDPRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
-	name string,
 ) *IDPRemovedEvent {
 	return &IDPRemovedEvent{
 		RemovedEvent: *idp.NewRemovedEvent(
@@ -445,7 +444,6 @@ func NewIDPRemovedEvent(
 				IDPRemovedEventType,
 			),
 			id,
-			name,
 		),
 	}
 }
