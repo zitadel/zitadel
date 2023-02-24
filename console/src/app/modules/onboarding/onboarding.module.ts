@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { TranslateModule } from '@ngx-translate/core';
-import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
 import { OnboardingComponent } from './onboarding.component';
