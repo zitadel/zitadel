@@ -500,7 +500,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 		),
 		crdb.AddCreateStatement(
 			[]handler.Column{
-				//handler.NewCol(OIDCIDCol, idpEvent.ID),
+				handler.NewCol(OIDCIDCol, idpEvent.ID),
 				handler.NewCol(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(OIDCIssuerCol, idpEvent.Issuer),
 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),

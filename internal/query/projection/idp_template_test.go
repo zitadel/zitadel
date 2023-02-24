@@ -1032,3 +1032,499 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 		})
 	}
 }
+
+func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceOIDCIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.OIDCIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"issuer": "issuer",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.OIDCIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeOIDC,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceOIDCIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OIDCIDPAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"issuer": "issuer",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.OIDCIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"",
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeOIDC,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceOIDCIDPChanged minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.OIDCIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"client_id": "id"
+}`),
+				), instance.OIDCIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates_oidc SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceOIDCIDPChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.OIDCIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"issuer": "issuer",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.OIDCIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedArgs: []interface{}{
+								true,
+								true,
+								true,
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates_oidc SET (client_id, client_secret, issuer, scopes) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.StringArray{"profile"},
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if !errors.IsErrorInvalidArgument(err) {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
+
+func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceJWTIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.JWTIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"issuer": "issuer",
+	"jwtEndpoint": "jwt",
+	"keysEndpoint": "keys",
+	"headerName": "header",
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.JWTIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceJWTIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeJWT,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"jwt",
+								"keys",
+								"header",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceJWTIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.JWTIDPAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"issuer": "issuer",
+	"jwtEndpoint": "jwt",
+	"keysEndpoint": "keys",
+	"headerName": "header",
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.JWTIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceJWTIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"",
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeJWT,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"jwt",
+								"keys",
+								"header",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceJWTIDPChanged minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.JWTIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"jwtEndpoint": "jwt"
+}`),
+				), instance.JWTIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceJWTIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates_jwt SET jwt_endpoint = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"jwt",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceJWTIDPChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.JWTIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"issuer": "issuer",
+	"jwtEndpoint": "jwt",
+	"keysEndpoint": "keys",
+	"headerName": "header",
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.JWTIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceJWTIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedArgs: []interface{}{
+								true,
+								true,
+								true,
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"jwt",
+								"keys",
+								"header",
+								"issuer",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if !errors.IsErrorInvalidArgument(err) {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
