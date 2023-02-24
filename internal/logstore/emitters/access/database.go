@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 
+	"github.com/zitadel/zitadel/internal/api/call"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
@@ -98,12 +99,11 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 	return nil
 }
 
-// TODO: AS OF SYSTEM TIME
 func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error) {
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("count(%s)", accessInstanceIdCol),
 	).
-		From(accessLogsTable).
+		From(accessLogsTable + l.dbClient.Timetravel(call.Took(ctx))).
 		Where(squirrel.And{
 			squirrel.Eq{accessInstanceIdCol: instanceId},
 			squirrel.GtOrEq{accessTimestampCol: start},
