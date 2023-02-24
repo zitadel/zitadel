@@ -20,8 +20,8 @@ var _ idp.Session = (*Session)(nil)
 type Session struct {
 	Provider *Provider
 	loginUrl string
-	user     string
-	password string
+	User     string
+	Password string
 }
 
 func (s *Session) GetAuthURL() string {
@@ -51,8 +51,22 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 	searchRequest := ldap.NewSearchRequest(
 		s.Provider.baseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf("(&(objectClass="+s.Provider.userObjectClass+")("+s.Provider.userUniqueAttribute+"=%s))", ldap.EscapeFilter(s.user)),
-		[]string{"dn"},
+		fmt.Sprintf("(&(objectClass="+s.Provider.userObjectClass+")("+s.Provider.userUniqueAttribute+"=%s))", ldap.EscapeFilter(s.User)),
+		[]string{"dn",
+			s.Provider.idAttribute,
+			s.Provider.firstNameAttribute,
+			s.Provider.lastNameAttribute,
+			s.Provider.displayNameAttribute,
+			s.Provider.nickNameAttribute,
+			s.Provider.preferredUsernameAttribute,
+			s.Provider.emailAttribute,
+			s.Provider.emailVerifiedAttribute,
+			s.Provider.phoneAttribute,
+			s.Provider.phoneVerifiedAttribute,
+			s.Provider.preferredLanguageAttribute,
+			s.Provider.avatarURLAttribute,
+			s.Provider.profileAttribute,
+		},
 		nil,
 	)
 
@@ -66,18 +80,23 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 
 	user := sr.Entries[0]
 	// Bind as the user to verify their password
-	err = l.Bind(user.DN, s.password)
+	err = l.Bind(user.DN, s.Password)
 	if err != nil {
 		return nil, err
 	}
-
-	emailVerified, err := strconv.ParseBool(user.GetAttributeValue(s.Provider.emailVerifiedAttribute))
-	if err != nil {
-		return nil, err
+	var emailVerified bool
+	if v := user.GetAttributeValue(s.Provider.emailVerifiedAttribute); v != "" {
+		emailVerified, err = strconv.ParseBool(user.GetAttributeValue(s.Provider.emailVerifiedAttribute))
+		if err != nil {
+			return nil, err
+		}
 	}
-	phoneVerified, err := strconv.ParseBool(user.GetAttributeValue(s.Provider.phoneVerifiedAttribute))
-	if err != nil {
-		return nil, err
+	var phoneVerified bool
+	if v := user.GetAttributeValue(s.Provider.phoneVerifiedAttribute); v != "" {
+		phoneVerified, err = strconv.ParseBool(v)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return NewUser(
