@@ -9,26 +9,23 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
-import OnboardingModule from 'src/app/modules/onboarding/onboarding.module';
-import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
-import { HomeRoutingModule } from './home-routing.module';
-import { HomeComponent } from './home.component';
+import { RouterModule } from '@angular/router';
+import { EventPipeModule } from 'src/app/pipes/event-pipe/event-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
+import { OnboardingCardComponent } from './onboarding-card.component';
 
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [OnboardingCardComponent],
   imports: [
     CommonModule,
     MatIconModule,
-    HasRoleModule,
-    HomeRoutingModule,
-    MatButtonModule,
-    HasRolePipeModule,
     TranslateModule,
-    MatTooltipModule,
+    RouterModule,
     MatProgressSpinnerModule,
-    ShortcutsModule,
-    OnboardingModule,
-    MatRippleModule,
+    EventPipeModule,
+    MatTooltipModule,
   ],
+  exports: [OnboardingCardComponent],
 })
-export default class HomeModule {}
+export default class OnboardingCardModule {}
