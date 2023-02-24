@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -427,23 +426,19 @@ func (wm *OrgIDPRemoveWriteModel) Reduce() error {
 func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *instance.OIDCIDPAddedEvent:
+		case *org.OIDCIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.OIDCIDPAddedEvent)
-		case *instance.JWTIDPAddedEvent:
+		case *org.JWTIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.JWTIDPAddedEvent)
-		case *instance.GoogleIDPAddedEvent:
+		case *org.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
-		case *instance.GoogleIDPChangedEvent:
-			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
-		case *instance.LDAPIDPAddedEvent:
+		case *org.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
-		case *instance.LDAPIDPChangedEvent:
-			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPChangedEvent)
-		case *instance.IDPRemovedEvent:
+		case *org.IDPRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.RemovedEvent)
-		case *instance.IDPConfigAddedEvent:
+		case *org.IDPConfigAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
-		case *instance.IDPConfigRemovedEvent:
+		case *org.IDPConfigRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
 		default:
 			wm.IDPRemoveWriteModel.AppendEvents(e)
@@ -458,11 +453,20 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			org.OIDCIDPAddedEventType,
+			org.JWTIDPAddedEventType,
 			org.GoogleIDPAddedEventType,
-			org.GoogleIDPChangedEventType,
 			org.LDAPIDPAddedEventType,
-			org.LDAPIDPChangedEventType,
 			org.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Or(). // old events
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.IDPConfigAddedEventType,
+			org.IDPConfigRemovedEventType,
+		).
+		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
 		Builder()
 }

@@ -430,12 +430,8 @@ func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) 
 			wm.IDPRemoveWriteModel.AppendEvents(&e.JWTIDPAddedEvent)
 		case *instance.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
-		case *instance.GoogleIDPChangedEvent:
-			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
 		case *instance.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
-		case *instance.LDAPIDPChangedEvent:
-			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.RemovedEvent)
 		case *instance.IDPConfigAddedEvent:
@@ -455,11 +451,20 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(instance.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			instance.OIDCIDPAddedEventType,
+			instance.JWTIDPAddedEventType,
 			instance.GoogleIDPAddedEventType,
-			instance.GoogleIDPChangedEventType,
 			instance.LDAPIDPAddedEventType,
-			instance.LDAPIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Or(). // old events
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			instance.IDPConfigAddedEventType,
+			instance.IDPConfigRemovedEventType,
+		).
+		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
 		Builder()
 }
