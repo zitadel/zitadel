@@ -51,11 +51,11 @@
       "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
     },
     "EVENTS": {
-      "instance.policy.label.changed": {
+      "instance.policy.label.added": {
         "title": "Setup your brand",
         "description": "Define coloring and shape of your login and upload your logo and icons."
       },
-      "instance.smtp.config.changed": {
+      "instance.smtp.config.added": {
         "title": "Setup your SMTP settings",
         "description": "Set your own mail server settings."
       },

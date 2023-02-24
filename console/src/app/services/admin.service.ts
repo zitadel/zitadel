@@ -236,6 +236,7 @@ import { StorageLocation, StorageService } from './storage.service';
 export interface OnboardingActions {
   order: number;
   eventType: string;
+  oneof: string[];
   link: string | string[];
   fragment?: string | undefined;
 }
@@ -248,23 +249,24 @@ type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
 })
 export class AdminService {
   public hideOnboarding: boolean = false;
-  public loadEvents: Subject<string[]> = new Subject();
+  public loadEvents: Subject<OnboardingActions[]> = new Subject();
   public onboardingLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public progressEvents$: Observable<OnboardingEventEntries> = this.loadEvents.pipe(
     tap(() => this.onboardingLoading.next(true)),
-    switchMap((types) => {
-      const eventsReq = new ListEventsRequest().setEventTypesList(types).setAsc(false);
+    switchMap((actions) => {
+      const searchForTypes = actions.map((oe) => oe.oneof).flat();
+      const eventsReq = new ListEventsRequest().setEventTypesList(searchForTypes).setAsc(false);
       return from(this.listEvents(eventsReq)).pipe(
         map((events) => {
           const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API');
 
           let obj: { [type: string]: OnboardingEvent } = {};
-          types.map((type) => {
-            const filtered = el.filter((event) => event.type?.type === type);
-            const ele = ONBOARDING_EVENTS.find((oe) => oe.eventType === type);
-            (obj as any)[type] = filtered.length
-              ? { order: ele?.order, link: ele?.link, fragment: ele?.fragment, event: filtered[0] }
-              : { order: ele?.order, link: ele?.link, fragment: ele?.fragment, event: undefined };
+          actions.map((action) => {
+            const filtered = el.filter((event) => event.type?.type && action.oneof.includes(event.type.type));
+            // const ele = ONBOARDING_EVENTS.find((oe) => oe.eventType === type);
+            (obj as any)[action.eventType] = filtered.length
+              ? { order: action.order, link: action.link, fragment: action.fragment, event: filtered[0] }
+              : { order: action.order, link: action.link, fragment: action.fragment, event: undefined };
           });
 
           const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);

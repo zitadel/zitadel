@@ -51,11 +51,11 @@
       "DESCRIPTION": "Cette liste de contrôle vous aide à configurer votre instance et vous guide à travers les étapes les plus essentielles."
     },
     "EVENTS": {
-      "instance.policy.label.changed": {
+      "instance.policy.label.added": {
         "title": "Créez votre marque",
         "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes."
       },
-      "instance.smtp.config.changed": {
+      "instance.smtp.config.added": {
         "title": "Configurez vos paramètres SMTP",
         "description": "Définissez vos propres paramètres de serveur de messagerie"
       },

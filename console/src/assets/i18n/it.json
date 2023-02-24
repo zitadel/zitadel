@@ -51,11 +51,11 @@
       "DESCRIPTION": "Questa lista di azioni aiuta a configurare la vostra istanza e vi guida attraverso i passaggi più essenziali."
     },
     "EVENTS": {
-      "instance.policy.label.changed": {
+      "instance.policy.label.added": {
         "title": "Imposta il tuo marchio",
         "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone."
       },
-      "instance.smtp.config.changed": {
+      "instance.smtp.config.added": {
         "title": "Configura le impostazioni SMTP",
         "description": "Imposta il proprio server di posta"
       },

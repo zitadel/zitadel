@@ -51,11 +51,11 @@
       "DESCRIPTION": "Diese Checkliste hilft bei der Einrichtung Ihrer Instanz und führt Sie durch die wichtigsten Schritte"
     },
     "EVENTS": {
-      "instance.policy.label.changed": {
+      "instance.policy.label.added": {
         "title": "Branding anpassen",
         "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons."
       },
-      "instance.smtp.config.changed": {
+      "instance.smtp.config.added": {
         "title": "SMTP Benachrichtigungseinstellungen",
         "description": "Konfiguriere deinen Mailserver."
       },
