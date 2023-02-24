@@ -411,7 +411,7 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		return providerConfig
 	}
 	if config.LDAPIDPTemplate != nil {
-		LdapConfigToPb(providerConfig, config.LDAPIDPTemplate)
+		ldapConfigToPb(providerConfig, config.LDAPIDPTemplate)
 		return providerConfig
 	}
 	return providerConfig
@@ -438,7 +438,7 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 	}
 }
 
-func LdapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPIDPTemplate) {
+func ldapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPIDPTemplate) {
 	providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
 		Ldap: &idp_pb.LDAPConfig{
 			Host:                template.Host,
