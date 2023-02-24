@@ -4369,6 +4369,53 @@ service ManagementService {
         };
     }
 
+    // Add a new OIDC identity provider in the organisation
+    rpc AddGenericOIDCProvider(AddGenericOIDCProviderRequest) returns (AddGenericOIDCProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/generic_oidc"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Change an existing OIDC identity provider in the organisation
+    rpc UpdateGenericOIDCProvider(UpdateGenericOIDCProviderRequest) returns (UpdateGenericOIDCProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/generic_oidc/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Add a new JWT identity provider in the organisation
+    rpc AddJWTProvider(AddJWTProviderRequest) returns (AddJWTProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/generic_jwt"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Change an existing JWT identity provider in the organisation
+    rpc UpdateJWTProvider(UpdateJWTProviderRequest) returns (UpdateJWTProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/generic_jwt/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
 
     // Add a new Google identity provider in the organisation
     rpc AddGoogleProvider(AddGoogleProviderRequest) returns (AddGoogleProviderResponse) {
@@ -7872,6 +7919,63 @@ message GetProviderByIDRequest {
 
 message GetProviderByIDResponse {
     zitadel.idp.v1.Provider idp = 1;
+}
+
+message AddGenericOIDCProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 6;
+}
+
+message AddGenericOIDCProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGenericOIDCProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // client_secret will only be updated if provided
+    string client_secret = 5 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 7;
+}
+
+message UpdateGenericOIDCProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddJWTProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string jwt_endpoint = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string keys_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string header_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.Options provider_options = 6;
+}
+
+message AddJWTProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateJWTProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string jwt_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string keys_endpoint = 5 [(validate.rules).string = {max_len: 200}];
+    string header_name = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.Options provider_options = 7;
+}
+
+message UpdateJWTProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message AddGoogleProviderRequest {

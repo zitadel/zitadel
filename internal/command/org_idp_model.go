@@ -6,8 +6,223 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
+
+type OrgOIDCIDPWriteModel struct {
+	OIDCIDPWriteModel
+}
+
+func NewOIDCOrgIDPWriteModel(orgID, id string) *OrgOIDCIDPWriteModel {
+	return &OrgOIDCIDPWriteModel{
+		OIDCIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgOIDCIDPWriteModel) Reduce() error {
+	return wm.OIDCIDPWriteModel.Reduce()
+}
+
+func (wm *OrgOIDCIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.OIDCIDPAddedEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPAddedEvent)
+		case *org.OIDCIDPChangedEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.RemovedEvent)
+
+			// old events
+		case *org.IDPConfigAddedEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
+		case *org.IDPConfigChangedEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.IDPConfigChangedEvent)
+		case *org.IDPOIDCConfigAddedEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCConfigAddedEvent)
+		case *org.IDPOIDCConfigChangedEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCConfigChangedEvent)
+		case *org.IDPConfigRemovedEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
+		default:
+			wm.OIDCIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgOIDCIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.OIDCIDPAddedEventType,
+			org.OIDCIDPChangedEventType,
+			org.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Or(). // old events
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.IDPConfigAddedEventType,
+			org.IDPConfigChangedEventType,
+			org.IDPOIDCConfigAddedEventType,
+			org.IDPOIDCConfigChangedEventType,
+			org.IDPConfigRemovedEventType,
+		).
+		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
+		Builder()
+}
+
+func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	issuer,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) (*org.OIDCIDPChangedEvent, error) {
+
+	changes, err := wm.OIDCIDPWriteModel.NewChanges(
+		name,
+		issuer,
+		clientID,
+		clientSecretString,
+		secretCrypto,
+		scopes,
+		options,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(changes) == 0 {
+		return nil, nil
+	}
+	changeEvent, err := org.NewOIDCIDPChangedEvent(ctx, aggregate, id, changes)
+	if err != nil {
+		return nil, err
+	}
+	return changeEvent, nil
+}
+
+type OrgJWTIDPWriteModel struct {
+	JWTIDPWriteModel
+}
+
+func NewJWTOrgIDPWriteModel(orgID, id string) *OrgJWTIDPWriteModel {
+	return &OrgJWTIDPWriteModel{
+		JWTIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgJWTIDPWriteModel) Reduce() error {
+	return wm.JWTIDPWriteModel.Reduce()
+}
+
+func (wm *OrgJWTIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.JWTIDPAddedEvent:
+			wm.JWTIDPWriteModel.AppendEvents(&e.JWTIDPAddedEvent)
+		case *org.JWTIDPChangedEvent:
+			wm.JWTIDPWriteModel.AppendEvents(&e.JWTIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			wm.JWTIDPWriteModel.AppendEvents(&e.RemovedEvent)
+
+			// old events
+		case *org.IDPConfigAddedEvent:
+			wm.JWTIDPWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
+		case *org.IDPConfigChangedEvent:
+			wm.JWTIDPWriteModel.AppendEvents(&e.IDPConfigChangedEvent)
+		case *org.IDPJWTConfigAddedEvent:
+			wm.JWTIDPWriteModel.AppendEvents(&e.JWTConfigAddedEvent)
+		case *org.IDPJWTConfigChangedEvent:
+			wm.JWTIDPWriteModel.AppendEvents(&e.JWTConfigChangedEvent)
+		case *org.IDPConfigRemovedEvent:
+			wm.JWTIDPWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
+		default:
+			wm.JWTIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgJWTIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.JWTIDPAddedEventType,
+			org.JWTIDPChangedEventType,
+			org.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Or(). // old events
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.IDPConfigAddedEventType,
+			org.IDPConfigChangedEventType,
+			org.IDPJWTConfigAddedEventType,
+			org.IDPJWTConfigChangedEventType,
+			org.IDPConfigRemovedEventType,
+		).
+		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
+		Builder()
+}
+
+func (wm *OrgJWTIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	issuer,
+	jwtEndpoint,
+	keysEndpoint,
+	headerName string,
+	options idp.Options,
+) (*org.JWTIDPChangedEvent, error) {
+
+	changes, err := wm.JWTIDPWriteModel.NewChanges(
+		name,
+		issuer,
+		jwtEndpoint,
+		keysEndpoint,
+		headerName,
+		options,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(changes) == 0 {
+		return nil, nil
+	}
+	changeEvent, err := org.NewJWTIDPChangedEvent(ctx, aggregate, id, changes)
+	if err != nil {
+		return nil, err
+	}
+	return changeEvent, nil
+}
 
 type OrgGoogleIDPWriteModel struct {
 	GoogleIDPWriteModel
@@ -212,16 +427,24 @@ func (wm *OrgIDPRemoveWriteModel) Reduce() error {
 func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *org.GoogleIDPAddedEvent:
+		case *instance.OIDCIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.OIDCIDPAddedEvent)
+		case *instance.JWTIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.JWTIDPAddedEvent)
+		case *instance.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
-		case *org.GoogleIDPChangedEvent:
+		case *instance.GoogleIDPChangedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
-		case *org.LDAPIDPAddedEvent:
+		case *instance.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
-		case *org.LDAPIDPChangedEvent:
+		case *instance.LDAPIDPChangedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPChangedEvent)
-		case *org.IDPRemovedEvent:
+		case *instance.IDPRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.RemovedEvent)
+		case *instance.IDPConfigAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
+		case *instance.IDPConfigRemovedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
 		default:
 			wm.IDPRemoveWriteModel.AppendEvents(e)
 		}
