@@ -8,7 +8,6 @@ export const ONBOARDING_EVENTS: OnboardingActions[] = [
   { order: 3, eventType: 'user.human.added', link: ['/users/create'] },
   { order: 4, eventType: 'instance.smtp.config.changed', link: ['/settings'], fragment: 'notifications' },
   { order: 5, eventType: 'user.grant.added', link: ['/grant-create'] },
-  { order: 6, eventType: 'instance.policy.domain.changed', link: '/settings?id=notifications' },
 ];
 
 @Component({
