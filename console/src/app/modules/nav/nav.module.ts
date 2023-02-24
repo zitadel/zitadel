@@ -12,12 +12,15 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
+import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
+import OnboardingCardModule from '../onboarding-card/onboarding-card.module';
 import { NavComponent } from './nav.component';
 
 @NgModule({
   declarations: [NavComponent],
   imports: [
     CommonModule,
+    OnboardingCardModule,
     FormsModule,
     ReactiveFormsModule,
     TranslateModule,
@@ -25,6 +28,7 @@ import { NavComponent } from './nav.component';
     RouterModule,
     MatTooltipModule,
     HasRolePipeModule,
+    MatLegacyProgressBarModule,
     HasRoleModule,
     MatMenuModule,
     MatButtonModule,
