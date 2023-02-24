@@ -662,6 +662,36 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 		},
 		{
+			name: "with limit and order by desc as of system time",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: &repository.SearchQuery{
+					Columns:         repository.ColumnsEvent,
+					Desc:            true,
+					Limit:           5,
+					AllowTimeTravel: true,
+					Filters: [][]*repository.Filter{
+						{
+							{
+								Field:     repository.FieldAggregateType,
+								Value:     repository.AggregateType("user"),
+								Operation: repository.OperationEquals,
+							},
+						},
+					},
+				},
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					`SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events AS OF SYSTEM TIME '-1 ms' WHERE \( aggregate_type = \$1 \) ORDER BY event_sequence DESC LIMIT \$2`,
+					[]driver.Value{repository.AggregateType("user"), uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
 			name: "error sql conn closed",
 			args: args{
 				dest: &[]*repository.Event{},
