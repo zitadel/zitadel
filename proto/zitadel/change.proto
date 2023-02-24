@@ -35,7 +35,7 @@ message Change {
     ];
     string resource_owner_id = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the organisation the event belongs to";
+            description: "the organization the event belongs to";
             example: "\"69629023906488334\"";
         }
     ];
@@ -47,23 +47,29 @@ message Change {
     ];
     string editor_avatar_url = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "avatar url of the editor";
+            description: "avatar URL of the editor";
             example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
 }
 
 message ChangeQuery {
-    //sequence represents the order of events. It's always upcounting
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Query for Changes of an Object"
+            description: "Filter possibility for the changes/history of an Object."
+        }
+    };
     uint64 sequence = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2\"";
+            description: "sequence represents the order of events. It's always counting";
         }
     ];
     uint32 limit = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "20";
-            description: "Maximum amount of events returned. Default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If no limit is set or the limit exeeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
+            description: "Maximum amount of events returned. The default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If no limit is set or the limit exceeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
         }
     ];
     bool asc = 3 [

@@ -32,7 +32,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
     };
   };
-
+  tags: [
+    {
+        name: "General"
+    }
+  ];
   schemes: HTTPS;
   schemes: HTTP;
 
@@ -45,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "api.zitadel.ch";
+  host: "$ZITADEL_DOMAIN";
   base_path: "/system/v1";
 
   external_docs: {
@@ -86,7 +90,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "probes";
+      tags: "General";
       responses: {
         key: "200";
         value: {
