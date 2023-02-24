@@ -24,21 +24,23 @@
     </div>
   </a>
 
-  <div class="item card disabled" matRipple (click)="createGoogle()">
+  <div class="item card" matRipple (click)="createGoogle()">
     <img class="idp-logo" src="../../../assets/images/idp/ms.svg" alt="microsoft" />
     <div class="text-container">
       <span class="title">Microsoft</span>
     </div>
   </div>
 
-  <div class="item card disabled" matRipple (click)="createGoogle()">
-    <img class="idp-logo" src="../../../assets/images/idp/github.svg" alt="GitHub" />
+  <div class="item card" matRipple (click)="createGoogle()">
+    <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="GitHub" />
+    <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="GitHub" />
+
     <div class="text-container">
       <span class="title">GitHub</span>
     </div>
   </div>
 
-  <div class="item card disabled" matRipple (click)="createGoogle()">
+  <div class="item card" matRipple (click)="createGoogle()">
     <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="GitLab" />
     <div class="text-container">
       <span class="title">GitLab</span>
@@ -55,7 +57,9 @@
         : []
     "
   >
-    <mat-icon class="idp-icon" svgIcon="mdi_openid" alt="openid" />
+    <div class="idp-icon">
+      <mat-icon class="icon" svgIcon="mdi_openid" alt="openid" />
+    </div>
     <div class="text-container">
       <span class="title">Generic OIDC provider</span>
     </div>
@@ -71,7 +75,9 @@
         : []
     "
   >
-    <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
+    <div class="idp-icon">
+      <mat-icon class="icon" svgIcon="mdi_jwt" alt="jwt" />
+    </div>
     <div class="text-container">
       <span class="title">Generic JWT provider</span>
     </div>
