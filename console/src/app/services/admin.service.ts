@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
-import { ONBOARDING_EVENTS } from '../modules/onboarding/onboarding.component';
 
 import {
   ActivateLabelPolicyRequest,
@@ -263,7 +262,6 @@ export class AdminService {
           let obj: { [type: string]: OnboardingEvent } = {};
           actions.map((action) => {
             const filtered = el.filter((event) => event.type?.type && action.oneof.includes(event.type.type));
-            // const ele = ONBOARDING_EVENTS.find((oe) => oe.eventType === type);
             (obj as any)[action.eventType] = filtered.length
               ? { order: action.order, link: action.link, fragment: action.fragment, event: filtered[0] }
               : { order: action.order, link: action.link, fragment: action.fragment, event: undefined };

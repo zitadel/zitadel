@@ -3,9 +3,6 @@
 
   <p class="desc cnsl-secondary-text">{{ 'ONBOARDING.DESCRIPTION' | translate }}</p>
 
-  <div class="onboarding-spinner">
-    <mat-spinner diameter="20" *ngIf="adminService.onboardingLoading | async"></mat-spinner>
-  </div>
   <ng-container *ngIf="!adminService.hideOnboarding && (adminService.progressAllDone | async) === false">
     <div class="onboarding-progress-bar-wrapper">
       <mat-progress-bar
@@ -18,6 +15,8 @@
         {{ adminService.progressDone | async }} / {{ adminService.progressTotal | async }}
         {{ 'ONBOARDING.COMPLETED' | translate }}
       </div>
+
+      <mat-spinner diameter="20" *ngIf="adminService.onboardingLoading | async"></mat-spinner>
     </div>
   </ng-container>
 

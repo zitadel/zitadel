@@ -1,14 +1,15 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { AdminService } from 'src/app/services/admin.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
+import { ONBOARDING_EVENTS } from 'src/app/utils/onboarding';
 
 @Component({
   selector: 'cnsl-onboarding-card',
   templateUrl: './onboarding-card.component.html',
   styleUrls: ['./onboarding-card.component.scss'],
 })
-export class OnboardingCardComponent {
+export class OnboardingCardComponent implements OnInit {
   public percentageChanged: EventEmitter<number> = new EventEmitter<number>();
   public loading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public actions = this.adminService.progressEvents;
@@ -18,5 +19,9 @@ export class OnboardingCardComponent {
 
   public dismiss(): void {
     this.dismissedCard.emit();
+  }
+
+  ngOnInit() {
+    this.adminService.loadEvents.next(ONBOARDING_EVENTS);
   }
 }
