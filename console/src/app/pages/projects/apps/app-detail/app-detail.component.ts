@@ -49,8 +49,8 @@ import {
   getAuthMethodFromPartialConfig,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
-  PK_JWT_METHOD,
   PKCE_METHOD,
+  PK_JWT_METHOD,
   POST_METHOD,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
