@@ -402,6 +402,14 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 			IsAutoUpdate:      config.IsAutoUpdate,
 		},
 	}
+	if config.GoogleIDPTemplate != nil {
+		providerConfig.Config = &idp_pb.ProviderConfig_Google{
+			Google: &idp_pb.GoogleConfig{
+				ClientId: config.GoogleIDPTemplate.ClientID,
+				Scopes:   config.GoogleIDPTemplate.Scopes,
+			},
+		}
+	}
 	if config.LDAPIDPTemplate != nil {
 		providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
 			Ldap: &idp_pb.LDAPConfig{

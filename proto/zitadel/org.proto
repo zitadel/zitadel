@@ -17,17 +17,17 @@ message Org {
     zitadel.v1.ObjectDetails details = 2;
     OrgState state = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "current state of the organisation";
+            description: "current state of the organization";
         }
     ];
     string name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"CAOS AG\"";
+            example: "\"ZITADEL\"";
         }
     ];
     string primary_domain = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos.ch\"";
+            example: "\"zitadel.cloud\"";
         }
     ];
 }
@@ -48,7 +48,7 @@ message Domain {
     zitadel.v1.ObjectDetails details = 2;
     string domain_name = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos.ch\"";
+            example: "\"zitadel.com\"";
         }
     ];
     bool is_verified = 4 [
@@ -88,7 +88,7 @@ message OrgNameQuery {
     string name = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos ag\"";
+            example: "\"ZITADEL\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
@@ -103,7 +103,7 @@ message OrgDomainQuery {
     string domain = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"CAOS.C\"";
+            example: "\"citadel.cloud\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
@@ -118,7 +118,7 @@ message OrgStateQuery {
     OrgState state = 1 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "current state of the organisation";
+            description: "current state of the organization";
         }
     ];
 }
@@ -140,7 +140,7 @@ message DomainNameQuery {
     string name = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos.ch\"";
+            example: "\"zitadel.cloud\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [

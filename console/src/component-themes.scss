@@ -34,6 +34,7 @@
 @import 'src/app/pages/users/user-list/user-table/user-table.component';
 @import 'src/app/pages/users/user-detail/contact/contact.component';
 @import 'src/app/pages/projects/project-grid/project-grid.component';
+@import 'src/app/pages/actions/actions.component';
 @import 'src/app/app.component.scss';
 @import './styles/color.scss';
 @import 'src/app/pages/instance/instance.component.scss';
@@ -117,6 +118,7 @@
   @include accounts-card-theme($theme);
   @include sidenav-theme($theme);
   @include info-section-theme($theme);
+  @include actions-theme($theme);
   @include filter-theme($theme);
   @include private-label-theme($theme);
   @include project-grid-theme($theme);

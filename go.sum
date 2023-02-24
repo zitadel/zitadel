@@ -916,8 +916,8 @@ github.com/zitadel/logging v0.3.4 h1:9hZsTjMMTE3X2LUi0xcF9Q9EdLo+FAezeu52ireBbHM
 github.com/zitadel/logging v0.3.4/go.mod h1:aPpLQhE+v6ocNK0TWrBrd363hZ95KcI17Q1ixAQwZF0=
 github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.8 h1:e6sRhY3Lijku8XBzazLoWpJcjO/EniEA7C5UEgiApRY=
 github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.8/go.mod h1:2jHMP6o/WK0EmcNJkz+FSpjeqcCuQG9YqqqzKZkfgIE=
-github.com/zitadel/saml v0.0.9 h1:q7FRu52Wm2S5rsSGuzR2nYhEClvexga8bwnGrBL7Bbw=
-github.com/zitadel/saml v0.0.9/go.mod h1:DIy/ln32rNYv/bIBA8uOB6Y2JmxjZldDYBeMNn7YyeQ=
+github.com/zitadel/saml v0.0.10 h1:cyKd78Vat9vz55S74lggJrXMSqbAPsnJDrPFTPScNYY=
+github.com/zitadel/saml v0.0.10/go.mod h1:Hze1/zRN9j1uh7U+89vweP/OwLNO8BLHg3zU1Jtycdg=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738/go.mod h1:dnLIgRNXwCJa5e+c6mIZCrds/GIG4ncV9HhK5PX7jPg=
 go.etcd.io/etcd/api/v3 v3.5.1/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
@@ -1483,6 +1483,7 @@ google.golang.org/grpc v1.41.0/go.mod h1:U3l9uK9J0sini8mHphKoXyaqDA/8VyGnDee1zzI
 google.golang.org/grpc v1.42.0/go.mod h1:k+4IHHFw41K8+bbowsex27ge2rCb65oeWqe4jJ590SU=
 google.golang.org/grpc v1.51.0 h1:E1eGv1FTqoLIdnBCZufiSHgKjlqG6fKFf6pPWtMTh8U=
 google.golang.org/grpc v1.51.0/go.mod h1:wgNDFcnuBGmxLKI/qn4T+m5BtEBYXJPvibbUPsAIPww=
+google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0 h1:M1YKkFIboKNieVO5DLUEVzQfGwJD30Nv2jfUgzb5UcE=
 google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0/go.mod h1:6Kw0yEErY5E/yWrBtf03jp27GLLJujG4z/JK95pnjjw=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
 google.golang.org/protobuf v0.0.0-20200221191635-4d8936d0db64/go.mod h1:kwYJMbMJ01Woi6D6+Kah6886xMZcty6N08ah7+eCXa0=
