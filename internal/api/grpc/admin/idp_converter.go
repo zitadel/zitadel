@@ -201,6 +201,32 @@ func providerQueryToQuery(idpQuery *admin_pb.ProviderQuery) (query.SearchQuery, 
 	}
 }
 
+func addGenericOAuthProviderToCommand(req *admin_pb.AddGenericOAuthProviderRequest) command.GenericOAuthProvider {
+	return command.GenericOAuthProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGenericOAuthProviderToCommand(req *admin_pb.UpdateGenericOAuthProviderRequest) command.GenericOAuthProvider {
+	return command.GenericOAuthProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
 func addGenericOIDCProviderToCommand(req *admin_pb.AddGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
 		Name:         req.Name,

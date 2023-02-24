@@ -10,6 +10,8 @@ import (
 )
 
 const (
+	OAuthIDPAddedEventType    eventstore.EventType = "org.idp.oauth.added"
+	OAuthIDPChangedEventType  eventstore.EventType = "org.idp.oauth.changed"
 	OIDCIDPAddedEventType     eventstore.EventType = "org.idp.oidc.added"
 	OIDCIDPChangedEventType   eventstore.EventType = "org.idp.oidc.changed"
 	JWTIDPAddedEventType      eventstore.EventType = "org.idp.jwt.added"
@@ -20,6 +22,88 @@ const (
 	LDAPIDPChangedEventType   eventstore.EventType = "org.idp.ldap.changed"
 	IDPRemovedEventType       eventstore.EventType = "org.idp.removed"
 )
+
+type OAuthIDPAddedEvent struct {
+	idp.OAuthIDPAddedEvent
+}
+
+func NewOAuthIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	authorizationEndpoint,
+	tokenEndpoint,
+	userEndpoint string,
+	scopes []string,
+	options idp.Options,
+) *OAuthIDPAddedEvent {
+
+	return &OAuthIDPAddedEvent{
+		OAuthIDPAddedEvent: *idp.NewOAuthIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				OAuthIDPAddedEventType,
+			),
+			id,
+			name,
+			clientID,
+			clientSecret,
+			authorizationEndpoint,
+			tokenEndpoint,
+			userEndpoint,
+			scopes,
+			options,
+		),
+	}
+}
+
+func OAuthIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.OAuthIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OAuthIDPAddedEvent{OAuthIDPAddedEvent: *e.(*idp.OAuthIDPAddedEvent)}, nil
+}
+
+type OAuthIDPChangedEvent struct {
+	idp.OAuthIDPChangedEvent
+}
+
+func NewOAuthIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.OAuthIDPChanges,
+) (*OAuthIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewOAuthIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OAuthIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &OAuthIDPChangedEvent{OAuthIDPChangedEvent: *changedEvent}, nil
+}
+
+func OAuthIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.OAuthIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OAuthIDPChangedEvent{OAuthIDPChangedEvent: *e.(*idp.OAuthIDPChangedEvent)}, nil
+}
 
 type OIDCIDPAddedEvent struct {
 	idp.OIDCIDPAddedEvent

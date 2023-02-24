@@ -10,6 +10,118 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
+type OAuthIDPWriteModel struct {
+	eventstore.WriteModel
+
+	Name                  string
+	ID                    string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	AuthorizationEndpoint string
+	TokenEndpoint         string
+	UserEndpoint          string
+	Scopes                []string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *OAuthIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.OAuthIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.OAuthIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *OAuthIDPWriteModel) reduceAddedEvent(e *idp.OAuthIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.AuthorizationEndpoint = e.AuthorizationEndpoint
+	wm.TokenEndpoint = e.TokenEndpoint
+	wm.UserEndpoint = e.UserEndpoint
+	wm.Scopes = e.Scopes
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *OAuthIDPWriteModel) reduceChangedEvent(e *idp.OAuthIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.AuthorizationEndpoint != nil {
+		wm.AuthorizationEndpoint = *e.AuthorizationEndpoint
+	}
+	if e.TokenEndpoint != nil {
+		wm.TokenEndpoint = *e.TokenEndpoint
+	}
+	if e.UserEndpoint != nil {
+		wm.UserEndpoint = *e.UserEndpoint
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *OAuthIDPWriteModel) NewChanges(
+	name,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	authorizationEndpoint,
+	tokenEndpoint,
+	userEndpoint string,
+	scopes []string,
+	options idp.Options,
+) ([]idp.OAuthIDPChanges, error) {
+	changes := make([]idp.OAuthIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeOAuthClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeOAuthClientID(clientID))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeOAuthName(name))
+	}
+	if wm.AuthorizationEndpoint != authorizationEndpoint {
+		changes = append(changes, idp.ChangeOAuthAuthorizationEndpoint(authorizationEndpoint))
+	}
+	if wm.TokenEndpoint != tokenEndpoint {
+		changes = append(changes, idp.ChangeOAuthTokenEndpoint(tokenEndpoint))
+	}
+	if wm.UserEndpoint != userEndpoint {
+		changes = append(changes, idp.ChangeOAuthUserEndpoint(userEndpoint))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeOAuthScopes(scopes))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeOAuthOptions(opts))
+	}
+	return changes, nil
+}
+
 type OIDCIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -547,6 +659,8 @@ type IDPRemoveWriteModel struct {
 func (wm *IDPRemoveWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *idp.OAuthIDPAddedEvent:
+			wm.reduceAdded(e.ID)
 		case *idp.OIDCIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.JWTIDPAddedEvent:

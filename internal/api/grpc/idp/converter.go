@@ -402,6 +402,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 			IsAutoUpdate:      config.IsAutoUpdate,
 		},
 	}
+	if config.OAuthIDPTemplate != nil {
+		oauthConfigToPb(providerConfig, config.OAuthIDPTemplate)
+		return providerConfig
+	}
 	if config.OIDCIDPTemplate != nil {
 		oidcConfigToPb(providerConfig, config.OIDCIDPTemplate)
 		return providerConfig
@@ -415,10 +419,22 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		return providerConfig
 	}
 	if config.LDAPIDPTemplate != nil {
-		LdapConfigToPb(providerConfig, config.LDAPIDPTemplate)
+		ldapConfigToPb(providerConfig, config.LDAPIDPTemplate)
 		return providerConfig
 	}
 	return providerConfig
+}
+
+func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAuthIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Oauth{
+		Oauth: &idp_pb.OAuthConfig{
+			ClientId:              template.ClientID,
+			AuthorizationEndpoint: template.AuthorizationEndpoint,
+			TokenEndpoint:         template.TokenEndpoint,
+			UserEndpoint:          template.UserEndpoint,
+			Scopes:                template.Scopes,
+		},
+	}
 }
 
 func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCIDPTemplate) {
@@ -451,7 +467,7 @@ func googleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.Goo
 	}
 }
 
-func LdapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPIDPTemplate) {
+func ldapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPIDPTemplate) {
 	providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
 		Ldap: &idp_pb.LDAPConfig{
 			Host:                template.Host,

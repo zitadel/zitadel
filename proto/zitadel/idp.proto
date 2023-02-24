@@ -263,9 +263,17 @@ message ProviderConfig {
     oneof config {
         LDAPConfig ldap = 2;
         GoogleConfig google = 3;
-        GenericOIDCConfig oidc = 4;
-        JWTConfig jwt = 5;
+        OAuthConfig oauth = 4;
+        GenericOIDCConfig oidc = 5;
+        JWTConfig jwt = 6;
     }
+}
+message OAuthConfig {
+    string client_id = 1;
+    string authorization_endpoint = 2;
+    string token_endpoint = 3;
+    string user_endpoint = 4;
+    repeated string scopes = 5;
 }
 
 message GenericOIDCConfig {
