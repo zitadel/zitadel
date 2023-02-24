@@ -115,6 +115,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				SearchQueryBuilder: eventstore.
 					NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AllowTimeTravel().
 					AddQuery().
 					AggregateTypes("testAgg").
 					SequenceGreater(5).
@@ -144,6 +145,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				SearchQueryBuilder: eventstore.
 					NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AllowTimeTravel().
 					AddQuery().
 					AggregateTypes("testAgg").
 					SequenceGreater(5).
