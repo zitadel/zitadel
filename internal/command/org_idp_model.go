@@ -9,6 +9,91 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
+type OrgOAuthIDPWriteModel struct {
+	OAuthIDPWriteModel
+}
+
+func NewOAuthOrgIDPWriteModel(orgID, id string) *OrgOAuthIDPWriteModel {
+	return &OrgOAuthIDPWriteModel{
+		OAuthIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgOAuthIDPWriteModel) Reduce() error {
+	return wm.OAuthIDPWriteModel.Reduce()
+}
+
+func (wm *OrgOAuthIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.OAuthIDPAddedEvent:
+			wm.OAuthIDPWriteModel.AppendEvents(&e.OAuthIDPAddedEvent)
+		case *org.OAuthIDPChangedEvent:
+			wm.OAuthIDPWriteModel.AppendEvents(&e.OAuthIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			wm.OAuthIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.OAuthIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgOAuthIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.OAuthIDPAddedEventType,
+			org.OAuthIDPChangedEventType,
+			org.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	authorizationEndpoint,
+	tokenEndpoint,
+	userEndpoint string,
+	scopes []string,
+	options idp.Options,
+) (*org.OAuthIDPChangedEvent, error) {
+
+	changes, err := wm.OAuthIDPWriteModel.NewChanges(
+		name,
+		clientID,
+		clientSecretString,
+		secretCrypto,
+		authorizationEndpoint,
+		tokenEndpoint,
+		userEndpoint,
+		scopes,
+		options,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(changes) == 0 {
+		return nil, nil
+	}
+	return org.NewOAuthIDPChangedEvent(ctx, aggregate, id, changes)
+}
+
 type OrgGoogleIDPWriteModel struct {
 	GoogleIDPWriteModel
 }
@@ -78,11 +163,7 @@ func (wm *OrgGoogleIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := org.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return org.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type OrgLDAPIDPWriteModel struct {
@@ -109,19 +190,10 @@ func (wm *OrgLDAPIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LDAPIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
 		case *org.LDAPIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.LDAPIDPChangedEvent)
 		case *org.IDPRemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.LDAPIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.LDAPIDPWriteModel.AppendEvents(e)
@@ -140,6 +212,7 @@ func (wm *OrgLDAPIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.LDAPIDPChangedEventType,
 			org.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
 
@@ -182,11 +255,7 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := org.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
 }
 
 type OrgIDPRemoveWriteModel struct {
@@ -212,6 +281,10 @@ func (wm *OrgIDPRemoveWriteModel) Reduce() error {
 func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
+		case *org.OAuthIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.OAuthIDPAddedEvent)
+		case *org.OAuthIDPChangedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.OAuthIDPChangedEvent)
 		case *org.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *org.GoogleIDPChangedEvent:
@@ -235,11 +308,14 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			org.OAuthIDPAddedEventType,
+			org.OAuthIDPChangedEventType,
 			org.GoogleIDPAddedEventType,
 			org.GoogleIDPChangedEventType,
 			org.LDAPIDPAddedEventType,
 			org.LDAPIDPChangedEventType,
 			org.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }

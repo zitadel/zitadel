@@ -47,8 +47,8 @@ func (o *Options) ReduceChanges(changes OptionChanges) {
 	if changes.IsLinkingAllowed != nil {
 		o.IsLinkingAllowed = *changes.IsLinkingAllowed
 	}
-	if changes.IsAutoUpdate != nil {
-		o.IsAutoUpdate = *changes.IsAutoUpdate
+	if changes.IsAutoCreation != nil {
+		o.IsAutoCreation = *changes.IsAutoCreation
 	}
 	if changes.IsAutoUpdate != nil {
 		o.IsAutoUpdate = *changes.IsAutoUpdate
