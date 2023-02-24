@@ -21,7 +21,7 @@ import { Subject } from 'rxjs';
 import { startWith, takeUntil } from 'rxjs/operators';
 
 import { cnslFormFieldAnimations } from './animations';
-import { CNSL_ERROR, CnslErrorDirective } from './error.directive';
+import { CnslErrorDirective, CNSL_ERROR } from './error.directive';
 
 export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslFormFieldComponent');
 

@@ -1,0 +1,25 @@
+h1 {
+  font-weight: 500;
+}
+
+.app-create-main-content {
+  max-width: 35rem;
+
+  .app-create-btn-container {
+    display: flex;
+    align-items: center;
+    margin-top: 3rem;
+
+    .continue-button {
+      margin-top: 3rem;
+      display: block;
+      padding: 0.5rem 4rem;
+      border-radius: 0.5rem;
+    }
+  }
+
+  .complexity-view {
+    width: 100%;
+    margin: 0 0.5rem;
+  }
+}
