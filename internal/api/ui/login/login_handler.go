@@ -95,6 +95,11 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+
+	// to be moved
+	l.handleLDAP(w, r)
+	return
+
 	if singleIDPAllowed(authReq) {
 		l.handleIDP(w, r, authReq, authReq.AllowedExternalIDPs[0].IDPConfigID)
 		return
