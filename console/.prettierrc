@@ -1,5 +1,6 @@
 {
   "printWidth": 125,
   "singleQuote": true,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "organizeImportsSkipDestructiveCodeActions": true
 }
