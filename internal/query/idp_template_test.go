@@ -28,10 +28,20 @@ var (
 		` projections.idp_templates.is_linking_allowed,` +
 		` projections.idp_templates.is_auto_creation,` +
 		` projections.idp_templates.is_auto_update,` +
+		// oauth
+		` projections.idp_templates_oauth.idp_id,` +
+		` projections.idp_templates_oauth.client_id,` +
+		` projections.idp_templates_oauth.client_secret,` +
+		` projections.idp_templates_oauth.authorization_endpoint,` +
+		` projections.idp_templates_oauth.token_endpoint,` +
+		` projections.idp_templates_oauth.user_endpoint,` +
+		` projections.idp_templates_oauth.scopes,` +
+		// google
 		` projections.idp_templates_google.idp_id,` +
 		` projections.idp_templates_google.client_id,` +
 		` projections.idp_templates_google.client_secret,` +
 		` projections.idp_templates_google.scopes,` +
+		// ldap
 		` projections.idp_templates_ldap.idp_id,` +
 		` projections.idp_templates_ldap.host,` +
 		` projections.idp_templates_ldap.port,` +
@@ -55,6 +65,7 @@ var (
 		` projections.idp_templates_ldap.avatar_url_attribute,` +
 		` projections.idp_templates_ldap.profile_attribute` +
 		` FROM projections.idp_templates` +
+		` LEFT JOIN projections.idp_templates_oauth ON projections.idp_templates.id = projections.idp_templates_oauth.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_oauth.instance_id` +
 		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
 		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id`
 	idpTemplateCols = []string{
@@ -71,6 +82,14 @@ var (
 		"is_linking_allowed",
 		"is_auto_creation",
 		"is_auto_update",
+		// oauth config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"authorization_endpoint",
+		"token_endpoint",
+		"user_endpoint",
+		"scopes",
 		// google config
 		"idp_id",
 		"client_id",
@@ -113,10 +132,20 @@ var (
 		` projections.idp_templates.is_linking_allowed,` +
 		` projections.idp_templates.is_auto_creation,` +
 		` projections.idp_templates.is_auto_update,` +
+		// oauth
+		` projections.idp_templates_oauth.idp_id,` +
+		` projections.idp_templates_oauth.client_id,` +
+		` projections.idp_templates_oauth.client_secret,` +
+		` projections.idp_templates_oauth.authorization_endpoint,` +
+		` projections.idp_templates_oauth.token_endpoint,` +
+		` projections.idp_templates_oauth.user_endpoint,` +
+		` projections.idp_templates_oauth.scopes,` +
+		// google
 		` projections.idp_templates_google.idp_id,` +
 		` projections.idp_templates_google.client_id,` +
 		` projections.idp_templates_google.client_secret,` +
 		` projections.idp_templates_google.scopes,` +
+		// ldap
 		` projections.idp_templates_ldap.idp_id,` +
 		` projections.idp_templates_ldap.host,` +
 		` projections.idp_templates_ldap.port,` +
@@ -141,6 +170,7 @@ var (
 		` projections.idp_templates_ldap.profile_attribute,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_templates` +
+		` LEFT JOIN projections.idp_templates_oauth ON projections.idp_templates.id = projections.idp_templates_oauth.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_oauth.instance_id` +
 		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
 		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id`
 	idpTemplatesCols = []string{
@@ -157,6 +187,14 @@ var (
 		"is_linking_allowed",
 		"is_auto_creation",
 		"is_auto_update",
+		// oauth config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"authorization_endpoint",
+		"token_endpoint",
+		"user_endpoint",
+		"scopes",
 		// google config
 		"idp_id",
 		"client_id",
@@ -218,7 +256,91 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 			},
 			object: (*IDPTemplate)(nil),
 		},
-
+		{
+			name:    "prepareIDPTemplateByIDQuery oauth idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeOAuth,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						// oauth
+						"idp-id",
+						"client_id",
+						nil,
+						"authorization",
+						"token",
+						"user",
+						database.StringArray{"profile"},
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeOAuth,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				OAuthIDPTemplate: &OAuthIDPTemplate{
+					IDPID:                 "idp-id",
+					ClientID:              "client_id",
+					ClientSecret:          nil,
+					AuthorizationEndpoint: "authorization",
+					TokenEndpoint:         "token",
+					UserEndpoint:          "user",
+					Scopes:                []string{"profile"},
+				},
+			},
+		},
 		{
 			name:    "prepareIDPTemplateByIDQuery google idp",
 			prepare: prepareIDPTemplateByIDQuery,
@@ -240,6 +362,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						"idp-id",
 						"client_id",
@@ -314,6 +444,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						nil,
 						nil,
@@ -407,6 +545,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google config
 						nil,
 						nil,
@@ -511,6 +657,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -613,6 +767,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -690,6 +852,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -733,6 +903,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google
 							"idp-id-google",
 							"client_id",
@@ -762,12 +940,63 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 						},
+						{
+							"idp-id-oauth",
+							"ro",
+							testNow,
+							testNow,
+							uint64(20211109),
+							domain.IDPConfigStateActive,
+							"idp-name",
+							domain.IDPTypeOAuth,
+							domain.IdentityProviderTypeOrg,
+							true,
+							true,
+							true,
+							true,
+							// oauth
+							"idp-id-oauth",
+							"client_id",
+							nil,
+							"authorization",
+							"token",
+							"user",
+							database.StringArray{"profile"},
+							// google
+							nil,
+							nil,
+							nil,
+							nil,
+							// ldap config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+						},
 					},
 				),
 			},
 			object: &IDPTemplates{
 				SearchResponse: SearchResponse{
-					Count: 2,
+					Count: 3,
 				},
 				Templates: []*IDPTemplate{
 					{
@@ -829,6 +1058,31 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							ClientID:     "client_id",
 							ClientSecret: nil,
 							Scopes:       []string{"profile"},
+						},
+					},
+
+					{
+						CreationDate:      testNow,
+						ChangeDate:        testNow,
+						Sequence:          20211109,
+						ResourceOwner:     "ro",
+						ID:                "idp-id-oauth",
+						State:             domain.IDPStateActive,
+						Name:              "idp-name",
+						Type:              domain.IDPTypeOAuth,
+						OwnerType:         domain.IdentityProviderTypeOrg,
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+						OAuthIDPTemplate: &OAuthIDPTemplate{
+							IDPID:                 "idp-id-oauth",
+							ClientID:              "client_id",
+							ClientSecret:          nil,
+							AuthorizationEndpoint: "authorization",
+							TokenEndpoint:         "token",
+							UserEndpoint:          "user",
+							Scopes:                []string{"profile"},
 						},
 					},
 				},
