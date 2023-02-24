@@ -56,12 +56,14 @@ func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, id st
 }
 
 func (c *Commands) AddInstanceGenericOIDCProvider(ctx context.Context, provider GenericOIDCProvider) (string, *domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceOIDCProvider(instanceAgg, id, provider))
+	writeModel := NewOIDCInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceOIDCProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -73,14 +75,20 @@ func (c *Commands) AddInstanceGenericOIDCProvider(ctx context.Context, provider 
 }
 
 func (c *Commands) UpdateInstanceGenericOIDCProvider(ctx context.Context, id string, provider GenericOIDCProvider) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceOIDCProvider(instanceAgg, id, provider))
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	writeModel := NewOIDCInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceOIDCProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
@@ -90,12 +98,14 @@ func (c *Commands) UpdateInstanceGenericOIDCProvider(ctx context.Context, id str
 }
 
 func (c *Commands) AddInstanceJWTProvider(ctx context.Context, provider JWTProvider) (string, *domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceJWTProvider(instanceAgg, id, provider))
+	writeModel := NewJWTInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceJWTProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -107,14 +117,20 @@ func (c *Commands) AddInstanceJWTProvider(ctx context.Context, provider JWTProvi
 }
 
 func (c *Commands) UpdateInstanceJWTProvider(ctx context.Context, id string, provider JWTProvider) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceJWTProvider(instanceAgg, id, provider))
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	writeModel := NewJWTInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceJWTProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
@@ -326,7 +342,7 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(a *instance.Aggregate, wri
 	}
 }
 
-func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, id string, provider GenericOIDCProvider) preparation.Validation {
+func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeModel *InstanceOIDCIDPWriteModel, provider GenericOIDCProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Sgtj5", "Errors.Invalid.Argument")
@@ -341,7 +357,6 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, id stri
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewOIDCInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -358,7 +373,7 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, id stri
 				instance.NewOIDCIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
-					id,
+					writeModel.ID,
 					provider.Name,
 					provider.Issuer,
 					provider.ClientID,
@@ -371,9 +386,9 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, id stri
 	}
 }
 
-func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, id string, provider GenericOIDCProvider) preparation.Validation {
+func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writeModel *InstanceOIDCIDPWriteModel, provider GenericOIDCProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if id = strings.TrimSpace(id); id == "" {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SAfd3", "Errors.Invalid.Argument")
 		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
@@ -386,7 +401,6 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, id s
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Db3bs", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewOIDCInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -401,7 +415,7 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, id s
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
-				id,
+				writeModel.ID,
 				provider.Name,
 				provider.Issuer,
 				provider.ClientID,
@@ -421,7 +435,7 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, id s
 	}
 }
 
-func (c *Commands) prepareAddInstanceJWTProvider(a *instance.Aggregate, id string, provider JWTProvider) preparation.Validation {
+func (c *Commands) prepareAddInstanceJWTProvider(a *instance.Aggregate, writeModel *InstanceJWTIDPWriteModel, provider JWTProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-JLKef", "Errors.Invalid.Argument")
@@ -439,7 +453,6 @@ func (c *Commands) prepareAddInstanceJWTProvider(a *instance.Aggregate, id strin
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-2rlks", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewJWTInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -452,7 +465,7 @@ func (c *Commands) prepareAddInstanceJWTProvider(a *instance.Aggregate, id strin
 				instance.NewJWTIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
-					id,
+					writeModel.ID,
 					provider.Name,
 					provider.Issuer,
 					provider.JWTEndpoint,
@@ -465,9 +478,9 @@ func (c *Commands) prepareAddInstanceJWTProvider(a *instance.Aggregate, id strin
 	}
 }
 
-func (c *Commands) prepareUpdateInstanceJWTProvider(a *instance.Aggregate, id string, provider JWTProvider) preparation.Validation {
+func (c *Commands) prepareUpdateInstanceJWTProvider(a *instance.Aggregate, writeModel *InstanceJWTIDPWriteModel, provider JWTProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if id = strings.TrimSpace(id); id == "" {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-HUe3q", "Errors.Invalid.Argument")
 		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
@@ -486,7 +499,6 @@ func (c *Commands) prepareUpdateInstanceJWTProvider(a *instance.Aggregate, id st
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SJK2f", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewJWTInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -501,7 +513,7 @@ func (c *Commands) prepareUpdateInstanceJWTProvider(a *instance.Aggregate, id st
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
-				id,
+				writeModel.ID,
 				provider.Name,
 				provider.Issuer,
 				provider.JWTEndpoint,

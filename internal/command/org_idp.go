@@ -58,7 +58,8 @@ func (c *Commands) AddOrgGenericOIDCProvider(ctx context.Context, resourceOwner 
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgOIDCProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgOIDCProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -71,13 +72,18 @@ func (c *Commands) AddOrgGenericOIDCProvider(ctx context.Context, resourceOwner 
 
 func (c *Commands) UpdateOrgGenericOIDCProvider(ctx context.Context, resourceOwner, id string, provider GenericOIDCProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgOIDCProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgOIDCProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
@@ -92,7 +98,8 @@ func (c *Commands) AddOrgJWTProvider(ctx context.Context, resourceOwner string, 
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgJWTProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgJWTProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -105,13 +112,18 @@ func (c *Commands) AddOrgJWTProvider(ctx context.Context, resourceOwner string, 
 
 func (c *Commands) UpdateOrgJWTProvider(ctx context.Context, resourceOwner, id string, provider JWTProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgJWTProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgJWTProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
@@ -322,7 +334,7 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, writeModel *O
 	}
 }
 
-func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOIDCProvider) preparation.Validation {
+func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, writeModel *OrgOIDCIDPWriteModel, provider GenericOIDCProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Sgtj5", "Errors.Invalid.Argument")
@@ -337,7 +349,6 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, resourceOwner, id
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Sfdf4", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -354,7 +365,7 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, resourceOwner, id
 				org.NewOIDCIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
-					id,
+					writeModel.ID,
 					provider.Name,
 					provider.Issuer,
 					provider.ClientID,
@@ -367,9 +378,9 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, resourceOwner, id
 	}
 }
 
-func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOIDCProvider) preparation.Validation {
+func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, writeModel *OrgOIDCIDPWriteModel, provider GenericOIDCProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if id = strings.TrimSpace(id); id == "" {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SAfd3", "Errors.Invalid.Argument")
 		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
@@ -382,7 +393,6 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, resourceOwner,
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Db3bs", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -397,7 +407,7 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, resourceOwner,
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
-				id,
+				writeModel.ID,
 				provider.Name,
 				provider.Issuer,
 				provider.ClientID,
@@ -417,7 +427,7 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, resourceOwner,
 	}
 }
 
-func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, resourceOwner, id string, provider JWTProvider) preparation.Validation {
+func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, writeModel *OrgJWTIDPWriteModel, provider JWTProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JLKef", "Errors.Invalid.Argument")
@@ -435,7 +445,6 @@ func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, resourceOwner, id 
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2rlks", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -448,7 +457,7 @@ func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, resourceOwner, id 
 				org.NewJWTIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
-					id,
+					writeModel.ID,
 					provider.Name,
 					provider.Issuer,
 					provider.JWTEndpoint,
@@ -461,9 +470,9 @@ func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, resourceOwner, id 
 	}
 }
 
-func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, resourceOwner, id string, provider JWTProvider) preparation.Validation {
+func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, writeModel *OrgJWTIDPWriteModel, provider JWTProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if id = strings.TrimSpace(id); id == "" {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
 		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
@@ -482,7 +491,6 @@ func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, resourceOwner, 
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SJK2f", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -497,7 +505,7 @@ func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, resourceOwner, 
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
-				id,
+				writeModel.ID,
 				provider.Name,
 				provider.Issuer,
 				provider.JWTEndpoint,
