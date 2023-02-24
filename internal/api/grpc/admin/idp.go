@@ -152,7 +152,11 @@ func (s *Server) UpdateIDPJWTConfig(ctx context.Context, req *admin_pb.UpdateIDP
 }
 
 func (s *Server) GetProviderByID(ctx context.Context, req *admin_pb.GetProviderByIDRequest) (*admin_pb.GetProviderByIDResponse, error) {
-	idp, err := s.query.IDPTemplateByIDAndResourceOwner(ctx, true, req.Id, authz.GetInstance(ctx).InstanceID(), false)
+	instanceIDQuery, err := query.NewIDPTemplateResourceOwnerSearchQuery(authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
+	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, instanceIDQuery)
 	if err != nil {
 		return nil, err
 	}

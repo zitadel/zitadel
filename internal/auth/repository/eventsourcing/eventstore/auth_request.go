@@ -850,16 +850,30 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 }
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
-	var externalIDP *user_view_model.ExternalIDPView
-	if request.RequestedOrgID != "" {
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID, request.InstanceID)
-	} else {
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID, request.InstanceID)
+
+	idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpConfigID)
+	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUserID)
+	queries := []query.SearchQuery{
+		idQuery, externalIDQuery,
 	}
+	if request.RequestedOrgID != "" {
+		orgIDQuery, _ := query.NewIDPUserLinksResourceOwnerSearchQuery(idpConfigID)
+		queries = append(queries, orgIDQuery)
+	}
+	links, err := repo.Query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	//var externalIDP *user_view_model.ExternalIDPView
+	//if request.RequestedOrgID != "" {
+	//	externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID, request.InstanceID)
+	//} else {
+	//	externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID, request.InstanceID)
+	//}
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID, false)
+	if len(links.Links) != 1 {
+		return errors.ThrowNotFound(nil, "AUTH-Sf8sd", "Errors.ExternalIDP.NotFound")
+	}
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, links.Links[0].UserID, false)
 	if err != nil {
 		return err
 	}
@@ -1390,6 +1404,7 @@ func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvid
 			IDPConfigID:    linkingUser.IDPConfigID,
 			ExternalUserID: linkingUser.ExternalUserID,
 			DisplayName:    linkingUser.DisplayName,
+			NewVersion:     true,
 		}
 		externalIDPs[i] = externalIDP
 	}

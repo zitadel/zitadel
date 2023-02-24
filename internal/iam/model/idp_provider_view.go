@@ -70,7 +70,7 @@ func (r *IDPProviderSearchRequest) AppendAggregateIDQuery(aggregateID string) {
 }
 
 func IdpProviderViewsToDomain(idpProviders []*IDPProviderView) []*domain.IDPProvider {
-	providers := make([]*domain.IDPProvider, len(idpProviders))
+	providers := make([]*domain.IDPProvider, len(idpProviders)+1)
 	for i, provider := range idpProviders {
 		p := &domain.IDPProvider{
 			IDPConfigID:   provider.IDPConfigID,
@@ -81,6 +81,14 @@ func IdpProviderViewsToDomain(idpProviders []*IDPProviderView) []*domain.IDPProv
 			IDPState:      idpStateToDomain(provider.IDPState),
 		}
 		providers[i] = p
+	}
+	providers[len(idpProviders)] = &domain.IDPProvider{
+		IDPConfigID:   "202403515522396717",
+		Type:          domain.IdentityProviderTypeSystem,
+		Name:          "Google",
+		IDPConfigType: 0,
+		StylingType:   0,
+		IDPState:      domain.IDPConfigStateActive,
 	}
 	return providers
 }

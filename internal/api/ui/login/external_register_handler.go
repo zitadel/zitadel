@@ -3,12 +3,10 @@ package login
 import (
 	"net/http"
 
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
@@ -58,62 +56,64 @@ func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	l.handleExternalRegisterByConfigID(w, r, authReq, data.IDPConfigID)
+	l.handleIDP(w, r, authReq, data.IDPConfigID)
+	//l.handleExternalRegisterByConfigID(w, r, authReq, data.IDPConfigID)
 }
 
-func (l *Login) handleExternalRegisterByConfigID(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, configID string) {
-	if authReq == nil {
-		l.defaultRedirect(w, r)
-		return
-	}
-	idpConfig, err := l.getIDPConfigByID(r, configID)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID)
-	if err != nil {
-		l.renderLogin(w, r, authReq, err)
-		return
-	}
-	if !idpConfig.IsOIDC {
-		l.handleJWTAuthorize(w, r, authReq, idpConfig)
-		return
-	}
-	l.handleOIDCAuthorize(w, r, authReq, idpConfig, EndpointExternalRegisterCallback)
-}
-
-func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Request) {
-	data := new(externalIDPCallbackData)
-	err := l.getParseData(r, data)
-	if err != nil {
-		l.renderError(w, r, nil, err)
-		return
-	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	provider, err := l.getRPConfig(r.Context(), idpConfig, EndpointExternalRegisterCallback)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	l.handleExternalUserRegister(w, r, authReq, idpConfig, userAgentID, tokens)
-}
+//
+//func (l *Login) handleExternalRegisterByConfigID(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, configID string) {
+//	if authReq == nil {
+//		l.defaultRedirect(w, r)
+//		return
+//	}
+//	idpConfig, err := l.getIDPConfigByID(r, configID)
+//	if err != nil {
+//		l.renderError(w, r, authReq, err)
+//		return
+//	}
+//	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+//	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID)
+//	if err != nil {
+//		l.renderLogin(w, r, authReq, err)
+//		return
+//	}
+//	if !idpConfig.IsOIDC {
+//		l.handleJWTAuthorize(w, r, authReq, idpConfig)
+//		return
+//	}
+//	l.handleOIDCAuthorize(w, r, authReq, idpConfig, EndpointExternalRegisterCallback)
+//}
+//
+//func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Request) {
+//	data := new(externalIDPCallbackData)
+//	err := l.getParseData(r, data)
+//	if err != nil {
+//		l.renderError(w, r, nil, err)
+//		return
+//	}
+//	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+//	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
+//	if err != nil {
+//		l.renderError(w, r, authReq, err)
+//		return
+//	}
+//	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
+//	if err != nil {
+//		l.renderError(w, r, authReq, err)
+//		return
+//	}
+//	provider, err := l.getRPConfig(r.Context(), idpConfig, EndpointExternalRegisterCallback)
+//	if err != nil {
+//		l.renderRegisterOption(w, r, authReq, err)
+//		return
+//	}
+//	tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
+//	if err != nil {
+//		l.renderRegisterOption(w, r, authReq, err)
+//		return
+//	}
+//	l.handleExternalUserRegister(w, r, authReq, idpConfig, userAgentID, tokens)
+//}
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
@@ -121,7 +121,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		resourceOwner = authReq.RequestedOrgID
 	}
 	externalUser, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(tokens, idpConfig)
-	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens, authReq, r, idpConfig, nil)
+	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens, authReq, r, nil)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -143,52 +143,53 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, externalUser, externalIDP, labelPolicy.HideLoginNameSuffix, nil)
 }
 
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) {
-	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		resourceOwner = authReq.RequestedOrgID
-	}
-	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-
-	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, externalUser, idpConfig)
-	user, metadata, err = l.runPreCreationActions(authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	// read auth request again to get current state including userID
-	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	userGrants, err := l.runPostCreationActions(authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	err = l.appendUserGrants(r.Context(), userGrants, resourceOwner)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	l.renderNextStep(w, r, authReq)
-}
+//
+//func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) {
+//	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
+//
+//	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
+//		resourceOwner = authReq.RequestedOrgID
+//	}
+//	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
+//	if err != nil {
+//		l.renderRegisterOption(w, r, authReq, err)
+//		return
+//	}
+//
+//	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
+//	if err != nil {
+//		l.renderRegisterOption(w, r, authReq, err)
+//		return
+//	}
+//	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, externalUser, idpConfig)
+//	user, metadata, err = l.runPreCreationActions(authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
+//	if err != nil {
+//		l.renderRegisterOption(w, r, authReq, err)
+//		return
+//	}
+//	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, metadata, nil)
+//	if err != nil {
+//		l.renderRegisterOption(w, r, authReq, err)
+//		return
+//	}
+//	// read auth request again to get current state including userID
+//	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+//	if err != nil {
+//		l.renderError(w, r, authReq, err)
+//		return
+//	}
+//	userGrants, err := l.runPostCreationActions(authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
+//	if err != nil {
+//		l.renderError(w, r, authReq, err)
+//		return
+//	}
+//	err = l.appendUserGrants(r.Context(), userGrants, resourceOwner)
+//	if err != nil {
+//		l.renderError(w, r, authReq, err)
+//		return
+//	}
+//	l.renderNextStep(w, r, authReq)
+//}
 
 func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, externalUser *domain.ExternalUser, idp *domain.UserIDPLink, hideLoginNameSuffix bool, err error) {
 	var errID, errMessage string

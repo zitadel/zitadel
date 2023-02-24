@@ -126,6 +126,10 @@ func NewIDPUserLinksResourceOwnerSearchQuery(value string) (SearchQuery, error) 
 	return NewTextQuery(IDPUserLinkResourceOwnerCol, value, TextEquals)
 }
 
+func NewIDPUserLinksExternalIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(IDPUserLinkExternalUserIDCol, value, TextEquals)
+}
+
 func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),

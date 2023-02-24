@@ -305,8 +305,8 @@ var (
 	}
 )
 
-// IDPTemplateByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
-func (q *Queries) IDPTemplateByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string, withOwnerRemoved bool) (_ *IDPTemplate, err error) {
+// IDPTemplateByID searches for the requested id
+func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (_ *IDPTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -322,20 +322,23 @@ func (q *Queries) IDPTemplateByIDAndResourceOwner(ctx context.Context, shouldTri
 	if !withOwnerRemoved {
 		eq[IDPTemplateOwnerRemovedCol.identifier()] = false
 	}
-	where := sq.And{
-		eq,
-		sq.Or{
-			sq.Eq{IDPTemplateResourceOwnerCol.identifier(): resourceOwner},
-			sq.Eq{IDPTemplateResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID()},
-		},
+	//where := sq.And{
+	//	eq,
+	//	sq.Or{
+	//		sq.Eq{IDPTemplateResourceOwnerCol.identifier(): resourceOwner},
+	//		sq.Eq{IDPTemplateResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID()},
+	//	},
+	//}
+	query, scan := prepareIDPTemplateByIDQuery()
+	for _, q := range queries {
+		query = q.toQuery(query)
 	}
-	stmt, scan := prepareIDPTemplateByIDQuery()
-	query, args, err := stmt.Where(where).ToSql()
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SFAew", "Errors.Query.SQLStatement")
+		return nil, errors.ThrowInternal(err, "QUERY-SFefg", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
+	row := q.client.QueryRowContext(ctx, stmt, args...)
 	return scan(row)
 }
 
