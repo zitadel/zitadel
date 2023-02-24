@@ -9,7 +9,7 @@ import { ProjectAutocompleteType } from 'src/app/modules/search-project-autocomp
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
-import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
+import { Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
