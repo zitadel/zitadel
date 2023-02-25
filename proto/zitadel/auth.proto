@@ -562,7 +562,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Social Login"
             summary: "List Social Logins";
-            description: "Returns a list of all liked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.)"
+            description: "Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.)"
         };
     }
 
@@ -870,7 +870,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Memberships"
             summary: "List My ZITADEL Permissions";
-            description: "Show all the permissions my user has in ZITADEL (ZITADEL Manager). The limit should always be set, there is a default limit set by the service"
+            description: "Show all the permissions my user has in ZITADEL (ZITADEL Manager)."
         };
     }
 

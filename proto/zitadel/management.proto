@@ -58,6 +58,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Global"
         },
         {
+            name: "Members"
+        },
+        {
             name: "Organizations"
         },
         {
@@ -89,6 +92,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         {
             name: "User Metadata",
             description: "Metadata is a key/value list to enrich the user object with any data needed. The data is not interpreted by ZITADEL itself."
+        },
+        {
+            name: "ZITADEL Administrators"
         }
     ];
     schemes: HTTPS;
@@ -1723,7 +1729,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    description: "The default is always the organization of the requesting user. If you like to get a result from another organization include the header. Make sure the requesting user has permission in the requested organization.";
                     type: STRING,
                     required: false;
                 };
@@ -1731,8 +1737,6 @@ service ManagementService {
         };
     }
 
-    // Lists all identity providers (social logins) that a human has configured (e.g Google, Microsoft, AD, etc..)
-    // Limit should always be set, there is a default limit set by the service
     rpc ListHumanLinkedIDPs(ListHumanLinkedIDPsRequest) returns (ListHumanLinkedIDPsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/idps/_search"
@@ -1742,9 +1746,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Users"
+            summary: "List Social Logins";
+            description: "Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.)"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get the result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removed a configured identity provider (social login) of a human
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/idps/{idp_id}/{linked_user_id}"
@@ -1753,10 +1770,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Users"
+            summary: "Remove Social Login";
+            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get the result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Show all the permissions a user has in ZITADEL (ZITADEL Manager)
-    // Limit should always be set, there is a default limit set by the service
     rpc ListUserMemberships(ListUserMembershipsRequest) returns (ListUserMembershipsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/memberships/_search"
@@ -1765,6 +1794,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.membership.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Users"
+            summary: "List ZITADEL Permissions";
+            description: "Show all the permissions the user has in ZITADEL (ZITADEL Manager)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get the result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -2103,7 +2146,7 @@ service ManagementService {
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
                     type: STRING,
                     required: false;
                 };
@@ -2111,8 +2154,6 @@ service ManagementService {
         };
     }
 
-    // Returns all registered domains of my organization
-    // Limit should always be set, there is a default limit set by the service
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/_search"
@@ -2122,9 +2163,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            summary: "Search Domains";
+            description: "Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Adds a new domain to my organization
     rpc AddOrgDomain(AddOrgDomainRequest) returns (AddOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains"
@@ -2134,9 +2188,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            summary: "Add Domain";
+            description: "Add a new domain to an organization. The domains are used to identify to which organization a user belongs."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removed the domain from my organization
     rpc RemoveOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/domains/{domain}"
@@ -2145,9 +2212,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            summary: "Remove Domain";
+            description: "Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Generates a new file to validate your domain
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_generate"
@@ -2157,10 +2237,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            summary: "Generate Domain Verification";
+            description: "Generate a new file to be able to verify your domain with DNS or HTTP challenge."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Validates your domain with the chosen method
-    // Validated domains must be unique
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_validate"
@@ -2170,10 +2262,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            summary: "Verify Domain";
+            description: "Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Sets the domain as the primary
-    // Primary domain is shown as a suffix on the preferred username of the users of the organization
     rpc SetPrimaryOrgDomain(SetPrimaryOrgDomainRequest) returns (SetPrimaryOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/_set_primary"
@@ -2182,9 +2286,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            summary: "Set Primary Domain";
+            description: "Set a domain as primary. It has to be verified to be able to set as primary. The primary domain will be shown as suffix on the usernames as preferred loginname on this organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all ZITADEL roles which are for organization managers
     rpc ListOrgMemberRoles(ListOrgMemberRolesRequest) returns (ListOrgMemberRolesResponse) {
         option (google.api.http) = {
             post: "/orgs/members/roles/_search"
@@ -2193,10 +2310,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.member.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations"
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "List Organization Member Roles";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the organization level."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all ZITADEL managers of this organization (Project and Project Grant managers not included)
-    // Limit should always be set, there is a default limit set by the service
     rpc ListOrgMembers(ListOrgMembersRequest) returns (ListOrgMembersResponse) {
         option (google.api.http) = {
             post: "/orgs/me/members/_search"
@@ -2206,9 +2337,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.member.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations"
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "List Organization Members";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the organization level, matching the search queries. The search queries will be AND linked."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Adds a new organization manager, which is allowed to administrate ZITADEL
     rpc AddOrgMember(AddOrgMemberRequest) returns (AddOrgMemberResponse) {
         option (google.api.http) = {
             post: "/orgs/me/members"
@@ -2218,9 +2364,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.member.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Add Organization Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the organization level with one or multiple roles."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Changes the organization manager
     rpc UpdateOrgMember(UpdateOrgMemberRequest) returns (UpdateOrgMemberResponse) {
         option (google.api.http) = {
             put: "/orgs/me/members/{user_id}"
@@ -2230,9 +2391,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.member.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Update Organization Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes an organization manager
     rpc RemoveOrgMember(RemoveOrgMemberRequest) returns (RemoveOrgMemberResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/members/{user_id}"
@@ -2241,10 +2417,25 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.member.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Remove Organization Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels.This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project)"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns a project from my organization (no granted projects)
-    rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
+   rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{id}"
         };
@@ -2253,9 +2444,22 @@ service ManagementService {
             permission: "project.read"
             check_field_name: "Id"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Projects";
+            summary: "Get Project By ID";
+            description: "Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // returns a project my organization got granted from another organization
     rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
         option (google.api.http) = {
             get: "/granted_projects/{project_id}/grants/{grant_id}"
@@ -2264,6 +2468,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.read"
             check_field_name: "GrantId"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Projects";
+            summary: "Get Granted Project By ID";
+            description: "Returns a project owned by another organization and granted to my organization. A Project is a vessel for different applications sharing the same role context."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -2280,7 +2498,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Search Project";
-            description: "Lists all projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context."
+            description: "Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2292,8 +2510,6 @@ service ManagementService {
         };
     }
 
-    // returns all projects my organization got granted from another organization
-    // Limit should always be set, there is a default limit set by the service
     rpc ListGrantedProjects(ListGrantedProjectsRequest) returns (ListGrantedProjectsResponse) {
         option (google.api.http) = {
             post: "/granted_projects/_search"
@@ -2302,6 +2518,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Projects";
+            summary: "Search Granted Project";
+            description: "Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -5659,7 +5889,15 @@ message ListOrgDomainsResponse {
 }
 
 message AddOrgDomainRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string domain = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"testdomain.com\"";
+        }
+    ];
 }
 
 message AddOrgDomainResponse {
@@ -5680,12 +5918,28 @@ message GenerateOrgDomainValidationRequest {
 }
 
 message GenerateOrgDomainValidationResponse {
-    string token = 1;
-    string url = 2;
+    string token = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ofSBHsSAVHAoTIE4Iv2gwhaYhTjcY5QX\"";
+        }
+    ];
+    string url = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://testdomain.com/.well-known/zitadel-challenge/ofSBHsSAVHAoTIE4Iv2gwhaYhTjcY5QX\"";
+        }
+    ];
 }
 
+
 message ValidateOrgDomainRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string domain = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"testdomain.com\"";
+        }
+    ];
 }
 
 message ValidateOrgDomainResponse {
@@ -5704,7 +5958,11 @@ message SetPrimaryOrgDomainResponse {
 message ListOrgMemberRolesRequest {}
 
 message ListOrgMemberRolesResponse {
-    repeated string result = 1;
+    repeated string result = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"ORG_OWNER\", \"ORG_OWNER_VIEWER\", \"...\"]";
+        }
+    ];
 }
 
 message ListOrgMembersRequest {
@@ -5723,7 +5981,12 @@ message ListOrgMembersResponse {
 
 message AddOrgMemberRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string roles = 2;
+    repeated string roles = 2  [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"IAM_OWNER\"]";
+            description: "If no roles are provided the user won't have any rights"
+        }
+    ];
 }
 message AddOrgMemberResponse {
     zitadel.v1.ObjectDetails details = 1;
@@ -5731,7 +5994,12 @@ message AddOrgMemberResponse {
 
 message UpdateOrgMemberRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string roles = 2;
+    repeated string roles = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"IAM_OWNER\"]";
+            description: "If no roles are provided the user won't have any rights"
+        }
+    ];
 }
 
 message UpdateOrgMemberResponse {
@@ -5827,7 +6095,12 @@ message BulkRemoveOrgMetadataResponse {
 }
 
 message GetProjectByIDRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629026806489455\"";
+        }
+    ];
 }
 
 message GetProjectByIDResponse {
