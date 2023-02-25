@@ -2915,7 +2915,7 @@ service ManagementService {
             tags: "Projects";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Add Organization Member";
+            summary: "Add Project Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project level with one or multiple roles."
             parameters: {
                 headers: {
@@ -2943,7 +2943,7 @@ service ManagementService {
             tags: "Projects";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Update Organization Member";
+            summary: "Update Project Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
             parameters: {
                 headers: {
@@ -2970,8 +2970,8 @@ service ManagementService {
             tags: "Projects";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Remove Organization Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, organization)"
+            summary: "Remove Project Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an project level. The user can still have roles on another level (iam, organization)"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3697,7 +3697,6 @@ service ManagementService {
         };
     }
 
-    // Returns all ZITADEL roles which are for project grant managers
     rpc ListProjectGrantMemberRoles(ListProjectGrantMemberRolesRequest) returns (ListProjectGrantMemberRolesResponse) {
         option (google.api.http) = {
             post: "/projects/grants/members/roles/_search"
@@ -3706,10 +3705,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.grant.member.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Project Grants"
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "List Project Grant Member Roles";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the project grant level."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all ZITADEL managers of this project grant
-    // Limit should always be set, there is a default limit set by the service
     rpc ListProjectGrantMembers(ListProjectGrantMembersRequest) returns (ListProjectGrantMembersResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/members/_search"
@@ -3719,9 +3732,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.grant.member.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Project Grants"
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "List Project Members";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Adds a new project grant manager, which is allowed to administrate in ZITADEL
     rpc AddProjectGrantMember(AddProjectGrantMemberRequest) returns (AddProjectGrantMemberResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/members"
@@ -3731,9 +3759,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.grant.member.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Project Grants";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Add Project Grant Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project grant level with one or multiple roles."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Changes project grant manager, which is allowed to administrate in ZITADEL
     rpc UpdateProjectGrantMember(UpdateProjectGrantMemberRequest) returns (UpdateProjectGrantMemberResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
@@ -3743,9 +3786,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.grant.member.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Project Grants";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Update Project Grant Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removed project grant manager
     rpc RemoveProjectGrantMember(RemoveProjectGrantMemberRequest) returns (RemoveProjectGrantMemberResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
@@ -3753,6 +3811,22 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.grant.member.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Project Grants";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Remove Project Grant Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an project grant level. The user can still have roles on another level (iam, organization, project)"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6840,7 +6914,7 @@ message ListProjectMembersResponse {
 message AddProjectMemberRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string roles = 3  [
+    repeated string roles = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"PROJECT_OWNER\"]";
             description: "If no roles are provided the user won't have any rights"
@@ -7435,7 +7509,11 @@ message ListProjectGrantMemberRolesRequest {
 
 message ListProjectGrantMemberRolesResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated string result = 2;
+    repeated string result = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"PROJECT_GRANT_OWNER\", \"PROJECT_GRANT_OWNER_VIEWER\", \"...\"]";
+        }
+    ];
 }
 
 message ListProjectGrantMembersRequest {
@@ -7455,8 +7533,21 @@ message ListProjectGrantMembersResponse {
 message AddProjectGrantMemberRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string roles = 4;
+    string user_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"69629012906488334\"";
+        }
+    ];
+    repeated string roles = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"PROJECT_GRANT_OWNER\"]";
+            description: "If no roles are provided the user won't have any rights"
+        }
+    ];
 }
 
 message AddProjectGrantMemberResponse {
@@ -7466,8 +7557,21 @@ message AddProjectGrantMemberResponse {
 message UpdateProjectGrantMemberRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string roles = 4;
+    string user_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"69629012906488334\"";
+        }
+    ];
+    repeated string roles = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"PROJECT_GRANT_OWNER\"]";
+            description: "If no roles are provided the user won't have any rights"
+        }
+    ];
 }
 
 message UpdateProjectGrantMemberResponse {
