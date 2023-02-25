@@ -3315,7 +3315,6 @@ service ManagementService {
         };
     }
 
-    // Generates a new client secret for the OIDC client, make sure to save the response
     rpc RegenerateOIDCClientSecret(RegenerateOIDCClientSecretRequest) returns (RegenerateOIDCClientSecretResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/oidc_config/_generate_client_secret"
@@ -3326,9 +3325,22 @@ service ManagementService {
             permission: "project.app.write"
             check_field_name: "ProjectId"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Applications";
+            summary: "Generate New OIDC Client Secret";
+            description: "Generates a new client secret for the OIDC application, make sure to save the response"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Generates a new client secret for the API application, make sure to save the response
     rpc RegenerateAPIClientSecret(RegenerateAPIClientSecretRequest) returns (RegenerateAPIClientSecretResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/api_config/_generate_client_secret"
@@ -3339,9 +3351,22 @@ service ManagementService {
             permission: "project.app.write"
             check_field_name: "ProjectId"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Applications";
+            summary: "Generate New API Client Secret";
+            description: "Generates a new client secret for the API application, make sure to save the response"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns an application key
     rpc GetAppKey(GetAppKeyRequest) returns (GetAppKeyResponse) {
         option (google.api.http) = {
             get: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
@@ -3351,10 +3376,22 @@ service ManagementService {
             permission: "project.app.read"
             check_field_name: "ProjectId"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Applications";
+            summary: "Get Application Key By ID";
+            description: "Returns an application key. Keys are used for authorizing API Applications."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all application keys matching the result
-    // Limit should always be set, there is a default limit set by the service
     rpc ListAppKeys(ListAppKeysRequest) returns (ListAppKeysResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/keys/_search"
@@ -3365,10 +3402,22 @@ service ManagementService {
             permission: "project.app.read"
             check_field_name: "ProjectId"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Applications";
+            summary: "List Application Keys";
+            description: "Search application keys. Keys are used for authorizing API Applications."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Creates a new app key
-    // Will return key details in the result, make sure to save it
     rpc AddAppKey(AddAppKeyRequest) returns (AddAppKeyResponse){
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/keys"
@@ -3379,9 +3428,22 @@ service ManagementService {
             permission: "project.app.write"
             check_field_name: "ProjectId"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Applications";
+            summary: "Create Application Key";
+            description: "Create a new application key, they are used for authorizing API Applications. Key details will be returned in the response, make sure to save it."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes an app key
     rpc RemoveAppKey(RemoveAppKeyRequest) returns (RemoveAppKeyResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
@@ -3390,6 +3452,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.app.write"
             check_field_name: "ProjectId"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Applications";
+            summary: "Delete Application Key";
+            description: "Remove an application key. The API application will not be able to authorize with the key anymore."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6814,13 +6890,13 @@ message AddOIDCAppResponse {
     zitadel.v1.ObjectDetails details = 2;
     string client_id = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gjöq34589uasgh\"";
-            description: "generated secret for this config";
+            example: "\"1035496534033449\"";
+            description: "generated client id for this config";
         }
     ];
     string client_secret = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gjöq34589uasgh\"";
+            example: "\"gjoq34589uasgh\"";
             description: "generated secret for this config";
         }
     ];
@@ -6870,13 +6946,13 @@ message AddAPIAppResponse {
     zitadel.v1.ObjectDetails details = 2;
     string client_id = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gjöq34589uasgh\"";
+            example: "\"3950723409029374\"";
             description: "generated secret for this config";
         }
     ];
     string client_secret = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gjöq34589uasgh\"";
+            example: "\"gjoq34589uasgh\"";
             description: "generated secret for this config";
         }
     ];
@@ -7043,7 +7119,7 @@ message RegenerateOIDCClientSecretRequest {
 message RegenerateOIDCClientSecretResponse {
     string client_secret = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gjöq34589uasgh\"";
+            example: "\"gjoq34589uasgh\"";
             description: "generated secret for the client";
         }
     ];
@@ -7056,7 +7132,12 @@ message RegenerateAPIClientSecretRequest {
 }
 
 message RegenerateAPIClientSecretResponse {
-    string client_secret = 1;
+    string client_secret = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"k3n0fnslei93nps9\"";
+            description: "generated secret for the client";
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
 }
 
@@ -7084,7 +7165,12 @@ message ListAppKeysResponse {
 message AddAppKeyRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.authn.v1.KeyType type = 3 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    zitadel.authn.v1.KeyType type = 3 [
+        (validate.rules).enum = {defined_only: true, not_in: [0]},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"KEY_TYPE_JSON\"";
+        }
+    ];
     google.protobuf.Timestamp expiration_date = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2519-04-01T08:45:00.000000Z\"";
@@ -7094,9 +7180,17 @@ message AddAppKeyRequest {
 }
 
 message AddAppKeyResponse {
-    string id = 1;
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"28746028909593987\"";
+        }
+    ];
     zitadel.v1.ObjectDetails details = 2;
-    bytes key_details = 3;
+    bytes key_details = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJrZXlJZCI6IjIwMjcxMDE4NjYyMjcxNDExMyIsImtleSI6Ii0tLS0tQkVHSU4gUlNBIFBSSVZBVEUgS0VZLS0tLS1cbk1JSUVvd0lCQUFLQ0FRRUFuMUxyNStTV0pGRllURU1kaXQ2U0dNY0E2Yks5dG0xMmhlcm55V0wrZm9PWnA3eEVcbk9wcmsvWE81QVplSU5NY0x0ZVhxckJlK1NPdVVNMFpLU2xCMHFTNzNjVStDVTVMTGoycVB0UzhNOFI0N3BGdFhcbjJXRTFJNjNhZHB1N01TejA2SXduQ2lyNnJYOTVPQ2ZneHA3VU1Dd0pSTUZmYXJqdjVBRXY3NXpsSS9lYUV6bUJcbkxKWU1xanZFRmZoN2x3M2lPT3VsWW9kNjNpN3RDNWl5czNlYjNLZW4yWU0rN1FSbXB2dE5qcTJMVmlIMnkrUGJcbk9ESlI3MU9ib05TYVJDNTZDUFpWVytoWDByYXI3VzMwUjI2eGtIQ09oSytQbUpSeGtOY0g1VTdja0xXMEw0WEVcbnNNZkVUSmszeDR3Q0psbisxbElXUzkrNmw0R1E2TWRzWURyOU5RSURBUUFCQW9JQkFCSkx6WGQxMHFBZEQwekNcbnNGUFFOMnJNLzVmV3hONThONDR0YWF6QXg0VHp5K050UlZDTmxScGQvYkxuR2VjbHJIeVpDSmYycWcxcHNEMHJcbkowRGRlR2d0VXBFYWxsYk9scjNEZVBsUGkrYnNsK0RKOUk2c0VSUWwxTjZtQjVzZ0ZJZllBR3UwZjlFSXdIem9cblozR25yNnBRaEVmM0JPUVdsTVhVTlJNSksyOHp3M2E1L01nRmtKVUZUSTUzeXFwbGRtZ2hLajRZR1hLRk1LUGhcbkV3RkxrRncwK2s3K0xuSjFQNGp1ZVd1RXo3WlAyaFpvUWxCcXdSajVyTG9QZ05RbUU4UytFVDRuczlUYzByOFFcbnFyaHlacDZBczJrTDhGTytCZnF3SVpDZnpnWHN2cC9PLzRaSHIzVTB2Ymp3UW1sSzdVSm42U0J6T2hpWFpNU0lcbk5Wc0V5VUVDZ1lFQTFEaktkRGo3NTM1MWQzdlRNQlRFd2JSQ3hoUVZOdENFMnMwVUw4ckJQZ1I0K1dlblNUWmFcbnprWUprcEV0bE54VGxzYnN1Y0RTUXZqeWRYYk5nSHFBeDYzMm1vdTVkak9lR0VTUDFWVGtUdElsZFZQZWszQWxcbjVYbkpQa1dqWGVyVVJZNm5KeUQ5UWhlREx3MVp4NEFYVzNHWURiTFkrT05XV0VKUlJaQUloNjBDZ1lFQXdEQ2xcbnc1MHc4dkcvbEJ4RzNSYW9FaHdLOWNna1VXOHk2T25DekNwcEtjOEZUUmY1VE5iWjl5TzNXUmdYajhkeHRCakFcbkl5VGlzYk9NQk1VaFZKUUtGZHRQaDhoVDBwRkRjeE9ndzY0aHBtYzhyY2RTbXVKNzlYSVRTaHUySjA0N0UvNFZcbnJOTThpWVk5ZGR3VGdGUUlsdFNZL0l0RnFxWERmdjhqK1dVY25La0NnWUVBaENOUU80bDNuNjRucWR2WnBTaHBcblVrclJBTkJrWFJyOGZkZ1BaNnFSSS9KWStNSEhjVmg4dGM3NkN0NkdTUmZlbkJVRU5LeVF2czZPK1FDZCtBOU9cbnZBWGZkRjduZldlcVdtWG1RT2g0dDNNMWk1WkxFZlpVUWt2UU9BdllLcFFhMDZ4OCsyb1pCdHZvL0pVTmY2Q0xcbjZvNFNKUVZrLzZOZGtkckpDODBnNG9rQ2dZQkZsNWYrbkVYa1F0dWZVeG5wNXRGWE5XWldsM0ZuTjMvVXpRaW5cbmkxZm5OcnB4cnhPcjJrUzA4KzdwU1FzSEdpNDNDNXRQWG9UajJlTUN1eXNWaUVHYXBuNUc2YWhJb0NjdlhWVWlcblprUnpFQUR0NERZdU5ZS3pYdXBUTkhPaUNmYmtoMlhyM2RXVzZ0QUloSGRmU1k2T3AwNzZhNmYvWWVUSGNMWGpcbkVkVHBlUUtCZ0FPdnBqcDQ4TzRUWEZkU0JLSnYya005OHVhUjlSQURtdGxTWHd2cTlyQkhTV084NFk4bzE0L1Bcbkl1UmxUOHhROGRYKzhMR21UUCtjcUtiOFFRQ1grQk1YUWxMSEVtWnpnb0xFa0pGMUVIMm4vZEZ5bngxS3prdFNcbm9UZUdsRzZhbXhVOVh4eW9RVFlEVGJCbERwc2FZUlFBZ2FUQzM3UVZRUjhmK1ZoRzFHSFFcbi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tXG4iLCJhcHBJZCI6IjIwMjcwNjM5ODgxMzg4MDU3NyIsImNsaWVudElkIjoiMjAyNzA2Mzk4ODEzOTQ2MTEzQG15dGVzdHByb2plY3QifQ==\"";
+        }
+    ];
 }
 
 message RemoveAppKeyRequest {
