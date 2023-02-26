@@ -29,6 +29,8 @@ func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) domai
 	return &domain.ChangeApp{
 		AppID:   writeModel.AppID,
 		AppName: writeModel.Name,
+		ExternalURL: writeModel.ExternalURL,
+		IsVisibleToEndUser: writeModel.IsVisibleToEndUser,
 		State:   writeModel.State,
 	}
 }
@@ -38,6 +40,8 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		ObjectRoot:               writeModelToObjectRoot(writeModel.WriteModel),
 		AppID:                    writeModel.AppID,
 		AppName:                  writeModel.AppName,
+		ExternalURL: writeModel.ExternalURL,
+		IsVisibleToEndUser: writeModel.IsVisibleToEndUser,
 		State:                    writeModel.State,
 		ClientID:                 writeModel.ClientID,
 		RedirectUris:             writeModel.RedirectUris,
@@ -62,6 +66,8 @@ func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.S
 		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
 		AppID:       writeModel.AppID,
 		AppName:     writeModel.AppName,
+		ExternalURL: writeModel.ExternalURL,
+		IsVisibleToEndUser: writeModel.IsVisibleToEndUser,
 		State:       writeModel.State,
 		Metadata:    writeModel.Metadata,
 		MetadataURL: writeModel.MetadataURL,
@@ -74,6 +80,8 @@ func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIA
 		ObjectRoot:     writeModelToObjectRoot(writeModel.WriteModel),
 		AppID:          writeModel.AppID,
 		AppName:        writeModel.AppName,
+		ExternalURL: writeModel.ExternalURL,
+		IsVisibleToEndUser: writeModel.IsVisibleToEndUser,
 		State:          writeModel.State,
 		ClientID:       writeModel.ClientID,
 		AuthMethodType: writeModel.AuthMethodType,

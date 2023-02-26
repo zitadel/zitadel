@@ -8660,6 +8660,8 @@ This is an empty request
 | project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| external_url |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| is_visible_to_end_user |  bool | - |  |
 
 
 

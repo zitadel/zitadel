@@ -69,7 +69,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 	}
 
 	return []eventstore.Command{
-		project.NewApplicationAddedEvent(ctx, projectAgg, samlApp.AppID, samlApp.AppName),
+		project.NewApplicationAddedEvent(ctx, projectAgg, samlApp.AppID, samlApp.AppName, samlApp.ExternalURL, samlApp.IsVisibleToEndUser),
 		project.NewSAMLConfigAddedEvent(ctx,
 			projectAgg,
 			samlApp.AppID,

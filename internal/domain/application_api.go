@@ -10,6 +10,8 @@ type APIApp struct {
 
 	AppID              string
 	AppName            string
+	ExternalURL string
+	IsVisibleToEndUser bool
 	ClientID           string
 	ClientSecret       *crypto.CryptoValue
 	ClientSecretString string
@@ -20,6 +22,14 @@ type APIApp struct {
 
 func (a *APIApp) GetApplicationName() string {
 	return a.AppName
+}
+
+func (a *APIApp) GetApplicationExternalURL() string {
+	return a.ExternalURL
+}
+
+func (a *APIApp) GetApplicationIsVisibleToEndUser() bool {
+	return a.IsVisibleToEndUser
 }
 
 func (a *APIApp) GetState() AppState {
@@ -34,6 +44,9 @@ const (
 )
 
 func (a *APIApp) IsValid() bool {
+	if a.ExternalURL != "" && !IsValidURL(a.ExternalURL) {
+		return false
+	}
 	return a.AppName != ""
 }
 

@@ -14,6 +14,8 @@ type AddApp struct {
 	Aggregate project.Aggregate
 	ID        string
 	Name      string
+	ExternalURL string
+	IsVisibleToEndUser bool
 }
 
 func newAppClientSecret(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.HashAlgorithm) (value *crypto.CryptoValue, plain string, err error) {
@@ -32,13 +34,13 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-28di9", "Errors.Project.App.NotExisting")
 	}
-	if existingApp.Name == appChange.GetApplicationName() {
+	if existingApp.Name == appChange.GetApplicationName() && existingApp.ExternalURL == appChange.GetApplicationExternalURL() && existingApp.IsVisibleToEndUser == appChange.GetApplicationIsVisibleToEndUser() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 	pushedEvents, err := c.eventstore.Push(
 		ctx,
-		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName()))
+		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName(), appChange.GetApplicationExternalURL(), appChange.GetApplicationIsVisibleToEndUser()))
 	if err != nil {
 		return nil, err
 	}

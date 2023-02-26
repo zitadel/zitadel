@@ -134,6 +134,8 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"consoleApplicationID",
 								"app",
+								"",
+								true,
 							),
 						),
 						eventFromEventPusherWithInstanceID(

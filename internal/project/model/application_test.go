@@ -21,7 +21,7 @@ func TestApplicationValid(t *testing.T) {
 				app: &Application{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
-					Name:       "Name",
+					Name:       "Name",					
 					Type:       AppTypeOIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode},
@@ -30,6 +30,40 @@ func TestApplicationValid(t *testing.T) {
 				},
 			},
 			result: true,
+		},
+		{
+			name: "valid oidc application: external url",
+			args: args{
+				app: &Application{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					AppID:      "AppID",
+					Name:       "Name",					
+					Type:       AppTypeOIDC,
+					ExternalURL: "https://zitadel.com",
+					OIDCConfig: &OIDCConfig{
+						ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode},
+						GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+					},
+				},
+			},
+			result: true,
+		},
+		{
+			name: "invalid oidc application: external url",
+			args: args{
+				app: &Application{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					AppID:      "AppID",
+					Name:       "Name",					
+					Type:       AppTypeOIDC,
+					ExternalURL: "external-url",
+					OIDCConfig: &OIDCConfig{
+						ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode},
+						GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+					},
+				},
+			},
+			result: false,
 		},
 		{
 			name: "invalid oidc application: responsetype code",

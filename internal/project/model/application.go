@@ -1,6 +1,8 @@
 package model
 
 import (
+	"net/url"
+
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -10,6 +12,8 @@ type Application struct {
 	AppID      string
 	State      AppState
 	Name       string
+	ExternalURL string
+	IsVisibleToEndUser bool
 	Type       AppType
 	OIDCConfig *OIDCConfig
 	APIConfig  *APIConfig
@@ -36,6 +40,12 @@ const (
 func (a *Application) IsValid(includeConfig bool) bool {
 	if a.Name == "" || a.AggregateID == "" {
 		return false
+	}
+	if a.ExternalURL != "" {
+		u, err := url.Parse(a.ExternalURL)
+		if err != nil || u.Scheme == "" && u.Host == "" {			
+			return false
+		}
 	}
 	if !includeConfig {
 		return true

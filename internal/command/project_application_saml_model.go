@@ -14,6 +14,8 @@ type SAMLApplicationWriteModel struct {
 
 	AppID       string
 	AppName     string
+	ExternalURL string
+	IsVisibleToEndUser bool
 	EntityID    string
 	Metadata    []byte
 	MetadataURL string
@@ -90,9 +92,13 @@ func (wm *SAMLApplicationWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:
 			wm.AppName = e.Name
+			wm.ExternalURL = e.ExternalURL
+			wm.IsVisibleToEndUser = e.IsVisibleToEndUser
 			wm.State = domain.AppStateActive
 		case *project.ApplicationChangedEvent:
 			wm.AppName = e.Name
+			wm.ExternalURL = e.ExternalURL
+			wm.IsVisibleToEndUser = e.IsVisibleToEndUser
 		case *project.ApplicationDeactivatedEvent:
 			if wm.State == domain.AppStateRemoved {
 				continue

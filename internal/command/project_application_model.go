@@ -12,6 +12,8 @@ type ApplicationWriteModel struct {
 	AppID string
 	State domain.AppState
 	Name  string
+	ExternalURL string
+	IsVisibleToEndUser bool
 }
 
 func NewApplicationWriteModelWithAppIDC(projectID, appID, resourceOwner string) *ApplicationWriteModel {
@@ -71,9 +73,13 @@ func (wm *ApplicationWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:
 			wm.Name = e.Name
+			wm.ExternalURL = e.ExternalURL
+			wm.IsVisibleToEndUser = e.IsVisibleToEndUser
 			wm.State = domain.AppStateActive
 		case *project.ApplicationChangedEvent:
 			wm.Name = e.Name
+			wm.ExternalURL = e.ExternalURL
+			wm.IsVisibleToEndUser = e.IsVisibleToEndUser
 		case *project.ApplicationDeactivatedEvent:
 			if wm.State == domain.AppStateRemoved {
 				continue

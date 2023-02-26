@@ -39,6 +39,8 @@ type ApplicationAddedEvent struct {
 
 	AppID string `json:"appId,omitempty"`
 	Name  string `json:"name,omitempty"`
+	ExternalURL string `json:"external_url,omitempty"`
+	IsVisibleToEndUser bool `json:"is_visible_to_end_user,omitempty"`
 }
 
 func (e *ApplicationAddedEvent) Data() interface{} {
@@ -53,7 +55,8 @@ func NewApplicationAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID,
-	name string,
+	name, externalURL string,
+	isVisibleToEndUser bool,
 ) *ApplicationAddedEvent {
 	return &ApplicationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -63,6 +66,8 @@ func NewApplicationAddedEvent(
 		),
 		AppID: appID,
 		Name:  name,
+		ExternalURL: externalURL,
+		IsVisibleToEndUser: isVisibleToEndUser,
 	}
 }
 
@@ -84,6 +89,8 @@ type ApplicationChangedEvent struct {
 
 	AppID   string `json:"appId,omitempty"`
 	Name    string `json:"name,omitempty"`
+	ExternalURL string `json:"external_url,omitempty"`
+	IsVisibleToEndUser bool `json:"is_visible_to_end_user,omitempty"`
 	oldName string
 }
 
@@ -101,9 +108,11 @@ func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 func NewApplicationChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	appID,
+	appID,	
 	oldName,
 	newName string,
+	externalURL string,	
+	isVisibleToEndUser bool,
 ) *ApplicationChangedEvent {
 	return &ApplicationChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -113,6 +122,8 @@ func NewApplicationChangedEvent(
 		),
 		AppID:   appID,
 		Name:    newName,
+		ExternalURL: externalURL,
+		IsVisibleToEndUser: isVisibleToEndUser,
 		oldName: oldName,
 	}
 }

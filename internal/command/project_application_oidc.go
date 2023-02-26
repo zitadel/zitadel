@@ -50,6 +50,10 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.Has
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument")
 		}
 
+		if app.ExternalURL != "" && !domain.IsValidURL(app.ExternalURL) {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-Tgf32", "Errors.Invalid.Argument")
+		}
+
 		if app.ClockSkew > time.Second*5 || app.ClockSkew < 0 {
 			return nil, errors.ThrowInvalidArgument(nil, "V2-PnCMS", "Errors.Invalid.Argument")
 		}
@@ -88,6 +92,8 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.Has
 					&app.Aggregate.Aggregate,
 					app.ID,
 					app.Name,
+					app.ExternalURL,
+					app.IsVisibleToEndUser,
 				),
 				project_repo.NewOIDCConfigAddedEvent(
 					ctx,
@@ -161,7 +167,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	oidcApp.AppID = appID
 
 	events := []eventstore.Command{
-		project_repo.NewApplicationAddedEvent(ctx, projectAgg, oidcApp.AppID, oidcApp.AppName),
+		project_repo.NewApplicationAddedEvent(ctx, projectAgg, oidcApp.AppID, oidcApp.AppName, oidcApp.ExternalURL, oidcApp.IsVisibleToEndUser),
 	}
 
 	var stringPw string
@@ -211,6 +217,10 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
 	if !oidc.IsValid() || oidc.AppID == "" || oidc.AggregateID == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-5m9fs", "Errors.Project.App.OIDCConfigInvalid")
+	}
+
+	if oidc.ExternalURL != "" && !domain.IsValidURL(oidc.ExternalURL) {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-6w6hh", "Errors.Invalid.Argument")
 	}
 
 	existingOIDC, err := c.getOIDCAppWriteModel(ctx, oidc.AggregateID, oidc.AppID, resourceOwner)

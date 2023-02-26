@@ -25,6 +25,8 @@ func AppToPb(app *query.App) *app_pb.App {
 		Details: object_grpc.ToViewDetailsPb(app.Sequence, app.CreationDate, app.ChangeDate, app.ResourceOwner),
 		State:   AppStateToPb(app.State),
 		Name:    app.Name,
+		ExternalUrl: app.ExternalURL,
+		IsVisibleToEndUser: app.IsVisibleToEndUser,
 		Config:  AppConfigToPb(app),
 	}
 }

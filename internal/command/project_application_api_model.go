@@ -15,6 +15,8 @@ type APIApplicationWriteModel struct {
 
 	AppID              string
 	AppName            string
+	ExternalURL string
+	IsVisibleToEndUser bool
 	ClientID           string
 	ClientSecret       *crypto.CryptoValue
 	ClientSecretString string
@@ -95,9 +97,13 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:
 			wm.AppName = e.Name
+			wm.ExternalURL = e.ExternalURL
+			wm.IsVisibleToEndUser = e.IsVisibleToEndUser
 			wm.State = domain.AppStateActive
 		case *project.ApplicationChangedEvent:
 			wm.AppName = e.Name
+			wm.ExternalURL = e.ExternalURL
+			wm.IsVisibleToEndUser = e.IsVisibleToEndUser
 		case *project.ApplicationDeactivatedEvent:
 			if wm.State == domain.AppStateRemoved {
 				continue

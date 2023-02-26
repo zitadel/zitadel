@@ -27,6 +27,8 @@ type OIDCApp struct {
 
 	AppID                    string
 	AppName                  string
+	ExternalURL string
+	IsVisibleToEndUser bool
 	ClientID                 string
 	ClientSecret             *crypto.CryptoValue
 	ClientSecretString       string
@@ -51,6 +53,14 @@ type OIDCApp struct {
 
 func (a *OIDCApp) GetApplicationName() string {
 	return a.AppName
+}
+
+func (a *OIDCApp) GetApplicationExternalURL() string {
+	return a.ExternalURL
+}
+
+func (a *OIDCApp) GetApplicationIsVisibleToEndUser() bool {
+	return a.IsVisibleToEndUser
 }
 
 func (a *OIDCApp) GetState() AppState {
@@ -122,6 +132,9 @@ const (
 
 func (a *OIDCApp) IsValid() bool {
 	if a.ClockSkew > time.Second*5 || a.ClockSkew < time.Second*0 || !a.OriginsValid() {
+		return false
+	}
+	if a.ExternalURL != "" && !IsValidURL(a.ExternalURL) {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()

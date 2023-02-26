@@ -9,6 +9,8 @@ type SAMLApp struct {
 
 	AppID       string
 	AppName     string
+	ExternalURL string
+	IsVisibleToEndUser bool
 	EntityID    string
 	Metadata    []byte
 	MetadataURL string
@@ -18,6 +20,14 @@ type SAMLApp struct {
 
 func (a *SAMLApp) GetApplicationName() string {
 	return a.AppName
+}
+
+func (a *SAMLApp) GetApplicationExternalURL() string {
+	return a.ExternalURL
+}
+
+func (a *SAMLApp) GetApplicationIsVisibleToEndUser() bool {
+	return a.IsVisibleToEndUser
 }
 
 func (a *SAMLApp) GetState() AppState {
@@ -34,6 +44,9 @@ func (a *SAMLApp) GetMetadataURL() string {
 
 func (a *SAMLApp) IsValid() bool {
 	if a.MetadataURL == "" && a.Metadata == nil {
+		return false
+	}
+	if a.ExternalURL != "" && !IsValidURL(a.ExternalURL) {
 		return false
 	}
 	return true

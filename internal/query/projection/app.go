@@ -15,13 +15,15 @@ import (
 )
 
 const (
-	AppProjectionTable = "projections.apps4"
+	AppProjectionTable = "projections.apps5"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
 
 	AppColumnID            = "id"
 	AppColumnName          = "name"
+	AppColumnExternalURL = "external_url"
+	AppColumnIsVisibleToEndUser = "is_visible_to_end_user"
 	AppColumnProjectID     = "project_id"
 	AppColumnCreationDate  = "creation_date"
 	AppColumnChangeDate    = "change_date"
@@ -78,6 +80,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(AppColumnID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnName, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnExternalURL, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnIsVisibleToEndUser, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(AppColumnProjectID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(AppColumnChangeDate, crdb.ColumnTypeTimestamp),
@@ -239,6 +243,8 @@ func (p *appProjection) reduceAppAdded(event eventstore.Event) (*handler.Stateme
 		[]handler.Column{
 			handler.NewCol(AppColumnID, e.AppID),
 			handler.NewCol(AppColumnName, e.Name),
+			handler.NewCol(AppColumnExternalURL, e.ExternalURL),
+			handler.NewCol(AppColumnIsVisibleToEndUser, e.IsVisibleToEndUser),
 			handler.NewCol(AppColumnProjectID, e.Aggregate().ID),
 			handler.NewCol(AppColumnCreationDate, e.CreationDate()),
 			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
@@ -262,6 +268,8 @@ func (p *appProjection) reduceAppChanged(event eventstore.Event) (*handler.State
 		e,
 		[]handler.Column{
 			handler.NewCol(AppColumnName, e.Name),
+			handler.NewCol(AppColumnExternalURL, e.ExternalURL),
+			handler.NewCol(AppColumnIsVisibleToEndUser, e.IsVisibleToEndUser),
 			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 			handler.NewCol(AppColumnSequence, e.Sequence()),
 		},

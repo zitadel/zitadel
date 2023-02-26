@@ -32,6 +32,8 @@ type App struct {
 
 	ProjectID string
 	Name      string
+	ExternalURL string
+	IsVisibleToEndUser bool
 
 	OIDCConfig *OIDCApp
 	SAMLConfig *SAMLApp
@@ -93,6 +95,14 @@ var (
 	}
 	AppColumnName = Column{
 		name:  projection.AppColumnName,
+		table: appsTable,
+	}
+	AppColumnExternalURL = Column{
+		name:  projection.AppColumnExternalURL,
+		table: appsTable,
+	}
+	AppColumnIsVisibleToEndUsers = Column{
+		name:  projection.AppColumnIsVisibleToEndUser,
 		table: appsTable,
 	}
 	AppColumnProjectID = Column{
@@ -507,6 +517,8 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 	return sq.Select(
 			AppColumnID.identifier(),
 			AppColumnName.identifier(),
+			AppColumnExternalURL.identifier(),
+			AppColumnIsVisibleToEndUsers.identifier(),
 			AppColumnProjectID.identifier(),
 			AppColumnCreationDate.identifier(),
 			AppColumnChangeDate.identifier(),
@@ -555,6 +567,8 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			err := row.Scan(
 				&app.ID,
 				&app.Name,
+				&app.ExternalURL,
+				&app.IsVisibleToEndUser,
 				&app.ProjectID,
 				&app.CreationDate,
 				&app.ChangeDate,
@@ -675,6 +689,8 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 	return sq.Select(
 			AppColumnID.identifier(),
 			AppColumnName.identifier(),
+			AppColumnExternalURL.identifier(),
+			AppColumnIsVisibleToEndUsers.identifier(),
 			AppColumnProjectID.identifier(),
 			AppColumnCreationDate.identifier(),
 			AppColumnChangeDate.identifier(),
@@ -726,6 +742,8 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 				err := row.Scan(
 					&app.ID,
 					&app.Name,
+					&app.ExternalURL,
+					&app.IsVisibleToEndUser,
 					&app.ProjectID,
 					&app.CreationDate,
 					&app.ChangeDate,

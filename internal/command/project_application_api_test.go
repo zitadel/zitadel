@@ -26,6 +26,8 @@ func TestAddAPIConfig(t *testing.T) {
 		a      *project.Aggregate
 		appID  string
 		name   string
+		externalURL string
+		isVisibleToEndUser bool
 		filter preparation.FilterToQueryReducer
 	}
 
@@ -63,6 +65,19 @@ func TestAddAPIConfig(t *testing.T) {
 			},
 		},
 		{
+			name:   "invalid external url",
+			fields: fields{},
+			args: args{
+				a:     agg,
+				appID: "appID",
+				name:  "app",
+				externalURL: "zitadel",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-Z6u98", "Errors.Invalid.Argument"),
+			},
+		},
+		{
 			name:   "project not exists",
 			fields: fields{},
 			args: args{
@@ -88,6 +103,8 @@ func TestAddAPIConfig(t *testing.T) {
 				a:     agg,
 				appID: "appID",
 				name:  "name",
+				externalURL: "https://zitadel.com",
+				isVisibleToEndUser: true,
 				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
@@ -111,6 +128,8 @@ func TestAddAPIConfig(t *testing.T) {
 						&agg.Aggregate,
 						"appID",
 						"name",
+						"https://zitadel.com",
+						true,
 					),
 					project.NewAPIConfigAddedEvent(ctx, &agg.Aggregate,
 						"appID",
@@ -135,6 +154,8 @@ func TestAddAPIConfig(t *testing.T) {
 							Aggregate: *tt.args.a,
 							ID:        tt.args.appID,
 							Name:      tt.args.name,
+							ExternalURL: tt.args.externalURL,
+							IsVisibleToEndUser: tt.args.isVisibleToEndUser,
 						},
 						AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 					},
@@ -197,6 +218,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 					},
 					AppID:   "app1",
 					AppName: "app",
+					ExternalURL: "https://zitadel.com",
 				},
 				resourceOwner: "org1",
 			},
@@ -235,6 +257,37 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 			},
 		},
 		{
+			name: "invalid app, invalid (external url) argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				apiApp: &domain.APIApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppID:   "app1",
+					AppName: "app",
+					ExternalURL: "zitadel",
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: errors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "create api app basic, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -254,6 +307,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 									&project.NewAggregate("project1", "org1").Aggregate,
 									"app1",
 									"app",
+									"https://zitadel.com",
+									true,
 								),
 							),
 							eventFromEventPusher(
@@ -282,6 +337,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 						AggregateID: "project1",
 					},
 					AppName:        "app",
+					ExternalURL: "https://zitadel.com",
+					IsVisibleToEndUser: true,
 					AuthMethodType: domain.APIAuthMethodTypeBasic,
 				},
 				resourceOwner:   "org1",
@@ -295,6 +352,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 					},
 					AppID:              "app1",
 					AppName:            "app",
+					ExternalURL: "https://zitadel.com",
+					IsVisibleToEndUser: true,
 					ClientID:           "client1@project",
 					ClientSecretString: "a",
 					AuthMethodType:     domain.APIAuthMethodTypeBasic,
@@ -322,6 +381,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 									&project.NewAggregate("project1", "org1").Aggregate,
 									"app1",
 									"app",
+									"",
+									false,
 								),
 							),
 							eventFromEventPusher(
@@ -427,6 +488,30 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 			},
 		},
 		{
+			name: "external url not valid, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				apiApp: &domain.APIApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppID:          "appid",
+					AppName:        "app",
+					AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+					ExternalURL: "zitadel",
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: errors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "missing aggregateid, invalid argument error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -483,6 +568,8 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"app",
+								"https://zitadel.com",
+								true,
 							),
 						),
 						eventFromEventPusher(
@@ -504,6 +591,8 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 					},
 					AppID:          "app1",
 					AppName:        "app",
+					ExternalURL: "https://zitadel.com",
+					IsVisibleToEndUser: true,
 					AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 				},
 				resourceOwner: "org1",
@@ -523,6 +612,8 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"app",
+								"https://zitadel.com",
+								true,
 							),
 						),
 						eventFromEventPusher(
@@ -560,6 +651,8 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 					},
 					AppID:          "app1",
 					AppName:        "app",
+					ExternalURL: "https://zitadel.com",
+					IsVisibleToEndUser: true,
 					AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 				},
 				resourceOwner: "org1",
@@ -572,6 +665,8 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 					},
 					AppID:          "app1",
 					AppName:        "app",
+					ExternalURL: "https://zitadel.com",
+					IsVisibleToEndUser: true,
 					ClientID:       "client1@project",
 					AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 					State:          domain.AppStateActive,
@@ -681,6 +776,8 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"app",
+								"",
+								false,
 							),
 						),
 						eventFromEventPusher(

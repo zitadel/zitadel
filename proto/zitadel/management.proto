@@ -4407,6 +4407,8 @@ message UpdateAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string external_url = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool is_visible_to_end_user = 7;
 }
 
 message UpdateAppResponse {

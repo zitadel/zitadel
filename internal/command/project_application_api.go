@@ -32,6 +32,10 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashA
 		if app.Name = strings.TrimSpace(app.Name); app.Name == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-F7g21", "Errors.Invalid.Argument")
 		}
+		if app.ExternalURL != "" && !domain.IsValidURL(app.ExternalURL) {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-Z6u98", "Errors.Invalid.Argument")
+		}
+
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			project, err := projectWriteModel(ctx, filter, app.Aggregate.ID, app.Aggregate.ResourceOwner)
 			if err != nil || !project.State.Valid() {
@@ -56,6 +60,8 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashA
 					&app.Aggregate.Aggregate,
 					app.ID,
 					app.Name,
+					app.ExternalURL,
+					app.IsVisibleToEndUser,
 				),
 				project_repo.NewAPIConfigAddedEvent(
 					ctx,
@@ -114,7 +120,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
 	events := []eventstore.Command{
-		project_repo.NewApplicationAddedEvent(ctx, projectAgg, apiApp.AppID, apiApp.AppName),
+		project_repo.NewApplicationAddedEvent(ctx, projectAgg, apiApp.AppID, apiApp.AppName, apiApp.ExternalURL, apiApp.IsVisibleToEndUser),
 	}
 
 	var stringPw string
@@ -150,6 +156,10 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
 	if apiApp.AppID == "" || apiApp.AggregateID == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-1m900", "Errors.Project.App.APIConfigInvalid")
+	}
+
+	if apiApp.ExternalURL != "" && !domain.IsValidURL(apiApp.ExternalURL) {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-6z583", "Errors.Project.App.APIConfigInvalid")
 	}
 
 	existingAPI, err := c.getAPIAppWriteModel(ctx, apiApp.AggregateID, apiApp.AppID, resourceOwner)

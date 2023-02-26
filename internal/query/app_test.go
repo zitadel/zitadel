@@ -15,93 +15,97 @@ import (
 )
 
 var (
-	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps4.id,` +
-		` projections.apps4.name,` +
-		` projections.apps4.project_id,` +
-		` projections.apps4.creation_date,` +
-		` projections.apps4.change_date,` +
-		` projections.apps4.resource_owner,` +
-		` projections.apps4.state,` +
-		` projections.apps4.sequence,` +
+	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps5.id,` +
+		` projections.apps5.name,` +
+		` projections.apps5.external_url,` +
+		` projections.apps5.is_visible_to_end_user,` +
+		` projections.apps5.project_id,` +
+		` projections.apps5.creation_date,` +
+		` projections.apps5.change_date,` +
+		` projections.apps5.resource_owner,` +
+		` projections.apps5.state,` +
+		` projections.apps5.sequence,` +
 		// api config
-		` projections.apps4_api_configs.app_id,` +
-		` projections.apps4_api_configs.client_id,` +
-		` projections.apps4_api_configs.auth_method,` +
+		` projections.apps5_api_configs.app_id,` +
+		` projections.apps5_api_configs.client_id,` +
+		` projections.apps5_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps4_oidc_configs.app_id,` +
-		` projections.apps4_oidc_configs.version,` +
-		` projections.apps4_oidc_configs.client_id,` +
-		` projections.apps4_oidc_configs.redirect_uris,` +
-		` projections.apps4_oidc_configs.response_types,` +
-		` projections.apps4_oidc_configs.grant_types,` +
-		` projections.apps4_oidc_configs.application_type,` +
-		` projections.apps4_oidc_configs.auth_method_type,` +
-		` projections.apps4_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps4_oidc_configs.is_dev_mode,` +
-		` projections.apps4_oidc_configs.access_token_type,` +
-		` projections.apps4_oidc_configs.access_token_role_assertion,` +
-		` projections.apps4_oidc_configs.id_token_role_assertion,` +
-		` projections.apps4_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps4_oidc_configs.clock_skew,` +
-		` projections.apps4_oidc_configs.additional_origins,` +
+		` projections.apps5_oidc_configs.app_id,` +
+		` projections.apps5_oidc_configs.version,` +
+		` projections.apps5_oidc_configs.client_id,` +
+		` projections.apps5_oidc_configs.redirect_uris,` +
+		` projections.apps5_oidc_configs.response_types,` +
+		` projections.apps5_oidc_configs.grant_types,` +
+		` projections.apps5_oidc_configs.application_type,` +
+		` projections.apps5_oidc_configs.auth_method_type,` +
+		` projections.apps5_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps5_oidc_configs.is_dev_mode,` +
+		` projections.apps5_oidc_configs.access_token_type,` +
+		` projections.apps5_oidc_configs.access_token_role_assertion,` +
+		` projections.apps5_oidc_configs.id_token_role_assertion,` +
+		` projections.apps5_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps5_oidc_configs.clock_skew,` +
+		` projections.apps5_oidc_configs.additional_origins,` +
 		//saml config
-		` projections.apps4_saml_configs.app_id,` +
-		` projections.apps4_saml_configs.entity_id,` +
-		` projections.apps4_saml_configs.metadata,` +
-		` projections.apps4_saml_configs.metadata_url` +
-		` FROM projections.apps4` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
-	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps4.id,` +
-		` projections.apps4.name,` +
-		` projections.apps4.project_id,` +
-		` projections.apps4.creation_date,` +
-		` projections.apps4.change_date,` +
-		` projections.apps4.resource_owner,` +
-		` projections.apps4.state,` +
-		` projections.apps4.sequence,` +
+		` projections.apps5_saml_configs.app_id,` +
+		` projections.apps5_saml_configs.entity_id,` +
+		` projections.apps5_saml_configs.metadata,` +
+		` projections.apps5_saml_configs.metadata_url` +
+		` FROM projections.apps5` +
+		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
+		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps5_saml_configs ON projections.apps5.id = projections.apps5_saml_configs.app_id AND projections.apps5.instance_id = projections.apps5_saml_configs.instance_id`)
+	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps5.id,` +
+		` projections.apps5.name,` +
+		` projections.apps5.external_url,` +
+		` projections.apps5.is_visible_to_end_user,` +
+		` projections.apps5.project_id,` +
+		` projections.apps5.creation_date,` +
+		` projections.apps5.change_date,` +
+		` projections.apps5.resource_owner,` +
+		` projections.apps5.state,` +
+		` projections.apps5.sequence,` +
 		// api config
-		` projections.apps4_api_configs.app_id,` +
-		` projections.apps4_api_configs.client_id,` +
-		` projections.apps4_api_configs.auth_method,` +
+		` projections.apps5_api_configs.app_id,` +
+		` projections.apps5_api_configs.client_id,` +
+		` projections.apps5_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps4_oidc_configs.app_id,` +
-		` projections.apps4_oidc_configs.version,` +
-		` projections.apps4_oidc_configs.client_id,` +
-		` projections.apps4_oidc_configs.redirect_uris,` +
-		` projections.apps4_oidc_configs.response_types,` +
-		` projections.apps4_oidc_configs.grant_types,` +
-		` projections.apps4_oidc_configs.application_type,` +
-		` projections.apps4_oidc_configs.auth_method_type,` +
-		` projections.apps4_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps4_oidc_configs.is_dev_mode,` +
-		` projections.apps4_oidc_configs.access_token_type,` +
-		` projections.apps4_oidc_configs.access_token_role_assertion,` +
-		` projections.apps4_oidc_configs.id_token_role_assertion,` +
-		` projections.apps4_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps4_oidc_configs.clock_skew,` +
-		` projections.apps4_oidc_configs.additional_origins,` +
+		` projections.apps5_oidc_configs.app_id,` +
+		` projections.apps5_oidc_configs.version,` +
+		` projections.apps5_oidc_configs.client_id,` +
+		` projections.apps5_oidc_configs.redirect_uris,` +
+		` projections.apps5_oidc_configs.response_types,` +
+		` projections.apps5_oidc_configs.grant_types,` +
+		` projections.apps5_oidc_configs.application_type,` +
+		` projections.apps5_oidc_configs.auth_method_type,` +
+		` projections.apps5_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps5_oidc_configs.is_dev_mode,` +
+		` projections.apps5_oidc_configs.access_token_type,` +
+		` projections.apps5_oidc_configs.access_token_role_assertion,` +
+		` projections.apps5_oidc_configs.id_token_role_assertion,` +
+		` projections.apps5_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps5_oidc_configs.clock_skew,` +
+		` projections.apps5_oidc_configs.additional_origins,` +
 		//saml config
-		` projections.apps4_saml_configs.app_id,` +
-		` projections.apps4_saml_configs.entity_id,` +
-		` projections.apps4_saml_configs.metadata,` +
-		` projections.apps4_saml_configs.metadata_url,` +
+		` projections.apps5_saml_configs.app_id,` +
+		` projections.apps5_saml_configs.entity_id,` +
+		` projections.apps5_saml_configs.metadata,` +
+		` projections.apps5_saml_configs.metadata_url,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.apps4` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
-	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps4_api_configs.client_id,` +
-		` projections.apps4_oidc_configs.client_id` +
-		` FROM projections.apps4` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id`)
-	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps4.project_id` +
-		` FROM projections.apps4` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
+		` FROM projections.apps5` +
+		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
+		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps5_saml_configs ON projections.apps5.id = projections.apps5_saml_configs.app_id AND projections.apps5.instance_id = projections.apps5_saml_configs.instance_id`)
+	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps5_api_configs.client_id,` +
+		` projections.apps5_oidc_configs.client_id` +
+		` FROM projections.apps5` +
+		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
+		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id`)
+	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps5.project_id` +
+		` FROM projections.apps5` +
+		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
+		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps5_saml_configs ON projections.apps5.id = projections.apps5_saml_configs.app_id AND projections.apps5.instance_id = projections.apps5_saml_configs.instance_id`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects3.id,` +
 		` projections.projects3.creation_date,` +
 		` projections.projects3.change_date,` +
@@ -114,14 +118,16 @@ var (
 		` projections.projects3.has_project_check,` +
 		` projections.projects3.private_labeling_setting` +
 		` FROM projections.projects3` +
-		` JOIN projections.apps4 ON projections.projects3.id = projections.apps4.project_id AND projections.projects3.instance_id = projections.apps4.instance_id` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
+		` JOIN projections.apps5 ON projections.projects3.id = projections.apps5.project_id AND projections.projects3.instance_id = projections.apps5.instance_id` +
+		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
+		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps5_saml_configs ON projections.apps5.id = projections.apps5_saml_configs.app_id AND projections.apps5.instance_id = projections.apps5_saml_configs.instance_id`)
 
 	appCols = database.StringArray{
 		"id",
 		"name",
+		"external_url",
+		"is_visible_to_end_user",
 		"project_id",
 		"creation_date",
 		"change_date",
@@ -192,6 +198,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -241,6 +249,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 					},
 				},
@@ -257,6 +267,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -306,6 +318,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						APIConfig: &APIApp{
 							ClientID:       "api-client-id",
@@ -325,6 +339,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -374,6 +390,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						SAMLConfig: &SAMLApp{
 							Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
@@ -395,6 +413,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -444,6 +464,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -479,6 +501,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -528,6 +552,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -563,6 +589,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -612,6 +640,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -647,6 +677,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -696,6 +728,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -731,6 +765,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -780,6 +816,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -815,6 +853,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"oidc-app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -851,6 +891,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"api-app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -887,6 +929,8 @@ func Test_AppsPrepare(t *testing.T) {
 						{
 							"saml-app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -936,6 +980,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -965,6 +1011,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						APIConfig: &APIApp{
 							ClientID:       "api-client-id",
@@ -979,6 +1027,8 @@ func Test_AppsPrepare(t *testing.T) {
 						State:         domain.AppStateActive,
 						Sequence:      20211109,
 						Name:          "app-name",
+						ExternalURL: "external-url",
+						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						SAMLConfig: &SAMLApp{
 							Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
@@ -1053,6 +1103,8 @@ func Test_AppPrepare(t *testing.T) {
 					[]driver.Value{
 						"app-id",
 						"app-name",
+						"external-url",
+						false,
 						"project-id",
 						testNow,
 						testNow,
@@ -1096,6 +1148,8 @@ func Test_AppPrepare(t *testing.T) {
 				State:         domain.AppStateActive,
 				Sequence:      20211109,
 				Name:          "app-name",
+				ExternalURL: "external-url",
+				IsVisibleToEndUser: false,
 				ProjectID:     "project-id",
 			},
 		},
@@ -1110,6 +1164,8 @@ func Test_AppPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -1154,6 +1210,8 @@ func Test_AppPrepare(t *testing.T) {
 				State:         domain.AppStateActive,
 				Sequence:      20211109,
 				Name:          "app-name",
+				ExternalURL: "external-url",
+				IsVisibleToEndUser: false,
 				ProjectID:     "project-id",
 				APIConfig: &APIApp{
 					ClientID:       "api-client-id",
@@ -1172,6 +1230,8 @@ func Test_AppPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -1216,6 +1276,8 @@ func Test_AppPrepare(t *testing.T) {
 				State:         domain.AppStateActive,
 				Sequence:      20211109,
 				Name:          "app-name",
+				ExternalURL: "external-url",
+				IsVisibleToEndUser: false,
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,
@@ -1248,6 +1310,8 @@ func Test_AppPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -1292,6 +1356,8 @@ func Test_AppPrepare(t *testing.T) {
 				State:         domain.AppStateActive,
 				Sequence:      20211109,
 				Name:          "app-name",
+				ExternalURL: "external-url",
+				IsVisibleToEndUser: false,
 				ProjectID:     "project-id",
 				SAMLConfig: &SAMLApp{
 					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
@@ -1311,6 +1377,8 @@ func Test_AppPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -1355,6 +1423,8 @@ func Test_AppPrepare(t *testing.T) {
 				State:         domain.AppStateActive,
 				Sequence:      20211109,
 				Name:          "app-name",
+				ExternalURL: "external-url",
+				IsVisibleToEndUser: false,
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,
@@ -1388,6 +1458,8 @@ func Test_AppPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -1432,6 +1504,8 @@ func Test_AppPrepare(t *testing.T) {
 				State:         domain.AppStateActive,
 				Sequence:      20211109,
 				Name:          "app-name",
+				ExternalURL: "external-url",
+				IsVisibleToEndUser: false,
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,
@@ -1465,6 +1539,8 @@ func Test_AppPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -1509,6 +1585,8 @@ func Test_AppPrepare(t *testing.T) {
 				State:         domain.AppStateActive,
 				Sequence:      20211109,
 				Name:          "app-name",
+				ExternalURL: "external-url",
+				IsVisibleToEndUser: false,
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,
@@ -1542,6 +1620,8 @@ func Test_AppPrepare(t *testing.T) {
 						{
 							"app-id",
 							"app-name",
+							"external-url",
+							false,
 							"project-id",
 							testNow,
 							testNow,
@@ -1586,6 +1666,8 @@ func Test_AppPrepare(t *testing.T) {
 				State:         domain.AppStateActive,
 				Sequence:      20211109,
 				Name:          "app-name",
+				ExternalURL: "external-url",
+				IsVisibleToEndUser: false,
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,

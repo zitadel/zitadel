@@ -973,6 +973,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"app1",
 							"app",
+							"",
+							false,
 						)),
 						eventFromEventPusher(
 							project.NewSAMLConfigAddedEvent(context.Background(),
@@ -1029,6 +1031,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"app1",
 							"app",
+							"",
+							false,
 						)),
 						eventFromEventPusher(
 							project.NewSAMLConfigAddedEvent(context.Background(),
@@ -1043,6 +1047,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"app2",
 							"app",
+							"",
+							false,
 						)),
 						eventFromEventPusher(
 							project.NewSAMLConfigAddedEvent(context.Background(),
@@ -1057,6 +1063,8 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"app3",
 							"app",
+							"",
+							false,
 						)),
 						eventFromEventPusher(
 							project.NewSAMLConfigAddedEvent(context.Background(),
