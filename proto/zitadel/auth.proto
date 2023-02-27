@@ -1429,9 +1429,10 @@ message UserGrant {
             example: "\"28746028909593987\""
         }
     ];
+    // Deprecated: user role_keys
     repeated string roles = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"RoleKey1\", \"RoleKey2\"]"
+            example: "[\"RoleKey1\", \"RoleKey2\"]",
         }
     ];
     string org_name = 5 [
@@ -1442,6 +1443,27 @@ message UserGrant {
     string grant_id = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"\""
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 7;
+    string org_domain = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.cloud\""
+        }
+    ];
+    string project_name = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\""
+        }
+    ];
+    string project_grant_id = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"28746028909586246\""
+        }
+    ];
+    repeated string role_keys = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"RoleKey1\", \"RoleKey2\"]",
         }
     ];
 }
