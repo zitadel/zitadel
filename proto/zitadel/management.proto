@@ -45,6 +45,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     };
     tags: [
         {
+            name: "Actions"
+        },
+        {
             name: "Applications",
             description: "Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
         },
@@ -6553,6 +6556,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.action.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Search Actions";
+            description: "Returns a list of actions matching the query. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc GetAction(GetActionRequest) returns (GetActionResponse) {
@@ -6562,6 +6579,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.action.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Get Action By ID";
+            description: "Returns an actions by id. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6574,6 +6605,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.action.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Create Action";
+            description: "Create a new ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc UpdateAction(UpdateActionRequest) returns (UpdateActionResponse) {
@@ -6584,6 +6629,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.action.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Update Action";
+            description: "Update an existing ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6596,6 +6655,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.action.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Deactivate Action";
+            description: "Deactivate an existing action. The action will not be executed if configured in a flow. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
@@ -6606,6 +6679,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.action.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Reactivate Action";
+            description: "Reactivate an existing action that is deactivated. The action will be executed again if configured in a flow. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6618,6 +6705,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.action.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Delete Action";
+            description: "Remove an existing action. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc ListFlowTypes(ListFlowTypesRequest) returns (ListFlowTypesResponse) {
@@ -6627,6 +6728,19 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.flow.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Search Flow Types";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6638,6 +6752,19 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.flow.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "List Flow Trigger Types";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc GetFlow(GetFlowRequest) returns (GetFlowResponse) {
@@ -6647,6 +6774,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.flow.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Get Flow";
+            description: "Returns a flow. Flows are the links between an action and a specific point during a user interaction with ZITADEL."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6658,6 +6799,19 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.flow.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Clear Flow";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc SetTriggerActions(SetTriggerActionsRequest) returns (SetTriggerActionsResponse) {
@@ -6668,6 +6822,19 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.flow.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Actions";
+            summary: "Set Trigger Actions";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 }
@@ -10924,15 +11091,22 @@ message ListActionsResponse {
 message CreateActionRequest {
     string name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"log context\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string script = 2 [
         (validate.rules).string = {min_len: 1, max_len: 2000},
-         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-             example: "\"function log(context, calls){console.log(context)}\"";
-         }
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"function log(context, calls){console.log(context)}\"";
+            description: "Javascript code that should executed"
+            min_length: 1;
+            max_length: 2000;
+        }
     ];
     google.protobuf.Duration timeout = 3 [
         (validate.rules).duration = {gte: {}, lte: {seconds: 20}},
