@@ -14,8 +14,8 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { CardModule } from '../../card/card.module';
 import { CreateLayoutModule } from '../../create-layout/create-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { ProviderGoogleCreateComponent } from './provider-google-create.component';
 import { ProviderGoogleCreateRoutingModule } from './provider-google-create-routing.module';
+import { ProviderGoogleCreateComponent } from './provider-google-create.component';
 
 @NgModule({
   declarations: [ProviderGoogleCreateComponent],
