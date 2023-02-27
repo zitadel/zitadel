@@ -70,7 +70,7 @@ func NewHumanPasswordReadModel(userID, resourceOwner string) *HumanPasswordReadM
 }
 
 func (rm *HumanPasswordReadModel) AppendEvents(events ...eventstore.Event) {
-	rm.ReadModel = rm.ReadModel.AppendEvents(events...)
+	rm.ReadModel.AppendEvents(events...)
 }
 
 func (wm *HumanPasswordReadModel) Reduce() error {

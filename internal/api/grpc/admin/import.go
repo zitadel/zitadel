@@ -88,17 +88,6 @@ func (c *count) getProgress() string {
 		"project_grant_members " + strconv.Itoa(c.projectGrantMemberCount) + "/" + strconv.Itoa(c.projectGrantMemberLen)
 }
 
-func Detach(ctx context.Context) context.Context { return detachedContext{ctx} }
-
-type detachedContext struct {
-	parent context.Context
-}
-
-func (v detachedContext) Deadline() (time.Time, bool)       { return time.Time{}, false }
-func (v detachedContext) Done() <-chan struct{}             { return nil }
-func (v detachedContext) Err() error                        { return nil }
-func (v detachedContext) Value(key interface{}) interface{} { return v.parent.Value(key) }
-
 func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest) (_ *admin_pb.ImportDataResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -169,7 +158,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 		if err != nil {
 			return nil, err
 		}
-		dctx := Detach(ctx)
+		dctx := authz.Detach(ctx)
 		go func() {
 			ch := make(chan importResponse, 1)
 			ctxTimeout, cancel := context.WithTimeout(dctx, timeoutDuration)

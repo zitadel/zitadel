@@ -161,7 +161,7 @@ func startZitadel(config *Config, masterKey string) error {
 	}
 
 	usageReporter := logstore.UsageReporterFunc(commands.ReportUsage)
-	actionsLogstoreSvc := logstore.New(commands, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
+	actionsLogstoreSvc := logstore.New(queries, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	if actionsLogstoreSvc.Enabled() {
 		logging.Warn("execution logs are currently in beta")
 	}
@@ -174,7 +174,7 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, commands, usageReporter)
+	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, queries, usageReporter)
 	if err != nil {
 		return err
 	}
