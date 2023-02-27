@@ -1,6 +1,10 @@
 ExternalDomain: localhost
 ExternalSecure: false
 
+Database:
+  cockroach:
+    Host:  db
+
 TLS:
   Enabled: false
 

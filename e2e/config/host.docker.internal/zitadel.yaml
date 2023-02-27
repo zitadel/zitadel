@@ -3,7 +3,7 @@ ExternalSecure: false
 
 Database:
   cockroach:
-    Host:  host.docker.internal
+    Host:  db
 
 TLS:
   Enabled: false
