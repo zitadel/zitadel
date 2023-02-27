@@ -46,7 +46,7 @@ var (
 		"script",
 		"allowed_to_fail",
 		"timeout",
-		//flow
+		// flow
 		"trigger_type",
 		"trigger_sequence",
 		"flow_type",
