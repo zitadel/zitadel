@@ -3,7 +3,6 @@ import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChil
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
-import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';

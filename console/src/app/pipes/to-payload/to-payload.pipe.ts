@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { JavaScriptValue, Struct } from 'google-protobuf/google/protobuf/struct_pb';
+import { JavaScriptValue } from 'google-protobuf/google/protobuf/struct_pb';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 
 @Pipe({
