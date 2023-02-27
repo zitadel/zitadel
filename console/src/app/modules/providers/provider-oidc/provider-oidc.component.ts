@@ -6,9 +6,9 @@ import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AddJWTIDPRequest, AddOIDCIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { AddOIDCIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
-import { AddOrgJWTIDPRequest, AddOrgOIDCIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { AddOrgOIDCIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -17,11 +17,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
-  selector: 'cnsl-provider-oidc-create',
-  templateUrl: './provider-oidc-create.component.html',
-  styleUrls: ['./provider-oidc-create.component.scss'],
+  selector: 'cnsl-provider-oidc',
+  templateUrl: './provider-oidc.component.html',
+  styleUrls: ['./provider-oidc.component.scss'],
 })
-export class ProviderOIDCCreateComponent implements OnInit, OnDestroy {
+export class ProviderOIDCComponent implements OnInit, OnDestroy {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];

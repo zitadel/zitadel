@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { ProviderOIDCCreateComponent } from './provider-oidc-create.component';
+import { ProviderOIDCComponent } from './provider-oidc.component';
 
-describe('ProviderOIDCCreateComponent', () => {
-  let component: ProviderOIDCCreateComponent;
-  let fixture: ComponentFixture<ProviderOIDCCreateComponent>;
+describe('ProviderOIDCComponent', () => {
+  let component: ProviderOIDCComponent;
+  let fixture: ComponentFixture<ProviderOIDCComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ProviderOIDCCreateComponent],
+      declarations: [ProviderOIDCComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProviderOIDCCreateComponent);
+    fixture = TestBed.createComponent(ProviderOIDCComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

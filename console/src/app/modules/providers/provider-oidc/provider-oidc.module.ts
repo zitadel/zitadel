@@ -14,13 +14,13 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { CardModule } from '../../card/card.module';
 import { CreateLayoutModule } from '../../create-layout/create-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { ProviderOIDCCreateRoutingModule } from './provider-oidc-create-routing.module';
-import { ProviderOIDCCreateComponent } from './provider-oidc-create.component';
+import { ProviderOIDCRoutingModule } from './provider-oidc-routing.module';
+import { ProviderOIDCComponent } from './provider-oidc.component';
 
 @NgModule({
-  declarations: [ProviderOIDCCreateComponent],
+  declarations: [ProviderOIDCComponent],
   imports: [
-    ProviderOIDCCreateRoutingModule,
+    ProviderOIDCRoutingModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

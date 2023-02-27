@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ProviderOIDCCreateComponent } from './provider-oidc-create.component';
+import { ProviderOIDCComponent } from './provider-oidc.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: ProviderOIDCCreateComponent,
+    component: ProviderOIDCComponent,
     data: { animation: 'DetailPage' },
   },
 ];
@@ -15,4 +15,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class ProviderOIDCCreateRoutingModule {}
+export class ProviderOIDCRoutingModule {}
