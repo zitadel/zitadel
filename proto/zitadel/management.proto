@@ -88,6 +88,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             description: "ZITADEL knows two different types of users: Users (Human) and Service Users (Machine Accounts)"
         },
         {
+            name: "User Grants",
+            description: "User grants are the roles a user has for a specific project and organization."
+        },
+        {
             name: "User Human"
         },
         {
@@ -3830,7 +3834,6 @@ service ManagementService {
         };
     }
 
-    // Returns a user grant (authorization of a user for a project)
     rpc GetUserGrantByID(GetUserGrantByIDRequest) returns (GetUserGrantByIDResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/grants/{grant_id}"
@@ -3839,10 +3842,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Grants";
+            summary: "User Grant By ID";
+            description: "Returns a user grant per ID. A user grant is the role a user has for a specific project and organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all user grants matching the query (authorizations of a user for the projects)
-    // Limit should always be set, there is a default limit set by the service
     rpc ListUserGrants(ListUserGrantRequest) returns (ListUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/grants/_search"
@@ -3852,9 +3867,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Grants";
+            summary: "Search User Grants";
+            description: "Returns a list of user grants that match the search queries. User grants are the roles users have for a specific project and organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Creates a new user grant (authorization of a user for a project with specified roles)
     rpc AddUserGrant(AddUserGrantRequest) returns (AddUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants"
@@ -3864,9 +3892,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Grants";
+            summary: "Add User Grant";
+            description: "Add a user grant for a specific user. User grants are the roles users have for a specific project and organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Changes a user grant (authorization of a user for a project with specified roles)
     rpc UpdateUserGrant(UpdateUserGrantRequest) returns (UpdateUserGrantResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/grants/{grant_id}"
@@ -3876,11 +3917,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Grants";
+            summary: "Update User Grants";
+            description: "Update the roles of a user grant. User grants are the roles users have for a specific project and organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Sets the state of a user grant to deactivated
-    // User will not be able to use the granted project anymore
-    // Returns an error if the user grant is already deactivated
     rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_deactivate"
@@ -3890,10 +3942,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Grants";
+            summary: "Deactivate User Grant";
+            description: "Deactivate the user grant. The user will not be able to use the granted project anymore. Also the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Sets the state of a user grant to active
-    // Returns an error if the user grant is not deactivated
     rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_reactivate"
@@ -3903,9 +3967,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Grants";
+            summary: "Reactivate User Grant";
+            description: "Reactivate a deactivated user grant. The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes a user grant
     rpc RemoveUserGrant(RemoveUserGrantRequest) returns (RemoveUserGrantResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/grants/{grant_id}"
@@ -3914,9 +3991,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Grants";
+            summary: "Remove User Grant";
+            description: "Removes the user grant from the user. The user will not be able to use the granted project anymore. Also the roles will not be included in the tokens when requested."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // remove a list of user grants in one request
     rpc BulkRemoveUserGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {
         option (google.api.http) = {
             delete: "/user_grants/_bulk"
@@ -3925,6 +4015,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.grant.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User Grants";
+            summary: "Bulk Remove User Grants";
+            description: "Remove a list of user grants. The users will not be able to use the granted project anymore. Also the roles will not be included in the tokens when requested."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7610,10 +7714,36 @@ message ListUserGrantResponse {
 }
 
 message AddUserGrantRequest {
-    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string project_grant_id = 3 [(validate.rules).string = {max_len: 200}];
-    repeated string role_keys = 4;
+    string user_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            example: "\"69629026806489455\"";
+        }
+    ];
+    string project_id = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"58949026806489455\"";
+        }
+    ];
+    string project_grant_id = 3 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"9847026806489455\"";
+            description: "Make sure to fill the project grant id if the user grant is for a granted project and the organization is not the owner of the project.";
+        }
+    ];
+    repeated string role_keys = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"RoleKey1\", \"RoleKey2\"]"
+        }
+    ];
 }
 
 message AddUserGrantResponse {
@@ -7624,7 +7754,11 @@ message AddUserGrantResponse {
 message UpdateUserGrantRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string role_keys = 3;
+    repeated string role_keys = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"RoleKey1\", \"RoleKey2\"]"
+        }
+    ];
 }
 
 message UpdateUserGrantResponse {
@@ -7659,7 +7793,11 @@ message RemoveUserGrantResponse {
 }
 
 message BulkRemoveUserGrantRequest {
-    repeated string grant_id = 1;
+    repeated string grant_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"9384786806489455\", \"2984754806489455\"]"
+        }
+    ];
 }
 
 message BulkRemoveUserGrantResponse {}
