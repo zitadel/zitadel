@@ -155,6 +155,7 @@
               actions
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               color="warn"
+              [disabled]="disableDelete"
               (click)="deleteGrant($event, grant)"
               mat-icon-button
             >
@@ -170,8 +171,8 @@
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr
-        (click)="openEditDialog(grant)"
-        class="highlight pointer"
+        (click)="!disableWrite ? openEditDialog(grant) : null"
+        [ngClass]="{ 'highlight pointer': !disableWrite }"
         mat-row
         *matRowDef="let grant; columns: displayedColumns"
       ></tr>
