@@ -118,19 +118,17 @@ module.exports = {
           items: [
             "guides/integrate/login-users",
             "guides/integrate/oauth-recommended-flows",
-            "guides/integrate/identity-brokering",
             "guides/integrate/logout",
           ],
         },
         {
           type: "category",
-          label: "Configure External IDPs",
+          label: "Configure Identity Providers",
           collapsed: true,
           items: [
-            "guides/integrate/auth0-oidc",
-            "guides/integrate/auth0-saml",
-            "guides/integrate/azuread-oidc",
-            "guides/integrate/pingidentity-saml",
+            "guides/integrate/identity-providers/introduction",
+            "guides/integrate/identity-providers/google-oidc",
+            "guides/integrate/identity-providers/azuread-oidc",
           ],
         },
         {
@@ -138,7 +136,6 @@ module.exports = {
           label: "Access ZITADEL APIs",
           collapsed: true,
           items: [
-            
             {
               type: "category",
               label: "Authenticate Service Users",
@@ -169,10 +166,13 @@ module.exports = {
           label: "Services",
           collapsed: false,
           items: [
-            "guides/integrate/gitlab-self-hosted",
-            "guides/integrate/aws-saml",
-            "guides/integrate/atlassian-saml",
-            "guides/integrate/gitlab-saml",
+            "guides/integrate/services/gitlab-self-hosted",
+            "guides/integrate/services/aws-saml",
+            "guides/integrate/services/atlassian-saml",
+            "guides/integrate/services/gitlab-saml",
+            "guides/integrate/services/auth0-oidc",
+            "guides/integrate/services/auth0-saml",
+            "guides/integrate/services/pingidentity-saml",
           ],
         },
         {

@@ -1,5 +1,6 @@
 ---
-title: Connect with AzureAD through OIDC
+title: Configure AzureAD as Identity Provider
+sidebar_label: AzureAD
 ---
 
 ## AzureAD Tenant as Identity Provider for ZITADEL
@@ -87,7 +88,7 @@ If you don't want your users to get this prompt when using Azure, you have to di
 1. Go to the login behaviour settings of your instance or organization, depending if you like to disable it for all or just a specific organization respectively
 2. Set "Multi-factor init lifetimes" to 0
 
-![img.png](../../../static/img/guides/login_lifetimes.png)
+![img.png](/img/guides/login_lifetimes.png)
 
 #### Create user with verified email
 
@@ -104,11 +105,11 @@ To create the user with a verified email address you must add an action.
 https://github.com/zitadel/actions/blob/main/examples/verify_email.js
 ```
 
-![img.png](../../../static/img/guides/action_email_verify.png)
+![img.png](/img/guides/action_email_verify.png)
 
 3. Add the action "email verify" to the flow "external authentication" and to the trigger "pre creation"
 
-![img.png](../../../static/img/guides/action_pre_creation_email_verify.png)
+![img.png](/img/guides/action_pre_creation_email_verify.png)
 
 #### Automatically redirect to Azure AD
 
