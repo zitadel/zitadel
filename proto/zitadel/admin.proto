@@ -5030,7 +5030,11 @@ message UpdatePrivacyPolicyResponse {
 }
 
 message AddNotificationPolicyRequest {
-    bool password_change = 1;
+    bool password_change = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If set to true the users will get a notification whenever their password has been changed.";
+        }
+    ];
 }
 
 message AddNotificationPolicyResponse {
@@ -5045,7 +5049,11 @@ message GetNotificationPolicyResponse {
 }
 
 message UpdateNotificationPolicyRequest {
-   bool password_change = 1;
+   bool password_change = 1 [
+       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+           description: "If set to true the users will get a notification whenever their password has been changed.";
+       }
+   ];
 }
 
 message UpdateNotificationPolicyResponse {

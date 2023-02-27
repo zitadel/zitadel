@@ -73,6 +73,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Members"
         },
         {
+            name: "Notification Settings"
+        },
+        {
             name: "Organizations"
         },
         {
@@ -4969,8 +4972,6 @@ service ManagementService {
         };
     }
 
-    // Returns the notification policy of the organization
-    // With this notification policy it can be configured how users should be notified
     rpc GetNotificationPolicy(GetNotificationPolicyRequest) returns (GetNotificationPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/notification"
@@ -4979,10 +4980,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Notification Settings";
+            summary: "Get Notification Settings";
+            description: "Return the notification settings configured on the organization. It overwrites the default settings configured on the instance for this organization. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns the default notification policy of the IAM
-    // With this notification privacy it can be configured how users should be notified
     rpc GetDefaultNotificationPolicy(GetDefaultNotificationPolicyRequest) returns (GetDefaultNotificationPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/notification"
@@ -4991,10 +5005,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Notification Settings";
+            summary: "Get Default Notification Settings";
+            description: "Return the default notification settings configured on the instance. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Add a custom notification policy for the organization
-    // With this notification privacy it can be configured how users should be notified
     rpc AddCustomNotificationPolicy(AddCustomNotificationPolicyRequest) returns (AddCustomNotificationPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/notification"
@@ -5004,10 +5031,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Notification Settings";
+            summary: "Add Notification Settings";
+            description: "Create notification settings for the organization and therefore overwrite the default settings for this organization. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Update the notification policy for the organization
-    // With this notification privacy it can be configured how users should be notified
     rpc UpdateCustomNotificationPolicy(UpdateCustomNotificationPolicyRequest) returns (UpdateCustomNotificationPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/notification"
@@ -5017,10 +5057,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Notification Settings";
+            summary: "Update Notification Settings";
+            description: "Update notification settings configured for the organization. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the notification policy of the organization
-    // The default policy of the IAM will trigger after
     rpc ResetNotificationPolicyToDefault(ResetNotificationPolicyToDefaultRequest) returns (ResetNotificationPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/notification"
@@ -5028,6 +5081,21 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Notification Settings";
+            summary: "Reset Notification Settings to Default";
+            description: "The settings configured will be removed from the organization. Therefore the settings from the instance will trigger for the users of this organization afterwards. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -8790,7 +8858,11 @@ message GetDefaultNotificationPolicyResponse {
 }
 
 message AddCustomNotificationPolicyRequest {
-    bool password_change = 1;
+    bool password_change = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If set to true the users will get a notification whenever their password has been changed.";
+        }
+    ];
 }
 
 message AddCustomNotificationPolicyResponse {
@@ -8798,7 +8870,11 @@ message AddCustomNotificationPolicyResponse {
 }
 
 message UpdateCustomNotificationPolicyRequest {
-    bool password_change = 1;
+    bool password_change = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If set to true the users will get a notification whenever their password has been changed.";
+        }
+    ];
 }
 
 message UpdateCustomNotificationPolicyResponse {
