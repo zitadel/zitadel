@@ -5,8 +5,15 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { take } from 'rxjs/operators';
-import { AddGoogleProviderRequest as AdminAddGoogleProviderRequest } from 'src/app/proto/generated/zitadel/admin_pb';
-import { AddGoogleProviderRequest as MgmtAddGoogleProviderRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import {
+  AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
+  GetProviderByIDRequest as AdminGetProviderByIDRequest,
+} from 'src/app/proto/generated/zitadel/admin_pb';
+import { Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import {
+  AddGoogleProviderRequest as MgmtAddGoogleProviderRequest,
+  GetProviderByIDRequest as MgmtGetProviderByIDRequest,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -30,6 +37,9 @@ export class ProviderGoogleComponent implements OnInit {
 
   public loading: boolean = false;
 
+  public provider?: Provider.AsObject;
+  public updateClientSecret: boolean = false;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -38,6 +48,10 @@ export class ProviderGoogleComponent implements OnInit {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
+    const idpId = this.route.snapshot.paramMap.get('id');
+
+    console.log(idpId);
+
     this.form = new FormGroup({
       name: new FormControl('', [Validators.required]),
       clientId: new FormControl('', [Validators.required]),
@@ -76,8 +90,20 @@ export class ProviderGoogleComponent implements OnInit {
     this.route.params.pipe(take(1)).subscribe((params) => this.getData(params));
   }
 
-  private getData({ projectid }: Params): void {
-    this.projectId = projectid;
+  private getData({ id }: Params): void {
+    const req =
+      this.serviceType === PolicyComponentServiceType.ADMIN
+        ? new AdminGetProviderByIDRequest()
+        : new MgmtGetProviderByIDRequest();
+    req.setId(id);
+    this.service.getProviderByID(req).then((resp) => {
+      this.provider = resp.idp;
+      console.log(this.provider);
+      if (this.provider?.config?.google) {
+        this.form.patchValue(this.provider.config.google);
+        this.name?.setValue(this.provider.name);
+      }
+    });
   }
 
   public addOIDCIdp(): void {
@@ -114,7 +140,6 @@ export class ProviderGoogleComponent implements OnInit {
         });
     } else if (PolicyComponentServiceType.ADMIN) {
       const req = new AdminAddGoogleProviderRequest();
-
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);

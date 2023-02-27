@@ -1633,7 +1633,7 @@
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "General Configuration of your identity provider.",
+      "DESCRIPTION": "Update your provider configuration",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed"
     },

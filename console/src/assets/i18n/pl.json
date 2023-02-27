@@ -1632,7 +1632,7 @@
     },
     "DETAIL": {
       "TITLE": "Dostawca tożsamości",
-      "DESCRIPTION": "Ogólna konfiguracja dostawcy tożsamości.",
+      "DESCRIPTION": "Aktualizacja konfiguracji dostawcy",
       "DATECREATED": "Utworzono",
       "DATECHANGED": "Zmieniono"
     },

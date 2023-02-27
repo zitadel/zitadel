@@ -6,7 +6,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AddJWTIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
-import { OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
+import { OIDCMappingField, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import { AddOrgJWTIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -31,6 +31,8 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
 
   public jwtFormGroup!: UntypedFormGroup;
   public loading: boolean = false;
+
+  public provider?: Provider.AsObject;
 
   constructor(
     private router: Router,

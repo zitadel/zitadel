@@ -1,4 +1,4 @@
-<cnsl-create-layout title="{{ 'IDP.CREATE.STEPPERTITLE' | translate }}" (closed)="close()">
+<cnsl-create-layout title="{{ (provider ? 'IDP.CREATE.TITLE' : 'IDP.DETAIL.TITLE') | translate }}" (closed)="close()">
   <div class="oidc-create-content">
     <div class="title-row">
       <mat-icon class="idp-logo" svgIcon="mdi_openid" alt="openid" />
@@ -97,7 +97,8 @@
 
       <div class="oidc-create-actions">
         <button color="primary" mat-raised-button class="continue-button" [disabled]="oidcFormGroup.invalid" type="submit">
-          {{ 'ACTIONS.SAVE' | translate }}
+          <span *ngIf="provider">{{ 'ACTIONS.SAVE' | translate }}</span>
+          <span *ngIf="!provider">{{ 'ACTIONS.CREATE' | translate }}</span>
         </button>
       </div>
     </form>

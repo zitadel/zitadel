@@ -1632,7 +1632,7 @@
     },
     "DETAIL": {
       "TITLE": "Fournisseur d'identité",
-      "DESCRIPTION": "Configuration générale de votre fournisseur d'identité.",
+      "DESCRIPTION": "Mettez à jour la configuration de votre fournisseur",
       "DATECREATED": "Créé",
       "DATECHANGED": "Modifié"
     },

@@ -1,4 +1,7 @@
-<cnsl-create-layout title="{{ 'IDP.CREATE.TITLE' | translate }}" (closed)="close()">
+<cnsl-create-layout
+  title="{{ !provider ? ('IDP.CREATE.TITLE' | translate) : ('IDP.DETAIL.TITLE' | translate) }}"
+  (closed)="close()"
+>
   <div class="google-create-content">
     <div class="title-row">
       <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
@@ -7,7 +10,9 @@
 
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
-    <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.GOOGLE.DESCRIPTION' | translate }}</p>
+    <p class="desc cnsl-secondary-text">
+      {{ (provider ? 'IDP.CREATE.GOOGLE.DESCRIPTION' : 'IDP.DETAIL.DESCRIPTION') | translate }}
+    </p>
 
     <form [formGroup]="form" (ngSubmit)="addOIDCIdp()">
       <div class="google-content">
@@ -19,7 +24,11 @@
           <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientId" />
         </cnsl-form-field>
-        <cnsl-form-field class="formfield">
+
+        <mat-checkbox *ngIf="provider" [(ngModel)]="updateClientSecret" [ngModelOptions]="{ standalone: true }"
+          >Update Client Secret</mat-checkbox
+        >
+        <cnsl-form-field *ngIf="!provider || (provider && updateClientSecret)" class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientSecret" />
         </cnsl-form-field>
@@ -61,7 +70,8 @@
 
       <div class="google-create-actions">
         <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
-          {{ 'ACTIONS.SAVE' | translate }}
+          <span *ngIf="provider">{{ 'ACTIONS.SAVE' | translate }}</span>
+          <span *ngIf="!provider">{{ 'ACTIONS.CREATE' | translate }}</span>
         </button>
       </div>
     </form>
