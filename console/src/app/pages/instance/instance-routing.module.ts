@@ -37,7 +37,7 @@ const routes: Routes = [
       },
       {
         path: 'jwt-create',
-        loadChildren: () => import('src/app/modules/providers/provider-jwt/provider-jwt-create.module'),
+        loadChildren: () => import('src/app/modules/providers/provider-jwt/provider-jwt.module'),
         canActivate: [AuthGuard, RoleGuard],
         data: {
           roles: ['iam.idp.write'],

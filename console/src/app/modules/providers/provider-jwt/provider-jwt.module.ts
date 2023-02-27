@@ -14,11 +14,11 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { CardModule } from '../../card/card.module';
 import { CreateLayoutModule } from '../../create-layout/create-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { ProviderJWTCreateRoutingModule } from './provider-jwt-create-routing.module';
-import { ProviderJWTCreateComponent } from './provider-jwt-create.component';
+import { ProviderJWTCreateRoutingModule } from './provider-jwt-routing.module';
+import { ProviderJWTComponent } from './provider-jwt.component';
 
 @NgModule({
-  declarations: [ProviderJWTCreateComponent],
+  declarations: [ProviderJWTComponent],
   imports: [
     ProviderJWTCreateRoutingModule,
     CommonModule,

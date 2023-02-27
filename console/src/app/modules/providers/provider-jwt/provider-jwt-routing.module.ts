@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ProviderJWTCreateComponent } from './provider-jwt-create.component';
+import { ProviderJWTComponent } from './provider-jwt.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: ProviderJWTCreateComponent,
+    component: ProviderJWTComponent,
     data: { animation: 'DetailPage' },
   },
 ];
