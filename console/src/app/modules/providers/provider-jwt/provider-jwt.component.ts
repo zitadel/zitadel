@@ -111,25 +111,25 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
       req.setStylingType(this.jwtStylingType?.value);
 
       this.loading = true;
-      (this.service as ManagementService)
-        .addOrgJWTIDP(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate([
-              this.serviceType === PolicyComponentServiceType.MGMT
-                ? 'org'
-                : this.serviceType === PolicyComponentServiceType.ADMIN
-                ? 'iam'
-                : '',
-              'policy',
-              'login',
-            ]);
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+      //   (this.service as ManagementService)
+      //     .addOrgJWTIDP(req)
+      //     .then((idp) => {
+      //       setTimeout(() => {
+      //         this.loading = false;
+      //         this.router.navigate([
+      //           this.serviceType === PolicyComponentServiceType.MGMT
+      //             ? 'org'
+      //             : this.serviceType === PolicyComponentServiceType.ADMIN
+      //             ? 'iam'
+      //             : '',
+      //           'policy',
+      //           'login',
+      //         ]);
+      //       }, 2000);
+      //     })
+      //     .catch((error) => {
+      //       this.toast.showError(error);
+      //     });
     } else if (PolicyComponentServiceType.ADMIN) {
       const req = new AddJWTIDPRequest();
 
@@ -142,25 +142,25 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
       req.setStylingType(this.jwtStylingType?.value);
 
       this.loading = true;
-      (this.service as AdminService)
-        .addJWTIDP(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate([
-              this.serviceType === PolicyComponentServiceType.MGMT
-                ? 'org'
-                : this.serviceType === PolicyComponentServiceType.ADMIN
-                ? 'iam'
-                : '',
-              'policy',
-              'login',
-            ]);
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+      //   (this.service as AdminService)
+      //     .addJWTIDP(req)
+      //     .then((idp) => {
+      //       setTimeout(() => {
+      //         this.loading = false;
+      //         this.router.navigate([
+      //           this.serviceType === PolicyComponentServiceType.MGMT
+      //             ? 'org'
+      //             : this.serviceType === PolicyComponentServiceType.ADMIN
+      //             ? 'iam'
+      //             : '',
+      //           'policy',
+      //           'login',
+      //         ]);
+      //       }, 2000);
+      //     })
+      //     .catch((error) => {
+      //       this.toast.showError(error);
+      //     });
     }
   }
 

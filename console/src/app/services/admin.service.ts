@@ -8,20 +8,18 @@ import {
   ActivateSMSProviderResponse,
   AddCustomDomainPolicyRequest,
   AddCustomOrgIAMPolicyResponse,
+  AddGenericOIDCProviderRequest,
+  AddGenericOIDCProviderResponse,
   AddGoogleProviderRequest,
   AddGoogleProviderResponse,
   AddIAMMemberRequest,
   AddIAMMemberResponse,
   AddIDPToLoginPolicyRequest,
   AddIDPToLoginPolicyResponse,
-  AddJWTIDPRequest,
-  AddJWTIDPResponse,
   AddMultiFactorToLoginPolicyRequest,
   AddMultiFactorToLoginPolicyResponse,
   AddNotificationPolicyRequest,
   AddNotificationPolicyResponse,
-  AddOIDCIDPRequest,
-  AddOIDCIDPResponse,
   AddOIDCSettingsRequest,
   AddOIDCSettingsResponse,
   AddSecondFactorToLoginPolicyRequest,
@@ -76,8 +74,6 @@ import {
   GetDomainPolicyResponse,
   GetFileSystemNotificationProviderRequest,
   GetFileSystemNotificationProviderResponse,
-  GetIDPByIDRequest,
-  GetIDPByIDResponse,
   GetLabelPolicyRequest,
   GetLabelPolicyResponse,
   GetLockoutPolicyRequest,
@@ -112,7 +108,6 @@ import {
   GetSMTPConfigResponse,
   GetSupportedLanguagesRequest,
   GetSupportedLanguagesResponse,
-  IDPQuery,
   ListAggregateTypesRequest,
   ListAggregateTypesResponse,
   ListEventsRequest,
@@ -125,8 +120,6 @@ import {
   ListIAMMemberRolesResponse,
   ListIAMMembersRequest,
   ListIAMMembersResponse,
-  ListIDPsRequest,
-  ListIDPsResponse,
   ListLoginPolicyIDPsRequest,
   ListLoginPolicyIDPsResponse,
   ListLoginPolicyMultiFactorsRequest,
@@ -199,16 +192,12 @@ import {
   UpdateCustomDomainPolicyResponse,
   UpdateDomainPolicyRequest,
   UpdateDomainPolicyResponse,
+  UpdateGenericOIDCProviderRequest,
+  UpdateGenericOIDCProviderResponse,
   UpdateGoogleProviderRequest,
   UpdateGoogleProviderResponse,
   UpdateIAMMemberRequest,
   UpdateIAMMemberResponse,
-  UpdateIDPJWTConfigRequest,
-  UpdateIDPJWTConfigResponse,
-  UpdateIDPOIDCConfigRequest,
-  UpdateIDPOIDCConfigResponse,
-  UpdateIDPRequest,
-  UpdateIDPResponse,
   UpdateLabelPolicyRequest,
   UpdateLabelPolicyResponse,
   UpdateLockoutPolicyRequest,
@@ -881,41 +870,6 @@ export class AdminService {
     return this.grpcService.admin.listLoginPolicyIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public listIDPs(limit?: number, offset?: number, queriesList?: IDPQuery[]): Promise<ListIDPsResponse.AsObject> {
-    const req = new ListIDPsRequest();
-    const query = new ListQuery();
-
-    if (limit) {
-      query.setLimit(limit);
-    }
-    if (offset) {
-      query.setOffset(offset);
-    }
-    if (queriesList) {
-      req.setQueriesList(queriesList);
-    }
-    req.setQuery(query);
-    return this.grpcService.admin.listIDPs(req, null).then((resp) => resp.toObject());
-  }
-
-  public getIDPByID(id: string): Promise<GetIDPByIDResponse.AsObject> {
-    const req = new GetIDPByIDRequest();
-    req.setId(id);
-    return this.grpcService.admin.getIDPByID(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateIDP(req: UpdateIDPRequest): Promise<UpdateIDPResponse.AsObject> {
-    return this.grpcService.admin.updateIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public addOIDCIDP(req: AddOIDCIDPRequest): Promise<AddOIDCIDPResponse.AsObject> {
-    return this.grpcService.admin.addOIDCIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateIDPOIDCConfig(req: UpdateIDPOIDCConfigRequest): Promise<UpdateIDPOIDCConfigResponse.AsObject> {
-    return this.grpcService.admin.updateIDPOIDCConfig(req, null).then((resp) => resp.toObject());
-  }
-
   public removeIDP(id: string): Promise<RemoveIDPResponse.AsObject> {
     const req = new RemoveIDPRequest();
     req.setIdpId(id);
@@ -934,14 +888,6 @@ export class AdminService {
     return this.grpcService.admin.reactivateIDP(req, null).then((resp) => resp.toObject());
   }
 
-  public addJWTIDP(req: AddJWTIDPRequest): Promise<AddJWTIDPResponse.AsObject> {
-    return this.grpcService.admin.addJWTIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateIDPJWTConfig(req: UpdateIDPJWTConfigRequest): Promise<UpdateIDPJWTConfigResponse.AsObject> {
-    return this.grpcService.admin.updateIDPJWTConfig(req, null).then((resp) => resp.toObject());
-  }
-
   //   idp templates
 
   public addGoogleProvider(req: AddGoogleProviderRequest): Promise<AddGoogleProviderResponse.AsObject> {
@@ -950,6 +896,16 @@ export class AdminService {
 
   public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
     return this.grpcService.admin.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOIDCProvider(
+    req: UpdateGenericOIDCProviderRequest,
+  ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
   }
 
   public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {

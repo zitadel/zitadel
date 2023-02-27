@@ -6,9 +6,9 @@ import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AddOIDCIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCMappingField, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
-import { AddOrgOIDCIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -104,20 +104,17 @@ export class ProviderOIDCComponent implements OnInit, OnDestroy {
 
   public addOIDCIdp(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new AddOrgOIDCIDPRequest();
+      const req = new MgmtAddGenericOIDCProviderRequest();
 
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
-      req.setDisplayNameMapping(this.idpDisplayNameMapping?.value);
-      req.setUsernameMapping(this.usernameMapping?.value);
-      req.setAutoRegister(this.autoRegister?.value);
 
       this.loading = true;
       (this.service as ManagementService)
-        .addOrgOIDCIDP(req)
+        .addGenericOIDCProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -137,19 +134,16 @@ export class ProviderOIDCComponent implements OnInit, OnDestroy {
           this.toast.showError(error);
         });
     } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AddOIDCIDPRequest();
+      const req = new AdminAddGenericOIDCProviderRequest();
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
-      req.setDisplayNameMapping(this.idpDisplayNameMapping?.value);
-      req.setUsernameMapping(this.usernameMapping?.value);
-      req.setAutoRegister(this.autoRegister?.value);
 
       this.loading = true;
       (this.service as AdminService)
-        .addOIDCIDP(req)
+        .addGenericOIDCProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -217,17 +211,5 @@ export class ProviderOIDCComponent implements OnInit, OnDestroy {
 
   public get scopesList(): AbstractControl | null {
     return this.oidcFormGroup.get('scopesList');
-  }
-
-  public get autoRegister(): AbstractControl | null {
-    return this.oidcFormGroup.get('autoRegister');
-  }
-
-  public get idpDisplayNameMapping(): AbstractControl | null {
-    return this.oidcFormGroup.get('idpDisplayNameMapping');
-  }
-
-  public get usernameMapping(): AbstractControl | null {
-    return this.oidcFormGroup.get('usernameMapping');
   }
 }

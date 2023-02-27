@@ -29,6 +29,8 @@ import {
   AddCustomPasswordComplexityPolicyResponse,
   AddCustomPrivacyPolicyRequest,
   AddCustomPrivacyPolicyResponse,
+  AddGenericOIDCProviderRequest,
+  AddGenericOIDCProviderResponse,
   AddGoogleProviderRequest,
   AddGoogleProviderResponse,
   AddHumanUserRequest,
@@ -45,12 +47,8 @@ import {
   AddOIDCAppResponse,
   AddOrgDomainRequest,
   AddOrgDomainResponse,
-  AddOrgJWTIDPRequest,
-  AddOrgJWTIDPResponse,
   AddOrgMemberRequest,
   AddOrgMemberResponse,
-  AddOrgOIDCIDPRequest,
-  AddOrgOIDCIDPResponse,
   AddOrgRequest,
   AddOrgResponse,
   AddPersonalAccessTokenRequest,
@@ -171,8 +169,6 @@ import {
   GetOIDCInformationResponse,
   GetOrgByDomainGlobalRequest,
   GetOrgByDomainGlobalResponse,
-  GetOrgIDPByIDRequest,
-  GetOrgIDPByIDResponse,
   GetPasswordAgePolicyRequest,
   GetPasswordAgePolicyResponse,
   GetPasswordComplexityPolicyRequest,
@@ -429,6 +425,8 @@ import {
   UpdateCustomPasswordComplexityPolicyResponse,
   UpdateCustomPrivacyPolicyRequest,
   UpdateCustomPrivacyPolicyResponse,
+  UpdateGenericOIDCProviderRequest,
+  UpdateGenericOIDCProviderResponse,
   UpdateGoogleProviderRequest,
   UpdateGoogleProviderResponse,
   UpdateHumanEmailRequest,
@@ -441,12 +439,6 @@ import {
   UpdateMachineResponse,
   UpdateOIDCAppConfigRequest,
   UpdateOIDCAppConfigResponse,
-  UpdateOrgIDPJWTConfigRequest,
-  UpdateOrgIDPJWTConfigResponse,
-  UpdateOrgIDPOIDCConfigRequest,
-  UpdateOrgIDPOIDCConfigResponse,
-  UpdateOrgIDPRequest,
-  UpdateOrgIDPResponse,
   UpdateOrgMemberRequest,
   UpdateOrgMemberResponse,
   UpdateOrgRequest,
@@ -837,24 +829,6 @@ export class ManagementService {
     return this.grpcService.mgmt.listLoginPolicyIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public getOrgIDPByID(id: string): Promise<GetOrgIDPByIDResponse.AsObject> {
-    const req = new GetOrgIDPByIDRequest();
-    req.setId(id);
-    return this.grpcService.mgmt.getOrgIDPByID(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateOrgIDP(req: UpdateOrgIDPRequest): Promise<UpdateOrgIDPResponse.AsObject> {
-    return this.grpcService.mgmt.updateOrgIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public addOrgOIDCIDP(req: AddOrgOIDCIDPRequest): Promise<AddOrgOIDCIDPResponse.AsObject> {
-    return this.grpcService.mgmt.addOrgOIDCIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateOrgIDPOIDCConfig(req: UpdateOrgIDPOIDCConfigRequest): Promise<UpdateOrgIDPOIDCConfigResponse.AsObject> {
-    return this.grpcService.mgmt.updateOrgIDPOIDCConfig(req, null).then((resp) => resp.toObject());
-  }
-
   public removeOrgIDP(idpId: string): Promise<RemoveOrgIDPResponse.AsObject> {
     const req = new RemoveOrgIDPRequest();
     req.setIdpId(idpId);
@@ -873,14 +847,6 @@ export class ManagementService {
     return this.grpcService.mgmt.reactivateOrgIDP(req, null).then((resp) => resp.toObject());
   }
 
-  public addOrgJWTIDP(req: AddOrgJWTIDPRequest): Promise<AddOrgJWTIDPResponse.AsObject> {
-    return this.grpcService.mgmt.addOrgJWTIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateOrgIDPJWTConfig(req: UpdateOrgIDPJWTConfigRequest): Promise<UpdateOrgIDPJWTConfigResponse.AsObject> {
-    return this.grpcService.mgmt.updateOrgIDPJWTConfig(req, null).then((resp) => resp.toObject());
-  }
-
   //   idp templates
 
   public addGoogleProvider(req: AddGoogleProviderRequest): Promise<AddGoogleProviderResponse.AsObject> {
@@ -889,6 +855,16 @@ export class ManagementService {
 
   public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOIDCProvider(
+    req: UpdateGenericOIDCProviderRequest,
+  ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
   }
 
   public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {

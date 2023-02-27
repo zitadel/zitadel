@@ -21,15 +21,6 @@
         </cnsl-form-field>
       </div>
 
-      <cnsl-info-section class="auto-reg-info">
-        <div>
-          <p class="auto-reg-desc">{{ 'IDP.AUTOREGISTER_DESC' | translate }}</p>
-          <mat-checkbox formControlName="autoRegister">
-            {{ 'IDP.AUTOREGISTER' | translate }}
-          </mat-checkbox>
-        </div>
-      </cnsl-info-section>
-
       <div class="oidc-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
@@ -39,8 +30,6 @@
           <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientSecret" />
         </cnsl-form-field>
-      </div>
-      <div class="oidc-content">
         <cnsl-card class="scope-card">
           <div class="idp-scopes">
             <div class="flex-line">
@@ -75,24 +64,6 @@
             </cnsl-form-field>
           </div>
         </cnsl-card>
-      </div>
-      <div class="oidc-content">
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</cnsl-label>
-          <mat-select formControlName="idpDisplayNameMapping">
-            <mat-option *ngFor="let field of mappingFields" [value]="field">
-              {{ 'IDP.MAPPINGFIELD.' + field | translate }}
-            </mat-option>
-          </mat-select>
-        </cnsl-form-field>
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</cnsl-label>
-          <mat-select formControlName="usernameMapping">
-            <mat-option *ngFor="let field of mappingFields" [value]="field">
-              {{ 'IDP.MAPPINGFIELD.' + field | translate }}
-            </mat-option>
-          </mat-select>
-        </cnsl-form-field>
       </div>
 
       <div class="oidc-create-actions">
