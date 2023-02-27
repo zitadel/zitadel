@@ -14,7 +14,7 @@ type OAuthIDPAddedEvent struct {
 
 	ID                    string              `json:"id"`
 	Name                  string              `json:"name,omitempty"`
-	ClientID              string              `json:"clientID,omitempty"`
+	ClientID              string              `json:"clientId,omitempty"`
 	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	AuthorizationEndpoint string              `json:"authorizationEndpoint,omitempty"`
 	TokenEndpoint         string              `json:"tokenEndpoint,omitempty"`
@@ -75,7 +75,7 @@ type OAuthIDPChangedEvent struct {
 
 	ID                    string              `json:"id"`
 	Name                  *string             `json:"name,omitempty"`
-	ClientID              *string             `json:"clientID,omitempty"`
+	ClientID              *string             `json:"clientId,omitempty"`
 	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	AuthorizationEndpoint *string             `json:"authorizationEndpoint,omitempty"`
 	TokenEndpoint         *string             `json:"tokenEndpoint,omitempty"`

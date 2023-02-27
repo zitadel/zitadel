@@ -41,7 +41,7 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_templates WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.idp_templates2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -67,7 +67,7 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -99,7 +99,7 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_templates WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_templates2 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -144,7 +144,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"clientID": "client_id",
+	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -169,7 +169,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -188,7 +188,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_oauth (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_oauth (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -213,7 +213,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"clientID": "client_id",
+	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -238,7 +238,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -257,7 +257,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_oauth (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_oauth (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -282,7 +282,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
-	"clientID": "id"
+	"clientId": "id"
 }`),
 				), instance.OAuthIDPChangedEventMapper),
 			},
@@ -294,7 +294,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -304,7 +304,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_oauth SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates2_oauth SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"id",
 								"idp-id",
@@ -324,7 +324,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"clientID": "client_id",
+	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -349,7 +349,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								true,
@@ -363,7 +363,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_oauth SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) = ($1, $2, $3, $4, $5, $6) WHERE (idp_id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates2_oauth SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) = ($1, $2, $3, $4, $5, $6) WHERE (idp_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
@@ -413,7 +413,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
-	"clientID": "client_id",
+	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -435,7 +435,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -454,7 +454,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_google (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_google (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -475,7 +475,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 					org.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
-	"clientID": "client_id",
+	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -497,7 +497,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -516,7 +516,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_google (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_google (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -538,7 +538,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
-	"clientID": "id"
+	"clientId": "id"
 }`),
 				), instance.GoogleIDPChangedEventMapper),
 			},
@@ -550,7 +550,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -560,7 +560,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_google SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates2_google SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"id",
 								"idp-id",
@@ -579,7 +579,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
-	"clientID": "client_id",
+	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -601,7 +601,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								true,
 								true,
@@ -614,7 +614,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_google SET (client_id, client_secret, scopes) = ($1, $2, $3) WHERE (idp_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2_google SET (client_id, client_secret, scopes) = ($1, $2, $3) WHERE (idp_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
@@ -702,7 +702,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -721,7 +721,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_ldap (idp_id, instance_id, host, port, tls, base_dn, user_object_class, user_unique_attribute, admin, password, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_ldap (idp_id, instance_id, host, port, tls, base_dn, user_object_class, user_unique_attribute, admin, password, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -801,7 +801,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -820,7 +820,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_ldap (idp_id, instance_id, host, port, tls, base_dn, user_object_class, user_unique_attribute, admin, password, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_ldap (idp_id, instance_id, host, port, tls, base_dn, user_object_class, user_unique_attribute, admin, password, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -872,7 +872,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								anyArg{},
@@ -882,7 +882,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_ldap SET host = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates2_ldap SET host = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"host",
 								"idp-id",
@@ -942,7 +942,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								true,
@@ -956,7 +956,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_ldap SET (host, port, tls, base_dn, user_object_class, user_unique_attribute, admin, password, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) WHERE (idp_id = $22) AND (instance_id = $23)",
+							expectedStmt: "UPDATE projections.idp_templates2_ldap SET (host, port, tls, base_dn, user_object_class, user_unique_attribute, admin, password, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) WHERE (idp_id = $22) AND (instance_id = $23)",
 							expectedArgs: []interface{}{
 								"host",
 								"port",
@@ -1004,7 +1004,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1052,7 +1052,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
-	"clientID": "client_id",
+	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -1074,7 +1074,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1093,7 +1093,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -1116,7 +1116,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
-	"clientID": "client_id",
+	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -1138,7 +1138,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1157,7 +1157,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -1180,7 +1180,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
-	"clientID": "id"
+	"clientId": "id"
 }`),
 				), instance.OIDCIDPChangedEventMapper),
 			},
@@ -1192,7 +1192,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -1202,7 +1202,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_oidc SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates2_oidc SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"id",
 								"idp-id",
@@ -1222,7 +1222,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
-	"clientID": "client_id",
+	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
@@ -1244,7 +1244,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								true,
 								true,
@@ -1257,7 +1257,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_oidc SET (client_id, client_secret, issuer, scopes) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.idp_templates2_oidc SET (client_id, client_secret, issuer, scopes) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
@@ -1324,7 +1324,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1343,7 +1343,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -1384,7 +1384,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1403,7 +1403,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -1438,7 +1438,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -1448,7 +1448,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_jwt SET jwt_endpoint = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates2_jwt SET jwt_endpoint = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"jwt",
 								"idp-id",
@@ -1486,7 +1486,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								true,
 								true,
@@ -1499,7 +1499,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.idp_templates2_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								"jwt",
 								"keys",

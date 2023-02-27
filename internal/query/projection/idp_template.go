@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTemplateTable       = "projections.idp_templates"
+	IDPTemplateTable       = "projections.idp_templates2"
 	IDPTemplateOAuthTable  = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateOIDCTable   = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable    = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
