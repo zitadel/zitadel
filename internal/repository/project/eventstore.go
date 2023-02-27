@@ -32,6 +32,10 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, ApplicationRemovedType, ApplicationRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, ApplicationDeactivatedType, ApplicationDeactivatedEventMapper).
 		RegisterFilterEventMapper(AggregateType, ApplicationReactivatedType, ApplicationReactivatedEventMapper).
+		RegisterFilterEventMapper(AggregateType, ApplicationLightIconAddedType, ApplicationLightIconAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, ApplicationDarkIconAddedType, ApplicationDarkIconAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, ApplicationLightIconRemovedType, ApplicationDarkIconRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, ApplicationDarkIconRemovedType, ApplicationDarkIconRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, OIDCConfigAddedType, OIDCConfigAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, OIDCConfigChangedType, OIDCConfigChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, OIDCConfigSecretChangedType, OIDCConfigSecretChangedEventMapper).

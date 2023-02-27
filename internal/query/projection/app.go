@@ -24,6 +24,8 @@ const (
 	AppColumnName          = "name"
 	AppColumnExternalURL = "external_url"
 	AppColumnIsVisibleToEndUser = "is_visible_to_end_user"
+	AppColumnLightIconURL  = "light_icon_url"
+	AppColumnDarkIconURL  = "dark_icon_url"
 	AppColumnProjectID     = "project_id"
 	AppColumnCreationDate  = "creation_date"
 	AppColumnChangeDate    = "change_date"
@@ -82,6 +84,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnName, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnExternalURL, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnIsVisibleToEndUser, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(AppColumnLightIconURL, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnDarkIconURL, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnProjectID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(AppColumnChangeDate, crdb.ColumnTypeTimestamp),
@@ -209,6 +213,22 @@ func (p *appProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.SAMLConfigChangedType,
 					Reduce: p.reduceSAMLConfigChanged,
+				},
+				{
+					Event:  project.ApplicationLightIconAddedType,
+					Reduce: p.reduceIconAdded,
+				},
+				{
+					Event:  project.ApplicationLightIconRemovedType,
+					Reduce: p.reduceIconRemoved,
+				},
+				{
+					Event:  project.ApplicationDarkIconAddedType,
+					Reduce: p.reduceIconAdded,
+				},
+				{
+					Event:  project.ApplicationDarkIconRemovedType,
+					Reduce: p.reduceIconRemoved,
 				},
 			},
 		},
@@ -686,4 +706,54 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 			},
 		),
 	), nil
+}
+
+func (p *appProjection) reduceIconAdded(event eventstore.Event) (*handler.Statement, error) {
+	var storeKey handler.Column
+	switch e := event.(type) {
+	case *project.ApplicationLightIconAddedEvent:
+		storeKey = handler.NewCol(AppColumnLightIconURL, e.StoreKey)
+	case *project.ApplicationDarkIconAddedEvent:
+		storeKey = handler.NewCol(AppColumnDarkIconURL, e.StoreKey)
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-e2JFz", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconAddedEventType, instance.LabelPolicyIconAddedEventType, org.LabelPolicyIconDarkAddedEventType, instance.LabelPolicyIconDarkAddedEventType})
+	}
+
+	return crdb.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(AppColumnChangeDate, event.CreationDate()),
+			handler.NewCol(AppColumnSequence, event.Sequence()),
+			storeKey,
+		},
+		[]handler.Condition{
+			handler.NewCond(AppColumnID, event.Aggregate().ID),
+			handler.NewCond(AppColumnState, domain.LabelPolicyStatePreview),
+			handler.NewCond(AppColumnInstanceID, event.Aggregate().InstanceID),
+		}), nil
+}
+
+func (p *appProjection) reduceIconRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var col string
+	switch event.(type) {
+	case *project.ApplicationLightIconRemovedEvent:
+		col = AppColumnLightIconURL
+	case  *project.ApplicationDarkIconRemovedEvent:
+		col = AppColumnDarkIconURL
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gfgbY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconRemovedEventType, instance.LabelPolicyIconRemovedEventType, org.LabelPolicyIconDarkRemovedEventType, instance.LabelPolicyIconDarkRemovedEventType})
+	}
+
+	return crdb.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(AppColumnChangeDate, event.CreationDate()),
+			handler.NewCol(AppColumnSequence, event.Sequence()),
+			handler.NewCol(col, nil),
+		},
+		[]handler.Condition{
+			handler.NewCond(AppColumnID, event.Aggregate().ID),
+			handler.NewCond(AppColumnState, domain.LabelPolicyStatePreview),
+			handler.NewCond(AppColumnInstanceID, event.Aggregate().InstanceID),
+		}), nil
 }

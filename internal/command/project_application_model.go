@@ -14,6 +14,8 @@ type ApplicationWriteModel struct {
 	Name  string
 	ExternalURL string
 	IsVisibleToEndUser bool
+	LightIconURL string
+	DarkIconURL string
 }
 
 func NewApplicationWriteModelWithAppIDC(projectID, appID, resourceOwner string) *ApplicationWriteModel {

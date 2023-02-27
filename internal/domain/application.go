@@ -7,6 +7,8 @@ type Application interface {
 	GetApplicationName() string
 	GetApplicationExternalURL() string
 	GetApplicationIsVisibleToEndUser() bool
+	GetApplicationLightIcon() string
+	GetApplicationDarkIcon() string
 	GetState() AppState
 	//GetSequence() uint64
 	//GetChangeDate() time.Time
@@ -30,7 +32,9 @@ type ChangeApp struct {
 	AppID   string
 	AppName string
 	ExternalURL string
-	IsVisibleToEndUser bool
+	IsVisibleToEndUser bool	
+	LightIconURL string
+	DarkIconURL string
 	State   AppState
 }
 
@@ -48,6 +52,14 @@ func (a *ChangeApp) GetApplicationExternalURL() string {
 
 func (a *ChangeApp) GetApplicationIsVisibleToEndUser() bool {
 	return a.IsVisibleToEndUser
+}
+
+func (a *ChangeApp) GetApplicationLightIcon() string {
+	return a.LightIconURL
+}
+
+func (a *ChangeApp) GetApplicationDarkIcon() string {
+	return a.DarkIconURL
 }
 
 func (a *ChangeApp) GetState() AppState {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/asset"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -19,6 +20,10 @@ const (
 	ApplicationDeactivatedType = applicationEventTypePrefix + "deactivated"
 	ApplicationReactivatedType = applicationEventTypePrefix + "reactivated"
 	ApplicationRemovedType     = applicationEventTypePrefix + "removed"
+	ApplicationLightIconAddedType = applicationEventTypePrefix + "light theme icon added"
+	ApplicationLightIconRemovedType = applicationEventTypePrefix + "light theme icon removed"
+	ApplicationDarkIconAddedType = applicationEventTypePrefix + "dark theme icon added"
+	ApplicationDarkIconRemovedType = applicationEventTypePrefix + "dark theme icon removed"
 )
 
 func NewAddApplicationUniqueConstraint(name, projectID string) *eventstore.EventUniqueConstraint {
@@ -68,6 +73,7 @@ func NewApplicationAddedEvent(
 		Name:  name,
 		ExternalURL: externalURL,
 		IsVisibleToEndUser: isVisibleToEndUser,
+
 	}
 }
 
@@ -275,4 +281,125 @@ func ApplicationRemovedEventMapper(event *repository.Event) (eventstore.Event, e
 	}
 
 	return e, nil
+}
+
+type ApplicationLightIconAddedEvent struct {
+	asset.AddedEvent
+}
+
+func NewApplicationLightIconAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate, 
+	storageKey string,
+) *ApplicationLightIconAddedEvent {
+	return &ApplicationLightIconAddedEvent{
+		*asset.NewAddedEvent(eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				ApplicationLightIconAddedType), storageKey),
+	}
+}
+
+func ApplicationLightIconAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := asset.AddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ApplicationLightIconAddedEvent{*e.(*asset.AddedEvent)}, nil
+}
+
+type ApplicationLightIconRemovedEvent struct {
+	asset.RemovedEvent
+}
+
+func (e *ApplicationLightIconRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *ApplicationLightIconRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewApplicationLightIconRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate, 
+	storageKey string,
+) *ApplicationLightIconRemovedEvent {
+	return &ApplicationLightIconRemovedEvent{
+		*asset.NewRemovedEvent(eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			ApplicationLightIconRemovedType), storageKey),
+	}
+}
+
+func ApplicationIconRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := asset.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ApplicationDarkIconRemovedEvent{*e.(*asset.RemovedEvent)}, nil
+}
+
+
+type ApplicationDarkIconAddedEvent struct {
+	asset.AddedEvent
+}
+
+func NewApplicationDarkIconAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate, 
+	storageKey string,
+) *ApplicationLightIconAddedEvent {
+	return &ApplicationLightIconAddedEvent{
+		*asset.NewAddedEvent(eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				ApplicationDarkIconAddedType), storageKey),
+	}
+}
+
+func ApplicationDarkIconAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := asset.AddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ApplicationDarkIconAddedEvent{*e.(*asset.AddedEvent)}, nil
+}
+
+type ApplicationDarkIconRemovedEvent struct {
+	asset.RemovedEvent
+}
+
+func (e *ApplicationDarkIconRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *ApplicationDarkIconRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewApplicationDarkIconRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate, 
+	storageKey string,
+) *ApplicationLightIconRemovedEvent {
+	return &ApplicationLightIconRemovedEvent{
+		*asset.NewRemovedEvent(eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			ApplicationDarkIconRemovedType), storageKey),
+	}
+}
+
+func ApplicationDarkIconRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := asset.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ApplicationDarkIconRemovedEvent{*e.(*asset.RemovedEvent)}, nil
 }

@@ -19,6 +19,8 @@ var (
 		` projections.apps5.name,` +
 		` projections.apps5.external_url,` +
 		` projections.apps5.is_visible_to_end_user,` +
+		` projections.apps5.light_icon_url,` +
+		` projections.apps5.dark_icon_url,` +
 		` projections.apps5.project_id,` +
 		` projections.apps5.creation_date,` +
 		` projections.apps5.change_date,` +
@@ -59,6 +61,8 @@ var (
 		` projections.apps5.name,` +
 		` projections.apps5.external_url,` +
 		` projections.apps5.is_visible_to_end_user,` +
+		` projections.apps5.light_icon_url,` +
+		` projections.apps5.dark_icon_url,` +
 		` projections.apps5.project_id,` +
 		` projections.apps5.creation_date,` +
 		` projections.apps5.change_date,` +
@@ -128,6 +132,8 @@ var (
 		"name",
 		"external_url",
 		"is_visible_to_end_user",
+		"light_icon_url",
+		"dark_icon_url",
 		"project_id",
 		"creation_date",
 		"change_date",
@@ -200,6 +206,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -251,6 +259,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ExternalURL: "external-url",
 						IsVisibleToEndUser: false,
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						ProjectID:     "project-id",
 					},
 				},
@@ -269,6 +279,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -320,6 +332,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ExternalURL: "external-url",
 						IsVisibleToEndUser: false,
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						ProjectID:     "project-id",
 						APIConfig: &APIApp{
 							ClientID:       "api-client-id",
@@ -341,6 +355,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -392,6 +408,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ExternalURL: "external-url",
 						IsVisibleToEndUser: false,
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						ProjectID:     "project-id",
 						SAMLConfig: &SAMLApp{
 							Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
@@ -415,6 +433,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -466,6 +486,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ExternalURL: "external-url",
 						IsVisibleToEndUser: false,
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -503,6 +525,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -554,6 +578,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ExternalURL: "external-url",
 						IsVisibleToEndUser: false,
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -591,6 +617,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -642,6 +670,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ExternalURL: "external-url",
 						IsVisibleToEndUser: false,
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -679,6 +709,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -730,6 +762,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ExternalURL: "external-url",
 						IsVisibleToEndUser: false,
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
 							Version:                domain.OIDCVersionV1,
@@ -767,6 +801,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -817,6 +853,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Sequence:      20211109,
 						Name:          "app-name",
 						ExternalURL: "external-url",
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
@@ -855,6 +893,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -893,6 +933,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -931,6 +973,8 @@ func Test_AppsPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -981,6 +1025,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Sequence:      20211109,
 						Name:          "app-name",
 						ExternalURL: "external-url",
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						IsVisibleToEndUser: false,
 						ProjectID:     "project-id",
 						OIDCConfig: &OIDCApp{
@@ -1013,6 +1059,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ExternalURL: "external-url",
 						IsVisibleToEndUser: false,
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						ProjectID:     "project-id",
 						APIConfig: &APIApp{
 							ClientID:       "api-client-id",
@@ -1029,6 +1077,8 @@ func Test_AppsPrepare(t *testing.T) {
 						Name:          "app-name",
 						ExternalURL: "external-url",
 						IsVisibleToEndUser: false,
+						LightIconURL: "light-icon",
+						DarkIconURL: "dark-icon",
 						ProjectID:     "project-id",
 						SAMLConfig: &SAMLApp{
 							Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
@@ -1105,6 +1155,8 @@ func Test_AppPrepare(t *testing.T) {
 						"app-name",
 						"external-url",
 						false,
+						"light-icon",
+						"dark-icon",
 						"project-id",
 						testNow,
 						testNow,
@@ -1150,6 +1202,8 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ExternalURL: "external-url",
 				IsVisibleToEndUser: false,
+				LightIconURL: "light-icon",
+				DarkIconURL: "dark-icon",
 				ProjectID:     "project-id",
 			},
 		},
@@ -1166,6 +1220,8 @@ func Test_AppPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -1212,6 +1268,8 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ExternalURL: "external-url",
 				IsVisibleToEndUser: false,
+				LightIconURL: "light-icon",
+				DarkIconURL: "dark-icon",
 				ProjectID:     "project-id",
 				APIConfig: &APIApp{
 					ClientID:       "api-client-id",
@@ -1232,6 +1290,8 @@ func Test_AppPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -1278,6 +1338,8 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ExternalURL: "external-url",
 				IsVisibleToEndUser: false,
+				LightIconURL: "light-icon",
+				DarkIconURL: "dark-icon",
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,
@@ -1312,6 +1374,8 @@ func Test_AppPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -1358,6 +1422,8 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ExternalURL: "external-url",
 				IsVisibleToEndUser: false,
+				LightIconURL: "light-icon",
+				DarkIconURL: "dark-icon",
 				ProjectID:     "project-id",
 				SAMLConfig: &SAMLApp{
 					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
@@ -1379,6 +1445,8 @@ func Test_AppPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -1425,6 +1493,8 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ExternalURL: "external-url",
 				IsVisibleToEndUser: false,
+				LightIconURL: "light-icon",
+				DarkIconURL: "dark-icon",
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,
@@ -1460,6 +1530,8 @@ func Test_AppPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -1506,6 +1578,8 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ExternalURL: "external-url",
 				IsVisibleToEndUser: false,
+				LightIconURL: "light-icon",
+				DarkIconURL: "dark-icon",
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,
@@ -1541,6 +1615,8 @@ func Test_AppPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -1587,6 +1663,8 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ExternalURL: "external-url",
 				IsVisibleToEndUser: false,
+				LightIconURL: "light-icon",
+				DarkIconURL: "dark-icon",
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,
@@ -1622,6 +1700,8 @@ func Test_AppPrepare(t *testing.T) {
 							"app-name",
 							"external-url",
 							false,
+							"light-icon",
+							"dark-icon",
 							"project-id",
 							testNow,
 							testNow,
@@ -1668,6 +1748,8 @@ func Test_AppPrepare(t *testing.T) {
 				Name:          "app-name",
 				ExternalURL: "external-url",
 				IsVisibleToEndUser: false,
+				LightIconURL: "light-icon",
+				DarkIconURL: "dark-icon",
 				ProjectID:     "project-id",
 				OIDCConfig: &OIDCApp{
 					Version:                domain.OIDCVersionV1,

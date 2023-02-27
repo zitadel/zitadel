@@ -38,6 +38,10 @@ func GetHumanAvatarAssetPath(userID string) string {
 	return UsersAssetPath + "/" + userID + AvatarAssetPath
 }
 
+func GetApplicationIconAssetPath(projectID string, appID string) string {
+	return "projects/" + projectID + "/apps/" + appID + "/icon"
+}
+
 func AssetURL(prefix, resourceOwner, key string) string {
 	if prefix == "" || resourceOwner == "" || key == "" {
 		return ""

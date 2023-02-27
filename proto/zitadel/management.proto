@@ -1484,6 +1484,30 @@ service ManagementService {
         };
     }
 
+    // Removes the icon of the application
+    rpc RemoveApplicationLightIcon(RemoveApplicationLightIconRequest) returns (RemoveApplicationLightIconResponse) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/apps/{app_id}/app_light_icon"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.app.write"
+            check_field_name: "ProjectId"
+        };
+    }
+
+    // Removes the icon of the application for dark theme
+    rpc RemoveApplicationDarkIcon(RemoveApplicationDarkIconRequest) returns (RemoveApplicationDarkIconResponse) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/apps/{app_id}/app_dark_icon"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.app.write"
+            check_field_name: "ProjectId"
+        };
+    }
+
     // Set the state to deactivated
     // Its not possible to request tokens for deactivated apps
     // Returns an error if already deactivated
@@ -4412,6 +4436,24 @@ message UpdateAppRequest {
 }
 
 message UpdateAppResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveApplicationLightIconRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveApplicationLightIconResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveApplicationDarkIconRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveApplicationDarkIconResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

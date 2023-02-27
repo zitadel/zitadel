@@ -1438,6 +1438,30 @@ Changes the configuration of the api application
     PUT: /projects/{project_id}/apps/{app_id}/api_config
 
 
+### RemoveApplicationLightIcon
+
+> **rpc** RemoveApplicationLightIcon([RemoveApplicationLightIconRequest](#removeapplicationlighticonrequest))
+[RemoveApplicationLightIconResponse](#removeapplicationlighticonresponse)
+
+Removes the icon of the application
+
+
+
+    DELETE: /projects/{project_id}/apps/{app_id}/app_light_icon
+
+
+### RemoveApplicationDarkIcon
+
+> **rpc** RemoveApplicationDarkIcon([RemoveApplicationDarkIconRequest](#removeapplicationdarkiconrequest))
+[RemoveApplicationDarkIconResponse](#removeapplicationdarkiconresponse)
+
+Removes the icon of the application for dark theme
+
+
+
+    DELETE: /projects/{project_id}/apps/{app_id}/app_dark_icon
+
+
 ### DeactivateApp
 
 > **rpc** DeactivateApp([DeactivateAppRequest](#deactivateapprequest))
@@ -7124,6 +7148,52 @@ This is an empty request
 
 
 ### RemoveAppResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveApplicationDarkIconRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveApplicationDarkIconResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveApplicationLightIconRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveApplicationLightIconResponse
 
 
 

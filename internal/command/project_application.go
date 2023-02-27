@@ -27,6 +27,11 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
 	}
 
+	externalURL := appChange.GetApplicationExternalURL()
+	if externalURL != "" && !domain.IsValidURL(externalURL) {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-7x8jP", "Errors.Project.App.Invalid")
+	}
+
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appChange.GetAppID(), resourceOwner)
 	if err != nil {
 		return nil, err
