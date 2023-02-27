@@ -166,7 +166,7 @@ DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zit
 (cd ./e2e && npm run lint:fix)
 
 # Run the tests
-ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/docker-compose.yaml run e2e
+ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/docker-compose.yaml run --service-ports e2e
 ```
 
 #### Running the tests without docker

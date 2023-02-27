@@ -49,7 +49,7 @@ jobs:
       - name: Build Docker Image
         run: docker build -t zitadel:pr --file build/Dockerfile .artifacts/zitadel
       - name: Run E2E Tests
-        run: docker compose run e2e --browser chrome
+        run: docker compose run --service-ports e2e --browser chrome
         working-directory: e2e/config/host.docker.internal
         env:
           ZITADEL_IMAGE: zitadel:pr

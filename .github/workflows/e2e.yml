@@ -40,7 +40,7 @@ jobs:
           driver: docker
           install: true
       - name: Test ${{ matrix.browser }}
-        run: docker compose run e2e --browser ${{ matrix.browser }}
+        run: docker compose run --service-ports e2e --browser ${{ matrix.browser }}
         working-directory: e2e/config/host.docker.internal
       - name: Ensure Artifacts Directory Exists
         run: mkdir -p ./.artifacts
