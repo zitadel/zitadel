@@ -6188,7 +6188,6 @@ service ManagementService {
         };
     }
 
-    // Returns a identity provider configuration of the organization
     rpc GetOrgIDPByID(GetOrgIDPByIDRequest) returns (GetOrgIDPByIDResponse) {
         option (google.api.http) = {
             get: "/idps/{id}"
@@ -6197,10 +6196,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Get Identity Provider (IDP) by ID";
+            description: "Returns an identity provider (social/enterprise login) by its ID e.g Google, AzureAD, etc that is configured on the organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all identity provider configurations in the organization, which match the query
-    // Limit should always be set, there is a default limit set by the service
     rpc ListOrgIDPs(ListOrgIDPsRequest) returns (ListOrgIDPsResponse) {
         option (google.api.http) = {
             post: "/idps/_search"
@@ -6210,10 +6221,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Search Identity Providers (IDPs)";
+            description: "Returns a list of identity providers (social/enterprise login) configured on the organization. e.g Google, AzureAD, etc."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Add a new identity provider configuration in the organization
-    // Provider must be OIDC compliant
     rpc AddOrgOIDCIDP(AddOrgOIDCIDPRequest) returns (AddOrgOIDCIDPResponse) {
         option (google.api.http) = {
             post: "/idps/oidc"
@@ -6223,9 +6246,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add OIDC Identity Provider (IDP)";
+            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. The provider has to be OIDC compliant. This configuration can only be used by the organization itself."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Add a new jwt identity provider configuration in the organization
     rpc AddOrgJWTIDP(AddOrgJWTIDPRequest) returns (AddOrgJWTIDPResponse) {
         option (google.api.http) = {
             post: "/idps/jwt"
@@ -6235,11 +6271,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add JWT Identity Provider (IDP)";
+            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Deactivate identity provider configuration
-    // Users will not be able to use this provider for login (e.g Google, Microsoft, AD, etc)
-    // Returns error if already deactivated
     rpc DeactivateOrgIDP(DeactivateOrgIDPRequest) returns (DeactivateOrgIDPResponse) {
         option (google.api.http) = {
             post: "/idps/{idp_id}/_deactivate"
@@ -6249,10 +6296,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Deactivate Identity Provider (IDP)";
+            description: "Sets the state of the provider to inactive. It can only be called for the provider with the state active. Users will not be able to log in with the given provider afterward. It might cause troubles if it is the only authentication method of the user."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Activate identity provider configuration
-    // Returns error if not deactivated
     rpc ReactivateOrgIDP(ReactivateOrgIDPRequest) returns (ReactivateOrgIDPResponse) {
         option (google.api.http) = {
             post: "/idps/{idp_id}/_reactivate"
@@ -6262,10 +6321,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Reactivate Identity Provider (IDP)";
+            description: "Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to log in again with the given provider."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes identity provider configuration
-    // Will remove all linked providers of this configuration on the users
     rpc RemoveOrgIDP(RemoveOrgIDPRequest) returns (RemoveOrgIDPResponse) {
         option (google.api.http) = {
             delete: "/idps/{idp_id}"
@@ -6274,9 +6345,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Remove Identity Provider (IDP)";
+            description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to log in with the provider afterward. If it is their only authentication possibility it might cause problems."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Change the identity provider configuration of the organization
     rpc UpdateOrgIDP(UpdateOrgIDPRequest) returns (UpdateOrgIDPResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}"
@@ -6286,9 +6370,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update Identity Provider (IDP)";
+            description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Change the OIDC identity provider configuration of the organization
     rpc UpdateOrgIDPOIDCConfig(UpdateOrgIDPOIDCConfigRequest) returns (UpdateOrgIDPOIDCConfigResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}/oidc_config"
@@ -6298,9 +6395,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update OIDC Identity Provider (IDP)";
+            description: "Update the OIDC-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Change the JWT identity provider configuration of the organization
     rpc UpdateOrgIDPJWTConfig(UpdateOrgIDPJWTConfigRequest) returns (UpdateOrgIDPJWTConfigResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}/jwt_config"
@@ -6309,6 +6419,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update JWT Identity Provider (IDP)";
+            description: "Update the JWT-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -10342,8 +10466,11 @@ message ListOrgIDPsResponse {
 message AddOrgOIDCIDPRequest {
     string name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"google\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     zitadel.idp.v1.IDPStylingType styling_type = 2 [
@@ -10355,18 +10482,25 @@ message AddOrgOIDCIDPRequest {
 
     string client_id = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "client id generated by the identity provider";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string client_secret = 4 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "client secret generated by the identity provider";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string issuer = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the OIDC issuer of the identity provider";
@@ -10395,14 +10529,21 @@ message AddOrgOIDCIDPRequest {
 
 message AddOrgOIDCIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
-    string idp_id = 2;
+    string idp_id = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69234230193872955\"";
+        }
+    ];
 }
 
 message AddOrgJWTIDPRequest {
     string name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"google\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     zitadel.idp.v1.IDPStylingType styling_type = 2 [
@@ -10413,6 +10554,7 @@ message AddOrgJWTIDPRequest {
     ];
     string jwt_endpoint = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the endpoint where the JWT can be extracted";
@@ -10422,6 +10564,7 @@ message AddOrgJWTIDPRequest {
     ];
     string issuer = 4 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the issuer of the JWT (for validation)";
@@ -10431,6 +10574,7 @@ message AddOrgJWTIDPRequest {
     ];
     string keys_endpoint = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/keys\"";
             description: "the endpoint to the key (JWK) which is used to sign the JWT with";
@@ -10440,9 +10584,11 @@ message AddOrgJWTIDPRequest {
     ];
     string header_name = 6 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"x-auth-token\"";
             description: "the name of the header where the JWT is sent in, default is authorization";
+            min_length: 1;
             max_length: 200;
         }
     ];
@@ -10451,7 +10597,11 @@ message AddOrgJWTIDPRequest {
 
 message AddOrgJWTIDPResponse {
     zitadel.v1.ObjectDetails details = 1;
-    string idp_id = 2;
+    string idp_id = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69234230193872955\"";
+        }
+    ];
 }
 
 message DeactivateOrgIDPRequest {
@@ -10481,8 +10631,11 @@ message UpdateOrgIDPRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"google\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     zitadel.idp.v1.IDPStylingType styling_type = 3 [
@@ -10508,8 +10661,11 @@ message UpdateOrgIDPOIDCConfigRequest {
 
     string client_id = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "client id generated by the identity provider";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     string client_secret = 3 [
@@ -10520,9 +10676,12 @@ message UpdateOrgIDPOIDCConfigRequest {
     ];
     string issuer = 4 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the OIDC issuer of the identity provider";
+            min_length: 1;
+            max_length: 200;
         }
     ];
     repeated string scopes = 5 [
@@ -10559,6 +10718,7 @@ message UpdateOrgIDPJWTConfigRequest {
     ];
     string jwt_endpoint = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the endpoint where the JWT can be extracted";
@@ -10568,6 +10728,7 @@ message UpdateOrgIDPJWTConfigRequest {
     ];
     string issuer = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
             description: "the issuer of the JWT (for validation)";
@@ -10577,6 +10738,7 @@ message UpdateOrgIDPJWTConfigRequest {
     ];
     string keys_endpoint = 4 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/keys\"";
             description: "the endpoint to the key (JWK) which is used to sign the JWT with";
@@ -10586,6 +10748,7 @@ message UpdateOrgIDPJWTConfigRequest {
     ];
     string header_name = 5 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"x-auth-token\"";
             description: "the name of the header where the JWT is sent in, default is authorization";
