@@ -199,6 +199,48 @@ func (s *Server) UpdateGenericOAuthProvider(ctx context.Context, req *admin_pb.U
 	}, nil
 }
 
+func (s *Server) AddGenericOIDCProvider(ctx context.Context, req *admin_pb.AddGenericOIDCProviderRequest) (*admin_pb.AddGenericOIDCProviderResponse, error) {
+	id, details, err := s.command.AddInstanceGenericOIDCProvider(ctx, addGenericOIDCProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGenericOIDCProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGenericOIDCProvider(ctx context.Context, req *admin_pb.UpdateGenericOIDCProviderRequest) (*admin_pb.UpdateGenericOIDCProviderResponse, error) {
+	details, err := s.command.UpdateInstanceGenericOIDCProvider(ctx, req.Id, updateGenericOIDCProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGenericOIDCProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddJWTProvider(ctx context.Context, req *admin_pb.AddJWTProviderRequest) (*admin_pb.AddJWTProviderResponse, error) {
+	id, details, err := s.command.AddInstanceJWTProvider(ctx, addJWTProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddJWTProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateJWTProvider(ctx context.Context, req *admin_pb.UpdateJWTProviderRequest) (*admin_pb.UpdateJWTProviderResponse, error) {
+	details, err := s.command.UpdateInstanceJWTProvider(ctx, req.Id, updateJWTProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateJWTProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddGoogleProvider(ctx context.Context, req *admin_pb.AddGoogleProviderRequest) (*admin_pb.AddGoogleProviderResponse, error) {
 	id, details, err := s.command.AddInstanceGoogleProvider(ctx, addGoogleProviderToCommand(req))
 	if err != nil {

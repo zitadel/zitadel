@@ -14,7 +14,7 @@ type GoogleIDPAddedEvent struct {
 
 	ID           string              `json:"id"`
 	Name         string              `json:"name,omitempty"`
-	ClientID     string              `json:"clientID"`
+	ClientID     string              `json:"clientId"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
 	Scopes       []string            `json:"scopes,omitempty"`
 	Options
@@ -66,7 +66,7 @@ type GoogleIDPChangedEvent struct {
 
 	ID           string              `json:"id"`
 	Name         *string             `json:"name,omitempty"`
-	ClientID     *string             `json:"clientID,omitempty"`
+	ClientID     *string             `json:"clientId,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	Scopes       []string            `json:"scopes,omitempty"`
 	OptionChanges
