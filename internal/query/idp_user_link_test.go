@@ -14,14 +14,14 @@ import (
 var (
 	idpUserLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_user_links3.idp_id,` +
 		` projections.idp_user_links3.user_id,` +
-		` projections.idp_templates.name,` +
+		` projections.idp_templates2.name,` +
 		` projections.idp_user_links3.external_user_id,` +
 		` projections.idp_user_links3.display_name,` +
-		` projections.idp_templates.type,` +
+		` projections.idp_templates2.type,` +
 		` projections.idp_user_links3.resource_owner,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_user_links3` +
-		` LEFT JOIN projections.idp_templates ON projections.idp_user_links3.idp_id = projections.idp_templates.id`)
+		` LEFT JOIN projections.idp_templates2 ON projections.idp_user_links3.idp_id = projections.idp_templates2.id`)
 	idpUserLinksCols = []string{
 		"idp_id",
 		"user_id",
