@@ -19,7 +19,7 @@ require (
 	github.com/dop251/goja_nodejs v0.0.0-20220905124449-678b33ca5009
 	github.com/drone/envsubst v1.0.3
 	github.com/duo-labs/webauthn v0.0.0-20211216225436-9a12cd078b8a
-	github.com/envoyproxy/protoc-gen-validate v0.6.7
+	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/go-ldap/ldap/v3 v3.4.4
 	github.com/golang/glog v1.0.0
 	github.com/golang/mock v1.6.0
@@ -30,7 +30,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.1
 	github.com/h2non/gock v1.2.0
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/jackc/pgconn v1.12.1
@@ -58,7 +58,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.3.4
 	github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.8
-	github.com/zitadel/saml v0.0.9
+	github.com/zitadel/saml v0.0.10
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.27.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.27.0
 	go.opentelemetry.io/otel v1.2.0
@@ -71,14 +71,14 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.25.0
 	go.opentelemetry.io/otel/trace v1.2.0
 	golang.org/x/crypto v0.6.0
-	golang.org/x/net v0.6.0
-	golang.org/x/oauth2 v0.4.0
+	golang.org/x/net v0.7.0
+	golang.org/x/oauth2 v0.5.0
 	golang.org/x/sync v0.1.0
 	golang.org/x/text v0.7.0
-	golang.org/x/tools v0.1.13-0.20220928184430-f80e98464e27
-	google.golang.org/api v0.106.0
-	google.golang.org/genproto v0.0.0-20230106154932-a12b697841d9
-	google.golang.org/grpc v1.51.0
+	golang.org/x/tools v0.3.0
+	google.golang.org/api v0.110.0
+	google.golang.org/genproto v0.0.0-20230221151758-ace64dc21148
+	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/square/go-jose.v2 v2.6.0
 	sigs.k8s.io/yaml v1.3.0
@@ -86,9 +86,9 @@ require (
 
 require (
 	cloud.google.com/go v0.108.0 // indirect
-	cloud.google.com/go/compute v1.15.0 // indirect
+	cloud.google.com/go/compute v1.18.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/iam v0.10.0 // indirect
+	cloud.google.com/go/iam v0.11.0 // indirect
 	cloud.google.com/go/trace v1.4.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
@@ -97,7 +97,7 @@ require (
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudflare/cfssl v0.0.0-20190726000631-633726f6bcb7 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
@@ -129,7 +129,7 @@ require (
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.2.1 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
@@ -175,7 +175,7 @@ require (
 	github.com/russellhaering/goxmldsig v1.2.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.0
-	github.com/spf13/afero v1.8.1 // indirect
+	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -189,7 +189,7 @@ require (
 	go.opentelemetry.io/otel/internal/metric v0.25.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.10.0 // indirect
 	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
+	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -200,3 +200,4 @@ require (
 )
 
 replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4
+

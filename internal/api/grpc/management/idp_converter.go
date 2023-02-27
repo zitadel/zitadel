@@ -218,6 +218,96 @@ func providerQueryToQuery(idpQuery *mgmt_pb.ProviderQuery) (query.SearchQuery, e
 	}
 }
 
+func addGenericOAuthProviderToCommand(req *mgmt_pb.AddGenericOAuthProviderRequest) command.GenericOAuthProvider {
+	return command.GenericOAuthProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGenericOAuthProviderToCommand(req *mgmt_pb.UpdateGenericOAuthProviderRequest) command.GenericOAuthProvider {
+	return command.GenericOAuthProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGenericOIDCProviderToCommand(req *mgmt_pb.AddGenericOIDCProviderRequest) command.GenericOIDCProvider {
+	return command.GenericOIDCProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRequest) command.GenericOIDCProvider {
+	return command.GenericOIDCProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addJWTProviderToCommand(req *mgmt_pb.AddJWTProviderRequest) command.JWTProvider {
+	return command.JWTProvider{
+		Name:        req.Name,
+		Issuer:      req.Issuer,
+		JWTEndpoint: req.JwtEndpoint,
+		KeyEndpoint: req.KeysEndpoint,
+		HeaderName:  req.HeaderName,
+		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateJWTProviderToCommand(req *mgmt_pb.UpdateJWTProviderRequest) command.JWTProvider {
+	return command.JWTProvider{
+		Name:        req.Name,
+		Issuer:      req.Issuer,
+		JWTEndpoint: req.JwtEndpoint,
+		KeyEndpoint: req.KeysEndpoint,
+		HeaderName:  req.HeaderName,
+		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGoogleProviderToCommand(req *mgmt_pb.AddGoogleProviderRequest) command.GoogleProvider {
+	return command.GoogleProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGoogleProviderToCommand(req *mgmt_pb.UpdateGoogleProviderRequest) command.GoogleProvider {
+	return command.GoogleProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
 func addLDAPProviderToCommand(req *mgmt_pb.AddLDAPProviderRequest) command.LDAPProvider {
 	return command.LDAPProvider{
 		Name:                req.Name,

@@ -11,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -32,12 +33,49 @@ type IDPTemplate struct {
 	IsLinkingAllowed  bool
 	IsAutoCreation    bool
 	IsAutoUpdate      bool
+	*OAuthIDPTemplate
+	*OIDCIDPTemplate
+	*JWTIDPTemplate
+	*GoogleIDPTemplate
 	*LDAPIDPTemplate
 }
 
 type IDPTemplates struct {
 	SearchResponse
 	Templates []*IDPTemplate
+}
+
+type OAuthIDPTemplate struct {
+	IDPID                 string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	AuthorizationEndpoint string
+	TokenEndpoint         string
+	UserEndpoint          string
+	Scopes                database.StringArray
+}
+
+type OIDCIDPTemplate struct {
+	IDPID        string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Issuer       string
+	Scopes       database.StringArray
+}
+
+type JWTIDPTemplate struct {
+	IDPID        string
+	Issuer       string
+	KeysEndpoint string
+	HeaderName   string
+	Endpoint     string
+}
+
+type GoogleIDPTemplate struct {
+	IDPID        string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.StringArray
 }
 
 type LDAPIDPTemplate struct {
@@ -51,7 +89,6 @@ type LDAPIDPTemplate struct {
 	Admin               string
 	Password            *crypto.CryptoValue
 	idp.LDAPAttributes
-	idp.Options
 }
 
 var (
@@ -118,6 +155,134 @@ var (
 	IDPTemplateIsAutoUpdateCol = Column{
 		name:  projection.IDPTemplateIsAutoUpdateCol,
 		table: idpTemplateTable,
+	}
+)
+
+var (
+	oauthIdpTemplateTable = table{
+		name:          projection.IDPTemplateOAuthTable,
+		instanceIDCol: projection.OAuthInstanceIDCol,
+	}
+	OAuthIDCol = Column{
+		name:  projection.OAuthIDCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthInstanceIDCol = Column{
+		name:  projection.OAuthInstanceIDCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthClientIDCol = Column{
+		name:  projection.OAuthClientIDCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthClientSecretCol = Column{
+		name:  projection.OAuthClientSecretCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthAuthorizationEndpointCol = Column{
+		name:  projection.OAuthAuthorizationEndpointCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthTokenEndpointCol = Column{
+		name:  projection.OAuthTokenEndpointCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthUserEndpointCol = Column{
+		name:  projection.OAuthUserEndpointCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthScopesCol = Column{
+		name:  projection.OAuthScopesCol,
+		table: oauthIdpTemplateTable,
+	}
+)
+
+var (
+	oidcIdpTemplateTable = table{
+		name:          projection.IDPTemplateOIDCTable,
+		instanceIDCol: projection.OIDCInstanceIDCol,
+	}
+	OIDCIDCol = Column{
+		name:  projection.OIDCIDCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCInstanceIDCol = Column{
+		name:  projection.OIDCInstanceIDCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCIssuerCol = Column{
+		name:  projection.OIDCIssuerCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCClientIDCol = Column{
+		name:  projection.OIDCClientIDCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCClientSecretCol = Column{
+		name:  projection.OIDCClientSecretCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCScopesCol = Column{
+		name:  projection.OIDCScopesCol,
+		table: oidcIdpTemplateTable,
+	}
+)
+
+var (
+	jwtIdpTemplateTable = table{
+		name:          projection.IDPTemplateJWTTable,
+		instanceIDCol: projection.JWTInstanceIDCol,
+	}
+	JWTIDCol = Column{
+		name:  projection.JWTIDCol,
+		table: jwtIdpTemplateTable,
+	}
+	JWTInstanceIDCol = Column{
+		name:  projection.JWTInstanceIDCol,
+		table: jwtIdpTemplateTable,
+	}
+	JWTIssuerCol = Column{
+		name:  projection.JWTIssuerCol,
+		table: jwtIdpTemplateTable,
+	}
+	JWTEndpointCol = Column{
+		name:  projection.JWTEndpointCol,
+		table: jwtIdpTemplateTable,
+	}
+	JWTKeysEndpointCol = Column{
+		name:  projection.JWTKeysEndpointCol,
+		table: jwtIdpTemplateTable,
+	}
+	JWTHeaderNameCol = Column{
+		name:  projection.JWTHeaderNameCol,
+		table: jwtIdpTemplateTable,
+	}
+)
+
+var (
+	googleIdpTemplateTable = table{
+		name:          projection.IDPTemplateGoogleTable,
+		instanceIDCol: projection.GoogleInstanceIDCol,
+	}
+	GoogleIDCol = Column{
+		name:  projection.GoogleIDCol,
+		table: googleIdpTemplateTable,
+	}
+	GoogleInstanceIDCol = Column{
+		name:  projection.GoogleInstanceIDCol,
+		table: googleIdpTemplateTable,
+	}
+	GoogleClientIDCol = Column{
+		name:  projection.GoogleClientIDCol,
+		table: googleIdpTemplateTable,
+	}
+	GoogleClientSecretCol = Column{
+		name:  projection.GoogleClientSecretCol,
+		table: googleIdpTemplateTable,
+	}
+	GoogleScopesCol = Column{
+		name:  projection.GoogleScopesCol,
+		table: googleIdpTemplateTable,
 	}
 )
 
@@ -335,6 +500,32 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			// oauth
+			OAuthIDCol.identifier(),
+			OAuthClientIDCol.identifier(),
+			OAuthClientSecretCol.identifier(),
+			OAuthAuthorizationEndpointCol.identifier(),
+			OAuthTokenEndpointCol.identifier(),
+			OAuthUserEndpointCol.identifier(),
+			OAuthScopesCol.identifier(),
+			// oidc
+			OIDCIDCol.identifier(),
+			OIDCIssuerCol.identifier(),
+			OIDCClientIDCol.identifier(),
+			OIDCClientSecretCol.identifier(),
+			OIDCScopesCol.identifier(),
+			// jwt
+			JWTIDCol.identifier(),
+			JWTIssuerCol.identifier(),
+			JWTEndpointCol.identifier(),
+			JWTKeysEndpointCol.identifier(),
+			JWTHeaderNameCol.identifier(),
+			// google
+			GoogleIDCol.identifier(),
+			GoogleClientIDCol.identifier(),
+			GoogleClientSecretCol.identifier(),
+			GoogleScopesCol.identifier(),
+			// ldap
 			LDAPIDCol.identifier(),
 			LDAPHostCol.identifier(),
 			LDAPPortCol.identifier(),
@@ -358,10 +549,41 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			LDAPAvatarURLAttributeCol.identifier(),
 			LDAPProfileAttributeCol.identifier(),
 		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDPTemplate, error) {
 			idpTemplate := new(IDPTemplate)
+
+			name := sql.NullString{}
+
+			oauthID := sql.NullString{}
+			oauthClientID := sql.NullString{}
+			oauthClientSecret := new(crypto.CryptoValue)
+			oauthAuthorizationEndpoint := sql.NullString{}
+			oauthTokenEndpoint := sql.NullString{}
+			oauthUserEndpoint := sql.NullString{}
+			oauthScopes := database.StringArray{}
+
+			oidcID := sql.NullString{}
+			oidcIssuer := sql.NullString{}
+			oidcClientID := sql.NullString{}
+			oidcClientSecret := new(crypto.CryptoValue)
+			oidcScopes := database.StringArray{}
+
+			jwtID := sql.NullString{}
+			jwtIssuer := sql.NullString{}
+			jwtEndpoint := sql.NullString{}
+			jwtKeysEndpoint := sql.NullString{}
+			jwtHeaderName := sql.NullString{}
+
+			googleID := sql.NullString{}
+			googleClientID := sql.NullString{}
+			googleClientSecret := new(crypto.CryptoValue)
+			googleScopes := database.StringArray{}
 
 			ldapID := sql.NullString{}
 			ldapHost := sql.NullString{}
@@ -393,13 +615,39 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&idpTemplate.ChangeDate,
 				&idpTemplate.Sequence,
 				&idpTemplate.State,
-				&idpTemplate.Name,
+				&name,
 				&idpTemplate.Type,
 				&idpTemplate.OwnerType,
 				&idpTemplate.IsCreationAllowed,
 				&idpTemplate.IsLinkingAllowed,
 				&idpTemplate.IsAutoCreation,
 				&idpTemplate.IsAutoUpdate,
+				// oauth
+				&oauthID,
+				&oauthClientID,
+				&oauthClientSecret,
+				&oauthAuthorizationEndpoint,
+				&oauthTokenEndpoint,
+				&oauthUserEndpoint,
+				&oauthScopes,
+				// oidc
+				&oidcID,
+				&oidcIssuer,
+				&oidcClientID,
+				&oidcClientSecret,
+				&oidcScopes,
+				// jwt
+				&jwtID,
+				&jwtIssuer,
+				&jwtEndpoint,
+				&jwtKeysEndpoint,
+				&jwtHeaderName,
+				// google
+				&googleID,
+				&googleClientID,
+				&googleClientSecret,
+				&googleScopes,
+				// ldap
 				&ldapID,
 				&ldapHost,
 				&ldapPort,
@@ -430,6 +678,45 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				return nil, errors.ThrowInternal(err, "QUERY-ADG42", "Errors.Internal")
 			}
 
+			idpTemplate.Name = name.String
+
+			if oauthID.Valid {
+				idpTemplate.OAuthIDPTemplate = &OAuthIDPTemplate{
+					IDPID:                 oauthID.String,
+					ClientID:              oauthClientID.String,
+					ClientSecret:          oauthClientSecret,
+					AuthorizationEndpoint: oauthAuthorizationEndpoint.String,
+					TokenEndpoint:         oauthTokenEndpoint.String,
+					UserEndpoint:          oauthUserEndpoint.String,
+					Scopes:                oauthScopes,
+				}
+			}
+			if oidcID.Valid {
+				idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
+					IDPID:        oidcID.String,
+					ClientID:     oidcClientID.String,
+					ClientSecret: oidcClientSecret,
+					Issuer:       oidcIssuer.String,
+					Scopes:       oidcScopes,
+				}
+			}
+			if jwtID.Valid {
+				idpTemplate.JWTIDPTemplate = &JWTIDPTemplate{
+					IDPID:        jwtID.String,
+					Issuer:       jwtIssuer.String,
+					KeysEndpoint: jwtKeysEndpoint.String,
+					HeaderName:   jwtHeaderName.String,
+					Endpoint:     jwtEndpoint.String,
+				}
+			}
+			if googleID.Valid {
+				idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
+					IDPID:        googleID.String,
+					ClientID:     googleClientID.String,
+					ClientSecret: googleClientSecret,
+					Scopes:       googleScopes,
+				}
+			}
 			if ldapID.Valid {
 				idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 					IDPID:               ldapID.String,
@@ -478,6 +765,32 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			// oauth
+			OAuthIDCol.identifier(),
+			OAuthClientIDCol.identifier(),
+			OAuthClientSecretCol.identifier(),
+			OAuthAuthorizationEndpointCol.identifier(),
+			OAuthTokenEndpointCol.identifier(),
+			OAuthUserEndpointCol.identifier(),
+			OAuthScopesCol.identifier(),
+			// oidc
+			OIDCIDCol.identifier(),
+			OIDCIssuerCol.identifier(),
+			OIDCClientIDCol.identifier(),
+			OIDCClientSecretCol.identifier(),
+			OIDCScopesCol.identifier(),
+			// jwt
+			JWTIDCol.identifier(),
+			JWTIssuerCol.identifier(),
+			JWTEndpointCol.identifier(),
+			JWTKeysEndpointCol.identifier(),
+			JWTHeaderNameCol.identifier(),
+			// google
+			GoogleIDCol.identifier(),
+			GoogleClientIDCol.identifier(),
+			GoogleClientSecretCol.identifier(),
+			GoogleScopesCol.identifier(),
+			// ldap
 			LDAPIDCol.identifier(),
 			LDAPHostCol.identifier(),
 			LDAPPortCol.identifier(),
@@ -502,6 +815,10 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			LDAPProfileAttributeCol.identifier(),
 			countColumn.identifier(),
 		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPTemplates, error) {
@@ -509,6 +826,33 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			var count uint64
 			for rows.Next() {
 				idpTemplate := new(IDPTemplate)
+
+				name := sql.NullString{}
+
+				oauthID := sql.NullString{}
+				oauthClientID := sql.NullString{}
+				oauthClientSecret := new(crypto.CryptoValue)
+				oauthAuthorizationEndpoint := sql.NullString{}
+				oauthTokenEndpoint := sql.NullString{}
+				oauthUserEndpoint := sql.NullString{}
+				oauthScopes := database.StringArray{}
+
+				oidcID := sql.NullString{}
+				oidcIssuer := sql.NullString{}
+				oidcClientID := sql.NullString{}
+				oidcClientSecret := new(crypto.CryptoValue)
+				oidcScopes := database.StringArray{}
+
+				jwtID := sql.NullString{}
+				jwtIssuer := sql.NullString{}
+				jwtEndpoint := sql.NullString{}
+				jwtKeysEndpoint := sql.NullString{}
+				jwtHeaderName := sql.NullString{}
+
+				googleID := sql.NullString{}
+				googleClientID := sql.NullString{}
+				googleClientSecret := new(crypto.CryptoValue)
+				googleScopes := database.StringArray{}
 
 				ldapID := sql.NullString{}
 				ldapHost := sql.NullString{}
@@ -540,13 +884,39 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&idpTemplate.ChangeDate,
 					&idpTemplate.Sequence,
 					&idpTemplate.State,
-					&idpTemplate.Name,
+					&name,
 					&idpTemplate.Type,
 					&idpTemplate.OwnerType,
 					&idpTemplate.IsCreationAllowed,
 					&idpTemplate.IsLinkingAllowed,
 					&idpTemplate.IsAutoCreation,
 					&idpTemplate.IsAutoUpdate,
+					// oauth
+					&oauthID,
+					&oauthClientID,
+					&oauthClientSecret,
+					&oauthAuthorizationEndpoint,
+					&oauthTokenEndpoint,
+					&oauthUserEndpoint,
+					&oauthScopes,
+					// oidc
+					&oidcID,
+					&oidcIssuer,
+					&oidcClientID,
+					&oidcClientSecret,
+					&oidcScopes,
+					// jwt
+					&jwtID,
+					&jwtIssuer,
+					&jwtEndpoint,
+					&jwtKeysEndpoint,
+					&jwtHeaderName,
+					// google
+					&googleID,
+					&googleClientID,
+					&googleClientSecret,
+					&googleScopes,
+					// ldap
 					&ldapID,
 					&ldapHost,
 					&ldapPort,
@@ -576,6 +946,45 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					return nil, err
 				}
 
+				idpTemplate.Name = name.String
+
+				if oauthID.Valid {
+					idpTemplate.OAuthIDPTemplate = &OAuthIDPTemplate{
+						IDPID:                 oauthID.String,
+						ClientID:              oauthClientID.String,
+						ClientSecret:          oauthClientSecret,
+						AuthorizationEndpoint: oauthAuthorizationEndpoint.String,
+						TokenEndpoint:         oauthTokenEndpoint.String,
+						UserEndpoint:          oauthUserEndpoint.String,
+						Scopes:                oauthScopes,
+					}
+				}
+				if oidcID.Valid {
+					idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
+						IDPID:        oidcID.String,
+						ClientID:     oidcClientID.String,
+						ClientSecret: oidcClientSecret,
+						Issuer:       oidcIssuer.String,
+						Scopes:       oidcScopes,
+					}
+				}
+				if jwtID.Valid {
+					idpTemplate.JWTIDPTemplate = &JWTIDPTemplate{
+						IDPID:        jwtID.String,
+						Issuer:       jwtIssuer.String,
+						KeysEndpoint: jwtKeysEndpoint.String,
+						HeaderName:   jwtHeaderName.String,
+						Endpoint:     jwtEndpoint.String,
+					}
+				}
+				if googleID.Valid {
+					idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
+						IDPID:        googleID.String,
+						ClientID:     googleClientID.String,
+						ClientSecret: googleClientSecret,
+						Scopes:       googleScopes,
+					}
+				}
 				if ldapID.Valid {
 					idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 						IDPID:               ldapID.String,

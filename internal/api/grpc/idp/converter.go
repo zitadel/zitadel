@@ -402,21 +402,84 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 			IsAutoUpdate:      config.IsAutoUpdate,
 		},
 	}
+	if config.OAuthIDPTemplate != nil {
+		oauthConfigToPb(providerConfig, config.OAuthIDPTemplate)
+		return providerConfig
+	}
+	if config.OIDCIDPTemplate != nil {
+		oidcConfigToPb(providerConfig, config.OIDCIDPTemplate)
+		return providerConfig
+	}
+	if config.JWTIDPTemplate != nil {
+		jwtConfigToPb(providerConfig, config.JWTIDPTemplate)
+		return providerConfig
+	}
+	if config.GoogleIDPTemplate != nil {
+		googleConfigToPb(providerConfig, config.GoogleIDPTemplate)
+		return providerConfig
+	}
 	if config.LDAPIDPTemplate != nil {
-		providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
-			Ldap: &idp_pb.LDAPConfig{
-				Host:                config.Host,
-				Port:                config.Port,
-				Tls:                 config.TLS,
-				BaseDn:              config.BaseDN,
-				UserObjectClass:     config.UserObjectClass,
-				UserUniqueAttribute: config.UserUniqueAttribute,
-				Admin:               config.Admin,
-				Attributes:          ldapAttributesToPb(config.LDAPAttributes),
-			},
-		}
+		ldapConfigToPb(providerConfig, config.LDAPIDPTemplate)
+		return providerConfig
 	}
 	return providerConfig
+}
+
+func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAuthIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Oauth{
+		Oauth: &idp_pb.OAuthConfig{
+			ClientId:              template.ClientID,
+			AuthorizationEndpoint: template.AuthorizationEndpoint,
+			TokenEndpoint:         template.TokenEndpoint,
+			UserEndpoint:          template.UserEndpoint,
+			Scopes:                template.Scopes,
+		},
+	}
+}
+
+func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Oidc{
+		Oidc: &idp_pb.GenericOIDCConfig{
+			ClientId: template.ClientID,
+			Issuer:   template.Issuer,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func jwtConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.JWTIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Jwt{
+		Jwt: &idp_pb.JWTConfig{
+			JwtEndpoint:  template.Endpoint,
+			Issuer:       template.Issuer,
+			KeysEndpoint: template.KeysEndpoint,
+			HeaderName:   template.HeaderName,
+		},
+	}
+}
+
+func googleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GoogleIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Google{
+		Google: &idp_pb.GoogleConfig{
+			ClientId: template.ClientID,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func ldapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
+		Ldap: &idp_pb.LDAPConfig{
+			Host:                template.Host,
+			Port:                template.Port,
+			Tls:                 template.TLS,
+			BaseDn:              template.BaseDN,
+			UserObjectClass:     template.UserObjectClass,
+			UserUniqueAttribute: template.UserUniqueAttribute,
+			Admin:               template.Admin,
+			Attributes:          ldapAttributesToPb(template.LDAPAttributes),
+		},
+	}
 }
 
 func ldapAttributesToPb(attributes idp.LDAPAttributes) *idp_pb.LDAPAttributes {

@@ -1,10 +1,11 @@
 <div class="max-width-container">
   <div class="home-wrapper enlarged-container">
-    <div class="header">
-      <h1 class="title" data-e2e="authenticated-welcome">{{ 'HOME.WELCOME' | translate }}</h1>
-    </div>
-
-    <cnsl-shortcuts></cnsl-shortcuts>
+    <ng-container *ngIf="['iam.read$'] | hasRole | async; else defaultHome">
+      <cnsl-onboarding></cnsl-onboarding>
+    </ng-container>
+    <ng-template #defaultHome>
+      <cnsl-shortcuts></cnsl-shortcuts>
+    </ng-template>
 
     <p class="disclaimer cnsl-secondary-text">{{ 'HOME.DISCLAIMER' | translate }}</p>
 

@@ -25,15 +25,11 @@ func AuthRequestFromDomain(c *actions.FieldConfig, request *domain.AuthRequest) 
 	}
 
 	return c.Runtime.ToValue(&authRequest{
-		Id:           request.ID,
-		AgentId:      request.AgentID,
-		CreationDate: request.CreationDate,
-		ChangeDate:   request.ChangeDate,
-		BrowserInfo: &browserInfo{
-			UserAgent:      request.BrowserInfo.UserAgent,
-			AcceptLanguage: request.BrowserInfo.AcceptLanguage,
-			RemoteIp:       request.BrowserInfo.RemoteIP,
-		},
+		Id:                       request.ID,
+		AgentId:                  request.AgentID,
+		CreationDate:             request.CreationDate,
+		ChangeDate:               request.ChangeDate,
+		BrowserInfo:              browserInfoFromDomain(request.BrowserInfo),
 		ApplicationId:            request.ApplicationID,
 		CallbackUri:              request.CallbackURI,
 		TransferState:            request.TransferState,
@@ -101,6 +97,17 @@ type authRequest struct {
 	MfasVerified             []domain.MFAType
 	Audience                 []string
 	AuthTime                 time.Time
+}
+
+func browserInfoFromDomain(info *domain.BrowserInfo) *browserInfo {
+	if info == nil {
+		return nil
+	}
+	return &browserInfo{
+		UserAgent:      info.UserAgent,
+		AcceptLanguage: info.AcceptLanguage,
+		RemoteIp:       info.RemoteIP,
+	}
 }
 
 func requestFromDomain(req domain.Request) *request {

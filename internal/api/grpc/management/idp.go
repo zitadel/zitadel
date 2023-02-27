@@ -166,6 +166,90 @@ func (s *Server) ListProviders(ctx context.Context, req *mgmt_pb.ListProvidersRe
 	}, nil
 }
 
+func (s *Server) AddGenericOAuthProvider(ctx context.Context, req *mgmt_pb.AddGenericOAuthProviderRequest) (*mgmt_pb.AddGenericOAuthProviderResponse, error) {
+	id, details, err := s.command.AddOrgGenericOAuthProvider(ctx, authz.GetCtxData(ctx).OrgID, addGenericOAuthProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddGenericOAuthProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGenericOAuthProvider(ctx context.Context, req *mgmt_pb.UpdateGenericOAuthProviderRequest) (*mgmt_pb.UpdateGenericOAuthProviderResponse, error) {
+	details, err := s.command.UpdateOrgGenericOAuthProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGenericOAuthProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateGenericOAuthProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGenericOIDCProvider(ctx context.Context, req *mgmt_pb.AddGenericOIDCProviderRequest) (*mgmt_pb.AddGenericOIDCProviderResponse, error) {
+	id, details, err := s.command.AddOrgGenericOIDCProvider(ctx, authz.GetCtxData(ctx).OrgID, addGenericOIDCProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddGenericOIDCProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGenericOIDCProvider(ctx context.Context, req *mgmt_pb.UpdateGenericOIDCProviderRequest) (*mgmt_pb.UpdateGenericOIDCProviderResponse, error) {
+	details, err := s.command.UpdateOrgGenericOIDCProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGenericOIDCProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateGenericOIDCProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddJWTProvider(ctx context.Context, req *mgmt_pb.AddJWTProviderRequest) (*mgmt_pb.AddJWTProviderResponse, error) {
+	id, details, err := s.command.AddOrgJWTProvider(ctx, authz.GetCtxData(ctx).OrgID, addJWTProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddJWTProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateJWTProvider(ctx context.Context, req *mgmt_pb.UpdateJWTProviderRequest) (*mgmt_pb.UpdateJWTProviderResponse, error) {
+	details, err := s.command.UpdateOrgJWTProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateJWTProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateJWTProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGoogleProvider(ctx context.Context, req *mgmt_pb.AddGoogleProviderRequest) (*mgmt_pb.AddGoogleProviderResponse, error) {
+	id, details, err := s.command.AddOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, addGoogleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddGoogleProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGoogleProvider(ctx context.Context, req *mgmt_pb.UpdateGoogleProviderRequest) (*mgmt_pb.UpdateGoogleProviderResponse, error) {
+	details, err := s.command.UpdateOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGoogleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateGoogleProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddLDAPProvider(ctx context.Context, req *mgmt_pb.AddLDAPProviderRequest) (*mgmt_pb.AddLDAPProviderResponse, error) {
 	id, details, err := s.command.AddOrgLDAPProvider(ctx, authz.GetCtxData(ctx).OrgID, addLDAPProviderToCommand(req))
 	if err != nil {
