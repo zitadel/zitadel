@@ -20,7 +20,7 @@ type IDPUserLink struct {
 	ProvidedUserID   string
 	ProvidedUsername string
 	ResourceOwner    string
-	IDPType          domain.IDPConfigType
+	IDPType          domain.IDPType
 }
 
 type IDPUserLinks struct {
@@ -134,14 +134,14 @@ func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLink
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),
 			IDPUserLinkUserIDCol.identifier(),
-			IDPNameCol.identifier(),
+			IDPTemplateNameCol.identifier(),
 			IDPUserLinkExternalUserIDCol.identifier(),
 			IDPUserLinkDisplayNameCol.identifier(),
-			IDPTypeCol.identifier(),
+			IDPTemplateTypeCol.identifier(),
 			IDPUserLinkResourceOwnerCol.identifier(),
 			countColumn.identifier()).
 			From(idpUserLinkTable.identifier()).
-			LeftJoin(join(IDPIDCol, IDPUserLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
+			LeftJoin(join(IDPTemplateIDCol, IDPUserLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPUserLinks, error) {
 			idps := make([]*IDPUserLink, 0)
 			var count uint64
@@ -167,9 +167,9 @@ func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLink
 				idp.IDPName = idpName.String
 				//IDPType 0 is oidc so we have to set unspecified manually
 				if idpType.Valid {
-					idp.IDPType = domain.IDPConfigType(idpType.Int16)
+					idp.IDPType = domain.IDPType(idpType.Int16)
 				} else {
-					idp.IDPType = domain.IDPConfigTypeUnspecified
+					idp.IDPType = domain.IDPTypeUnspecified
 				}
 				idps = append(idps, idp)
 			}

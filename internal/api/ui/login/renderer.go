@@ -69,14 +69,14 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplChangePasswordDone:           "change_password_done.html",
 		tmplRegisterOption:               "register_option.html",
 		tmplRegister:                     "register.html",
-		tmplExternalRegisterOverview:     "external_register_overview.html",
-		tmplLogoutDone:                   "logout_done.html",
-		tmplRegisterOrg:                  "register_org.html",
-		tmplChangeUsername:               "change_username.html",
-		tmplChangeUsernameDone:           "change_username_done.html",
-		tmplLinkUsersDone:                "link_users_done.html",
-		tmplExternalNotFoundOption:       "external_not_found_option.html",
-		tmplLoginSuccess:                 "login_success.html",
+		//tmplExternalRegisterOverview:     "external_register_overview.html",
+		tmplLogoutDone:             "logout_done.html",
+		tmplRegisterOrg:            "register_org.html",
+		tmplChangeUsername:         "change_username.html",
+		tmplChangeUsernameDone:     "change_username_done.html",
+		tmplLinkUsersDone:          "link_users_done.html",
+		tmplExternalNotFoundOption: "external_not_found_option.html",
+		tmplLoginSuccess:           "login_success.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {

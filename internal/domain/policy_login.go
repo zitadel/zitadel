@@ -55,10 +55,10 @@ type IDPProvider struct {
 	Type        IdentityProviderType
 	IDPConfigID string
 
-	Name          string
-	StylingType   IDPConfigStylingType
-	IDPConfigType IDPConfigType
-	IDPState      IDPConfigState
+	Name        string
+	StylingType IDPConfigStylingType // deprecated
+	IDPType     IDPType
+	IDPState    IDPConfigState
 }
 
 func (p IDPProvider) IsValid() bool {

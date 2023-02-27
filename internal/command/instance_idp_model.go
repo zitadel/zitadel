@@ -291,6 +291,8 @@ func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) 
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.RemovedEvent)
+		case *instance.IDPConfigAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
 		default:
 			wm.IDPRemoveWriteModel.AppendEvents(e)
 		}
@@ -313,5 +315,12 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
+		Or().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			instance.IDPConfigAddedEventType,
+		).
+		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
 		Builder()
 }

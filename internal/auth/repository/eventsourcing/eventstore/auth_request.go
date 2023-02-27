@@ -17,8 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
-	iam_view_model "github.com/zitadel/zitadel/internal/iam/repository/view/model"
 	"github.com/zitadel/zitadel/internal/id"
 	project_view_model "github.com/zitadel/zitadel/internal/project/repository/view/model"
 	"github.com/zitadel/zitadel/internal/query"
@@ -81,7 +79,9 @@ type lockoutPolicyViewProvider interface {
 }
 
 type idpProviderViewProvider interface {
-	IDPProvidersByAggregateIDAndState(string, string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
+	//IDPProvidersByAggregateIDAndState(string, string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
+	IDPLoginPolicyLinks(context.Context, string, *query.IDPLoginPolicyLinksSearchQuery, bool) (*query.IDPLoginPolicyLinks, error)
+	//IDPProvidersByAggregateIDAndState(string, string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
 }
 
 type idpUserLinksProvider interface {
@@ -554,13 +554,13 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	if !policy.AllowExternalIDPs {
 		return policy, nil, nil
 	}
-	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, authz.GetInstance(ctx).InstanceID(), orgID, policy.IsDefault)
+	idpProviders, err := getLoginPolicyIDPProviders(ctx, repo.IDPProviderViewProvider, authz.GetInstance(ctx).InstanceID(), orgID, policy.IsDefault)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	providers := iam_model.IdpProviderViewsToDomain(idpProviders)
-	return policy, providers, nil
+	//
+	//providers := iam_model.IdpProviderViewsToDomain(idpProviders)
+	return policy, idpProviders, nil
 }
 
 func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.AuthRequest) error {
@@ -1247,19 +1247,47 @@ func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *dom
 	return nil
 }
 
-func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*iam_model.IDPProviderView, error) {
-	if defaultPolicy {
-		idpProviders, err := provider.IDPProvidersByAggregateIDAndState(iamID, iamID, iam_model.IDPConfigStateActive)
-		if err != nil {
-			return nil, err
-		}
-		return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
+func getLoginPolicyIDPProviders(ctx context.Context, provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*domain.IDPProvider, error) {
+	resourceOwner := iamID
+	if !defaultPolicy {
+		resourceOwner = orgID
 	}
-	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iamID, iam_model.IDPConfigStateActive)
+	links, err := provider.IDPLoginPolicyLinks(ctx, resourceOwner, &query.IDPLoginPolicyLinksSearchQuery{}, false)
 	if err != nil {
 		return nil, err
 	}
-	return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
+	providers := make([]*domain.IDPProvider, len(links.Links))
+	for i, link := range links.Links {
+		providers[i] = &domain.IDPProvider{
+			//Type:          link.,
+			IDPConfigID: link.IDPID,
+			Name:        link.IDPName,
+			StylingType: 0,
+			IDPType:     link.IDPType,
+			IDPState:    0,
+		}
+	}
+	return providers, nil
+	//queries := make([]query.SearchQuery, 0, 3)
+	//queries = append(queries)
+	//for i, link := range links.Links {
+	//	link.
+	//}
+	//query.NewIDPTemplateIDsSearchQuery()
+	//
+	//q.IDPLoginPolicyLinks(nil, queries, false)
+	//if defaultPolicy {
+	//	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(iamID, iamID, iam_model.IDPConfigStateActive)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
+	//}
+	//idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iamID, iam_model.IDPConfigStateActive)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
 }
 
 func checkVerificationTimeMaxAge(verificationTime time.Time, lifetime time.Duration, request *domain.AuthRequest) bool {

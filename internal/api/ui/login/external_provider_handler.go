@@ -4,7 +4,10 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -16,6 +19,61 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
 )
+
+const (
+	queryIDPConfigID           = "idpConfigID"
+	tmplExternalNotFoundOption = "externalnotfoundoption"
+)
+
+type externalIDPData struct {
+	IDPConfigID string `schema:"idpConfigID"`
+}
+
+type externalIDPCallbackData struct {
+	State string `schema:"state"`
+	Code  string `schema:"code"`
+}
+
+type externalNotFoundOptionFormData struct {
+	externalRegisterFormData
+	Link         bool `schema:"linkbutton"`
+	AutoRegister bool `schema:"autoregisterbutton"`
+	ResetLinking bool `schema:"resetlinking"`
+	TermsConfirm bool `schema:"terms-confirm"`
+}
+
+type externalNotFoundOptionData struct {
+	baseData
+	externalNotFoundOptionFormData
+	ExternalIDPID              string
+	ExternalIDPUserID          string
+	ExternalIDPUserDisplayName string
+	ShowUsername               bool
+	ShowUsernameSuffix         bool
+	OrgRegister                bool
+	ExternalEmail              string
+	ExternalEmailVerified      bool
+	ExternalPhone              string
+	ExternalPhoneVerified      bool
+}
+
+type externalRegisterFormData struct {
+	ExternalIDPConfigID    string `schema:"external-idp-config-id"`
+	ExternalIDPExtUserID   string `schema:"external-idp-ext-user-id"`
+	ExternalIDPDisplayName string `schema:"external-idp-display-name"`
+	ExternalEmail          string `schema:"external-email"`
+	ExternalEmailVerified  bool   `schema:"external-email-verified"`
+	Email                  string `schema:"email"`
+	Username               string `schema:"username"`
+	Firstname              string `schema:"firstname"`
+	Lastname               string `schema:"lastname"`
+	Nickname               string `schema:"nickname"`
+	ExternalPhone          string `schema:"external-phone"`
+	ExternalPhoneVerified  bool   `schema:"external-phone-verified"`
+	Phone                  string `schema:"phone"`
+	Language               string `schema:"language"`
+	TermsConfirm           bool   `schema:"terms-confirm"`
+}
 
 func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, selectedIDPID string) {
 	for _, idp := range authReq.AllowedExternalIDPs {
@@ -41,6 +99,16 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 	l.handleIDP(w, r, authReq, data.IDPConfigID)
 }
 
+func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
+	data := new(externalIDPData)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	l.handleIDP(w, r, authReq, data.IDPConfigID)
+	//l.handleExternalRegisterByConfigID(w, r, authReq, data.IDPConfigID)
+}
 func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, id string) {
 	identityProvider, err := l.getIDPByID(r, id)
 	if err != nil {
@@ -80,11 +148,16 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 }
 
 func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*google.Provider, error) {
-	secret, err := crypto.DecryptString(identityProvider.ClientSecret, l.idpConfigAlg)
+	errorHandler := func(w http.ResponseWriter, r *http.Request, errorType string, errorDesc string, state string) {
+		logging.Errorf("token exchanged failed: %s - %s (state: %s)", errorType, errorType, state)
+		rp.DefaultErrorHandler(w, r, errorType, errorDesc, state)
+	}
+	openid.WithRelyingPartyOption(rp.WithErrorHandler(errorHandler))
+	secret, err := crypto.DecryptString(identityProvider.GoogleIDPTemplate.ClientSecret, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
-	return google.New(identityProvider.ClientID, secret, l.baseURL(ctx)+EndpointExternalLoginCallback, identityProvider.Scopes)
+	return google.New(identityProvider.GoogleIDPTemplate.ClientID, secret, l.baseURL(ctx)+EndpointExternalLoginCallback, identityProvider.GoogleIDPTemplate.Scopes)
 }
 
 func providerOptions(identityProvider *query.IDPTemplate) {
@@ -397,70 +470,122 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 	l.renderNextStep(w, r, authReq)
 }
 
-//
-//
-//func (l *Login) handleExternalRegistration(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userNotFound bool) {
-//	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-//
-//	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-//		resourceOwner = authReq.RequestedOrgID
-//	}
-//
-//	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
-//	if err != nil {
-//		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
-//		return
-//	}
-//	//
-//	//idp, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
-//	//if err != nil {
-//	//	l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, nil, nil, err)
-//	//	return
-//	//}
-//
-//	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-//	if len(authReq.LinkingUsers) == 0 {
-//		l.renderError(w, r, authReq, errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
-//		return
-//	}
-//
-//	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
-//	if userNotFound {
-//		data := new(externalNotFoundOptionFormData)
-//		err := l.getParseData(r, data)
-//		if err != nil {
-//			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
-//			return
-//		}
-//		linkingUser = l.mapExternalNotFoundOptionFormDataToLoginUser(data)
-//	}
-//
-//	user, externalIDP, metadata := mapExternalUserToLoginUser(linkingUser, orgIamPolicy.UserLoginMustBeDomain)
-//
-//	user, metadata, err = l.runPreCreationActions(authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
-//	if err != nil {
-//		l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, nil, nil, err)
-//		return
-//	}
-//	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, userAgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
-//	if err != nil {
-//		l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, user, externalIDP, err)
-//		return
-//	}
-//	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
-//	if err != nil {
-//		l.renderError(w, r, authReq, err)
-//		return
-//	}
-//	userGrants, err := l.runPostCreationActions(authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
-//	if err != nil {
-//		l.renderError(w, r, authReq, err)
-//		return
-//	}
-//	err = l.appendUserGrants(r.Context(), userGrants, resourceOwner)
-//	if err != nil {
-//		l.renderError(w, r, authReq, err)
-//		return
-//	}
-//	l.renderNextStep(w, r, authReq)
-//}
+func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, externalIDP *domain.UserIDPLink, err error) {
+	var errID, errMessage string
+	if err != nil {
+		errID, errMessage = l.getErrorMessage(r, err)
+	}
+	if orgIAMPolicy == nil {
+		resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
+
+		if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
+			resourceOwner = authReq.RequestedOrgID
+		}
+
+		orgIAMPolicy, err = l.getOrgDomainPolicy(r, resourceOwner)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
+
+	}
+
+	if human == nil || externalIDP == nil {
+		//idpConfig, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
+		//if err != nil {
+		//	l.renderError(w, r, authReq, err)
+		//	return
+		//}
+		linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
+		human, externalIDP, _ = mapExternalUserToLoginUser(linkingUser, orgIAMPolicy.UserLoginMustBeDomain)
+	}
+
+	var resourceOwner string
+	if authReq != nil {
+		resourceOwner = authReq.RequestedOrgID
+	}
+	if resourceOwner == "" {
+		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
+	}
+	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+
+	translator := l.getTranslator(r.Context(), authReq)
+	data := externalNotFoundOptionData{
+		baseData: l.getBaseData(r, authReq, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
+		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
+			externalRegisterFormData: externalRegisterFormData{
+				Email:     human.EmailAddress,
+				Username:  human.Username,
+				Firstname: human.FirstName,
+				Lastname:  human.LastName,
+				Nickname:  human.NickName,
+				Language:  human.PreferredLanguage.String(),
+			},
+		},
+		ExternalIDPID:              externalIDP.IDPConfigID,
+		ExternalIDPUserID:          externalIDP.ExternalUserID,
+		ExternalIDPUserDisplayName: externalIDP.DisplayName,
+		ExternalEmail:              human.EmailAddress,
+		ExternalEmailVerified:      human.IsEmailVerified,
+		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
+		ShowUsernameSuffix:         !labelPolicy.HideLoginNameSuffix,
+		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
+	}
+	if human.Phone != nil {
+		data.Phone = human.PhoneNumber
+		data.ExternalPhone = human.PhoneNumber
+		data.ExternalPhoneVerified = human.IsPhoneVerified
+	}
+	funcs := map[string]interface{}{
+		"selectedLanguage": func(l string) bool {
+			return data.Language == l
+		},
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, funcs)
+}
+
+func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {
+	data := new(externalNotFoundOptionFormData)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
+	if err != nil {
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
+		return
+	}
+	if data.Link {
+		l.renderLogin(w, r, authReq, nil)
+		return
+	} else if data.ResetLinking {
+		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
+		}
+		l.handleLogin(w, r)
+		return
+	}
+	linkingUser := mapExternalNotFoundOptionFormDataToLoginUser(data)
+	l.registerExternalUser(w, r, authReq, linkingUser)
+}
+
+func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {
+	isEmailVerified := formData.ExternalEmailVerified && formData.Email == formData.ExternalEmail
+	isPhoneVerified := formData.ExternalPhoneVerified && formData.Phone == formData.ExternalPhone
+	return &domain.ExternalUser{
+		IDPConfigID:       formData.ExternalIDPConfigID,
+		ExternalUserID:    formData.ExternalIDPExtUserID,
+		PreferredUsername: formData.Username,
+		DisplayName:       formData.Email,
+		FirstName:         formData.Firstname,
+		LastName:          formData.Lastname,
+		NickName:          formData.Nickname,
+		Email:             formData.Email,
+		IsEmailVerified:   isEmailVerified,
+		Phone:             formData.Phone,
+		IsPhoneVerified:   isPhoneVerified,
+		PreferredLanguage: language.Make(formData.Language),
+	}
+}

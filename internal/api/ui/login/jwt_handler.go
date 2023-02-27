@@ -9,14 +9,15 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 type jwtRequest struct {
@@ -50,12 +51,12 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
+	idpConfig, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if idpConfig.IsOIDC {
+	if idpConfig.Type != domain.IDPTypeJWT {
 		if err != nil {
 			l.renderError(w, r, nil, err)
 			return
@@ -64,8 +65,10 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 	l.handleJWTExtraction(w, r, authReq, idpConfig)
 }
 
-func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView) {
-	token, err := getToken(r, idpConfig.JWTHeaderName)
+func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *query.IDPTemplate) {
+	var token string
+	var err error
+	//token, err := getToken(r, idpConfig.JWTHeaderName) // TODO: template
 	if err != nil {
 		emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
 		if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emtpyTokens, authReq, r, err); actionErr != nil {
@@ -84,7 +87,8 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
+	var externalUser *domain.ExternalUser
+	//externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
 	externalUser, err = l.runPostExternalAuthenticationActions(externalUser, tokens, authReq, r, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -116,11 +120,11 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 	http.Redirect(w, r, redirect, http.StatusFound)
 }
 
-func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, tokens *oidc.Tokens, err error) {
+func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *query.IDPTemplate, tokens *oidc.Tokens, err error) {
 	if errors.IsNotFound(err) {
 		err = nil
 	}
-	if !idpConfig.AutoRegister {
+	if !idpConfig.IsAutoCreation {
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
 		return
 	}
@@ -136,7 +140,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
+	user, externalIDP, metadata := mapExternalUserToLoginUser(authReq.LinkingUsers[len(authReq.LinkingUsers)-1], orgIamPolicy.UserLoginMustBeDomain)
 	user, metadata, err = l.runPreCreationActions(authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -221,19 +225,19 @@ func (l *Login) handleJWTCallback(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
+	idpConfig, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if idpConfig.IsOIDC {
+	if idpConfig.Type != domain.IDPTypeJWT { // TODO: ?
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
 }
 
-func validateToken(ctx context.Context, token string, config *iam_model.IDPConfigView) (oidc.IDTokenClaims, error) {
+func validateToken(ctx context.Context, token string, config *query.IDPTemplate) (oidc.IDTokenClaims, error) {
 	logging.Log("LOGIN-ADf42").Debug("begin token validation")
 	offset := 3 * time.Second
 	maxAge := time.Hour
@@ -243,15 +247,16 @@ func validateToken(ctx context.Context, token string, config *iam_model.IDPConfi
 		return nil, err
 	}
 
-	if err = oidc.CheckIssuer(claims, config.JWTIssuer); err != nil {
-		return nil, err
-	}
+	//if err = oidc.CheckIssuer(claims, config.JWTIssuer); err != nil { //TODO: check
+	//	return nil, err
+	//}
 
-	logging.Log("LOGIN-Dfg22").Debug("begin signature validation")
-	keySet := rp.NewRemoteKeySet(http.DefaultClient, config.JWTKeysEndpoint)
-	if err = oidc.CheckSignature(ctx, token, payload, claims, nil, keySet); err != nil {
-		return nil, err
-	}
+	logging.Debug("begin signature validation")
+	_ = payload
+	//keySet := rp.NewRemoteKeySet(http.DefaultClient, config.JWTKeysEndpoint)
+	//if err = oidc.CheckSignature(ctx, token, payload, claims, nil, keySet); err != nil {
+	//	return nil, err
+	//}
 
 	if !claims.GetExpiration().IsZero() {
 		if err = oidc.CheckExpiration(claims, offset); err != nil {
@@ -276,4 +281,27 @@ func getToken(r *http.Request, headerName string) (string, error) {
 		return "", errors.ThrowInvalidArgument(nil, "LOGIN-adh42", "Errors.AuthRequest.TokenNotFound")
 	}
 	return strings.TrimPrefix(auth, oidc.PrefixBearer), nil
+}
+
+func (l *Login) handleJWTAuthorize(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView) {
+	redirect, err := url.Parse(idpConfig.JWTEndpoint)
+	if err != nil {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	q := redirect.Query()
+	q.Set(QueryAuthRequestID, authReq.ID)
+	userAgentID, ok := http_mw.UserAgentIDFromCtx(r.Context())
+	if !ok {
+		l.renderLogin(w, r, authReq, errors.ThrowPreconditionFailed(nil, "LOGIN-dsgg3", "Errors.AuthRequest.UserAgentNotFound"))
+		return
+	}
+	nonce, err := l.idpConfigAlg.Encrypt([]byte(userAgentID))
+	if err != nil {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	q.Set(queryUserAgentID, base64.RawURLEncoding.EncodeToString(nonce))
+	redirect.RawQuery = q.Encode()
+	http.Redirect(w, r, redirect.String(), http.StatusFound)
 }

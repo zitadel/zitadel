@@ -1,59 +1,60 @@
 package login
 
-import (
-	"encoding/base64"
-	"net/http"
-	"net/url"
-	"strings"
-
-	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"golang.org/x/text/language"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
-	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
-	"github.com/zitadel/zitadel/internal/query"
-)
-
-const (
-	queryIDPConfigID           = "idpConfigID"
-	tmplExternalNotFoundOption = "externalnotfoundoption"
-)
-
-type externalIDPData struct {
-	IDPConfigID string `schema:"idpConfigID"`
-}
-
-type externalIDPCallbackData struct {
-	State string `schema:"state"`
-	Code  string `schema:"code"`
-}
-
-type externalNotFoundOptionFormData struct {
-	externalRegisterFormData
-	Link         bool `schema:"linkbutton"`
-	AutoRegister bool `schema:"autoregisterbutton"`
-	ResetLinking bool `schema:"resetlinking"`
-	TermsConfirm bool `schema:"terms-confirm"`
-}
-
-type externalNotFoundOptionData struct {
-	baseData
-	externalNotFoundOptionFormData
-	ExternalIDPID              string
-	ExternalIDPUserID          string
-	ExternalIDPUserDisplayName string
-	ShowUsername               bool
-	ShowUsernameSuffix         bool
-	OrgRegister                bool
-	ExternalEmail              string
-	ExternalEmailVerified      bool
-	ExternalPhone              string
-	ExternalPhoneVerified      bool
-}
-
+//
+//const (
+//	queryIDPConfigID           = "idpConfigID"
+//	tmplExternalNotFoundOption = "externalnotfoundoption"
+//)
+//
+//type externalIDPData struct {
+//	IDPConfigID string `schema:"idpConfigID"`
+//}
+//
+//type externalIDPCallbackData struct {
+//	State string `schema:"state"`
+//	Code  string `schema:"code"`
+//}
+//
+//type externalNotFoundOptionFormData struct {
+//	externalRegisterFormData
+//	Link         bool `schema:"linkbutton"`
+//	AutoRegister bool `schema:"autoregisterbutton"`
+//	ResetLinking bool `schema:"resetlinking"`
+//	TermsConfirm bool `schema:"terms-confirm"`
+//}
+//
+//type externalNotFoundOptionData struct {
+//	baseData
+//	externalNotFoundOptionFormData
+//	ExternalIDPID              string
+//	ExternalIDPUserID          string
+//	ExternalIDPUserDisplayName string
+//	ShowUsername               bool
+//	ShowUsernameSuffix         bool
+//	OrgRegister                bool
+//	ExternalEmail              string
+//	ExternalEmailVerified      bool
+//	ExternalPhone              string
+//	ExternalPhoneVerified      bool
+//}
+//
+//type externalRegisterFormData struct {
+//	ExternalIDPConfigID    string `schema:"external-idp-config-id"`
+//	ExternalIDPExtUserID   string `schema:"external-idp-ext-user-id"`
+//	ExternalIDPDisplayName string `schema:"external-idp-display-name"`
+//	ExternalEmail          string `schema:"external-email"`
+//	ExternalEmailVerified  bool   `schema:"external-email-verified"`
+//	Email                  string `schema:"email"`
+//	Username               string `schema:"username"`
+//	Firstname              string `schema:"firstname"`
+//	Lastname               string `schema:"lastname"`
+//	Nickname               string `schema:"nickname"`
+//	ExternalPhone          string `schema:"external-phone"`
+//	ExternalPhoneVerified  bool   `schema:"external-phone-verified"`
+//	Phone                  string `schema:"phone"`
+//	Language               string `schema:"language"`
+//	TermsConfirm           bool   `schema:"terms-confirm"`
+//}
 //
 //func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, selectedIDPConfigID string) {
 //	for _, idp := range authReq.AllowedExternalIDPs {
@@ -106,29 +107,29 @@ type externalNotFoundOptionData struct {
 //	}
 //	http.Redirect(w, r, rp.AuthURL(authReq.ID, provider, rp.WithPrompt(oidc.PromptSelectAccount)), http.StatusFound)
 //}
-
-func (l *Login) handleJWTAuthorize(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView) {
-	redirect, err := url.Parse(idpConfig.JWTEndpoint)
-	if err != nil {
-		l.renderLogin(w, r, authReq, err)
-		return
-	}
-	q := redirect.Query()
-	q.Set(QueryAuthRequestID, authReq.ID)
-	userAgentID, ok := http_mw.UserAgentIDFromCtx(r.Context())
-	if !ok {
-		l.renderLogin(w, r, authReq, errors.ThrowPreconditionFailed(nil, "LOGIN-dsgg3", "Errors.AuthRequest.UserAgentNotFound"))
-		return
-	}
-	nonce, err := l.idpConfigAlg.Encrypt([]byte(userAgentID))
-	if err != nil {
-		l.renderLogin(w, r, authReq, err)
-		return
-	}
-	q.Set(queryUserAgentID, base64.RawURLEncoding.EncodeToString(nonce))
-	redirect.RawQuery = q.Encode()
-	http.Redirect(w, r, redirect.String(), http.StatusFound)
-}
+//
+//func (l *Login) handleJWTAuthorize(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView) {
+//	redirect, err := url.Parse(idpConfig.JWTEndpoint)
+//	if err != nil {
+//		l.renderLogin(w, r, authReq, err)
+//		return
+//	}
+//	q := redirect.Query()
+//	q.Set(QueryAuthRequestID, authReq.ID)
+//	userAgentID, ok := http_mw.UserAgentIDFromCtx(r.Context())
+//	if !ok {
+//		l.renderLogin(w, r, authReq, errors.ThrowPreconditionFailed(nil, "LOGIN-dsgg3", "Errors.AuthRequest.UserAgentNotFound"))
+//		return
+//	}
+//	nonce, err := l.idpConfigAlg.Encrypt([]byte(userAgentID))
+//	if err != nil {
+//		l.renderLogin(w, r, authReq, err)
+//		return
+//	}
+//	q.Set(queryUserAgentID, base64.RawURLEncoding.EncodeToString(nonce))
+//	redirect.RawQuery = q.Encode()
+//	http.Redirect(w, r, redirect.String(), http.StatusFound)
+//}
 
 //
 //func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Request) {
@@ -206,7 +207,7 @@ func (l *Login) handleJWTAuthorize(w http.ResponseWriter, r *http.Request, authR
 //	}
 //	return rp.NewRelyingPartyOAuth(oauth2Config, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 //}
-
+//
 //
 //func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 //	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
@@ -259,107 +260,107 @@ func (l *Login) handleJWTAuthorize(w http.ResponseWriter, r *http.Request, authR
 //	}
 //	l.renderNextStep(w, r, authReq)
 //}
-
-func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, externalIDP *domain.UserIDPLink, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
-	if orgIAMPolicy == nil {
-		resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-		if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-			resourceOwner = authReq.RequestedOrgID
-		}
-
-		orgIAMPolicy, err = l.getOrgDomainPolicy(r, resourceOwner)
-		if err != nil {
-			l.renderError(w, r, authReq, err)
-			return
-		}
-
-	}
-
-	if human == nil || externalIDP == nil {
-		idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
-		if err != nil {
-			l.renderError(w, r, authReq, err)
-			return
-		}
-		linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
-		human, externalIDP, _ = l.mapExternalUserToLoginUser(orgIAMPolicy, linkingUser, idpConfig)
-	}
-
-	var resourceOwner string
-	if authReq != nil {
-		resourceOwner = authReq.RequestedOrgID
-	}
-	if resourceOwner == "" {
-		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
-	}
-	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-
-	translator := l.getTranslator(r.Context(), authReq)
-	data := externalNotFoundOptionData{
-		baseData: l.getBaseData(r, authReq, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
-		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
-			externalRegisterFormData: externalRegisterFormData{
-				Email:     human.EmailAddress,
-				Username:  human.Username,
-				Firstname: human.FirstName,
-				Lastname:  human.LastName,
-				Nickname:  human.NickName,
-				Language:  human.PreferredLanguage.String(),
-			},
-		},
-		ExternalIDPID:              externalIDP.IDPConfigID,
-		ExternalIDPUserID:          externalIDP.ExternalUserID,
-		ExternalIDPUserDisplayName: externalIDP.DisplayName,
-		ExternalEmail:              human.EmailAddress,
-		ExternalEmailVerified:      human.IsEmailVerified,
-		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
-		ShowUsernameSuffix:         !labelPolicy.HideLoginNameSuffix,
-		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
-	}
-	if human.Phone != nil {
-		data.Phone = human.PhoneNumber
-		data.ExternalPhone = human.PhoneNumber
-		data.ExternalPhoneVerified = human.IsPhoneVerified
-	}
-	funcs := map[string]interface{}{
-		"selectedLanguage": func(l string) bool {
-			return data.Language == l
-		},
-	}
-	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, funcs)
-}
-
-func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {
-	data := new(externalNotFoundOptionFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
-	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
-		return
-	}
-	if data.Link {
-		l.renderLogin(w, r, authReq, nil)
-		return
-	} else if data.ResetLinking {
-		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID)
-		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
-		}
-		l.handleLogin(w, r)
-		return
-	}
-	linkingUser := l.mapExternalNotFoundOptionFormDataToLoginUser(data)
-	l.registerExternalUser(w, r, authReq, linkingUser)
-}
+//
+//func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, externalIDP *domain.UserIDPLink, err error) {
+//	var errID, errMessage string
+//	if err != nil {
+//		errID, errMessage = l.getErrorMessage(r, err)
+//	}
+//	if orgIAMPolicy == nil {
+//		resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
+//
+//		if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
+//			resourceOwner = authReq.RequestedOrgID
+//		}
+//
+//		orgIAMPolicy, err = l.getOrgDomainPolicy(r, resourceOwner)
+//		if err != nil {
+//			l.renderError(w, r, authReq, err)
+//			return
+//		}
+//
+//	}
+//
+//	if human == nil || externalIDP == nil {
+//		//idpConfig, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
+//		//if err != nil {
+//		//	l.renderError(w, r, authReq, err)
+//		//	return
+//		//}
+//		linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
+//		human, externalIDP, _ = mapExternalUserToLoginUser(linkingUser, orgIAMPolicy.UserLoginMustBeDomain)
+//	}
+//
+//	var resourceOwner string
+//	if authReq != nil {
+//		resourceOwner = authReq.RequestedOrgID
+//	}
+//	if resourceOwner == "" {
+//		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
+//	}
+//	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+//	if err != nil {
+//		l.renderError(w, r, authReq, err)
+//		return
+//	}
+//
+//	translator := l.getTranslator(r.Context(), authReq)
+//	data := externalNotFoundOptionData{
+//		baseData: l.getBaseData(r, authReq, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
+//		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
+//			externalRegisterFormData: externalRegisterFormData{
+//				Email:     human.EmailAddress,
+//				Username:  human.Username,
+//				Firstname: human.FirstName,
+//				Lastname:  human.LastName,
+//				Nickname:  human.NickName,
+//				Language:  human.PreferredLanguage.String(),
+//			},
+//		},
+//		ExternalIDPID:              externalIDP.IDPConfigID,
+//		ExternalIDPUserID:          externalIDP.ExternalUserID,
+//		ExternalIDPUserDisplayName: externalIDP.DisplayName,
+//		ExternalEmail:              human.EmailAddress,
+//		ExternalEmailVerified:      human.IsEmailVerified,
+//		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
+//		ShowUsernameSuffix:         !labelPolicy.HideLoginNameSuffix,
+//		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
+//	}
+//	if human.Phone != nil {
+//		data.Phone = human.PhoneNumber
+//		data.ExternalPhone = human.PhoneNumber
+//		data.ExternalPhoneVerified = human.IsPhoneVerified
+//	}
+//	funcs := map[string]interface{}{
+//		"selectedLanguage": func(l string) bool {
+//			return data.Language == l
+//		},
+//	}
+//	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, funcs)
+//}
+//
+//func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {
+//	data := new(externalNotFoundOptionFormData)
+//	authReq, err := l.getAuthRequestAndParseData(r, data)
+//	if err != nil {
+//		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
+//		return
+//	}
+//	if data.Link {
+//		l.renderLogin(w, r, authReq, nil)
+//		return
+//	} else if data.ResetLinking {
+//		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+//		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID)
+//		if err != nil {
+//			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
+//		}
+//		l.handleLogin(w, r)
+//		return
+//	}
+//	linkingUser := mapExternalNotFoundOptionFormDataToLoginUser(data)
+//	l.registerExternalUser(w, r, authReq, linkingUser)
+//}
 
 //
 //func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userNotFound bool) {
@@ -427,111 +428,111 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 //	}
 //	l.renderNextStep(w, r, authReq)
 //}
-
-func (l *Login) mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {
-	isEmailVerified := formData.ExternalEmailVerified && formData.Email == formData.ExternalEmail
-	isPhoneVerified := formData.ExternalPhoneVerified && formData.Phone == formData.ExternalPhone
-	return &domain.ExternalUser{
-		IDPConfigID:       formData.ExternalIDPConfigID,
-		ExternalUserID:    formData.ExternalIDPExtUserID,
-		PreferredUsername: formData.Username,
-		DisplayName:       formData.Email,
-		FirstName:         formData.Firstname,
-		LastName:          formData.Lastname,
-		NickName:          formData.Nickname,
-		Email:             formData.Email,
-		IsEmailVerified:   isEmailVerified,
-		Phone:             formData.Phone,
-		IsPhoneVerified:   isPhoneVerified,
-		PreferredLanguage: language.Make(formData.Language),
-	}
-}
-
-func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *domain.ExternalUser {
-	displayName := tokens.IDTokenClaims.GetPreferredUsername()
-	if displayName == "" && tokens.IDTokenClaims.GetEmail() != "" {
-		displayName = tokens.IDTokenClaims.GetEmail()
-	}
-	switch idpConfig.OIDCIDPDisplayNameMapping {
-	case iam_model.OIDCMappingFieldEmail:
-		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
-			displayName = tokens.IDTokenClaims.GetEmail()
-		}
-	}
-
-	externalUser := &domain.ExternalUser{
-		IDPConfigID:       idpConfig.IDPConfigID,
-		ExternalUserID:    tokens.IDTokenClaims.GetSubject(),
-		PreferredUsername: tokens.IDTokenClaims.GetPreferredUsername(),
-		DisplayName:       displayName,
-		FirstName:         tokens.IDTokenClaims.GetGivenName(),
-		LastName:          tokens.IDTokenClaims.GetFamilyName(),
-		NickName:          tokens.IDTokenClaims.GetNickname(),
-		Email:             tokens.IDTokenClaims.GetEmail(),
-		IsEmailVerified:   tokens.IDTokenClaims.IsEmailVerified(),
-		PreferredLanguage: tokens.IDTokenClaims.GetLocale(),
-	}
-
-	if tokens.IDTokenClaims.GetPhoneNumber() != "" {
-		externalUser.Phone = tokens.IDTokenClaims.GetPhoneNumber()
-		externalUser.IsPhoneVerified = tokens.IDTokenClaims.IsPhoneNumberVerified()
-	}
-	return externalUser
-}
-func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.DomainPolicy, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.UserIDPLink, []*domain.Metadata) {
-	username := linkingUser.PreferredUsername
-	switch idpConfig.OIDCUsernameMapping {
-	case iam_model.OIDCMappingFieldEmail:
-		if linkingUser.IsEmailVerified && linkingUser.Email != "" && username == "" {
-			username = linkingUser.Email
-		}
-	}
-	if username == "" {
-		username = linkingUser.Email
-	}
-
-	if orgIamPolicy.UserLoginMustBeDomain {
-		index := strings.LastIndex(username, "@")
-		if index > 1 {
-			username = username[:index]
-		}
-	}
-
-	human := &domain.Human{
-		Username: username,
-		Profile: &domain.Profile{
-			FirstName:         linkingUser.FirstName,
-			LastName:          linkingUser.LastName,
-			PreferredLanguage: linkingUser.PreferredLanguage,
-			NickName:          linkingUser.NickName,
-		},
-		Email: &domain.Email{
-			EmailAddress:    linkingUser.Email,
-			IsEmailVerified: linkingUser.IsEmailVerified,
-		},
-	}
-	if linkingUser.Phone != "" {
-		human.Phone = &domain.Phone{
-			PhoneNumber:     linkingUser.Phone,
-			IsPhoneVerified: linkingUser.IsPhoneVerified,
-		}
-	}
-
-	displayName := linkingUser.PreferredUsername
-	switch idpConfig.OIDCIDPDisplayNameMapping {
-	case iam_model.OIDCMappingFieldEmail:
-		if linkingUser.IsEmailVerified && linkingUser.Email != "" && displayName == "" {
-			displayName = linkingUser.Email
-		}
-	}
-	if displayName == "" {
-		displayName = linkingUser.Email
-	}
-
-	externalIDP := &domain.UserIDPLink{
-		IDPConfigID:    idpConfig.IDPConfigID,
-		ExternalUserID: linkingUser.ExternalUserID,
-		DisplayName:    displayName,
-	}
-	return human, externalIDP, linkingUser.Metadatas
-}
+//
+//func  mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {
+//	isEmailVerified := formData.ExternalEmailVerified && formData.Email == formData.ExternalEmail
+//	isPhoneVerified := formData.ExternalPhoneVerified && formData.Phone == formData.ExternalPhone
+//	return &domain.ExternalUser{
+//		IDPConfigID:       formData.ExternalIDPConfigID,
+//		ExternalUserID:    formData.ExternalIDPExtUserID,
+//		PreferredUsername: formData.Username,
+//		DisplayName:       formData.Email,
+//		FirstName:         formData.Firstname,
+//		LastName:          formData.Lastname,
+//		NickName:          formData.Nickname,
+//		Email:             formData.Email,
+//		IsEmailVerified:   isEmailVerified,
+//		Phone:             formData.Phone,
+//		IsPhoneVerified:   isPhoneVerified,
+//		PreferredLanguage: language.Make(formData.Language),
+//	}
+//}
+//
+//func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *domain.ExternalUser {
+//	displayName := tokens.IDTokenClaims.GetPreferredUsername()
+//	if displayName == "" && tokens.IDTokenClaims.GetEmail() != "" {
+//		displayName = tokens.IDTokenClaims.GetEmail()
+//	}
+//	switch idpConfig.OIDCIDPDisplayNameMapping {
+//	case iam_model.OIDCMappingFieldEmail:
+//		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
+//			displayName = tokens.IDTokenClaims.GetEmail()
+//		}
+//	}
+//
+//	externalUser := &domain.ExternalUser{
+//		IDPConfigID:       idpConfig.IDPConfigID,
+//		ExternalUserID:    tokens.IDTokenClaims.GetSubject(),
+//		PreferredUsername: tokens.IDTokenClaims.GetPreferredUsername(),
+//		DisplayName:       displayName,
+//		FirstName:         tokens.IDTokenClaims.GetGivenName(),
+//		LastName:          tokens.IDTokenClaims.GetFamilyName(),
+//		NickName:          tokens.IDTokenClaims.GetNickname(),
+//		Email:             tokens.IDTokenClaims.GetEmail(),
+//		IsEmailVerified:   tokens.IDTokenClaims.IsEmailVerified(),
+//		PreferredLanguage: tokens.IDTokenClaims.GetLocale(),
+//	}
+//
+//	if tokens.IDTokenClaims.GetPhoneNumber() != "" {
+//		externalUser.Phone = tokens.IDTokenClaims.GetPhoneNumber()
+//		externalUser.IsPhoneVerified = tokens.IDTokenClaims.IsPhoneNumberVerified()
+//	}
+//	return externalUser
+//}
+//func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.DomainPolicy, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.UserIDPLink, []*domain.Metadata) {
+//	username := linkingUser.PreferredUsername
+//	switch idpConfig.OIDCUsernameMapping {
+//	case iam_model.OIDCMappingFieldEmail:
+//		if linkingUser.IsEmailVerified && linkingUser.Email != "" && username == "" {
+//			username = linkingUser.Email
+//		}
+//	}
+//	if username == "" {
+//		username = linkingUser.Email
+//	}
+//
+//	if orgIamPolicy.UserLoginMustBeDomain {
+//		index := strings.LastIndex(username, "@")
+//		if index > 1 {
+//			username = username[:index]
+//		}
+//	}
+//
+//	human := &domain.Human{
+//		Username: username,
+//		Profile: &domain.Profile{
+//			FirstName:         linkingUser.FirstName,
+//			LastName:          linkingUser.LastName,
+//			PreferredLanguage: linkingUser.PreferredLanguage,
+//			NickName:          linkingUser.NickName,
+//		},
+//		Email: &domain.Email{
+//			EmailAddress:    linkingUser.Email,
+//			IsEmailVerified: linkingUser.IsEmailVerified,
+//		},
+//	}
+//	if linkingUser.Phone != "" {
+//		human.Phone = &domain.Phone{
+//			PhoneNumber:     linkingUser.Phone,
+//			IsPhoneVerified: linkingUser.IsPhoneVerified,
+//		}
+//	}
+//
+//	displayName := linkingUser.PreferredUsername
+//	switch idpConfig.OIDCIDPDisplayNameMapping {
+//	case iam_model.OIDCMappingFieldEmail:
+//		if linkingUser.IsEmailVerified && linkingUser.Email != "" && displayName == "" {
+//			displayName = linkingUser.Email
+//		}
+//	}
+//	if displayName == "" {
+//		displayName = linkingUser.Email
+//	}
+//
+//	externalIDP := &domain.UserIDPLink{
+//		IDPConfigID:    idpConfig.IDPConfigID,
+//		ExternalUserID: linkingUser.ExternalUserID,
+//		DisplayName:    displayName,
+//	}
+//	return human, externalIDP, linkingUser.Metadatas
+//}
