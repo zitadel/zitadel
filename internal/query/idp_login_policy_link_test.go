@@ -17,7 +17,8 @@ var (
 		` projections.idps3.type,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_login_policy_links4` +
-		` LEFT JOIN projections.idps3 ON projections.idp_login_policy_links4.idp_id = projections.idps3.id`)
+		` LEFT JOIN projections.idps3 ON projections.idp_login_policy_links4.idp_id = projections.idps3.id AND projections.idp_login_policy_links4.instance_id = projections.idps3.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	loginPolicyIDPLinksCols = []string{
 		"idp_id",
 		"name",
@@ -115,7 +116,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

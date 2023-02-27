@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -91,7 +92,7 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserAuthMethodsQuery()
+	query, scan := prepareUserAuthMethodsQuery(ctx, q.client)
 	eq := sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[UserAuthMethodColumnOwnerRemoved.identifier()] = false
@@ -203,7 +204,7 @@ func (q *UserAuthMethodSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectB
 	return query
 }
 
-func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
+func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
 	return sq.Select(
 			UserAuthMethodColumnTokenID.identifier(),
 			UserAuthMethodColumnCreationDate.identifier(),
@@ -215,7 +216,8 @@ func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMeth
 			UserAuthMethodColumnState.identifier(),
 			UserAuthMethodColumnMethodType.identifier(),
 			countColumn.identifier()).
-			From(userAuthMethodTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(userAuthMethodTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*AuthMethods, error) {
 			userAuthMethods := make([]*AuthMethod, 0)
 			var count uint64

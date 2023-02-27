@@ -21,15 +21,6 @@ func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
 	return view.UserByID(v.Db, userTable, userID, instanceID)
 }
 
-func (v *View) UserByUsername(userName, instanceID string) (*model.UserView, error) {
-	query, err := query.NewUserUsernameSearchQuery(userName, query.TextEquals)
-	if err != nil {
-		return nil, err
-	}
-
-	return v.userByID(instanceID, query)
-}
-
 func (v *View) UserByLoginName(loginName, instanceID string) (*model.UserView, error) {
 	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
 	if err != nil {
