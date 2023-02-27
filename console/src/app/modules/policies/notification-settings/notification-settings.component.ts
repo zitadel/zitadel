@@ -8,7 +8,6 @@ import {
   AddSMTPConfigResponse,
   UpdateSMSProviderTwilioRequest,
   UpdateSMTPConfigPasswordRequest,
-  UpdateSMTPConfigPasswordResponse,
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
