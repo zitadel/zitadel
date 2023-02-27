@@ -4,7 +4,7 @@ title: Next.js B2B Scenario
 
 This is our Zitadel [Next.js](https://nextjs.org/) B2B template. It shows how to authenticate as a user with multiple organizations. The application shows your users roles on the selected organizations, other projects your organization is allowed to use and other users having a grant to use the application.
 
-If you need more info on B2B use cases consider reading our guide for the [B2B solution scenario](../../guides/solution-scenarios/b2b.mdx).
+If you need more info on B2B use cases consider reading our guide for the [B2B solution scenario](/guides/solution-scenarios/b2b.mdx).
 
 > You can follow along with the template code in our [zitadel-nextjs-b2b](https://github.com/zitadel/zitadel-nextjs-b2b) repo.
 
@@ -134,7 +134,7 @@ Let's call this new organization `Demo-Customer`.
 
 ### Users
 
-Now switch back to the organization `Demo-Customer` and [create a new user](/manuals/user-register) in this organization.
+Now switch back to the organization `Demo-Customer` and [create a new user](/guides/manage/console/users#create-user) in this organization.
 Let's call the first user `Alice Admin`. Create a second user called `Eric Employee`.
 
 ### Manager Role

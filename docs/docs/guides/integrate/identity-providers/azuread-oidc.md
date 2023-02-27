@@ -118,7 +118,7 @@ If you like to get automatically redirected to your Azure AD login instead of sh
 1. Go to the login behaviour settings of your instance or organization
 2. Disable login with username and password
 3. Make sure you have only configured AzureAD as external identity provider
-4. If you did all your settings on the organization level make sure to send the organization scope in your authorization request: [scope](../../apis/openidoauth/scopes#reserved-scopes)
+4. If you did all your settings on the organization level make sure to send the organization scope in your authorization request: [scope](/apis/openidoauth/scopes#reserved-scopes)
 
 ### Test the setup
 
