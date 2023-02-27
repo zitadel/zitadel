@@ -5,6 +5,8 @@ services:
     extends:
       file: '../localhost/docker-compose.yaml'
       service: 'zitadel'
+    volumes:
+      - ./zitadel.yaml:/zitadel.yaml
 
   db:
     extends:
@@ -33,7 +35,7 @@ services:
     volumes:
       - ../../:/e2e
     environment:
-      CYPRESS_BASE_URL: http://host.docker.internal:8080
+      CYPRESS_BASE_URL: http://host.docker.internal:8080/ui/console
       CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal
       CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://root@host.docker.internal:26257/zitadel'
     ports:
