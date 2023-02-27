@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { LabelPolicy } from '../proto/generated/zitadel/policy_pb';
 
-import { GrpcAuthService } from './grpc-auth.service';
-
 declare const tinycolor: any;
 
 export interface Color {

@@ -1,0 +1,39 @@
+<div class="onboarding-card" cdkTrapFocus>
+  <div class="spinner-w">
+    <mat-spinner diameter="20" *ngIf="loading$ | async" color="accent"> </mat-spinner>
+  </div>
+  <div class="progress-header">
+    <h2>{{ 'ONBOARDING.CARD.TITLE' | translate }}</h2>
+    <p class="cnsl-secondary-text">
+      {{ 'ONBOARDING.CARD.DESCRIPTION' | translate }}
+    </p>
+  </div>
+
+  <div class="prog-desc cnsl-secondary-text">
+    {{ adminService.progressDone | async }} / {{ adminService.progressTotal | async }}
+    {{ 'ONBOARDING.COMPLETED' | translate }}
+  </div>
+
+  <div class="actions-list">
+    <ng-container *ngFor="let action of actions | async">
+      <a
+        [routerLink]="action[1].link"
+        [queryParams]="{ id: action[1].fragment }"
+        class="action-element"
+        [ngClass]="{ done: action[1].event !== undefined }"
+      >
+        <div class="state-circle">
+          <mat-icon *ngIf="action[1]?.event !== undefined" class="success-icon" matTooltip="{{ action[1].event | event }}"
+            >check_circle</mat-icon
+          >
+        </div>
+
+        <span class="name">{{ 'ONBOARDING.EVENTS.' + action[0] + '.title' | translate }}</span>
+        <mat-icon class="arrow-right">keyboard_arrow_right</mat-icon>
+      </a>
+    </ng-container>
+  </div>
+  <div class="no-thanks-wrapper">
+    <a class="no-thanks-btn" (click)="dismiss()">{{ 'ONBOARDING.DISMISS' | translate }}</a>
+  </div>
+</div>

@@ -1,18 +1,18 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, Input, ViewChild } from '@angular/core';
-import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatSort, Sort } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { Org, OrgFieldName, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PaginatorComponent } from '../paginator/paginator.component';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { PaginatorComponent } from '../paginator/paginator.component';
 
 enum OrgListSearchKey {
   NAME = 'NAME',

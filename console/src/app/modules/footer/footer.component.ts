@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { LabelPolicy, PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { Component } from '@angular/core';
+import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Component({
