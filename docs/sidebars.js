@@ -169,7 +169,6 @@ module.exports = {
           label: "Services",
           collapsed: false,
           items: [
-            "guides/integrate/authenticated-mongodb-charts",
             "guides/integrate/gitlab-self-hosted",
             "guides/integrate/aws-saml",
             "guides/integrate/atlassian-saml",
