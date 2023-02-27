@@ -4929,22 +4929,22 @@ message UpdatePasswordComplexityPolicyRequest {
     ];
     bool has_uppercase = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the password MUST contain an upper case letter"
+            description: "Defines if the password MUST contain an upper case letter"
         }
     ];
     bool has_lowercase = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the password MUST contain a lowercase letter"
+            description: "Defines if the password MUST contain a lowercase letter"
         }
     ];
     bool has_number = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the password MUST contain a number"
+            description: "Defines if the password MUST contain a number"
         }
     ];
     bool has_symbol = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the password MUST contain a symbol. E.g. \"$\""
+            description: "Defines if the password MUST contain a symbol. E.g. \"$\""
         }
     ];
 }

@@ -316,7 +316,7 @@ message LockoutPolicy {
     zitadel.v1.ObjectDetails details = 1;
     uint64 max_password_attempts = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset."
+            description: "Maximum password check attempts before the account gets locked. Attempts are reset as soon as the password is entered correctly or the password is reset. If set to 0 the account will never be locked."
             example: "\"10\""
         }
     ];

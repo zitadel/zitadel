@@ -79,7 +79,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Organization Metadata"
         },
         {
-            name: "Policies"
+            name: "Password Settings"
+        },
+        {
+            name: "Privacy Settings"
         },
         {
             name: "Projects",
@@ -4453,8 +4456,6 @@ service ManagementService {
         };
     }
 
-    // Returns the password complexity policy of the organization
-    // With this policy the password strength can be configured
     rpc GetPasswordComplexityPolicy(GetPasswordComplexityPolicyRequest) returns (GetPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/complexity"
@@ -4463,10 +4464,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Get Password Complexity Settings";
+            description: "Returns the password complexity settings configured on the organization. The settings specify how a password should look (characters, length, etc.)"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns the default password complexity policy of the IAM
-    // With this policy the password strength can be configured
     rpc GetDefaultPasswordComplexityPolicy(GetDefaultPasswordComplexityPolicyRequest) returns (GetDefaultPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/password/complexity"
@@ -4475,10 +4489,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Get Default Password Complexity Settings";
+            description: "Returns the default password complexity settings configured on the instance. The settings specify how a password should look (characters, length, etc.)"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Add a custom password complexity policy for the organization
-    // With this policy the password strength can be configured
     rpc AddCustomPasswordComplexityPolicy(AddCustomPasswordComplexityPolicyRequest) returns (AddCustomPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/password/complexity"
@@ -4488,10 +4515,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Create Password Complexity Settings";
+            description: "Create new password complexity settings for the organization. This will overwrite the settings of the instance for this organization. The settings specify how a password should look (characters, length, etc.)"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Update the custom password complexity policy for the organization
-    // With this policy the password strength can be configured
     rpc UpdateCustomPasswordComplexityPolicy(UpdateCustomPasswordComplexityPolicyRequest) returns (UpdateCustomPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/complexity"
@@ -4501,10 +4541,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Update Password Complexity Settings";
+            description: "Update the password complexity settings of the organization. The settings specify how a password should look (characters, length, etc.)"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the custom password complexity policy of the organization
-    // The default policy of the IAM will trigger after
     rpc ResetPasswordComplexityPolicyToDefault(ResetPasswordComplexityPolicyToDefaultRequest) returns (ResetPasswordComplexityPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/password/complexity"
@@ -4512,6 +4565,21 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Reset Password Complexity Settings to Default";
+            description: "Remove the password complexity settings of the organization and therefore use the default set on the instance. The settings specify how a password should look (characters, length, etc.)"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -4524,6 +4592,21 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Get Password Age Settings";
+            description: "Not implemented";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     // The password age policy is not used at the moment
@@ -4534,6 +4617,21 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Get Default Password Age Settings";
+            description: "Not implemented";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -4547,6 +4645,21 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Add Password Age Settings";
+            description: "Not implemented";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     // The password age policy is not used at the moment
@@ -4559,6 +4672,21 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Update Password Age Settings";
+            description: "Not implemented";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     // The password age policy is not used at the moment
@@ -4570,6 +4698,21 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Reset Password Age Settings to Default";
+            description: "Not implemented";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc GetLockoutPolicy(GetLockoutPolicyRequest) returns (GetLockoutPolicyResponse) {
@@ -4580,6 +4723,21 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Get Password Lockout Settings";
+            description: "Returns the password lockout settings configured on the organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc GetDefaultLockoutPolicy(GetDefaultLockoutPolicyRequest) returns (GetDefaultLockoutPolicyResponse) {
@@ -4589,6 +4747,21 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Get Default Password Lockout Settings";
+            description: "Returns the default password lockout settings configured on the instance. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -4601,6 +4774,21 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Add Password Lockout Settings";
+            description: "Add new password lockout settings on the organization level. This will overwrite the settings set on the instance for this organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc UpdateCustomLockoutPolicy(UpdateCustomLockoutPolicyRequest) returns (UpdateCustomLockoutPolicyResponse) {
@@ -4612,6 +4800,21 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Update Password Lockout Settings";
+            description: "Update the password lockout settings configured on the organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
     rpc ResetLockoutPolicyToDefault(ResetLockoutPolicyToDefaultRequest) returns (ResetLockoutPolicyToDefaultResponse) {
@@ -4622,10 +4825,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Reset Password Lockout Settings to Default";
+            description: "Remove the password lockout settings from the organization. The settings configured on the instance will trigger afterwards for this organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns the privacy policy of the organization
-    // With this policy privacy relevant things can be configured (e.g. TOS link)
     rpc GetPrivacyPolicy(GetPrivacyPolicyRequest) returns (GetPrivacyPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/privacy"
@@ -4634,10 +4850,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Privacy Settings";
+            summary: "Get Privacy Settings";
+            description: "Returns the privacy settings configured on the organization. To be able to trigger the correct policy make sure to identify which organization should be requested on the login/register (organization scope). The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns the default privacy policy of the IAM
-    // With this policy the privacy-relevant things can be configured (e.g TOS link)
     rpc GetDefaultPrivacyPolicy(GetDefaultPrivacyPolicyRequest) returns (GetDefaultPrivacyPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/privacy"
@@ -4646,11 +4875,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Privacy Settings";
+            summary: "Get Default Privacy Settings";
+            description: "Returns the default privacy settings configured on the instance. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Add a custom privacy policy for the organization
-    // With this policy privacy relevant things can be configured (e.g. TOS link)
-    // Variable {{.Lang}} can be set to have different links based on the language
     rpc AddCustomPrivacyPolicy(AddCustomPrivacyPolicyRequest) returns (AddCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/privacy"
@@ -4660,11 +4901,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Privacy Settings";
+            summary: "Add Privacy Settings";
+            description: "Add a custom privacy policy for the organization. The configuration of the instance will be overwritten. Variable {{.Lang}} can be set to have different links based on the language. Make sure to identify which settings should be triggered by sending the organization scope. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Update the privacy policy for the organization
-    // With this policy privacy relevant things can be configured (e.g. TOS link)
-    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdateCustomPrivacyPolicy(UpdateCustomPrivacyPolicyRequest) returns (UpdateCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy"
@@ -4674,10 +4927,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Privacy Settings";
+            summary: "Update Privacy Settings";
+            description: "Update the custom privacy policy for the organization. Variable {{.Lang}} can be set to have different links based on the language. Make sure to identify which settings should be triggered by sending the organization scope. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the privacy policy of the organization
-    // The default policy of the IAM will trigger after
     rpc ResetPrivacyPolicyToDefault(ResetPrivacyPolicyToDefaultRequest) returns (ResetPrivacyPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/privacy"
@@ -4685,6 +4951,21 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Privacy Settings";
+            summary: "Reset Privacy Settings to Default";
+            description: "The settings from the organization will be removed and therefore the default settings configured on the instance will be triggered. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -8250,7 +8531,11 @@ message GetPasswordComplexityPolicyRequest {}
 message GetPasswordComplexityPolicyResponse {
     zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
     //deprecated: is_default is also defined in zitadel.policy.v1.PasswordComplexityPolicy
-    bool is_default = 2;
+    bool is_default = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Deprecated: Is defined in the policy itself"
+        }
+    ];
 }
 
 //This is an empty request
@@ -8261,11 +8546,31 @@ message GetDefaultPasswordComplexityPolicyResponse {
 }
 
 message AddCustomPasswordComplexityPolicyRequest {
-    uint64 min_length = 1;
-    bool has_uppercase = 2;
-    bool has_lowercase = 3;
-    bool has_number = 4;
-    bool has_symbol = 5;
+    uint64 min_length = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"8\""
+        }
+    ];
+    bool has_uppercase = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the password MUST contain an upper case letter"
+        }
+    ];
+    bool has_lowercase = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the password MUST contain a lowercase letter"
+        }
+    ];
+    bool has_number = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the password MUST contain a number"
+        }
+    ];
+    bool has_symbol = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the password MUST contain a symbol. E.g. \"$\""
+        }
+    ];
 }
 
 message AddCustomPasswordComplexityPolicyResponse {
@@ -8273,11 +8578,31 @@ message AddCustomPasswordComplexityPolicyResponse {
 }
 
 message UpdateCustomPasswordComplexityPolicyRequest {
-    uint64 min_length = 1;
-    bool has_uppercase = 2;
-    bool has_lowercase = 3;
-    bool has_number = 4;
-    bool has_symbol = 5;
+    uint64 min_length = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"8\""
+        }
+    ];
+    bool has_uppercase = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the password MUST contain an upper case letter"
+        }
+    ];
+    bool has_lowercase = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the password MUST contain a lowercase letter"
+        }
+    ];
+    bool has_number = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines if the password MUST contain a number"
+        }
+    ];
+    bool has_symbol = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the password MUST contain a symbol. E.g. \"$\""
+        }
+    ];
 }
 
 message UpdateCustomPasswordComplexityPolicyResponse {
@@ -8349,7 +8674,11 @@ message GetDefaultLockoutPolicyResponse {
 }
 
 message AddCustomLockoutPolicyRequest {
-    uint32 max_password_attempts = 1;
+    uint32 max_password_attempts = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
+        }
+    ];
 }
 
 message AddCustomLockoutPolicyResponse {
@@ -8357,7 +8686,11 @@ message AddCustomLockoutPolicyResponse {
 }
 
 message UpdateCustomLockoutPolicyRequest {
-    uint32 max_password_attempts = 1;
+    uint32 max_password_attempts = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
+        }
+    ];
 }
 
 message UpdateCustomLockoutPolicyResponse {
@@ -8386,9 +8719,24 @@ message GetDefaultPrivacyPolicyResponse {
 }
 
 message AddCustomPrivacyPolicyRequest {
-    string tos_link = 1;
-    string privacy_link = 2;
-    string help_link = 3;
+    string tos_link = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If registration is enabled, the user has to accept the tos. Variable {{.Lang}} can be set to have different links based on the language.";
+            example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+        }
+    ];
+    string privacy_link = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If registration is enabled, the user has to accept the privacy terms. Variable {{.Lang}} can be set to have different links based on the language.";
+            example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+        }
+    ];
+    string help_link = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Variable {{.Lang}} can be set to have different links based on the language.";
+            example: "\"https://zitadel.com/docs/manuals/introduction\"";
+        }
+    ];
 }
 
 message AddCustomPrivacyPolicyResponse {
@@ -8396,9 +8744,24 @@ message AddCustomPrivacyPolicyResponse {
 }
 
 message UpdateCustomPrivacyPolicyRequest {
-    string tos_link = 1;
-    string privacy_link = 2;
-    string help_link = 3;
+    string tos_link = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If registration is enabled, the user has to accept the tos. Variable {{.Lang}} can be set to have different links based on the language.";
+            example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+        }
+    ];
+    string privacy_link = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If registration is enabled, the user has to accept the privacy terms. Variable {{.Lang}} can be set to have different links based on the language.";
+            example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+        }
+    ];
+    string help_link = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Variable {{.Lang}} can be set to have different links based on the language.";
+            example: "\"https://zitadel.com/docs/manuals/introduction\"";
+        }
+    ];
 }
 
 message UpdateCustomPrivacyPolicyResponse {
