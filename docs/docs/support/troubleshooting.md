@@ -11,8 +11,6 @@ ZITADEL uses some cookies to identify the browser/user agent of the user, so it 
 
 We only found this issue with iPhone users, and it was dependent on the settings of the device.
 
-### Solution
-
 Go to the settings of the app Safari and check in the "Experimental WebKit Features" if SameSite strict enforcement (ITP) is disabled
 Also check if "block all cookies" is active. If so please disable this setting.
 

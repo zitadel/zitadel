@@ -417,6 +417,7 @@ module.exports = {
   ],
   support: [
     "support/introduction",
+    "support/troubleshooting",
     {
       type: "category",
       label: "Trainings",
@@ -428,15 +429,6 @@ module.exports = {
         "guides/trainings/project",
       ],
     },
-  ],
-  concepts: [
-    
-  ],
-  manuals: [
-    "manuals/introduction",
-    "manuals/user-profile",
-    "manuals/user-login",
-    "manuals/troubleshooting",
   ],
   legal: [
     "legal/introduction",
