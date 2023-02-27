@@ -105,7 +105,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Project Grants",
-            description: "A project that is granted to another organization, so the other organization has access to it and can manage the user authorizations, is called project grant."
+            description: "A project that is granted to another organization, so the other organization has access to it and can manage the user authorizations, is called a project grant."
         },
         {
             name: "Project Roles"
@@ -2328,7 +2328,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             summary: "Set Primary Domain";
-            description: "Set a domain as primary. It has to be verified to be able to set as primary. The primary domain will be shown as suffix on the usernames as preferred loginname on this organization."
+            description: "Set a domain as primary. It has to be verified to be able to be set as primary. The primary domain will be shown as suffix on the usernames as preferred loginname on this organization."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2461,7 +2461,7 @@ service ManagementService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "Remove Organization Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels.This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project)"
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project)"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3264,7 +3264,7 @@ service ManagementService {
       option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
           tags: "Applications";
           summary: "Update API Application Config";
-          description: "Update the OIDC specific configuration of an application."
+          description: "Update the OIDC-specific configuration of an application."
           parameters: {
               headers: {
                   name: "x-zitadel-orgid";
@@ -3544,7 +3544,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
             summary: "Project Grant By ID";
-            description: "Returns a project grant. A project grant is a when the organization grants the own project to another organization."
+            description: "Returns a project grant. A project grant is when the organization grants its project to another organization."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3570,7 +3570,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
             summary: "Search Project Grants from Project";
-            description: "Returns a list of project grants for a specific project. A project grant is a when the organization grants the own project to another organization."
+            description: "Returns a list of project grants for a specific project. A project grant is when the organization grants its project to another organization."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3595,7 +3595,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
             summary: "Search Project Grants";
-            description: "Returns a list of project grants. A project grant is a when the organization grants the own project to another organization."
+            description: "Returns a list of project grants. A project grant is when the organization grants its project to another organization."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3719,7 +3719,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
             summary: "Remove Project Grant";
-            description: "Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterwards (if permissions are checked)."
+            description: "Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked)."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3852,7 +3852,7 @@ service ManagementService {
             tags: "Members";
             tags: "ZITADEL Administrators";
             summary: "Remove Project Grant Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an project grant level. The user can still have roles on another level (iam, organization, project)"
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on a project grant level. The user can still have roles on another level (iam, organization, project)"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3876,7 +3876,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
             summary: "User Grant By ID";
-            description: "Returns a user grant per ID. A user grant is the role a user has for a specific project and organization."
+            description: "Returns a user grant per ID. A user grant is a role a user has for a specific project and organization."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3976,7 +3976,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
             summary: "Deactivate User Grant";
-            description: "Deactivate the user grant. The user will not be able to use the granted project anymore. Also the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated."
+            description: "Deactivate the user grant. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4025,7 +4025,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
             summary: "Remove User Grant";
-            description: "Removes the user grant from the user. The user will not be able to use the granted project anymore. Also the roles will not be included in the tokens when requested."
+            description: "Removes the user grant from the user. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4050,7 +4050,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
             summary: "Bulk Remove User Grants";
-            description: "Remove a list of user grants. The users will not be able to use the granted project anymore. Also the roles will not be included in the tokens when requested."
+            description: "Remove a list of user grants. The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4119,7 +4119,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Login Settings";
             summary: "Get Login Settings";
-            description: "Returns the login settings defined on the organization level. It will trigger as soon as the organization is identified (scope, user identitfication). The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
+            description: "Returns the login settings defined on the organization level. It will trigger as soon as the organization is identified (scope, user identification). The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4221,7 +4221,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Login Settings";
             summary: "Reset Custom Login Settings to Default";
-            description: "Remove the custom settings from the organization. The default settings of the instance will be triggereed afterwards. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
+            description: "Remove the custom settings from the organization. The default settings of the instance will be triggered afterward. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4354,7 +4354,7 @@ service ManagementService {
             tags: "Login Settings";
             tags: "Authentication Methods"
             summary: "Add Second Factor (2FA)";
-            description: "Add a new second factor (2FA) to the login settings of the ogranization. Users will have the possibility to authenticate with the configured factor afterward. Authentication factors are used as an additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called a second factor as it is used as an additional authentication after a password. In the UI we generalize this as multi-factor."
+            description: "Add a new second factor (2FA) to the login settings of the organization. Users will have the possibility to authenticate with the configured factor afterward. Authentication factors are used as an additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called a second factor as it is used as an additional authentication after a password. In the UI we generalize this as multi-factor."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4586,7 +4586,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Reset Password Complexity Settings to Default";
-            description: "Remove the password complexity settings of the organization and therefore use the default set on the instance. The settings specify how a password should look (characters, length, etc.)"
+            description: "Remove the password complexity settings of the organization and therefore use the default settings on the instance. The settings specify how a password should look (characters, length, etc.)"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4845,7 +4845,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Reset Password Lockout Settings to Default";
-            description: "Remove the password lockout settings from the organization. The settings configured on the instance will trigger afterwards for this organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
+            description: "Remove the password lockout settings from the organization. The settings configured on the instance will trigger afterward for this organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5099,7 +5099,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Notification Settings";
             summary: "Reset Notification Settings to Default";
-            description: "The settings configured will be removed from the organization. Therefore the settings from the instance will trigger for the users of this organization afterwards. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
+            description: "The settings configured will be removed from the organization. Therefore the settings from the instance will trigger for the users of this organization afterward. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5427,7 +5427,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Custom Init Message Text";
-            description: "Get the custom text of the initialize-user message/email that set on the organization. The email is sent when a user is created and has either no password or a non-verified email address."
+            description: "Get the custom text of the initialize-user message/email that is set on the organization. The email is sent when a user is created and has either no password or a non-verified email address."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5597,7 +5597,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Password Reset Message Text to Default";
-            description: "Removes the custom text of the password reset user message/email and the default will trigger afterwards."
+            description: "Removes the custom text of the password reset user message/email and the default will trigger afterward."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5670,7 +5670,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Set Default Verify Email Message Text";
-            description: "Set the custom text of the verify email user message/email for the organization. The email is sent when a user adds a new nonverified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            description: "Set the custom text of the verify-email user message/email for the organization. The email is sent when a user adds a new nonverified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5694,7 +5694,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Verify Email Message Text to Default";
-            description: "Removes the custom text of the email verify message/email and therefore the default settings will trigger afterwards."
+            description: "Removes the custom text of the email verify message/email and therefore the default settings will trigger afterward."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5791,7 +5791,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Reset Custom Verify Phone Message Text to Default";
-            description: "Removes the custom text of the verify-phone message from the organization and therefore the default texts will trigger for the users afterwards."
+            description: "Removes the custom text of the verify-phone message from the organization and therefore the default texts will trigger for the users afterward."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -5815,7 +5815,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Get Custom Domain Claimed Message Text";
-            description: "Get the custom text of the domain claimed message/email that configured on the organization. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
+            description: "Get the custom text of the domain claimed message/email that is configured on the organization. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6058,7 +6058,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Message Texts";
             summary: "Set Custom Password Changed Message Text";
-            description: "Set the custom text of the password-changed message/email for the oraganization. The message/email is sent when the password of a user has been changed.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+            description: "Set the custom text of the password-changed message/email for the organization. The message/email is sent when the password of a user has been changed.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6130,7 +6130,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Login Texts";
             summary: "Get Default Login Text";
-            description: "Get the default texts for the login and register UI of ZITADEL, which are configure on the instance or as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured. Or if the organization context is not given."
+            description: "Get the default texts for the login and register UI of ZITADEL, which are configured on the instance or as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured. Or if the organization context is not given."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6253,7 +6253,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Add OIDC Identity Provider (IDP)";
-            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. The provider has to be OIDC compliant. This configuration can only be used by the organization itself."
+            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. The provider has to be OIDC-compliant. This configuration can only be used by the organization itself."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6452,7 +6452,7 @@ service ManagementService {
         };
     }
 
-    // Returns an identity provider of the organisation
+    // Returns an identity provider of the organization
     rpc GetProviderByID(GetProviderByIDRequest) returns (GetProviderByIDResponse) {
         option (google.api.http) = {
             get: "/idps/templates/{id}"
@@ -6463,7 +6463,7 @@ service ManagementService {
         };
     }
 
-    // Add a new OAuth2 identity provider in the organisation
+    // Add a new OAuth2 identity provider in the organization
     rpc AddGenericOAuthProvider(AddGenericOAuthProviderRequest) returns (AddGenericOAuthProviderResponse) {
         option (google.api.http) = {
             post: "/idps/oauth"
@@ -6475,7 +6475,7 @@ service ManagementService {
         };
     }
 
-    // Change an existing OAuth2 identity provider in the organisation
+    // Change an existing OAuth2 identity provider in the organization
     rpc UpdateGenericOAuthProvider(UpdateGenericOAuthProviderRequest) returns (UpdateGenericOAuthProviderResponse) {
         option (google.api.http) = {
             put: "/idps/oauth/{id}"
@@ -6487,7 +6487,7 @@ service ManagementService {
         };
     }
 
-    // Add a new Google identity provider in the organisation
+    // Add a new Google identity provider in the organization
     rpc AddGoogleProvider(AddGoogleProviderRequest) returns (AddGoogleProviderResponse) {
         option (google.api.http) = {
             post: "/idps/google"
@@ -6499,7 +6499,7 @@ service ManagementService {
         };
     }
 
-    // Change an existing Google identity provider in the organisation
+    // Change an existing Google identity provider in the organization
     rpc UpdateGoogleProvider(UpdateGoogleProviderRequest) returns (UpdateGoogleProviderResponse) {
         option (google.api.http) = {
             put: "/idps/google/{id}"
@@ -6511,7 +6511,7 @@ service ManagementService {
         };
     }
 
-    // Add a new LDAP identity provider in the organisation
+    // Add a new LDAP identity provider in the organization
     rpc AddLDAPProvider(AddLDAPProviderRequest) returns (AddLDAPProviderResponse) {
         option (google.api.http) = {
             post: "/idps/ldap"
@@ -6523,7 +6523,7 @@ service ManagementService {
         };
     }
 
-    // Change an existing LDAP identity provider in the organisation
+    // Change an existing LDAP identity provider in the organization
     rpc UpdateLDAPProvider(UpdateLDAPProviderRequest) returns (UpdateLDAPProviderResponse) {
         option (google.api.http) = {
             put: "/idps/ldap/{id}"
@@ -6560,7 +6560,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Actions";
             summary: "Search Actions";
-            description: "Returns a list of actions matching the query. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            description: "Returns a list of actions matching the query. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6584,7 +6584,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Actions";
             summary: "Get Action By ID";
-            description: "Returns an actions by id. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            description: "Returns an action by id. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6609,7 +6609,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Actions";
             summary: "Create Action";
-            description: "Create a new ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            description: "Create a new ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6634,7 +6634,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Actions";
             summary: "Update Action";
-            description: "Update an existing ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            description: "Update an existing ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6659,7 +6659,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Actions";
             summary: "Deactivate Action";
-            description: "Deactivate an existing action. The action will not be executed if configured in a flow. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            description: "Deactivate an existing action. The action will not be executed if configured in a flow. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6684,7 +6684,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Actions";
             summary: "Reactivate Action";
-            description: "Reactivate an existing action that is deactivated. The action will be executed again if configured in a flow. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            description: "Reactivate an existing action that is deactivated. The action will be executed again if configured in a flow. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6709,7 +6709,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Actions";
             summary: "Delete Action";
-            description: "Remove an existing action. Actions are custom code written in javascript, that can be run at a specified point/flow/tirgger in ZITADEL."
+            description: "Remove an existing action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -8047,7 +8047,7 @@ message ListOrgMetadataRequest {
     repeated zitadel.metadata.v1.MetadataQuery queries = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             title: "Medata Query"
-            description: "Metadata object specific queries."
+            description: "Metadata object-specific queries."
         }];
 }
 
@@ -9161,7 +9161,7 @@ message AddUserGrantRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_length: 200;
             example: "\"9847026806489455\"";
-            description: "Make sure to fill the project grant id if the user grant is for a granted project and the organization is not the owner of the project.";
+            description: "Make sure to fill in the project grant id if the user grant is for a granted project and the organization is not the owner of the project.";
         }
     ];
     repeated string role_keys = 4 [
@@ -9645,7 +9645,7 @@ message GetDefaultPrivacyPolicyResponse {
 message AddCustomPrivacyPolicyRequest {
     string tos_link = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "If registration is enabled, the user has to accept the tos. Variable {{.Lang}} can be set to have different links based on the language.";
+            description: "If registration is enabled, the user has to accept the TOS. Variable {{.Lang}} can be set to have different links based on the language.";
             example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
         }
     ];
@@ -9670,7 +9670,7 @@ message AddCustomPrivacyPolicyResponse {
 message UpdateCustomPrivacyPolicyRequest {
     string tos_link = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "If registration is enabled, the user has to accept the tos. Variable {{.Lang}} can be set to have different links based on the language.";
+            description: "If registration is enabled, the user has to accept the TOS. Variable {{.Lang}} can be set to have different links based on the language.";
             example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
         }
     ];
@@ -11103,7 +11103,7 @@ message CreateActionRequest {
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"function log(context, calls){console.log(context)}\"";
-            description: "Javascript code that should executed"
+            description: "Javascript code that should be executed"
             min_length: 1;
             max_length: 2000;
         }
