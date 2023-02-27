@@ -39,7 +39,7 @@ services:
     environment:
       CYPRESS_BASE_URL: http://host.docker.internal:8080/ui/console
       CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal
-      CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://root@host.docker.internal:26257/zitadel'
+      CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://root@db:26257/zitadel'
     ports:
       - "8900:8900"
     extra_hosts:
