@@ -55,6 +55,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Authorization"
         },
         {
+            name: "Branding"
+        },
+        {
             name: "Domain Settings"
         },
         {
@@ -5099,8 +5102,6 @@ service ManagementService {
         };
     }
 
-    // Returns the active label policy of the organization
-    // With this policy private labeling can be configured (colors, etc.)
     rpc GetLabelPolicy(GetLabelPolicyRequest) returns (GetLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/label"
@@ -5109,10 +5110,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Get Private Labeling/Branding Settings";
+            description: "Returns the currently active private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns the preview label policy of the organization
-    // With this policy private labeling can be configured (colors, etc.)
     rpc GetPreviewLabelPolicy(GetPreviewLabelPolicyRequest) returns (GetPreviewLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/label/_preview"
@@ -5121,10 +5135,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Get Preview Private Labeling/Branding Settings";
+            description: "Returns the preview private labeling/branding configured on the organization. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns the default label policy of the IAM
-    // With this policy private labeling can be configured (colors, etc.)
     rpc GetDefaultLabelPolicy(GetDefaultLabelPolicyRequest) returns (GetDefaultLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/label"
@@ -5133,10 +5160,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Get Default Private Labeling/Branding Settings";
+            description: "Returns the default private labeling/branding configured on the instance. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Add a custom label policy for the organization
-    // With this policy private labeling can be configured (colors, etc.)
     rpc AddCustomLabelPolicy(AddCustomLabelPolicyRequest) returns (AddCustomLabelPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/label"
@@ -5146,10 +5186,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Create Labeling/Branding Settings";
+            description: "Create the private labeling/branding configured on the organization. Make sure to activate it so it will be shown to the users. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Changes the custom label policy for the organization
-    // With this policy private labeling can be configured (colors, etc.)
     rpc UpdateCustomLabelPolicy(UpdateCustomLabelPolicyRequest) returns (UpdateCustomLabelPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/label"
@@ -5159,9 +5212,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Update Labeling/Branding Settings";
+            description: "Update the preview private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Activates all changes to the label policy
     rpc ActivateCustomLabelPolicy(ActivateCustomLabelPolicyRequest) returns (ActivateCustomLabelPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/label/_activate"
@@ -5172,9 +5239,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Activate Labeling/Branding Settings";
+            description: "Activates the preview private labeling/branding configured on the organization. It will be shown to the users afterward. The settings will trigger if the organization has been identified (organization scope, user). Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the logo of the label policy
     rpc RemoveCustomLabelPolicyLogo(RemoveCustomLabelPolicyLogoRequest) returns (RemoveCustomLabelPolicyLogoResponse) {
         option (google.api.http) = {
             delete: "/policies/label/logo"
@@ -5183,9 +5264,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Logo Light";
+            description: "Removes the logo of the light theme from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the logo dark of the label policy
     rpc RemoveCustomLabelPolicyLogoDark(RemoveCustomLabelPolicyLogoDarkRequest) returns (RemoveCustomLabelPolicyLogoDarkResponse) {
         option (google.api.http) = {
             delete: "/policies/label/logo_dark"
@@ -5194,9 +5289,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Logo Dark";
+            description: "Removes the logo of the dark theme from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the icon of the label policy
     rpc RemoveCustomLabelPolicyIcon(RemoveCustomLabelPolicyIconRequest) returns (RemoveCustomLabelPolicyIconResponse) {
         option (google.api.http) = {
             delete: "/policies/label/icon"
@@ -5205,9 +5314,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Icon Light";
+            description: "Removes the icon of the light theme from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the logo dark of the label policy
     rpc RemoveCustomLabelPolicyIconDark(RemoveCustomLabelPolicyIconDarkRequest) returns (RemoveCustomLabelPolicyIconDarkResponse) {
         option (google.api.http) = {
             delete: "/policies/label/icon_dark"
@@ -5216,9 +5339,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Icon Dark";
+            description: "Removes the icon of the dark theme from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the font of the label policy
     rpc RemoveCustomLabelPolicyFont(RemoveCustomLabelPolicyFontRequest) returns (RemoveCustomLabelPolicyFontResponse) {
         option (google.api.http) = {
             delete: "/policies/label/font"
@@ -5227,10 +5364,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Font";
+            description: "Removes the font from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the custom label policy of the organization
-    // The default policy of the IAM will trigger after
     rpc ResetLabelPolicyToDefault(ResetLabelPolicyToDefaultRequest) returns (ResetLabelPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/label"
@@ -5238,6 +5388,21 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Reset Labeling/Branding Settings";
+            description: "Removes the label policy/branding of the organization and therefore the default settings from the instance will be shown to the users."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -8914,20 +9079,76 @@ message GetDefaultLabelPolicyResponse {
 }
 
 message AddCustomLabelPolicyRequest {
-    string primary_color = 1 [(validate.rules).string = {max_len: 50}];
+    string primary_color = 1 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Represents a color scheme"
+            example: "\"#353535\"";
+            max_length: 50;
+        }
+    ];
     // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set";
         }
     ];
-    string warn_color = 4 [(validate.rules).string = {max_len: 50}];
-    string background_color = 5 [(validate.rules).string = {max_len: 50}];
-    string font_color = 6 [(validate.rules).string = {max_len: 50}];
-    string primary_color_dark = 7 [(validate.rules).string = {max_len: 50}];
-    string background_color_dark = 8 [(validate.rules).string = {max_len: 50}];
-    string warn_color_dark = 9 [(validate.rules).string = {max_len: 50}];
-    string font_color_dark = 10 [(validate.rules).string = {max_len: 50}];
+    string warn_color = 4 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for warn color";
+            example: "\"#CD3D56\"";
+            max_length: 50;
+        }
+    ];
+    string background_color = 5 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for background color";
+            example: "\"#FAFAFA\"";
+            max_length: 50;
+        }
+    ];
+    string font_color = 6 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color";
+            example: "\"#000000\"";
+            max_length: 50;
+        }
+    ];
+    string primary_color_dark = 7 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for the primary color dark theme";
+            example: "\"#BBBAFA\"";
+            max_length: 50;
+        }
+    ];
+    string background_color_dark = 8 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for background color dark theme";
+            example: "\"#111827\"";
+            max_length: 50;
+        }
+    ];
+    string warn_color_dark = 9 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for warning color dark theme";
+            example: "\"#FF3B5B\"";
+            max_length: 50;
+        }
+    ];
+    string font_color_dark = 10 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color dark theme";
+            example: "\"#FFFFFF\"";
+            max_length: 50;
+        }
+    ];
     bool disable_watermark = 11;
 }
 
@@ -8942,13 +9163,62 @@ message UpdateCustomLabelPolicyRequest {
             description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set";
         }
     ];
-    string warn_color = 4 [(validate.rules).string = {max_len: 50}];
-    string background_color = 5 [(validate.rules).string = {max_len: 50}];
-    string font_color = 6 [(validate.rules).string = {max_len: 50}];
-    string primary_color_dark = 7 [(validate.rules).string = {max_len: 50}];
-    string background_color_dark = 8 [(validate.rules).string = {max_len: 50}];
-    string warn_color_dark = 9 [(validate.rules).string = {max_len: 50}];
-    string font_color_dark = 10 [(validate.rules).string = {max_len: 50}];
+    string warn_color = 4 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for warn color";
+            example: "\"#CD3D56\"";
+            max_length: 50;
+        }
+    ];
+    string background_color = 5 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for background color";
+            example: "\"#FAFAFA\"";
+            max_length: 50;
+        }
+    ];
+    string font_color = 6 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color";
+            example: "\"#000000\"";
+            max_length: 50;
+        }
+    ];
+    string primary_color_dark = 7 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for the primary color dark theme";
+            example: "\"#BBBAFA\"";
+            max_length: 50;
+        }
+    ];
+    string background_color_dark = 8 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for background color dark theme";
+            example: "\"#111827\"";
+            max_length: 50;
+        }
+    ];
+    string warn_color_dark = 9 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for warning color dark theme";
+            example: "\"#FF3B5B\"";
+            max_length: 50;
+        }
+    ];
+    string font_color_dark = 10 [
+        (validate.rules).string = {max_len: 50},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color dark theme";
+            example: "\"#FFFFFF\"";
+            max_length: 50;
+        }
+    ];
     bool disable_watermark = 11;
 }
 
