@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ProviderGoogleCreateComponent } from './provider-google-create.component';
+import { ProviderGoogleComponent } from './provider-google.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: ProviderGoogleCreateComponent,
+    component: ProviderGoogleComponent,
     data: { animation: 'DetailPage' },
   },
 ];
@@ -15,4 +15,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class ProviderGoogleCreateRoutingModule {}
+export class ProviderGoogleRoutingModule {}

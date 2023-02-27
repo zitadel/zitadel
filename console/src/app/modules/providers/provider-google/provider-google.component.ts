@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, Injector, OnDestroy, OnInit, Type } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, Injector, OnInit, Type } from '@angular/core';
+import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { take } from 'rxjs/operators';
@@ -15,11 +15,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
-  selector: 'cnsl-provider-google-create',
-  templateUrl: './provider-google-create.component.html',
-  styleUrls: ['./provider-google-create.component.scss'],
+  selector: 'cnsl-provider-google',
+  templateUrl: './provider-google.component.html',
+  styleUrls: ['./provider-google.component.scss'],
 })
-export class ProviderGoogleCreateComponent implements OnInit {
+export class ProviderGoogleComponent implements OnInit {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
 

@@ -24,43 +24,51 @@ const routes: Routes = [
     },
   },
   {
-    path: 'idp',
+    path: 'provider',
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.idp.write'],
+      serviceType: PolicyComponentServiceType.ADMIN,
+    },
     children: [
       {
-        path: 'oidc-create',
-        loadChildren: () => import('src/app/modules/providers/provider-oidc/provider-oidc.module'),
-        canActivate: [AuthGuard, RoleGuard],
-        data: {
-          roles: ['iam.idp.write'],
-          serviceType: PolicyComponentServiceType.ADMIN,
-        },
+        path: 'oidc',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-oidc/provider-oidc.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-oidc/provider-oidc.module'),
+          },
+        ],
       },
       {
-        path: 'jwt-create',
-        loadChildren: () => import('src/app/modules/providers/provider-jwt/provider-jwt.module'),
-        canActivate: [AuthGuard, RoleGuard],
-        data: {
-          roles: ['iam.idp.write'],
-          serviceType: PolicyComponentServiceType.ADMIN,
-        },
+        path: 'jwt',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-jwt/provider-jwt.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-jwt/provider-jwt.module'),
+          },
+        ],
       },
       {
-        path: 'google-create',
-        loadChildren: () => import('src/app/modules/providers/provider-google/provider-google-create.module'),
-        canActivate: [AuthGuard, RoleGuard],
-        data: {
-          roles: ['iam.idp.write'],
-          serviceType: PolicyComponentServiceType.ADMIN,
-        },
-      },
-      {
-        path: ':id',
-        loadChildren: () => import('src/app/modules/idp/idp.module'),
-        canActivate: [AuthGuard, RoleGuard],
-        data: {
-          roles: ['iam.idp.read'],
-          serviceType: PolicyComponentServiceType.ADMIN,
-        },
+        path: 'google',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-google/provider-google.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-google/provider-google.module'),
+          },
+        ],
       },
     ],
   },

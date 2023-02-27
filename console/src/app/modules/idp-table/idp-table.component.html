@@ -109,8 +109,17 @@
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.TYPE' | translate }}</th>
         <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
-          <span class="state" *ngIf="idp?.oidcConfig">{{ 'IDP.TYPES.1' | translate }}</span>
-          <span class="state" *ngIf="idp?.jwtConfig">{{ 'IDP.TYPES.3' | translate }}</span>
+          <div [ngSwitch]="idp.type">
+            <div class="provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GOOGLE">
+              <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
+            </div>
+            <div class="provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OIDC">
+              <mat-icon class="idp-icon" svgIcon="mdi_oidc" alt="oidc" />
+            </div>
+            <div class="provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_JWT">
+              <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
+            </div>
+          </div>
         </td>
       </ng-container>
 

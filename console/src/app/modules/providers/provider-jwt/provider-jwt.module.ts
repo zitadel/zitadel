@@ -38,4 +38,4 @@ import { ProviderJWTComponent } from './provider-jwt.component';
     MatProgressBarModule,
   ],
 })
-export default class ProviderJWTCreateModule {}
+export default class ProviderJWTModule {}

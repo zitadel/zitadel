@@ -38,4 +38,4 @@ import { ProviderOIDCComponent } from './provider-oidc.component';
     MatProgressBarModule,
   ],
 })
-export default class ProviderOIDCCreateModule {}
+export default class ProviderOIDCModule {}

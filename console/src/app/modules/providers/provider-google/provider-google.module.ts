@@ -14,13 +14,13 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { CardModule } from '../../card/card.module';
 import { CreateLayoutModule } from '../../create-layout/create-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { ProviderGoogleCreateRoutingModule } from './provider-google-create-routing.module';
-import { ProviderGoogleCreateComponent } from './provider-google-create.component';
+import { ProviderGoogleRoutingModule } from './provider-google-routing.module';
+import { ProviderGoogleComponent } from './provider-google.component';
 
 @NgModule({
-  declarations: [ProviderGoogleCreateComponent],
+  declarations: [ProviderGoogleComponent],
   imports: [
-    ProviderGoogleCreateRoutingModule,
+    ProviderGoogleRoutingModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -38,4 +38,4 @@ import { ProviderGoogleCreateComponent } from './provider-google-create.componen
     MatProgressBarModule,
   ],
 })
-export default class ProviderGoogleCreateModule {}
+export default class ProviderGoogleModule {}

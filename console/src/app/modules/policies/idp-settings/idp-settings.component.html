@@ -12,9 +12,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'idp', 'google-create']
+        ? ['/instance', 'idp', 'google', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/instance', 'idp', 'google-create']
+        ? ['/instance', 'idp', 'google', 'create']
         : []
     "
   >
@@ -51,9 +51,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'idp', 'oidc-create']
+        ? ['/instance', 'idp', 'oidc', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/instance', 'idp', 'oidc-create']
+        ? ['/instance', 'idp', 'oidc', 'create']
         : []
     "
   >
@@ -69,9 +69,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'idp', 'jwt-create']
+        ? ['/instance', 'idp', 'jwt', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/instance', 'idp', 'jwt-create']
+        ? ['/instance', 'idp', 'jwt', 'create']
         : []
     "
   >
