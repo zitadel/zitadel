@@ -642,7 +642,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&jwtEndpoint,
 				&jwtKeysEndpoint,
 				&jwtHeaderName,
-				//google
+				// google
 				&googleID,
 				&googleClientID,
 				&googleClientSecret,
