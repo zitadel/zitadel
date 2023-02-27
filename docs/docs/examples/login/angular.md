@@ -14,7 +14,7 @@ At the end of the guide, your application has login functionality and has access
 Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select **User Agent** application type and continue.
-We recommend you use [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
+We recommend you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
 
 ![Create app in console](/img/angular/app-create.png)
 
@@ -158,6 +158,6 @@ If you get stuck, consider checking out our [example](https://github.com/zitadel
 
 ### What's next?
 
-Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs. Refer to the [docs](../../apis/introduction) or check out our ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which is using gRPC to access data.
+Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs. Refer to the [docs](/apis/introduction) or check out our ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which is using gRPC to access data.
 
 For more information about creating an Angular application, refer to [Angular](https://angular.io/start) and for more information about the OAuth/OIDC library used above, consider reading their docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).

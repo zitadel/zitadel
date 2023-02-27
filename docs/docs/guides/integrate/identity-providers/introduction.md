@@ -19,6 +19,6 @@ Because Google is registered as trusted identity provider the user will be able 
 
 ## How to use external identity providers in ZITADEL
 
-Configure external identity providers on instance level or just for one organization via [Console](/manage/console/instance-settings#identity-providers) or APIs.
+Configure external identity providers on instance level or just for one organization via [Console](/guides/manage/console/instance-settings#identity-providers) or APIs.
 The guides in this will help you to set up specific identity providers.
 ZITADEL provides also templates to configure generic identity providers, which don't have a template.
