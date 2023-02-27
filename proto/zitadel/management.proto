@@ -73,6 +73,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Login Settings"
         },
         {
+            name: "Login Texts"
+        },
+        {
             name: "Members"
         },
         {
@@ -6088,7 +6091,6 @@ service ManagementService {
         };
     }
 
-    //Returns the custom texts for login ui
     rpc GetCustomLoginTexts(GetCustomLoginTextsRequest) returns (GetCustomLoginTextsResponse) {
         option (google.api.http) = {
             get: "/text/login/{language}";
@@ -6097,9 +6099,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Login Texts";
+            summary: "Get Custom Login Text";
+            description: "Get the custom texts for the login and register UI of ZITADEL, which are configured on the organization. The text from the organization will trigger as soon as the organization is identified (organization scope or user)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    //Returns the custom texts for login ui
     rpc GetDefaultLoginTexts(GetDefaultLoginTextsRequest) returns (GetDefaultLoginTextsResponse) {
         option (google.api.http) = {
             get: "/text/default/login/{language}";
@@ -6108,10 +6123,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Login Texts";
+            summary: "Get Default Login Text";
+            description: "Get the default texts for the login and register UI of ZITADEL, which are configure on the instance or as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured. Or if the organization context is not given."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    //Sets the default custom text for login UI
-    //it impacts all organizations without customized login UI texts
     rpc SetCustomLoginText(SetCustomLoginTextsRequest) returns (SetCustomLoginTextsResponse) {
         option (google.api.http) = {
             put: "/text/login/{language}";
@@ -6121,10 +6148,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Login Texts";
+            summary: "Set Default Login Text";
+            description: "Set the custom texts for the login and register UI of ZITADEL for the organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the custom login text of the organization
-    // The default text of the IAM will trigger after
     rpc ResetCustomLoginTextToDefault(ResetCustomLoginTextsToDefaultRequest) returns (ResetCustomLoginTextsToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/login/{language}"
@@ -6132,6 +6171,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Login Texts";
+            summary: "Reset Custom Login Text to Default";
+            description: "Removes the custom texts for the login and register UI from the organization and therefore the configuration of the instance or the translation files in ZITADEL itself will trigger."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
