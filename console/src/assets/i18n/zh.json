@@ -42,6 +42,41 @@
       "ADD": "按住并拖动来添加"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "你的入职过程",
+    "COMPLETED": "已完成",
+    "DISMISS": "隐藏",
+    "CARD": {
+      "TITLE": "让你的ZITADEL运转起来",
+      "DESCRIPTION": "这份清单有助于设置你的实例，并指导你完成最重要的步骤"
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "设置你的品牌",
+        "description": "定义你的登录的颜色和形状，上传你的标志和图标。"
+      },
+      "instance.smtp.config.added": {
+        "title": "SMTP设置",
+        "description": "设置你自己的邮件服务器设置"
+      },
+      "project.added": {
+        "title": "创建你的第一个项目",
+        "description": "添加你的第一个项目并定义其角色和授权。"
+      },
+      "project.application.added": {
+        "title": "创建你的第一个应用程序",
+        "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。"
+      },
+      "user.human.added": {
+        "title": "添加用户",
+        "description": "添加你的应用程序用户"
+      },
+      "user.grant.added": {
+        "title": "授予用户",
+        "description": "允许用户访问你的应用程序并设置他们的角色。"
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "实例",
     "DASHBOARD": "首页",
@@ -1736,9 +1771,11 @@
       "TITLE": "应用",
       "ID": "ID",
       "DESCRIPTION": "在这里您可以编辑您的应用程序数据及其配置。",
-      "CREATE_OIDC": "OIDC 应用",
-      "CREATE_OIDC_DESC_TITLE": "逐步输入您的应用详情",
-      "CREATE_OIDC_DESC_SUB": "将自动生成推荐的配置。",
+      "CREATE": "OIDC 应用",
+      "CREATE_SELECT_PROJECT": "首先选择你的项目",
+      "CREATE_NEW_PROJECT": "或创建一个新的<a href='{url}}' title='创建项目'>这里</a>。",
+      "CREATE_DESC_TITLE": "逐步输入您的应用详情",
+      "CREATE_DESC_SUB": "将自动生成推荐的配置。",
       "STATE": "状态",
       "DATECREATED": "创建于",
       "DATECHANGED": "修改于",

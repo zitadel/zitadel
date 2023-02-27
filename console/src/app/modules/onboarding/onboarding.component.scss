@@ -1,0 +1,174 @@
+@use '@angular/material' as mat;
+
+@mixin onboarding-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  $list-background-color: mat.get-color-from-palette($background, 300);
+  $card-background-color: mat.get-color-from-palette($background, cards);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-selected-color: if($is-dark-theme, #fff, #000);
+
+  .onboarding-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+
+    .title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .desc {
+      font-size: 14px;
+      margin-top: 0;
+    }
+
+    .onboarding-progress-bar-wrapper {
+      display: flex;
+      align-items: center;
+      padding: 1rem 0;
+      min-height: 20px;
+
+      .progress {
+        border-radius: 50vw;
+        height: 8px;
+        max-width: 300px;
+        margin-right: 1rem;
+
+        .mat-progress-bar-buffer {
+          background-color: if($is-dark-theme, rgb(69, 91, 84), #cccccc) !important;
+        }
+        .mat-progress-bar-background {
+          fill: if($is-dark-theme, rgb(69, 91, 84), #cccccc) !important;
+        }
+        .mat-progress-bar-fill:after {
+          background-color: var(--success);
+        }
+      }
+
+      .prog-desc {
+        font-style: italic;
+        font-size: 14px;
+        margin-right: 1rem;
+      }
+    }
+
+    .action-card-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -1rem;
+      box-sizing: border-box;
+
+      .action-card {
+        position: relative;
+        z-index: 100;
+        margin: 1rem;
+        flex-basis: 270px;
+        text-decoration: none;
+        cursor: pointer;
+        padding-top: 0;
+        padding-right: 0;
+        padding-bottom: 0;
+        padding-left: 1rem;
+        border-radius: 0.5rem;
+        box-sizing: border-box;
+        min-height: 166px;
+        transition: box-shadow 0.1s ease-in;
+
+        .action-content {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          padding-right: 0.5rem;
+
+          .text-block {
+            display: flex;
+            flex-direction: column;
+            color: map-get($foreground, text);
+            padding-top: 1rem;
+
+            .name {
+              margin-bottom: 1rem;
+            }
+
+            .description {
+              font-size: 14px;
+            }
+          }
+
+          .fill-space {
+            flex: 1;
+          }
+        }
+
+        .state-circle {
+          position: absolute;
+          top: 0;
+          left: 0;
+          transform: translateX(-50%) translateY(-50%);
+          flex-shrink: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 1.5rem;
+          width: 1.5rem;
+          border-radius: 50vw;
+          margin-right: 1rem;
+          background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
+          box-shadow: 0 0 3px #0000001a;
+
+          i {
+            font-size: 1rem;
+          }
+
+          .success-icon {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            width: 1.2rem;
+            color: var(--success);
+          }
+
+          .warn-icon {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            width: 1.2rem;
+            color: map-get($foreground, text);
+            opacity: 0.3;
+          }
+        }
+
+        .action-row {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          font-size: 14px;
+          margin-bottom: 0.5rem;
+
+          .icon {
+            margin-left: 0rem;
+          }
+        }
+
+        &:hover {
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+        }
+      }
+
+      &.alldone {
+        .state-circle {
+          display: none;
+        }
+      }
+    }
+  }
+}

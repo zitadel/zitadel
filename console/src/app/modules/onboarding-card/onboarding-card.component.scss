@@ -1,0 +1,144 @@
+@mixin onboarding-card-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  .onboarding-card {
+    border-radius: 0.5rem;
+    z-index: 200;
+    position: relative;
+    min-width: 220px;
+    max-width: 280px;
+    padding-bottom: 0.5rem;
+    position: relative;
+    color: map-get($foreground, text);
+    background: map-get($background, cards);
+
+    .spinner-w {
+      top: 1rem;
+      left: 0;
+      right: 0;
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .progress-header {
+      padding: 1rem 1rem 0 1rem;
+
+      h2 {
+        margin-top: 0;
+      }
+      p {
+        font-size: 14px;
+      }
+    }
+
+    .prog-desc {
+      font-style: italic;
+      font-size: 14px;
+      padding: 0 1rem 1rem 1rem;
+    }
+
+    .actions-list {
+      display: flex;
+      flex-direction: column;
+      padding: 0 0 1rem 0;
+
+      .action-element {
+        display: flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem 0.25rem 1rem;
+        text-decoration: none;
+        color: map-get($foreground, text);
+
+        .state-circle {
+          flex-shrink: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 1.5rem;
+          width: 1.5rem;
+          border-radius: 50vw;
+          margin-right: 1rem;
+          background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
+          box-shadow: 0 0 3px #0000001a;
+
+          i {
+            font-size: 1rem;
+          }
+
+          .success-icon {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            width: 1.2rem;
+            color: var(--success);
+          }
+
+          .warn-icon {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            width: 1.2rem;
+            color: map-get($background, alert);
+          }
+        }
+
+        .name {
+          font-size: 14px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          min-width: 0;
+          flex: 1;
+        }
+
+        .fill-space {
+          flex: 1;
+        }
+
+        .arrow-right {
+          visibility: hidden;
+        }
+
+        &.done {
+          .state-circle i {
+            color: var(--success);
+          }
+
+          .name {
+            text-decoration: line-through;
+            opacity: 0.5;
+          }
+        }
+
+        &:hover {
+          cursor: pointer;
+          background-color: #00000010;
+
+          .arrow-right {
+            visibility: visible;
+          }
+        }
+      }
+    }
+
+    .no-thanks-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 1rem 0.5rem 1rem;
+
+      .no-thanks-btn {
+        font-style: italic;
+        cursor: pointer;
+      }
+    }
+  }
+}

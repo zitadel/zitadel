@@ -11,10 +11,10 @@ import {
   DOMAIN,
   IDP,
   LOCKOUT,
-  NOTIFICATION_POLICY,
   LOGIN,
   LOGINTEXTS,
   MESSAGETEXTS,
+  NOTIFICATION_POLICY,
   PRIVACYPOLICY,
 } from '../../modules/settings-list/settings';
 

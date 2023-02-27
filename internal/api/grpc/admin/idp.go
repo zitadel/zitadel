@@ -174,8 +174,29 @@ func (s *Server) ListProviders(ctx context.Context, req *admin_pb.ListProvidersR
 	}, nil
 }
 
+func (s *Server) AddGenericOAuthProvider(ctx context.Context, req *admin_pb.AddGenericOAuthProviderRequest) (*admin_pb.AddGenericOAuthProviderResponse, error) {
+	id, details, err := s.command.AddInstanceGenericOAuthProvider(ctx, addGenericOAuthProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGenericOAuthProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGenericOAuthProvider(ctx context.Context, req *admin_pb.UpdateGenericOAuthProviderRequest) (*admin_pb.UpdateGenericOAuthProviderResponse, error) {
+	details, err := s.command.UpdateInstanceGenericOAuthProvider(ctx, req.Id, updateGenericOAuthProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGenericOAuthProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddGoogleProvider(ctx context.Context, req *admin_pb.AddGoogleProviderRequest) (*admin_pb.AddGoogleProviderResponse, error) {
-	id, details, err := s.command.AddOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, addGoogleProviderToCommand(req))
+	id, details, err := s.command.AddInstanceGoogleProvider(ctx, addGoogleProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +207,7 @@ func (s *Server) AddGoogleProvider(ctx context.Context, req *admin_pb.AddGoogleP
 }
 
 func (s *Server) UpdateGoogleProvider(ctx context.Context, req *admin_pb.UpdateGoogleProviderRequest) (*admin_pb.UpdateGoogleProviderResponse, error) {
-	details, err := s.command.UpdateOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGoogleProviderToCommand(req))
+	details, err := s.command.UpdateInstanceGoogleProvider(ctx, req.Id, updateGoogleProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}

@@ -42,6 +42,41 @@
       "ADD": "Per aggiungere, tieni premuto e trascina il riquadro"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Your onboarding process",
+    "COMPLETED": "completed",
+    "DISMISS": "chiudi",
+    "CARD": {
+      "TITLE": "Fate funzionare il vostro ZITADEL",
+      "DESCRIPTION": "Questa lista di azioni aiuta a configurare la vostra istanza e vi guida attraverso i passaggi più essenziali."
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Imposta il tuo marchio",
+        "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone."
+      },
+      "instance.smtp.config.added": {
+        "title": "Configura le impostazioni SMTP",
+        "description": "Imposta il proprio server di posta"
+      },
+      "project.added": {
+        "title": "Crea il tuo primo progetto",
+        "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni."
+      },
+      "project.application.added": {
+        "title": "Crea la tua prima applicazione",
+        "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione."
+      },
+      "user.human.added": {
+        "title": "Aggiungi utenti",
+        "description": "Aggiungi gli utenti dell'applicazione"
+      },
+      "user.grant.added": {
+        "title": "Crea autorizzazioni per gli utenti",
+        "description": "Consenti agli utenti di accedere alla tua applicazione e imposta il loro ruolo."
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Istanza",
     "DASHBOARD": "Pagina iniziale",
@@ -1739,6 +1774,8 @@
       "ID": "ID",
       "DESCRIPTION": "Qui puoi modificare i dati della tua applicazione e la sua configurazione.",
       "CREATE": "Crea Applicazione",
+      "CREATE_SELECT_PROJECT": "Seleziona il tuo progetto",
+      "CREATE_NEW_PROJECT": "o crea uno nuovo <a href='{{url}}' title='Crea progetto'>qui</a>.",
       "CREATE_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",
       "CREATE_DESC_SUB": "Una configurazione raccomandata sar\u00e0 generata automaticamente.",
       "STATE": "Stato",

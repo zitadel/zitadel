@@ -42,6 +42,41 @@
       "ADD": "Maintenir et faire glisser une tuile pour ajouter"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Votre processus d'intégration",
+    "COMPLETED": "terminé",
+    "DISMISS": "fermer",
+    "CARD": {
+      "TITLE": "Faites fonctionner votre ZITADEL",
+      "DESCRIPTION": "Cette liste de contrôle vous aide à configurer votre instance et vous guide à travers les étapes les plus essentielles."
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Créez votre marque",
+        "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes."
+      },
+      "instance.smtp.config.added": {
+        "title": "Configurez vos paramètres SMTP",
+        "description": "Définissez vos propres paramètres de serveur de messagerie"
+      },
+      "project.added": {
+        "title": "Créez votre premier projet",
+        "description": "Ajoutez votre premier projet et définissez ses rôles et autorisations."
+      },
+      "project.application.added": {
+        "title": "Créez votre première application",
+        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification."
+      },
+      "user.human.added": {
+        "title": "Ajouter des utilisateurs",
+        "description": "Ajouter les utilisateurs de votre application"
+      },
+      "user.grant.added": {
+        "title": "Utilisateurs de subventions",
+        "description": "Autorisez les utilisateurs à accéder à votre application et définissez leur rôle."
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Instance",
     "DASHBOARD": "Accueil",
@@ -1737,9 +1772,11 @@
       "TITLE": "Application",
       "ID": "ID",
       "DESCRIPTION": "Ici vous pouvez modifier les données de votre application et sa configuration.",
-      "CREATE_OIDC": "Application OIDC",
-      "CREATE_OIDC_DESC_TITLE": "Entrez les détails de votre application étape par étape",
-      "CREATE_OIDC_DESC_SUB": "Une configuration recommandée sera automatiquement générée.",
+      "CREATE": "Application OIDC",
+      "CREATE_SELECT_PROJECT": "Sélectionnez d'abord votre projet",
+      "CREATE_NEW_PROJECT": "ou créez-en un nouveau <a href='{{url}}' title='Create project'>here</a>.",
+      "CREATE_DESC_TITLE": "Entrez les détails de votre application étape par étape",
+      "CREATE_DESC_SUB": "Une configuration recommandée sera automatiquement générée.",
       "STATE": "Statut",
       "DATECREATED": "Créé",
       "DATECHANGED": "Modifié",
