@@ -144,8 +144,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientID": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -213,8 +213,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientID": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -282,7 +282,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
-	"client_id": "id"
+	"clientID": "id"
 }`),
 				), instance.OAuthIDPChangedEventMapper),
 			},
@@ -324,8 +324,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientID": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -1052,8 +1052,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientID": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -1116,8 +1116,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientID": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -1180,7 +1180,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
-	"client_id": "id"
+	"clientID": "id"
 }`),
 				), instance.OIDCIDPChangedEventMapper),
 			},
@@ -1222,8 +1222,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"issuer": "issuer",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientID": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"

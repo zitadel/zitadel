@@ -15,8 +15,8 @@ type OIDCIDPAddedEvent struct {
 	ID           string              `json:"id"`
 	Name         string              `json:"name"`
 	Issuer       string              `json:"issuer"`
-	ClientID     string              `json:"client_id"`
-	ClientSecret *crypto.CryptoValue `json:"client_secret"`
+	ClientID     string              `json:"clientID"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
 	Scopes       []string            `json:"scopes,omitempty"`
 	Options
 }
@@ -70,8 +70,8 @@ type OIDCIDPChangedEvent struct {
 	ID           string              `json:"id"`
 	Name         *string             `json:"name,omitempty"`
 	Issuer       *string             `json:"issuer,omitempty"`
-	ClientID     *string             `json:"client_id,omitempty"`
-	ClientSecret *crypto.CryptoValue `json:"client_secret,omitempty"`
+	ClientID     *string             `json:"clientID,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	Scopes       []string            `json:"scopes,omitempty"`
 	OptionChanges
 }

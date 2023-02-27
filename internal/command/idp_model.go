@@ -228,7 +228,6 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 // reduceIDPConfigAddedEvent handles old idpConfig events
 func (wm *OIDCIDPWriteModel) reduceIDPConfigAddedEvent(e *idpconfig.IDPConfigAddedEvent) {
 	wm.Name = e.Name
-	//rm.StylingType = e.StylingType //TODO: drop?
 	wm.Options.IsAutoCreation = e.AutoRegister
 	wm.State = domain.IDPStateActive
 }
@@ -238,9 +237,6 @@ func (wm *OIDCIDPWriteModel) reduceIDPConfigChangedEvent(e *idpconfig.IDPConfigC
 	if e.Name != nil {
 		wm.Name = *e.Name
 	}
-	//if e.StylingType != nil && e.StylingType.Valid() { //TODO: drop?
-	//	rm.StylingType = *e.StylingType
-	//}
 	if e.AutoRegister != nil {
 		wm.Options.IsAutoCreation = *e.AutoRegister
 	}
@@ -369,7 +365,6 @@ func (wm *JWTIDPWriteModel) NewChanges(
 // reduceIDPConfigAddedEvent handles old idpConfig events
 func (wm *JWTIDPWriteModel) reduceIDPConfigAddedEvent(e *idpconfig.IDPConfigAddedEvent) {
 	wm.Name = e.Name
-	//rm.StylingType = e.StylingType //TODO: drop?
 	wm.Options.IsAutoCreation = e.AutoRegister
 	wm.State = domain.IDPStateActive
 }
@@ -379,9 +374,6 @@ func (wm *JWTIDPWriteModel) reduceIDPConfigChangedEvent(e *idpconfig.IDPConfigCh
 	if e.Name != nil {
 		wm.Name = *e.Name
 	}
-	//if e.StylingType != nil && e.StylingType.Valid() { //TODO: drop?
-	//	rm.StylingType = *e.StylingType
-	//}
 	if e.AutoRegister != nil {
 		wm.Options.IsAutoCreation = *e.AutoRegister
 	}

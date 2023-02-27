@@ -331,11 +331,8 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(a *instance.Aggregate, wri
 				provider.Scopes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
@@ -424,11 +421,8 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 				provider.Scopes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
@@ -521,11 +515,8 @@ func (c *Commands) prepareUpdateInstanceJWTProvider(a *instance.Aggregate, write
 				provider.HeaderName,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
@@ -600,11 +591,8 @@ func (c *Commands) prepareUpdateInstanceGoogleProvider(a *instance.Aggregate, wr
 				provider.Scopes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
@@ -722,11 +710,8 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 				provider.LDAPAttributes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil

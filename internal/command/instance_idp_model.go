@@ -83,11 +83,8 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 		scopes,
 		options,
 	)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
-	}
-	if len(changes) == 0 {
-		return nil, nil
 	}
 	return instance.NewOAuthIDPChangedEvent(ctx, aggregate, id, changes)
 }
@@ -187,17 +184,10 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 		scopes,
 		options,
 	)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
 	}
-	if len(changes) == 0 {
-		return nil, nil
-	}
-	changeEvent, err := instance.NewOIDCIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return instance.NewOIDCIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceJWTIDPWriteModel struct {
@@ -293,17 +283,10 @@ func (wm *InstanceJWTIDPWriteModel) NewChangedEvent(
 		headerName,
 		options,
 	)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
 	}
-	if len(changes) == 0 {
-		return nil, nil
-	}
-	changeEvent, err := instance.NewJWTIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return instance.NewJWTIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceGoogleIDPWriteModel struct {
@@ -367,11 +350,8 @@ func (wm *InstanceGoogleIDPWriteModel) NewChangedEvent(
 ) (*instance.GoogleIDPChangedEvent, error) {
 
 	changes, err := wm.GoogleIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
-	}
-	if len(changes) == 0 {
-		return nil, nil
 	}
 	return instance.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
 }
@@ -459,11 +439,8 @@ func (wm *InstanceLDAPIDPWriteModel) NewChangedEvent(
 		attributes,
 		options,
 	)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
-	}
-	if len(changes) == 0 {
-		return nil, nil
 	}
 	return instance.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
 }

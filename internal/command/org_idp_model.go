@@ -85,11 +85,8 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 		scopes,
 		options,
 	)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
-	}
-	if len(changes) == 0 {
-		return nil, nil
 	}
 	return org.NewOAuthIDPChangedEvent(ctx, aggregate, id, changes)
 }
@@ -189,17 +186,10 @@ func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
 		scopes,
 		options,
 	)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
 	}
-	if len(changes) == 0 {
-		return nil, nil
-	}
-	changeEvent, err := org.NewOIDCIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return org.NewOIDCIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type OrgJWTIDPWriteModel struct {
@@ -295,17 +285,10 @@ func (wm *OrgJWTIDPWriteModel) NewChangedEvent(
 		headerName,
 		options,
 	)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
 	}
-	if len(changes) == 0 {
-		return nil, nil
-	}
-	changeEvent, err := org.NewJWTIDPChangedEvent(ctx, aggregate, id, changes)
-	if err != nil {
-		return nil, err
-	}
-	return changeEvent, nil
+	return org.NewJWTIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type OrgGoogleIDPWriteModel struct {
@@ -371,11 +354,8 @@ func (wm *OrgGoogleIDPWriteModel) NewChangedEvent(
 ) (*org.GoogleIDPChangedEvent, error) {
 
 	changes, err := wm.GoogleIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
-	}
-	if len(changes) == 0 {
-		return nil, nil
 	}
 	return org.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
 }
@@ -463,11 +443,8 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 		attributes,
 		options,
 	)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
-	}
-	if len(changes) == 0 {
-		return nil, nil
 	}
 	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
 }
