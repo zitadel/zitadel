@@ -49,7 +49,7 @@ type HumanOTPReadModel struct {
 }
 
 func (rm *HumanOTPReadModel) AppendEvents(events ...eventstore.Event) {
-	rm.ReadModel = rm.ReadModel.AppendEvents(events...)
+	rm.ReadModel.AppendEvents(events...)
 }
 
 func NewHumanOTPReadModel(userID, resourceOwner string) *HumanOTPReadModel {
