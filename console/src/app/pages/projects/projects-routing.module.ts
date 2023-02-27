@@ -20,6 +20,15 @@ const routes: Routes = [
     },
   },
   {
+    path: 'app-create',
+    canActivate: [RoleGuard],
+    data: {
+      animation: 'AddPage',
+      roles: ['project.app.write'],
+    },
+    loadChildren: () => import('../app-create/app-create.module'),
+  },
+  {
     path: ':projectid',
     loadChildren: () => import('./owned-projects/owned-projects.module'),
   },
