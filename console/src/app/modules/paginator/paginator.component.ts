@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { EventManager } from '@angular/platform-browser';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
 
 export interface PageEvent {

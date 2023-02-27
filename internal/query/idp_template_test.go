@@ -15,59 +15,73 @@ import (
 )
 
 var (
-	idpTemplateQuery = `SELECT projections.idp_templates.id,` +
-		` projections.idp_templates.resource_owner,` +
-		` projections.idp_templates.creation_date,` +
-		` projections.idp_templates.change_date,` +
-		` projections.idp_templates.sequence,` +
-		` projections.idp_templates.state,` +
-		` projections.idp_templates.name,` +
-		` projections.idp_templates.type,` +
-		` projections.idp_templates.owner_type,` +
-		` projections.idp_templates.is_creation_allowed,` +
-		` projections.idp_templates.is_linking_allowed,` +
-		` projections.idp_templates.is_auto_creation,` +
-		` projections.idp_templates.is_auto_update,` +
+	idpTemplateQuery = `SELECT projections.idp_templates2.id,` +
+		` projections.idp_templates2.resource_owner,` +
+		` projections.idp_templates2.creation_date,` +
+		` projections.idp_templates2.change_date,` +
+		` projections.idp_templates2.sequence,` +
+		` projections.idp_templates2.state,` +
+		` projections.idp_templates2.name,` +
+		` projections.idp_templates2.type,` +
+		` projections.idp_templates2.owner_type,` +
+		` projections.idp_templates2.is_creation_allowed,` +
+		` projections.idp_templates2.is_linking_allowed,` +
+		` projections.idp_templates2.is_auto_creation,` +
+		` projections.idp_templates2.is_auto_update,` +
 		// oauth
-		` projections.idp_templates_oauth.idp_id,` +
-		` projections.idp_templates_oauth.client_id,` +
-		` projections.idp_templates_oauth.client_secret,` +
-		` projections.idp_templates_oauth.authorization_endpoint,` +
-		` projections.idp_templates_oauth.token_endpoint,` +
-		` projections.idp_templates_oauth.user_endpoint,` +
-		` projections.idp_templates_oauth.scopes,` +
+		` projections.idp_templates2_oauth.idp_id,` +
+		` projections.idp_templates2_oauth.client_id,` +
+		` projections.idp_templates2_oauth.client_secret,` +
+		` projections.idp_templates2_oauth.authorization_endpoint,` +
+		` projections.idp_templates2_oauth.token_endpoint,` +
+		` projections.idp_templates2_oauth.user_endpoint,` +
+		` projections.idp_templates2_oauth.scopes,` +
+		// oidc
+		` projections.idp_templates2_oidc.idp_id,` +
+		` projections.idp_templates2_oidc.issuer,` +
+		` projections.idp_templates2_oidc.client_id,` +
+		` projections.idp_templates2_oidc.client_secret,` +
+		` projections.idp_templates2_oidc.scopes,` +
+		// jwt
+		` projections.idp_templates2_jwt.idp_id,` +
+		` projections.idp_templates2_jwt.issuer,` +
+		` projections.idp_templates2_jwt.jwt_endpoint,` +
+		` projections.idp_templates2_jwt.keys_endpoint,` +
+		` projections.idp_templates2_jwt.header_name,` +
 		// google
-		` projections.idp_templates_google.idp_id,` +
-		` projections.idp_templates_google.client_id,` +
-		` projections.idp_templates_google.client_secret,` +
-		` projections.idp_templates_google.scopes,` +
+		` projections.idp_templates2_google.idp_id,` +
+		` projections.idp_templates2_google.client_id,` +
+		` projections.idp_templates2_google.client_secret,` +
+		` projections.idp_templates2_google.scopes,` +
 		// ldap
-		` projections.idp_templates_ldap.idp_id,` +
-		` projections.idp_templates_ldap.host,` +
-		` projections.idp_templates_ldap.port,` +
-		` projections.idp_templates_ldap.tls,` +
-		` projections.idp_templates_ldap.base_dn,` +
-		` projections.idp_templates_ldap.user_object_class,` +
-		` projections.idp_templates_ldap.user_unique_attribute,` +
-		` projections.idp_templates_ldap.admin,` +
-		` projections.idp_templates_ldap.password,` +
-		` projections.idp_templates_ldap.id_attribute,` +
-		` projections.idp_templates_ldap.first_name_attribute,` +
-		` projections.idp_templates_ldap.last_name_attribute,` +
-		` projections.idp_templates_ldap.display_name_attribute,` +
-		` projections.idp_templates_ldap.nick_name_attribute,` +
-		` projections.idp_templates_ldap.preferred_username_attribute,` +
-		` projections.idp_templates_ldap.email_attribute,` +
-		` projections.idp_templates_ldap.email_verified,` +
-		` projections.idp_templates_ldap.phone_attribute,` +
-		` projections.idp_templates_ldap.phone_verified_attribute,` +
-		` projections.idp_templates_ldap.preferred_language_attribute,` +
-		` projections.idp_templates_ldap.avatar_url_attribute,` +
-		` projections.idp_templates_ldap.profile_attribute` +
-		` FROM projections.idp_templates` +
-		` LEFT JOIN projections.idp_templates_oauth ON projections.idp_templates.id = projections.idp_templates_oauth.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_oauth.instance_id` +
-		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
-		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id` +
+		` projections.idp_templates2_ldap.idp_id,` +
+		` projections.idp_templates2_ldap.host,` +
+		` projections.idp_templates2_ldap.port,` +
+		` projections.idp_templates2_ldap.tls,` +
+		` projections.idp_templates2_ldap.base_dn,` +
+		` projections.idp_templates2_ldap.user_object_class,` +
+		` projections.idp_templates2_ldap.user_unique_attribute,` +
+		` projections.idp_templates2_ldap.admin,` +
+		` projections.idp_templates2_ldap.password,` +
+		` projections.idp_templates2_ldap.id_attribute,` +
+		` projections.idp_templates2_ldap.first_name_attribute,` +
+		` projections.idp_templates2_ldap.last_name_attribute,` +
+		` projections.idp_templates2_ldap.display_name_attribute,` +
+		` projections.idp_templates2_ldap.nick_name_attribute,` +
+		` projections.idp_templates2_ldap.preferred_username_attribute,` +
+		` projections.idp_templates2_ldap.email_attribute,` +
+		` projections.idp_templates2_ldap.email_verified,` +
+		` projections.idp_templates2_ldap.phone_attribute,` +
+		` projections.idp_templates2_ldap.phone_verified_attribute,` +
+		` projections.idp_templates2_ldap.preferred_language_attribute,` +
+		` projections.idp_templates2_ldap.avatar_url_attribute,` +
+		` projections.idp_templates2_ldap.profile_attribute` +
+		` FROM projections.idp_templates2` +
+		` LEFT JOIN projections.idp_templates2_oauth ON projections.idp_templates2.id = projections.idp_templates2_oauth.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oauth.instance_id` +
+		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates2.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oidc.instance_id` +
+		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates2.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_jwt.instance_id` +
+		` LEFT JOIN projections.idp_templates2_google ON projections.idp_templates2.id = projections.idp_templates2_google.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_google.instance_id` +
+		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates2.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_ldap.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplateCols = []string{
 		"id",
@@ -91,6 +105,18 @@ var (
 		"token_endpoint",
 		"user_endpoint",
 		"scopes",
+		// oidc config
+		"id_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// jwt
+		"idp_id",
+		"issuer",
+		"jwt_endpoint",
+		"keys_endpoint",
+		"header_name",
 		// google config
 		"idp_id",
 		"client_id",
@@ -120,60 +146,74 @@ var (
 		"avatar_url_attribute",
 		"profile_attribute",
 	}
-	idpTemplatesQuery = `SELECT projections.idp_templates.id,` +
-		` projections.idp_templates.resource_owner,` +
-		` projections.idp_templates.creation_date,` +
-		` projections.idp_templates.change_date,` +
-		` projections.idp_templates.sequence,` +
-		` projections.idp_templates.state,` +
-		` projections.idp_templates.name,` +
-		` projections.idp_templates.type,` +
-		` projections.idp_templates.owner_type,` +
-		` projections.idp_templates.is_creation_allowed,` +
-		` projections.idp_templates.is_linking_allowed,` +
-		` projections.idp_templates.is_auto_creation,` +
-		` projections.idp_templates.is_auto_update,` +
+	idpTemplatesQuery = `SELECT projections.idp_templates2.id,` +
+		` projections.idp_templates2.resource_owner,` +
+		` projections.idp_templates2.creation_date,` +
+		` projections.idp_templates2.change_date,` +
+		` projections.idp_templates2.sequence,` +
+		` projections.idp_templates2.state,` +
+		` projections.idp_templates2.name,` +
+		` projections.idp_templates2.type,` +
+		` projections.idp_templates2.owner_type,` +
+		` projections.idp_templates2.is_creation_allowed,` +
+		` projections.idp_templates2.is_linking_allowed,` +
+		` projections.idp_templates2.is_auto_creation,` +
+		` projections.idp_templates2.is_auto_update,` +
 		// oauth
-		` projections.idp_templates_oauth.idp_id,` +
-		` projections.idp_templates_oauth.client_id,` +
-		` projections.idp_templates_oauth.client_secret,` +
-		` projections.idp_templates_oauth.authorization_endpoint,` +
-		` projections.idp_templates_oauth.token_endpoint,` +
-		` projections.idp_templates_oauth.user_endpoint,` +
-		` projections.idp_templates_oauth.scopes,` +
+		` projections.idp_templates2_oauth.idp_id,` +
+		` projections.idp_templates2_oauth.client_id,` +
+		` projections.idp_templates2_oauth.client_secret,` +
+		` projections.idp_templates2_oauth.authorization_endpoint,` +
+		` projections.idp_templates2_oauth.token_endpoint,` +
+		` projections.idp_templates2_oauth.user_endpoint,` +
+		` projections.idp_templates2_oauth.scopes,` +
+		// oidc
+		` projections.idp_templates2_oidc.idp_id,` +
+		` projections.idp_templates2_oidc.issuer,` +
+		` projections.idp_templates2_oidc.client_id,` +
+		` projections.idp_templates2_oidc.client_secret,` +
+		` projections.idp_templates2_oidc.scopes,` +
+		// jwt
+		` projections.idp_templates2_jwt.idp_id,` +
+		` projections.idp_templates2_jwt.issuer,` +
+		` projections.idp_templates2_jwt.jwt_endpoint,` +
+		` projections.idp_templates2_jwt.keys_endpoint,` +
+		` projections.idp_templates2_jwt.header_name,` +
 		// google
-		` projections.idp_templates_google.idp_id,` +
-		` projections.idp_templates_google.client_id,` +
-		` projections.idp_templates_google.client_secret,` +
-		` projections.idp_templates_google.scopes,` +
+		` projections.idp_templates2_google.idp_id,` +
+		` projections.idp_templates2_google.client_id,` +
+		` projections.idp_templates2_google.client_secret,` +
+		` projections.idp_templates2_google.scopes,` +
 		// ldap
-		` projections.idp_templates_ldap.idp_id,` +
-		` projections.idp_templates_ldap.host,` +
-		` projections.idp_templates_ldap.port,` +
-		` projections.idp_templates_ldap.tls,` +
-		` projections.idp_templates_ldap.base_dn,` +
-		` projections.idp_templates_ldap.user_object_class,` +
-		` projections.idp_templates_ldap.user_unique_attribute,` +
-		` projections.idp_templates_ldap.admin,` +
-		` projections.idp_templates_ldap.password,` +
-		` projections.idp_templates_ldap.id_attribute,` +
-		` projections.idp_templates_ldap.first_name_attribute,` +
-		` projections.idp_templates_ldap.last_name_attribute,` +
-		` projections.idp_templates_ldap.display_name_attribute,` +
-		` projections.idp_templates_ldap.nick_name_attribute,` +
-		` projections.idp_templates_ldap.preferred_username_attribute,` +
-		` projections.idp_templates_ldap.email_attribute,` +
-		` projections.idp_templates_ldap.email_verified,` +
-		` projections.idp_templates_ldap.phone_attribute,` +
-		` projections.idp_templates_ldap.phone_verified_attribute,` +
-		` projections.idp_templates_ldap.preferred_language_attribute,` +
-		` projections.idp_templates_ldap.avatar_url_attribute,` +
-		` projections.idp_templates_ldap.profile_attribute,` +
+		` projections.idp_templates2_ldap.idp_id,` +
+		` projections.idp_templates2_ldap.host,` +
+		` projections.idp_templates2_ldap.port,` +
+		` projections.idp_templates2_ldap.tls,` +
+		` projections.idp_templates2_ldap.base_dn,` +
+		` projections.idp_templates2_ldap.user_object_class,` +
+		` projections.idp_templates2_ldap.user_unique_attribute,` +
+		` projections.idp_templates2_ldap.admin,` +
+		` projections.idp_templates2_ldap.password,` +
+		` projections.idp_templates2_ldap.id_attribute,` +
+		` projections.idp_templates2_ldap.first_name_attribute,` +
+		` projections.idp_templates2_ldap.last_name_attribute,` +
+		` projections.idp_templates2_ldap.display_name_attribute,` +
+		` projections.idp_templates2_ldap.nick_name_attribute,` +
+		` projections.idp_templates2_ldap.preferred_username_attribute,` +
+		` projections.idp_templates2_ldap.email_attribute,` +
+		` projections.idp_templates2_ldap.email_verified,` +
+		` projections.idp_templates2_ldap.phone_attribute,` +
+		` projections.idp_templates2_ldap.phone_verified_attribute,` +
+		` projections.idp_templates2_ldap.preferred_language_attribute,` +
+		` projections.idp_templates2_ldap.avatar_url_attribute,` +
+		` projections.idp_templates2_ldap.profile_attribute,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.idp_templates` +
-		` LEFT JOIN projections.idp_templates_oauth ON projections.idp_templates.id = projections.idp_templates_oauth.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_oauth.instance_id` +
-		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
-		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id` +
+		` FROM projections.idp_templates2` +
+		` LEFT JOIN projections.idp_templates2_oauth ON projections.idp_templates2.id = projections.idp_templates2_oauth.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oauth.instance_id` +
+		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates2.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oidc.instance_id` +
+		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates2.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_jwt.instance_id` +
+		` LEFT JOIN projections.idp_templates2_google ON projections.idp_templates2.id = projections.idp_templates2_google.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_google.instance_id` +
+		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates2.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_ldap.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplatesCols = []string{
 		"id",
@@ -197,6 +237,18 @@ var (
 		"token_endpoint",
 		"user_endpoint",
 		"scopes",
+		// oidc config
+		"id_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// jwt
+		"idp_id",
+		"issuer",
+		"jwt_endpoint",
+		"keys_endpoint",
+		"header_name",
 		// google config
 		"idp_id",
 		"client_id",
@@ -287,6 +339,18 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"token",
 						"user",
 						database.StringArray{"profile"},
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						nil,
 						nil,
@@ -344,6 +408,196 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 			},
 		},
 		{
+			name:    "prepareIDPTemplateByIDQuery oidc idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeOIDC,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						"idp-id",
+						"issuer",
+						"client_id",
+						nil,
+						database.StringArray{"profile"},
+						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeOIDC,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				OIDCIDPTemplate: &OIDCIDPTemplate{
+					IDPID:        "idp-id",
+					Issuer:       "issuer",
+					ClientID:     "client_id",
+					ClientSecret: nil,
+					Scopes:       []string{"profile"},
+				},
+			},
+		},
+		{
+			name:    "prepareIDPTemplateByIDQuery oidc idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeJWT,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
+						"idp-id",
+						"issuer",
+						"jwt",
+						"keys",
+						"header",
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeJWT,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				JWTIDPTemplate: &JWTIDPTemplate{
+					IDPID:        "idp-id",
+					Issuer:       "issuer",
+					Endpoint:     "jwt",
+					KeysEndpoint: "keys",
+					HeaderName:   "header",
+				},
+			},
+		},
+		{
 			name:    "prepareIDPTemplateByIDQuery google idp",
 			prepare: prepareIDPTemplateByIDQuery,
 			want: want{
@@ -367,6 +621,18 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						// oauth
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
 						nil,
 						nil,
 						nil,
@@ -449,6 +715,18 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						// oauth
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
 						nil,
 						nil,
 						nil,
@@ -550,6 +828,18 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						// oauth
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
 						nil,
 						nil,
 						nil,
@@ -667,6 +957,18 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// oidc
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -777,6 +1079,18 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// oidc
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -862,6 +1176,18 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// oidc
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -908,6 +1234,18 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							// oauth
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// oidc
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// jwt
 							nil,
 							nil,
 							nil,
@@ -964,6 +1302,144 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"token",
 							"user",
 							database.StringArray{"profile"},
+							// oidc
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// google
+							nil,
+							nil,
+							nil,
+							nil,
+							// ldap config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+						},
+						{
+							"idp-id-oidc",
+							"ro",
+							testNow,
+							testNow,
+							uint64(20211109),
+							domain.IDPConfigStateActive,
+							"idp-name",
+							domain.IDPTypeOIDC,
+							domain.IdentityProviderTypeOrg,
+							true,
+							true,
+							true,
+							true,
+							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// oidc
+							"idp-id-oidc",
+							"issuer",
+							"client_id",
+							nil,
+							database.StringArray{"profile"},
+							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// google
+							nil,
+							nil,
+							nil,
+							nil,
+							// ldap config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+						},
+						{
+							"idp-id-jwt",
+							"ro",
+							testNow,
+							testNow,
+							uint64(20211109),
+							domain.IDPConfigStateActive,
+							"idp-name",
+							domain.IDPTypeJWT,
+							domain.IdentityProviderTypeOrg,
+							true,
+							true,
+							true,
+							true,
+							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// oidc
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// jwt
+							"idp-id-jwt",
+							"issuer",
+							"jwt",
+							"keys",
+							"header",
 							// google
 							nil,
 							nil,
@@ -998,7 +1474,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 			},
 			object: &IDPTemplates{
 				SearchResponse: SearchResponse{
-					Count: 3,
+					Count: 5,
 				},
 				Templates: []*IDPTemplate{
 					{
@@ -1085,6 +1561,50 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							TokenEndpoint:         "token",
 							UserEndpoint:          "user",
 							Scopes:                []string{"profile"},
+						},
+					},
+					{
+						CreationDate:      testNow,
+						ChangeDate:        testNow,
+						Sequence:          20211109,
+						ResourceOwner:     "ro",
+						ID:                "idp-id-oidc",
+						State:             domain.IDPStateActive,
+						Name:              "idp-name",
+						Type:              domain.IDPTypeOIDC,
+						OwnerType:         domain.IdentityProviderTypeOrg,
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+						OIDCIDPTemplate: &OIDCIDPTemplate{
+							IDPID:        "idp-id-oidc",
+							Issuer:       "issuer",
+							ClientID:     "client_id",
+							ClientSecret: nil,
+							Scopes:       []string{"profile"},
+						},
+					},
+					{
+						CreationDate:      testNow,
+						ChangeDate:        testNow,
+						Sequence:          20211109,
+						ResourceOwner:     "ro",
+						ID:                "idp-id-jwt",
+						State:             domain.IDPStateActive,
+						Name:              "idp-name",
+						Type:              domain.IDPTypeJWT,
+						OwnerType:         domain.IdentityProviderTypeOrg,
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+						JWTIDPTemplate: &JWTIDPTemplate{
+							IDPID:        "idp-id-jwt",
+							Issuer:       "issuer",
+							Endpoint:     "jwt",
+							KeysEndpoint: "keys",
+							HeaderName:   "header",
 						},
 					},
 				},

@@ -30,7 +30,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.1
 	github.com/h2non/gock v1.2.0
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/jackc/pgconn v1.14.0
