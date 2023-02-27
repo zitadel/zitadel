@@ -149,7 +149,7 @@ export class UserGrantsDataSource extends DataSource<UserGrantAsObject> {
   /**
    * Connect this data source to the table. The table will only update when
    * the returned stream emits new items.
-   * @returns A stream of the items to be rendered.
+   * @returns A stream of item lists to be rendered.
    */
   public connect(): Observable<Array<UserGrantAsObject>> {
     return this.grantsSubject.asObservable();
