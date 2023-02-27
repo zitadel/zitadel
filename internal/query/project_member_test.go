@@ -37,6 +37,7 @@ var (
 		"LEFT JOIN projections.login_names2 " +
 		"ON members.user_id = projections.login_names2.user_id " +
 		"AND members.instance_id = projections.login_names2.instance_id " +
+		`AS OF SYSTEM TIME '-1 ms' ` +
 		"WHERE projections.login_names2.is_primary = $1")
 	projectMembersColumns = []string{
 		"creation_date",

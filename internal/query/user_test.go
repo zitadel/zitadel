@@ -58,7 +58,8 @@ var (
 		` ON login_names.user_id = projections.users8.id AND login_names.instance_id = projections.users8.instance_id` +
 		` LEFT JOIN` +
 		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users8.id AND preferred_login_name.instance_id = projections.users8.instance_id`
+		` ON preferred_login_name.user_id = projections.users8.id AND preferred_login_name.instance_id = projections.users8.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	userCols = []string{
 		"id",
 		"creation_date",
@@ -105,7 +106,8 @@ var (
 		` projections.users8_humans.gender,` +
 		` projections.users8_humans.avatar_key` +
 		` FROM projections.users8` +
-		` LEFT JOIN projections.users8_humans ON projections.users8.id = projections.users8_humans.user_id AND projections.users8.instance_id = projections.users8_humans.instance_id`
+		` LEFT JOIN projections.users8_humans ON projections.users8.id = projections.users8_humans.user_id AND projections.users8.instance_id = projections.users8_humans.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	profileCols = []string{
 		"id",
 		"creation_date",
@@ -130,7 +132,8 @@ var (
 		` projections.users8_humans.email,` +
 		` projections.users8_humans.is_email_verified` +
 		` FROM projections.users8` +
-		` LEFT JOIN projections.users8_humans ON projections.users8.id = projections.users8_humans.user_id AND projections.users8.instance_id = projections.users8_humans.instance_id`
+		` LEFT JOIN projections.users8_humans ON projections.users8.id = projections.users8_humans.user_id AND projections.users8.instance_id = projections.users8_humans.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	emailCols = []string{
 		"id",
 		"creation_date",
@@ -150,7 +153,8 @@ var (
 		` projections.users8_humans.phone,` +
 		` projections.users8_humans.is_phone_verified` +
 		` FROM projections.users8` +
-		` LEFT JOIN projections.users8_humans ON projections.users8.id = projections.users8_humans.user_id AND projections.users8.instance_id = projections.users8_humans.instance_id`
+		` LEFT JOIN projections.users8_humans ON projections.users8.id = projections.users8_humans.user_id AND projections.users8.instance_id = projections.users8_humans.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	phoneCols = []string{
 		"id",
 		"creation_date",
@@ -168,7 +172,8 @@ var (
 		` projections.users8_humans.email,` +
 		` projections.users8_humans.is_email_verified` +
 		` FROM projections.users8` +
-		` LEFT JOIN projections.users8_humans ON projections.users8.id = projections.users8_humans.user_id AND projections.users8.instance_id = projections.users8_humans.instance_id`
+		` LEFT JOIN projections.users8_humans ON projections.users8.id = projections.users8_humans.user_id AND projections.users8.instance_id = projections.users8_humans.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	userUniqueCols = []string{
 		"id",
 		"state",
@@ -210,7 +215,8 @@ var (
 		` ON login_names.user_id = projections.users8.id AND login_names.instance_id = projections.users8.instance_id` +
 		` LEFT JOIN` +
 		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users8.id AND preferred_login_name.instance_id = projections.users8.instance_id`
+		` ON preferred_login_name.user_id = projections.users8.id AND preferred_login_name.instance_id = projections.users8.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	notifyUserCols = []string{
 		"id",
 		"creation_date",
@@ -276,7 +282,8 @@ var (
 		` ON login_names.user_id = projections.users8.id AND login_names.instance_id = projections.users8.instance_id` +
 		` LEFT JOIN` +
 		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users8.id AND preferred_login_name.instance_id = projections.users8.instance_id`
+		` ON preferred_login_name.user_id = projections.users8.id AND preferred_login_name.instance_id = projections.users8.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	usersCols = []string{
 		"id",
 		"creation_date",

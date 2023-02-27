@@ -26,7 +26,8 @@ var (
 		` projections.instances.console_client_id,` +
 		` projections.instances.console_app_id,` +
 		` projections.instances.default_language` +
-		` FROM projections.instances`
+		` FROM projections.instances` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	instanceCols = []string{
 		"id",
 		"creation_date",
@@ -56,7 +57,8 @@ var (
 		` projections.instance_domains.sequence` +
 		` FROM (SELECT projections.instances.id, COUNT(*) OVER () FROM projections.instances) AS f` +
 		` LEFT JOIN projections.instances ON f.id = projections.instances.id` +
-		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`
+		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	instancesCols = []string{
 		"count",
 		"id",

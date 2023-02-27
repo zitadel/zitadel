@@ -18,7 +18,8 @@ var (
 		` projections.org_metadata2.sequence,` +
 		` projections.org_metadata2.key,` +
 		` projections.org_metadata2.value` +
-		` FROM projections.org_metadata2`
+		` FROM projections.org_metadata2` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	orgMetadataCols = []string{
 		"creation_date",
 		"change_date",
@@ -34,7 +35,8 @@ var (
 		` projections.org_metadata2.key,` +
 		` projections.org_metadata2.value,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.org_metadata2`
+		` FROM projections.org_metadata2` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	orgMetadataListCols = []string{
 		"creation_date",
 		"change_date",

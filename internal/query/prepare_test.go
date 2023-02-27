@@ -317,7 +317,7 @@ func TestValidatePrepare(t *testing.T) {
 
 type prepareDB struct{}
 
-func (_ *prepareDB) Timetravel(time.Duration) string { return "" }
+func (_ *prepareDB) Timetravel(time.Duration) string { return " AS OF SYSTEM TIME '-1 ms' " }
 
 var defaultPrepareArgs = []reflect.Value{reflect.ValueOf(context.Background()), reflect.ValueOf(new(prepareDB))}
 

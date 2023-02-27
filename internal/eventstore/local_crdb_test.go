@@ -72,7 +72,7 @@ func initDB(db *sql.DB) error {
 
 type testDB struct{}
 
-func (_ *testDB) Timetravel(time.Duration) string { return "" }
+func (_ *testDB) Timetravel(time.Duration) string { return " AS OF SYSTEM TIME '-1 ms' " }
 
 func (*testDB) DatabaseName() string { return "db" }
 

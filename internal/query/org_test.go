@@ -17,8 +17,60 @@ import (
 )
 
 var (
-	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs LEFT JOIN projections.org_domains2 ON projections.orgs.id = projections.org_domains2.org_id AND projections.orgs.instance_id = projections.org_domains2.instance_id WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs.name ILIKE $4) AND projections.orgs.org_state <> $5)"
+	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs LEFT JOIN projections.org_domains2 ON projections.orgs.id = projections.org_domains2.org_id AND projections.orgs.instance_id = projections.org_domains2.instance_id AS OF SYSTEM TIME '-1 ms' WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs.name ILIKE $4) AND projections.orgs.org_state <> $5)"
 	orgUniqueCols  = []string{"is_unique"}
+
+	prepareOrgsQueryStmt = `SELECT projections.orgs.id,` +
+		` projections.orgs.creation_date,` +
+		` projections.orgs.change_date,` +
+		` projections.orgs.resource_owner,` +
+		` projections.orgs.org_state,` +
+		` projections.orgs.sequence,` +
+		` projections.orgs.name,` +
+		` projections.orgs.primary_domain,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.orgs` +
+		` AS OF SYSTEM TIME '-1 ms' `
+	prepareOrgsQueryCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"org_state",
+		"sequence",
+		"name",
+		"primary_domain",
+		"count",
+	}
+
+	prepareOrgQueryStmt = `SELECT projections.orgs.id,` +
+		` projections.orgs.creation_date,` +
+		` projections.orgs.change_date,` +
+		` projections.orgs.resource_owner,` +
+		` projections.orgs.org_state,` +
+		` projections.orgs.sequence,` +
+		` projections.orgs.name,` +
+		` projections.orgs.primary_domain` +
+		` FROM projections.orgs` +
+		` AS OF SYSTEM TIME '-1 ms' `
+	prepareOrgQueryCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"org_state",
+		"sequence",
+		"name",
+		"primary_domain",
+	}
+
+	prepareOrgUniqueStmt = `SELECT COUNT(*) = 0` +
+		` FROM projections.orgs` +
+		` LEFT JOIN projections.org_domains2 ON projections.orgs.id = projections.org_domains2.org_id AND projections.orgs.instance_id = projections.org_domains2.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms' `
+	prepareOrgUniqueCols = []string{
+		"count",
+	}
 )
 
 func Test_OrgPrepares(t *testing.T) {
@@ -37,16 +89,7 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
-						` projections.orgs.creation_date,`+
-						` projections.orgs.change_date,`+
-						` projections.orgs.resource_owner,`+
-						` projections.orgs.org_state,`+
-						` projections.orgs.sequence,`+
-						` projections.orgs.name,`+
-						` projections.orgs.primary_domain,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.orgs`),
+					regexp.QuoteMeta(prepareOrgsQueryStmt),
 					nil,
 					nil,
 				),
@@ -58,27 +101,8 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
-						` projections.orgs.creation_date,`+
-						` projections.orgs.change_date,`+
-						` projections.orgs.resource_owner,`+
-						` projections.orgs.org_state,`+
-						` projections.orgs.sequence,`+
-						` projections.orgs.name,`+
-						` projections.orgs.primary_domain,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.orgs`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"org_state",
-						"sequence",
-						"name",
-						"primary_domain",
-						"count",
-					},
+					regexp.QuoteMeta(prepareOrgsQueryStmt),
+					prepareOrgsQueryCols,
 					[][]driver.Value{
 						{
 							"id",
@@ -116,27 +140,8 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
-						` projections.orgs.creation_date,`+
-						` projections.orgs.change_date,`+
-						` projections.orgs.resource_owner,`+
-						` projections.orgs.org_state,`+
-						` projections.orgs.sequence,`+
-						` projections.orgs.name,`+
-						` projections.orgs.primary_domain,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.orgs`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"org_state",
-						"sequence",
-						"name",
-						"primary_domain",
-						"count",
-					},
+					regexp.QuoteMeta(prepareOrgsQueryStmt),
+					prepareOrgsQueryCols,
 					[][]driver.Value{
 						{
 							"id-1",
@@ -194,16 +199,7 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
-						` projections.orgs.creation_date,`+
-						` projections.orgs.change_date,`+
-						` projections.orgs.resource_owner,`+
-						` projections.orgs.org_state,`+
-						` projections.orgs.sequence,`+
-						` projections.orgs.name,`+
-						` projections.orgs.primary_domain,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.orgs`),
+					regexp.QuoteMeta(prepareOrgsQueryStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -220,15 +216,7 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
-						` projections.orgs.creation_date,`+
-						` projections.orgs.change_date,`+
-						` projections.orgs.resource_owner,`+
-						` projections.orgs.org_state,`+
-						` projections.orgs.sequence,`+
-						` projections.orgs.name,`+
-						` projections.orgs.primary_domain`+
-						` FROM projections.orgs`),
+					regexp.QuoteMeta(prepareOrgQueryStmt),
 					nil,
 					nil,
 				),
@@ -246,25 +234,8 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
-						` projections.orgs.creation_date,`+
-						` projections.orgs.change_date,`+
-						` projections.orgs.resource_owner,`+
-						` projections.orgs.org_state,`+
-						` projections.orgs.sequence,`+
-						` projections.orgs.name,`+
-						` projections.orgs.primary_domain`+
-						` FROM projections.orgs`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"org_state",
-						"sequence",
-						"name",
-						"primary_domain",
-					},
+					regexp.QuoteMeta(prepareOrgQueryStmt),
+					prepareOrgQueryCols,
 					[]driver.Value{
 						"id",
 						testNow,
@@ -293,15 +264,7 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
-						` projections.orgs.creation_date,`+
-						` projections.orgs.change_date,`+
-						` projections.orgs.resource_owner,`+
-						` projections.orgs.org_state,`+
-						` projections.orgs.sequence,`+
-						` projections.orgs.name,`+
-						` projections.orgs.primary_domain`+
-						` FROM projections.orgs`),
+					regexp.QuoteMeta(prepareOrgQueryStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -318,8 +281,7 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgUniqueQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT COUNT(*) = 0`+
-						` FROM projections.orgs`),
+					regexp.QuoteMeta(prepareOrgUniqueStmt),
 					nil,
 					nil,
 				),
@@ -337,11 +299,8 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgUniqueQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT COUNT(*) = 0`+
-						` FROM projections.orgs`),
-					[]string{
-						"count",
-					},
+					regexp.QuoteMeta(prepareOrgUniqueStmt),
+					prepareOrgUniqueCols,
 					[]driver.Value{
 						1,
 					},
@@ -354,8 +313,7 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgUniqueQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT COUNT(*) = 0`+
-						` FROM projections.orgs`),
+					regexp.QuoteMeta(prepareOrgUniqueStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

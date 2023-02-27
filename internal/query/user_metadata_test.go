@@ -18,7 +18,8 @@ var (
 		` projections.user_metadata4.sequence,` +
 		` projections.user_metadata4.key,` +
 		` projections.user_metadata4.value` +
-		` FROM projections.user_metadata4`
+		` FROM projections.user_metadata4` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	userMetadataCols = []string{
 		"creation_date",
 		"change_date",

@@ -67,7 +67,8 @@ var (
 		` FROM projections.idp_templates` +
 		` LEFT JOIN projections.idp_templates_oauth ON projections.idp_templates.id = projections.idp_templates_oauth.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_oauth.instance_id` +
 		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
-		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id`
+		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplateCols = []string{
 		"id",
 		"resource_owner",
@@ -172,7 +173,8 @@ var (
 		` FROM projections.idp_templates` +
 		` LEFT JOIN projections.idp_templates_oauth ON projections.idp_templates.id = projections.idp_templates_oauth.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_oauth.instance_id` +
 		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
-		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id`
+		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplatesCols = []string{
 		"id",
 		"resource_owner",
