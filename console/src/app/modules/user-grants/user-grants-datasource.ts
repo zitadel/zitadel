@@ -130,7 +130,6 @@ export class UserGrantsDataSource extends DataSource<UserGrantAsObject> {
       .then((resp) => {
         this.loadingSubject.next(false);
         if (resp.resultList) {
-          console.log(resp.resultList);
           this.grantsSubject.next(resp.resultList);
         }
         if (resp.details) {
