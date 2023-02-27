@@ -127,7 +127,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     this.loadGrantsPage(type);
   }
 
-  public getType(grant: AuthUserGrant.AsObject | MgmtUserGrant.AsObject): string {
+  public getType(grant: UserGrantAsObject): string {
     if (grant.projectGrantId) {
       return 'Project Grant';
     } else if (grant.projectId) {
@@ -169,7 +169,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       : this.dataSource.grantsSubject.value.forEach((row) => this.selection.select(row));
   }
 
-  public openEditDialog(grant: MgmtUserGrant.AsObject | AuthUserGrant.AsObject): void {
+  public openEditDialog(grant: UserGrantAsObject): void {
     const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
       data: {
         projectId: grant.projectId,

@@ -9,10 +9,8 @@ import {
   finalize,
   map,
   mergeMap,
-  pairwise,
   switchMap,
   take,
-  tap,
   timeout,
   withLatestFrom,
 } from 'rxjs/operators';
@@ -29,7 +27,6 @@ import {
   GetMyEmailRequest,
   GetMyEmailResponse,
   GetMyLabelPolicyRequest,
-  GetMyLabelPolicyResponse,
   GetMyLoginPolicyRequest,
   GetMyLoginPolicyResponse,
   GetMyPasswordComplexityPolicyRequest,
@@ -108,7 +105,7 @@ import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { LabelPolicy } from '../proto/generated/zitadel/policy_pb';
-import { Gender, MembershipQuery, User, UserGrantQuery, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
+import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
 import { ThemeService } from './theme.service';
