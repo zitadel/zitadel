@@ -1,10 +1,6 @@
 ExternalDomain: localhost
 ExternalSecure: false
 
-Database:
-  cockroach:
-    Host:  host.docker.internal
-
 TLS:
   Enabled: false
 

@@ -7,6 +7,8 @@ services:
       service: 'zitadel'
     volumes:
       - ./zitadel.yaml:/zitadel.yaml
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
 
   db:
     extends:
