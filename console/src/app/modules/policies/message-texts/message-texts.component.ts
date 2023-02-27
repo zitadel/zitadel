@@ -3,6 +3,13 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacySelectChange as MatSelectChange } from '@angular/material/legacy-select';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import {
+  GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,
+  GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
+  GetDefaultPasswordChangeMessageTextRequest as AdminGetDefaultPasswordChangeMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextRequest as AdminGetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultPasswordResetMessageTextRequest as AdminGetDefaultPasswordResetMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
   SetDefaultDomainClaimedMessageTextRequest,
   SetDefaultInitMessageTextRequest,
   SetDefaultPasswordChangeMessageTextRequest,
@@ -10,13 +17,6 @@ import {
   SetDefaultPasswordResetMessageTextRequest,
   SetDefaultVerifyEmailMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextRequest,
-  GetDefaultPasswordChangeMessageTextRequest as AdminGetDefaultPasswordChangeMessageTextRequest,
-  GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
-  GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
-  GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
-  GetDefaultPasswordResetMessageTextRequest as AdminGetDefaultPasswordResetMessageTextRequest,
-  GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,
-  GetDefaultPasswordlessRegistrationMessageTextRequest as AdminGetDefaultPasswordlessRegistrationMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
   GetCustomDomainClaimedMessageTextRequest,

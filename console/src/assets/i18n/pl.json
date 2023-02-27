@@ -42,6 +42,41 @@
       "ADD": "Przytrzymaj i przeciągnij kafel, aby go dodać"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Twój proces wprowadzania na rynek",
+    "COMPLETED": "zakończone",
+    "DISMISS": "zamknąć",
+    "CARD": {
+      "TITLE": "Uruchom swój ZITADEL",
+      "DESCRIPTION": "Ta lista kontrolna pomoże Ci skonfigurować instancję i poprowadzi Cię przez najważniejsze kroki."
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Skonfiguruj swoją markę",
+        "description": "Zdefiniuj kolorystykę i kształt swojego loginu oraz wgraj swoje logo i ikony."
+      },
+      "instance.smtp.config.added": {
+        "title": "Ustawienia SMTP",
+        "description": "Ustawienie własnego serwera pocztowego"
+      },
+      "project.added": {
+        "title": "Stwórz swój pierwszy projekt",
+        "description": "Dodaj swój pierwszy projekt i określ jego role i uprawnienia."
+      },
+      "project.application.added": {
+        "title": "Utwórz swoją pierwszą aplikację",
+        "description": "Utwórz aplikację internetową, natywną, api lub saml i skonfiguruj swój przepływ uwierzytelniania."
+      },
+      "user.human.added": {
+        "title": "Dodaj użytkowników",
+        "description": "Dodaj użytkowników aplikacji"
+      },
+      "user.grant.added": {
+        "title": "Użytkownicy dotacji",
+        "description": "Pozwól użytkownikom na dostęp do Twojej aplikacji i ustaw ich rolę."
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Instancja",
     "DASHBOARD": "Strona główna",
@@ -1725,6 +1760,8 @@
       "ID": "ID",
       "DESCRIPTION": "Tutaj możesz edytować dane swojej aplikacji i jej konfigurację.",
       "CREATE": "Utwórz aplikację",
+      "CREATE_SELECT_PROJECT": "Najpierw wybierz swój projekt",
+      "CREATE_NEW_PROJECT": "lub utworzyć nowy <a href='{{url}}' title='Utwórz projekt'>tutaj</a>.",
       "CREATE_DESC_TITLE": "Wprowadź szczegóły swojej aplikacji krok po kroku",
       "CREATE_DESC_SUB": "Automatycznie zostanie wygenerowana zalecana konfiguracja.",
       "STATE": "Status",

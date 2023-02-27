@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
-import { MatSortModule } from '@angular/material/sort';
 import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+import { MatSortModule } from '@angular/material/sort';
 import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { CardModule } from 'src/app/modules/card/card.module';
@@ -18,16 +18,16 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
-import { EventsComponent } from './events.component';
-import { EventsRoutingModule } from './events-routing.module';
-import { FilterEventsModule } from 'src/app/modules/filter-events/filter-events.module';
-import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { OverlayModule } from '@angular/cdk/overlay';
-import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
-import { DisplayJsonDialogModule } from 'src/app/modules/display-json-dialog/display-json-dialog.module';
 import { MatLegacyDialogModule } from '@angular/material/legacy-dialog';
+import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
+import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
+import { DisplayJsonDialogModule } from 'src/app/modules/display-json-dialog/display-json-dialog.module';
+import { FilterEventsModule } from 'src/app/modules/filter-events/filter-events.module';
 import { ToObjectPipeModule } from 'src/app/pipes/to-object/to-object.module';
 import { ToPayloadPipeModule } from 'src/app/pipes/to-payload/to-payload.module';
+import { EventsRoutingModule } from './events-routing.module';
+import { EventsComponent } from './events.component';
 
 @NgModule({
   declarations: [EventsComponent],
