@@ -49,13 +49,25 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             description: "Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
         },
         {
+            name: "Authentication Methods"
+        },
+        {
             name: "Authorization"
+        },
+        {
+            name: "Domain Settings"
         },
         {
             name: "General"
         },
         {
+            name: "Identity Providers"
+        },
+        {
             name: "Global"
+        },
+        {
+            name: "Login Settings"
         },
         {
             name: "Members"
@@ -4033,7 +4045,6 @@ service ManagementService {
     }
 
     //deprecated: please use DomainPolicy instead
-    // Returns the domain policy (this policy is managed by the IAM administrator)
     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/orgiam"
@@ -4044,9 +4055,10 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Policies";
-            summary: "Get Organziation IAM Policy";
-            description: "Use Get Domain Policy instead"
+            tags: "Settings";
+            tags: "Domain Settings";
+            summary: "Get Org IAM Policy";
+            description: "Use Get Domain Settings instead"
             deprecated: true;
         };
     }
@@ -4061,15 +4073,21 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Policies";
+            tags: "Settings";
+            tags: "Domain Settings";
             summary: "Get Domain Policy";
             description: "Returns the domain policy (this policy is managed by the IAM administrator)";
-            deprecated: true;
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
-    // Returns the login policy of the organization
-    // With this policy the login UI can be configured
     rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/login"
@@ -4078,9 +4096,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            summary: "Get Login Settings";
+            description: "Returns the login settings defined on the organization level. It will trigger as soon as the organization is identified (scope, user identitfication). The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns the default login policy configured in the IAM
     rpc GetDefaultLoginPolicy(GetDefaultLoginPolicyRequest) returns (GetDefaultLoginPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/login"
@@ -4089,10 +4121,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            summary: "Get Default Login Settings";
+            description: "Returns the default login settings defined on the instance level. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Add a custom login policy for the organization
-    // With this policy the login UI can be configured
     rpc AddCustomLoginPolicy(AddCustomLoginPolicyRequest) returns (AddCustomLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login"
@@ -4102,10 +4147,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            summary: "Create Custom Login Settings";
+            description: "Create login settings for the organization and therefore overwrite the default settings for this organization. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Change the custom login policy for the organization
-    // With this policy the login UI can be configured
     rpc UpdateCustomLoginPolicy(UpdateCustomLoginPolicyRequest) returns (UpdateCustomLoginPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/login"
@@ -4115,10 +4173,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            summary: "Update Custom Login Settings";
+            description: "Change the login settings for the organization, that overwrites the default settings for this organization. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the custom login policy of the organization
-    // The default policy of the IAM will trigger after
     rpc ResetLoginPolicyToDefault(ResetLoginPolicyToDefaultRequest) returns (ResetLoginPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/login"
@@ -4127,10 +4198,23 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            summary: "Reset Custom Login Settings to Default";
+            description: "Remove the custom settings from the organization. The default settings of the instance will be triggereed afterwards. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Lists all possible identity providers configured on the organization
-    // Limit should always be set, there is a default limit set by the service
     rpc ListLoginPolicyIDPs(ListLoginPolicyIDPsRequest) returns (ListLoginPolicyIDPsResponse) {
         option (google.api.http) = {
             post: "/policies/login/idps/_search"
@@ -4140,9 +4224,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Identity Providers"
+            summary: "List Linked Identity Providers";
+            description: "Returns a list of identity providers that are linked in the login policy. This means, that they are configured for the organization and will be shown to the users. They will be shown if the organization is identified (per scope or user)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Add a (preconfigured) identity provider to the custom login policy
     rpc AddIDPToLoginPolicy(AddIDPToLoginPolicyRequest) returns (AddIDPToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/idps"
@@ -4152,9 +4251,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Identity Providers"
+            summary: "Add Linked Identity Provider";
+            description: "Add/link a pre-configured identity provider to the login settings of the organization. This means that it will be shown to the users on the login page. They will be shown if the organization is identified (per scope or user)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Remove a identity provider from the custom login policy
     rpc RemoveIDPFromLoginPolicy(RemoveIDPFromLoginPolicyRequest) returns (RemoveIDPFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/idps/{idp_id}"
@@ -4163,9 +4277,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Identity Providers"
+            summary: "Remove Linked Identity Provider";
+            description: "Remove an identity provider from the login settings of the organization. This means that it will not be shown to the users on the login page."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all configured second factors of the custom login policy
     rpc ListLoginPolicySecondFactors(ListLoginPolicySecondFactorsRequest) returns (ListLoginPolicySecondFactorsResponse) {
         option (google.api.http) = {
             post: "/policies/login/second_factors/_search"
@@ -4174,9 +4303,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "List Second Factors (2FA)";
+            description: "Returns a list of second factors (2FA) configured on the login settings of the organization. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called the second factor as it is used after a password. In the UI we generalize it as multi-factor."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Adds a new second factor to the custom login policy
     rpc AddSecondFactorToLoginPolicy(AddSecondFactorToLoginPolicyRequest) returns (AddSecondFactorToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/second_factors"
@@ -4186,9 +4330,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "Add Second Factor (2FA)";
+            description: "Add a new second factor (2FA) to the login settings of the ogranization. Users will have the possibility to authenticate with the configured factor afterward. Authentication factors are used as an additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called a second factor as it is used as an additional authentication after a password. In the UI we generalize this as multi-factor."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Remove a second factor from the custom login policy
     rpc RemoveSecondFactorFromLoginPolicy(RemoveSecondFactorFromLoginPolicyRequest) returns (RemoveSecondFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/second_factors/{type}"
@@ -4197,9 +4356,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "Remove Second Factor (2FA)";
+            description: "Remove a configured second factor (2FA) from the login settings of the organization. Users will not be able to authenticate with the configured factor afterward. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called the second factor as it is used after a password. In the UI we generalize it as multi-factor."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all configured multi factors of the custom login policy
     rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
             post: "/policies/login/auth_factors/_search"
@@ -4208,9 +4382,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "List Multi Factors (MFA)";
+            description: "Returns a list of multi factors (MFA) configured on the login settings of the organization. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Adds a new multi-factor to the custom login policy
     rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/multi_factors"
@@ -4220,9 +4409,24 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "Add Multi-Factor (MFA)";
+            description: "Add a multi-factor (MFA) to the login settings of the organization. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Remove a multi-factor from the custom login policy
     rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/multi_factors/{type}"
@@ -4230,6 +4434,22 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "Remove Multi Factor (MFA)";
+            description: "Remove a multi-factor (MFA) from the login settings of the organization. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7941,7 +8161,13 @@ message ListLoginPolicyIDPsResponse {
 
 message AddIDPToLoginPolicyRequest {
     string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.IDPOwnerType ownerType = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    zitadel.idp.v1.IDPOwnerType ownerType = 2 [
+        (validate.rules).enum = {defined_only: true, not_in: [0]},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"IDP_OWNER_TYPE_SYSTEM\"]";
+            description: "Choose IDP_OWNER_TYPE_SYSTEM if the configuration is made on the instance and IDP_OWNER_TYPE_ORG if the configuration is made on the organization."
+        }
+    ];
 }
 
 message AddIDPToLoginPolicyResponse {
@@ -7960,11 +8186,20 @@ message ListLoginPolicySecondFactorsRequest {}
 
 message ListLoginPolicySecondFactorsResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.policy.v1.SecondFactorType result = 2;
+    repeated zitadel.policy.v1.SecondFactorType result = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"SECOND_FACTOR_TYPE_OTP\"]"
+        }
+    ];
 }
 
 message AddSecondFactorToLoginPolicyRequest {
-    zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    zitadel.policy.v1.SecondFactorType type = 1 [
+        (validate.rules).enum = {defined_only: true, not_in: [0]},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"SECOND_FACTOR_TYPE_OTP\"";
+        }
+    ];
 }
 message AddSecondFactorToLoginPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
@@ -7982,11 +8217,20 @@ message ListLoginPolicyMultiFactorsRequest {}
 
 message ListLoginPolicyMultiFactorsResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.policy.v1.MultiFactorType result = 2;
+    repeated zitadel.policy.v1.MultiFactorType result = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION\"]"
+        }
+    ];
 }
 
 message AddMultiFactorToLoginPolicyRequest {
-    zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    zitadel.policy.v1.MultiFactorType type = 1 [
+        (validate.rules).enum = {defined_only: true, not_in: [0]},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION\"";
+        }
+    ];
 }
 
 message AddMultiFactorToLoginPolicyResponse {

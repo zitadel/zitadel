@@ -1847,7 +1847,7 @@ service AdminService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Identity Providers"
-            summary: "Add Linked Identity Providers";
+            summary: "Add Linked Identity Provider";
             description: "Add/link a pre-configured identity provider to the login settings of the instance. This means that it will be shown to the users on the login page. It affects all organizations, without custom login settings."
             responses: {
                 key: "200";
@@ -1871,7 +1871,7 @@ service AdminService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Identity Providers"
-            summary: "Remove Linked Identity Providers";
+            summary: "Remove Linked Identity Provider";
             description: "Remove an identity provider from the login settings of the instance. This means that it will not be shown to the users on the login page. It affects all organizations, without custom login settings."
             responses: {
                 key: "200";
