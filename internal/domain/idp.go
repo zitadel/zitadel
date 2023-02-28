@@ -36,7 +36,7 @@ const (
 )
 
 func (t IDPType) GetCSSClass() string {
-	switch t {
+	switch t { //nolint:exhaustive
 	case IDPTypeGoogle:
 		return "google"
 	default:

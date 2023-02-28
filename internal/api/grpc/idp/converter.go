@@ -88,8 +88,6 @@ func IDPTypeToPb(idpType domain.IDPType) idp_pb.IDPType {
 	switch idpType {
 	case domain.IDPTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
-	//case domain.IDPTypeSAML:
-	//	return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
 	case domain.IDPTypeJWT:
 		return idp_pb.IDPType_IDP_TYPE_JWT
 	default:

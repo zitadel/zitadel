@@ -70,7 +70,7 @@ type JWTIDPConfig struct {
 }
 
 // IDPConfigType
-// deprecated: use [IDPType]
+// Deprecated: use [IDPType]
 type IDPConfigType int32
 
 const (
@@ -88,7 +88,7 @@ func (f IDPConfigType) Valid() bool {
 }
 
 // IDPConfigState
-// deprecated: use [IDPStateType]
+// Deprecated: use [IDPStateType]
 type IDPConfigState int32
 
 const (
@@ -109,7 +109,7 @@ func (s IDPConfigState) Exists() bool {
 }
 
 // IDPConfigStylingType
-// deprecated: use a concrete provider
+// Deprecated: use a concrete provider
 type IDPConfigStylingType int32
 
 const (

@@ -847,7 +847,13 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
 	idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpConfigID)
+	if err != nil {
+		return err
+	}
 	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUserID)
+	if err != nil {
+		return err
+	}
 	queries := []query.SearchQuery{
 		idQuery, externalIDQuery,
 	}

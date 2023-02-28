@@ -134,16 +134,20 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.oidcProvider(r.Context(), identityProvider)
 	case domain.IDPTypeJWT:
 		provider, err = l.jwtProvider(r.Context(), identityProvider)
-	case domain.IDPTypeOAuth:
-		//provider, err = l.oauthProvider(r.Context(), identityProvider)
-	case domain.IDPTypeLDAP:
-	case domain.IDPTypeAzureAD:
-	case domain.IDPTypeGitHub:
-	case domain.IDPTypeGitHubEE:
-	case domain.IDPTypeGitLab:
-	case domain.IDPTypeGitLabSelfHosted:
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
+	case domain.IDPTypeOAuth,
+		domain.IDPTypeLDAP,
+		domain.IDPTypeAzureAD,
+		domain.IDPTypeGitHub,
+		domain.IDPTypeGitHubEE,
+		domain.IDPTypeGitLab,
+		domain.IDPTypeGitLabSelfHosted,
+		domain.IDPTypeUnspecified:
+		fallthrough
+	default:
+		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.Invalid"))
+		return
 	}
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
@@ -188,18 +192,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		}
 		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
 	case domain.IDPTypeJWT:
-	case domain.IDPTypeOAuth:
-		//provider, err = l.oauthProvider(r.Context(), identityProvider)
-		//if err != nil {
-		//
-		//}
-		//session = &oauth.Session{Provider: provider.(*oauth.Provider), Code: data.Code}
-	case domain.IDPTypeLDAP:
-	case domain.IDPTypeAzureAD:
-	case domain.IDPTypeGitHub:
-	case domain.IDPTypeGitHubEE:
-	case domain.IDPTypeGitLab:
-	case domain.IDPTypeGitLabSelfHosted:
+		// TODO: ?
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -207,6 +200,18 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
+	case domain.IDPTypeOAuth,
+		domain.IDPTypeLDAP,
+		domain.IDPTypeAzureAD,
+		domain.IDPTypeGitHub,
+		domain.IDPTypeGitHubEE,
+		domain.IDPTypeGitLab,
+		domain.IDPTypeGitLabSelfHosted,
+		domain.IDPTypeUnspecified:
+		fallthrough
+	default:
+		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-SFefg", "Errors.ExternalIDP.Invalid"))
+		return
 	}
 
 	user, err := session.FetchUser(r.Context())
@@ -235,8 +240,9 @@ func (l *Login) handleExternalUserAuthenticated(
 	}
 	err = l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
-		if errors.IsNotFound(err) {
-			err = nil
+		if !errors.IsNotFound(err) {
+			l.renderError(w, r, authReq, err)
+			return
 		}
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser)
 		return
@@ -288,7 +294,6 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 	l.autoCreateExternalUser(w, r, authReq)
-	return
 }
 
 // autoCreateExternalUser takes the externalUser and creates it automatically (without user interaction)
@@ -494,32 +499,6 @@ func (l *Login) jwtProvider(ctx context.Context, identityProvider *query.IDPTemp
 		l.idpConfigAlg,
 	)
 }
-
-//
-//func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*oauth.Provider, error) {
-//	secret, err := crypto.DecryptString(identityProvider.OAuthIDPTemplate.ClientSecret, l.idpConfigAlg)
-//	if err != nil {
-//		return nil, err
-//	}
-//	config := &oauth2.Config{
-//		ClientID:     identityProvider.OAuthIDPTemplate.ClientID,
-//		ClientSecret: secret,
-//		Endpoint: oauth2.Endpoint{
-//			AuthURL:  identityProvider.OAuthIDPTemplate.AuthorizationEndpoint,
-//			TokenURL: identityProvider.OAuthIDPTemplate.TokenEndpoint,
-//		},
-//		RedirectURL: l.baseURL(ctx) + EndpointExternalLoginCallback,
-//		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
-//	}
-//
-//	return oauth.New(config,
-//		identityProvider.Name,
-//		identityProvider.OAuthIDPTemplate.UserEndpoint,
-//		func() idp.User {
-//			return new(oauth.UserMapper)
-//		},
-//	)
-//}
 
 func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserGrant, resourceOwner string) error {
 	if len(userGrants) == 0 {
