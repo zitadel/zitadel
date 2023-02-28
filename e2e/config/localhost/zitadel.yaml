@@ -1,0 +1,41 @@
+ExternalDomain: localhost
+ExternalSecure: false
+
+Database:
+  cockroach:
+    Host:  db
+
+TLS:
+  Enabled: false
+
+FirstInstance:
+  Org:
+    Human:
+      PasswordChangeRequired: false
+
+LogStore:
+  Access:
+    Database:
+      Enabled: true
+      Debounce:
+        MinFrequency: 0s
+        MaxBulkSize: 0
+  Execution:
+    Database:
+      Enabled: true
+    Stdout:
+      Enabled: false
+
+Quotas:
+  Access:
+    ExhaustedCookieKey: "zitadel.quota.limiting"
+    ExhaustedCookieMaxAge: "60s"
+
+DefaultInstance:
+  LoginPolicy:
+    MfaInitSkipLifetime: "0"
+
+SystemAPIUsers:
+- cypress:
+    KeyData: "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6aStGRlNKTDdmNXl3NEtUd3pnTQpQMzRlUEd5Y20vTStrVDBNN1Y0Q2d4NVYzRWFESXZUUUtUTGZCYUVCNDV6YjlMdGpJWHpEdzByWFJvUzJoTzZ0CmgrQ1lRQ3ozS0N2aDA5QzBJenhaaUIySVMzSC9hVCs1Qng5RUZZK3ZuQWtaamNjYnlHNVlOUnZtdE9sbnZJZUkKSDdxWjB0RXdrUGZGNUdFWk5QSlB0bXkzVUdWN2lvZmRWUVMxeFJqNzMrYU13NXJ2SDREOElkeWlBQzNWZWtJYgpwdDBWajBTVVgzRHdLdG9nMzM3QnpUaVBrM2FYUkYwc2JGaFFvcWRKUkk4TnFnWmpDd2pxOXlmSTV0eXhZc3duCitKR3pIR2RIdlczaWRPRGxtd0V0NUsycGFzaVJJV0syT0dmcSt3MEVjbHRRSGFidXFFUGdabG1oQ2tSZE5maXgKQndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
+
