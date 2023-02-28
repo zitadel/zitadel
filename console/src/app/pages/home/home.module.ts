@@ -9,6 +9,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
+import OnboardingModule from 'src/app/modules/onboarding/onboarding.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
 
@@ -20,10 +22,12 @@ import { HomeComponent } from './home.component';
     HasRoleModule,
     HomeRoutingModule,
     MatButtonModule,
+    HasRolePipeModule,
     TranslateModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
     ShortcutsModule,
+    OnboardingModule,
     MatRippleModule,
   ],
 })

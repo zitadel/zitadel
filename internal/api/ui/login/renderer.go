@@ -69,7 +69,6 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplChangePasswordDone:           "change_password_done.html",
 		tmplRegisterOption:               "register_option.html",
 		tmplRegister:                     "register.html",
-		tmplExternalRegisterOverview:     "external_register_overview.html",
 		tmplLogoutDone:                   "logout_done.html",
 		tmplRegisterOrg:                  "register_org.html",
 		tmplChangeUsername:               "change_username.html",
@@ -194,9 +193,6 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"orgRegistrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointRegisterOrg)
 		},
-		"externalRegistrationUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointExternalRegister)
-		},
 		"changeUsernameUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangeUsername)
 		},
@@ -221,8 +217,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"hasRegistration": func() bool {
 			return true
 		},
-		"idpProviderClass": func(stylingType domain.IDPConfigStylingType) string {
-			return stylingType.GetCSSClass()
+		"idpProviderClass": func(idpType domain.IDPType) string {
+			return idpType.GetCSSClass()
 		},
 		"ldapUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLDAPCallback)

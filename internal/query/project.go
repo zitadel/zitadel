@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -107,7 +108,7 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 		projection.ProjectProjection.Trigger(ctx)
 	}
 
-	stmt, scan := prepareProjectQuery()
+	stmt, scan := prepareProjectQuery(ctx, q.client)
 	eq := sq.Eq{
 		ProjectColumnID.identifier():         id,
 		ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -128,7 +129,7 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProjectsQuery()
+	query, scan := prepareProjectsQuery(ctx, q.client)
 	eq := sq.Eq{ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[ProjectColumnOwnerRemoved.identifier()] = false
@@ -195,7 +196,7 @@ func (q *ProjectSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder 
 	return query
 }
 
-func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
+func prepareProjectQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
 	return sq.Select(
 			ProjectColumnID.identifier(),
 			ProjectColumnCreationDate.identifier(),
@@ -208,7 +209,8 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 			ProjectColumnProjectRoleCheck.identifier(),
 			ProjectColumnHasProjectCheck.identifier(),
 			ProjectColumnPrivateLabelingSetting.identifier()).
-			From(projectsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(projectsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
 			err := row.Scan(
@@ -234,7 +236,7 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 		}
 }
 
-func prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error)) {
+func prepareProjectsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Projects, error)) {
 	return sq.Select(
 			ProjectColumnID.identifier(),
 			ProjectColumnCreationDate.identifier(),
@@ -248,7 +250,8 @@ func prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error
 			ProjectColumnHasProjectCheck.identifier(),
 			ProjectColumnPrivateLabelingSetting.identifier(),
 			countColumn.identifier()).
-			From(projectsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(projectsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Projects, error) {
 			projects := make([]*Project, 0)
 			var count uint64

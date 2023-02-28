@@ -2,7 +2,6 @@ import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 import { Subject } from 'rxjs';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';

@@ -13,6 +13,60 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
+var (
+	prepareActionsStmt = `SELECT projections.actions3.id,` +
+		` projections.actions3.creation_date,` +
+		` projections.actions3.change_date,` +
+		` projections.actions3.resource_owner,` +
+		` projections.actions3.sequence,` +
+		` projections.actions3.action_state,` +
+		` projections.actions3.name,` +
+		` projections.actions3.script,` +
+		` projections.actions3.timeout,` +
+		` projections.actions3.allowed_to_fail,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.actions3` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareActionsCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"sequence",
+		"action_state",
+		"name",
+		"script",
+		"timeout",
+		"allowed_to_fail",
+		"count",
+	}
+
+	prepareActionStmt = `SELECT projections.actions3.id,` +
+		` projections.actions3.creation_date,` +
+		` projections.actions3.change_date,` +
+		` projections.actions3.resource_owner,` +
+		` projections.actions3.sequence,` +
+		` projections.actions3.action_state,` +
+		` projections.actions3.name,` +
+		` projections.actions3.script,` +
+		` projections.actions3.timeout,` +
+		` projections.actions3.allowed_to_fail` +
+		` FROM projections.actions3` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareActionCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"sequence",
+		"action_state",
+		"name",
+		"script",
+		"timeout",
+		"allowed_to_fail",
+	}
+)
+
 func Test_ActionPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -29,18 +83,7 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.timeout,`+
-						` projections.actions3.allowed_to_fail,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.actions3`),
+					regexp.QuoteMeta(prepareActionsStmt),
 					nil,
 					nil,
 				),
@@ -52,31 +95,8 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.timeout,`+
-						` projections.actions3.allowed_to_fail,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.actions3`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"action_state",
-						"name",
-						"script",
-						"timeout",
-						"allowed_to_fail",
-						"count",
-					},
+					regexp.QuoteMeta(prepareActionsStmt),
+					prepareActionsCols,
 					[][]driver.Value{
 						{
 							"id",
@@ -118,31 +138,8 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.timeout,`+
-						` projections.actions3.allowed_to_fail,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.actions3`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"action_state",
-						"name",
-						"script",
-						"timeout",
-						"allowed_to_fail",
-						"count",
-					},
+					regexp.QuoteMeta(prepareActionsStmt),
+					prepareActionsCols,
 					[][]driver.Value{
 						{
 							"id-1",
@@ -208,18 +205,7 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.timeout,`+
-						` projections.actions3.allowed_to_fail,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.actions3`),
+					regexp.QuoteMeta(prepareActionsStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -236,17 +222,7 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.timeout,`+
-						` projections.actions3.allowed_to_fail`+
-						` FROM projections.actions3`),
+					regexp.QuoteMeta(prepareActionStmt),
 					nil,
 					nil,
 				),
@@ -264,29 +240,8 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.timeout,`+
-						` projections.actions3.allowed_to_fail`+
-						` FROM projections.actions3`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"action_state",
-						"name",
-						"script",
-						"timeout",
-						"allowed_to_fail",
-					},
+					regexp.QuoteMeta(prepareActionStmt),
+					prepareActionCols,
 					[]driver.Value{
 						"id",
 						testNow,
@@ -319,17 +274,7 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.timeout,`+
-						` projections.actions3.allowed_to_fail`+
-						` FROM projections.actions3`),
+					regexp.QuoteMeta(prepareActionStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -344,7 +289,7 @@ func Test_ActionPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

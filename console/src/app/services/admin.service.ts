@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
 
 import {
   ActivateLabelPolicyRequest,
@@ -225,15 +226,84 @@ import {
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
 } from '../proto/generated/zitadel/admin_pb';
+import { Event } from '../proto/generated/zitadel/event_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
+import { StorageLocation, StorageService } from './storage.service';
+
+export interface OnboardingActions {
+  order: number;
+  eventType: string;
+  oneof: string[];
+  link: string | string[];
+  fragment?: string | undefined;
+}
+
+type OnboardingEvent = { order: number; link: string; fragment: string | undefined; event: Event.AsObject | undefined };
+type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
-  constructor(private readonly grpcService: GrpcService) {}
+  public hideOnboarding: boolean = false;
+  public loadEvents: Subject<OnboardingActions[]> = new Subject();
+  public onboardingLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public progressEvents$: Observable<OnboardingEventEntries> = this.loadEvents.pipe(
+    tap(() => this.onboardingLoading.next(true)),
+    switchMap((actions) => {
+      const searchForTypes = actions.map((oe) => oe.oneof).flat();
+      const eventsReq = new ListEventsRequest().setAsc(true).setEventTypesList(searchForTypes).setAsc(false);
+      return from(this.listEvents(eventsReq)).pipe(
+        map((events) => {
+          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API');
+
+          let obj: { [type: string]: OnboardingEvent } = {};
+          actions.map((action) => {
+            const filtered = el.filter((event) => event.type?.type && action.oneof.includes(event.type.type));
+            (obj as any)[action.eventType] = filtered.length
+              ? { order: action.order, link: action.link, fragment: action.fragment, event: filtered[0] }
+              : { order: action.order, link: action.link, fragment: action.fragment, event: undefined };
+          });
+
+          const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
+
+          const toDo = toArray.filter(([key, value]) => value.event === undefined);
+          const done = toArray.filter(([key, value]) => !!value.event);
+
+          return [...toDo, ...done];
+        }),
+        tap((events) => {
+          const total = events.length;
+          const done = events.map(([type, value]) => value.event !== undefined).filter((res) => !!res).length;
+          const percentage = Math.round((done / total) * 100);
+          this.progressDone.next(done);
+          this.progressTotal.next(total);
+          this.progressPercentage.next(percentage);
+          this.progressAllDone.next(done === total);
+        }),
+        catchError((error) => {
+          console.error(error);
+          return of([]);
+        }),
+        finalize(() => this.onboardingLoading.next(false)),
+      );
+    }),
+  );
+
+  public progressEvents: BehaviorSubject<OnboardingEventEntries> = new BehaviorSubject<OnboardingEventEntries>([]);
+  public progressPercentage: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressDone: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressTotal: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressAllDone: BehaviorSubject<boolean> = new BehaviorSubject(true);
+
+  constructor(private readonly grpcService: GrpcService, private storageService: StorageService) {
+    this.progressEvents$.subscribe(this.progressEvents);
+
+    this.hideOnboarding =
+      this.storageService.getItem('onboarding-dismissed', StorageLocation.local) === 'true' ? true : false;
+  }
 
   public setDefaultOrg(orgId: string): Promise<SetDefaultOrgResponse.AsObject> {
     const req = new SetDefaultOrgRequest();

@@ -41,8 +41,8 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-GVDfe", "Errors.IAM.LoginPolicy.NotFound")
 	}
 
-	_, err = c.getInstanceIDPConfigByID(ctx, idpProvider.IDPConfigID)
-	if err != nil {
+	exists, err := ExistsInstanceIDP(ctx, c.eventstore.Filter, idpProvider.IDPConfigID)
+	if err != nil || !exists {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "INSTANCE-m8fsd", "Errors.IDPConfig.NotExisting")
 	}
 	idpModel := NewInstanceIdentityProviderWriteModel(ctx, idpProvider.IDPConfigID)

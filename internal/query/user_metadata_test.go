@@ -18,7 +18,8 @@ var (
 		` projections.user_metadata4.sequence,` +
 		` projections.user_metadata4.key,` +
 		` projections.user_metadata4.value` +
-		` FROM projections.user_metadata4`
+		` FROM projections.user_metadata4` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	userMetadataCols = []string{
 		"creation_date",
 		"change_date",
@@ -242,7 +243,7 @@ func Test_UserMetadataPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

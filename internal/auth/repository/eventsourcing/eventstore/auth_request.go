@@ -17,8 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
-	iam_view_model "github.com/zitadel/zitadel/internal/iam/repository/view/model"
 	"github.com/zitadel/zitadel/internal/id"
 	project_view_model "github.com/zitadel/zitadel/internal/project/repository/view/model"
 	"github.com/zitadel/zitadel/internal/query"
@@ -81,7 +79,7 @@ type lockoutPolicyViewProvider interface {
 }
 
 type idpProviderViewProvider interface {
-	IDPProvidersByAggregateIDAndState(string, string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
+	IDPLoginPolicyLinks(context.Context, string, *query.IDPLoginPolicyLinksSearchQuery, bool) (*query.IDPLoginPolicyLinks, error)
 }
 
 type idpUserLinksProvider interface {
@@ -554,13 +552,11 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	if !policy.AllowExternalIDPs {
 		return policy, nil, nil
 	}
-	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, authz.GetInstance(ctx).InstanceID(), orgID, policy.IsDefault)
+	idpProviders, err := getLoginPolicyIDPProviders(ctx, repo.IDPProviderViewProvider, authz.GetInstance(ctx).InstanceID(), orgID, policy.IsDefault)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	providers := iam_model.IdpProviderViewsToDomain(idpProviders)
-	return policy, providers, nil
+	return policy, idpProviders, nil
 }
 
 func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.AuthRequest) error {
@@ -850,16 +846,32 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 }
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
-	var externalIDP *user_view_model.ExternalIDPView
-	if request.RequestedOrgID != "" {
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID, request.InstanceID)
-	} else {
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID, request.InstanceID)
-	}
+	idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpConfigID)
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID, false)
+	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUserID)
+	if err != nil {
+		return err
+	}
+	queries := []query.SearchQuery{
+		idQuery, externalIDQuery,
+	}
+	if request.RequestedOrgID != "" {
+		orgIDQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(idpConfigID)
+		if err != nil {
+			return err
+		}
+		queries = append(queries, orgIDQuery)
+	}
+	links, err := repo.Query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	if err != nil {
+		return err
+	}
+	if len(links.Links) != 1 {
+		return errors.ThrowNotFound(nil, "AUTH-Sf8sd", "Errors.ExternalIDP.NotFound")
+	}
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, links.Links[0].UserID, false)
 	if err != nil {
 		return err
 	}
@@ -1233,19 +1245,25 @@ func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *dom
 	return nil
 }
 
-func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*iam_model.IDPProviderView, error) {
-	if defaultPolicy {
-		idpProviders, err := provider.IDPProvidersByAggregateIDAndState(iamID, iamID, iam_model.IDPConfigStateActive)
-		if err != nil {
-			return nil, err
-		}
-		return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
+func getLoginPolicyIDPProviders(ctx context.Context, provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*domain.IDPProvider, error) {
+	resourceOwner := iamID
+	if !defaultPolicy {
+		resourceOwner = orgID
 	}
-	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iamID, iam_model.IDPConfigStateActive)
+	links, err := provider.IDPLoginPolicyLinks(ctx, resourceOwner, &query.IDPLoginPolicyLinksSearchQuery{}, false)
 	if err != nil {
 		return nil, err
 	}
-	return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
+	providers := make([]*domain.IDPProvider, len(links.Links))
+	for i, link := range links.Links {
+		providers[i] = &domain.IDPProvider{
+			Type:        link.OwnerType,
+			IDPConfigID: link.IDPID,
+			Name:        link.IDPName,
+			IDPType:     link.IDPType,
+		}
+	}
+	return providers, nil
 }
 
 func checkVerificationTimeMaxAge(verificationTime time.Time, lifetime time.Duration, request *domain.AuthRequest) bool {

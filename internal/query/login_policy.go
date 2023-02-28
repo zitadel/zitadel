@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -172,7 +173,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 		eq[LoginPolicyColumnOwnerRemoved.identifier()] = false
 	}
 
-	query, scan := prepareLoginPolicyQuery()
+	query, scan := prepareLoginPolicyQuery(ctx, q.client)
 	stmt, args, err := query.Where(
 		sq.And{
 			eq,
@@ -212,7 +213,7 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (_ *LoginPolicy, err e
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLoginPolicyQuery()
+	query, scan := prepareLoginPolicyQuery(ctx, q.client)
 	stmt, args, err := query.Where(sq.Eq{
 		LoginPolicyColumnOrgID.identifier():      authz.GetInstance(ctx).InstanceID(),
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -232,7 +233,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (_ *Seco
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLoginPolicy2FAsQuery()
+	query, scan := prepareLoginPolicy2FAsQuery(ctx, q.client)
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
@@ -266,7 +267,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (_ *SecondFactors, e
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLoginPolicy2FAsQuery()
+	query, scan := prepareLoginPolicy2FAsQuery(ctx, q.client)
 	stmt, args, err := query.Where(sq.Eq{
 		LoginPolicyColumnOrgID.identifier():      authz.GetInstance(ctx).InstanceID(),
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -288,7 +289,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (_ *Multi
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLoginPolicyMFAsQuery()
+	query, scan := prepareLoginPolicyMFAsQuery(ctx, q.client)
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
@@ -322,7 +323,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (_ *MultiFactors, err
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLoginPolicyMFAsQuery()
+	query, scan := prepareLoginPolicyMFAsQuery(ctx, q.client)
 	stmt, args, err := query.Where(sq.Eq{
 		LoginPolicyColumnOrgID.identifier():      authz.GetInstance(ctx).InstanceID(),
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -340,7 +341,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (_ *MultiFactors, err
 	return factors, err
 }
 
-func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy, error)) {
+func prepareLoginPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy, error)) {
 	return sq.Select(
 			LoginPolicyColumnOrgID.identifier(),
 			LoginPolicyColumnCreationDate.identifier(),
@@ -365,7 +366,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			LoginPolicyColumnMFAInitSkipLifetime.identifier(),
 			LoginPolicyColumnSecondFactorCheckLifetime.identifier(),
 			LoginPolicyColumnMultiFactorCheckLifetime.identifier(),
-		).From(loginPolicyTable.identifier()).
+		).From(loginPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
@@ -408,10 +409,11 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 		}
 }
 
-func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFactors, error)) {
+func prepareLoginPolicy2FAsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SecondFactors, error)) {
 	return sq.Select(
 			LoginPolicyColumnSecondFactors.identifier(),
-		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(loginPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecondFactors, error) {
 			p := new(SecondFactors)
 			err := row.Scan(
@@ -429,10 +431,11 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 		}
 }
 
-func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFactors, error)) {
+func prepareLoginPolicyMFAsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*MultiFactors, error)) {
 	return sq.Select(
 			LoginPolicyColumnMultiFactors.identifier(),
-		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(loginPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MultiFactors, error) {
 			p := new(MultiFactors)
 			err := row.Scan(

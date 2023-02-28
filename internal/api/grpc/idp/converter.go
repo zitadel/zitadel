@@ -84,13 +84,11 @@ func IDPUserLinkToPb(link *query.IDPUserLink) *idp_pb.IDPUserLink {
 	}
 }
 
-func IDPTypeToPb(idpType domain.IDPConfigType) idp_pb.IDPType {
+func IDPTypeToPb(idpType domain.IDPType) idp_pb.IDPType {
 	switch idpType {
-	case domain.IDPConfigTypeOIDC:
+	case domain.IDPTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
-	case domain.IDPConfigTypeSAML:
-		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
-	case domain.IDPConfigTypeJWT:
+	case domain.IDPTypeJWT:
 		return idp_pb.IDPType_IDP_TYPE_JWT
 	default:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
@@ -406,6 +404,14 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		oauthConfigToPb(providerConfig, config.OAuthIDPTemplate)
 		return providerConfig
 	}
+	if config.OIDCIDPTemplate != nil {
+		oidcConfigToPb(providerConfig, config.OIDCIDPTemplate)
+		return providerConfig
+	}
+	if config.JWTIDPTemplate != nil {
+		jwtConfigToPb(providerConfig, config.JWTIDPTemplate)
+		return providerConfig
+	}
 	if config.GoogleIDPTemplate != nil {
 		googleConfigToPb(providerConfig, config.GoogleIDPTemplate)
 		return providerConfig
@@ -417,15 +423,6 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 	return providerConfig
 }
 
-func googleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GoogleIDPTemplate) {
-	providerConfig.Config = &idp_pb.ProviderConfig_Google{
-		Google: &idp_pb.GoogleConfig{
-			ClientId: template.ClientID,
-			Scopes:   template.Scopes,
-		},
-	}
-}
-
 func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAuthIDPTemplate) {
 	providerConfig.Config = &idp_pb.ProviderConfig_Oauth{
 		Oauth: &idp_pb.OAuthConfig{
@@ -434,6 +431,36 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 			TokenEndpoint:         template.TokenEndpoint,
 			UserEndpoint:          template.UserEndpoint,
 			Scopes:                template.Scopes,
+		},
+	}
+}
+
+func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Oidc{
+		Oidc: &idp_pb.GenericOIDCConfig{
+			ClientId: template.ClientID,
+			Issuer:   template.Issuer,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func jwtConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.JWTIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Jwt{
+		Jwt: &idp_pb.JWTConfig{
+			JwtEndpoint:  template.Endpoint,
+			Issuer:       template.Issuer,
+			KeysEndpoint: template.KeysEndpoint,
+			HeaderName:   template.HeaderName,
+		},
+	}
+}
+
+func googleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GoogleIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Google{
+		Google: &idp_pb.GoogleConfig{
+			ClientId: template.ClientID,
+			Scopes:   template.Scopes,
 		},
 	}
 }

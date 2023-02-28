@@ -9,15 +9,16 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 type AuthRequestCache struct {
-	client *sql.DB
+	client *database.DB
 }
 
-func Start(dbClient *sql.DB) *AuthRequestCache {
+func Start(dbClient *database.DB) *AuthRequestCache {
 	return &AuthRequestCache{
 		client: dbClient,
 	}
