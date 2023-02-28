@@ -12,6 +12,31 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
+var (
+	preparePasswordAgePolicyStmt = `SELECT projections.password_age_policies2.id,` +
+		` projections.password_age_policies2.sequence,` +
+		` projections.password_age_policies2.creation_date,` +
+		` projections.password_age_policies2.change_date,` +
+		` projections.password_age_policies2.resource_owner,` +
+		` projections.password_age_policies2.expire_warn_days,` +
+		` projections.password_age_policies2.max_age_days,` +
+		` projections.password_age_policies2.is_default,` +
+		` projections.password_age_policies2.state` +
+		` FROM projections.password_age_policies2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	preparePasswordAgePolicyCols = []string{
+		"id",
+		"sequence",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"expire_warn_days",
+		"max_age_days",
+		"is_default",
+		"state",
+	}
+)
+
 func Test_PasswordAgePolicyPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -28,16 +53,7 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 			prepare: preparePasswordAgePolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.password_age_policies2.id,`+
-						` projections.password_age_policies2.sequence,`+
-						` projections.password_age_policies2.creation_date,`+
-						` projections.password_age_policies2.change_date,`+
-						` projections.password_age_policies2.resource_owner,`+
-						` projections.password_age_policies2.expire_warn_days,`+
-						` projections.password_age_policies2.max_age_days,`+
-						` projections.password_age_policies2.is_default,`+
-						` projections.password_age_policies2.state`+
-						` FROM projections.password_age_policies2`),
+					regexp.QuoteMeta(preparePasswordAgePolicyStmt),
 					nil,
 					nil,
 				),
@@ -55,27 +71,8 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 			prepare: preparePasswordAgePolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.password_age_policies2.id,`+
-						` projections.password_age_policies2.sequence,`+
-						` projections.password_age_policies2.creation_date,`+
-						` projections.password_age_policies2.change_date,`+
-						` projections.password_age_policies2.resource_owner,`+
-						` projections.password_age_policies2.expire_warn_days,`+
-						` projections.password_age_policies2.max_age_days,`+
-						` projections.password_age_policies2.is_default,`+
-						` projections.password_age_policies2.state`+
-						` FROM projections.password_age_policies2`),
-					[]string{
-						"id",
-						"sequence",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"expire_warn_days",
-						"max_age_days",
-						"is_default",
-						"state",
-					},
+					regexp.QuoteMeta(preparePasswordAgePolicyStmt),
+					preparePasswordAgePolicyCols,
 					[]driver.Value{
 						"pol-id",
 						uint64(20211109),
@@ -106,16 +103,7 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 			prepare: preparePasswordAgePolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.password_age_policies2.id,`+
-						` projections.password_age_policies2.sequence,`+
-						` projections.password_age_policies2.creation_date,`+
-						` projections.password_age_policies2.change_date,`+
-						` projections.password_age_policies2.resource_owner,`+
-						` projections.password_age_policies2.expire_warn_days,`+
-						` projections.password_age_policies2.max_age_days,`+
-						` projections.password_age_policies2.is_default,`+
-						` projections.password_age_policies2.state`+
-						` FROM projections.password_age_policies2`),
+					regexp.QuoteMeta(preparePasswordAgePolicyStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -130,7 +118,7 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

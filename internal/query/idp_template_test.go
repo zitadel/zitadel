@@ -81,7 +81,8 @@ var (
 		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates2.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oidc.instance_id` +
 		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates2.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_jwt.instance_id` +
 		` LEFT JOIN projections.idp_templates2_google ON projections.idp_templates2.id = projections.idp_templates2_google.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_google.instance_id` +
-		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates2.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_ldap.instance_id`
+		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates2.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_ldap.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplateCols = []string{
 		"id",
 		"resource_owner",
@@ -212,7 +213,8 @@ var (
 		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates2.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oidc.instance_id` +
 		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates2.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_jwt.instance_id` +
 		` LEFT JOIN projections.idp_templates2_google ON projections.idp_templates2.id = projections.idp_templates2_google.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_google.instance_id` +
-		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates2.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_ldap.instance_id`
+		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates2.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_ldap.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplatesCols = []string{
 		"id",
 		"resource_owner",
@@ -1628,7 +1630,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

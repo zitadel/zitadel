@@ -12,6 +12,32 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
+var (
+	prepareLockoutPolicyStmt = `SELECT projections.lockout_policies2.id,` +
+		` projections.lockout_policies2.sequence,` +
+		` projections.lockout_policies2.creation_date,` +
+		` projections.lockout_policies2.change_date,` +
+		` projections.lockout_policies2.resource_owner,` +
+		` projections.lockout_policies2.show_failure,` +
+		` projections.lockout_policies2.max_password_attempts,` +
+		` projections.lockout_policies2.is_default,` +
+		` projections.lockout_policies2.state` +
+		` FROM projections.lockout_policies2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+
+	prepareLockoutPolicyCols = []string{
+		"id",
+		"sequence",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"show_failure",
+		"max_password_attempts",
+		"is_default",
+		"state",
+	}
+)
+
 func Test_LockoutPolicyPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -28,16 +54,7 @@ func Test_LockoutPolicyPrepares(t *testing.T) {
 			prepare: prepareLockoutPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.lockout_policies2.id,`+
-						` projections.lockout_policies2.sequence,`+
-						` projections.lockout_policies2.creation_date,`+
-						` projections.lockout_policies2.change_date,`+
-						` projections.lockout_policies2.resource_owner,`+
-						` projections.lockout_policies2.show_failure,`+
-						` projections.lockout_policies2.max_password_attempts,`+
-						` projections.lockout_policies2.is_default,`+
-						` projections.lockout_policies2.state`+
-						` FROM projections.lockout_policies2`),
+					regexp.QuoteMeta(prepareLockoutPolicyStmt),
 					nil,
 					nil,
 				),
@@ -55,27 +72,8 @@ func Test_LockoutPolicyPrepares(t *testing.T) {
 			prepare: prepareLockoutPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.lockout_policies2.id,`+
-						` projections.lockout_policies2.sequence,`+
-						` projections.lockout_policies2.creation_date,`+
-						` projections.lockout_policies2.change_date,`+
-						` projections.lockout_policies2.resource_owner,`+
-						` projections.lockout_policies2.show_failure,`+
-						` projections.lockout_policies2.max_password_attempts,`+
-						` projections.lockout_policies2.is_default,`+
-						` projections.lockout_policies2.state`+
-						` FROM projections.lockout_policies2`),
-					[]string{
-						"id",
-						"sequence",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"show_failure",
-						"max_password_attempts",
-						"is_default",
-						"state",
-					},
+					regexp.QuoteMeta(prepareLockoutPolicyStmt),
+					prepareLockoutPolicyCols,
 					[]driver.Value{
 						"pol-id",
 						uint64(20211109),
@@ -106,16 +104,7 @@ func Test_LockoutPolicyPrepares(t *testing.T) {
 			prepare: prepareLockoutPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.lockout_policies2.id,`+
-						` projections.lockout_policies2.sequence,`+
-						` projections.lockout_policies2.creation_date,`+
-						` projections.lockout_policies2.change_date,`+
-						` projections.lockout_policies2.resource_owner,`+
-						` projections.lockout_policies2.show_failure,`+
-						` projections.lockout_policies2.max_password_attempts,`+
-						` projections.lockout_policies2.is_default,`+
-						` projections.lockout_policies2.state`+
-						` FROM projections.lockout_policies2`),
+					regexp.QuoteMeta(prepareLockoutPolicyStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -130,7 +119,7 @@ func Test_LockoutPolicyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

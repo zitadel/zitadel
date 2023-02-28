@@ -12,15 +12,28 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
-var notificationPolicyStmt = regexp.QuoteMeta(`SELECT projections.notification_policies.id,` +
-	` projections.notification_policies.sequence,` +
-	` projections.notification_policies.creation_date,` +
-	` projections.notification_policies.change_date,` +
-	` projections.notification_policies.resource_owner,` +
-	` projections.notification_policies.password_change,` +
-	` projections.notification_policies.is_default,` +
-	` projections.notification_policies.state` +
-	` FROM projections.notification_policies`)
+var (
+	notificationPolicyStmt = regexp.QuoteMeta(`SELECT projections.notification_policies.id,` +
+		` projections.notification_policies.sequence,` +
+		` projections.notification_policies.creation_date,` +
+		` projections.notification_policies.change_date,` +
+		` projections.notification_policies.resource_owner,` +
+		` projections.notification_policies.password_change,` +
+		` projections.notification_policies.is_default,` +
+		` projections.notification_policies.state` +
+		` FROM projections.notification_policies` +
+		` AS OF SYSTEM TIME '-1 ms'`)
+	notificationPolicyCols = []string{
+		"id",
+		"sequence",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"password_change",
+		"is_default",
+		"state",
+	}
+)
 
 func Test_NotificationPolicyPrepares(t *testing.T) {
 	type want struct {
@@ -57,16 +70,7 @@ func Test_NotificationPolicyPrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQuery(
 					notificationPolicyStmt,
-					[]string{
-						"id",
-						"sequence",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"password_change",
-						"is_default",
-						"state",
-					},
+					notificationPolicyCols,
 					[]driver.Value{
 						"pol-id",
 						uint64(20211109),
@@ -110,7 +114,7 @@ func Test_NotificationPolicyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

@@ -9,6 +9,29 @@ import (
 	"testing"
 )
 
+var (
+	prepareInstanceDomainsStmt = `SELECT projections.instance_domains.creation_date,` +
+		` projections.instance_domains.change_date,` +
+		` projections.instance_domains.sequence,` +
+		` projections.instance_domains.domain,` +
+		` projections.instance_domains.instance_id,` +
+		` projections.instance_domains.is_generated,` +
+		` projections.instance_domains.is_primary,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.instance_domains` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareInstanceDomainsCols = []string{
+		"creation_date",
+		"change_date",
+		"sequence",
+		"domain",
+		"instance_id",
+		"is_generated",
+		"is_primary",
+		"count",
+	}
+)
+
 func Test_InstanceDomainPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -25,15 +48,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 			prepare: prepareInstanceDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.instance_domains.creation_date,`+
-						` projections.instance_domains.change_date,`+
-						` projections.instance_domains.sequence,`+
-						` projections.instance_domains.domain,`+
-						` projections.instance_domains.instance_id,`+
-						` projections.instance_domains.is_generated,`+
-						` projections.instance_domains.is_primary,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.instance_domains`),
+					regexp.QuoteMeta(prepareInstanceDomainsStmt),
 					nil,
 					nil,
 				),
@@ -45,25 +60,8 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 			prepare: prepareInstanceDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.instance_domains.creation_date,`+
-						` projections.instance_domains.change_date,`+
-						` projections.instance_domains.sequence,`+
-						` projections.instance_domains.domain,`+
-						` projections.instance_domains.instance_id,`+
-						` projections.instance_domains.is_generated,`+
-						` projections.instance_domains.is_primary,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.instance_domains`),
-					[]string{
-						"creation_date",
-						"change_date",
-						"sequence",
-						"domain",
-						"instance_id",
-						"is_generated",
-						"is_primary",
-						"count",
-					},
+					regexp.QuoteMeta(prepareInstanceDomainsStmt),
+					prepareInstanceDomainsCols,
 					[][]driver.Value{
 						{
 							testNow,
@@ -99,25 +97,8 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 			prepare: prepareInstanceDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.instance_domains.creation_date,`+
-						` projections.instance_domains.change_date,`+
-						` projections.instance_domains.sequence,`+
-						` projections.instance_domains.domain,`+
-						` projections.instance_domains.instance_id,`+
-						` projections.instance_domains.is_generated,`+
-						` projections.instance_domains.is_primary,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.instance_domains`),
-					[]string{
-						"creation_date",
-						"change_date",
-						"sequence",
-						"domain",
-						"instance_id",
-						"is_generated",
-						"is_primary",
-						"count",
-					},
+					regexp.QuoteMeta(prepareInstanceDomainsStmt),
+					prepareInstanceDomainsCols,
 					[][]driver.Value{
 						{
 							testNow,
@@ -171,15 +152,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 			prepare: prepareInstanceDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.instance_domains.creation_date,`+
-						` projections.instance_domains.change_date,`+
-						` projections.instance_domains.sequence,`+
-						` projections.instance_domains.domain,`+
-						` projections.instance_domains.instance_id,`+
-						` projections.instance_domains.is_generated,`+
-						` projections.instance_domains.is_primary,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.instance_domains`),
+					regexp.QuoteMeta(prepareInstanceDomainsStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -194,7 +167,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

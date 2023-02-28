@@ -2,7 +2,7 @@ package eventstore
 
 import "time"
 
-//ReadModel is the minimum representation of a read model.
+// ReadModel is the minimum representation of a read model.
 // It implements a basic reducer
 // it might be saved in a database or in memory
 type ReadModel struct {
@@ -15,14 +15,13 @@ type ReadModel struct {
 	InstanceID        string    `json:"-"`
 }
 
-//AppendEvents adds all the events to the read model.
+// AppendEvents adds all the events to the read model.
 // The function doesn't compute the new state of the read model
-func (rm *ReadModel) AppendEvents(events ...Event) *ReadModel {
+func (rm *ReadModel) AppendEvents(events ...Event) {
 	rm.Events = append(rm.Events, events...)
-	return rm
 }
 
-//Reduce is the basic implementation of reducer
+// Reduce is the basic implementation of reducer
 // If this function is extended the extending function should be the last step
 func (rm *ReadModel) Reduce() error {
 	if len(rm.Events) == 0 {

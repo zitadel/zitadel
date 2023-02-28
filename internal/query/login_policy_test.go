@@ -38,7 +38,8 @@ var (
 		` projections.login_policies4.mfa_init_skip_lifetime,` +
 		` projections.login_policies4.second_factor_check_lifetime,` +
 		` projections.login_policies4.multi_factor_check_lifetime` +
-		` FROM projections.login_policies4`
+		` FROM projections.login_policies4` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	loginPolicyCols = []string{
 		"aggregate_id",
 		"creation_date",
@@ -63,6 +64,20 @@ var (
 		"mfa_init_skip_lifetime",
 		"second_factor_check_lifetime",
 		"multi_factor_check_lifetime",
+	}
+
+	prepareLoginPolicy2FAsStmt = `SELECT projections.login_policies4.second_factors` +
+		` FROM projections.login_policies4` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareLoginPolicy2FAsCols = []string{
+		"second_factors",
+	}
+
+	prepareLoginPolicyMFAsStmt = `SELECT projections.login_policies4.multi_factors` +
+		` FROM projections.login_policies4` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareLoginPolicyMFAsCols = []string{
+		"multi_factors",
 	}
 )
 
@@ -177,11 +192,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies4.second_factors`+
-						` FROM projections.login_policies4`),
-					[]string{
-						"second_factors",
-					},
+					regexp.QuoteMeta(prepareLoginPolicy2FAsStmt),
+					prepareLoginPolicy2FAsCols,
 					nil,
 				),
 				err: func(err error) (error, bool) {
@@ -198,11 +210,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies4.second_factors`+
-						` FROM projections.login_policies4`),
-					[]string{
-						"second_factors",
-					},
+					regexp.QuoteMeta(prepareLoginPolicy2FAsStmt),
+					prepareLoginPolicy2FAsCols,
 					[]driver.Value{
 						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 					},
@@ -220,11 +229,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies4.second_factors`+
-						` FROM projections.login_policies4`),
-					[]string{
-						"second_factors",
-					},
+					regexp.QuoteMeta(prepareLoginPolicy2FAsStmt),
+					prepareLoginPolicy2FAsCols,
 					[]driver.Value{
 						database.EnumArray[domain.SecondFactorType]{},
 					},
@@ -237,8 +243,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.login_policies4.second_factors`+
-						` FROM projections.login_policies4`),
+					regexp.QuoteMeta(prepareLoginPolicy2FAsStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -255,11 +260,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies4.multi_factors`+
-						` FROM projections.login_policies4`),
-					[]string{
-						"multi_factors",
-					},
+					regexp.QuoteMeta(prepareLoginPolicyMFAsStmt),
+					prepareLoginPolicyMFAsCols,
 					nil,
 				),
 				err: func(err error) (error, bool) {
@@ -276,11 +278,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies4.multi_factors`+
-						` FROM projections.login_policies4`),
-					[]string{
-						"multi_factors",
-					},
+					regexp.QuoteMeta(prepareLoginPolicyMFAsStmt),
+					prepareLoginPolicyMFAsCols,
 					[]driver.Value{
 						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 					},
@@ -298,11 +297,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies4.multi_factors`+
-						` FROM projections.login_policies4`),
-					[]string{
-						"multi_factors",
-					},
+					regexp.QuoteMeta(prepareLoginPolicyMFAsStmt),
+					prepareLoginPolicyMFAsCols,
 					[]driver.Value{
 						database.EnumArray[domain.MultiFactorType]{},
 					},
@@ -315,8 +311,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.login_policies4.multi_factors`+
-						` FROM projections.login_policies4`),
+					regexp.QuoteMeta(prepareLoginPolicyMFAsStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -331,7 +326,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

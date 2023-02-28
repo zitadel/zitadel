@@ -2,8 +2,8 @@ package v1
 
 import (
 	"context"
-	"database/sql"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/internal/repository"
 	z_sql "github.com/zitadel/zitadel/internal/eventstore/v1/internal/repository/sql"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -22,7 +22,7 @@ type eventstore struct {
 	repo repository.Repository
 }
 
-func Start(db *sql.DB) (Eventstore, error) {
+func Start(db *database.DB) (Eventstore, error) {
 	return &eventstore{
 		repo: z_sql.Start(db),
 	}, nil

@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -70,7 +71,7 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareFlowQuery(flowType)
+	query, scan := prepareFlowQuery(ctx, q.client, flowType)
 	eq := sq.Eq{
 		FlowsTriggersColumnFlowType.identifier():      flowType,
 		FlowsTriggersColumnResourceOwner.identifier(): orgID,
@@ -95,7 +96,7 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareTriggerActionsQuery()
+	stmt, scan := prepareTriggerActionsQuery(ctx, q.client)
 	eq := sq.Eq{
 		FlowsTriggersColumnFlowType.identifier():      flowType,
 		FlowsTriggersColumnTriggerType.identifier():   triggerType,
@@ -122,7 +123,7 @@ func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string, w
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareFlowTypesQuery()
+	stmt, scan := prepareFlowTypesQuery(ctx, q.client)
 	eq := sq.Eq{
 		FlowsTriggersColumnActionID.identifier():   actionID,
 		FlowsTriggersColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -143,11 +144,11 @@ func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string, w
 	return scan(rows)
 }
 
-func prepareFlowTypesQuery() (sq.SelectBuilder, func(*sql.Rows) ([]domain.FlowType, error)) {
+func prepareFlowTypesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) ([]domain.FlowType, error)) {
 	return sq.Select(
 			FlowsTriggersColumnFlowType.identifier(),
 		).
-			From(flowsTriggersTable.identifier()).
+			From(flowsTriggersTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) ([]domain.FlowType, error) {
 			types := []domain.FlowType{}
@@ -166,7 +167,7 @@ func prepareFlowTypesQuery() (sq.SelectBuilder, func(*sql.Rows) ([]domain.FlowTy
 
 }
 
-func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action, error)) {
+func prepareTriggerActionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) ([]*Action, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -180,7 +181,7 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 			ActionColumnTimeout.identifier(),
 		).
 			From(flowsTriggersTable.name).
-			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
+			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) ([]*Action, error) {
 			actions := make([]*Action, 0)
@@ -212,7 +213,7 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 		}
 }
 
-func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+func prepareFlowQuery(ctx context.Context, db prepareDatabase, flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -232,7 +233,7 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 			FlowsTriggersColumnResourceOwner.identifier(),
 		).
 			From(flowsTriggersTable.name).
-			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
+			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Flow, error) {
 			flow := &Flow{
