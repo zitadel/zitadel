@@ -262,17 +262,16 @@ module.exports = {
       label: "Support",
       collapsed: true,
       items: [
-        "support/introduction",
         "support/troubleshooting",
         {
           type: "category",
           label: "Trainings",
           collapsed: true,
           items: [
-            "guides/trainings/introduction",
-            "guides/trainings/application",
-            "guides/trainings/recurring",
-            "guides/trainings/project",
+            "support/trainings/introduction",
+            "support/trainings/application",
+            "support/trainings/recurring",
+            "support/trainings/project",
           ],
         },
       ]
