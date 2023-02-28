@@ -257,6 +257,26 @@ module.exports = {
         },
       ]
     },
+    {
+      type: "category",
+      label: "Support",
+      collapsed: true,
+      items: [
+        "support/introduction",
+        "support/troubleshooting",
+        {
+          type: "category",
+          label: "Trainings",
+          collapsed: true,
+          items: [
+            "guides/trainings/introduction",
+            "guides/trainings/application",
+            "guides/trainings/recurring",
+            "guides/trainings/project",
+          ],
+        },
+      ]
+    },
   ],
   apis: [
     "apis/introduction",
@@ -415,19 +435,6 @@ module.exports = {
     },
   ],
   support: [
-    "support/introduction",
-    "support/troubleshooting",
-    {
-      type: "category",
-      label: "Trainings",
-      collapsed: true,
-      items: [
-        "guides/trainings/introduction",
-        "guides/trainings/application",
-        "guides/trainings/recurring",
-        "guides/trainings/project",
-      ],
-    },
   ],
   legal: [
     "legal/introduction",

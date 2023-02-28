@@ -71,6 +71,12 @@ module.exports = {
         }, 
         {
           type: "doc",
+          label: "Get Started",
+          docId: "guides/start/quickstart",
+          position: "left",
+        },
+        {
+          type: "doc",
           label: "APIs",
           docId: "apis/introduction",
           position: "left",
@@ -83,15 +89,9 @@ module.exports = {
         },
         {
           type: "doc",
-          docId: "support/introduction",
-          label: "Support",
-          position: "left",
-        },
-        {
-          type: "doc",
           docId: "legal/introduction",
           label: "Legal",
-          position: "left",
+          position: "right",
         },
         {
           type: "html",
