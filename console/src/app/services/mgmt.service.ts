@@ -37,6 +37,8 @@ import {
   AddHumanUserResponse,
   AddIDPToLoginPolicyRequest,
   AddIDPToLoginPolicyResponse,
+  AddJWTProviderRequest,
+  AddJWTProviderResponse,
   AddMachineKeyRequest,
   AddMachineKeyResponse,
   AddMachineUserRequest,
@@ -435,6 +437,8 @@ import {
   UpdateHumanPhoneResponse,
   UpdateHumanProfileRequest,
   UpdateHumanProfileResponse,
+  UpdateJWTProviderRequest,
+  UpdateJWTProviderResponse,
   UpdateMachineRequest,
   UpdateMachineResponse,
   UpdateOIDCAppConfigRequest,
@@ -865,6 +869,16 @@ export class ManagementService {
     req: UpdateGenericOIDCProviderRequest,
   ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addJWTProvider(req: AddJWTProviderRequest): Promise<AddJWTProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateJWTProvider(
+    req: UpdateJWTProviderRequest,
+  ): Promise<UpdateJWTProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateJWTProvider(req, null).then((resp) => resp.toObject());
   }
 
   public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {

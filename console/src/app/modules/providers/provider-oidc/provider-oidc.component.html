@@ -8,7 +8,7 @@
 
     <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.OIDC.DESCRIPTION' | translate }}</p>
 
-    <form [formGroup]="oidcFormGroup" (ngSubmit)="addOIDCIdp()">
+    <form [formGroup]="oidcFormGroup" (ngSubmit)="submitForm()">
       <div class="oidc-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>

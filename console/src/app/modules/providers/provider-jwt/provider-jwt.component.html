@@ -8,44 +8,32 @@
 
     <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.JWT.DESCRIPTION' | translate }}</p>
 
-    <form [formGroup]="jwtFormGroup" (ngSubmit)="submitForm()">
+    <form [formGroup]="form" (ngSubmit)="submitForm()">
       <div class="jwt-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
-          <input cnslInput formControlName="jwtName" />
+          <input cnslInput formControlName="name" />
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.JWT.HEADERNAME' | translate }}</cnsl-label>
-          <input cnslInput formControlName="jwtHeaderName" />
+          <input cnslInput formControlName="headerName" />
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
-          <input cnslInput formControlName="jwtIssuer" />
+          <input cnslInput formControlName="issuer" />
         </cnsl-form-field>
-      </div>
-
-      <cnsl-info-section class="auto-reg-info">
-        <div>
-          <p class="auto-reg-desc">{{ 'IDP.AUTOREGISTER_DESC' | translate }}</p>
-          <mat-checkbox formControlName="jwtAutoRegister">
-            {{ 'IDP.AUTOREGISTER' | translate }}
-          </mat-checkbox>
-        </div>
-      </cnsl-info-section>
-
-      <div class="jwt-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.JWT.JWTENDPOINT' | translate }}</cnsl-label>
           <input cnslInput formControlName="jwtEndpoint" />
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.JWT.JWTKEYSENDPOINT' | translate }}</cnsl-label>
-          <input cnslInput formControlName="jwtKeysEndpoint" />
+          <input cnslInput formControlName="keysEndpoint" />
         </cnsl-form-field>
       </div>
 
       <div class="jwt-create-actions">
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="jwtFormGroup.invalid" type="submit">
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
           <span *ngIf="provider">{{ 'ACTIONS.SAVE' | translate }}</span>
           <span *ngIf="!provider">{{ 'ACTIONS.CREATE' | translate }}</span>
         </button>

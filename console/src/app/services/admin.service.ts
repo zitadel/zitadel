@@ -16,6 +16,8 @@ import {
   AddIAMMemberResponse,
   AddIDPToLoginPolicyRequest,
   AddIDPToLoginPolicyResponse,
+  AddJWTProviderRequest,
+  AddJWTProviderResponse,
   AddMultiFactorToLoginPolicyRequest,
   AddMultiFactorToLoginPolicyResponse,
   AddNotificationPolicyRequest,
@@ -198,6 +200,8 @@ import {
   UpdateGoogleProviderResponse,
   UpdateIAMMemberRequest,
   UpdateIAMMemberResponse,
+  UpdateJWTProviderRequest,
+  UpdateJWTProviderResponse,
   UpdateLabelPolicyRequest,
   UpdateLabelPolicyResponse,
   UpdateLockoutPolicyRequest,
@@ -899,13 +903,21 @@ export class AdminService {
   }
 
   public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
-    return this.grpcService.mgmt.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+    return this.grpcService.admin.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
   }
 
   public updateGenericOIDCProvider(
     req: UpdateGenericOIDCProviderRequest,
   ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
-    return this.grpcService.mgmt.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+    return this.grpcService.admin.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addJWTProvider(req: AddJWTProviderRequest): Promise<AddJWTProviderResponse.AsObject> {
+    return this.grpcService.admin.addJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
+    return this.grpcService.admin.updateJWTProvider(req, null).then((resp) => resp.toObject());
   }
 
   public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {

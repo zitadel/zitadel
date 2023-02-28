@@ -1,9 +1,9 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, Injector, OnInit, Type } from '@angular/core';
+import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
@@ -28,12 +28,11 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   templateUrl: './provider-google.component.html',
   styleUrls: ['./provider-google.component.scss'],
 })
-export class ProviderGoogleComponent implements OnInit {
+export class ProviderGoogleComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  public projectId: string = '';
 
   public form!: FormGroup;
 
@@ -50,7 +49,10 @@ export class ProviderGoogleComponent implements OnInit {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    const idpId = this.route.snapshot.paramMap.get('id');
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.getData(id);
+    }
 
     this.form = new FormGroup({
       name: new FormControl('', [Validators.required]),
@@ -86,11 +88,7 @@ export class ProviderGoogleComponent implements OnInit {
     });
   }
 
-  public ngOnInit(): void {
-    this.route.params.pipe(take(1)).subscribe((params) => this.getData(params));
-  }
-
-  private getData({ id }: Params): void {
+  private getData(id: string): void {
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
         ? new AdminGetProviderByIDRequest()

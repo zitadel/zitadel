@@ -1,14 +1,21 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, Injector, OnDestroy, OnInit, Type } from '@angular/core';
+import { Component, Injector, OnInit, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest } from 'src/app/proto/generated/zitadel/admin_pb';
-import { OIDCMappingField, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
-import { AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import {
+  AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
+  GetProviderByIDRequest as AdminGetProviderByIDRequest,
+  UpdateGenericOIDCProviderRequest as AdminUpdateGenericOIDCProviderRequest,
+} from 'src/app/proto/generated/zitadel/admin_pb';
+import { Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import {
+  AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest,
+  GetProviderByIDRequest as MgmtGetProviderByIDRequest,
+  UpdateGenericOIDCProviderRequest as MgmtUpdateGenericOIDCProviderRequest,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -21,15 +28,10 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   templateUrl: './provider-oidc.component.html',
   styleUrls: ['./provider-oidc.component.scss'],
 })
-export class ProviderOIDCComponent implements OnInit, OnDestroy {
+export class ProviderOIDCComponent implements OnInit {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  public mappingFields: OIDCMappingField[] = [];
-
-  private subscription?: Subscription;
-  public projectId: string = '';
-
   public oidcFormGroup!: UntypedFormGroup;
 
   public loading: boolean = false;
@@ -61,10 +63,7 @@ export class ProviderOIDCComponent implements OnInit, OnDestroy {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.mappingFields = [
-            OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
-            OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
-          ];
+
           const bread: Breadcrumb = {
             type: BreadcrumbType.ORG,
             routerLink: ['/org'],
@@ -74,10 +73,6 @@ export class ProviderOIDCComponent implements OnInit, OnDestroy {
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.mappingFields = [
-            OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
-            OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
-          ];
 
           const iamBread = new Breadcrumb({
             type: BreadcrumbType.ORG,
@@ -91,18 +86,30 @@ export class ProviderOIDCComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.subscription = this.route.params.subscribe((params) => this.getData(params));
+    this.route.params.pipe(take(1)).subscribe((params) => this.getData(params));
   }
 
-  public ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+  private getData({ id }: Params): void {
+    const req =
+      this.serviceType === PolicyComponentServiceType.ADMIN
+        ? new AdminGetProviderByIDRequest()
+        : new MgmtGetProviderByIDRequest();
+    req.setId(id);
+    this.service.getProviderByID(req).then((resp) => {
+      this.provider = resp.idp;
+      console.log(this.provider);
+      if (this.provider?.config?.google) {
+        this.oidcFormGroup.patchValue(this.provider.config.google);
+        this.name?.setValue(this.provider.name);
+      }
+    });
   }
 
-  private getData({ projectid }: Params): void {
-    this.projectId = projectid;
+  public submitForm(): void {
+    this.provider ? this.updateGenericOIDCProvider() : this.addGenericOIDCProvider();
   }
 
-  public addOIDCIdp(): void {
+  public addGenericOIDCProvider(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       const req = new MgmtAddGenericOIDCProviderRequest();
 
@@ -118,16 +125,7 @@ export class ProviderOIDCComponent implements OnInit, OnDestroy {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(
-              [
-                this.serviceType === PolicyComponentServiceType.MGMT
-                  ? '/org-settings'
-                  : this.serviceType === PolicyComponentServiceType.ADMIN
-                  ? '/settings'
-                  : '',
-              ],
-              { queryParams: { id: 'idp' } },
-            );
+            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
           }, 2000);
         })
         .catch((error) => {
@@ -147,21 +145,60 @@ export class ProviderOIDCComponent implements OnInit, OnDestroy {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(
-              [
-                this.serviceType === PolicyComponentServiceType.MGMT
-                  ? '/org-settings'
-                  : this.serviceType === PolicyComponentServiceType.ADMIN
-                  ? '/settings'
-                  : '',
-              ],
-              { queryParams: { id: 'idp' } },
-            );
+            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
           }, 2000);
         })
         .catch((error) => {
           this.toast.showError(error);
         });
+    }
+  }
+
+  public updateGenericOIDCProvider(): void {
+    if (this.provider) {
+      if (this.serviceType === PolicyComponentServiceType.MGMT) {
+        const req = new MgmtUpdateGenericOIDCProviderRequest();
+        req.setId(this.provider.id);
+        req.setName(this.name?.value);
+        req.setClientId(this.clientId?.value);
+        req.setClientSecret(this.clientSecret?.value);
+        req.setIssuer(this.issuer?.value);
+        req.setScopesList(this.scopesList?.value);
+
+        this.loading = true;
+        (this.service as ManagementService)
+          .updateGenericOIDCProvider(req)
+          .then((idp) => {
+            setTimeout(() => {
+              this.loading = false;
+              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+            }, 2000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      } else if (PolicyComponentServiceType.ADMIN) {
+        const req = new AdminUpdateGenericOIDCProviderRequest();
+        req.setId(this.provider.id);
+        req.setName(this.name?.value);
+        req.setClientId(this.clientId?.value);
+        req.setClientSecret(this.clientSecret?.value);
+        req.setIssuer(this.issuer?.value);
+        req.setScopesList(this.scopesList?.value);
+
+        this.loading = true;
+        (this.service as AdminService)
+          .updateGenericOIDCProvider(req)
+          .then((idp) => {
+            setTimeout(() => {
+              this.loading = false;
+              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+            }, 2000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
     }
   }
 

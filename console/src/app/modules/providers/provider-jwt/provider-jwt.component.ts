@@ -1,17 +1,18 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, Injector, OnDestroy, OnInit, Type } from '@angular/core';
+import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import {
   AddJWTProviderRequest as AdminAddJWTProviderRequest,
+  GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateJWTProviderRequest as AdminUpdateJWTProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { OIDCMappingField, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddJWTProviderRequest as MgmtAddJWTProviderRequest,
+  GetProviderByIDRequest as MgmtGetProviderByIDRequest,
   UpdateJWTProviderRequest as MgmtUpdateJWTProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -26,16 +27,12 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   templateUrl: './provider-jwt.component.html',
   styleUrls: ['./provider-jwt.component.scss'],
 })
-export class ProviderJWTComponent implements OnInit, OnDestroy {
+export class ProviderJWTComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  public mappingFields: OIDCMappingField[] = [];
 
-  private subscription?: Subscription;
-  public projectId: string = '';
-
-  public jwtFormGroup!: UntypedFormGroup;
+  public form!: UntypedFormGroup;
   public loading: boolean = false;
 
   public provider?: Provider.AsObject;
@@ -48,14 +45,17 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    this.jwtFormGroup = new UntypedFormGroup({
-      jwtName: new UntypedFormControl('', [Validators.required]),
-      jwtHeaderName: new UntypedFormControl('', [Validators.required]),
-      jwtIssuer: new UntypedFormControl('', [Validators.required]),
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.getData(id);
+    }
+
+    this.form = new UntypedFormGroup({
+      name: new UntypedFormControl('', [Validators.required]),
+      headerName: new UntypedFormControl('', [Validators.required]),
+      issuer: new UntypedFormControl('', [Validators.required]),
       jwtEndpoint: new UntypedFormControl('', [Validators.required]),
-      jwtKeysEndpoint: new UntypedFormControl('', [Validators.required]),
-      jwtStylingType: new UntypedFormControl(0),
-      jwtAutoRegister: new UntypedFormControl(false),
+      keysEndpoint: new UntypedFormControl('', [Validators.required]),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -63,10 +63,7 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.mappingFields = [
-            OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
-            OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
-          ];
+
           const bread: Breadcrumb = {
             type: BreadcrumbType.ORG,
             routerLink: ['/org'],
@@ -76,10 +73,6 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.mappingFields = [
-            OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
-            OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
-          ];
 
           const iamBread = new Breadcrumb({
             type: BreadcrumbType.ORG,
@@ -92,16 +85,19 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
     });
   }
 
-  public ngOnInit(): void {
-    this.subscription = this.route.params.subscribe((params) => this.getData(params));
-  }
-
-  public ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  private getData({ projectid }: Params): void {
-    this.projectId = projectid;
+  private getData(id: string): void {
+    const req =
+      this.serviceType === PolicyComponentServiceType.ADMIN
+        ? new AdminGetProviderByIDRequest()
+        : new MgmtGetProviderByIDRequest();
+    req.setId(id);
+    this.service.getProviderByID(req).then((resp) => {
+      this.provider = resp.idp;
+      if (this.provider?.config?.jwt) {
+        this.form.patchValue(this.provider.config.jwt);
+        this.name?.setValue(this.provider.name);
+      }
+    });
   }
 
   public submitForm(): void {
@@ -112,63 +108,47 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       const req = new MgmtAddJWTProviderRequest();
 
-      req.setName(this.jwtName?.value);
-      req.setHeaderName(this.jwtHeaderName?.value);
-      req.setIssuer(this.jwtIssuer?.value);
+      req.setName(this.name?.value);
+      req.setHeaderName(this.headerName?.value);
+      req.setIssuer(this.issuer?.value);
       req.setJwtEndpoint(this.jwtEndpoint?.value);
-      req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
+      req.setKeysEndpoint(this.keysEndpoint?.value);
 
       this.loading = true;
-      //   (this.service as ManagementService)
-      //     .addOrgJWTIDP(req)
-      //     .then((idp) => {
-      //       setTimeout(() => {
-      //         this.loading = false;
-      //         this.router.navigate([
-      //           this.serviceType === PolicyComponentServiceType.MGMT
-      //             ? 'org'
-      //             : this.serviceType === PolicyComponentServiceType.ADMIN
-      //             ? 'iam'
-      //             : '',
-      //           'policy',
-      //           'login',
-      //         ]);
-      //       }, 2000);
-      //     })
-      //     .catch((error) => {
-      //       this.toast.showError(error);
-      //   this.loading=false;
-      //     });
+      (this.service as ManagementService)
+        .addJWTProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     } else if (PolicyComponentServiceType.ADMIN) {
       const req = new AdminAddJWTProviderRequest();
 
-      req.setName(this.jwtName?.value);
-      req.setHeaderName(this.jwtHeaderName?.value);
-      req.setIssuer(this.jwtIssuer?.value);
+      req.setName(this.name?.value);
+      req.setHeaderName(this.headerName?.value);
+      req.setIssuer(this.issuer?.value);
       req.setJwtEndpoint(this.jwtEndpoint?.value);
-      req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
+      req.setKeysEndpoint(this.keysEndpoint?.value);
 
       this.loading = true;
-      //   (this.service as AdminService)
-      //     .addJWTIDP(req)
-      //     .then((idp) => {
-      //       setTimeout(() => {
-      //         this.loading = false;
-      //         this.router.navigate([
-      //           this.serviceType === PolicyComponentServiceType.MGMT
-      //             ? 'org'
-      //             : this.serviceType === PolicyComponentServiceType.ADMIN
-      //             ? 'iam'
-      //             : '',
-      //           'policy',
-      //           'login',
-      //         ]);
-      //       }, 2000);
-      //     })
-      //     .catch((error) => {
-      //       this.toast.showError(error);
-      //   this.loading=false;
-      //     });
+      (this.service as AdminService)
+        .addJWTProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 
@@ -177,63 +157,47 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
         const req = new MgmtUpdateJWTProviderRequest();
         req.setId(this.provider.id);
-        req.setName(this.jwtName?.value);
-        req.setHeaderName(this.jwtHeaderName?.value);
-        req.setIssuer(this.jwtIssuer?.value);
+        req.setName(this.name?.value);
+        req.setHeaderName(this.headerName?.value);
+        req.setIssuer(this.issuer?.value);
         req.setJwtEndpoint(this.jwtEndpoint?.value);
-        req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
+        req.setKeysEndpoint(this.keysEndpoint?.value);
 
         this.loading = true;
-        //   (this.service as ManagementService)
-        //     .addOrgJWTIDP(req)
-        //     .then((idp) => {
-        //       setTimeout(() => {
-        //         this.loading = false;
-        //         this.router.navigate([
-        //           this.serviceType === PolicyComponentServiceType.MGMT
-        //             ? 'org'
-        //             : this.serviceType === PolicyComponentServiceType.ADMIN
-        //             ? 'iam'
-        //             : '',
-        //           'policy',
-        //           'login',
-        //         ]);
-        //       }, 2000);
-        //     })
-        //     .catch((error) => {
-        //       this.toast.showError(error);
-        // this.loading=false;
-        //     });
+        (this.service as ManagementService)
+          .updateJWTProvider(req)
+          .then((idp) => {
+            setTimeout(() => {
+              this.loading = false;
+              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+            }, 2000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+            this.loading = false;
+          });
       } else if (PolicyComponentServiceType.ADMIN) {
         const req = new AdminUpdateJWTProviderRequest();
         req.setId(this.provider.id);
-        req.setName(this.jwtName?.value);
-        req.setHeaderName(this.jwtHeaderName?.value);
-        req.setIssuer(this.jwtIssuer?.value);
+        req.setName(this.name?.value);
+        req.setHeaderName(this.headerName?.value);
+        req.setIssuer(this.issuer?.value);
         req.setJwtEndpoint(this.jwtEndpoint?.value);
-        req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
+        req.setKeysEndpoint(this.keysEndpoint?.value);
 
         this.loading = true;
-        //   (this.service as AdminService)
-        //     .addJWTIDP(req)
-        //     .then((idp) => {
-        //       setTimeout(() => {
-        //         this.loading = false;
-        //         this.router.navigate([
-        //           this.serviceType === PolicyComponentServiceType.MGMT
-        //             ? 'org'
-        //             : this.serviceType === PolicyComponentServiceType.ADMIN
-        //             ? 'iam'
-        //             : '',
-        //           'policy',
-        //           'login',
-        //         ]);
-        //       }, 2000);
-        //     })
-        //     .catch((error) => {
-        //       this.toast.showError(error);
-        // this.loading=false;
-        //     });
+        (this.service as AdminService)
+          .updateJWTProvider(req)
+          .then((idp) => {
+            setTimeout(() => {
+              this.loading = false;
+              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+            }, 2000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+            this.loading = false;
+          });
       }
     }
   }
@@ -242,23 +206,23 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
     this._location.back();
   }
 
-  public get jwtName(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtName');
+  public get name(): AbstractControl | null {
+    return this.form.get('name');
   }
 
-  public get jwtHeaderName(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtHeaderName');
+  public get headerName(): AbstractControl | null {
+    return this.form.get('headerName');
   }
 
-  public get jwtIssuer(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtIssuer');
+  public get issuer(): AbstractControl | null {
+    return this.form.get('issuer');
   }
 
   public get jwtEndpoint(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtEndpoint');
+    return this.form.get('jwtEndpoint');
   }
 
-  public get jwtKeysEndpoint(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtKeysEndpoint');
+  public get keysEndpoint(): AbstractControl | null {
+    return this.form.get('keysEndpoint');
   }
 }
