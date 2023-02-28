@@ -220,8 +220,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"hasRegistration": func() bool {
 			return true
 		},
-		"idpProviderClass": func(stylingType domain.IDPConfigStylingType) string {
-			return stylingType.GetCSSClass()
+		"idpProviderClass": func(idpType domain.IDPType) string {
+			return idpType.GetCSSClass()
 		},
 	}
 	var err error

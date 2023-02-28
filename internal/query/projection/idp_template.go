@@ -668,7 +668,7 @@ func (p *idpTemplateProjection) reduceOldConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 			handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeUnspecified),
 			handler.NewCol(IDPTemplateIsCreationAllowedCol, true),
 			handler.NewCol(IDPTemplateIsLinkingAllowedCol, true),
 			handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.AutoRegister),
@@ -727,6 +727,7 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event)
 			[]handler.Column{
 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),
@@ -820,6 +821,7 @@ func (p *idpTemplateProjection) reduceOldJWTConfigAdded(event eventstore.Event) 
 			[]handler.Column{
 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),

@@ -1259,12 +1259,11 @@ func getLoginPolicyIDPProviders(ctx context.Context, provider idpProviderViewPro
 	providers := make([]*domain.IDPProvider, len(links.Links))
 	for i, link := range links.Links {
 		providers[i] = &domain.IDPProvider{
-			//Type:          link.,
+			Type:        link.OwnerType,
 			IDPConfigID: link.IDPID,
 			Name:        link.IDPName,
-			StylingType: 0,
-			IDPType:     link.IDPType,
-			IDPState:    0,
+			//StylingType: domain.IDPConfigStylingTypeGoogle,
+			IDPType: link.IDPType,
 		}
 	}
 	return providers, nil
