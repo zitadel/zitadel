@@ -2,6 +2,8 @@ package jwt
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -14,6 +16,11 @@ import (
 )
 
 var _ idp.Session = (*Session)(nil)
+
+var (
+	ErrNoTokens     = errors.New("no tokens provided")
+	ErrInvalidToken = errors.New("invalid tokens provided")
+)
 
 // Session is the [idp.Session] implementation for the JWT provider
 type Session struct {
@@ -47,28 +54,28 @@ func (s *Session) validateToken(ctx context.Context, token string) (oidc.IDToken
 	claims := oidc.EmptyIDTokenClaims()
 	payload, err := oidc.ParseToken(token, claims)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: malformed jwt payload: %v", ErrInvalidToken, err)
 	}
 
 	if err = oidc.CheckIssuer(claims, s.Provider.issuer); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: invalid issuer: %v", ErrInvalidToken, err)
 	}
 
 	logging.Debug("begin signature validation")
 	keySet := rp.NewRemoteKeySet(http.DefaultClient, s.Provider.keysEndpoint)
 	if err = oidc.CheckSignature(ctx, token, payload, claims, nil, keySet); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: invalid signature: %v", ErrInvalidToken, err)
 	}
 
 	if !claims.GetExpiration().IsZero() {
 		if err = oidc.CheckExpiration(claims, offset); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: expired: %v", ErrInvalidToken, err)
 		}
 	}
 
 	if !claims.GetIssuedAt().IsZero() {
 		if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
 		}
 	}
 	return claims, nil
