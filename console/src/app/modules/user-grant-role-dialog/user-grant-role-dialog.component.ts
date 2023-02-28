@@ -3,7 +3,6 @@ import {
   MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
-import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 
 @Component({
   selector: 'cnsl-user-grant-role-dialog',

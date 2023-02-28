@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -91,7 +92,7 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldTriggerBulk 
 	if !withOwnerRemoved {
 		eq[PasswordAgeColOwnerRemoved.identifier()] = false
 	}
-	stmt, scan := preparePasswordAgePolicyQuery()
+	stmt, scan := preparePasswordAgePolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(
 		sq.And{
 			eq,
@@ -118,7 +119,7 @@ func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBul
 		projection.PasswordAgeProjection.Trigger(ctx)
 	}
 
-	stmt, scan := preparePasswordAgePolicyQuery()
+	stmt, scan := preparePasswordAgePolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		PasswordAgeColID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).
@@ -132,7 +133,7 @@ func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBul
 	return scan(row)
 }
 
-func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PasswordAgePolicy, error)) {
+func preparePasswordAgePolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*PasswordAgePolicy, error)) {
 	return sq.Select(
 			PasswordAgeColID.identifier(),
 			PasswordAgeColSequence.identifier(),
@@ -144,7 +145,8 @@ func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Passwor
 			PasswordAgeColIsDefault.identifier(),
 			PasswordAgeColState.identifier(),
 		).
-			From(passwordAgeTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(passwordAgeTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PasswordAgePolicy, error) {
 			policy := new(PasswordAgePolicy)
 			err := row.Scan(

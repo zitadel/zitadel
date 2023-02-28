@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -45,7 +46,7 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, with
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareLabelPolicyQuery()
+	stmt, scan := prepareLabelPolicyQuery(ctx, q.client)
 	eq := sq.Eq{
 		LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
 		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -75,7 +76,7 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (_ 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareLabelPolicyQuery()
+	stmt, scan := prepareLabelPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Or{
@@ -105,7 +106,7 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (_ *LabelPolicy,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareLabelPolicyQuery()
+	stmt, scan := prepareLabelPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		LabelPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
@@ -125,7 +126,7 @@ func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (_ *LabelPolicy
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareLabelPolicyQuery()
+	stmt, scan := prepareLabelPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		LabelPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		LabelPolicyColState.identifier():      domain.LabelPolicyStatePreview,
@@ -223,7 +224,7 @@ var (
 	}
 )
 
-func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, error)) {
+func prepareLabelPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, error)) {
 	return sq.Select(
 			LabelPolicyColCreationDate.identifier(),
 			LabelPolicyColChangeDate.identifier(),
@@ -252,7 +253,8 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 			LabelPolicyColDarkLogoURL.identifier(),
 			LabelPolicyColDarkIconURL.identifier(),
 		).
-			From(labelPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(labelPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LabelPolicy, error) {
 			policy := new(LabelPolicy)
 

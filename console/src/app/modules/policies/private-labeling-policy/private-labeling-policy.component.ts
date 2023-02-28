@@ -184,7 +184,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           case PolicyComponentServiceType.MGMT:
             return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
           case PolicyComponentServiceType.ADMIN:
-            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData, this.org.id));
+            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData));
         }
       }
     }

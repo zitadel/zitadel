@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -73,7 +74,7 @@ func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwner
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMailTemplateQuery()
+	stmt, scan := prepareMailTemplateQuery(ctx, q.client)
 	eq := sq.Eq{MailTemplateColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[MailTemplateColOwnerRemoved.identifier()] = false
@@ -100,7 +101,7 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMailTemplateQuery()
+	stmt, scan := prepareMailTemplateQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		MailTemplateColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
@@ -115,7 +116,7 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err
 	return scan(row)
 }
 
-func prepareMailTemplateQuery() (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
+func prepareMailTemplateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
 	return sq.Select(
 			MailTemplateColAggregateID.identifier(),
 			MailTemplateColSequence.identifier(),
@@ -125,7 +126,8 @@ func prepareMailTemplateQuery() (sq.SelectBuilder, func(*sql.Row) (*MailTemplate
 			MailTemplateColIsDefault.identifier(),
 			MailTemplateColState.identifier(),
 		).
-			From(mailTemplateTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(mailTemplateTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MailTemplate, error) {
 			policy := new(MailTemplate)
 			err := row.Scan(

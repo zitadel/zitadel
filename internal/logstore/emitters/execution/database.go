@@ -2,13 +2,14 @@ package execution
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -29,10 +30,10 @@ var _ logstore.UsageQuerier = (*databaseLogStorage)(nil)
 var _ logstore.LogCleanupper = (*databaseLogStorage)(nil)
 
 type databaseLogStorage struct {
-	dbClient *sql.DB
+	dbClient *database.DB
 }
 
-func NewDatabaseLogStorage(dbClient *sql.DB) *databaseLogStorage {
+func NewDatabaseLogStorage(dbClient *database.DB) *databaseLogStorage {
 	return &databaseLogStorage{dbClient: dbClient}
 }
 
@@ -91,12 +92,11 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 	return nil
 }
 
-// TODO: AS OF SYSTEM TIME
 func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error) {
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("COALESCE(SUM(%s)::INT,0)", executionTookCol),
 	).
-		From(executionLogsTable).
+		From(executionLogsTable + l.dbClient.Timetravel(call.Took(ctx))).
 		Where(squirrel.And{
 			squirrel.Eq{executionInstanceIdCol: instanceId},
 			squirrel.GtOrEq{executionTimestampCol: start},

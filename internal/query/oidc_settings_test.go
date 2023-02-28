@@ -12,6 +12,31 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
+var (
+	prepareOIDCSettingsStmt = `SELECT projections.oidc_settings2.aggregate_id,` +
+		` projections.oidc_settings2.creation_date,` +
+		` projections.oidc_settings2.change_date,` +
+		` projections.oidc_settings2.resource_owner,` +
+		` projections.oidc_settings2.sequence,` +
+		` projections.oidc_settings2.access_token_lifetime,` +
+		` projections.oidc_settings2.id_token_lifetime,` +
+		` projections.oidc_settings2.refresh_token_idle_expiration,` +
+		` projections.oidc_settings2.refresh_token_expiration` +
+		` FROM projections.oidc_settings2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareOIDCSettingsCols = []string{
+		"aggregate_id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"sequence",
+		"access_token_lifetime",
+		"id_token_lifetime",
+		"refresh_token_idle_expiration",
+		"refresh_token_expiration",
+	}
+)
+
 func Test_OIDCConfigsPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -28,16 +53,7 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					`SELECT projections.oidc_settings2.aggregate_id,`+
-						` projections.oidc_settings2.creation_date,`+
-						` projections.oidc_settings2.change_date,`+
-						` projections.oidc_settings2.resource_owner,`+
-						` projections.oidc_settings2.sequence,`+
-						` projections.oidc_settings2.access_token_lifetime,`+
-						` projections.oidc_settings2.id_token_lifetime,`+
-						` projections.oidc_settings2.refresh_token_idle_expiration,`+
-						` projections.oidc_settings2.refresh_token_expiration`+
-						` FROM projections.oidc_settings`,
+					prepareOIDCSettingsStmt,
 					nil,
 					nil,
 				),
@@ -55,27 +71,8 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.oidc_settings2.aggregate_id,`+
-						` projections.oidc_settings2.creation_date,`+
-						` projections.oidc_settings2.change_date,`+
-						` projections.oidc_settings2.resource_owner,`+
-						` projections.oidc_settings2.sequence,`+
-						` projections.oidc_settings2.access_token_lifetime,`+
-						` projections.oidc_settings2.id_token_lifetime,`+
-						` projections.oidc_settings2.refresh_token_idle_expiration,`+
-						` projections.oidc_settings2.refresh_token_expiration`+
-						` FROM projections.oidc_settings`),
-					[]string{
-						"aggregate_id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"access_token_lifetime",
-						"id_token_lifetime",
-						"refresh_token_idle_expiration",
-						"refresh_token_expiration",
-					},
+					regexp.QuoteMeta(prepareOIDCSettingsStmt),
+					prepareOIDCSettingsCols,
 					[]driver.Value{
 						"agg-id",
 						testNow,
@@ -106,16 +103,7 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.oidc_settings2.aggregate_id,`+
-						` projections.oidc_settings2.creation_date,`+
-						` projections.oidc_settings2.change_date,`+
-						` projections.oidc_settings2.resource_owner,`+
-						` projections.oidc_settings2.sequence,`+
-						` projections.oidc_settings2.access_token_lifetime,`+
-						` projections.oidc_settings2.id_token_lifetime,`+
-						` projections.oidc_settings2.refresh_token_idle_expiration,`+
-						` projections.oidc_settings2.refresh_token_expiration`+
-						` FROM projections.oidc_settings`),
+					regexp.QuoteMeta(prepareOIDCSettingsStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -130,7 +118,7 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

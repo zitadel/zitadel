@@ -1,10 +1,12 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"reflect"
 	"regexp"
 	"testing"
 
@@ -24,7 +26,8 @@ var (
 		` projections.instances.console_client_id,` +
 		` projections.instances.console_app_id,` +
 		` projections.instances.default_language` +
-		` FROM projections.instances`
+		` FROM projections.instances` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	instanceCols = []string{
 		"id",
 		"creation_date",
@@ -54,7 +57,8 @@ var (
 		` projections.instance_domains.sequence` +
 		` FROM (SELECT projections.instances.id, COUNT(*) OVER () FROM projections.instances) AS f` +
 		` LEFT JOIN projections.instances ON f.id = projections.instances.id` +
-		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`
+		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	instancesCols = []string{
 		"count",
 		"id",
@@ -82,16 +86,16 @@ func Test_InstancePrepares(t *testing.T) {
 		err             checkErr
 	}
 	tests := []struct {
-		name    string
-		prepare interface{}
-		want    want
-		object  interface{}
+		name           string
+		prepare        interface{}
+		additionalArgs []reflect.Value
+		want           want
+		object         interface{}
 	}{
 		{
-			name: "prepareInstanceQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery("")
-			},
+			name:           "prepareInstanceQuery no result",
+			additionalArgs: []reflect.Value{reflect.ValueOf("")},
+			prepare:        prepareInstanceQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(instanceQuery),
@@ -108,10 +112,9 @@ func Test_InstancePrepares(t *testing.T) {
 			object: (*Instance)(nil),
 		},
 		{
-			name: "prepareInstanceQuery found",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery("")
-			},
+			name:           "prepareInstanceQuery found",
+			additionalArgs: []reflect.Value{reflect.ValueOf("")},
+			prepare:        prepareInstanceQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(instanceQuery),
@@ -142,10 +145,9 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 		},
 		{
-			name: "prepareInstanceQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery("")
-			},
+			name:           "prepareInstanceQuery sql err",
+			additionalArgs: []reflect.Value{reflect.ValueOf("")},
+			prepare:        prepareInstanceQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(instanceQuery),
@@ -162,8 +164,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(ctx, db)
 				return query(filter), scan
 			},
 			want: want{
@@ -177,8 +179,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery one result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(ctx, db)
 				return query(filter), scan
 			},
 			want: want{
@@ -241,8 +243,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery multiple results",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(ctx, db)
 				return query(filter), scan
 			},
 			want: want{
@@ -374,8 +376,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(ctx, db)
 				return query(filter), scan
 			},
 			want: want{
@@ -395,7 +397,7 @@ func Test_InstancePrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, append(defaultPrepareArgs, tt.additionalArgs...)...)
 		})
 	}
 }

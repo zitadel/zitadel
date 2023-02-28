@@ -42,7 +42,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   public userLoginMustBeDomain: boolean = false;
   public UserState: any = UserState;
 
-  public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
+  public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.AUTHUSER;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
   public metadata: Metadata.AsObject[] = [];
