@@ -291,6 +291,7 @@ npm run open:angular
 ```
 
 If you also make [changes to the backend code](#backend--login), you can run the test against your locally built backend code and frontend server
+
 ```bash
 npm run open:golangangular
 npm run e2e:golangangular
