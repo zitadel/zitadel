@@ -49,18 +49,18 @@ jobs:
       - name: Build Docker Image
         run: docker build -t zitadel:pr --file build/Dockerfile .artifacts/zitadel
       - name: Run E2E Tests
-        run: docker compose run e2e --browser chrome
-        working-directory: e2e
+        run: docker compose run --service-ports e2e --browser chrome
+        working-directory: e2e/config/host.docker.internal
         env:
           ZITADEL_IMAGE: zitadel:pr
       - name: Save ZITADEL Logs
         if: always()
-        run: docker compose logs zitadel > ../.artifacts/e2e-compose-zitadel.log
-        working-directory: e2e
+        run: docker compose logs zitadel > ../../../.artifacts/e2e-compose-zitadel.log
+        working-directory: e2e/config/host.docker.internal
       - name: Save Prepare Logs
         if: always()
-        run: docker compose logs prepare > ../.artifacts/e2e-compose-prepare.log
-        working-directory: e2e
+        run: docker compose logs prepare > ../../../.artifacts/e2e-compose-prepare.log
+        working-directory: e2e/config/host.docker.internal
       - name: Archive Test Results
         if: always()
         uses: actions/upload-artifact@v3
