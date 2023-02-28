@@ -1,5 +1,6 @@
 ---
 title: SaaS Product with Authentication and Authorization
+sidebar_label: Software-as-a-Service
 ---
 
 This is an example architecture for a typical SaaS product. 

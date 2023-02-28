@@ -95,7 +95,6 @@ module.exports = {
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
-            "guides/manage/customize/user-metadata",
           ],
         },
         {
@@ -103,7 +102,14 @@ module.exports = {
           label: "Terraform",
           items: ["guides/manage/terraform/basics"],
         },
-        "guides/manage/user/reg-create-user",
+        {
+          type: "category",
+          label: "Users",
+          items: [
+            "guides/manage/user/reg-create-user",
+            "guides/manage/customize/user-metadata",
+          ],
+        },
       ],
     },
     {
@@ -194,6 +200,7 @@ module.exports = {
         "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
+        "concepts/usecases/saas",
         "guides/solution-scenarios/configurations",
       ],
     },
