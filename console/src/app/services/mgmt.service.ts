@@ -875,9 +875,7 @@ export class ManagementService {
     return this.grpcService.mgmt.addJWTProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public updateJWTProvider(
-    req: UpdateJWTProviderRequest,
-  ): Promise<UpdateJWTProviderResponse.AsObject> {
+  public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateJWTProvider(req, null).then((resp) => resp.toObject());
   }
 

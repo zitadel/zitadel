@@ -91,43 +91,43 @@ export class IdpTableComponent implements OnInit {
     this.getData(event.pageSize, event.pageIndex * event.pageSize);
   }
 
-  public deactivateSelectedIdps(): void {
-    const map: Promise<any>[] = this.selection.selected.map((value) => {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        return (this.service as ManagementService).deactivateOrgIDP(value.id);
-      } else {
-        return (this.service as AdminService).deactivateIDP(value.id);
-      }
-    });
-    Promise.all(map)
-      .then(() => {
-        this.selection.clear();
-        this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
-        this.refreshPage();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
+  //   public deactivateSelectedIdps(): void {
+  //     const map: Promise<any>[] = this.selection.selected.map((value) => {
+  //       if (this.serviceType === PolicyComponentServiceType.MGMT) {
+  //         return (this.service as ManagementService).deactivateOrgIDP(value.id);
+  //       } else {
+  //         return (this.service as AdminService).deactivateIDP(value.id);
+  //       }
+  //     });
+  //     Promise.all(map)
+  //       .then(() => {
+  //         this.selection.clear();
+  //         this.toast.showInfo('IDP.TOAST.SELECTEDDEACTIVATED', true);
+  //         this.refreshPage();
+  //       })
+  //       .catch((error) => {
+  //         this.toast.showError(error);
+  //       });
+  //   }
 
-  public reactivateSelectedIdps(): void {
-    const map: Promise<any>[] = this.selection.selected.map((value) => {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        return (this.service as ManagementService).reactivateOrgIDP(value.id);
-      } else {
-        return (this.service as AdminService).reactivateIDP(value.id);
-      }
-    });
-    Promise.all(map)
-      .then(() => {
-        this.selection.clear();
-        this.toast.showInfo('IDP.TOAST.SELECTEDREACTIVATED', true);
-        this.refreshPage();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
+  //   public reactivateSelectedIdps(): void {
+  //     const map: Promise<any>[] = this.selection.selected.map((value) => {
+  //       if (this.serviceType === PolicyComponentServiceType.MGMT) {
+  //         return (this.service as ManagementService).reactivateOrgIDP(value.id);
+  //       } else {
+  //         return (this.service as AdminService).reactivateIDP(value.id);
+  //       }
+  //     });
+  //     Promise.all(map)
+  //       .then(() => {
+  //         this.selection.clear();
+  //         this.toast.showInfo('IDP.TOAST.SELECTEDREACTIVATED', true);
+  //         this.refreshPage();
+  //       })
+  //       .catch((error) => {
+  //         this.toast.showError(error);
+  //       });
+  //   }
 
   public deleteIdp(idp: IDP.AsObject): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {

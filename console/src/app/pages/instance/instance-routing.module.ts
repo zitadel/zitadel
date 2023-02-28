@@ -67,9 +67,6 @@ const routes: Routes = [
           {
             path: ':id',
             loadChildren: () => import('src/app/modules/providers/provider-google/provider-google.module'),
-            data: {
-              serviceType: PolicyComponentServiceType.ADMIN,
-            },
           },
         ],
       },
