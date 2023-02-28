@@ -10,6 +10,8 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	z_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
@@ -24,6 +26,7 @@ type querier interface {
 	instanceIDsQuery() string
 	db() *sql.DB
 	orderByEventSequence(desc bool) string
+	dialect.Database
 }
 
 type scan func(dest ...interface{}) error
@@ -33,6 +36,11 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 	where, values := prepareCondition(criteria, searchQuery.Filters)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+	}
+	if searchQuery.Tx == nil {
+		if travel := prepareTimeTravel(ctx, criteria, searchQuery.AllowTimeTravel); travel != "" {
+			query += travel
+		}
 	}
 	query += where
 
@@ -83,6 +91,14 @@ func prepareColumns(criteria querier, columns repository.Columns) (string, func(
 	default:
 		return "", nil
 	}
+}
+
+func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string {
+	if !allow {
+		return ""
+	}
+	took := call.Took(ctx)
+	return criteria.Timetravel(took)
 }
 
 func maxSequenceScanner(row scan, dest interface{}) (err error) {

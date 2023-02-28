@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -84,7 +85,7 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 		projection.OrgMetadataProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareOrgMetadataQuery()
+	query, scan := prepareOrgMetadataQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -119,7 +120,7 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	if !withOwnerRemoved {
 		eq[OrgMetadataOwnerRemovedCol.identifier()] = false
 	}
-	query, scan := prepareOrgMetadataListQuery()
+	query, scan := prepareOrgMetadataListQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatment")
@@ -162,7 +163,7 @@ func NewOrgMetadataKeySearchQuery(value string, comparison TextComparison) (Sear
 	return NewTextQuery(OrgMetadataKeyCol, value, comparison)
 }
 
-func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, error)) {
+func prepareOrgMetadataQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, error)) {
 	return sq.Select(
 			OrgMetadataCreationDateCol.identifier(),
 			OrgMetadataChangeDateCol.identifier(),
@@ -171,7 +172,7 @@ func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, 
 			OrgMetadataKeyCol.identifier(),
 			OrgMetadataValueCol.identifier(),
 		).
-			From(orgMetadataTable.identifier()).
+			From(orgMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*OrgMetadata, error) {
 			m := new(OrgMetadata)
@@ -194,7 +195,7 @@ func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, 
 		}
 }
 
-func prepareOrgMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrgMetadataList, error)) {
+func prepareOrgMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*OrgMetadataList, error)) {
 	return sq.Select(
 			OrgMetadataCreationDateCol.identifier(),
 			OrgMetadataChangeDateCol.identifier(),
@@ -203,7 +204,7 @@ func prepareOrgMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrgMetad
 			OrgMetadataKeyCol.identifier(),
 			OrgMetadataValueCol.identifier(),
 			countColumn.identifier()).
-			From(orgMetadataTable.identifier()).
+			From(orgMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*OrgMetadataList, error) {
 			metadata := make([]*OrgMetadata, 0)

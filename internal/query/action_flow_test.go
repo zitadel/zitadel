@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -12,6 +13,82 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/domain"
+)
+
+var (
+	prepareFlowStmt = `SELECT projections.actions3.id,` +
+		` projections.actions3.creation_date,` +
+		` projections.actions3.change_date,` +
+		` projections.actions3.resource_owner,` +
+		` projections.actions3.action_state,` +
+		` projections.actions3.sequence,` +
+		` projections.actions3.name,` +
+		` projections.actions3.script,` +
+		` projections.actions3.allowed_to_fail,` +
+		` projections.actions3.timeout,` +
+		` projections.flow_triggers2.trigger_type,` +
+		` projections.flow_triggers2.trigger_sequence,` +
+		` projections.flow_triggers2.flow_type,` +
+		` projections.flow_triggers2.change_date,` +
+		` projections.flow_triggers2.sequence,` +
+		` projections.flow_triggers2.resource_owner` +
+		` FROM projections.flow_triggers2` +
+		` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id AND projections.flow_triggers2.instance_id = projections.actions3.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareFlowCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"state",
+		"sequence",
+		"name",
+		"script",
+		"allowed_to_fail",
+		"timeout",
+		// flow
+		"trigger_type",
+		"trigger_sequence",
+		"flow_type",
+		"change_date",
+		"sequence",
+		"resource_owner",
+	}
+
+	prepareTriggerActionStmt = `SELECT projections.actions3.id,` +
+		` projections.actions3.creation_date,` +
+		` projections.actions3.change_date,` +
+		` projections.actions3.resource_owner,` +
+		` projections.actions3.action_state,` +
+		` projections.actions3.sequence,` +
+		` projections.actions3.name,` +
+		` projections.actions3.script,` +
+		` projections.actions3.allowed_to_fail,` +
+		` projections.actions3.timeout` +
+		` FROM projections.flow_triggers2` +
+		` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id AND projections.flow_triggers2.instance_id = projections.actions3.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`
+
+	prepareTriggerActionCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"state",
+		"sequence",
+		"name",
+		"script",
+		"allowed_to_fail",
+		"timeout",
+	}
+
+	prepareFlowTypeStmt = `SELECT projections.flow_triggers2.flow_type` +
+		` FROM projections.flow_triggers2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+
+	prepareFlowTypeCols = []string{
+		"flow_type",
+	}
 )
 
 func Test_FlowPrepares(t *testing.T) {
@@ -27,29 +104,12 @@ func Test_FlowPrepares(t *testing.T) {
 	}{
 		{
 			name: "prepareFlowQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.allowed_to_fail,`+
-						` projections.actions3.timeout,`+
-						` projections.flow_triggers2.trigger_type,`+
-						` projections.flow_triggers2.trigger_sequence,`+
-						` projections.flow_triggers2.flow_type,`+
-						` projections.flow_triggers2.change_date,`+
-						` projections.flow_triggers2.sequence,`+
-						` projections.flow_triggers2.resource_owner`+
-						` FROM projections.flow_triggers2`+
-						` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id`),
+					regexp.QuoteMeta(prepareFlowStmt),
 					nil,
 					nil,
 				),
@@ -61,48 +121,13 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery one action",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.allowed_to_fail,`+
-						` projections.actions3.timeout,`+
-						` projections.flow_triggers2.trigger_type,`+
-						` projections.flow_triggers2.trigger_sequence,`+
-						` projections.flow_triggers2.flow_type,`+
-						` projections.flow_triggers2.change_date,`+
-						` projections.flow_triggers2.sequence,`+
-						` projections.flow_triggers2.resource_owner`+
-						` FROM projections.flow_triggers2`+
-						` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"state",
-						"sequence",
-						"name",
-						"script",
-						"allowed_to_fail",
-						"timeout",
-						//flow
-						"trigger_type",
-						"trigger_sequence",
-						"flow_type",
-						"change_date",
-						"sequence",
-						"resource_owner",
-					},
+					regexp.QuoteMeta(prepareFlowStmt),
+					prepareFlowCols,
 					[][]driver.Value{
 						{
 							"action-id",
@@ -150,48 +175,13 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery multiple actions",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.allowed_to_fail,`+
-						` projections.actions3.timeout,`+
-						` projections.flow_triggers2.trigger_type,`+
-						` projections.flow_triggers2.trigger_sequence,`+
-						` projections.flow_triggers2.flow_type,`+
-						` projections.flow_triggers2.change_date,`+
-						` projections.flow_triggers2.sequence,`+
-						` projections.flow_triggers2.resource_owner`+
-						` FROM projections.flow_triggers2`+
-						` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"state",
-						"sequence",
-						"name",
-						"script",
-						"allowed_to_fail",
-						"timeout",
-						//flow
-						"trigger_type",
-						"trigger_sequence",
-						"flow_type",
-						"change_date",
-						"sequence",
-						"resource_owner",
-					},
+					regexp.QuoteMeta(prepareFlowStmt),
+					prepareFlowCols,
 					[][]driver.Value{
 						{
 							"action-id-pre",
@@ -271,48 +261,13 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery no action",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.allowed_to_fail,`+
-						` projections.actions3.timeout,`+
-						` projections.flow_triggers2.trigger_type,`+
-						` projections.flow_triggers2.trigger_sequence,`+
-						` projections.flow_triggers2.flow_type,`+
-						` projections.flow_triggers2.change_date,`+
-						` projections.flow_triggers2.sequence,`+
-						` projections.flow_triggers2.resource_owner`+
-						` FROM projections.flow_triggers2`+
-						` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"state",
-						"sequence",
-						"name",
-						"script",
-						"allowed_to_fail",
-						"timeout",
-						//flow
-						"trigger_type",
-						"trigger_sequence",
-						"flow_type",
-						"change_date",
-						"sequence",
-						"resource_owner",
-					},
+					regexp.QuoteMeta(prepareFlowStmt),
+					prepareFlowCols,
 					[][]driver.Value{
 						{
 							nil,
@@ -345,29 +300,12 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.allowed_to_fail,`+
-						` projections.actions3.timeout,`+
-						` projections.flow_triggers2.trigger_type,`+
-						` projections.flow_triggers2.trigger_sequence,`+
-						` projections.flow_triggers2.flow_type,`+
-						` projections.flow_triggers2.change_date,`+
-						` projections.flow_triggers2.sequence,`+
-						` projections.flow_triggers2.resource_owner`+
-						` FROM projections.flow_triggers2`+
-						` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id`),
+					regexp.QuoteMeta(prepareFlowStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -384,18 +322,7 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.allowed_to_fail,`+
-						` projections.actions3.timeout`+
-						` FROM projections.flow_triggers2`+
-						` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id`),
+					regexp.QuoteMeta(prepareTriggerActionStmt),
 					nil,
 					nil,
 				),
@@ -407,30 +334,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.allowed_to_fail,`+
-						` projections.actions3.timeout`+
-						` FROM projections.flow_triggers2`+
-						` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"state",
-						"sequence",
-						"name",
-						"script",
-						"allowed_to_fail",
-						"timeout",
-					},
+					regexp.QuoteMeta(prepareTriggerActionStmt),
+					prepareTriggerActionCols,
 					[][]driver.Value{
 						{
 							"action-id",
@@ -467,30 +372,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.allowed_to_fail,`+
-						` projections.actions3.timeout`+
-						` FROM projections.flow_triggers2`+
-						` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"state",
-						"sequence",
-						"name",
-						"script",
-						"allowed_to_fail",
-						"timeout",
-					},
+					regexp.QuoteMeta(prepareTriggerActionStmt),
+					prepareTriggerActionCols,
 					[][]driver.Value{
 						{
 							"action-id-1",
@@ -551,18 +434,7 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.actions3.id,`+
-						` projections.actions3.creation_date,`+
-						` projections.actions3.change_date,`+
-						` projections.actions3.resource_owner,`+
-						` projections.actions3.action_state,`+
-						` projections.actions3.sequence,`+
-						` projections.actions3.name,`+
-						` projections.actions3.script,`+
-						` projections.actions3.allowed_to_fail,`+
-						` projections.actions3.timeout`+
-						` FROM projections.flow_triggers2`+
-						` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id`),
+					regexp.QuoteMeta(prepareTriggerActionStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -579,8 +451,7 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.flow_triggers2.flow_type`+
-						` FROM projections.flow_triggers2`),
+					regexp.QuoteMeta(prepareFlowTypeStmt),
 					nil,
 					nil,
 				),
@@ -592,11 +463,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.flow_triggers2.flow_type`+
-						` FROM projections.flow_triggers2`),
-					[]string{
-						"flow_type",
-					},
+					regexp.QuoteMeta(prepareFlowTypeStmt),
+					prepareFlowTypeCols,
 					[][]driver.Value{
 						{
 							domain.FlowTypeExternalAuthentication,
@@ -613,11 +481,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.flow_triggers2.flow_type`+
-						` FROM projections.flow_triggers2`),
-					[]string{
-						"flow_type",
-					},
+					regexp.QuoteMeta(prepareFlowTypeStmt),
+					prepareFlowTypeCols,
 					[][]driver.Value{
 						{
 							domain.FlowTypeExternalAuthentication,
@@ -638,8 +503,7 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.flow_triggers2.flow_type`+
-						` FROM projections.flow_triggers2`),
+					regexp.QuoteMeta(prepareFlowTypeStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -654,7 +518,7 @@ func Test_FlowPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

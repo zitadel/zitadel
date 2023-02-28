@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -70,7 +71,7 @@ type FailedEventSearchQueries struct {
 }
 
 func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSearchQueries) (failedEvents *FailedEvents, err error) {
-	query, scan := prepareFailedEventsQuery()
+	query, scan := prepareFailedEventsQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-n8rjJ", "Errors.Query.InvalidRequest")
@@ -123,7 +124,7 @@ func (q *FailedEventSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvents, error)) {
+func prepareFailedEventsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*FailedEvents, error)) {
 	return sq.Select(
 			FailedEventsColumnProjectionName.identifier(),
 			FailedEventsColumnFailedSequence.identifier(),
@@ -131,7 +132,8 @@ func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvent
 			FailedEventsColumnLastFailed.identifier(),
 			FailedEventsColumnError.identifier(),
 			countColumn.identifier()).
-			From(failedEventsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(failedEventsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*FailedEvents, error) {
 			failedEvents := make([]*FailedEvent, 0)
 			var count uint64

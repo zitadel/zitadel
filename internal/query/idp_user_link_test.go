@@ -21,7 +21,8 @@ var (
 		` projections.idp_user_links3.resource_owner,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_user_links3` +
-		` LEFT JOIN projections.idp_templates2 ON projections.idp_user_links3.idp_id = projections.idp_templates2.id`)
+		` LEFT JOIN projections.idp_templates2 ON projections.idp_user_links3.idp_id = projections.idp_templates2.id AND projections.idp_user_links3.instance_id = projections.idps3.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	idpUserLinksCols = []string{
 		"idp_id",
 		"user_id",
@@ -139,7 +140,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

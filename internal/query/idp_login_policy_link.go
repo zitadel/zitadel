@@ -7,6 +7,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -85,7 +86,7 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPLoginPolicyLinksQuery()
+	query, scan := prepareIDPLoginPolicyLinksQuery(ctx, q.client)
 	eq := sq.Eq{
 		IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
 		IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).InstanceID(),
@@ -110,7 +111,7 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	return idps, err
 }
 
-func prepareIDPLoginPolicyLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
 	return sq.Select(
 			IDPLoginPolicyLinkIDPIDCol.identifier(),
 			IDPTemplateNameCol.identifier(),
@@ -118,7 +119,8 @@ func prepareIDPLoginPolicyLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPL
 			IDPTemplateOwnerTypeCol.identifier(),
 			countColumn.identifier()).
 			From(idpLoginPolicyLinkTable.identifier()).
-			LeftJoin(join(IDPTemplateIDCol, IDPLoginPolicyLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
+			LeftJoin(join(IDPTemplateIDCol, IDPLoginPolicyLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPLoginPolicyLinks, error) {
 			links := make([]*IDPLoginPolicyLink, 0)
 			var count uint64

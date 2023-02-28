@@ -71,6 +71,7 @@ func CreateGateway(ctx context.Context, g Gateway, port uint16, http1HostName st
 }
 
 func addInterceptors(handler http.Handler, http1HostName string) http.Handler {
+	handler = http_mw.CallDurationHandler(handler)
 	handler = http1Host(handler, http1HostName)
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.DefaultTelemetryHandler(handler)

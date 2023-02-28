@@ -2,11 +2,12 @@ package sql
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 type SQL struct {
-	client *sql.DB
+	client *database.DB
 }
 
 func (db *SQL) Health(ctx context.Context) error {

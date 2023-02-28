@@ -19,7 +19,12 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 	c.connector = connector
 }
 
-func Connect(config Config, useAdmin bool) (*sql.DB, error) {
+type DB struct {
+	*sql.DB
+	dialect.Database
+}
+
+func Connect(config Config, useAdmin bool) (*DB, error) {
 	client, err := config.connector.Connect(useAdmin)
 	if err != nil {
 		return nil, err
@@ -29,7 +34,10 @@ func Connect(config Config, useAdmin bool) (*sql.DB, error) {
 		return nil, errors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
 	}
 
-	return client, nil
+	return &DB{
+		DB:       client,
+		Database: config.connector,
+	}, nil
 }
 
 func DecodeHook(from, to reflect.Value) (interface{}, error) {
@@ -61,7 +69,7 @@ func DecodeHook(from, to reflect.Value) (interface{}, error) {
 	return Config{connector: connector}, nil
 }
 
-func (c Config) Database() string {
+func (c Config) DatabaseName() string {
 	return c.connector.DatabaseName()
 }
 
