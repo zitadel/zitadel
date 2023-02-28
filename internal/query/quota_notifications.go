@@ -1,4 +1,4 @@
-package command
+package query
 
 import (
 	"context"
@@ -9,13 +9,13 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
-func (c *Commands) GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, usedAbs uint64) ([]*quota.NotifiedEvent, error) {
+func (q *Queries) GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, usedAbs uint64) ([]*quota.NotifiedEvent, error) {
 	if len(config.Notifications) == 0 {
 		return nil, nil
 	}
 
 	aggregate := config.Aggregate()
-	wm, err := c.getQuotaNotificationsWriteModel(ctx, aggregate, periodStart)
+	wm, err := q.getQuotaNotificationsReadModel(ctx, aggregate, periodStart)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *Commands) GetDueQuotaNotifications(ctx context.Context, config *quota.A
 	return dueNotifications, nil
 }
 
-func (c *Commands) getQuotaNotificationsWriteModel(ctx context.Context, aggregate eventstore.Aggregate, periodStart time.Time) (*quotaNotificationsWriteModel, error) {
-	wm := newQuotaNotificationsWriteModel(aggregate.ID, aggregate.InstanceID, aggregate.ResourceOwner, periodStart)
-	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
+func (q *Queries) getQuotaNotificationsReadModel(ctx context.Context, aggregate eventstore.Aggregate, periodStart time.Time) (*quotaNotificationsReadModel, error) {
+	wm := newQuotaNotificationsReadModel(aggregate.ID, aggregate.InstanceID, aggregate.ResourceOwner, periodStart)
+	return wm, q.eventstore.FilterToQueryReducer(ctx, wm)
 }

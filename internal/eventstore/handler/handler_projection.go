@@ -194,7 +194,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 	var succeededOnce bool
 	var err error
 	// get every instance id except empty (system)
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).AddQuery().ExcludedInstanceID("")
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).AllowTimeTravel().AddQuery().ExcludedInstanceID("")
 	for range h.triggerProjection.C {
 		if !succeededOnce {
 			// (re)check if it has succeeded in the meantime
