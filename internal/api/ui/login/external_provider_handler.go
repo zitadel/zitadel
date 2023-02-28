@@ -47,6 +47,8 @@ type externalNotFoundOptionFormData struct {
 type externalNotFoundOptionData struct {
 	baseData
 	externalNotFoundOptionFormData
+	IsLinkingAllowed           bool
+	IsCreationAllowed          bool
 	ExternalIDPID              string
 	ExternalIDPUserID          string
 	ExternalIDPUserDisplayName string
@@ -146,7 +148,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
-		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.Invalid"))
+		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
 	if err != nil {
@@ -210,7 +212,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
-		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-SFefg", "Errors.ExternalIDP.Invalid"))
+		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-SFefg", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
 
@@ -281,16 +283,17 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	human, idpLinking, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
+	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
+	// if auto creation or creation itself is disabled, send the user to the notFoundOption
 	if !provider.IsCreationAllowed || !provider.IsAutoCreation {
-		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLinking, err)
+		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
 		return
 	}
 
 	// reload auth request, to ensure current state (checked external login)
 	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLinking, err)
+		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
 		return
 	}
 	l.autoCreateExternalUser(w, r, authReq)
@@ -311,7 +314,7 @@ func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, a
 
 // renderExternalNotFoundOption renders a page, where the user is able to edit the IDP data,
 // create a new externalUser of link to existing on (based on the IDP template)
-func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, externalIDP *domain.UserIDPLink, err error) {
+func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idpLink *domain.UserIDPLink, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -331,9 +334,9 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 
 	}
 
-	if human == nil || externalIDP == nil {
+	if human == nil || idpLink == nil {
 		linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
-		human, externalIDP, _ = mapExternalUserToLoginUser(linkingUser, orgIAMPolicy.UserLoginMustBeDomain)
+		human, idpLink, _ = mapExternalUserToLoginUser(linkingUser, orgIAMPolicy.UserLoginMustBeDomain)
 	}
 
 	var resourceOwner string
@@ -344,6 +347,12 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
 	}
 	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+
+	idpTemplate, err := l.getIDPByID(r, idpLink.IDPConfigID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -362,9 +371,11 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 				Language:  human.PreferredLanguage.String(),
 			},
 		},
-		ExternalIDPID:              externalIDP.IDPConfigID,
-		ExternalIDPUserID:          externalIDP.ExternalUserID,
-		ExternalIDPUserDisplayName: externalIDP.DisplayName,
+		IsLinkingAllowed:           idpTemplate.IsLinkingAllowed,
+		IsCreationAllowed:          idpTemplate.IsCreationAllowed,
+		ExternalIDPID:              idpLink.IDPConfigID,
+		ExternalIDPUserID:          idpLink.ExternalUserID,
+		ExternalIDPUserDisplayName: idpLink.DisplayName,
 		ExternalEmail:              human.EmailAddress,
 		ExternalEmailVerified:      human.IsEmailVerified,
 		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
@@ -393,16 +404,34 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
 		return
 	}
-	if data.Link {
-		l.renderLogin(w, r, authReq, nil)
+
+	idpTemplate, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
 		return
-	} else if data.ResetLinking {
+	}
+	// if the user click on the cancel button / back icon
+	if data.ResetLinking {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID)
 		if err != nil {
 			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
 		}
 		l.handleLogin(w, r)
+		return
+	}
+	// if the user selects the linking button
+	if data.Link {
+		if !idpTemplate.IsLinkingAllowed {
+			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, errors.ThrowPreconditionFailed(nil, "LOGIN-AS3ff", "Errors.ExternalIDP.LinkingNotAllowed"))
+			return
+		}
+		l.renderLogin(w, r, authReq, nil)
+		return
+	}
+	// if the user selects the creation button
+	if !idpTemplate.IsCreationAllowed {
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, errors.ThrowPreconditionFailed(nil, "LOGIN-dsfd3", "Errors.ExternalIDP.CreationNotAllowed"))
 		return
 	}
 	linkingUser := mapExternalNotFoundOptionFormDataToLoginUser(data)
