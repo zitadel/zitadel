@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
@@ -651,8 +652,15 @@ func mapIDPUserToExternalUser(user idp.User, id string) *domain.ExternalUser {
 }
 
 func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain bool) (*domain.Human, *domain.UserIDPLink, []*domain.Metadata) {
+	username := externalUser.PreferredUsername
+	if mustBeDomain {
+		index := strings.LastIndex(username, "@")
+		if index > 1 {
+			username = username[:index]
+		}
+	}
 	human := &domain.Human{
-		Username: externalUser.PreferredUsername, //TODO: currently we remove the last @suffix when mustBeDomain
+		Username: username,
 		Profile: &domain.Profile{
 			FirstName:         externalUser.FirstName,
 			LastName:          externalUser.LastName,
