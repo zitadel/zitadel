@@ -34,7 +34,3 @@ func (l *Login) getLabelPolicy(r *http.Request, orgID string) (*query.LabelPolic
 	}
 	return l.query.ActiveLabelPolicyByOrg(r.Context(), orgID, false)
 }
-
-func (l *Login) getIDPTemplateByID(r *http.Request, orgID string, idpID string) (*query.IDPTemplate, error) {
-	return l.query.IDPTemplateByIDAndResourceOwner(r.Context(), false, idpID, orgID, false)
-}

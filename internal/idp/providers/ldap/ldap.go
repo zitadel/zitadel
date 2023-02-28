@@ -216,9 +216,7 @@ func (p *Provider) Name() string {
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
 	return &Session{
 		Provider: p,
-		loginUrl: p.loginUrl + "?state=" + state,
-		User:     params[0].(string),
-		Password: params[1].(string),
+		loginUrl: p.loginUrl + state,
 	}, nil
 }
 
