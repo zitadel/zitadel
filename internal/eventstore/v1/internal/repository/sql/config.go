@@ -1,10 +1,10 @@
 package sql
 
 import (
-	"database/sql"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
-func Start(client *sql.DB) *SQL {
+func Start(client *database.DB) *SQL {
 	return &SQL{
 		client: client,
 	}

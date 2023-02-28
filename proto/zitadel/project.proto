@@ -17,7 +17,7 @@ message Project {
     zitadel.v1.ObjectDetails details = 2;
     string name = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADEL\""
+            example: "\"MyProject\""
         }
     ];
     ProjectState state = 4 [
@@ -79,7 +79,7 @@ message GrantedProject {
     ];
     string project_owner_name = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"CAOS AG\""
+            example: "\"ZITADEL\""
         }
     ];
 

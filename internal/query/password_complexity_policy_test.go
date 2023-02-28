@@ -12,6 +12,37 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
+var (
+	preparePasswordComplexityPolicyStmt = `SELECT projections.password_complexity_policies2.id,` +
+		` projections.password_complexity_policies2.sequence,` +
+		` projections.password_complexity_policies2.creation_date,` +
+		` projections.password_complexity_policies2.change_date,` +
+		` projections.password_complexity_policies2.resource_owner,` +
+		` projections.password_complexity_policies2.min_length,` +
+		` projections.password_complexity_policies2.has_lowercase,` +
+		` projections.password_complexity_policies2.has_uppercase,` +
+		` projections.password_complexity_policies2.has_number,` +
+		` projections.password_complexity_policies2.has_symbol,` +
+		` projections.password_complexity_policies2.is_default,` +
+		` projections.password_complexity_policies2.state` +
+		` FROM projections.password_complexity_policies2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	preparePasswordComplexityPolicyCols = []string{
+		"id",
+		"sequence",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"min_length",
+		"has_lowercase",
+		"has_uppercase",
+		"has_number",
+		"has_symbol",
+		"is_default",
+		"state",
+	}
+)
+
 func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -28,19 +59,7 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.password_complexity_policies2.id,`+
-						` projections.password_complexity_policies2.sequence,`+
-						` projections.password_complexity_policies2.creation_date,`+
-						` projections.password_complexity_policies2.change_date,`+
-						` projections.password_complexity_policies2.resource_owner,`+
-						` projections.password_complexity_policies2.min_length,`+
-						` projections.password_complexity_policies2.has_lowercase,`+
-						` projections.password_complexity_policies2.has_uppercase,`+
-						` projections.password_complexity_policies2.has_number,`+
-						` projections.password_complexity_policies2.has_symbol,`+
-						` projections.password_complexity_policies2.is_default,`+
-						` projections.password_complexity_policies2.state`+
-						` FROM projections.password_complexity_policies2`),
+					regexp.QuoteMeta(preparePasswordComplexityPolicyStmt),
 					nil,
 					nil,
 				),
@@ -58,33 +77,8 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.password_complexity_policies2.id,`+
-						` projections.password_complexity_policies2.sequence,`+
-						` projections.password_complexity_policies2.creation_date,`+
-						` projections.password_complexity_policies2.change_date,`+
-						` projections.password_complexity_policies2.resource_owner,`+
-						` projections.password_complexity_policies2.min_length,`+
-						` projections.password_complexity_policies2.has_lowercase,`+
-						` projections.password_complexity_policies2.has_uppercase,`+
-						` projections.password_complexity_policies2.has_number,`+
-						` projections.password_complexity_policies2.has_symbol,`+
-						` projections.password_complexity_policies2.is_default,`+
-						` projections.password_complexity_policies2.state`+
-						` FROM projections.password_complexity_policies2`),
-					[]string{
-						"id",
-						"sequence",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"min_length",
-						"has_lowercase",
-						"has_uppercase",
-						"has_number",
-						"has_symbol",
-						"is_default",
-						"state",
-					},
+					regexp.QuoteMeta(preparePasswordComplexityPolicyStmt),
+					preparePasswordComplexityPolicyCols,
 					[]driver.Value{
 						"pol-id",
 						uint64(20211109),
@@ -121,19 +115,7 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.password_complexity_policies2.id,`+
-						` projections.password_complexity_policies2.sequence,`+
-						` projections.password_complexity_policies2.creation_date,`+
-						` projections.password_complexity_policies2.change_date,`+
-						` projections.password_complexity_policies2.resource_owner,`+
-						` projections.password_complexity_policies2.min_length,`+
-						` projections.password_complexity_policies2.has_lowercase,`+
-						` projections.password_complexity_policies2.has_uppercase,`+
-						` projections.password_complexity_policies2.has_number,`+
-						` projections.password_complexity_policies2.has_symbol,`+
-						` projections.password_complexity_policies2.is_default,`+
-						` projections.password_complexity_policies2.state`+
-						` FROM projections.password_complexity_policies2`),
+					regexp.QuoteMeta(preparePasswordComplexityPolicyStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -148,7 +130,7 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
