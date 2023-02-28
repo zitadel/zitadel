@@ -8,11 +8,13 @@ import { take } from 'rxjs/operators';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
+  UpdateGoogleProviderRequest as AdminUpdateGoogleProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGoogleProviderRequest as MgmtAddGoogleProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
+  UpdateGoogleProviderRequest as MgmtUpdateGoogleProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -50,12 +52,10 @@ export class ProviderGoogleComponent implements OnInit {
   ) {
     const idpId = this.route.snapshot.paramMap.get('id');
 
-    console.log(idpId);
-
     this.form = new FormGroup({
       name: new FormControl('', [Validators.required]),
       clientId: new FormControl('', [Validators.required]),
-      clientSecret: new FormControl('', [Validators.required]),
+      clientSecret: new FormControl('', []),
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
     });
 
@@ -106,7 +106,11 @@ export class ProviderGoogleComponent implements OnInit {
     });
   }
 
-  public addOIDCIdp(): void {
+  public submitForm(): void {
+    this.provider ? this.updateGoogleProvider() : this.addGoogleProvider();
+  }
+
+  public addGoogleProvider(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       const req = new MgmtAddGoogleProviderRequest();
 
@@ -114,7 +118,6 @@ export class ProviderGoogleComponent implements OnInit {
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
-      //   req.setProviderOptions()
 
       this.loading = true;
       (this.service as ManagementService)
@@ -122,16 +125,7 @@ export class ProviderGoogleComponent implements OnInit {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(
-              [
-                this.serviceType === PolicyComponentServiceType.MGMT
-                  ? '/org-settings'
-                  : this.serviceType === PolicyComponentServiceType.ADMIN
-                  ? '/settings'
-                  : '',
-              ],
-              { queryParams: { id: 'idp' } },
-            );
+            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
           }, 2000);
         })
         .catch((error) => {
@@ -151,21 +145,63 @@ export class ProviderGoogleComponent implements OnInit {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(
-              [
-                this.serviceType === PolicyComponentServiceType.MGMT
-                  ? '/org-settings'
-                  : this.serviceType === PolicyComponentServiceType.ADMIN
-                  ? '/settings'
-                  : '',
-              ],
-              { queryParams: { id: 'idp' } },
-            );
+            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
           }, 2000);
         })
         .catch((error) => {
+          this.loading = false;
           this.toast.showError(error);
         });
+    }
+  }
+
+  public updateGoogleProvider(): void {
+    if (this.provider) {
+      if (this.serviceType === PolicyComponentServiceType.MGMT) {
+        const req = new MgmtUpdateGoogleProviderRequest();
+        req.setId(this.provider.id);
+        req.setName(this.name?.value);
+        req.setClientId(this.clientId?.value);
+        req.setScopesList(this.scopesList?.value);
+        if (this.updateClientSecret) {
+          req.setClientSecret(this.clientSecret?.value);
+        }
+
+        this.loading = true;
+        (this.service as ManagementService)
+          .updateGoogleProvider(req)
+          .then((idp) => {
+            setTimeout(() => {
+              this.loading = false;
+              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+            }, 2000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+            this.loading = false;
+          });
+      } else if (PolicyComponentServiceType.ADMIN) {
+        const req = new AdminUpdateGoogleProviderRequest();
+        req.setId(this.provider.id);
+        req.setName(this.name?.value);
+        req.setClientId(this.clientId?.value);
+        req.setClientSecret(this.clientSecret?.value);
+        req.setScopesList(this.scopesList?.value);
+
+        this.loading = true;
+        (this.service as AdminService)
+          .updateGoogleProvider(req)
+          .then((idp) => {
+            setTimeout(() => {
+              this.loading = false;
+              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+            }, 2000);
+          })
+          .catch((error) => {
+            this.loading = false;
+            this.toast.showError(error);
+          });
+      }
     }
   }
 

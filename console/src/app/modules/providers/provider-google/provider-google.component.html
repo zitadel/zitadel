@@ -6,15 +6,15 @@
     <div class="title-row">
       <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
       <h1>{{ 'IDP.CREATE.GOOGLE.TITLE' | translate }}</h1>
-    </div>
 
-    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+      <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
+    </div>
 
     <p class="desc cnsl-secondary-text">
       {{ !provider ? ('IDP.CREATE.GOOGLE.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}
     </p>
 
-    <form [formGroup]="form" (ngSubmit)="addOIDCIdp()">
+    <form [formGroup]="form" (ngSubmit)="submitForm()">
       <div class="google-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>

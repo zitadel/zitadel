@@ -52,35 +52,6 @@
 
   <div class="table-wrapper">
     <table class="table" mat-table [dataSource]="dataSource">
-      <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef>
-          <mat-checkbox
-            color="primary"
-            (change)="$event ? masterToggle() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()"
-            [disabled]="serviceType === PolicyComponentServiceType.MGMT"
-          >
-          </mat-checkbox>
-        </th>
-        <td mat-cell *matCellDef="let idp">
-          <mat-checkbox
-            color="primary"
-            (click)="$event.stopPropagation()"
-            class="chbox"
-            [disabled]="serviceType === PolicyComponentServiceType.MGMT && idp?.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM"
-            (change)="$event ? selection.toggle(idp) : null"
-            [checked]="selection.isSelected(idp)"
-          >
-            <img
-              src="../../../assets/images/google.png"
-              *ngIf="idp.stylingType === IDPStylingType.IDPSTYLINGTYPE_GOOGLE"
-              alt="google"
-            />
-          </mat-checkbox>
-        </td>
-      </ng-container>
-
       <ng-container matColumnDef="availability">
         <th class="availability" mat-header-cell *matHeaderCellDef>
           <span>{{ 'IDP.AVAILABILITY' | translate }}</span>
@@ -112,12 +83,15 @@
           <div [ngSwitch]="idp.type">
             <div class="provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GOOGLE">
               <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
+              Google
             </div>
             <div class="provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OIDC">
               <mat-icon class="idp-icon" svgIcon="mdi_oidc" alt="oidc" />
+              Generic OIDC
             </div>
             <div class="provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_JWT">
               <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
+              Generic JWT
             </div>
           </div>
         </td>
