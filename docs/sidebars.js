@@ -210,6 +210,27 @@ module.exports = {
       collapsed: true,
       items: [
         "concepts/introduction",
+        "concepts/structure/instance",
+        "concepts/structure/organizations",
+        "concepts/structure/projects",
+        "concepts/structure/applications",
+        "concepts/structure/granted_projects",
+        "concepts/structure/users",
+        "concepts/structure/managers",
+        "concepts/structure/policies",
+        "concepts/structure/jwt_idp",
+        "concepts/features/actions",
+        "concepts/features/selfservice",
+      ]
+    },
+    {
+      type: "category",
+      label: "Architecture",
+      collapsed: true,
+      items: [
+        "concepts/architecture/software",
+        "concepts/architecture/solution",
+        "concepts/architecture/secrets",
         "concepts/principles",
         {
           type: "category",
@@ -218,48 +239,6 @@ module.exports = {
           items: [
             "concepts/eventstore/overview",
             "concepts/eventstore/implementation",
-          ],
-        },
-        {
-          type: "category",
-          label: "Architecture",
-          collapsed: false,
-          items: [
-            "concepts/architecture/software",
-            "concepts/architecture/solution",
-            "concepts/architecture/secrets",
-          ],
-        },
-        {
-          type: "category",
-          label: "Structure",
-          collapsed: false,
-          items: [
-            "concepts/structure/overview",
-            "concepts/structure/instance",
-            "concepts/structure/organizations",
-            "concepts/structure/projects",
-            "concepts/structure/applications",
-            "concepts/structure/granted_projects",
-            "concepts/structure/users",
-            "concepts/structure/managers",
-            "concepts/structure/policies",
-            "concepts/structure/jwt_idp",
-          ],
-        },
-        {
-          type: "category",
-          label: "Use Cases",
-          collapsed: false,
-          items: ["concepts/usecases/saas"],
-        },
-        {
-          type: "category",
-          label: "Features",
-          collapsed: false,
-          items: [
-            "concepts/features/actions",
-            "concepts/features/selfservice"
           ],
         },
       ]
