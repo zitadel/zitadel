@@ -80,7 +80,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			UserViewProvider:          view,
 			UserCommandProvider:       command,
 			UserEventProvider:         &userRepo,
-			IDPProviderViewProvider:   view,
+			IDPProviderViewProvider:   queries,
 			IDPUserLinksProvider:      queries,
 			LockoutPolicyViewProvider: queries,
 			LoginPolicyViewProvider:   queries,

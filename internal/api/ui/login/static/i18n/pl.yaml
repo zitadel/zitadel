@@ -370,6 +370,8 @@ Errors:
       ExternalUserIDEmpty: Identyfikator użytkownika zewnętrznego jest pusty
       UserDisplayNameEmpty: Nazwa wyświetlana użytkownika jest pusta
       NoExternalUserData: Nie otrzymano danych użytkownika zewnętrznego
+      CreationNotAllowed: Tworzenie nowego użytkownika nie jest dozwolone w tym Providencie
+      LinkingNotAllowed: Linkowanie użytkownika nie jest dozwolone na tym Providencie
     GrantRequired: Logowanie nie jest możliwe. Użytkownik musi posiadać przynajmniej jedno uprawnienie w aplikacji. Skontaktuj się z administratorem.
     ProjectRequired: Logowanie nie jest możliwe. Organizacja użytkownika musi zostać udzielona projektowi. Skontaktuj się z administratorem.
   IdentityProvider:

@@ -68,7 +68,7 @@ var DefaultMapper UserInfoMapper = func(info oidc.UserInfo) idp.User {
 }
 
 // New creates a generic OIDC provider
-func New(name, issuer, clientID, clientSecret, redirectURI string, userInfoMapper UserInfoMapper, options ...ProviderOpts) (provider *Provider, err error) {
+func New(name, issuer, clientID, clientSecret, redirectURI string, scopes []string, userInfoMapper UserInfoMapper, options ...ProviderOpts) (provider *Provider, err error) {
 	provider = &Provider{
 		name:           name,
 		userInfoMapper: userInfoMapper,
@@ -76,11 +76,25 @@ func New(name, issuer, clientID, clientSecret, redirectURI string, userInfoMappe
 	for _, option := range options {
 		option(provider)
 	}
-	provider.RelyingParty, err = rp.NewRelyingPartyOIDC(issuer, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID}, provider.options...)
+	provider.RelyingParty, err = rp.NewRelyingPartyOIDC(issuer, clientID, clientSecret, redirectURI, setDefaultScope(scopes), provider.options...)
 	if err != nil {
 		return nil, err
 	}
 	return provider, nil
+}
+
+// setDefaultScope ensures that at least openid ist set
+// if none is provided it will request `openid profile email phone`
+func setDefaultScope(scopes []string) []string {
+	if len(scopes) == 0 {
+		return []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopePhone}
+	}
+	for _, scope := range scopes {
+		if scope == oidc.ScopeOpenID {
+			return scopes
+		}
+	}
+	return append(scopes, oidc.ScopeOpenID)
 }
 
 // Name implements the [idp.Provider] interface
