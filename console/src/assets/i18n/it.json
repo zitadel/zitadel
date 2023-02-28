@@ -159,6 +159,7 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     }

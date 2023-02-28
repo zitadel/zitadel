@@ -12,9 +12,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'idp', 'google', 'create']
+        ? ['/instance', 'provider', 'google', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/instance', 'idp', 'google', 'create']
+        ? ['/instance', 'provider', 'google', 'create']
         : []
     "
   >
@@ -24,14 +24,16 @@
     </div>
   </a>
 
-  <div class="item card" matRipple (click)="createGoogle()">
+  <div class="item card coming-soon" matRipple>
+    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
     <img class="idp-logo" src="../../../assets/images/idp/ms.svg" alt="microsoft" />
     <div class="text-container">
       <span class="title">Microsoft</span>
     </div>
   </div>
 
-  <div class="item card" matRipple (click)="createGoogle()">
+  <div class="item card coming-soon" matRipple>
+    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
     <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="GitHub" />
     <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="GitHub" />
 
@@ -40,7 +42,8 @@
     </div>
   </div>
 
-  <div class="item card" matRipple (click)="createGoogle()">
+  <div class="item card coming-soon" matRipple>
+    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
     <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="GitLab" />
     <div class="text-container">
       <span class="title">GitLab</span>
@@ -51,9 +54,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'idp', 'oidc', 'create']
+        ? ['/instance', 'provider', 'oidc', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/instance', 'idp', 'oidc', 'create']
+        ? ['/instance', 'provider', 'oidc', 'create']
         : []
     "
   >
@@ -61,7 +64,7 @@
       <mat-icon class="icon" svgIcon="mdi_openid" alt="openid" />
     </div>
     <div class="text-container">
-      <span class="title">Generic OIDC provider</span>
+      <span class="title">Generic OIDC</span>
     </div>
   </a>
 
@@ -69,9 +72,9 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
-        ? ['/instance', 'idp', 'jwt', 'create']
+        ? ['/instance', 'provider', 'jwt', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/instance', 'idp', 'jwt', 'create']
+        ? ['/instance', 'provider', 'jwt', 'create']
         : []
     "
   >
@@ -79,7 +82,7 @@
       <mat-icon class="icon" svgIcon="mdi_jwt" alt="jwt" />
     </div>
     <div class="text-container">
-      <span class="title">Generic JWT provider</span>
+      <span class="title">Generic JWT</span>
     </div>
   </a>
 </div>

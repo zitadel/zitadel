@@ -160,6 +160,7 @@
     "MORE": "more",
     "STEP": "Step",
     "SETUP": "Setup",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
