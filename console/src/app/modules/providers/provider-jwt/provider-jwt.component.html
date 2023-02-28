@@ -3,13 +3,12 @@
     <div class="title-row">
       <mat-icon class="idp-logo" svgIcon="mdi_jwt" alt="jwt" />
       <h1>{{ 'IDP.CREATE.JWT.TITLE' | translate }}</h1>
+      <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
-
-    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
     <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.JWT.DESCRIPTION' | translate }}</p>
 
-    <form [formGroup]="jwtFormGroup" (ngSubmit)="addJWTIdp()">
+    <form [formGroup]="jwtFormGroup" (ngSubmit)="submitForm()">
       <div class="jwt-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>

@@ -3,9 +3,8 @@
     <div class="title-row">
       <mat-icon class="idp-logo" svgIcon="mdi_openid" alt="openid" />
       <h1>{{ 'IDP.CREATE.OIDC.TITLE' | translate }}</h1>
+      <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
-
-    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
     <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.OIDC.DESCRIPTION' | translate }}</p>
 

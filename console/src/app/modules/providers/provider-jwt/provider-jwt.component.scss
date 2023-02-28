@@ -2,24 +2,6 @@
   font-size: 14px;
 }
 
-.add-line-btn {
-  margin-bottom: 1rem;
-}
-
-.first-step-actions {
-  margin-top: 1rem;
-}
-
-.auto-reg-info {
-  display: block;
-  width: 100%;
-  max-width: 400px;
-
-  .auto-reg-desc {
-    margin: 0 0 1rem 0;
-  }
-}
-
 .jwt-create-content {
   .title-row {
     display: flex;
@@ -33,7 +15,7 @@
     }
 
     h1 {
-      margin: 0;
+      margin: 0 1rem 0 0;
     }
   }
 

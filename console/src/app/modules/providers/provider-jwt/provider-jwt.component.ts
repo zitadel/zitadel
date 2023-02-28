@@ -5,9 +5,15 @@ import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } fro
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AddJWTIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import {
+  AddJWTProviderRequest as AdminAddJWTProviderRequest,
+  UpdateJWTProviderRequest as AdminUpdateJWTProviderRequest,
+} from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCMappingField, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
-import { AddOrgJWTIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import {
+  AddJWTProviderRequest as MgmtAddJWTProviderRequest,
+  UpdateJWTProviderRequest as MgmtUpdateJWTProviderRequest,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -98,17 +104,19 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
     this.projectId = projectid;
   }
 
-  public addJWTIdp(): void {
+  public submitForm(): void {
+    this.provider ? this.updateJWTProvider() : this.addJWTProvider();
+  }
+
+  public addJWTProvider(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new AddOrgJWTIDPRequest();
+      const req = new MgmtAddJWTProviderRequest();
 
       req.setName(this.jwtName?.value);
       req.setHeaderName(this.jwtHeaderName?.value);
       req.setIssuer(this.jwtIssuer?.value);
       req.setJwtEndpoint(this.jwtEndpoint?.value);
       req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
-      req.setAutoRegister(this.jwtAutoRegister?.value);
-      req.setStylingType(this.jwtStylingType?.value);
 
       this.loading = true;
       //   (this.service as ManagementService)
@@ -129,17 +137,16 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
       //     })
       //     .catch((error) => {
       //       this.toast.showError(error);
+      //   this.loading=false;
       //     });
     } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AddJWTIDPRequest();
+      const req = new AdminAddJWTProviderRequest();
 
       req.setName(this.jwtName?.value);
       req.setHeaderName(this.jwtHeaderName?.value);
       req.setIssuer(this.jwtIssuer?.value);
       req.setJwtEndpoint(this.jwtEndpoint?.value);
       req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
-      req.setAutoRegister(this.jwtAutoRegister?.value);
-      req.setStylingType(this.jwtStylingType?.value);
 
       this.loading = true;
       //   (this.service as AdminService)
@@ -160,7 +167,74 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
       //     })
       //     .catch((error) => {
       //       this.toast.showError(error);
+      //   this.loading=false;
       //     });
+    }
+  }
+
+  public updateJWTProvider(): void {
+    if (this.provider) {
+      if (this.serviceType === PolicyComponentServiceType.MGMT) {
+        const req = new MgmtUpdateJWTProviderRequest();
+        req.setId(this.provider.id);
+        req.setName(this.jwtName?.value);
+        req.setHeaderName(this.jwtHeaderName?.value);
+        req.setIssuer(this.jwtIssuer?.value);
+        req.setJwtEndpoint(this.jwtEndpoint?.value);
+        req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
+
+        this.loading = true;
+        //   (this.service as ManagementService)
+        //     .addOrgJWTIDP(req)
+        //     .then((idp) => {
+        //       setTimeout(() => {
+        //         this.loading = false;
+        //         this.router.navigate([
+        //           this.serviceType === PolicyComponentServiceType.MGMT
+        //             ? 'org'
+        //             : this.serviceType === PolicyComponentServiceType.ADMIN
+        //             ? 'iam'
+        //             : '',
+        //           'policy',
+        //           'login',
+        //         ]);
+        //       }, 2000);
+        //     })
+        //     .catch((error) => {
+        //       this.toast.showError(error);
+        // this.loading=false;
+        //     });
+      } else if (PolicyComponentServiceType.ADMIN) {
+        const req = new AdminUpdateJWTProviderRequest();
+        req.setId(this.provider.id);
+        req.setName(this.jwtName?.value);
+        req.setHeaderName(this.jwtHeaderName?.value);
+        req.setIssuer(this.jwtIssuer?.value);
+        req.setJwtEndpoint(this.jwtEndpoint?.value);
+        req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
+
+        this.loading = true;
+        //   (this.service as AdminService)
+        //     .addJWTIDP(req)
+        //     .then((idp) => {
+        //       setTimeout(() => {
+        //         this.loading = false;
+        //         this.router.navigate([
+        //           this.serviceType === PolicyComponentServiceType.MGMT
+        //             ? 'org'
+        //             : this.serviceType === PolicyComponentServiceType.ADMIN
+        //             ? 'iam'
+        //             : '',
+        //           'policy',
+        //           'login',
+        //         ]);
+        //       }, 2000);
+        //     })
+        //     .catch((error) => {
+        //       this.toast.showError(error);
+        // this.loading=false;
+        //     });
+      }
     }
   }
 
@@ -186,13 +260,5 @@ export class ProviderJWTComponent implements OnInit, OnDestroy {
 
   public get jwtKeysEndpoint(): AbstractControl | null {
     return this.jwtFormGroup.get('jwtKeysEndpoint');
-  }
-
-  public get jwtStylingType(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtStylingType');
-  }
-
-  public get jwtAutoRegister(): AbstractControl | null {
-    return this.jwtFormGroup.get('jwtAutoRegister');
   }
 }
