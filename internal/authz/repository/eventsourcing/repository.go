@@ -2,12 +2,12 @@ package eventsourcing
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/authz/repository"
 	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
 	authz_view "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
@@ -18,7 +18,7 @@ type EsRepository struct {
 	eventstore.TokenVerifierRepo
 }
 
-func Start(queries *query.Queries, dbClient *sql.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
+func Start(queries *query.Queries, dbClient *database.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err

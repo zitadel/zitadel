@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -108,7 +109,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, queryArgs, scan := prepareMembershipsQuery(withOwnerRemoved)
+	query, queryArgs, scan := prepareMembershipsQuery(ctx, q.client, withOwnerRemoved)
 	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -221,7 +222,7 @@ func getMembershipFromQuery(withOwnerRemoved bool) (string, []interface{}) {
 		args
 }
 
-func prepareMembershipsQuery(withOwnerRemoved bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
+func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerRemoved bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
 	query, args := getMembershipFromQuery(withOwnerRemoved)
 	return sq.Select(
 			membershipUserID.identifier(),
@@ -241,7 +242,7 @@ func prepareMembershipsQuery(withOwnerRemoved bool) (sq.SelectBuilder, []interfa
 		).From(query).
 			LeftJoin(join(ProjectColumnID, membershipProjectID)).
 			LeftJoin(join(OrgColumnID, membershipOrgID)).
-			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		args,
 		func(rows *sql.Rows) (*Memberships, error) {

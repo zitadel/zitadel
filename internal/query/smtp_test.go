@@ -12,6 +12,35 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
+var (
+	prepareSMTPConfigStmt = `SELECT projections.smtp_configs.aggregate_id,` +
+		` projections.smtp_configs.creation_date,` +
+		` projections.smtp_configs.change_date,` +
+		` projections.smtp_configs.resource_owner,` +
+		` projections.smtp_configs.sequence,` +
+		` projections.smtp_configs.tls,` +
+		` projections.smtp_configs.sender_address,` +
+		` projections.smtp_configs.sender_name,` +
+		` projections.smtp_configs.host,` +
+		` projections.smtp_configs.username,` +
+		` projections.smtp_configs.password` +
+		` FROM projections.smtp_configs` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareSMTPConfigCols = []string{
+		"aggregate_id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"sequence",
+		"tls",
+		"sender_address",
+		"sender_name",
+		"smtp_host",
+		"smtp_user",
+		"smtp_password",
+	}
+)
+
 func Test_SMTPConfigsPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -28,18 +57,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 			prepare: prepareSMTPConfigQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					`SELECT projections.smtp_configs.aggregate_id,`+
-						` projections.smtp_configs.creation_date,`+
-						` projections.smtp_configs.change_date,`+
-						` projections.smtp_configs.resource_owner,`+
-						` projections.smtp_configs.sequence,`+
-						` projections.smtp_configs.tls,`+
-						` projections.smtp_configs.sender_address,`+
-						` projections.smtp_configs.sender_name,`+
-						` projections.smtp_configs.host,`+
-						` projections.smtp_configs.username,`+
-						` projections.smtp_configs.password`+
-						` FROM projections.smtp_configs`,
+					prepareSMTPConfigStmt,
 					nil,
 					nil,
 				),
@@ -57,31 +75,8 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 			prepare: prepareSMTPConfigQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.smtp_configs.aggregate_id,`+
-						` projections.smtp_configs.creation_date,`+
-						` projections.smtp_configs.change_date,`+
-						` projections.smtp_configs.resource_owner,`+
-						` projections.smtp_configs.sequence,`+
-						` projections.smtp_configs.tls,`+
-						` projections.smtp_configs.sender_address,`+
-						` projections.smtp_configs.sender_name,`+
-						` projections.smtp_configs.host,`+
-						` projections.smtp_configs.username,`+
-						` projections.smtp_configs.password`+
-						` FROM projections.smtp_configs`),
-					[]string{
-						"aggregate_id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"tls",
-						"sender_address",
-						"sender_name",
-						"smtp_host",
-						"smtp_user",
-						"smtp_password",
-					},
+					regexp.QuoteMeta(prepareSMTPConfigStmt),
+					prepareSMTPConfigCols,
 					[]driver.Value{
 						"agg-id",
 						testNow,
@@ -116,18 +111,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 			prepare: prepareSMTPConfigQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.smtp_configs.aggregate_id,`+
-						` projections.smtp_configs.creation_date,`+
-						` projections.smtp_configs.change_date,`+
-						` projections.smtp_configs.resource_owner,`+
-						` projections.smtp_configs.sequence,`+
-						` projections.smtp_configs.tls,`+
-						` projections.smtp_configs.sender_address,`+
-						` projections.smtp_configs.sender_name,`+
-						` projections.smtp_configs.host,`+
-						` projections.smtp_configs.username,`+
-						` projections.smtp_configs.password`+
-						` FROM projections.smtp_configs`),
+					regexp.QuoteMeta(prepareSMTPConfigStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -142,7 +126,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

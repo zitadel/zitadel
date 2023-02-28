@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
 	"github.com/zitadel/logging"
@@ -53,8 +54,8 @@ func initDB(db *sql.DB) error {
 
 	err := initialise.Init(db,
 		initialise.VerifyUser(config.Username(), ""),
-		initialise.VerifyDatabase(config.Database()),
-		initialise.VerifyGrant(config.Database(), config.Username()))
+		initialise.VerifyDatabase(config.DatabaseName()),
+		initialise.VerifyGrant(config.DatabaseName(), config.Username()))
 	if err != nil {
 		return err
 	}
@@ -66,3 +67,13 @@ func fillUniqueData(unique_type, field, instanceID string) error {
 	_, err := testCRDBClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
 	return err
 }
+
+type testDB struct{}
+
+func (_ *testDB) Timetravel(time.Duration) string { return " AS OF SYSTEM TIME '-1 ms' " }
+
+func (*testDB) DatabaseName() string { return "db" }
+
+func (*testDB) Username() string { return "user" }
+
+func (*testDB) Type() string { return "type" }
