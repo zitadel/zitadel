@@ -49,6 +49,7 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 
 func (s *Session) validateToken(ctx context.Context, token string) (oidc.IDTokenClaims, error) {
 	logging.Debug("begin token validation")
+	// TODO: be able to specify them in the template: https://github.com/zitadel/zitadel/issues/5322
 	offset := 3 * time.Second
 	maxAge := time.Hour
 	claims := oidc.EmptyIDTokenClaims()

@@ -194,8 +194,6 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
-	case domain.IDPTypeJWT:
-		// TODO: ?
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -203,7 +201,8 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
-	case domain.IDPTypeOAuth,
+	case domain.IDPTypeJWT,
+		domain.IDPTypeOAuth,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeAzureAD,
 		domain.IDPTypeGitHub,
@@ -318,7 +317,7 @@ func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, a
 		return
 	}
 
-	// TODO: how do we get multiple and why do we use the last of them (taken as is)?
+	// TODO (LS): how do we get multiple and why do we use the last of them (taken as is)?
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 
 	l.registerExternalUser(w, r, authReq, linkingUser)
@@ -347,6 +346,8 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 	}
 
 	if human == nil || idpLink == nil {
+
+		// TODO (LS): how do we get multiple and why do we use the last of them (taken as is)?
 		linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 		human, idpLink, _ = mapExternalUserToLoginUser(linkingUser, orgIAMPolicy.UserLoginMustBeDomain)
 	}

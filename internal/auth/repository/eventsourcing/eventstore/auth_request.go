@@ -858,7 +858,10 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 		idQuery, externalIDQuery,
 	}
 	if request.RequestedOrgID != "" {
-		orgIDQuery, _ := query.NewIDPUserLinksResourceOwnerSearchQuery(idpConfigID)
+		orgIDQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(idpConfigID)
+		if err != nil {
+			return err
+		}
 		queries = append(queries, orgIDQuery)
 	}
 	links, err := repo.Query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
