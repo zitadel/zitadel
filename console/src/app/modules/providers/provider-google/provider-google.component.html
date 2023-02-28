@@ -65,6 +65,12 @@
             </cnsl-form-field>
           </div>
         </cnsl-card>
+
+        <cnsl-provider-options
+          *ngIf="options"
+          [initialOptions]="options.toObject()"
+          (optionsChanged)="options = $event"
+        ></cnsl-provider-options>
       </div>
 
       <div class="google-create-actions">

@@ -14,6 +14,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { CardModule } from '../../card/card.module';
 import { CreateLayoutModule } from '../../create-layout/create-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
+import { ProviderOptionsModule } from '../../provider-options/provider-options.module';
 import { ProviderGoogleRoutingModule } from './provider-google-routing.module';
 import { ProviderGoogleComponent } from './provider-google.component';
 
@@ -35,6 +36,7 @@ import { ProviderGoogleComponent } from './provider-google.component';
     MatCheckboxModule,
     MatTooltipModule,
     TranslateModule,
+    ProviderOptionsModule,
     MatLegacyProgressSpinnerModule,
   ],
 })

@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGoogleProviderRequest as AdminUpdateGoogleProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGoogleProviderRequest as MgmtAddGoogleProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -29,6 +29,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   styleUrls: ['./provider-google.component.scss'],
 })
 export class ProviderGoogleComponent {
+  public options: Options = new Options();
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
@@ -100,6 +101,7 @@ export class ProviderGoogleComponent {
       .getProviderByID(req)
       .then((resp) => {
         this.provider = resp.idp;
+        console.log(this.provider);
         this.loading = false;
         if (this.provider?.config?.google) {
           this.form.patchValue(this.provider.config.google);
@@ -124,6 +126,7 @@ export class ProviderGoogleComponent {
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       (this.service as ManagementService)
@@ -144,6 +147,7 @@ export class ProviderGoogleComponent {
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       (this.service as AdminService)
@@ -169,6 +173,8 @@ export class ProviderGoogleComponent {
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
         req.setScopesList(this.scopesList?.value);
+        req.setProviderOptions(this.options);
+
         if (this.updateClientSecret) {
           req.setClientSecret(this.clientSecret?.value);
         }
@@ -191,8 +197,12 @@ export class ProviderGoogleComponent {
         req.setId(this.provider.id);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
         req.setScopesList(this.scopesList?.value);
+        req.setProviderOptions(this.options);
+
+        if (this.updateClientSecret) {
+          req.setClientSecret(this.clientSecret?.value);
+        }
 
         this.loading = true;
         (this.service as AdminService)
