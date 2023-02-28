@@ -1,4 +1,7 @@
-<cnsl-create-layout title="{{ (provider ? 'IDP.CREATE.TITLE' : 'IDP.DETAIL.TITLE') | translate }}" (closed)="close()">
+<cnsl-create-layout
+  title="{{ id ? ('IDP.DETAIL.TITLE' | translate) : ('IDP.CREATE.TITLE' | translate) }}"
+  (closed)="close()"
+>
   <div class="jwt-create-content">
     <div class="title-row">
       <mat-icon class="idp-logo" svgIcon="mdi_jwt" alt="jwt" />
@@ -34,8 +37,8 @@
 
       <div class="jwt-create-actions">
         <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
-          <span *ngIf="provider">{{ 'ACTIONS.SAVE' | translate }}</span>
-          <span *ngIf="!provider">{{ 'ACTIONS.CREATE' | translate }}</span>
+          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
+          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
         </button>
       </div>
     </form>

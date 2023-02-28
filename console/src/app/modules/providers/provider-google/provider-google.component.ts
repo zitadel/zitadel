@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute, Router } from '@angular/router';
-import { take } from 'rxjs/operators';
+import { take } from 'rxjs';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -29,6 +29,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   styleUrls: ['./provider-google.component.scss'],
 })
 export class ProviderGoogleComponent {
+  public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
 
@@ -47,22 +48,11 @@ export class ProviderGoogleComponent {
     private toast: ToastService,
     private injector: Injector,
     private _location: Location,
-    breadcrumbService: BreadcrumbService,
+    private breadcrumbService: BreadcrumbService,
   ) {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.getData(id);
-    }
-
-    this.form = new FormGroup({
-      name: new FormControl('', [Validators.required]),
-      clientId: new FormControl('', [Validators.required]),
-      clientSecret: new FormControl('', []),
-      scopesList: new FormControl(['openid', 'profile', 'email'], []),
-    });
-
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
+
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
@@ -72,7 +62,7 @@ export class ProviderGoogleComponent {
             routerLink: ['/org'],
           };
 
-          breadcrumbService.setBreadcrumb([bread]);
+          this.breadcrumbService.setBreadcrumb([bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
@@ -82,9 +72,21 @@ export class ProviderGoogleComponent {
             name: 'Instance',
             routerLink: ['/instance'],
           });
-          breadcrumbService.setBreadcrumb([iamBread]);
+          this.breadcrumbService.setBreadcrumb([iamBread]);
           break;
       }
+
+      this.id = this.route.snapshot.paramMap.get('id');
+      if (this.id) {
+        this.getData(this.id);
+      }
+    });
+
+    this.form = new FormGroup({
+      name: new FormControl('', [Validators.required]),
+      clientId: new FormControl('', [Validators.required]),
+      clientSecret: new FormControl('', []),
+      scopesList: new FormControl(['openid', 'profile', 'email'], []),
     });
   }
 
@@ -94,14 +96,20 @@ export class ProviderGoogleComponent {
         ? new AdminGetProviderByIDRequest()
         : new MgmtGetProviderByIDRequest();
     req.setId(id);
-    this.service.getProviderByID(req).then((resp) => {
-      this.provider = resp.idp;
-      console.log(this.provider);
-      if (this.provider?.config?.google) {
-        this.form.patchValue(this.provider.config.google);
-        this.name?.setValue(this.provider.name);
-      }
-    });
+    this.service
+      .getProviderByID(req)
+      .then((resp) => {
+        this.provider = resp.idp;
+        this.loading = false;
+        if (this.provider?.config?.google) {
+          this.form.patchValue(this.provider.config.google);
+          this.name?.setValue(this.provider.name);
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public submitForm(): void {

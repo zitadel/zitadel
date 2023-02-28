@@ -1,10 +1,10 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, Injector, OnInit, Type } from '@angular/core';
+import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { take } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { take } from 'rxjs';
 import {
   AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -28,7 +28,9 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   templateUrl: './provider-oidc.component.html',
   styleUrls: ['./provider-oidc.component.scss'],
 })
-export class ProviderOIDCComponent implements OnInit {
+export class ProviderOIDCComponent {
+  public id: string | null = '';
+  public updateClientSecret: boolean = false;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -37,7 +39,6 @@ export class ProviderOIDCComponent implements OnInit {
   public loading: boolean = false;
 
   public provider?: Provider.AsObject;
-  public updateClientSecret: boolean = false;
 
   constructor(
     private router: Router,
@@ -47,19 +48,9 @@ export class ProviderOIDCComponent implements OnInit {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    this.oidcFormGroup = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      clientId: new UntypedFormControl('', [Validators.required]),
-      clientSecret: new UntypedFormControl('', [Validators.required]),
-      issuer: new UntypedFormControl('', [Validators.required]),
-      scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
-      idpDisplayNameMapping: new UntypedFormControl(0),
-      usernameMapping: new UntypedFormControl(0),
-      autoRegister: new UntypedFormControl(false),
-    });
-
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
+
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
@@ -82,27 +73,46 @@ export class ProviderOIDCComponent implements OnInit {
           breadcrumbService.setBreadcrumb([iamBread]);
           break;
       }
+
+      this.id = this.route.snapshot.paramMap.get('id');
+      if (this.id) {
+        this.getData(this.id);
+      }
+    });
+
+    this.oidcFormGroup = new UntypedFormGroup({
+      name: new UntypedFormControl('', [Validators.required]),
+      clientId: new UntypedFormControl('', [Validators.required]),
+      clientSecret: new UntypedFormControl('', []),
+      issuer: new UntypedFormControl('', [Validators.required]),
+      scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
+      idpDisplayNameMapping: new UntypedFormControl(0),
+      usernameMapping: new UntypedFormControl(0),
+      autoRegister: new UntypedFormControl(false),
     });
   }
 
-  public ngOnInit(): void {
-    this.route.params.pipe(take(1)).subscribe((params) => this.getData(params));
-  }
-
-  private getData({ id }: Params): void {
+  private getData(id: string): void {
+    this.loading = true;
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
         ? new AdminGetProviderByIDRequest()
         : new MgmtGetProviderByIDRequest();
     req.setId(id);
-    this.service.getProviderByID(req).then((resp) => {
-      this.provider = resp.idp;
-      console.log(this.provider);
-      if (this.provider?.config?.google) {
-        this.oidcFormGroup.patchValue(this.provider.config.google);
-        this.name?.setValue(this.provider.name);
-      }
-    });
+    this.service
+      .getProviderByID(req)
+      .then((resp) => {
+        this.provider = resp.idp;
+        this.loading = false;
+        if (this.provider?.config?.oidc) {
+          this.oidcFormGroup.patchValue(this.provider.config.oidc);
+          this.name?.setValue(this.provider.name);
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public submitForm(): void {

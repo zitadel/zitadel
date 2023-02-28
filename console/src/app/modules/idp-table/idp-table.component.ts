@@ -53,7 +53,7 @@ export class IdpTableComponent implements OnInit {
   public IDPOwnerType: any = IDPOwnerType;
   public IDPState: any = IDPState;
   public ProviderType: any = ProviderType;
-  public displayedColumns: string[] = ['availability', 'name', 'type', 'creationDate', 'changeDate', 'state', 'actions'];
+  public displayedColumns: string[] = ['availability', 'name', 'type', 'creationDate', 'changeDate', 'actions'];
   @Output() public changedSelection: EventEmitter<Array<Provider.AsObject>> = new EventEmitter();
 
   public idps: IDPLoginPolicyLink.AsObject[] = [];
@@ -73,7 +73,7 @@ export class IdpTableComponent implements OnInit {
     });
 
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      this.displayedColumns = ['availability', 'name', 'type', 'owner', 'creationDate', 'changeDate', 'state', 'actions'];
+      this.displayedColumns = ['availability', 'name', 'type', 'owner', 'creationDate', 'changeDate', 'actions'];
     }
   }
 

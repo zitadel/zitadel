@@ -28,6 +28,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   styleUrls: ['./provider-jwt.component.scss'],
 })
 export class ProviderJWTComponent {
+  public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -45,10 +46,37 @@ export class ProviderJWTComponent {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.getData(id);
-    }
+    this.route.data.pipe(take(1)).subscribe((data) => {
+      this.serviceType = data.serviceType;
+
+      switch (this.serviceType) {
+        case PolicyComponentServiceType.MGMT:
+          this.service = this.injector.get(ManagementService as Type<ManagementService>);
+
+          const bread: Breadcrumb = {
+            type: BreadcrumbType.ORG,
+            routerLink: ['/org'],
+          };
+
+          breadcrumbService.setBreadcrumb([bread]);
+          break;
+        case PolicyComponentServiceType.ADMIN:
+          this.service = this.injector.get(AdminService as Type<AdminService>);
+
+          const iamBread = new Breadcrumb({
+            type: BreadcrumbType.ORG,
+            name: 'Instance',
+            routerLink: ['/instance'],
+          });
+          breadcrumbService.setBreadcrumb([iamBread]);
+          break;
+      }
+
+      this.id = this.route.snapshot.paramMap.get('id');
+      if (this.id) {
+        this.getData(this.id);
+      }
+    });
 
     this.form = new UntypedFormGroup({
       name: new UntypedFormControl('', [Validators.required]),
@@ -91,13 +119,20 @@ export class ProviderJWTComponent {
         ? new AdminGetProviderByIDRequest()
         : new MgmtGetProviderByIDRequest();
     req.setId(id);
-    this.service.getProviderByID(req).then((resp) => {
-      this.provider = resp.idp;
-      if (this.provider?.config?.jwt) {
-        this.form.patchValue(this.provider.config.jwt);
-        this.name?.setValue(this.provider.name);
-      }
-    });
+    this.service
+      .getProviderByID(req)
+      .then((resp) => {
+        this.provider = resp.idp;
+        this.loading = false;
+        if (this.provider?.config?.jwt) {
+          this.form.patchValue(this.provider.config.jwt);
+          this.name?.setValue(this.provider.name);
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public submitForm(): void {

@@ -1,5 +1,5 @@
 <cnsl-create-layout
-  title="{{ !provider ? ('IDP.CREATE.TITLE' | translate) : ('IDP.DETAIL.TITLE' | translate) }}"
+  title="{{ id ? ('IDP.DETAIL.TITLE' | translate) : ('IDP.CREATE.TITLE' | translate) }}"
   (closed)="close()"
 >
   <div class="google-create-content">
@@ -69,8 +69,8 @@
 
       <div class="google-create-actions">
         <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
-          <span *ngIf="provider">{{ 'ACTIONS.SAVE' | translate }}</span>
-          <span *ngIf="!provider">{{ 'ACTIONS.CREATE' | translate }}</span>
+          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
+          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
         </button>
       </div>
     </form>
