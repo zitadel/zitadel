@@ -17,11 +17,6 @@ func (l *Login) getOrgDomainPolicy(r *http.Request, orgID string) (*query.Domain
 	return l.query.DomainPolicyByOrg(r.Context(), false, orgID, false)
 }
 
-//
-//func (l *Login) getIDPConfigByID(r *http.Request, idpConfigID string) (*iam_model.IDPConfigView, error) {
-//	return l.authRepo.GetIDPConfigByID(r.Context(), idpConfigID)
-//}
-
 func (l *Login) getIDPByID(r *http.Request, id string) (*query.IDPTemplate, error) {
 	return l.query.IDPTemplateByID(r.Context(), false, id, false)
 }

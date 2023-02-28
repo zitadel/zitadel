@@ -597,7 +597,6 @@ func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain 
 		IDPConfigID:    externalUser.IDPConfigID,
 		ExternalUserID: externalUser.ExternalUserID,
 		DisplayName:    externalUser.DisplayName,
-		NewVersion:     true,
 	}
 	return human, externalIDP, externalUser.Metadatas
 }

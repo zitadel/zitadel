@@ -79,9 +79,7 @@ type lockoutPolicyViewProvider interface {
 }
 
 type idpProviderViewProvider interface {
-	//IDPProvidersByAggregateIDAndState(string, string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
 	IDPLoginPolicyLinks(context.Context, string, *query.IDPLoginPolicyLinksSearchQuery, bool) (*query.IDPLoginPolicyLinks, error)
-	//IDPProvidersByAggregateIDAndState(string, string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
 }
 
 type idpUserLinksProvider interface {
@@ -558,8 +556,6 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	if err != nil {
 		return nil, nil, err
 	}
-	//
-	//providers := iam_model.IdpProviderViewsToDomain(idpProviders)
 	return policy, idpProviders, nil
 }
 
@@ -850,7 +846,6 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 }
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
-
 	idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpConfigID)
 	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUserID)
 	queries := []query.SearchQuery{
@@ -861,12 +856,6 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 		queries = append(queries, orgIDQuery)
 	}
 	links, err := repo.Query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
-	//var externalIDP *user_view_model.ExternalIDPView
-	//if request.RequestedOrgID != "" {
-	//	externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID, request.InstanceID)
-	//} else {
-	//	externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID, request.InstanceID)
-	//}
 	if err != nil {
 		return err
 	}
@@ -1262,31 +1251,10 @@ func getLoginPolicyIDPProviders(ctx context.Context, provider idpProviderViewPro
 			Type:        link.OwnerType,
 			IDPConfigID: link.IDPID,
 			Name:        link.IDPName,
-			//StylingType: domain.IDPConfigStylingTypeGoogle,
-			IDPType: link.IDPType,
+			IDPType:     link.IDPType,
 		}
 	}
 	return providers, nil
-	//queries := make([]query.SearchQuery, 0, 3)
-	//queries = append(queries)
-	//for i, link := range links.Links {
-	//	link.
-	//}
-	//query.NewIDPTemplateIDsSearchQuery()
-	//
-	//q.IDPLoginPolicyLinks(nil, queries, false)
-	//if defaultPolicy {
-	//	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(iamID, iamID, iam_model.IDPConfigStateActive)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
-	//}
-	//idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iamID, iam_model.IDPConfigStateActive)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
 }
 
 func checkVerificationTimeMaxAge(verificationTime time.Time, lifetime time.Duration, request *domain.AuthRequest) bool {
@@ -1431,7 +1399,6 @@ func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvid
 			IDPConfigID:    linkingUser.IDPConfigID,
 			ExternalUserID: linkingUser.ExternalUserID,
 			DisplayName:    linkingUser.DisplayName,
-			NewVersion:     true,
 		}
 		externalIDPs[i] = externalIDP
 	}

@@ -403,13 +403,6 @@ func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, i
 	if !withOwnerRemoved {
 		eq[IDPTemplateOwnerRemovedCol.identifier()] = false
 	}
-	//where := sq.And{
-	//	eq,
-	//	sq.Or{
-	//		sq.Eq{IDPTemplateResourceOwnerCol.identifier(): resourceOwner},
-	//		sq.Eq{IDPTemplateResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID()},
-	//	},
-	//}
 	query, scan := prepareIDPTemplateByIDQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)

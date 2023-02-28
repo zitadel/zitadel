@@ -8,7 +8,6 @@ type UserIDPLink struct {
 	IDPConfigID    string
 	ExternalUserID string
 	DisplayName    string
-	NewVersion     bool
 }
 
 func (idp *UserIDPLink) IsValid() bool {

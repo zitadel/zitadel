@@ -66,17 +66,6 @@ func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggrega
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid")
 	}
 
-	//TODO: remove NewVersion
-	if !link.NewVersion {
-		_, err := c.getOrgIDPConfigByID(ctx, link.IDPConfigID, human.ResourceOwner)
-		if caos_errs.IsNotFound(err) {
-			_, err = c.getInstanceIDPConfigByID(ctx, link.IDPConfigID)
-		}
-		if err != nil {
-			return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-39nfs", "Errors.IDPConfig.NotExisting")
-		}
-		return user.NewUserIDPLinkAddedEvent(ctx, human, link.IDPConfigID, link.DisplayName, link.ExternalUserID), nil
-	}
 	exists, err := ExistsIDP(ctx, c.eventstore.Filter, link.IDPConfigID, human.ResourceOwner)
 	if !exists || err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-39nfs", "Errors.IDPConfig.NotExisting")
