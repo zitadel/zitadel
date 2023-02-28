@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
@@ -249,11 +250,22 @@ func (l *Login) handleExternalUserAuthenticated(
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser)
 		return
 	}
-	if len(externalUser.Metadatas) > 0 {
-		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.ID)
+	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 {
+		// read current auth request state (incl. authorized user)
+		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 		if err != nil {
+			l.renderError(w, r, authReq, err)
 			return
 		}
+	}
+	if provider.IsAutoUpdate {
+		err = l.updateExternalUser(r.Context(), authReq, externalUser)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
+	}
+	if len(externalUser.Metadatas) > 0 {
 		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
@@ -483,6 +495,63 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		return
 	}
 	l.renderNextStep(w, r, authReq)
+}
+
+// updateExternalUser will update the existing user (email, phone, profile) with data provided by the IDP
+func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
+	user, err := l.query.GetUserByID(ctx, true, authReq.UserID, false)
+	if err != nil {
+		return err
+	}
+	if user.Human == nil {
+		return errors.ThrowPreconditionFailed(nil, "LOGIN-WLTce", "Errors.User.NotHuman")
+	}
+	if externalUser.Email != "" && externalUser.Email != user.Human.Email && externalUser.IsEmailVerified != user.Human.IsEmailVerified {
+		emailCodeGenerator, err := l.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
+		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update email")
+		if err == nil {
+			_, err = l.command.ChangeHumanEmail(setContext(ctx, authReq.UserOrgID),
+				&domain.Email{
+					ObjectRoot:      models.ObjectRoot{AggregateID: authReq.UserID},
+					EmailAddress:    externalUser.Email,
+					IsEmailVerified: externalUser.IsEmailVerified,
+				},
+				emailCodeGenerator)
+			logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update email")
+		}
+	}
+	if externalUser.Phone != "" && externalUser.Phone != user.Human.Phone && externalUser.IsPhoneVerified != user.Human.IsPhoneVerified {
+		phoneCodeGenerator, err := l.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
+		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update phone")
+		if err == nil {
+			_, err = l.command.ChangeHumanPhone(setContext(ctx, authReq.UserOrgID),
+				&domain.Phone{
+					ObjectRoot:      models.ObjectRoot{AggregateID: authReq.UserID},
+					PhoneNumber:     externalUser.Phone,
+					IsPhoneVerified: externalUser.IsPhoneVerified,
+				},
+				authReq.UserOrgID,
+				phoneCodeGenerator)
+			logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update phone")
+		}
+	}
+	if externalUser.FirstName != user.Human.FirstName ||
+		externalUser.LastName != user.Human.LastName ||
+		externalUser.NickName != user.Human.NickName ||
+		externalUser.DisplayName != user.Human.DisplayName ||
+		externalUser.PreferredLanguage != user.Human.PreferredLanguage {
+		_, err = l.command.ChangeHumanProfile(setContext(ctx, authReq.UserOrgID), &domain.Profile{
+			ObjectRoot:        models.ObjectRoot{AggregateID: authReq.UserID},
+			FirstName:         externalUser.FirstName,
+			LastName:          externalUser.LastName,
+			NickName:          externalUser.NickName,
+			DisplayName:       externalUser.DisplayName,
+			PreferredLanguage: externalUser.PreferredLanguage,
+			Gender:            user.Human.Gender,
+		})
+		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update profile")
+	}
+	return nil
 }
 
 func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*google.Provider, error) {
