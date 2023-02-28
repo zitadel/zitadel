@@ -26,7 +26,7 @@ type EventEditor struct {
 func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQueryBuilder) (_ []*Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	events, err := q.eventstore.Filter(ctx, query)
+	events, err := q.eventstore.Filter(ctx, query.AllowTimeTravel())
 	if err != nil {
 		return nil, err
 	}

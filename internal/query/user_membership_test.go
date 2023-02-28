@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -88,7 +89,8 @@ var (
 			") AS memberships" +
 			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id AND memberships.instance_id = projections.projects3.instance_id" +
 			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +
-			" LEFT JOIN projections.project_grants3 ON memberships.grant_id = projections.project_grants3.grant_id AND memberships.instance_id = projections.project_grants3.instance_id")
+			" LEFT JOIN projections.project_grants3 ON memberships.grant_id = projections.project_grants3.grant_id AND memberships.instance_id = projections.project_grants3.instance_id" +
+			` AS OF SYSTEM TIME '-1 ms'`)
 	membershipCols = []string{
 		"user_id",
 		"roles",
@@ -447,14 +449,14 @@ func Test_MembershipPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
 
-func prepareMembershipWrapper(withOwnerRemoved bool) func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
-	builder, _, fun := prepareMembershipsQuery(withOwnerRemoved)
-	return func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+func prepareMembershipWrapper(withOwnerRemoved bool) func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+	return func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+		builder, _, fun := prepareMembershipsQuery(ctx, db, withOwnerRemoved)
 		return builder, fun
 	}
 }

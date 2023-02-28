@@ -3,6 +3,7 @@ package dialect
 import (
 	"database/sql"
 	"sync"
+	"time"
 )
 
 type Config struct {
@@ -29,10 +30,15 @@ type Matcher interface {
 
 type Connector interface {
 	Connect(useAdmin bool) (*sql.DB, error)
+	Password() string
+	Database
+}
+
+type Database interface {
 	DatabaseName() string
 	Username() string
-	Password() string
 	Type() string
+	Timetravel(time.Duration) string
 }
 
 func Register(matcher Matcher, config Connector, isDefault bool) {

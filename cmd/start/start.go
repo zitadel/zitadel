@@ -3,7 +3,6 @@ package start
 import (
 	"context"
 	"crypto/tls"
-	"database/sql"
 	_ "embed"
 	"fmt"
 	"net"
@@ -95,7 +94,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start client for projection: %w", err)
 	}
 
-	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient.DB, masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
@@ -120,7 +119,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
 
-	storage, err := config.AssetStorage.NewStorage(dbClient)
+	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
 	if err != nil {
 		return fmt.Errorf("cannot start asset storage client: %w", err)
 	}
@@ -162,7 +161,7 @@ func startZitadel(config *Config, masterKey string) error {
 	}
 
 	usageReporter := logstore.UsageReporterFunc(commands.ReportUsage)
-	actionsLogstoreSvc := logstore.New(commands, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
+	actionsLogstoreSvc := logstore.New(queries, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	if actionsLogstoreSvc.Enabled() {
 		logging.Warn("execution logs are currently in beta")
 	}
@@ -175,7 +174,7 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, commands, usageReporter)
+	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, queries, usageReporter)
 	if err != nil {
 		return err
 	}
@@ -189,7 +188,7 @@ func startAPIs(
 	commands *command.Commands,
 	queries *query.Queries,
 	eventstore *eventstore.Eventstore,
-	dbClient *sql.DB,
+	dbClient *database.DB,
 	config *Config,
 	store static.Storage,
 	authZRepo authz_repo.Repository,
@@ -233,10 +232,10 @@ func startAPIs(
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.Database(), config.DefaultInstance, config.ExternalDomain)); err != nil {
+	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.Database(), commands, queries, config.SystemDefaults, adminRepo, config.ExternalSecure, keys.User)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, adminRepo, config.ExternalSecure, keys.User)); err != nil {
 		return err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
@@ -247,7 +246,7 @@ func startAPIs(
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
-	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle))
+	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources)
 	if err != nil {
@@ -272,7 +271,7 @@ func startAPIs(
 	}
 	apis.RegisterHandler(saml.HandlerPrefix, samlProvider.HttpHandler())
 
-	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, instanceInterceptor.Handler, accessInterceptor.Handle, config.CustomerPortal)
+	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, accessInterceptor.Handle, config.CustomerPortal)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
