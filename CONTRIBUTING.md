@@ -166,7 +166,14 @@ DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zit
 (cd ./e2e && npm run lint:fix)
 
 # Run the tests
-ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/docker-compose.yaml run --service-ports e2e
+ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml run --service-ports e2e
+```
+
+When you are happy with your changes, you can cleanup your environment.
+
+```bash
+# Stop and remove the docker containers for zitadel and the database
+docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ```
 
 #### Running the tests without docker
@@ -189,7 +196,7 @@ When you are happy with your changes, you can cleanup your environment.
 
 ```bash
 # Stop and remove the docker containers for zitadel and the database
-docker compose --file ./e2e/docker-compose.yaml down
+docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ```
 
 ### Console
