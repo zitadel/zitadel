@@ -95,6 +95,7 @@ message IDPLoginPolicyLink {
     ];
     IDPType idp_type = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"IDP_TYPE_OIDC\"]"
             description: "the authorization framework of the identity provider";
         }
     ];
