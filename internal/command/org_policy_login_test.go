@@ -755,106 +755,106 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "resourceowner missing, invalid argument error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//		),
-		//	},
-		//	args: args{
-		//		ctx: context.Background(),
-		//		provider: &domain.IDPProvider{
-		//			IDPConfigID: "config1",
-		//			Name:        "name",
-		//			Type:        domain.IdentityProviderTypeOrg,
-		//		},
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsErrorInvalidArgument,
-		//	},
-		//},
-		//{
-		//	name: "provider invalid, invalid argument error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:           context.Background(),
-		//		resourceOwner: "org1",
-		//		provider:      &domain.IDPProvider{},
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsErrorInvalidArgument,
-		//	},
-		//},
-		//{
-		//	name: "policy not existing, not found error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:           context.Background(),
-		//		resourceOwner: "org1",
-		//		provider: &domain.IDPProvider{
-		//			IDPConfigID: "config1",
-		//			Name:        "name",
-		//			Type:        domain.IdentityProviderTypeOrg,
-		//		},
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsNotFound,
-		//	},
-		//},
-		//{
-		//	name: "config not existing, precondition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					org.NewLoginPolicyAddedEvent(context.Background(),
-		//						&org.NewAggregate("org1").Aggregate,
-		//						true,
-		//						true,
-		//						true,
-		//						true,
-		//						true,
-		//						true,
-		//						true,
-		//						true,
-		//						true,
-		//						domain.PasswordlessTypeAllowed,
-		//						"",
-		//						time.Hour*1,
-		//						time.Hour*2,
-		//						time.Hour*3,
-		//						time.Hour*4,
-		//						time.Hour*5,
-		//					),
-		//				),
-		//			),
-		//			expectFilter(),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:           context.Background(),
-		//		resourceOwner: "org1",
-		//		provider: &domain.IDPProvider{
-		//			IDPConfigID: "config1",
-		//			Name:        "name",
-		//			Type:        domain.IdentityProviderTypeOrg,
-		//		},
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
+		{
+			name: "resourceowner missing, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				provider: &domain.IDPProvider{
+					IDPConfigID: "config1",
+					Name:        "name",
+					Type:        domain.IdentityProviderTypeOrg,
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "provider invalid, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider:      &domain.IDPProvider{},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: &domain.IDPProvider{
+					IDPConfigID: "config1",
+					Name:        "name",
+					Type:        domain.IdentityProviderTypeOrg,
+				},
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "config not existing, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: &domain.IDPProvider{
+					IDPConfigID: "config1",
+					Name:        "name",
+					Type:        domain.IdentityProviderTypeOrg,
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
 		{
 			name: "provider already exists, already exists error",
 			fields: fields{
