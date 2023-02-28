@@ -21,7 +21,7 @@ var (
 		` projections.idp_user_links3.resource_owner,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_user_links3` +
-		` LEFT JOIN projections.idp_templates2 ON projections.idp_user_links3.idp_id = projections.idp_templates2.id AND projections.idp_user_links3.instance_id = projections.idps3.instance_id` +
+		` LEFT JOIN projections.idp_templates2 ON projections.idp_user_links3.idp_id = projections.idp_templates2.id AND projections.idp_user_links3.instance_id = projections.idp_templates2.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 	idpUserLinksCols = []string{
 		"idp_id",
