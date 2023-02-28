@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -140,8 +141,9 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.jwtProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
+	case domain.IDPTypeLDAP:
+		provider, err = l.ldapProvider(r.Context(), identityProvider)
 	case domain.IDPTypeOAuth,
-		domain.IDPTypeLDAP,
 		domain.IDPTypeAzureAD,
 		domain.IDPTypeGitHub,
 		domain.IDPTypeGitHubEE,
@@ -600,6 +602,28 @@ func (l *Login) jwtProvider(ctx context.Context, identityProvider *query.IDPTemp
 	)
 }
 
+func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*ldap.Provider, error) {
+	password, err := crypto.DecryptString(identityProvider.LDAPIDPTemplate.Password, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	var opts []ldap.ProviderOpts
+	if !identityProvider.LDAPIDPTemplate.TLS {
+		opts = append(opts, ldap.Insecure())
+	}
+	return ldap.New(
+		identityProvider.Name,
+		identityProvider.Host,
+		identityProvider.BaseDN,
+		identityProvider.UserObjectClass,
+		identityProvider.UserUniqueAttribute,
+		identityProvider.Admin,
+		password,
+		l.baseURL(ctx)+EndpointLDAPLogin+"?"+QueryAuthRequestID+"=",
+		opts...,
+	), nil
+}
+
 func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserGrant, resourceOwner string) error {
 	if len(userGrants) == 0 {
 		return nil
@@ -631,7 +655,12 @@ func tokens(session idp.Session) *oidc.Tokens {
 	case *jwt.Session:
 		return s.Tokens
 	}
-	return nil
+	return &oidc.Tokens{
+		Token: &oauth2.Token{
+			AccessToken: "",
+		},
+		IDToken: "",
+	}
 }
 
 func mapIDPUserToExternalUser(user idp.User, id string) *domain.ExternalUser {

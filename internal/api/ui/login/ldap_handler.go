@@ -3,7 +3,6 @@ package login
 import (
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 )
@@ -44,39 +43,23 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idpTemplate, err := l.getIDPTemplateByID(r, "199408199776862496", "202307103371559120")
+	identityProvider, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
 
-	password, err := crypto.DecryptString(idpTemplate.Password, l.idpConfigAlg)
+	provider, err := l.ldapProvider(r.Context(), identityProvider)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	session := &ldap.Session{Provider: provider, User: data.Username, Password: data.Password}
 
-	provider := ldap.New(
-		idpTemplate.Name,
-		idpTemplate.Host,
-		idpTemplate.BaseDN,
-		idpTemplate.UserObjectClass,
-		idpTemplate.UserUniqueAttribute,
-		idpTemplate.Admin,
-		password,
-		"not used",
-		ldap.Insecure(),
-	)
-
-	session, err := provider.BeginAuth(r.Context(), authReq.ID, data.Username, data.Password)
+	user, err := session.FetchUser(r.Context())
 	if err != nil {
-		l.renderError(w, r, authReq, err)
+		l.externalAuthFailed(w, r, authReq, tokens(session), err)
 		return
 	}
-
-	_, err = session.FetchUser(r.Context())
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
+	l.handleExternalUserAuthenticated(w, r, authReq, identityProvider, session, user, l.renderNextStep)
 }
