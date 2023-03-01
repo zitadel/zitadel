@@ -27,6 +27,7 @@ func TestSession_FetchUser(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		userMapper   func(oidc.UserInfo) idp.User
 		httpMock     func(issuer string)
 		authURL      string
@@ -62,6 +63,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -93,6 +95,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -141,6 +144,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -201,6 +205,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -254,7 +259,7 @@ func TestSession_FetchUser(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.userMapper)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper)
 			require.NoError(t, err)
 
 			session := &Session{

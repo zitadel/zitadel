@@ -370,6 +370,8 @@ Errors:
       ExternalUserIDEmpty: Externe User ID  ist leer
       UserDisplayNameEmpty: Benutzer Anzeige Name ist leer
       NoExternalUserData: Keine externe User Daten erhalten
+      CreationNotAllowed: Erstellen eines neuen User ist auf diesem Provider nicht erlaubt
+      LinkingNotAllowed: Linken eines Users ist auf diesem Provider nicht erlaubt
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
     ProjectRequired: Der Login an diese Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
