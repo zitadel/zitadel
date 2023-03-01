@@ -337,18 +337,28 @@ func (l *Login) runPostCreationActions(
 }
 
 func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
-	return []actions.FieldOption{
-		actions.SetFields("accessToken", tokens.AccessToken),
-		actions.SetFields("idToken", tokens.IDToken),
-		actions.SetFields("getClaim", func(claim string) interface{} {
-			return tokens.IDTokenClaims.GetClaim(claim)
-		}),
-		actions.SetFields("claimsJSON", func() (string, error) {
+	var accessToken, idToken string
+	claimsJSON := func() (string, error) {
+		return "", nil
+	}
+	getClaim := func(claim string) interface{} {
+		return nil
+	}
+	if tokens != nil {
+		accessToken = tokens.AccessToken
+		idToken = tokens.IDToken
+		claimsJSON = func() (string, error) {
 			c, err := json.Marshal(tokens.IDTokenClaims)
 			if err != nil {
 				return "", err
 			}
 			return string(c), nil
-		}),
+		}
+	}
+	return []actions.FieldOption{
+		actions.SetFields("accessToken", accessToken),
+		actions.SetFields("idToken", idToken),
+		actions.SetFields("getClaim", getClaim),
+		actions.SetFields("claimsJSON", claimsJSON),
 	}
 }

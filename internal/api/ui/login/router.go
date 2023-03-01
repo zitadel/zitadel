@@ -13,6 +13,8 @@ const (
 	EndpointLogin                    = "/login"
 	EndpointExternalLogin            = "/login/externalidp"
 	EndpointExternalLoginCallback    = "/login/externalidp/callback"
+	EndpointLDAPLogin                = "/login/ldap/login"
+	EndpointLDAPCallback             = "/login/ldap/callback"
 	EndpointJWTAuthorize             = "/login/jwt/authorize"
 	EndpointJWTCallback              = "/login/jwt/callback"
 	EndpointPasswordlessLogin        = "/login/passwordless"
@@ -44,9 +46,6 @@ const (
 
 	EndpointResources        = "/resources"
 	EndpointDynamicResources = "/resources/dynamic"
-
-	EndpointLDAPLogin    = "/ldap/login"
-	EndpointLDAPCallback = "/ldap/callback"
 )
 
 var (
