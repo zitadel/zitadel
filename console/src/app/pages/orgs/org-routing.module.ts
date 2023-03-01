@@ -15,7 +15,7 @@ const routes: Routes = [
     path: 'provider',
     canActivate: [AuthGuard, RoleGuard],
     data: {
-      roles: ['iam.idp.write'],
+      roles: ['org.idp.write'],
       serviceType: PolicyComponentServiceType.MGMT,
     },
     children: [

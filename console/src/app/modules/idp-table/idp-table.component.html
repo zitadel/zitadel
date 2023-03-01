@@ -38,15 +38,15 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.TYPE' | translate }}</th>
         <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
           <div [ngSwitch]="idp.type">
-            <div class="provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GOOGLE">
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GOOGLE">
               <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
               Google
             </div>
-            <div class="provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OIDC">
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OIDC">
               <mat-icon class="idp-icon" svgIcon="mdi_openid" alt="oidc" />
               Generic OIDC
             </div>
-            <div class="provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_JWT">
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_JWT">
               <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
               Generic JWT
             </div>

@@ -14,7 +14,7 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'google', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/instance', 'provider', 'google', 'create']
+        ? ['/org', 'provider', 'google', 'create']
         : []
     "
   >
@@ -56,7 +56,7 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'oidc', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/instance', 'provider', 'oidc', 'create']
+        ? ['/org', 'provider', 'oidc', 'create']
         : []
     "
   >
@@ -74,7 +74,7 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'jwt', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/instance', 'provider', 'jwt', 'create']
+        ? ['/org', 'provider', 'jwt', 'create']
         : []
     "
   >

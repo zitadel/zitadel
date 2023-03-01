@@ -1639,9 +1639,13 @@
     },
     "OPTIONS": {
       "ISAUTOCREATION": "is auto creating",
+      "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
       "ISAUTOUPDATE": "is auto updating",
+      "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
       "ISCREATIONALLOWED": "is creation allowed",
-      "ISLINKINGALLOWED": "is linking allowed"
+      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
+      "ISLINKINGALLOWED": "is linking allowed",
+      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
     },
     "OWNERTYPES": {
       "0": "nieznany",
@@ -1667,8 +1671,6 @@
       "1": "Google"
     },
     "ADD": "Dodaj dostawcę tożsamości",
-    "AUTOREGISTER": "Automatyczna rejestracja",
-    "AUTOREGISTER_DESC": "Jeśli zaznaczone, a konto jeszcze nie istnieje, zostanie utworzone.",
     "TYPE": "Typ",
     "OWNER": "Właściciel",
     "ID": "ID",

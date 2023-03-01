@@ -1638,9 +1638,13 @@
     },
     "OPTIONS": {
       "ISAUTOCREATION": "is auto creating",
+      "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
       "ISAUTOUPDATE": "is auto updating",
+      "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
       "ISCREATIONALLOWED": "is creation allowed",
-      "ISLINKINGALLOWED": "is linking allowed"
+      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
+      "ISLINKINGALLOWED": "is linking allowed",
+      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
     },
     "OWNERTYPES": {
       "0": "未知",
@@ -1666,8 +1670,6 @@
       "1": "Google"
     },
     "ADD": "添加身份提供者",
-    "AUTOREGISTER": "自动注册",
-    "AUTOREGISTER_DESC": "如果勾选，当使用 IDP 登录且用户不存在时，则会创建一个。",
     "TYPE": "类型",
     "OWNER": "所有者",
     "ID": "ID",

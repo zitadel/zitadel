@@ -29,6 +29,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   styleUrls: ['./provider-google.component.scss'],
 })
 export class ProviderGoogleComponent {
+  public showOptional: boolean = false;
   public options: Options = new Options();
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;

@@ -1638,10 +1638,14 @@
       "DATECHANGED": "Geändert"
     },
     "OPTIONS": {
-      "ISAUTOCREATION": "is auto creating",
-      "ISAUTOUPDATE": "is auto updating",
-      "ISCREATIONALLOWED": "is creation allowed",
-      "ISLINKINGALLOWED": "is linking allowed"
+      "ISAUTOCREATION": "Automatisches Erstellen",
+      "ISAUTOCREATION_DESC": "Wenn ausgewählt, wird ein Konto erstellt, falls es noch nicht existiert.",
+      "ISAUTOUPDATE": "Automatisches Update",
+      "ISAUTOUPDATE_DESC": "Legt fest ob Konten bei der erneuten Authentifizierung aktualisiert werden.",
+      "ISCREATIONALLOWED": "Account erstellen erlaubt",
+      "ISCREATIONALLOWED_DESC": "Legt fest, ob Konten erstellt werden können.",
+      "ISLINKINGALLOWED": "Account linking erlaubt",
+      "ISLINKINGALLOWED_DESC": "Legt fest, ob eine Identität mit einem bestehenden Konto verknüpft werden kann."
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -1667,8 +1671,6 @@
       "1": "Google"
     },
     "ADD": "Identity Provider hinzufügen",
-    "AUTOREGISTER": "Automatische Registrierung",
-    "AUTOREGISTER_DESC": "Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
     "TYPE": "Typ",
     "OWNER": "Besitzer",
     "ID": "ID",

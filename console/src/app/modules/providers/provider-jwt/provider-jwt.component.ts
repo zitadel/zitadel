@@ -50,6 +50,7 @@ export class ProviderJWTComponent {
   ) {
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
+      console.log(data.serviceType);
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
@@ -86,32 +87,6 @@ export class ProviderJWTComponent {
       issuer: new UntypedFormControl('', [Validators.required]),
       jwtEndpoint: new UntypedFormControl('', [Validators.required]),
       keysEndpoint: new UntypedFormControl('', [Validators.required]),
-    });
-
-    this.route.data.pipe(take(1)).subscribe((data) => {
-      this.serviceType = data.serviceType;
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
-
-          const bread: Breadcrumb = {
-            type: BreadcrumbType.ORG,
-            routerLink: ['/org'],
-          };
-
-          breadcrumbService.setBreadcrumb([bread]);
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
-
-          const iamBread = new Breadcrumb({
-            type: BreadcrumbType.ORG,
-            name: 'Instance',
-            routerLink: ['/instance'],
-          });
-          breadcrumbService.setBreadcrumb([iamBread]);
-          break;
-      }
     });
   }
 

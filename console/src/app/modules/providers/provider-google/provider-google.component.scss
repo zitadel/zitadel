@@ -43,22 +43,20 @@
       margin-bottom: 1rem;
     }
 
-    .scope-card {
-      max-width: 400px;
-      display: block;
+    .idp-scopes {
+      padding-bottom: 0.5rem;
 
-      .idp-scopes {
-        .flex-line {
-          display: flex;
-          align-items: flex-start;
+      .flex-line {
+        display: flex;
+        align-items: flex-start;
+        max-width: 400px;
 
-          .formfield {
-            flex: 1;
-          }
+        .formfield {
+          flex: 1;
+        }
 
-          .scope-add-button {
-            margin-top: 1.75rem;
-          }
+        .scope-add-button {
+          margin-top: 1.75rem;
         }
       }
     }
@@ -72,5 +70,14 @@
   button[mat-raised-button] {
     border-radius: 0.5rem;
     padding: 0.5rem 4rem;
+  }
+}
+
+.optional-h-wrapper {
+  display: flex;
+  align-items: center;
+
+  h2 {
+    margin-right: 0.25rem;
   }
 }

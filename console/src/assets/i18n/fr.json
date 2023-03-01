@@ -1615,20 +1615,20 @@
       "ACTIVETITLE": "Fournisseurs d'identité actifs"
     },
     "CREATE": {
-      "TITLE": "Add provider",
-      "DESCRIPTION": "Select one ore more of the following providers.",
-      "STEPPERTITLE": "Create Provider",
+      "TITLE": "Ajouter un fournisseur",
+      "DESCRIPTION": "Sélectionnez un ou plusieurs des fournisseurs suivants.",
+      "STEPPERTITLE": "Créer un fournisseur",
       "OIDC": {
-        "TITLE": "OIDC Provider",
-        "DESCRIPTION": "Enter the required data for your OIDC provider."
+        "TITLE": "Fournisseur OIDC",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur OIDC."
       },
       "JWT": {
-        "TITLE": "JWT Provider",
-        "DESCRIPTION": "Enter the required data for your JWT provider."
+        "TITLE": "Fournisseur JWT",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur JWT."
       },
       "GOOGLE": {
-        "TITLE": "Google Provider",
-        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+        "TITLE": "Fournisseur Google",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Google"
       }
     },
     "DETAIL": {
@@ -1638,10 +1638,14 @@
       "DATECHANGED": "Modifié"
     },
     "OPTIONS": {
-      "ISAUTOCREATION": "is auto creating",
-      "ISAUTOUPDATE": "is auto updating",
-      "ISCREATIONALLOWED": "is creation allowed",
-      "ISLINKINGALLOWED": "is linking allowed"
+      "ISAUTOCREATION": "Création automatique",
+      "ISAUTOCREATION_DESC": "Détermine si un compte sera créé s'il n'existe pas déjà.",
+      "ISAUTOUPDATE": "est mise à jour automatiquement",
+      "ISAUTOUPDATE_DESC": "Si cette option est sélectionnée, les comptes sont mis à jour lors de la réauthentification.",
+      "ISCREATIONALLOWED": "la création est-elle autorisée",
+      "ISCREATIONALLOWED_DESC": "Détermine si des comptes peuvent être créés.",
+      "ISLINKINGALLOWED": "la liaison est-elle autorisée",
+      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant."
     },
     "OWNERTYPES": {
       "0": "inconnu",
@@ -1667,8 +1671,6 @@
       "1": "Google"
     },
     "ADD": "Ajouter un fournisseur d'identité",
-    "AUTOREGISTER": "Enregistrement automatique",
-    "AUTOREGISTER_DESC": "Si cette option est sélectionnée et qu'aucun compte n'existe encore, un compte sera créé.",
     "TYPE": "Type",
     "OWNER": "Propriétaire",
     "ID": "ID",

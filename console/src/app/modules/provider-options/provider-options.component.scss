@@ -1,8 +1,11 @@
 .option-form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 1rem;
-  row-gap: 1rem;
+  grid-template-columns: 1fr;
   max-width: 400px;
   padding-bottom: 1rem;
+
+  .checkbox-desc {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
 }

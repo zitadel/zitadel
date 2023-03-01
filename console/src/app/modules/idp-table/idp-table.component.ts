@@ -327,13 +327,15 @@ export class IdpTableComponent implements OnInit {
             .addIDPToLoginPolicy(idp.id, idp.owner)
             .then(() => {
               this.toast.showInfo('IDP.TOAST.ADDED', true);
-              this.getIdps()
-                .then((resp) => {
-                  this.idps = resp;
-                })
-                .catch((error) => {
-                  this.toast.showError(error);
-                });
+              setTimeout(() => {
+                this.getIdps()
+                  .then((resp) => {
+                    this.idps = resp;
+                  })
+                  .catch((error) => {
+                    this.toast.showError(error);
+                  });
+              }, 2000);
             })
             .catch((error) => {
               this.toast.showError(error);
@@ -344,9 +346,15 @@ export class IdpTableComponent implements OnInit {
           .addIDPToLoginPolicy(idp.id)
           .then(() => {
             this.toast.showInfo('IDP.TOAST.ADDED', true);
-            this.getIdps().then((resp) => {
-              this.idps = resp;
-            });
+            setTimeout(() => {
+              this.getIdps()
+                .then((resp) => {
+                  this.idps = resp;
+                })
+                .catch((error) => {
+                  this.toast.showError(error);
+                });
+            }, 2000);
           })
           .catch((error) => {
             this.toast.showError(error);
@@ -387,9 +395,15 @@ export class IdpTableComponent implements OnInit {
             .removeIDPFromLoginPolicy(idp.id)
             .then(() => {
               this.toast.showInfo('IDP.TOAST.REMOVED', true);
-              this.getIdps().then((resp) => {
-                this.idps = resp;
-              });
+              setTimeout(() => {
+                this.getIdps()
+                  .then((resp) => {
+                    this.idps = resp;
+                  })
+                  .catch((error) => {
+                    this.toast.showError(error);
+                  });
+              }, 2000);
             })
             .catch((error) => {
               this.toast.showError(error);
@@ -400,9 +414,15 @@ export class IdpTableComponent implements OnInit {
           .removeIDPFromLoginPolicy(idp.id)
           .then(() => {
             this.toast.showInfo('IDP.TOAST.REMOVED', true);
-            this.getIdps().then((resp) => {
-              this.idps = resp;
-            });
+            setTimeout(() => {
+              this.getIdps()
+                .then((resp) => {
+                  this.idps = resp;
+                })
+                .catch((error) => {
+                  this.toast.showError(error);
+                });
+            }, 2000);
           })
           .catch((error) => {
             this.toast.showError(error);

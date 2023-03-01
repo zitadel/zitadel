@@ -29,6 +29,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   styleUrls: ['./provider-oidc.component.scss'],
 })
 export class ProviderOIDCComponent {
+  public showOptional: boolean = false;
   public options: Options = new Options();
 
   public id: string | null = '';
