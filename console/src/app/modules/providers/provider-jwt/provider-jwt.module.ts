@@ -14,6 +14,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { CardModule } from '../../card/card.module';
 import { CreateLayoutModule } from '../../create-layout/create-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
+import { ProviderOptionsModule } from '../../provider-options/provider-options.module';
 import { ProviderJWTCreateRoutingModule } from './provider-jwt-routing.module';
 import { ProviderJWTComponent } from './provider-jwt.component';
 
@@ -35,6 +36,7 @@ import { ProviderJWTComponent } from './provider-jwt.component';
     MatCheckboxModule,
     MatTooltipModule,
     TranslateModule,
+    ProviderOptionsModule,
     MatLegacyProgressSpinnerModule,
   ],
 })

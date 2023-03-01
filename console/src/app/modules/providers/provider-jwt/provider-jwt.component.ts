@@ -9,7 +9,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateJWTProviderRequest as AdminUpdateJWTProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddJWTProviderRequest as MgmtAddJWTProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -28,6 +28,8 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   styleUrls: ['./provider-jwt.component.scss'],
 })
 export class ProviderJWTComponent {
+  public options: Options = new Options();
+
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
@@ -148,6 +150,7 @@ export class ProviderJWTComponent {
       req.setIssuer(this.issuer?.value);
       req.setJwtEndpoint(this.jwtEndpoint?.value);
       req.setKeysEndpoint(this.keysEndpoint?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       (this.service as ManagementService)
@@ -170,6 +173,7 @@ export class ProviderJWTComponent {
       req.setIssuer(this.issuer?.value);
       req.setJwtEndpoint(this.jwtEndpoint?.value);
       req.setKeysEndpoint(this.keysEndpoint?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       (this.service as AdminService)
@@ -197,6 +201,7 @@ export class ProviderJWTComponent {
         req.setIssuer(this.issuer?.value);
         req.setJwtEndpoint(this.jwtEndpoint?.value);
         req.setKeysEndpoint(this.keysEndpoint?.value);
+        req.setProviderOptions(this.options);
 
         this.loading = true;
         (this.service as ManagementService)
@@ -219,6 +224,7 @@ export class ProviderJWTComponent {
         req.setIssuer(this.issuer?.value);
         req.setJwtEndpoint(this.jwtEndpoint?.value);
         req.setKeysEndpoint(this.keysEndpoint?.value);
+        req.setProviderOptions(this.options);
 
         this.loading = true;
         (this.service as AdminService)

@@ -7,49 +7,6 @@
   [selection]="selection"
   [hideRefresh]="true"
 >
-  <!-- <div actions>
-    <button
-      (click)="deactivateSelectedIdps()"
-      matTooltip="{{ 'IDP.DEACTIVATE' | translate }}"
-      class="idp-margin-right bg-state inactive"
-      mat-stroked-button
-      *ngIf="selection.hasValue()"
-      [disabled]="
-        ([
-          serviceType === PolicyComponentServiceType.ADMIN
-            ? 'iam.idp.write'
-            : serviceType === PolicyComponentServiceType.MGMT
-            ? 'org.idp.write'
-            : ''
-        ]
-          | hasRole
-          | async) === false
-      "
-    >
-      {{ 'IDP.DEACTIVATE' | translate }}
-    </button>
-    <button
-      (click)="reactivateSelectedIdps()"
-      matTooltip="{{ 'IDP.ACTIVATE' | translate }}"
-      class="bg-state active"
-      mat-stroked-button
-      *ngIf="selection.hasValue()"
-      [disabled]="
-        ([
-          serviceType === PolicyComponentServiceType.ADMIN
-            ? 'iam.idp.write'
-            : serviceType === PolicyComponentServiceType.MGMT
-            ? 'org.idp.write'
-            : ''
-        ]
-          | hasRole
-          | async) === false
-      "
-    >
-      {{ 'IDP.ACTIVATE' | translate }}
-    </button>
-  </div> -->
-
   <div class="table-wrapper">
     <table class="table" mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="availability">
@@ -113,21 +70,21 @@
 
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CREATIONDATE' | translate }}</th>
-        <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
+        <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
           <span>{{ idp.details.creationDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="changeDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CHANGEDATE' | translate }}</th>
-        <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
+        <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
           <span>{{ idp.details.changeDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="owner">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.OWNER' | translate }}</th>
-        <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
+        <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
           {{ 'IDP.OWNERTYPES.' + idp.owner | translate }}
         </td>
       </ng-container>

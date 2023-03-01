@@ -101,7 +101,6 @@ export class ProviderGoogleComponent {
       .getProviderByID(req)
       .then((resp) => {
         this.provider = resp.idp;
-        console.log(this.provider);
         this.loading = false;
         if (this.provider?.config?.google) {
           this.form.patchValue(this.provider.config.google);

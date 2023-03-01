@@ -35,6 +35,11 @@
         </cnsl-form-field>
       </div>
 
+      <cnsl-provider-options
+        [initialOptions]="provider?.config?.options"
+        (optionsChanged)="options = $event"
+      ></cnsl-provider-options>
+
       <div class="jwt-create-actions">
         <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>

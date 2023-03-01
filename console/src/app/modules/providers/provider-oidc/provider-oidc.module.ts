@@ -14,6 +14,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { CardModule } from '../../card/card.module';
 import { CreateLayoutModule } from '../../create-layout/create-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
+import { ProviderOptionsModule } from '../../provider-options/provider-options.module';
 import { ProviderOIDCRoutingModule } from './provider-oidc-routing.module';
 import { ProviderOIDCComponent } from './provider-oidc.component';
 
@@ -35,6 +36,7 @@ import { ProviderOIDCComponent } from './provider-oidc.component';
     MatCheckboxModule,
     MatTooltipModule,
     TranslateModule,
+    ProviderOptionsModule,
     MatLegacyProgressSpinnerModule,
   ],
 })

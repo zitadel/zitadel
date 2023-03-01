@@ -1637,6 +1637,12 @@
       "DATECREATED": "Utworzono",
       "DATECHANGED": "Zmieniono"
     },
+    "OPTIONS": {
+      "ISAUTOCREATION": "is auto creating",
+      "ISAUTOUPDATE": "is auto updating",
+      "ISCREATIONALLOWED": "is creation allowed",
+      "ISLINKINGALLOWED": "is linking allowed"
+    },
     "OWNERTYPES": {
       "0": "nieznany",
       "1": "Instancja",

@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGenericOIDCProviderRequest as AdminUpdateGenericOIDCProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -29,6 +29,8 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   styleUrls: ['./provider-oidc.component.scss'],
 })
 export class ProviderOIDCComponent {
+  public options: Options = new Options();
+
   public id: string | null = '';
   public updateClientSecret: boolean = false;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
@@ -140,6 +142,7 @@ export class ProviderOIDCComponent {
         })
         .catch((error) => {
           this.toast.showError(error);
+          this.loading = false;
         });
     } else if (PolicyComponentServiceType.ADMIN) {
       const req = new AdminAddGenericOIDCProviderRequest();
@@ -160,6 +163,7 @@ export class ProviderOIDCComponent {
         })
         .catch((error) => {
           this.toast.showError(error);
+          this.loading = false;
         });
     }
   }
@@ -186,6 +190,7 @@ export class ProviderOIDCComponent {
           })
           .catch((error) => {
             this.toast.showError(error);
+            this.loading = false;
           });
       } else if (PolicyComponentServiceType.ADMIN) {
         const req = new AdminUpdateGenericOIDCProviderRequest();
@@ -207,6 +212,7 @@ export class ProviderOIDCComponent {
           })
           .catch((error) => {
             this.toast.showError(error);
+            this.loading = false;
           });
       }
     }

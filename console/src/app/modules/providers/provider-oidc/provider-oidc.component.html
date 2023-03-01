@@ -32,7 +32,7 @@
         <mat-checkbox *ngIf="provider" [(ngModel)]="updateClientSecret" [ngModelOptions]="{ standalone: true }"
           >Update Client Secret</mat-checkbox
         >
-        <cnsl-form-field *ngIf="updateClientSecret" class="formfield">
+        <cnsl-form-field *ngIf="!provider || (provider && updateClientSecret)" class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientSecret" />
         </cnsl-form-field>
@@ -70,6 +70,11 @@
             </cnsl-form-field>
           </div>
         </cnsl-card>
+
+        <cnsl-provider-options
+          [initialOptions]="provider?.config?.options"
+          (optionsChanged)="options = $event"
+        ></cnsl-provider-options>
       </div>
 
       <div class="oidc-create-actions">

@@ -67,8 +67,7 @@
         </cnsl-card>
 
         <cnsl-provider-options
-          *ngIf="options"
-          [initialOptions]="options.toObject()"
+          [initialOptions]="provider?.config?.options"
           (optionsChanged)="options = $event"
         ></cnsl-provider-options>
       </div>
