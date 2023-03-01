@@ -42,7 +42,7 @@ func (l *databaseLogStorage) QuotaUnit() quota.Unit {
 }
 
 func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord) error {
-	if len(bulk) <= 0 {
+	if len(bulk) == 0 {
 		return nil
 	}
 	builder := squirrel.Insert(executionLogsTable).
