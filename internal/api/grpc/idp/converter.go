@@ -84,13 +84,11 @@ func IDPUserLinkToPb(link *query.IDPUserLink) *idp_pb.IDPUserLink {
 	}
 }
 
-func IDPTypeToPb(idpType domain.IDPConfigType) idp_pb.IDPType {
+func IDPTypeToPb(idpType domain.IDPType) idp_pb.IDPType {
 	switch idpType {
-	case domain.IDPConfigTypeOIDC:
+	case domain.IDPTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
-	case domain.IDPConfigTypeSAML:
-		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
-	case domain.IDPConfigTypeJWT:
+	case domain.IDPTypeJWT:
 		return idp_pb.IDPType_IDP_TYPE_JWT
 	default:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED

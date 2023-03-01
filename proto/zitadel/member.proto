@@ -23,13 +23,13 @@ message Member {
     ];
     string preferred_login_name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
             description: "preferred login name of the user"
         }
     ];
     string email = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
             description: "preferred login name of the user"
         }
     ];
@@ -108,7 +108,7 @@ message EmailQuery {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
             max_length: 200;
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [

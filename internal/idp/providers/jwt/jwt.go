@@ -18,7 +18,6 @@ const (
 var _ idp.Provider = (*Provider)(nil)
 
 var (
-	ErrNoTokens           = errors.New("no tokens provided")
 	ErrMissingUserAgentID = errors.New("userAgentID missing")
 )
 

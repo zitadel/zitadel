@@ -225,6 +225,23 @@ func (c *Commands) DeleteOrgProvider(ctx context.Context, resourceOwner, id stri
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+func ExistsOrgIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {
+	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
+	events, err := filter(ctx, writeModel.Query())
+	if err != nil {
+		return false, err
+	}
+
+	if len(events) == 0 {
+		return false, nil
+	}
+	writeModel.AppendEvents(events...)
+	if err := writeModel.Reduce(); err != nil {
+		return false, err
+	}
+	return writeModel.State.Exists(), nil
+}
+
 func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, writeModel *OrgOAuthIDPWriteModel, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
