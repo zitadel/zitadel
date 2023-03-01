@@ -1639,7 +1639,7 @@
     },
     "OPTIONS": {
       "ISAUTOCREATION": "Automatisches Erstellen",
-      "ISAUTOCREATION_DESC": "Wenn ausgewählt, wird ein Konto erstellt, falls es noch nicht existiert.",
+      "ISAUTOCREATION_DESC": "Legt fest ob ein Konto erstellt wird, falls es noch nicht existiert.",
       "ISAUTOUPDATE": "Automatisches Update",
       "ISAUTOUPDATE_DESC": "Legt fest ob Konten bei der erneuten Authentifizierung aktualisiert werden.",
       "ISCREATIONALLOWED": "Account erstellen erlaubt",
