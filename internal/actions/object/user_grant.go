@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 type UserGrants struct {
@@ -29,6 +30,26 @@ func AppendGrantFunc(userGrants *UserGrants) func(c *actions.FieldConfig) func(c
 	}
 }
 
+func UserGrantsFromQuery(c *actions.FieldConfig,userGrants *query.UserGrants) goja.Value{
+	return c.Runtime.ToValue(&)
+}
+
+func UserGrantsToDomain(userID string, actionUserGrants []UserGrant) []*domain.UserGrant {
+	if actionUserGrants == nil {
+		return nil
+	}
+	userGrants := make([]*domain.UserGrant, len(actionUserGrants))
+	for i, grant := range actionUserGrants {
+		userGrants[i] = &domain.UserGrant{
+			UserID:         userID,
+			ProjectID:      grant.ProjectID,
+			ProjectGrantID: grant.ProjectGrantID,
+			RoleKeys:       grant.Roles,
+		}
+	}
+	return userGrants
+}
+
 func mapObjectToGrant(object *goja.Object, grant *UserGrant) {
 	for _, key := range object.Keys() {
 		switch key {
@@ -49,20 +70,4 @@ func mapObjectToGrant(object *goja.Object, grant *UserGrant) {
 	if grant.ProjectID == "" {
 		panic("projectId not set")
 	}
-}
-
-func UserGrantsToDomain(userID string, actionUserGrants []UserGrant) []*domain.UserGrant {
-	if actionUserGrants == nil {
-		return nil
-	}
-	userGrants := make([]*domain.UserGrant, len(actionUserGrants))
-	for i, grant := range actionUserGrants {
-		userGrants[i] = &domain.UserGrant{
-			UserID:         userID,
-			ProjectID:      grant.ProjectID,
-			ProjectGrantID: grant.ProjectGrantID,
-			RoleKeys:       grant.Roles,
-		}
-	}
-	return userGrants
 }
