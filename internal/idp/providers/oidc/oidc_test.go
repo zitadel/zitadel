@@ -51,7 +51,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 						})
 				},
 			},
-			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
 		},
 	}
 	for _, tt := range tests {
