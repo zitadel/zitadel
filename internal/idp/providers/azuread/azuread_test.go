@@ -34,7 +34,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				redirectURI:  "redirectURI",
 			},
 			want: &oidc.Session{
-				AuthURL: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
+				AuthURL: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
 			},
 		},
 		{
@@ -48,7 +48,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				},
 			},
 			want: &oidc.Session{
-				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
+				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
 			},
 		},
 	}

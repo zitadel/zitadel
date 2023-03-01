@@ -74,7 +74,7 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	provider, err := l.jwtProvider(r.Context(), identityProvider)
+	provider, err := l.jwtProvider(identityProvider)
 	if err != nil {
 		emptyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
 		if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emptyTokens, authReq, r, err); actionErr != nil {

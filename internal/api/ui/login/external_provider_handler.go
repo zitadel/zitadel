@@ -137,7 +137,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 	case domain.IDPTypeOIDC:
 		provider, err = l.oidcProvider(r.Context(), identityProvider)
 	case domain.IDPTypeJWT:
-		provider, err = l.jwtProvider(r.Context(), identityProvider)
+		provider, err = l.jwtProvider(identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 	case domain.IDPTypeOAuth,
@@ -589,7 +589,7 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	)
 }
 
-func (l *Login) jwtProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*jwt.Provider, error) {
+func (l *Login) jwtProvider(identityProvider *query.IDPTemplate) (*jwt.Provider, error) {
 	return jwt.New(
 		identityProvider.Name,
 		identityProvider.JWTIDPTemplate.Issuer,

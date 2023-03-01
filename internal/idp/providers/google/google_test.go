@@ -32,7 +32,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				scopes:       []string{"openid"},
 			},
 			want: &oidc.Session{
-				AuthURL: "https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				AuthURL: "https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
 			},
 		},
 	}
