@@ -34,3 +34,12 @@ const (
 	IDPTypeGitLabSelfHosted
 	IDPTypeGoogle
 )
+
+func (t IDPType) GetCSSClass() string {
+	switch t { //nolint:exhaustive
+	case IDPTypeGoogle:
+		return "google"
+	default:
+		return ""
+	}
+}

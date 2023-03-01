@@ -236,6 +236,23 @@ func (c *Commands) DeleteInstanceProvider(ctx context.Context, id string) (*doma
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+func ExistsInstanceIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
+	instanceWriteModel := NewInstanceIDPRemoveWriteModel(authz.GetInstance(ctx).InstanceID(), id)
+	events, err := filter(ctx, instanceWriteModel.Query())
+	if err != nil {
+		return false, err
+	}
+
+	if len(events) == 0 {
+		return false, nil
+	}
+	instanceWriteModel.AppendEvents(events...)
+	if err := instanceWriteModel.Reduce(); err != nil {
+		return false, err
+	}
+	return instanceWriteModel.State.Exists(), nil
+}
+
 func (c *Commands) prepareAddInstanceOAuthProvider(a *instance.Aggregate, writeModel *InstanceOAuthIDPWriteModel, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {

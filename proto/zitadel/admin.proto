@@ -4403,7 +4403,7 @@ message AddJWTProviderRequest {
     string jwt_endpoint = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string keys_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string header_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 6 [(validate.rules).message = {required: true}];
+    zitadel.idp.v1.Options provider_options = 6;
 }
 
 message AddJWTProviderResponse {
@@ -4418,7 +4418,7 @@ message UpdateJWTProviderRequest {
     string jwt_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string keys_endpoint = 5 [(validate.rules).string = {max_len: 200}];
     string header_name = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
+    zitadel.idp.v1.Options provider_options = 7;
 }
 
 message UpdateJWTProviderResponse {
