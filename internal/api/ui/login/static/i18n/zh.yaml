@@ -11,6 +11,14 @@ Login:
   RegisterButtonText: 注册
   NextButtonText: 继续
 
+LDAP:
+  Title: 注册
+  Description: 输入您的登录数据。
+  LoginNameLabel: 登录名
+  PasswordLabel: 密码
+  BackButtonText: 后退
+  NextButtonText: 继续
+
 SelectAccount:
   Title: 选择账户
   Description: 使用您的 ZITADEL 帐户

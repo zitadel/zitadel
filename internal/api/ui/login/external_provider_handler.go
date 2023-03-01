@@ -655,12 +655,7 @@ func tokens(session idp.Session) *oidc.Tokens {
 	case *jwt.Session:
 		return s.Tokens
 	}
-	return &oidc.Tokens{
-		Token: &oauth2.Token{
-			AccessToken: "",
-		},
-		IDToken: "",
-	}
+	return &oidc.Tokens{Token: &oauth2.Token{}}
 }
 
 func mapIDPUserToExternalUser(user idp.User, id string) *domain.ExternalUser {

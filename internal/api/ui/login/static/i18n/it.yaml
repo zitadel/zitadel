@@ -11,6 +11,14 @@ Login:
   RegisterButtonText: registrare
   NextButtonText: Avanti
 
+LDAP:
+  Title: Accesso
+  Description: Inserisci i tuoi dati di accesso.
+  LoginNameLabel: Nome di accesso
+  PasswordLabel: Password
+  BackButtonText: indietro
+  NextButtonText: Avanti
+
 SelectAccount:
   Title: Seleziona l'account
   Description: Usa il tuo account ZITADEL
