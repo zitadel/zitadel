@@ -338,15 +338,18 @@ func (l *Login) runPostCreationActions(
 
 func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
 	var accessToken, idToken string
-	claimsJSON := func() (string, error) {
-		return "", nil
-	}
 	getClaim := func(claim string) interface{} {
 		return nil
+	}
+	claimsJSON := func() (string, error) {
+		return "", nil
 	}
 	if tokens != nil {
 		accessToken = tokens.AccessToken
 		idToken = tokens.IDToken
+		getClaim = func(claim string) interface{} {
+			return tokens.IDTokenClaims.GetClaim(claim)
+		}
 		claimsJSON = func() (string, error) {
 			c, err := json.Marshal(tokens.IDTokenClaims)
 			if err != nil {
