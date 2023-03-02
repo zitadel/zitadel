@@ -13,8 +13,6 @@ const (
 	EndpointLogin                    = "/login"
 	EndpointExternalLogin            = "/login/externalidp"
 	EndpointExternalLoginCallback    = "/login/externalidp/callback"
-	EndpointLDAPLogin                = "/login/ldap/login"
-	EndpointLDAPCallback             = "/login/ldap/callback"
 	EndpointJWTAuthorize             = "/login/jwt/authorize"
 	EndpointJWTCallback              = "/login/jwt/callback"
 	EndpointLDAPLogin                = "/login/ldap"
