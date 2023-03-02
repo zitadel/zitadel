@@ -414,8 +414,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "name",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientId": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -436,7 +436,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -455,7 +455,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_github (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_github (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -477,8 +477,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "name",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientId": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -499,7 +499,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -518,7 +518,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_github (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_github (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -540,7 +540,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
-	"client_id": "id"
+	"clientId": "id"
 }`),
 				), instance.GitHubIDPChangedEventMapper),
 			},
@@ -552,7 +552,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -562,7 +562,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_github SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates2_github SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"id",
 								"idp-id",
@@ -582,8 +582,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "name",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientId": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -604,7 +604,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								"name",
 								true,
@@ -618,7 +618,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_github SET (client_id, client_secret, scopes) = ($1, $2, $3) WHERE (idp_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2_github SET (client_id, client_secret, scopes) = ($1, $2, $3) WHERE (idp_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
@@ -666,8 +666,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "name",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientId": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -691,7 +691,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -710,7 +710,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_github_enterprise (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_github_enterprise (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -735,8 +735,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "name",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientId": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -760,7 +760,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -779,7 +779,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates_github_enterprise (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_github_enterprise (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -804,7 +804,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"isCreationAllowed": true,
-	"client_id": "id"
+	"clientId": "id"
 }`),
 				), instance.GitHubEnterpriseIDPChangedEventMapper),
 			},
@@ -816,7 +816,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -826,7 +826,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_github_enterprise SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates2_github_enterprise SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"id",
 								"idp-id",
@@ -846,8 +846,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "name",
-	"client_id": "client_id",
-	"client_secret": {
+	"clientId": "client_id",
+	"clientSecret": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
@@ -871,7 +871,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.idp_templates2 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								"name",
 								true,
@@ -885,7 +885,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates_github_enterprise SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) = ($1, $2, $3, $4, $5, $6) WHERE (idp_id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates2_github_enterprise SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) = ($1, $2, $3, $4, $5, $6) WHERE (idp_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},

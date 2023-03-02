@@ -253,8 +253,8 @@ var (
 		` LEFT JOIN projections.idp_templates2_oauth ON projections.idp_templates2.id = projections.idp_templates2_oauth.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oauth.instance_id` +
 		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates2.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oidc.instance_id` +
 		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates2.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_jwt.instance_id` +
-		` LEFT JOIN projections.idp_templates2_github ON projections.idp_templates.id = projections.idp_templates2_github.idp_id AND projections.idp_templates.instance_id = projections.idp_templates2_github.instance_id` +
-		` LEFT JOIN projections.idp_templates2_github_enterprise ON projections.idp_templates.id = projections.idp_templates2_github_enterprise.idp_id AND projections.idp_templates.instance_id = projections.idp_templates2_github_enterprise.instance_id` +
+		` LEFT JOIN projections.idp_templates2_github ON projections.idp_templates2.id = projections.idp_templates2_github.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_github.instance_id` +
+		` LEFT JOIN projections.idp_templates2_github_enterprise ON projections.idp_templates2.id = projections.idp_templates2_github_enterprise.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_github_enterprise.instance_id` +
 		` LEFT JOIN projections.idp_templates2_google ON projections.idp_templates2.id = projections.idp_templates2_google.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_google.instance_id` +
 		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates2.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_ldap.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
@@ -1683,6 +1683,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google
 							nil,
 							nil,
@@ -1746,6 +1759,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"jwt",
 							"keys",
 							"header",
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google
 							nil,
 							nil,

@@ -144,7 +144,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		domain.IDPTypeLDAP,
 		domain.IDPTypeAzureAD,
 		domain.IDPTypeGitHub,
-		domain.IDPTypeGitHubEE,
+		domain.IDPTypeGitHubEnterprise,
 		domain.IDPTypeGitLab,
 		domain.IDPTypeGitLabSelfHosted,
 		domain.IDPTypeUnspecified:
@@ -207,7 +207,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		domain.IDPTypeLDAP,
 		domain.IDPTypeAzureAD,
 		domain.IDPTypeGitHub,
-		domain.IDPTypeGitHubEE,
+		domain.IDPTypeGitHubEnterprise,
 		domain.IDPTypeGitLab,
 		domain.IDPTypeGitLabSelfHosted,
 		domain.IDPTypeUnspecified:
