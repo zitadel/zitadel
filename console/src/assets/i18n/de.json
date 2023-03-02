@@ -42,6 +42,41 @@
       "ADD": "Zum Hinzufügen Kachel halten und ziehen"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Dein Onboarding-prozess",
+    "COMPLETED": "abgeschlossen",
+    "DISMISS": "schließen",
+    "CARD": {
+      "TITLE": "Bringe deine Instanz zum Laufen",
+      "DESCRIPTION": "Diese Checkliste hilft bei der Einrichtung Ihrer Instanz und führt Sie durch die wichtigsten Schritte"
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Branding anpassen",
+        "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons."
+      },
+      "instance.smtp.config.added": {
+        "title": "SMTP Benachrichtigungseinstellungen",
+        "description": "Konfiguriere deinen Mailserver."
+      },
+      "project.added": {
+        "title": "Erstelle ein Projekt",
+        "description": "Erstelle dein erstes Projekt und definiere Rollen"
+      },
+      "project.application.added": {
+        "title": "Erstelle eine App",
+        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow."
+      },
+      "user.human.added": {
+        "title": "Erfasse Benutzer",
+        "description": "Erstelle Benutzer die später deine Apps nutzen können."
+      },
+      "user.grant.added": {
+        "title": "Berechtige Benutzer",
+        "description": "Erlaube es deinen Nutzern auf deine Apps zuzugreifen und gebe ihnen Rollen."
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Instance",
     "DASHBOARD": "Home",
@@ -1725,6 +1760,8 @@
       "ID": "ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
       "CREATE": "Applikation erstellen",
+      "CREATE_SELECT_PROJECT": "Wähle zuerst dein Projekt aus",
+      "CREATE_NEW_PROJECT": "oder erstelle ein neues <a href='{{url}}' title='Create project'>hier</a>.",
       "CREATE_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",
       "CREATE_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert.",
       "STATE": "Status",

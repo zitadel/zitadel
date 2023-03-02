@@ -20,6 +20,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		userMapper   func(info oidc.UserInfo) idp.User
 		httpMock     func(issuer string)
 	}
@@ -36,6 +37,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -49,7 +51,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 						})
 				},
 			},
-			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
 		},
 	}
 	for _, tt := range tests {
@@ -59,7 +61,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.userMapper)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper)
 			r.NoError(err)
 
 			session, err := provider.BeginAuth(context.Background(), "testState")
@@ -77,6 +79,7 @@ func TestProvider_Options(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		userMapper   func(info oidc.UserInfo) idp.User
 		opts         []ProviderOpts
 		httpMock     func(issuer string)
@@ -102,6 +105,7 @@ func TestProvider_Options(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				opts:         nil,
 				httpMock: func(issuer string) {
@@ -133,6 +137,7 @@ func TestProvider_Options(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				opts: []ProviderOpts{
 					WithLinkingAllowed(),
@@ -169,7 +174,7 @@ func TestProvider_Options(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.userMapper, tt.fields.opts...)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, tt.fields.opts...)
 			require.NoError(t, err)
 
 			a.Equal(tt.want.name, provider.Name())

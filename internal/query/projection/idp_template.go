@@ -11,23 +11,28 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 const (
-	IDPTemplateTable                 = "projections.idp_templates"
-	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
+	IDPTemplateTable       = "projections.idp_templates2"
+	IDPTemplateOAuthTable  = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
+	IDPTemplateOIDCTable   = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
+	IDPTemplateJWTTable    = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
 	IDPTemplateGitHubTable           = IDPTemplateTable + "_" + IDPTemplateGitHubSuffix
 	IDPTemplateGitHubEnterpriseTable = IDPTemplateTable + "_" + IDPTemplateGitHubEnterpriseSuffix
-	IDPTemplateGoogleTable           = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
-	IDPTemplateLDAPTable             = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
+	IDPTemplateGoogleTable = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
+	IDPTemplateLDAPTable   = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 
-	IDPTemplateOAuthSuffix            = "oauth"
+	IDPTemplateOAuthSuffix  = "oauth"
+	IDPTemplateOIDCSuffix   = "oidc"
+	IDPTemplateJWTSuffix    = "jwt"
 	IDPTemplateGitHubSuffix           = "github"
 	IDPTemplateGitHubEnterpriseSuffix = "github_enterprise"
-	IDPTemplateGoogleSuffix           = "google"
-	IDPTemplateLDAPSuffix             = "ldap"
+	IDPTemplateGoogleSuffix = "google"
+	IDPTemplateLDAPSuffix   = "ldap"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -53,6 +58,20 @@ const (
 	OAuthTokenEndpointCol         = "token_endpoint"
 	OAuthUserEndpointCol          = "user_endpoint"
 	OAuthScopesCol                = "scopes"
+
+	OIDCIDCol           = "idp_id"
+	OIDCInstanceIDCol   = "instance_id"
+	OIDCIssuerCol       = "issuer"
+	OIDCClientIDCol     = "client_id"
+	OIDCClientSecretCol = "client_secret"
+	OIDCScopesCol       = "scopes"
+
+	JWTIDCol           = "idp_id"
+	JWTInstanceIDCol   = "instance_id"
+	JWTIssuerCol       = "issuer"
+	JWTEndpointCol     = "jwt_endpoint"
+	JWTKeysEndpointCol = "keys_endpoint"
+	JWTHeaderNameCol   = "header_name"
 
 	GitHubIDCol           = "idp_id"
 	GitHubInstanceIDCol   = "instance_id"
@@ -145,6 +164,30 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(OIDCIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OIDCInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OIDCIssuerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OIDCClientIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OIDCClientSecretCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(OIDCScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(OIDCInstanceIDCol, OIDCIDCol),
+			IDPTemplateOIDCSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(JWTIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(JWTInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(JWTIssuerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(JWTEndpointCol, crdb.ColumnTypeText),
+			crdb.NewColumn(JWTKeysEndpointCol, crdb.ColumnTypeText),
+			crdb.NewColumn(JWTHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(JWTInstanceIDCol, JWTIDCol),
+			IDPTemplateJWTSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(GitHubIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(GitHubInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(GitHubClientIDCol, crdb.ColumnTypeText),
@@ -228,6 +271,46 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOAuthIDPChanged,
 				},
 				{
+					Event:  instance.OIDCIDPAddedEventType,
+					Reduce: p.reduceOIDCIDPAdded,
+				},
+				{
+					Event:  instance.OIDCIDPChangedEventType,
+					Reduce: p.reduceOIDCIDPChanged,
+				},
+				{
+					Event:  instance.JWTIDPAddedEventType,
+					Reduce: p.reduceJWTIDPAdded,
+				},
+				{
+					Event:  instance.JWTIDPAddedEventType,
+					Reduce: p.reduceJWTIDPChanged,
+				},
+				{
+					Event:  instance.IDPConfigAddedEventType,
+					Reduce: p.reduceOldConfigAdded,
+				},
+				{
+					Event:  instance.IDPConfigChangedEventType,
+					Reduce: p.reduceOldConfigChanged,
+				},
+				{
+					Event:  instance.IDPOIDCConfigAddedEventType,
+					Reduce: p.reduceOldOIDCConfigAdded,
+				},
+				{
+					Event:  instance.IDPOIDCConfigChangedEventType,
+					Reduce: p.reduceOldOIDCConfigChanged,
+				},
+				{
+					Event:  instance.IDPJWTConfigAddedEventType,
+					Reduce: p.reduceOldJWTConfigAdded,
+				},
+				{
+					Event:  instance.IDPJWTConfigChangedEventType,
+					Reduce: p.reduceOldJWTConfigChanged,
+				},
+				{
 					Event:  instance.GitHubIDPAddedEventType,
 					Reduce: p.reduceGitHubIDPAdded,
 				},
@@ -279,6 +362,47 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.OAuthIDPChangedEventType,
 					Reduce: p.reduceOAuthIDPChanged,
+				},
+				{
+					Event:  org.OIDCIDPAddedEventType,
+					Reduce: p.reduceOIDCIDPAdded,
+				},
+				{
+					Event:  org.OIDCIDPChangedEventType,
+					Reduce: p.reduceOIDCIDPChanged,
+				},
+
+				{
+					Event:  org.JWTIDPAddedEventType,
+					Reduce: p.reduceJWTIDPAdded,
+				},
+				{
+					Event:  org.JWTIDPAddedEventType,
+					Reduce: p.reduceJWTIDPChanged,
+				},
+				{
+					Event:  org.IDPConfigAddedEventType,
+					Reduce: p.reduceOldConfigAdded,
+				},
+				{
+					Event:  org.IDPConfigChangedEventType,
+					Reduce: p.reduceOldConfigChanged,
+				},
+				{
+					Event:  org.IDPOIDCConfigAddedEventType,
+					Reduce: p.reduceOldOIDCConfigAdded,
+				},
+				{
+					Event:  org.IDPOIDCConfigChangedEventType,
+					Reduce: p.reduceOldOIDCConfigChanged,
+				},
+				{
+					Event:  org.IDPJWTConfigAddedEventType,
+					Reduce: p.reduceOldJWTConfigAdded,
+				},
+				{
+					Event:  org.IDPJWTConfigChangedEventType,
+					Reduce: p.reduceOldJWTConfigChanged,
 				},
 				{
 					Event:  org.GitHubIDPAddedEventType,
@@ -406,6 +530,440 @@ func (p *idpTemplateProjection) reduceOAuthIDPChanged(event eventstore.Event) (*
 					handler.NewCond(OAuthInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 				crdb.WithTableSuffix(IDPTemplateOAuthSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OIDCIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.OIDCIDPAddedEvent:
+		idpEvent = e.OIDCIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.OIDCIDPAddedEvent:
+		idpEvent = e.OIDCIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(OIDCIDCol, idpEvent.ID),
+				handler.NewCol(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(OIDCIssuerCol, idpEvent.Issuer),
+				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
+				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OIDCIDPChangedEvent
+	switch e := event.(type) {
+	case *org.OIDCIDPChangedEvent:
+		idpEvent = e.OIDCIDPChangedEvent
+	case *instance.OIDCIDPChangedEvent:
+		idpEvent = e.OIDCIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	oidcCols := reduceOIDCIDPChangedColumns(idpEvent)
+	if len(oidcCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				oidcCols,
+				[]handler.Condition{
+					handler.NewCond(OIDCIDCol, idpEvent.ID),
+					handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.JWTIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.JWTIDPAddedEvent:
+		idpEvent = e.JWTIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.JWTIDPAddedEvent:
+		idpEvent = e.JWTIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(JWTIDCol, idpEvent.ID),
+				handler.NewCol(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(JWTIssuerCol, idpEvent.Issuer),
+				handler.NewCol(JWTEndpointCol, idpEvent.JWTEndpoint),
+				handler.NewCol(JWTKeysEndpointCol, idpEvent.KeysEndpoint),
+				handler.NewCol(JWTHeaderNameCol, idpEvent.HeaderName),
+			},
+			crdb.WithTableSuffix(IDPTemplateJWTSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceJWTIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.JWTIDPChangedEvent
+	switch e := event.(type) {
+	case *org.JWTIDPChangedEvent:
+		idpEvent = e.JWTIDPChangedEvent
+	case *instance.JWTIDPChangedEvent:
+		idpEvent = e.JWTIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	jwtCols := reduceJWTIDPChangedColumns(idpEvent)
+	if len(jwtCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				jwtCols,
+				[]handler.Condition{
+					handler.NewCond(JWTIDCol, idpEvent.ID),
+					handler.NewCond(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateJWTSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOldConfigAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.IDPConfigAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.IDPConfigAddedEvent:
+		idpEvent = e.IDPConfigAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.IDPConfigAddedEvent:
+		idpEvent = e.IDPConfigAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ADfeg", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
+	}
+
+	return crdb.NewCreateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ConfigID),
+			handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+			handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+			handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+			handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeUnspecified),
+			handler.NewCol(IDPTemplateIsCreationAllowedCol, true),
+			handler.NewCol(IDPTemplateIsLinkingAllowedCol, true),
+			handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.AutoRegister),
+			handler.NewCol(IDPTemplateIsAutoUpdateCol, false),
+		},
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOldConfigChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.IDPConfigChangedEvent
+	switch e := event.(type) {
+	case *org.IDPConfigChangedEvent:
+		idpEvent = e.IDPConfigChangedEvent
+	case *instance.IDPConfigChangedEvent:
+		idpEvent = e.IDPConfigChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAfg2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
+	}
+
+	cols := make([]handler.Column, 0, 4)
+	if idpEvent.Name != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateNameCol, *idpEvent.Name))
+	}
+	if idpEvent.AutoRegister != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateIsAutoCreationCol, *idpEvent.AutoRegister))
+	}
+	cols = append(cols,
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+	)
+
+	return crdb.NewUpdateStatement(
+		event,
+		cols,
+		[]handler.Condition{
+			handler.NewCond(OIDCIDCol, idpEvent.ConfigID),
+			handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.OIDCConfigAddedEvent
+	switch e := event.(type) {
+	case *org.IDPOIDCConfigAddedEvent:
+		idpEvent = e.OIDCConfigAddedEvent
+	case *instance.IDPOIDCConfigAddedEvent:
+		idpEvent = e.OIDCConfigAddedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(OIDCIDCol, idpEvent.IDPConfigID),
+				handler.NewCol(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(OIDCIssuerCol, idpEvent.Issuer),
+				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
+				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOldOIDCConfigChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.OIDCConfigChangedEvent
+	switch e := event.(type) {
+	case *org.IDPOIDCConfigChangedEvent:
+		idpEvent = e.OIDCConfigChangedEvent
+	case *instance.IDPOIDCConfigChangedEvent:
+		idpEvent = e.OIDCConfigChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	oidcCols := make([]handler.Column, 0, 4)
+	if idpEvent.ClientID != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Issuer != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCIssuerCol, *idpEvent.Issuer))
+	}
+	if idpEvent.Scopes != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	if len(oidcCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				oidcCols,
+				[]handler.Condition{
+					handler.NewCond(OIDCIDCol, idpEvent.IDPConfigID),
+					handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOldJWTConfigAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.JWTConfigAddedEvent
+	switch e := event.(type) {
+	case *org.IDPJWTConfigAddedEvent:
+		idpEvent = e.JWTConfigAddedEvent
+	case *instance.IDPJWTConfigAddedEvent:
+		idpEvent = e.JWTConfigAddedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(JWTIDCol, idpEvent.IDPConfigID),
+				handler.NewCol(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(JWTIssuerCol, idpEvent.Issuer),
+				handler.NewCol(JWTEndpointCol, idpEvent.JWTEndpoint),
+				handler.NewCol(JWTKeysEndpointCol, idpEvent.KeysEndpoint),
+				handler.NewCol(JWTHeaderNameCol, idpEvent.HeaderName),
+			},
+			crdb.WithTableSuffix(IDPTemplateJWTSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOldJWTConfigChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.JWTConfigChangedEvent
+	switch e := event.(type) {
+	case *org.IDPJWTConfigChangedEvent:
+		idpEvent = e.JWTConfigChangedEvent
+	case *instance.IDPJWTConfigChangedEvent:
+		idpEvent = e.JWTConfigChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	jwtCols := make([]handler.Column, 0, 4)
+	if idpEvent.JWTEndpoint != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTEndpointCol, *idpEvent.JWTEndpoint))
+	}
+	if idpEvent.KeysEndpoint != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTKeysEndpointCol, *idpEvent.KeysEndpoint))
+	}
+	if idpEvent.HeaderName != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTHeaderNameCol, *idpEvent.HeaderName))
+	}
+	if idpEvent.Issuer != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTIssuerCol, *idpEvent.Issuer))
+	}
+	if len(jwtCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				jwtCols,
+				[]handler.Condition{
+					handler.NewCond(JWTIDCol, idpEvent.IDPConfigID),
+					handler.NewCond(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateJWTSuffix),
 			),
 		)
 	}
@@ -875,6 +1433,41 @@ func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.C
 	}
 	return oauthCols
 }
+
+func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Column {
+	oidcCols := make([]handler.Column, 0, 4)
+	if idpEvent.ClientID != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Issuer != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCIssuerCol, *idpEvent.Issuer))
+	}
+	if idpEvent.Scopes != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	return oidcCols
+}
+
+func reduceJWTIDPChangedColumns(idpEvent idp.JWTIDPChangedEvent) []handler.Column {
+	jwtCols := make([]handler.Column, 0, 4)
+	if idpEvent.JWTEndpoint != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTEndpointCol, *idpEvent.JWTEndpoint))
+	}
+	if idpEvent.KeysEndpoint != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTKeysEndpointCol, *idpEvent.KeysEndpoint))
+	}
+	if idpEvent.HeaderName != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTHeaderNameCol, *idpEvent.HeaderName))
+	}
+	if idpEvent.Issuer != nil {
+		jwtCols = append(jwtCols, handler.NewCol(JWTIssuerCol, *idpEvent.Issuer))
+	}
+	return jwtCols
+}
+
 func reduceGitHubIDPChangedColumns(idpEvent idp.GitHubIDPChangedEvent) []handler.Column {
 	oauthCols := make([]handler.Column, 0, 3)
 	if idpEvent.ClientID != nil {

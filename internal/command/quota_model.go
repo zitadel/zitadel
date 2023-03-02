@@ -9,7 +9,6 @@ type quotaWriteModel struct {
 	eventstore.WriteModel
 	unit   quota.Unit
 	active bool
-	config *quota.AddedEvent
 }
 
 // newQuotaWriteModel aggregateId is filled by reducing unit matching events
@@ -43,11 +42,9 @@ func (wm *quotaWriteModel) Reduce() error {
 		case *quota.AddedEvent:
 			wm.AggregateID = e.Aggregate().ID
 			wm.active = true
-			wm.config = e
 		case *quota.RemovedEvent:
 			wm.AggregateID = e.Aggregate().ID
 			wm.active = false
-			wm.config = nil
 		}
 	}
 	return wm.WriteModel.Reduce()

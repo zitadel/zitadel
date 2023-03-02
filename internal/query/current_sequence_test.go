@@ -9,6 +9,23 @@ import (
 	"testing"
 )
 
+var (
+	currentSequenceStmt = `SELECT max(projections.current_sequences.current_sequence) as current_sequence,` +
+		` max(projections.current_sequences.timestamp) as timestamp,` +
+		` projections.current_sequences.projection_name,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.current_sequences` +
+		" AS OF SYSTEM TIME '-1 ms' " +
+		` GROUP BY projections.current_sequences.projection_name`
+
+	currentSequenceCols = []string{
+		"current_sequence",
+		"timestamp",
+		"projection_name",
+		"count",
+	}
+)
+
 func Test_CurrentSequencesPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -25,12 +42,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 			prepare: prepareCurrentSequencesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT max(projections.current_sequences.current_sequence) as current_sequence,`+
-						` max(projections.current_sequences.timestamp) as timestamp,`+
-						` projections.current_sequences.projection_name,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.current_sequences`+
-						` GROUP BY projections.current_sequences.projection_name`),
+					regexp.QuoteMeta(currentSequenceStmt),
 					nil,
 					nil,
 				),
@@ -42,18 +54,8 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 			prepare: prepareCurrentSequencesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT max(projections.current_sequences.current_sequence) as current_sequence,`+
-						` max(projections.current_sequences.timestamp) as timestamp,`+
-						` projections.current_sequences.projection_name,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.current_sequences`+
-						` GROUP BY projections.current_sequences.projection_name`),
-					[]string{
-						"current_sequence",
-						"timestamp",
-						"projection_name",
-						"count",
-					},
+					regexp.QuoteMeta(currentSequenceStmt),
+					currentSequenceCols,
 					[][]driver.Value{
 						{
 							uint64(20211108),
@@ -81,18 +83,8 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 			prepare: prepareCurrentSequencesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT max(projections.current_sequences.current_sequence) as current_sequence,`+
-						` max(projections.current_sequences.timestamp) as timestamp,`+
-						` projections.current_sequences.projection_name,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.current_sequences`+
-						` GROUP BY projections.current_sequences.projection_name`),
-					[]string{
-						"current_sequence",
-						"timestamp",
-						"projection_name",
-						"count",
-					},
+					regexp.QuoteMeta(currentSequenceStmt),
+					currentSequenceCols,
 					[][]driver.Value{
 						{
 							uint64(20211108),
@@ -130,12 +122,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 			prepare: prepareCurrentSequencesQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT max(projections.current_sequences.current_sequence) as current_sequence,`+
-						` max(projections.current_sequences.timestamp) as timestamp,`+
-						` projections.current_sequences.projection_name,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.current_sequences`+
-						` GROUP BY projections.current_sequences.projection_name`),
+					regexp.QuoteMeta(currentSequenceStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -150,7 +137,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

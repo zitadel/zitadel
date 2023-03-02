@@ -7,6 +7,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -14,9 +15,10 @@ import (
 )
 
 type IDPLoginPolicyLink struct {
-	IDPID   string
-	IDPName string
-	IDPType domain.IDPConfigType
+	IDPID     string
+	IDPName   string
+	IDPType   domain.IDPType
+	OwnerType domain.IdentityProviderType
 }
 
 type IDPLoginPolicyLinks struct {
@@ -84,7 +86,7 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPLoginPolicyLinksQuery()
+	query, scan := prepareIDPLoginPolicyLinksQuery(ctx, q.client)
 	eq := sq.Eq{
 		IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
 		IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).InstanceID(),
@@ -109,27 +111,31 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	return idps, err
 }
 
-func prepareIDPLoginPolicyLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
 	return sq.Select(
 			IDPLoginPolicyLinkIDPIDCol.identifier(),
-			IDPNameCol.identifier(),
-			IDPTypeCol.identifier(),
+			IDPTemplateNameCol.identifier(),
+			IDPTemplateTypeCol.identifier(),
+			IDPTemplateOwnerTypeCol.identifier(),
 			countColumn.identifier()).
 			From(idpLoginPolicyLinkTable.identifier()).
-			LeftJoin(join(IDPIDCol, IDPLoginPolicyLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
+			LeftJoin(join(IDPTemplateIDCol, IDPLoginPolicyLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPLoginPolicyLinks, error) {
 			links := make([]*IDPLoginPolicyLink, 0)
 			var count uint64
 			for rows.Next() {
 				var (
-					idpName = sql.NullString{}
-					idpType = sql.NullInt16{}
-					link    = new(IDPLoginPolicyLink)
+					idpName      = sql.NullString{}
+					idpType      = sql.NullInt16{}
+					idpOwnerType = sql.NullInt16{}
+					link         = new(IDPLoginPolicyLink)
 				)
 				err := rows.Scan(
 					&link.IDPID,
 					&idpName,
 					&idpType,
+					&idpOwnerType,
 					&count,
 				)
 				if err != nil {
@@ -138,10 +144,11 @@ func prepareIDPLoginPolicyLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPL
 				link.IDPName = idpName.String
 				//IDPType 0 is oidc so we have to set unspecified manually
 				if idpType.Valid {
-					link.IDPType = domain.IDPConfigType(idpType.Int16)
+					link.IDPType = domain.IDPType(idpType.Int16)
 				} else {
-					link.IDPType = domain.IDPConfigTypeUnspecified
+					link.IDPType = domain.IDPTypeUnspecified
 				}
+				link.OwnerType = domain.IdentityProviderType(idpOwnerType.Int16)
 				links = append(links, link)
 			}
 

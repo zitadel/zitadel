@@ -122,6 +122,287 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
+type OIDCIDPWriteModel struct {
+	eventstore.WriteModel
+
+	Name         string
+	ID           string
+	Issuer       string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *OIDCIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.OIDCIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.OIDCIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idpconfig.IDPConfigAddedEvent:
+			wm.reduceIDPConfigAddedEvent(e)
+		case *idpconfig.IDPConfigChangedEvent:
+			wm.reduceIDPConfigChangedEvent(e)
+		case *idpconfig.OIDCConfigAddedEvent:
+			wm.reduceOIDCConfigAddedEvent(e)
+		case *idpconfig.OIDCConfigChangedEvent:
+			wm.reduceOIDCConfigChangedEvent(e)
+		case *idpconfig.IDPConfigRemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *OIDCIDPWriteModel) reduceAddedEvent(e *idp.OIDCIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.Issuer = e.Issuer
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *OIDCIDPWriteModel) reduceChangedEvent(e *idp.OIDCIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *OIDCIDPWriteModel) NewChanges(
+	name,
+	issuer,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) ([]idp.OIDCIDPChanges, error) {
+	changes := make([]idp.OIDCIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeOIDCClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeOIDCClientID(clientID))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeOIDCName(name))
+	}
+	if wm.Issuer != issuer {
+		changes = append(changes, idp.ChangeOIDCIssuer(issuer))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeOIDCScopes(scopes))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeOIDCOptions(opts))
+	}
+	return changes, nil
+}
+
+// reduceIDPConfigAddedEvent handles old idpConfig events
+func (wm *OIDCIDPWriteModel) reduceIDPConfigAddedEvent(e *idpconfig.IDPConfigAddedEvent) {
+	wm.Name = e.Name
+	wm.Options.IsAutoCreation = e.AutoRegister
+	wm.State = domain.IDPStateActive
+}
+
+// reduceIDPConfigChangedEvent handles old idpConfig changes
+func (wm *OIDCIDPWriteModel) reduceIDPConfigChangedEvent(e *idpconfig.IDPConfigChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.AutoRegister != nil {
+		wm.Options.IsAutoCreation = *e.AutoRegister
+	}
+}
+
+// reduceOIDCConfigAddedEvent handles old OIDC idpConfig events
+func (wm *OIDCIDPWriteModel) reduceOIDCConfigAddedEvent(e *idpconfig.OIDCConfigAddedEvent) {
+	wm.Issuer = e.Issuer
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+}
+
+// reduceOIDCConfigChangedEvent handles old OIDC idpConfig changes
+func (wm *OIDCIDPWriteModel) reduceOIDCConfigChangedEvent(e *idpconfig.OIDCConfigChangedEvent) {
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+}
+
+type JWTIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	Name         string
+	Issuer       string
+	JWTEndpoint  string
+	KeysEndpoint string
+	HeaderName   string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *JWTIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.JWTIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.JWTIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idpconfig.IDPConfigAddedEvent:
+			wm.reduceIDPConfigAddedEvent(e)
+		case *idpconfig.IDPConfigChangedEvent:
+			wm.reduceIDPConfigChangedEvent(e)
+		case *idpconfig.JWTConfigAddedEvent:
+			wm.reduceJWTConfigAddedEvent(e)
+		case *idpconfig.JWTConfigChangedEvent:
+			wm.reduceJWTConfigChangedEvent(e)
+		case *idpconfig.IDPConfigRemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *JWTIDPWriteModel) reduceAddedEvent(e *idp.JWTIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.Issuer = e.Issuer
+	wm.JWTEndpoint = e.JWTEndpoint
+	wm.KeysEndpoint = e.KeysEndpoint
+	wm.HeaderName = e.HeaderName
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *JWTIDPWriteModel) reduceChangedEvent(e *idp.JWTIDPChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.JWTEndpoint != nil {
+		wm.JWTEndpoint = *e.JWTEndpoint
+	}
+	if e.KeysEndpoint != nil {
+		wm.KeysEndpoint = *e.KeysEndpoint
+	}
+	if e.HeaderName != nil {
+		wm.HeaderName = *e.HeaderName
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *JWTIDPWriteModel) NewChanges(
+	name,
+	issuer,
+	jwtEndpoint,
+	keysEndpoint,
+	headerName string,
+	options idp.Options,
+) ([]idp.JWTIDPChanges, error) {
+	changes := make([]idp.JWTIDPChanges, 0)
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeJWTName(name))
+	}
+	if wm.Issuer != issuer {
+		changes = append(changes, idp.ChangeJWTIssuer(issuer))
+	}
+	if wm.JWTEndpoint != jwtEndpoint {
+		changes = append(changes, idp.ChangeJWTEndpoint(jwtEndpoint))
+	}
+	if wm.KeysEndpoint != keysEndpoint {
+		changes = append(changes, idp.ChangeJWTKeysEndpoint(keysEndpoint))
+	}
+	if wm.HeaderName != headerName {
+		changes = append(changes, idp.ChangeJWTHeaderName(headerName))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeJWTOptions(opts))
+	}
+	return changes, nil
+}
+
+// reduceIDPConfigAddedEvent handles old idpConfig events
+func (wm *JWTIDPWriteModel) reduceIDPConfigAddedEvent(e *idpconfig.IDPConfigAddedEvent) {
+	wm.Name = e.Name
+	wm.Options.IsAutoCreation = e.AutoRegister
+	wm.State = domain.IDPStateActive
+}
+
+// reduceIDPConfigChangedEvent handles old idpConfig changes
+func (wm *JWTIDPWriteModel) reduceIDPConfigChangedEvent(e *idpconfig.IDPConfigChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.AutoRegister != nil {
+		wm.Options.IsAutoCreation = *e.AutoRegister
+	}
+}
+
+// reduceJWTConfigAddedEvent handles old JWT idpConfig events
+func (wm *JWTIDPWriteModel) reduceJWTConfigAddedEvent(e *idpconfig.JWTConfigAddedEvent) {
+	wm.Issuer = e.Issuer
+	wm.JWTEndpoint = e.JWTEndpoint
+	wm.KeysEndpoint = e.KeysEndpoint
+	wm.HeaderName = e.HeaderName
+}
+
+// reduceJWTConfigChangedEvent handles old JWT idpConfig changes
+func (wm *JWTIDPWriteModel) reduceJWTConfigChangedEvent(e *idpconfig.JWTConfigChangedEvent) {
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.JWTEndpoint != nil {
+		wm.JWTEndpoint = *e.JWTEndpoint
+	}
+	if e.KeysEndpoint != nil {
+		wm.KeysEndpoint = *e.KeysEndpoint
+	}
+	if e.HeaderName != nil {
+		wm.HeaderName = *e.HeaderName
+	}
+}
+
 type GitHubIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -563,36 +844,29 @@ type IDPRemoveWriteModel struct {
 
 	ID    string
 	State domain.IDPState
-	name  string
 }
 
 func (wm *IDPRemoveWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *idp.OAuthIDPAddedEvent:
-			wm.reduceAdded(e.ID, e.Name)
-		case *idp.OAuthIDPChangedEvent:
-			wm.reduceChanged(e.ID, e.Name)
+			wm.reduceAdded(e.ID)
+		case *idp.OIDCIDPAddedEvent:
+			wm.reduceAdded(e.ID)
+		case *idp.JWTIDPAddedEvent:
+			wm.reduceAdded(e.ID)
 		case *idp.GitHubIDPAddedEvent:
-			wm.reduceAdded(e.ID, e.Name)
-		case *idp.GitHubIDPChangedEvent:
-			wm.reduceChanged(e.ID, e.Name)
+			wm.reduceAdded(e.ID)
 		case *idp.GitHubEnterpriseIDPAddedEvent:
-			wm.reduceAdded(e.ID, e.Name)
-		case *idp.GitHubEnterpriseIDPChangedEvent:
-			wm.reduceChanged(e.ID, e.Name)
+			wm.reduceAdded(e.ID)
 		case *idp.GoogleIDPAddedEvent:
-			wm.reduceAdded(e.ID, e.Name)
-		case *idp.GoogleIDPChangedEvent:
-			wm.reduceChanged(e.ID, e.Name)
+			wm.reduceAdded(e.ID)
 		case *idp.LDAPIDPAddedEvent:
-			wm.reduceAdded(e.ID, e.Name)
-		case *idp.LDAPIDPChangedEvent:
-			wm.reduceChanged(e.ID, e.Name)
+			wm.reduceAdded(e.ID)
 		case *idp.RemovedEvent:
 			wm.reduceRemoved(e.ID)
 		case *idpconfig.IDPConfigAddedEvent:
-			wm.reduceAdded(e.ConfigID, "")
+			wm.reduceAdded(e.ConfigID)
 		case *idpconfig.IDPConfigRemovedEvent:
 			wm.reduceRemoved(e.ConfigID)
 		}
@@ -600,19 +874,11 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *IDPRemoveWriteModel) reduceAdded(id string, name string) {
+func (wm *IDPRemoveWriteModel) reduceAdded(id string) {
 	if wm.ID != id {
 		return
 	}
 	wm.State = domain.IDPStateActive
-	wm.name = name
-}
-
-func (wm *IDPRemoveWriteModel) reduceChanged(id string, name *string) {
-	if wm.ID != id || name == nil {
-		return
-	}
-	wm.name = *name
 }
 
 func (wm *IDPRemoveWriteModel) reduceRemoved(id string) {

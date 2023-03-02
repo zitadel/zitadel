@@ -12,12 +12,14 @@ message Metadata {
     zitadel.v1.ObjectDetails details = 1;
     string key = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "metadata key"
+            description: "metadata key",
+            example: "\"key1\"";
         }
     ];
     bytes value = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "metadata value"
+            description: "metadata value is base64 encoded, make sure to decode to get the value",
+            example: "\"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"";
         }
     ];
 }

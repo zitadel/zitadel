@@ -1,16 +1,16 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatSort, Sort } from '@angular/material/sort';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { BehaviorSubject, distinctUntilChanged, Observable, Subject, takeUntil } from 'rxjs';
+import { MatSort, Sort } from '@angular/material/sort';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
+import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { ListEventsRequest, ListEventsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { Event } from 'src/app/proto/generated/zitadel/event_pb';
-import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { ToastService } from 'src/app/services/toast.service';
-import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 
 enum EventFieldName {
   EDITOR = 'editor',

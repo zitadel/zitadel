@@ -1,11 +1,10 @@
 package view
 
 import (
-	"database/sql"
-
 	"github.com/jinzhu/gorm"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	eventstore "github.com/zitadel/zitadel/internal/eventstore/v1"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
@@ -19,7 +18,7 @@ type View struct {
 	es           eventstore.Eventstore
 }
 
-func StartView(sqlClient *sql.DB, keyAlgorithm crypto.EncryptionAlgorithm, queries *query.Queries, idGenerator id.Generator, es eventstore.Eventstore) (*View, error) {
+func StartView(sqlClient *database.DB, keyAlgorithm crypto.EncryptionAlgorithm, queries *query.Queries, idGenerator id.Generator, es eventstore.Eventstore) (*View, error) {
 	gorm, err := gorm.Open("postgres", sqlClient)
 	if err != nil {
 		return nil, err

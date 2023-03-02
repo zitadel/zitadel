@@ -7,6 +7,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -20,7 +21,7 @@ type IDPUserLink struct {
 	ProvidedUserID   string
 	ProvidedUsername string
 	ResourceOwner    string
-	IDPType          domain.IDPConfigType
+	IDPType          domain.IDPType
 }
 
 type IDPUserLinks struct {
@@ -92,7 +93,7 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPUserLinksQuery()
+	query, scan := prepareIDPUserLinksQuery(ctx, q.client)
 	eq := sq.Eq{IDPUserLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[IDPUserLinkOwnerRemovedCol.identifier()] = false
@@ -126,18 +127,23 @@ func NewIDPUserLinksResourceOwnerSearchQuery(value string) (SearchQuery, error) 
 	return NewTextQuery(IDPUserLinkResourceOwnerCol, value, TextEquals)
 }
 
-func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
+func NewIDPUserLinksExternalIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(IDPUserLinkExternalUserIDCol, value, TextEquals)
+}
+
+func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),
 			IDPUserLinkUserIDCol.identifier(),
-			IDPNameCol.identifier(),
+			IDPTemplateNameCol.identifier(),
 			IDPUserLinkExternalUserIDCol.identifier(),
 			IDPUserLinkDisplayNameCol.identifier(),
-			IDPTypeCol.identifier(),
+			IDPTemplateTypeCol.identifier(),
 			IDPUserLinkResourceOwnerCol.identifier(),
 			countColumn.identifier()).
 			From(idpUserLinkTable.identifier()).
-			LeftJoin(join(IDPIDCol, IDPUserLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
+			LeftJoin(join(IDPTemplateIDCol, IDPUserLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPUserLinks, error) {
 			idps := make([]*IDPUserLink, 0)
 			var count uint64
@@ -163,9 +169,9 @@ func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLink
 				idp.IDPName = idpName.String
 				//IDPType 0 is oidc so we have to set unspecified manually
 				if idpType.Valid {
-					idp.IDPType = domain.IDPConfigType(idpType.Int16)
+					idp.IDPType = domain.IDPType(idpType.Int16)
 				} else {
-					idp.IDPType = domain.IDPConfigTypeUnspecified
+					idp.IDPType = domain.IDPTypeUnspecified
 				}
 				idps = append(idps, idp)
 			}

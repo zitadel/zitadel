@@ -1,33 +1,37 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { ListMyUserGrantsResponse, UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
 import { ListUserGrantResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import {
-  UserGrant,
+  UserGrant as MgmtUserGrant,
   UserGrantProjectGrantIDQuery,
   UserGrantProjectIDQuery,
   UserGrantQuery,
   UserGrantUserIDQuery,
 } from 'src/app/proto/generated/zitadel/user_pb';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 export enum UserGrantContext {
   NONE = 'none',
+  AUTHUSER = 'authuser',
   USER = 'user',
   OWNED_PROJECT = 'owned',
   GRANTED_PROJECT = 'granted',
 }
 
-export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
+type UserGrantAsObject = AuthUserGrant.AsObject | MgmtUserGrant.AsObject;
+
+export class UserGrantsDataSource extends DataSource<UserGrantAsObject> {
   public totalResult: number = 0;
   public viewTimestamp!: Timestamp.AsObject;
 
-  public grantsSubject: BehaviorSubject<UserGrant.AsObject[]> = new BehaviorSubject<UserGrant.AsObject[]>([]);
+  public grantsSubject: BehaviorSubject<Array<UserGrantAsObject>> = new BehaviorSubject<Array<UserGrantAsObject>>([]);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-  constructor(private userService: ManagementService) {
+  constructor(private authService: GrpcAuthService, private userService: ManagementService) {
     super();
   }
 
@@ -43,6 +47,13 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     queries?: UserGrantQuery[],
   ): void {
     switch (context) {
+      case UserGrantContext.AUTHUSER:
+        if (data && data.userId) {
+          this.loadingSubject.next(true);
+          const promise = this.authService.listMyUserGrants(pageSize, pageSize * pageIndex);
+          this.loadResponse(promise);
+        }
+        break;
       case UserGrantContext.USER:
         if (data && data.userId) {
           this.loadingSubject.next(true);
@@ -114,34 +125,33 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     }
   }
 
-  private loadResponse(promise: Promise<ListUserGrantResponse.AsObject>): void {
-    from(promise)
-      .pipe(
-        map((resp) => {
-          if (resp.details?.totalResult) {
-            this.totalResult = resp.details.totalResult;
-          } else {
-            this.totalResult = 0;
-          }
-          if (resp.details?.viewTimestamp) {
+  private loadResponse(promise: Promise<ListUserGrantResponse.AsObject | ListMyUserGrantsResponse.AsObject>): void {
+    promise
+      .then((resp) => {
+        this.loadingSubject.next(false);
+        if (resp.resultList) {
+          this.grantsSubject.next(resp.resultList);
+        }
+        if (resp.details) {
+          this.totalResult = resp.details.totalResult;
+          if (resp.details.viewTimestamp) {
             this.viewTimestamp = resp.details.viewTimestamp;
           }
-          return resp.resultList;
-        }),
-        catchError(() => of([])),
-        finalize(() => this.loadingSubject.next(false)),
-      )
-      .subscribe((grants) => {
-        this.grantsSubject.next(grants);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        this.grantsSubject.next([]);
+        this.loadingSubject.next(false);
       });
   }
 
   /**
    * Connect this data source to the table. The table will only update when
-   * the returned stream emits new items.
-   * @returns A stream of the items to be rendered.
+   * the returned stream emits new lists of items.
+   * @returns A stream of item lists to be rendered.
    */
-  public connect(): Observable<UserGrant.AsObject[]> {
+  public connect(): Observable<Array<UserGrantAsObject>> {
     return this.grantsSubject.asObservable();
   }
 

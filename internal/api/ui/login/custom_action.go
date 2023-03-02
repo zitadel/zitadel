@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 )
 
 func (l *Login) runPostExternalAuthenticationActions(
@@ -21,18 +20,13 @@ func (l *Login) runPostExternalAuthenticationActions(
 	tokens *oidc.Tokens,
 	authRequest *domain.AuthRequest,
 	httpRequest *http.Request,
-	config *iam_model.IDPConfigView,
 	authenticationError error,
 ) (*domain.ExternalUser, error) {
 	ctx := httpRequest.Context()
 
 	resourceOwner := authRequest.RequestedOrgID
 	if resourceOwner == "" {
-		resourceOwner = config.AggregateID
-	}
-	instance := authz.GetInstance(ctx)
-	if resourceOwner == instance.InstanceID() {
-		resourceOwner = instance.DefaultOrganisationID()
+		resourceOwner = authz.GetInstance(ctx).DefaultOrganisationID()
 	}
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
 	if err != nil {
@@ -314,7 +308,7 @@ func (l *Login) runPostCreationActions(
 			actions.SetFields("v1",
 				actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 					return func(call goja.FunctionCall) goja.Value {
-						user, err := l.query.GetUserByID(actionCtx, true, authRequest.UserID, false)
+						user, err := l.query.GetUserByID(actionCtx, true, userID, false)
 						if err != nil {
 							panic(err)
 						}

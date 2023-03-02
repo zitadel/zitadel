@@ -89,6 +89,10 @@ func (c *Config) Type() string {
 	return "postgres"
 }
 
+func (c *Config) Timetravel(time.Duration) string {
+	return ""
+}
+
 type User struct {
 	Username string
 	Password string

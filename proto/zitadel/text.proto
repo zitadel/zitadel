@@ -12,37 +12,44 @@ message MessageCustomText {
     zitadel.v1.ObjectDetails details = 1;
     string title = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email title"
+            description: "custom text for email title";
+            example: "\"ZITADEL - Message Title\"";
         }
     ];
     string pre_header = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email pre header"
+            description: "custom text for email pre-header";
+            example: "\"User Message\"";
         }
     ];
     string subject = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email subject"
+            description: "custom text for email subject";
+            example: "\"Message Subject\"";
         }
     ];
     string greeting = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "custom text for email greeting"
+            example: "\"Hello {{.FirstName}} {{.LastName}},\"";
         }
     ];
     string text = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "custom text for email text"
+            example: "\"This is my custom message Text. I can also include some fields, depending on the message type I want to send. {{.FirstName}} {{.LastName}},\"";
         }
     ];
     string button_text = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email button_text"
+            description: "custom text for email button_text";
+            example: "\"Call to action\"";
         }
     ];
     string footer_text = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email footer_text"
+            description: "custom text for email footer_text";
+            example: "\"\"";
         }
     ];
     bool is_default = 9;
@@ -373,7 +380,7 @@ message ExternalUserNotFoundScreenText {
 
 message SuccessLoginScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
-    // Text to describe that auto redirect should happen after successful login
+    // Text to describe that auto-redirect should happen after successful login
     string auto_redirect_description = 2 [(validate.rules).string = {max_len: 500}];
     // Text to describe that the window can be closed after redirect
     string redirected_description = 3 [(validate.rules).string = {max_len: 100}];

@@ -10,17 +10,21 @@ import (
 )
 
 const (
-	OAuthIDPAddedEventType              eventstore.EventType = "instance.idp.oauth.added"
-	OAuthIDPChangedEventType            eventstore.EventType = "instance.idp.oauth.changed"
+	OAuthIDPAddedEventType    eventstore.EventType = "instance.idp.oauth.added"
+	OAuthIDPChangedEventType  eventstore.EventType = "instance.idp.oauth.changed"
+	OIDCIDPAddedEventType     eventstore.EventType = "instance.idp.oidc.added"
+	OIDCIDPChangedEventType   eventstore.EventType = "instance.idp.oidc.changed"
+	JWTIDPAddedEventType      eventstore.EventType = "instance.idp.jwt.added"
+	JWTIDPChangedEventType    eventstore.EventType = "instance.idp.jwt.changed"
 	GitHubIDPAddedEventType             eventstore.EventType = "instance.idp.github.added"
 	GitHubIDPChangedEventType           eventstore.EventType = "instance.idp.github.changed"
 	GitHubEnterpriseIDPAddedEventType   eventstore.EventType = "instance.idp.github_enterprise.added"
 	GitHubEnterpriseIDPChangedEventType eventstore.EventType = "instance.idp.github_enterprise.changed"
-	GoogleIDPAddedEventType             eventstore.EventType = "instance.idp.google.added"
-	GoogleIDPChangedEventType           eventstore.EventType = "instance.idp.google.changed"
-	LDAPIDPAddedEventType               eventstore.EventType = "instance.idp.ldap.added"
-	LDAPIDPChangedEventType             eventstore.EventType = "instance.idp.ldap.changed"
-	IDPRemovedEventType                 eventstore.EventType = "instance.idp.removed"
+	GoogleIDPAddedEventType   eventstore.EventType = "instance.idp.google.added"
+	GoogleIDPChangedEventType eventstore.EventType = "instance.idp.google.changed"
+	LDAPIDPAddedEventType     eventstore.EventType = "instance.idp.ldap.added"
+	LDAPIDPChangedEventType   eventstore.EventType = "instance.idp.ldap.changed"
+	IDPRemovedEventType       eventstore.EventType = "instance.idp.removed"
 )
 
 type OAuthIDPAddedEvent struct {
@@ -103,6 +107,162 @@ func OAuthIDPChangedEventMapper(event *repository.Event) (eventstore.Event, erro
 	}
 
 	return &OAuthIDPChangedEvent{OAuthIDPChangedEvent: *e.(*idp.OAuthIDPChangedEvent)}, nil
+}
+
+type OIDCIDPAddedEvent struct {
+	idp.OIDCIDPAddedEvent
+}
+
+func NewOIDCIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	issuer,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	options idp.Options,
+) *OIDCIDPAddedEvent {
+
+	return &OIDCIDPAddedEvent{
+		OIDCIDPAddedEvent: *idp.NewOIDCIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				OIDCIDPAddedEventType,
+			),
+			id,
+			name,
+			issuer,
+			clientID,
+			clientSecret,
+			scopes,
+			options,
+		),
+	}
+}
+
+func OIDCIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.OIDCIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OIDCIDPAddedEvent{OIDCIDPAddedEvent: *e.(*idp.OIDCIDPAddedEvent)}, nil
+}
+
+type OIDCIDPChangedEvent struct {
+	idp.OIDCIDPChangedEvent
+}
+
+func NewOIDCIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.OIDCIDPChanges,
+) (*OIDCIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewOIDCIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OIDCIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &OIDCIDPChangedEvent{OIDCIDPChangedEvent: *changedEvent}, nil
+}
+
+func OIDCIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.OIDCIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OIDCIDPChangedEvent{OIDCIDPChangedEvent: *e.(*idp.OIDCIDPChangedEvent)}, nil
+}
+
+type JWTIDPAddedEvent struct {
+	idp.JWTIDPAddedEvent
+}
+
+func NewJWTIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	issuer,
+	jwtEndpoint,
+	keysEndpoint,
+	headerName string,
+	options idp.Options,
+) *JWTIDPAddedEvent {
+
+	return &JWTIDPAddedEvent{
+		JWTIDPAddedEvent: *idp.NewJWTIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				JWTIDPAddedEventType,
+			),
+			id,
+			name,
+			issuer,
+			jwtEndpoint,
+			keysEndpoint,
+			headerName,
+			options,
+		),
+	}
+}
+
+func JWTIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.JWTIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &JWTIDPAddedEvent{JWTIDPAddedEvent: *e.(*idp.JWTIDPAddedEvent)}, nil
+}
+
+type JWTIDPChangedEvent struct {
+	idp.JWTIDPChangedEvent
+}
+
+func NewJWTIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.JWTIDPChanges,
+) (*JWTIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewJWTIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			JWTIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &JWTIDPChangedEvent{JWTIDPChangedEvent: *changedEvent}, nil
+}
+
+func JWTIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.JWTIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &JWTIDPChangedEvent{JWTIDPChangedEvent: *e.(*idp.JWTIDPChangedEvent)}, nil
 }
 
 type GitHubIDPAddedEvent struct {
@@ -437,7 +597,6 @@ func NewIDPRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
-	name string,
 ) *IDPRemovedEvent {
 	return &IDPRemovedEvent{
 		RemovedEvent: *idp.NewRemovedEvent(
@@ -447,7 +606,6 @@ func NewIDPRemovedEvent(
 				IDPRemovedEventType,
 			),
 			id,
-			name,
 		),
 	}
 }

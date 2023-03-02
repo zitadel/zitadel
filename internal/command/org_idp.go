@@ -18,7 +18,8 @@ func (c *Commands) AddOrgGenericOAuthProvider(ctx context.Context, resourceOwner
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgOAuthProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgOAuthProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -31,13 +32,98 @@ func (c *Commands) AddOrgGenericOAuthProvider(ctx context.Context, resourceOwner
 
 func (c *Commands) UpdateOrgGenericOAuthProvider(ctx context.Context, resourceOwner, id string, provider GenericOAuthProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgOAuthProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgOAuthProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) AddOrgGenericOIDCProvider(ctx context.Context, resourceOwner string, provider GenericOIDCProvider) (string, *domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+	writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgOIDCProvider(orgAgg, writeModel, provider))
+	if err != nil {
+		return "", nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) UpdateOrgGenericOIDCProvider(ctx context.Context, resourceOwner, id string, provider GenericOIDCProvider) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgOIDCProvider(orgAgg, writeModel, provider))
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) AddOrgJWTProvider(ctx context.Context, resourceOwner string, provider JWTProvider) (string, *domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+	writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgJWTProvider(orgAgg, writeModel, provider))
+	if err != nil {
+		return "", nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) UpdateOrgJWTProvider(ctx context.Context, resourceOwner, id string, provider JWTProvider) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgJWTProvider(orgAgg, writeModel, provider))
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
@@ -120,7 +206,8 @@ func (c *Commands) AddOrgGoogleProvider(ctx context.Context, resourceOwner strin
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgGoogleProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgGoogleProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -133,13 +220,18 @@ func (c *Commands) AddOrgGoogleProvider(ctx context.Context, resourceOwner strin
 
 func (c *Commands) UpdateOrgGoogleProvider(ctx context.Context, resourceOwner, id string, provider GoogleProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgGoogleProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgGoogleProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
@@ -154,7 +246,8 @@ func (c *Commands) AddOrgLDAPProvider(ctx context.Context, resourceOwner string,
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgLDAPProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewLDAPOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgLDAPProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -167,13 +260,18 @@ func (c *Commands) AddOrgLDAPProvider(ctx context.Context, resourceOwner string,
 
 func (c *Commands) UpdateOrgLDAPProvider(ctx context.Context, resourceOwner, id string, provider LDAPProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgLDAPProvider(orgAgg, resourceOwner, id, provider))
+	writeModel := NewLDAPOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgLDAPProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
@@ -195,7 +293,24 @@ func (c *Commands) DeleteOrgProvider(ctx context.Context, resourceOwner, id stri
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOAuthProvider) preparation.Validation {
+func ExistsOrgIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {
+	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
+	events, err := filter(ctx, writeModel.Query())
+	if err != nil {
+		return false, err
+	}
+
+	if len(events) == 0 {
+		return false, nil
+	}
+	writeModel.AppendEvents(events...)
+	if err := writeModel.Reduce(); err != nil {
+		return false, err
+	}
+	return writeModel.State.Exists(), nil
+}
+
+func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, writeModel *OrgOAuthIDPWriteModel, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D32ef", "Errors.Invalid.Argument")
@@ -216,7 +331,6 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, i
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Fb8jk", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -233,7 +347,7 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, i
 				org.NewOAuthIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
-					id,
+					writeModel.ID,
 					provider.Name,
 					provider.ClientID,
 					secret,
@@ -248,8 +362,11 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, i
 	}
 }
 
-func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOAuthProvider) preparation.Validation {
+func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, writeModel *OrgOAuthIDPWriteModel, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-asfsa", "Errors.Invalid.Argument")
+		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D32ef", "Errors.Invalid.Argument")
 		}
@@ -266,7 +383,6 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, resourceOwner
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Fb8jk", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -281,7 +397,7 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, resourceOwner
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
-				id,
+				writeModel.ID,
 				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,
@@ -292,11 +408,192 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, resourceOwner
 				provider.Scopes,
 				provider.IDPOptions,
 			)
+			if err != nil || event == nil {
+				return nil, err
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, writeModel *OrgOIDCIDPWriteModel, provider GenericOIDCProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Sgtj5", "Errors.Invalid.Argument")
+		}
+		if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Hz6zj", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-fb5jm", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Sfdf4", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
 			}
-			if event == nil {
-				return nil, nil
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				org.NewOIDCIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					provider.Name,
+					provider.Issuer,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.IDPOptions,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, writeModel *OrgOIDCIDPWriteModel, provider GenericOIDCProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SAfd3", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dvf4f", "Errors.Invalid.Argument")
+		}
+		if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-BDfr3", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Db3bs", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "ORG-Dg331", "Errors.Org.IDPConfig.NotExisting")
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				writeModel.ID,
+				provider.Name,
+				provider.Issuer,
+				provider.ClientID,
+				provider.ClientSecret,
+				c.idpConfigEncryption,
+				provider.Scopes,
+				provider.IDPOptions,
+			)
+			if err != nil || event == nil {
+				return nil, err
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, writeModel *OrgJWTIDPWriteModel, provider JWTProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JLKef", "Errors.Invalid.Argument")
+		}
+		if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-WNJK3", "Errors.Invalid.Argument")
+		}
+		if provider.JWTEndpoint = strings.TrimSpace(provider.JWTEndpoint); provider.JWTEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-NJKSD", "Errors.Invalid.Argument")
+		}
+		if provider.KeyEndpoint = strings.TrimSpace(provider.KeyEndpoint); provider.KeyEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-NJKE3", "Errors.Invalid.Argument")
+		}
+		if provider.HeaderName = strings.TrimSpace(provider.HeaderName); provider.HeaderName == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2rlks", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				org.NewJWTIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					provider.Name,
+					provider.Issuer,
+					provider.JWTEndpoint,
+					provider.KeyEndpoint,
+					provider.HeaderName,
+					provider.IDPOptions,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, writeModel *OrgJWTIDPWriteModel, provider JWTProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		}
+		if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKs3f", "Errors.Invalid.Argument")
+		}
+		if provider.JWTEndpoint = strings.TrimSpace(provider.JWTEndpoint); provider.JWTEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-NJKS2", "Errors.Invalid.Argument")
+		}
+		if provider.KeyEndpoint = strings.TrimSpace(provider.KeyEndpoint); provider.KeyEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SJk2d", "Errors.Invalid.Argument")
+		}
+		if provider.HeaderName = strings.TrimSpace(provider.HeaderName); provider.HeaderName == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SJK2f", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "ORG-Bhju5", "Errors.Org.IDPConfig.NotExisting")
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				writeModel.ID,
+				provider.Name,
+				provider.Issuer,
+				provider.JWTEndpoint,
+				provider.KeyEndpoint,
+				provider.HeaderName,
+				provider.IDPOptions,
+			)
+			if err != nil || event == nil {
+				return nil, err
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
@@ -495,7 +792,7 @@ func (c *Commands) prepareUpdateOrgGitHubEnterpriseProvider(a *org.Aggregate, re
 	}
 }
 
-func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, id string, provider GoogleProvider) preparation.Validation {
+func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, writeModel *OrgGoogleIDPWriteModel, provider GoogleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D3fvs", "Errors.Invalid.Argument")
@@ -504,7 +801,6 @@ func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, 
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-W2vqs", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -518,22 +814,30 @@ func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, 
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, provider.Name, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
+				org.NewGoogleIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					provider.Name,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.IDPOptions,
+				),
 			}, nil
 		}, nil
 	}
 }
 
-func (c *Commands) prepareUpdateOrgGoogleProvider(a *org.Aggregate, resourceOwner, id string, provider GoogleProvider) preparation.Validation {
+func (c *Commands) prepareUpdateOrgGoogleProvider(a *org.Aggregate, writeModel *OrgGoogleIDPWriteModel, provider GoogleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if id = strings.TrimSpace(id); id == "" {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-S32t1", "Errors.Invalid.Argument")
 		}
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-ds432", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -548,7 +852,7 @@ func (c *Commands) prepareUpdateOrgGoogleProvider(a *org.Aggregate, resourceOwne
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
-				id,
+				writeModel.ID,
 				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,
@@ -556,18 +860,15 @@ func (c *Commands) prepareUpdateOrgGoogleProvider(a *org.Aggregate, resourceOwne
 				provider.Scopes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
 	}
 }
 
-func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, resourceOwner, id string, provider LDAPProvider) preparation.Validation {
+func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, writeModel *OrgLDAPIDPWriteModel, provider LDAPProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SAfdd", "Errors.Invalid.Argument")
@@ -591,7 +892,6 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, resourceOwner, id
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-sdf5h", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewLDAPOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -608,7 +908,7 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, resourceOwner, id
 				org.NewLDAPIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
-					id,
+					writeModel.ID,
 					provider.Name,
 					provider.Host,
 					provider.Port,
@@ -626,9 +926,9 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, resourceOwner, id
 	}
 }
 
-func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, resourceOwner, id string, provider LDAPProvider) preparation.Validation {
+func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, writeModel *OrgLDAPIDPWriteModel, provider LDAPProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if id = strings.TrimSpace(id); id == "" {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dgdbs", "Errors.Invalid.Argument")
 		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
@@ -650,7 +950,6 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, resourceOwner,
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-DG45z", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewLDAPOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -665,7 +964,7 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, resourceOwner,
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
-				id,
+				writeModel.ID,
 				writeModel.Name,
 				provider.Name,
 				provider.Host,
@@ -680,11 +979,8 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, resourceOwner,
 				provider.LDAPAttributes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
@@ -706,7 +1002,7 @@ func (c *Commands) prepareDeleteOrgProvider(a *org.Aggregate, resourceOwner, id 
 			if !writeModel.State.Exists() {
 				return nil, caos_errs.ThrowNotFound(nil, "ORG-Se3tg", "Errors.Org.IDPConfig.NotExisting")
 			}
-			return []eventstore.Command{org.NewIDPRemovedEvent(ctx, &a.Aggregate, id, writeModel.name)}, nil
+			return []eventstore.Command{org.NewIDPRemovedEvent(ctx, &a.Aggregate, id)}, nil
 		}, nil
 	}
 }

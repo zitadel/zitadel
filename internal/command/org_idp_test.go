@@ -459,7 +459,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{},
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 		{
@@ -1737,7 +1737,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{},
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 		{
@@ -2361,7 +2361,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{},
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 		{
