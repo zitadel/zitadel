@@ -351,8 +351,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 	ctxFields := actions.SetContextFields(
 		actions.SetFields("v1",
 			actions.SetFields("claims", func(c *actions.FieldConfig) interface{} {
-				// TODO: where do i get the claims from?
-				return nil
+				return c.Runtime.ToValue(userInfo.GetClaims())
 			}),
 			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 				return func(call goja.FunctionCall) goja.Value {
