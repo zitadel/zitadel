@@ -252,7 +252,12 @@
       </ng-container>
     </ng-template>
 
-    <div (click)="openHelp()" class="nav-shortcut-action-key" matTooltip="{{ 'MENU.OPENSHORTCUTSTOOLTIP' | translate }}">
+    <div
+      (click)="openHelp()"
+      class="nav-shortcut-action-key"
+      tabindex="0"
+      matTooltip="{{ 'MENU.OPENSHORTCUTSTOOLTIP' | translate }}"
+    >
       <div class="nav-key-overlay"></div>
       <span>?</span>
     </div>
