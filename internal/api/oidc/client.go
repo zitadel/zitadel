@@ -350,6 +350,10 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 
 	ctxFields := actions.SetContextFields(
 		actions.SetFields("v1",
+			actions.SetFields("claims", func(c *actions.FieldConfig) interface{} {
+				// TODO: where do i get the claims from?
+				return nil
+			}),
 			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 				return func(call goja.FunctionCall) goja.Value {
 					user, err := o.query.GetUserByID(ctx, true, userInfo.GetSubject(), false)
@@ -381,7 +385,9 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 						return object.UserMetadataListFromQuery(c, metadata)
 					}
 				}),
-				actions.SetFields("grant", object.UserGrantsFromQuery(userGrants)),
+				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
+					return object.UserGrantsFromQuery(c, userGrants)
+				}),
 			),
 		),
 	)
@@ -392,7 +398,20 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 
 		apiFields := actions.WithAPIFields(
 			actions.SetFields("v1",
+				// TODO: deprecation warning
 				actions.SetFields("userinfo",
+					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if userInfo.GetClaim(key) == nil {
+							userInfo.AppendClaims(key, value)
+							return
+						}
+						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))
+					}),
+					actions.SetFields("appendLogIntoClaims", func(entry string) {
+						claimLogs = append(claimLogs, entry)
+					}),
+				),
+				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
 						if userInfo.GetClaim(key) == nil {
 							userInfo.AppendClaims(key, value)
@@ -517,6 +536,9 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 
 	ctxFields := actions.SetContextFields(
 		actions.SetFields("v1",
+			actions.SetFields("claims", func(c *actions.FieldConfig) interface{} {
+				return c.Runtime.ToValue(claims)
+			}),
 			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 				return func(call goja.FunctionCall) goja.Value {
 					user, err := o.query.GetUserByID(ctx, true, userID, false)
@@ -548,7 +570,9 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 						return object.UserMetadataListFromQuery(c, metadata)
 					}
 				}),
-				actions.SetFields("grants", object.UserGrantsFromQuery(userGrants)),
+				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
+					return object.UserGrantsFromQuery(c, userGrants)
+				}),
 			),
 		),
 	)
