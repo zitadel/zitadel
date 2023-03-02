@@ -5,7 +5,6 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "yarn generate && docusaurus start",
-    "start_small": "docusaurus start", 
     "build": "yarn generate && docusaurus build --no-minify",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
