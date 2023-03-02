@@ -344,9 +344,17 @@ func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
 	claimsJSON := func() (string, error) {
 		return "", nil
 	}
-	if tokens != nil {
-		accessToken = tokens.AccessToken
-		idToken = tokens.IDToken
+	if tokens == nil {
+		return []actions.FieldOption{
+			actions.SetFields("accessToken", accessToken),
+			actions.SetFields("idToken", idToken),
+			actions.SetFields("getClaim", getClaim),
+			actions.SetFields("claimsJSON", claimsJSON),
+		}
+	}
+	accessToken = tokens.AccessToken
+	idToken = tokens.IDToken
+	if tokens.IDTokenClaims != nil {
 		getClaim = func(claim string) interface{} {
 			return tokens.IDTokenClaims.GetClaim(claim)
 		}
