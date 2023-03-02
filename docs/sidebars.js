@@ -7,13 +7,6 @@ module.exports = {
       collapsed: false,
       items: [
         "guides/start/quickstart",
-      ],
-    },
-    "examples/sdks",
-    {
-      type: "category",
-      label: "Quickstarts",
-      items: [
         {
           type: "category",
           label: "Frontend",
@@ -23,7 +16,7 @@ module.exports = {
             "examples/login/flutter",
             "examples/login/nextjs",
           ],
-          collapsed: false,
+          collapsed: true,
         },
         {
           type: "category",
@@ -33,11 +26,11 @@ module.exports = {
             "examples/secure-api/python-flask", 
             "examples/secure-api/dot-net"
           ],
-          collapsed: false,
+          collapsed: true,
         },
       ],
-      collapsed: true,
     },
+    "examples/sdks",
     {
       type: "category",
       label: "Example Applications",
@@ -170,7 +163,7 @@ module.exports = {
         {
           type: "category",
           label: "Services",
-          collapsed: false,
+          collapsed: true,
           items: [
             "guides/integrate/services/gitlab-self-hosted",
             "guides/integrate/services/aws-saml",
@@ -183,8 +176,8 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Infrastructure",
-          collapsed: false,
+          label: "Tools",
+          collapsed: true,
           items: [
             "guides/integrate/authenticated-mongodb-charts",
             "examples/identity-proxy/oauth2-proxy"
@@ -235,7 +228,7 @@ module.exports = {
         {
           type: "category",
           label: "Eventstore",
-          collapsed: false,
+          collapsed: true,
           items: [
             "concepts/eventstore/overview",
             "concepts/eventstore/implementation",
