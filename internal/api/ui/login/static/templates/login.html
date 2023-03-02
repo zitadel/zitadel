@@ -47,7 +47,7 @@
         {{ $reqid := .AuthReqID}}
         {{range $provider := .IDPProviders}}
         <a href="{{ externalIDPAuthURL $reqid $provider.IDPConfigID}}"
-            class="lgn-idp {{idpProviderClass $provider.StylingType}}">
+            class="lgn-idp {{idpProviderClass $provider.IDPType}}">
             <span class="logo"></span>
             <span class="provider-name">{{$provider.Name}}</span>
         </a>

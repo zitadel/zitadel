@@ -2,6 +2,7 @@ package setup
 
 import (
 	"context"
+	"embed"
 	_ "embed"
 
 	"github.com/spf13/cobra"
@@ -81,11 +82,12 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
 
-	steps.s4EventstoreIndexes = &EventstoreIndexes{dbClient: dbClient.DB, dbType: config.Database.Type()}
+	steps.s4EventstoreIndexes = New04(dbClient)
 	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
 	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
 	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
-	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient.DB}
+	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
+	steps.s9EventstoreIndexes2 = New09(dbClient)
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -119,9 +121,16 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 7")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s8AuthTokens)
 	logging.OnError(err).Fatal("unable to migrate step 8")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s9EventstoreIndexes2)
+	logging.OnError(err).Fatal("unable to migrate step 9")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
 		logging.OnError(err).Fatalf("unable to migrate repeatable step: %s", repeatableStep.String())
 	}
+}
+
+func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
+	stmt, err := fs.ReadFile(folder + "/" + typ + "/" + filename)
+	return string(stmt), err
 }

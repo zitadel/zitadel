@@ -38,7 +38,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 					Scopes:      []string{"user"},
 				},
 			},
-			want: &Session{AuthURL: "https://oauth2.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
+			want: &Session{AuthURL: "https://oauth2.com/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
 		},
 	}
 	for _, tt := range tests {

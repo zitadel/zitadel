@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  zitadel:
+    extends:
+      file: '../localhost/docker-compose.yaml'
+      service: 'zitadel'
+    volumes:
+      - ./zitadel.yaml:/zitadel.yaml
+
+  db:
+    extends:
+      file: '../localhost/docker-compose.yaml'
+      service: 'db'
+
+  prepare:
+    image: node:18-alpine3.15
+    working_dir: /e2e
+    user: '$UID'
+    volumes:
+      - ../../:/e2e
+    command: 'sh -c "npm ci --omit=dev && npm run lint && npx wait-on http://zitadel:8080/debug/ready"'
+
+  e2e:
+    image: cypress/included:12.2.0
+    depends_on:
+      zitadel:
+        condition: 'service_started'
+      db:
+        condition: 'service_healthy'
+      prepare:
+        condition: 'service_completed_successfully'
+    working_dir: /e2e
+    user: '$UID'
+    volumes:
+      - ../../:/e2e
+    environment:
+      CYPRESS_BASE_URL: http://host.docker.internal:8080/ui/console
+      CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal
+      CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://root@db:26257/zitadel'
+    ports:
+      - "8900:8900"
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
