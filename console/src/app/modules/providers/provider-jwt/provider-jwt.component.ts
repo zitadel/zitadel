@@ -28,6 +28,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   styleUrls: ['./provider-jwt.component.scss'],
 })
 export class ProviderJWTComponent {
+  public showOptional: boolean = false;
   public options: Options = new Options();
 
   public id: string | null = '';

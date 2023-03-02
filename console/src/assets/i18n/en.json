@@ -1657,6 +1657,8 @@
       "1": "active",
       "2": "inactive"
     },
+    "OPTIONAL": "optional",
+    "UPDATECLIENTSECRET": "update client secret",
     "ADD": "Add Identity Provider",
     "TYPE": "Type",
     "OWNER": "Owner",

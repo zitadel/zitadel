@@ -1661,6 +1661,8 @@
       "1": "actif",
       "2": "inactif"
     },
+    "OPTIONAL": "optionnel",
+    "UPDATECLIENTSECRET": "mise à jour du secret client",
     "ADD": "Ajouter un fournisseur d'identité",
     "TYPE": "Type",
     "OWNER": "Propriétaire",

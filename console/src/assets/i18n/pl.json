@@ -1661,6 +1661,8 @@
       "1": "aktywny",
       "2": "nieaktywny"
     },
+    "OPTIONAL": "opcjonalnie",
+    "UPDATECLIENTSECRET": "aktualizacja tajemnicy klienta",
     "ADD": "Dodaj dostawcę tożsamości",
     "TYPE": "Typ",
     "OWNER": "Właściciel",
