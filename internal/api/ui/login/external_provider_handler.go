@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -638,9 +637,6 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 }
 
 func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens, err error) {
-	if tokens == nil {
-		tokens = &oidc.Tokens{Token: &oauth2.Token{}}
-	}
 	if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, err); actionErr != nil {
 		logging.WithError(err).Error("both external user authentication and action post authentication failed")
 	}
@@ -655,7 +651,7 @@ func tokens(session idp.Session) *oidc.Tokens {
 	case *jwt.Session:
 		return s.Tokens
 	}
-	return &oidc.Tokens{Token: &oauth2.Token{}}
+	return nil
 }
 
 func mapIDPUserToExternalUser(user idp.User, id string) *domain.ExternalUser {

@@ -66,8 +66,7 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, identityProvider *query.IDPTemplate) {
 	token, err := getToken(r, identityProvider.JWTIDPTemplate.HeaderName)
 	if err != nil {
-		emptyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
-		if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emptyTokens, authReq, r, err); actionErr != nil {
+		if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, nil, authReq, r, err); actionErr != nil {
 			logging.WithError(err).Error("both external user authentication and action post authentication failed")
 		}
 
@@ -76,8 +75,7 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 	}
 	provider, err := l.jwtProvider(r.Context(), identityProvider)
 	if err != nil {
-		emptyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
-		if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emptyTokens, authReq, r, err); actionErr != nil {
+		if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, nil, authReq, r, err); actionErr != nil {
 			logging.WithError(err).Error("both external user authentication and action post authentication failed")
 		}
 		l.renderError(w, r, authReq, err)
