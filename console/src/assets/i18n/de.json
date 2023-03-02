@@ -1661,6 +1661,7 @@
       "1": "aktiv",
       "2": "inaktiv"
     },
+    "NAMEHINT": "Wenn angegeben, wir er im Login interface angezeigt.",
     "OPTIONAL": "optional",
     "UPDATECLIENTSECRET": "Client Secret updaten",
     "ADD": "Identity Provider hinzufügen",

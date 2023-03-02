@@ -1661,6 +1661,7 @@
       "1": "aktywny",
       "2": "nieaktywny"
     },
+    "NAMEHINT": "Jeśli zostanie podany, będzie widoczny w interfejsie logowania.",
     "OPTIONAL": "opcjonalnie",
     "UPDATECLIENTSECRET": "aktualizacja tajemnicy klienta",
     "ADD": "Dodaj dostawcę tożsamości",

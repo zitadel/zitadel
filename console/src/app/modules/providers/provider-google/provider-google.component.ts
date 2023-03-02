@@ -52,6 +52,13 @@ export class ProviderGoogleComponent {
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
   ) {
+    this.form = new FormGroup({
+      name: new FormControl('', []),
+      clientId: new FormControl('', [Validators.required]),
+      clientSecret: new FormControl('', [Validators.required]),
+      scopesList: new FormControl(['openid', 'profile', 'email'], []),
+    });
+
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
 
@@ -80,15 +87,9 @@ export class ProviderGoogleComponent {
 
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
+        this.clientSecret?.setValidators([]);
         this.getData(this.id);
       }
-    });
-
-    this.form = new FormGroup({
-      name: new FormControl('', [Validators.required]),
-      clientId: new FormControl('', [Validators.required]),
-      clientSecret: new FormControl('', []),
-      scopesList: new FormControl(['openid', 'profile', 'email'], []),
     });
   }
 

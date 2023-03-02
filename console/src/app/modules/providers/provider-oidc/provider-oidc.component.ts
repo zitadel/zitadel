@@ -51,6 +51,14 @@ export class ProviderOIDCComponent {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
+    this.oidcFormGroup = new UntypedFormGroup({
+      name: new UntypedFormControl('', [Validators.required]),
+      clientId: new UntypedFormControl('', [Validators.required]),
+      clientSecret: new UntypedFormControl('', [Validators.required]),
+      issuer: new UntypedFormControl('', [Validators.required]),
+      scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
+    });
+
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
 
@@ -79,19 +87,9 @@ export class ProviderOIDCComponent {
 
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
+        this.clientSecret?.setValidators([]);
         this.getData(this.id);
       }
-    });
-
-    this.oidcFormGroup = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      clientId: new UntypedFormControl('', [Validators.required]),
-      clientSecret: new UntypedFormControl('', []),
-      issuer: new UntypedFormControl('', [Validators.required]),
-      scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
-      idpDisplayNameMapping: new UntypedFormControl(0),
-      usernameMapping: new UntypedFormControl(0),
-      autoRegister: new UntypedFormControl(false),
     });
   }
 

@@ -1661,6 +1661,7 @@
       "1": "actif",
       "2": "inactif"
     },
+    "NAMEHINT": "Si elle est spécifiée, elle sera affichée dans l'interface de connexion.",
     "OPTIONAL": "optionnel",
     "UPDATECLIENTSECRET": "mise à jour du secret client",
     "ADD": "Ajouter un fournisseur d'identité",

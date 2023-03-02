@@ -1657,6 +1657,7 @@
       "1": "active",
       "2": "inactive"
     },
+    "NAMEHINT": "If specified it will be shown in the login interface.",
     "OPTIONAL": "optional",
     "UPDATECLIENTSECRET": "update client secret",
     "ADD": "Add Identity Provider",

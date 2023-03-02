@@ -23,6 +23,10 @@
     display: block;
     max-width: 400px;
 
+    .name-hint {
+      font-size: 12px;
+    }
+
     .mat-chip-input {
       width: 100%;
       margin: 0;
