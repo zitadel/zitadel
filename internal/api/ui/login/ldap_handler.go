@@ -3,6 +3,7 @@ package login
 import (
 	"net/http"
 
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 )
@@ -12,8 +13,9 @@ const (
 )
 
 type ldapFormData struct {
-	Username string `schema:"username"`
-	Password string `schema:"password"`
+	Username         string `schema:"username"`
+	Password         string `schema:"password"`
+	ResetExternalIDP bool   `schema:"resetexternalidp"`
 }
 
 func (l *Login) handleLDAP(w http.ResponseWriter, r *http.Request) {
@@ -40,6 +42,16 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
+		return
+	}
+	if data.ResetExternalIDP {
+		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+		err := l.authRepo.ResetSelectedIDP(r.Context(), authReq.ID, userAgentID)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+		}
+
+		l.handleLoginName(w, r)
 		return
 	}
 

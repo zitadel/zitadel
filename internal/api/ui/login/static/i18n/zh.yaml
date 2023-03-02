@@ -16,7 +16,6 @@ LDAP:
   Description: 输入您的登录数据。
   LoginNameLabel: 登录名
   PasswordLabel: 密码
-  BackButtonText: 后退
   NextButtonText: 继续
 
 SelectAccount:
