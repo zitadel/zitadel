@@ -1616,20 +1616,20 @@
       "ACTIVETITLE": "Identity Providers"
     },
     "CREATE": {
-      "TITLE": "Add provider",
-      "DESCRIPTION": "Select one ore more of the following providers.",
+      "TITLE": "Aggiungi provider",
+      "DESCRIPTION": "Seleziona uno dei seguenti provider.",
       "STEPPERTITLE": "Create Provider",
       "OIDC": {
         "TITLE": "OIDC Provider",
-        "DESCRIPTION": "Enter the required data for your OIDC provider."
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider OIDC."
       },
       "JWT": {
         "TITLE": "JWT Provider",
-        "DESCRIPTION": "Enter the required data for your JWT provider."
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider JWT."
       },
       "GOOGLE": {
         "TITLE": "Google Provider",
-        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Google provider."
       }
     },
     "DETAIL": {
@@ -1639,14 +1639,14 @@
       "DATECHANGED": "Cambiato"
     },
     "OPTIONS": {
-      "ISAUTOCREATION": "is auto creating",
-      "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
-      "ISAUTOUPDATE": "is auto updating",
-      "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
-      "ISCREATIONALLOWED": "is creation allowed",
-      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
-      "ISLINKINGALLOWED": "is linking allowed",
-      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
+      "ISAUTOCREATION": "Creazione automatica",
+      "ISAUTOCREATION_DESC": "Se selezionato, verrà creato un account se non esiste ancora.",
+      "ISAUTOUPDATE": "Aggiornamento automatico",
+      "ISAUTOUPDATE_DESC": "Se selezionato, gli account vengono aggiornati alla riautenticazione.",
+      "ISCREATIONALLOWED": "Creazione consentita",
+      "ISCREATIONALLOWED_DESC": "Determina se i conti possono essere creati.",
+      "ISLINKINGALLOWED": "Collegamento consentito",
+      "ISLINKINGALLOWED_DESC": "Determina se un'identità può essere collegata a un account esistente."
     },
     "OWNERTYPES": {
       "0": "sconosciuto",
@@ -1661,15 +1661,6 @@
     "STATES": {
       "1": "attivo",
       "2": "inattivo"
-    },
-    "MAPPINGFIELD": {
-      "1": "Nome utente preferito",
-      "2": "Email"
-    },
-    "STYLE": "Stile",
-    "STYLEFIELD": {
-      "0": "No Styling",
-      "1": "Google"
     },
     "ADD": "Aggiungi Identity Provider",
     "TYPE": "Tipo",

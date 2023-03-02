@@ -1615,20 +1615,20 @@
       "ACTIVETITLE": "Aktive Identitäts Provider"
     },
     "CREATE": {
-      "TITLE": "Add provider",
-      "DESCRIPTION": "Select one ore more of the following providers.",
-      "STEPPERTITLE": "Create Provider",
+      "TITLE": "Provider hinzufügen",
+      "DESCRIPTION": "Wähle einen der verfügbaren Provider.",
+      "STEPPERTITLE": "Provider hinzufügen",
       "OIDC": {
         "TITLE": "OIDC Provider",
-        "DESCRIPTION": "Enter the required data for your OIDC provider."
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren OIDC-Provider ein."
       },
       "JWT": {
         "TITLE": "JWT Provider",
-        "DESCRIPTION": "Enter the required data for your JWT provider."
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren JWT-Provider ein."
       },
       "GOOGLE": {
         "TITLE": "Google Provider",
-        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Google-Identitätsprovider ein."
       }
     },
     "DETAIL": {
@@ -1660,15 +1660,6 @@
     "STATES": {
       "1": "aktiv",
       "2": "inaktiv"
-    },
-    "MAPPINGFIELD": {
-      "1": "Preferred Username",
-      "2": "Email"
-    },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "kein Styling",
-      "1": "Google"
     },
     "ADD": "Identity Provider hinzufügen",
     "TYPE": "Typ",

@@ -1639,13 +1639,13 @@
       "DATECHANGED": "Changed"
     },
     "OPTIONS": {
-      "ISAUTOCREATION": "is auto creating",
+      "ISAUTOCREATION": "Automatic creation",
       "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
-      "ISAUTOUPDATE": "is auto updating",
+      "ISAUTOUPDATE": "Automatic update",
       "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
-      "ISCREATIONALLOWED": "is creation allowed",
+      "ISCREATIONALLOWED": "Account creation allowed",
       "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
-      "ISLINKINGALLOWED": "is linking allowed",
+      "ISLINKINGALLOWED": "Account linking allowed",
       "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
     },
     "OWNERTYPES": {
@@ -1656,15 +1656,6 @@
     "STATES": {
       "1": "active",
       "2": "inactive"
-    },
-    "MAPPINGFIELD": {
-      "1": "Preferred Username",
-      "2": "Email"
-    },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "No Styling",
-      "1": "Google"
     },
     "ADD": "Add Identity Provider",
     "TYPE": "Type",

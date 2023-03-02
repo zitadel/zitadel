@@ -1661,15 +1661,6 @@
       "1": "actif",
       "2": "inactif"
     },
-    "MAPPINGFIELD": {
-      "1": "Nom d'utilisateur préféré",
-      "2": "Courriel"
-    },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "Pas de style",
-      "1": "Google"
-    },
     "ADD": "Ajouter un fournisseur d'identité",
     "TYPE": "Type",
     "OWNER": "Propriétaire",

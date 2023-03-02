@@ -1615,20 +1615,20 @@
       "ACTIVETITLE": "Aktywni dostawcy tożsamości"
     },
     "CREATE": {
-      "TITLE": "Add provider",
-      "DESCRIPTION": "Select one ore more of the following providers.",
-      "STEPPERTITLE": "Create Provider",
+      "TITLE": "Dodaj dostawcę",
+      "DESCRIPTION": "Wybierz jednego lub więcej z następujących dostawców.",
+      "STEPPERTITLE": "Utwórz dostawcę",
       "OIDC": {
         "TITLE": "OIDC Provider",
-        "DESCRIPTION": "Enter the required data for your OIDC provider."
+        "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OIDC."
       },
       "JWT": {
         "TITLE": "JWT Provider",
-        "DESCRIPTION": "Enter the required data for your JWT provider."
+        "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy JWT."
       },
       "GOOGLE": {
         "TITLE": "Google Provider",
-        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Google"
       }
     },
     "DETAIL": {
@@ -1638,14 +1638,14 @@
       "DATECHANGED": "Zmieniono"
     },
     "OPTIONS": {
-      "ISAUTOCREATION": "is auto creating",
-      "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
-      "ISAUTOUPDATE": "is auto updating",
-      "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
-      "ISCREATIONALLOWED": "is creation allowed",
-      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
-      "ISLINKINGALLOWED": "is linking allowed",
-      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
+      "ISAUTOCREATION": "Automatyczne tworzenie",
+      "ISAUTOCREATION_DESC": "Jeśli zostanie wybrana, konto zostanie utworzone, jeśli jeszcze nie istnieje.",
+      "ISAUTOUPDATE": "Automatyczna aktualizacja",
+      "ISAUTOUPDATE_DESC": "Jeśli zaznaczone, konta są aktualizowane przy ponownym uwierzytelnianiu.",
+      "ISCREATIONALLOWED": "tworzenie dozwolone",
+      "ISCREATIONALLOWED_DESC": "Określa, czy można tworzyć konta.",
+      "ISLINKINGALLOWED": "dozwolone łączenie rachunków",
+      "ISLINKINGALLOWED_DESC": "Określa, czy tożsamość może być powiązana z istniejącym kontem."
     },
     "OWNERTYPES": {
       "0": "nieznany",
@@ -1660,15 +1660,6 @@
     "STATES": {
       "1": "aktywny",
       "2": "nieaktywny"
-    },
-    "MAPPINGFIELD": {
-      "1": "Preferowana nazwa użytkownika",
-      "2": "E-mail"
-    },
-    "STYLE": "Styl",
-    "STYLEFIELD": {
-      "0": "Bez stylizacji",
-      "1": "Google"
     },
     "ADD": "Dodaj dostawcę tożsamości",
     "TYPE": "Typ",
