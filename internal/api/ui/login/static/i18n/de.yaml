@@ -16,7 +16,6 @@ LDAP:
   Description: Mit Konto anmelden.
   LoginNameLabel: Loginname
   PasswordLabel: Passwort
-  BackButtonText: zurück
   NextButtonText: weiter
 
 SelectAccount:

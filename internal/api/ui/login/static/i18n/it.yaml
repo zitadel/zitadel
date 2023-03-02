@@ -16,7 +16,6 @@ LDAP:
   Description: Inserisci i tuoi dati di accesso.
   LoginNameLabel: Nome di accesso
   PasswordLabel: Password
-  BackButtonText: indietro
   NextButtonText: Avanti
 
 SelectAccount:

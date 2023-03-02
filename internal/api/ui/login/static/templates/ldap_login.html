@@ -28,9 +28,9 @@
             {{t "LDAP.NextButtonText"}}
         </button>
         <span class="fill-space"></span>
-        <a href="{{ loginNameChangeUrl .AuthReqID }}">
-            <button class="lgn-stroked-button" type="button">{{t "LDAP.BackButtonText"}}</button>
-        </a>
+        <button class="lgn-icon-button lgn-left-action" name="resetexternalidp" value="true" formnovalidate>
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </button>
     </div>
 </form>
 
