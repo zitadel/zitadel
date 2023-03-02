@@ -11,6 +11,14 @@ Login:
   RegisterButtonText: zarejestruj
   NextButtonText: dalej
 
+LDAP:
+  Title: Rejestracja
+  Description: Wprowadź swoje dane logowania.
+  LoginNameLabel: Nazwa użytkownika
+  PasswordLabel: Hasło
+  BackButtonText: wróć
+  NextButtonText: dalej
+
 SelectAccount:
   Title: Wybierz konto
   Description: Użyj swojego konta ZITADEL

@@ -17,6 +17,8 @@ const (
 	EndpointLDAPCallback             = "/login/ldap/callback"
 	EndpointJWTAuthorize             = "/login/jwt/authorize"
 	EndpointJWTCallback              = "/login/jwt/callback"
+	EndpointLDAPLogin                = "/login/ldap"
+	EndpointLDAPCallback             = "/login/ldap/callback"
 	EndpointPasswordlessLogin        = "/login/passwordless"
 	EndpointPasswordlessRegistration = "/login/passwordless/init"
 	EndpointPasswordlessPrompt       = "/login/passwordless/prompt"
