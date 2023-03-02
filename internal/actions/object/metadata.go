@@ -22,6 +22,14 @@ func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetad
 
 	for i, md := range metadata.Metadata {
 		var value interface{}
+		if !json.Valid(md.Value) {
+			var err error
+			md.Value, err = json.Marshal(string(md.Value))
+			if err != nil {
+				logging.WithError(err).Debug("unable to marshal unknow value")
+				panic(err)
+			}
+		}
 		err := json.Unmarshal(md.Value, &value)
 		if err != nil {
 			logging.WithError(err).Debug("unable to unmarshal into map")

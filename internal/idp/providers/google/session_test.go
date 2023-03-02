@@ -22,6 +22,7 @@ func TestSession_FetchUser(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		httpMock     func()
 		authURL      string
 		code         string
@@ -55,6 +56,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				httpMock: func() {
 					gock.New("https://openidconnect.googleapis.com").
 						Get("/v1/userinfo").
@@ -74,6 +76,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				httpMock: func() {
 					gock.New("https://openidconnect.googleapis.com").
 						Get("/v1/userinfo").
@@ -110,6 +113,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				httpMock: func() {
 					gock.New("https://openidconnect.googleapis.com").
 						Get("/v1/userinfo").
@@ -162,7 +166,7 @@ func TestSession_FetchUser(t *testing.T) {
 
 			// call the real discovery endpoint
 			gock.New(issuer).Get(openid.DiscoveryEndpoint).EnableNetworking()
-			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
+			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes)
 			require.NoError(t, err)
 
 			session := &oidc.Session{
