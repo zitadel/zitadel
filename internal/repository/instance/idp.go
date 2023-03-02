@@ -10,21 +10,21 @@ import (
 )
 
 const (
-	OAuthIDPAddedEventType    eventstore.EventType = "instance.idp.oauth.added"
-	OAuthIDPChangedEventType  eventstore.EventType = "instance.idp.oauth.changed"
-	OIDCIDPAddedEventType     eventstore.EventType = "instance.idp.oidc.added"
-	OIDCIDPChangedEventType   eventstore.EventType = "instance.idp.oidc.changed"
-	JWTIDPAddedEventType      eventstore.EventType = "instance.idp.jwt.added"
-	JWTIDPChangedEventType    eventstore.EventType = "instance.idp.jwt.changed"
+	OAuthIDPAddedEventType              eventstore.EventType = "instance.idp.oauth.added"
+	OAuthIDPChangedEventType            eventstore.EventType = "instance.idp.oauth.changed"
+	OIDCIDPAddedEventType               eventstore.EventType = "instance.idp.oidc.added"
+	OIDCIDPChangedEventType             eventstore.EventType = "instance.idp.oidc.changed"
+	JWTIDPAddedEventType                eventstore.EventType = "instance.idp.jwt.added"
+	JWTIDPChangedEventType              eventstore.EventType = "instance.idp.jwt.changed"
 	GitHubIDPAddedEventType             eventstore.EventType = "instance.idp.github.added"
 	GitHubIDPChangedEventType           eventstore.EventType = "instance.idp.github.changed"
 	GitHubEnterpriseIDPAddedEventType   eventstore.EventType = "instance.idp.github_enterprise.added"
 	GitHubEnterpriseIDPChangedEventType eventstore.EventType = "instance.idp.github_enterprise.changed"
-	GoogleIDPAddedEventType   eventstore.EventType = "instance.idp.google.added"
-	GoogleIDPChangedEventType eventstore.EventType = "instance.idp.google.changed"
-	LDAPIDPAddedEventType     eventstore.EventType = "instance.idp.ldap.added"
-	LDAPIDPChangedEventType   eventstore.EventType = "instance.idp.ldap.changed"
-	IDPRemovedEventType       eventstore.EventType = "instance.idp.removed"
+	GoogleIDPAddedEventType             eventstore.EventType = "instance.idp.google.added"
+	GoogleIDPChangedEventType           eventstore.EventType = "instance.idp.google.changed"
+	LDAPIDPAddedEventType               eventstore.EventType = "instance.idp.ldap.added"
+	LDAPIDPChangedEventType             eventstore.EventType = "instance.idp.ldap.changed"
+	IDPRemovedEventType                 eventstore.EventType = "instance.idp.removed"
 )
 
 type OAuthIDPAddedEvent struct {

@@ -636,7 +636,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if !errors.IsErrorInvalidArgument(err) {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 
@@ -906,7 +906,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if !errors.IsErrorInvalidArgument(err) {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

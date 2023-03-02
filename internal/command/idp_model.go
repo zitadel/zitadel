@@ -48,6 +48,7 @@ func (wm *OAuthIDPWriteModel) reduceAddedEvent(e *idp.OAuthIDPAddedEvent) {
 	wm.TokenEndpoint = e.TokenEndpoint
 	wm.UserEndpoint = e.UserEndpoint
 	wm.Scopes = e.Scopes
+	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
 
@@ -435,6 +436,7 @@ func (wm *GitHubIDPWriteModel) reduceAddedEvent(e *idp.GitHubIDPAddedEvent) {
 	wm.ClientID = e.ClientID
 	wm.ClientSecret = e.ClientSecret
 	wm.Scopes = e.Scopes
+	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
 
@@ -527,6 +529,7 @@ func (wm *GitHubEnterpriseIDPWriteModel) reduceAddedEvent(e *idp.GitHubEnterpris
 	wm.TokenEndpoint = e.TokenEndpoint
 	wm.UserEndpoint = e.UserEndpoint
 	wm.Scopes = e.Scopes
+	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
 

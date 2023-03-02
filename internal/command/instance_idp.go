@@ -140,12 +140,14 @@ func (c *Commands) UpdateInstanceJWTProvider(ctx context.Context, id string, pro
 }
 
 func (c *Commands) AddInstanceGitHubProvider(ctx context.Context, provider GitHubProvider) (string, *domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitHubProvider(instanceAgg, id, provider))
+	writeModel := NewGitHubInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitHubProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -157,14 +159,20 @@ func (c *Commands) AddInstanceGitHubProvider(ctx context.Context, provider GitHu
 }
 
 func (c *Commands) UpdateInstanceGitHubProvider(ctx context.Context, id string, provider GitHubProvider) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitHubProvider(instanceAgg, id, provider))
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	writeModel := NewGitHubInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitHubProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
@@ -174,12 +182,14 @@ func (c *Commands) UpdateInstanceGitHubProvider(ctx context.Context, id string, 
 }
 
 func (c *Commands) AddInstanceGitHubEnterpriseProvider(ctx context.Context, provider GitHubEnterpriseProvider) (string, *domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitHubEnterpriseProvider(instanceAgg, id, provider))
+	writeModel := NewGitHubEnterpriseInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitHubEnterpriseProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -191,14 +201,20 @@ func (c *Commands) AddInstanceGitHubEnterpriseProvider(ctx context.Context, prov
 }
 
 func (c *Commands) UpdateInstanceGitHubEnterpriseProvider(ctx context.Context, id string, provider GitHubEnterpriseProvider) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitHubEnterpriseProvider(instanceAgg, id, provider))
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	writeModel := NewGitHubEnterpriseInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitHubEnterpriseProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
@@ -608,7 +624,7 @@ func (c *Commands) prepareUpdateInstanceJWTProvider(a *instance.Aggregate, write
 	}
 }
 
-func (c *Commands) prepareAddInstanceGitHubProvider(a *instance.Aggregate, id string, provider GitHubProvider) preparation.Validation {
+func (c *Commands) prepareAddInstanceGitHubProvider(a *instance.Aggregate, writeModel *InstanceGitHubIDPWriteModel, provider GitHubProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Jdsgf", "Errors.Invalid.Argument")
@@ -617,7 +633,6 @@ func (c *Commands) prepareAddInstanceGitHubProvider(a *instance.Aggregate, id st
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-dsgz3", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewGitHubInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -634,7 +649,7 @@ func (c *Commands) prepareAddInstanceGitHubProvider(a *instance.Aggregate, id st
 				instance.NewGitHubIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
-					id,
+					writeModel.ID,
 					provider.Name,
 					provider.ClientID,
 					secret,
@@ -646,16 +661,15 @@ func (c *Commands) prepareAddInstanceGitHubProvider(a *instance.Aggregate, id st
 	}
 }
 
-func (c *Commands) prepareUpdateInstanceGitHubProvider(a *instance.Aggregate, id string, provider GitHubProvider) preparation.Validation {
+func (c *Commands) prepareUpdateInstanceGitHubProvider(a *instance.Aggregate, writeModel *InstanceGitHubIDPWriteModel, provider GitHubProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if id = strings.TrimSpace(id); id == "" {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdf4h", "Errors.Invalid.Argument")
 		}
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-fdh5z", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewGitHubInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -670,7 +684,7 @@ func (c *Commands) prepareUpdateInstanceGitHubProvider(a *instance.Aggregate, id
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
-				id,
+				writeModel.ID,
 				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,
@@ -689,7 +703,7 @@ func (c *Commands) prepareUpdateInstanceGitHubProvider(a *instance.Aggregate, id
 	}
 }
 
-func (c *Commands) prepareAddInstanceGitHubEnterpriseProvider(a *instance.Aggregate, id string, provider GitHubEnterpriseProvider) preparation.Validation {
+func (c *Commands) prepareAddInstanceGitHubEnterpriseProvider(a *instance.Aggregate, writeModel *InstanceGitHubEnterpriseIDPWriteModel, provider GitHubEnterpriseProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Dg4td", "Errors.Invalid.Argument")
@@ -710,7 +724,6 @@ func (c *Commands) prepareAddInstanceGitHubEnterpriseProvider(a *instance.Aggreg
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sd5hn", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewGitHubEnterpriseInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -727,7 +740,7 @@ func (c *Commands) prepareAddInstanceGitHubEnterpriseProvider(a *instance.Aggreg
 				instance.NewGitHubEnterpriseIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
-					id,
+					writeModel.ID,
 					provider.Name,
 					provider.ClientID,
 					secret,
@@ -742,9 +755,9 @@ func (c *Commands) prepareAddInstanceGitHubEnterpriseProvider(a *instance.Aggreg
 	}
 }
 
-func (c *Commands) prepareUpdateInstanceGitHubEnterpriseProvider(a *instance.Aggregate, id string, provider GitHubEnterpriseProvider) preparation.Validation {
+func (c *Commands) prepareUpdateInstanceGitHubEnterpriseProvider(a *instance.Aggregate, writeModel *InstanceGitHubEnterpriseIDPWriteModel, provider GitHubEnterpriseProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if id = strings.TrimSpace(id); id == "" {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdfh3", "Errors.Invalid.Argument")
 		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
@@ -763,7 +776,6 @@ func (c *Commands) prepareUpdateInstanceGitHubEnterpriseProvider(a *instance.Agg
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-ybj62", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewGitHubEnterpriseInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -778,7 +790,7 @@ func (c *Commands) prepareUpdateInstanceGitHubEnterpriseProvider(a *instance.Agg
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
-				id,
+				writeModel.ID,
 				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,

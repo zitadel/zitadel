@@ -352,11 +352,8 @@ func (wm *InstanceGitHubIDPWriteModel) NewChangedEvent(
 ) (*instance.GitHubIDPChangedEvent, error) {
 
 	changes, err := wm.GitHubIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
-	}
-	if len(changes) == 0 {
-		return nil, nil
 	}
 	return instance.NewGitHubIDPChangedEvent(ctx, aggregate, id, changes)
 }
@@ -437,11 +434,8 @@ func (wm *InstanceGitHubEnterpriseIDPWriteModel) NewChangedEvent(
 		scopes,
 		options,
 	)
-	if err != nil {
+	if err != nil || len(changes) == 0 {
 		return nil, err
-	}
-	if len(changes) == 0 {
-		return nil, nil
 	}
 	return instance.NewGitHubEnterpriseIDPChangedEvent(ctx, aggregate, id, changes)
 }

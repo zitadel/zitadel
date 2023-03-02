@@ -830,7 +830,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{},
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 		{
@@ -1367,7 +1367,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{},
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 		{
