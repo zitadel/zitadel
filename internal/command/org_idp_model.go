@@ -69,7 +69,8 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.Crypto,
 	authorizationEndpoint,
 	tokenEndpoint,
-	userEndpoint string,
+	userEndpoint,
+	idAttribute string,
 	scopes []string,
 	options idp.Options,
 ) (*org.OAuthIDPChangedEvent, error) {
@@ -82,6 +83,7 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 		authorizationEndpoint,
 		tokenEndpoint,
 		userEndpoint,
+		idAttribute,
 		scopes,
 		options,
 	)
