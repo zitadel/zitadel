@@ -13,7 +13,7 @@ import (
 var _ idp.User = (*UserMapper)(nil)
 
 // UserMapper is an implementation of [idp.User].
-// It can be used in ZITADEL actions to map the `rawInfo`
+// It can be used in ZITADEL actions to map the `RawInfo`
 type UserMapper struct {
 	idAttribute string
 	RawInfo     map[string]interface{}
