@@ -109,7 +109,13 @@ module.exports = {
       type: "category",
       label: "Integrate",
       collapsed: true,
+      link: {
+        type: 'generated-index',
+        title: 'Overview',
+        slug: 'guides/integrate',
+      },
       items: [
+        
         {
           type: "category",
           label: "Authenticate Users",

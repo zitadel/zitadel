@@ -17,7 +17,7 @@ import styles from "./styles.module.css";
 
 const features = [
   {
-    title: "Documentation", // Integrate overview
+    title: "Documentation", // TODO: Plausible
     darkImageUrl: "img/index/Guides-dark.svg",
     lightImageUrl: "img/index/Guides-light.svg",
     link: "guides/overview",
@@ -55,7 +55,7 @@ const features = [
               description="All about Console"
             />
             <ListElement
-              link="docs/guides/integrate/login-users"
+              link="/docs/guides/integrate"
               type={ICONTYPE.LOGIN}
               title="Integrate"
               description="Access our APIs and configure services and tools"
@@ -102,7 +102,7 @@ const features = [
     ),
   },
   {
-    title: "Get Started", // Quickstart, Frontend, Backend, Example Apps
+    title: "Get Started",
     darkImageUrl: "/docs/img/index/Quickstarts-dark.svg",
     lightImageUrl: "img/index/Quickstarts-light.svg",
     link: "examples/introduction",
@@ -195,7 +195,7 @@ const features = [
     ),
   },
   {
-    title: "Self-hosting", // Replace with Self-hosting (incl. prod checklist)
+    title: "Self-hosting", 
     darkImageUrl: "img/index/Concepts-dark.svg",
     lightImageUrl: "img/index/Concepts-light.svg",
     link: "/docs/self-hosting/deploy/overview",
