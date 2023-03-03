@@ -16,6 +16,7 @@ type GenericOAuthProvider struct {
 	TokenEndpoint         string
 	UserEndpoint          string
 	Scopes                []string
+	IDAttribute           string
 	IDPOptions            idp.Options
 }
 

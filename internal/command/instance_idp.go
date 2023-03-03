@@ -273,6 +273,9 @@ func (c *Commands) prepareAddInstanceOAuthProvider(a *instance.Aggregate, writeM
 		if provider.UserEndpoint = strings.TrimSpace(provider.UserEndpoint); provider.UserEndpoint == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Fb8jk", "Errors.Invalid.Argument")
 		}
+		if provider.IDAttribute = strings.TrimSpace(provider.IDAttribute); provider.IDAttribute == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdf3f", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -297,6 +300,7 @@ func (c *Commands) prepareAddInstanceOAuthProvider(a *instance.Aggregate, writeM
 					provider.AuthorizationEndpoint,
 					provider.TokenEndpoint,
 					provider.UserEndpoint,
+					provider.IDAttribute,
 					provider.Scopes,
 					provider.IDPOptions,
 				),
@@ -322,6 +326,9 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(a *instance.Aggregate, wri
 		if provider.UserEndpoint = strings.TrimSpace(provider.UserEndpoint); provider.UserEndpoint == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Fb8jk", "Errors.Invalid.Argument")
 		}
+		if provider.IDAttribute = strings.TrimSpace(provider.IDAttribute); provider.IDAttribute == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-asf3fs", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -345,6 +352,7 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(a *instance.Aggregate, wri
 				provider.AuthorizationEndpoint,
 				provider.TokenEndpoint,
 				provider.UserEndpoint,
+				provider.IDAttribute,
 				provider.Scopes,
 				provider.IDPOptions,
 			)

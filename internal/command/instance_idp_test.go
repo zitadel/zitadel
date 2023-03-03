@@ -146,6 +146,27 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid id attribute",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: GenericOAuthProvider{
+					Name:                  "name",
+					ClientID:              "clientID",
+					ClientSecret:          "clientSecret",
+					AuthorizationEndpoint: "auth",
+					TokenEndpoint:         "token",
+					UserEndpoint:          "user",
+				},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "ok",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
@@ -167,6 +188,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 									"auth",
 									"token",
 									"user",
+									"idAttribute",
 									nil,
 									idp.Options{},
 								)),
@@ -185,6 +207,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 					AuthorizationEndpoint: "auth",
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
+					IDAttribute:           "idAttribute",
 				},
 			},
 			res: res{
@@ -214,6 +237,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 									"auth",
 									"token",
 									"user",
+									"idAttribute",
 									[]string{"user"},
 									idp.Options{
 										IsCreationAllowed: true,
@@ -238,6 +262,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
 					Scopes:                []string{"user"},
+					IDAttribute:           "idAttribute",
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -391,6 +416,26 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid id attribute",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: GenericOAuthProvider{
+					Name:                  "name",
+					ClientID:              "clientID",
+					AuthorizationEndpoint: "auth",
+					TokenEndpoint:         "token",
+					UserEndpoint:          "user",
+				},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "not found",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
@@ -406,6 +451,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 					AuthorizationEndpoint: "auth",
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
+					IDAttribute:           "idAttribute",
 				},
 			},
 			res: res{
@@ -431,6 +477,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 								"auth",
 								"token",
 								"user",
+								"idAttribute",
 								nil,
 								idp.Options{},
 							)),
@@ -446,6 +493,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 					AuthorizationEndpoint: "auth",
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
+					IDAttribute:           "idAttribute",
 				},
 			},
 			res: res{
@@ -471,6 +519,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 								"auth",
 								"token",
 								"user",
+								"idAttribute",
 								nil,
 								idp.Options{},
 							)),
@@ -496,6 +545,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 											idp.ChangeOAuthTokenEndpoint("new token"),
 											idp.ChangeOAuthUserEndpoint("new user"),
 											idp.ChangeOAuthScopes([]string{"openid", "profile"}),
+											idp.ChangeOAuthIDAttribute("newAttribute"),
 											idp.ChangeOAuthOptions(idp.OptionChanges{
 												IsCreationAllowed: &t,
 												IsLinkingAllowed:  &t,
@@ -523,6 +573,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "new token",
 					UserEndpoint:          "new user",
 					Scopes:                []string{"openid", "profile"},
+					IDAttribute:           "newAttribute",
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,

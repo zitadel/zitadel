@@ -145,6 +145,8 @@ func (c Config) String(useAdmin bool) string {
 	}
 	if !useAdmin {
 		fields = append(fields, "dbname="+c.Database)
+	} else {
+		fields = append(fields, "dbname=postgres")
 	}
 	if user.SSL.Mode != sslDisabledMode {
 		fields = append(fields, "sslrootcert="+user.SSL.RootCert)

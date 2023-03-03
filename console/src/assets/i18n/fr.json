@@ -1752,7 +1752,7 @@
   "APP": {
     "LIST": "Applications",
     "COMPLIANCE": "Conformité à l'OIDC",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "Configuration",
     "TOKEN": "Paramètres du jeton",
     "PAGES": {
@@ -1767,7 +1767,7 @@
       "STATE": "Statut",
       "DATECREATED": "Créé",
       "DATECHANGED": "Modifié",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "Supprimer l'application",
       "DETAIL": {
         "TITLE": "Détail",
