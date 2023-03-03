@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -597,6 +598,31 @@ func (l *Login) jwtProvider(identityProvider *query.IDPTemplate) (*jwt.Provider,
 		identityProvider.JWTIDPTemplate.KeysEndpoint,
 		identityProvider.JWTIDPTemplate.HeaderName,
 		l.idpConfigAlg,
+	)
+}
+
+func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*oauth.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.OAuthIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	config := &oauth2.Config{
+		ClientID:     identityProvider.OAuthIDPTemplate.ClientID,
+		ClientSecret: secret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  identityProvider.OAuthIDPTemplate.AuthorizationEndpoint,
+			TokenURL: identityProvider.OAuthIDPTemplate.TokenEndpoint,
+		},
+		RedirectURL: l.baseURL(ctx) + EndpointExternalLoginCallback,
+		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
+	}
+	return oauth.New(
+		config,
+		identityProvider.Name,
+		identityProvider.OAuthIDPTemplate.UserEndpoint,
+		func() idp.User {
+			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
+		},
 	)
 }
 
