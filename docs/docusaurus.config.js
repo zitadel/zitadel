@@ -71,12 +71,6 @@ module.exports = {
         }, 
         {
           type: "doc",
-          label: "Get Started",
-          docId: "guides/start/quickstart",
-          position: "left",
-        },
-        {
-          type: "doc",
           label: "APIs",
           docId: "apis/introduction",
           position: "left",
