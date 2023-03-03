@@ -117,6 +117,7 @@ func NewGitHubEnterpriseIDPAddedEvent(
 			authorizationEndpoint,
 			tokenEndpoint,
 			userEndpoint,
+			"",
 			scopes,
 			options,
 		),

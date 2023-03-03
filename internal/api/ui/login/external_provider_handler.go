@@ -210,14 +210,14 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, err)
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
 		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeGitHubEnterprise:
 		provider, err = l.githubEnterpriseProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, err)
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
 		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
