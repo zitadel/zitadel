@@ -93,7 +93,7 @@ Replace the values as follows
 
 `NEXTAUTH_URL`: Base url of this demo app (B2B portal); runs per default on [http://localhost:3000](http://localhost:3000)
 
-`NEXT_PUBLIC_ZITADEL_ISSUER`: The url to your zitadel instance. When using zitadel.cloud for this demo you can find the domain of your ZITADEL instance in the customer portal. You can also find this information by going to your application `portal-web` and click 'Urls' in the navigation. The variable is prefixed with `NEXT_PUBLIC_` such that it can be accessed from the client.
+`NEXT_PUBLIC_ZITADEL_ISSUER`: The url to your zitadel instance. When using zitadel.cloud for this demo you can find the domain of your ZITADEL instance in the customer portal. You can also find this information by going to your application `portal-web` and click 'URLs' in the navigation. The variable is prefixed with `NEXT_PUBLIC_` such that it can be accessed from the client.
 
 `ZITADEL_API`: URL of the Management API. Typically the same as `ZITADEL_ISSUER`.
 

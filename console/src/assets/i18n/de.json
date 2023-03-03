@@ -1116,7 +1116,7 @@
     "NOTIFICATION": {
       "TITLE": "Notification",
       "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
-      "PASSWORDCHANGE": "Passwordänderung"
+      "PASSWORDCHANGE": "Passwortänderung"
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
@@ -1752,7 +1752,7 @@
   "APP": {
     "LIST": "Apps",
     "COMPLIANCE": "OIDC Einhaltung",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "Konfiguration",
     "TOKEN": "Token Einstellungen",
     "PAGES": {
@@ -1767,7 +1767,7 @@
       "STATE": "Status",
       "DATECREATED": "Erstellt",
       "DATECHANGED": "Geändert",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "App löschen",
       "DETAIL": {
         "TITLE": "Detail",
