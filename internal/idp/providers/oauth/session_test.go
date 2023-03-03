@@ -145,6 +145,7 @@ func TestProvider_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &UserMapper{
+					idAttribute: "userID",
 					RawInfo: map[string]interface{}{
 						"userID": "id",
 						"custom": "claim",
@@ -208,6 +209,7 @@ func TestProvider_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &UserMapper{
+					idAttribute: "userID",
 					RawInfo: map[string]interface{}{
 						"userID": "id",
 						"custom": "claim",
