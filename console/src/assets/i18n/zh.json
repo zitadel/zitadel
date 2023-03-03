@@ -1767,7 +1767,7 @@
   "APP": {
     "LIST": "应用",
     "COMPLIANCE": "OIDC 兼容性",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "配置",
     "TOKEN": "令牌设置",
     "PAGES": {
@@ -1782,7 +1782,7 @@
       "STATE": "状态",
       "DATECREATED": "创建于",
       "DATECHANGED": "修改于",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "删除应用",
       "DETAIL": {
         "TITLE": "详情",
