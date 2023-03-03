@@ -610,6 +610,48 @@ func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTem
 	if !identityProvider.LDAPIDPTemplate.TLS {
 		opts = append(opts, ldap.Insecure())
 	}
+	if identityProvider.Port != "" {
+		opts = append(opts, ldap.WithCustomPort(identityProvider.Port))
+	}
+	if identityProvider.IDAttribute != "" {
+		opts = append(opts, ldap.WithCustomIDAttribute(identityProvider.IDAttribute))
+	}
+	if identityProvider.FirstNameAttribute != "" {
+		opts = append(opts, ldap.WithFirstNameAttribute(identityProvider.FirstNameAttribute))
+	}
+	if identityProvider.LastNameAttribute != "" {
+		opts = append(opts, ldap.WithLastNameAttribute(identityProvider.LastNameAttribute))
+	}
+	if identityProvider.DisplayNameAttribute != "" {
+		opts = append(opts, ldap.WithDisplayNameAttribute(identityProvider.DisplayNameAttribute))
+	}
+	if identityProvider.NickNameAttribute != "" {
+		opts = append(opts, ldap.WithNickNameAttribute(identityProvider.NickNameAttribute))
+	}
+	if identityProvider.PreferredUsernameAttribute != "" {
+		opts = append(opts, ldap.WithPreferredUsernameAttribute(identityProvider.PreferredUsernameAttribute))
+	}
+	if identityProvider.EmailAttribute != "" {
+		opts = append(opts, ldap.WithEmailAttribute(identityProvider.EmailAttribute))
+	}
+	if identityProvider.EmailVerifiedAttribute != "" {
+		opts = append(opts, ldap.WithEmailVerifiedAttribute(identityProvider.EmailVerifiedAttribute))
+	}
+	if identityProvider.PhoneAttribute != "" {
+		opts = append(opts, ldap.WithPhoneAttribute(identityProvider.PhoneAttribute))
+	}
+	if identityProvider.PhoneVerifiedAttribute != "" {
+		opts = append(opts, ldap.WithPhoneVerifiedAttribute(identityProvider.PhoneVerifiedAttribute))
+	}
+	if identityProvider.PreferredLanguageAttribute != "" {
+		opts = append(opts, ldap.WithPreferredLanguageAttribute(identityProvider.PreferredLanguageAttribute))
+	}
+	if identityProvider.AvatarURLAttribute != "" {
+		opts = append(opts, ldap.WithAvatarURLAttribute(identityProvider.AvatarURLAttribute))
+	}
+	if identityProvider.ProfileAttribute != "" {
+		opts = append(opts, ldap.WithProfileAttribute(identityProvider.ProfileAttribute))
+	}
 	return ldap.New(
 		identityProvider.Name,
 		identityProvider.Host,

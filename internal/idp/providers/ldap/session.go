@@ -47,26 +47,53 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 		return nil, err
 	}
 
+	attributes := []string{"dn"}
+	if s.Provider.idAttribute != "" {
+		attributes = append(attributes, s.Provider.idAttribute)
+	}
+	if s.Provider.firstNameAttribute != "" {
+		attributes = append(attributes, s.Provider.firstNameAttribute)
+	}
+	if s.Provider.lastNameAttribute != "" {
+		attributes = append(attributes, s.Provider.lastNameAttribute)
+	}
+	if s.Provider.displayNameAttribute != "" {
+		attributes = append(attributes, s.Provider.displayNameAttribute)
+	}
+	if s.Provider.nickNameAttribute != "" {
+		attributes = append(attributes, s.Provider.nickNameAttribute)
+	}
+	if s.Provider.preferredUsernameAttribute != "" {
+		attributes = append(attributes, s.Provider.preferredUsernameAttribute)
+	}
+	if s.Provider.emailAttribute != "" {
+		attributes = append(attributes, s.Provider.emailAttribute)
+	}
+	if s.Provider.emailVerifiedAttribute != "" {
+		attributes = append(attributes, s.Provider.emailVerifiedAttribute)
+	}
+	if s.Provider.phoneAttribute != "" {
+		attributes = append(attributes, s.Provider.phoneAttribute)
+	}
+	if s.Provider.phoneVerifiedAttribute != "" {
+		attributes = append(attributes, s.Provider.phoneVerifiedAttribute)
+	}
+	if s.Provider.preferredLanguageAttribute != "" {
+		attributes = append(attributes, s.Provider.preferredLanguageAttribute)
+	}
+	if s.Provider.avatarURLAttribute != "" {
+		attributes = append(attributes, s.Provider.avatarURLAttribute)
+	}
+	if s.Provider.profileAttribute != "" {
+		attributes = append(attributes, s.Provider.profileAttribute)
+	}
+
 	// Search for user with the unique attribute for the userDN
 	searchRequest := ldap.NewSearchRequest(
 		s.Provider.baseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		fmt.Sprintf("(&(objectClass="+s.Provider.userObjectClass+")("+s.Provider.userUniqueAttribute+"=%s))", ldap.EscapeFilter(s.User)),
-		[]string{"dn",
-			s.Provider.idAttribute,
-			s.Provider.firstNameAttribute,
-			s.Provider.lastNameAttribute,
-			s.Provider.displayNameAttribute,
-			s.Provider.nickNameAttribute,
-			s.Provider.preferredUsernameAttribute,
-			s.Provider.emailAttribute,
-			s.Provider.emailVerifiedAttribute,
-			s.Provider.phoneAttribute,
-			s.Provider.phoneVerifiedAttribute,
-			s.Provider.preferredLanguageAttribute,
-			s.Provider.avatarURLAttribute,
-			s.Provider.profileAttribute,
-		},
+		attributes,
 		nil,
 	)
 

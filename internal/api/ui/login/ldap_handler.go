@@ -3,6 +3,8 @@ package login
 import (
 	"net/http"
 
+	"github.com/zitadel/logging"
+
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
