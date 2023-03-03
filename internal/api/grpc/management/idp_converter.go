@@ -227,6 +227,7 @@ func addGenericOAuthProviderToCommand(req *mgmt_pb.AddGenericOAuthProviderReques
 		TokenEndpoint:         req.TokenEndpoint,
 		UserEndpoint:          req.UserEndpoint,
 		Scopes:                req.Scopes,
+		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -240,6 +241,7 @@ func updateGenericOAuthProviderToCommand(req *mgmt_pb.UpdateGenericOAuthProvider
 		TokenEndpoint:         req.TokenEndpoint,
 		UserEndpoint:          req.UserEndpoint,
 		Scopes:                req.Scopes,
+		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }

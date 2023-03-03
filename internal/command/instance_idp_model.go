@@ -67,7 +67,8 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.Crypto,
 	authorizationEndpoint,
 	tokenEndpoint,
-	userEndpoint string,
+	userEndpoint,
+	idAttribute string,
 	scopes []string,
 	options idp.Options,
 ) (*instance.OAuthIDPChangedEvent, error) {
@@ -80,6 +81,7 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 		authorizationEndpoint,
 		tokenEndpoint,
 		userEndpoint,
+		idAttribute,
 		scopes,
 		options,
 	)

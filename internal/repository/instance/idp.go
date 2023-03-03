@@ -40,7 +40,8 @@ func NewOAuthIDPAddedEvent(
 	clientSecret *crypto.CryptoValue,
 	authorizationEndpoint,
 	tokenEndpoint,
-	userEndpoint string,
+	userEndpoint,
+	idAttribute string,
 	scopes []string,
 	options idp.Options,
 ) *OAuthIDPAddedEvent {
@@ -59,6 +60,7 @@ func NewOAuthIDPAddedEvent(
 			authorizationEndpoint,
 			tokenEndpoint,
 			userEndpoint,
+			idAttribute,
 			scopes,
 			options,
 		),

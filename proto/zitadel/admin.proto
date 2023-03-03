@@ -4391,7 +4391,9 @@ message AddGenericOAuthProviderRequest {
     string token_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
-    zitadel.idp.v1.Options provider_options = 8;
+    // identifying attribute of the user in the response of the user_endpoint
+    string id_attribute = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.Options provider_options = 9;
 }
 
 message AddGenericOAuthProviderResponse {
@@ -4409,7 +4411,9 @@ message UpdateGenericOAuthProviderRequest {
     string token_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_endpoint = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 8 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
-    zitadel.idp.v1.Options provider_options = 9;
+    // identifying attribute of the user in the response of the user_endpoint
+    string id_attribute = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.Options provider_options = 10;
 }
 
 message UpdateGenericOAuthProviderResponse {

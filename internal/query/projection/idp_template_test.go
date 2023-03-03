@@ -154,6 +154,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	"tokenEndpoint": "token",
  	"userEndpoint": "user",
 	"scopes": ["profile"],
+	"idAttribute": "id-attribute",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -188,7 +189,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2_oauth (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -198,6 +199,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"token",
 								"user",
 								database.StringArray{"profile"},
+								"id-attribute",
 							},
 						},
 					},
@@ -223,6 +225,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	"tokenEndpoint": "token",
  	"userEndpoint": "user",
 	"scopes": ["profile"],
+	"idAttribute": "id-attribute",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -257,7 +260,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2_oauth (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates2_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -267,6 +270,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"token",
 								"user",
 								database.StringArray{"profile"},
+								"id-attribute",
 							},
 						},
 					},
@@ -304,7 +308,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates2_oauth SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates2_oauth2 SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"id",
 								"idp-id",
@@ -334,6 +338,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	"tokenEndpoint": "token",
  	"userEndpoint": "user",
 	"scopes": ["profile"],
+	"idAttribute": "id-attribute",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -363,7 +368,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates2_oauth SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) = ($1, $2, $3, $4, $5, $6) WHERE (idp_id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates2_oauth2 SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute) = ($1, $2, $3, $4, $5, $6, $7) WHERE (idp_id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
@@ -371,6 +376,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"token",
 								"user",
 								database.StringArray{"profile"},
+								"id-attribute",
 								"idp-id",
 								"instance-id",
 							},

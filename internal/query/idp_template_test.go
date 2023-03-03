@@ -29,13 +29,14 @@ var (
 		` projections.idp_templates2.is_auto_creation,` +
 		` projections.idp_templates2.is_auto_update,` +
 		// oauth
-		` projections.idp_templates2_oauth.idp_id,` +
-		` projections.idp_templates2_oauth.client_id,` +
-		` projections.idp_templates2_oauth.client_secret,` +
-		` projections.idp_templates2_oauth.authorization_endpoint,` +
-		` projections.idp_templates2_oauth.token_endpoint,` +
-		` projections.idp_templates2_oauth.user_endpoint,` +
-		` projections.idp_templates2_oauth.scopes,` +
+		` projections.idp_templates2_oauth2.idp_id,` +
+		` projections.idp_templates2_oauth2.client_id,` +
+		` projections.idp_templates2_oauth2.client_secret,` +
+		` projections.idp_templates2_oauth2.authorization_endpoint,` +
+		` projections.idp_templates2_oauth2.token_endpoint,` +
+		` projections.idp_templates2_oauth2.user_endpoint,` +
+		` projections.idp_templates2_oauth2.scopes,` +
+		` projections.idp_templates2_oauth2.id_attribute,` +
 		// oidc
 		` projections.idp_templates2_oidc.idp_id,` +
 		` projections.idp_templates2_oidc.issuer,` +
@@ -90,7 +91,7 @@ var (
 		` projections.idp_templates2_ldap.avatar_url_attribute,` +
 		` projections.idp_templates2_ldap.profile_attribute` +
 		` FROM projections.idp_templates2` +
-		` LEFT JOIN projections.idp_templates2_oauth ON projections.idp_templates2.id = projections.idp_templates2_oauth.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oauth.instance_id` +
+		` LEFT JOIN projections.idp_templates2_oauth2 ON projections.idp_templates2.id = projections.idp_templates2_oauth2.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oauth2.instance_id` +
 		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates2.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oidc.instance_id` +
 		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates2.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_jwt.instance_id` +
 		` LEFT JOIN projections.idp_templates2_github ON projections.idp_templates2.id = projections.idp_templates2_github.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_github.instance_id` +
@@ -120,6 +121,7 @@ var (
 		"token_endpoint",
 		"user_endpoint",
 		"scopes",
+		"id_attribute",
 		// oidc config
 		"id_id",
 		"issuer",
@@ -188,13 +190,14 @@ var (
 		` projections.idp_templates2.is_auto_creation,` +
 		` projections.idp_templates2.is_auto_update,` +
 		// oauth
-		` projections.idp_templates2_oauth.idp_id,` +
-		` projections.idp_templates2_oauth.client_id,` +
-		` projections.idp_templates2_oauth.client_secret,` +
-		` projections.idp_templates2_oauth.authorization_endpoint,` +
-		` projections.idp_templates2_oauth.token_endpoint,` +
-		` projections.idp_templates2_oauth.user_endpoint,` +
-		` projections.idp_templates2_oauth.scopes,` +
+		` projections.idp_templates2_oauth2.idp_id,` +
+		` projections.idp_templates2_oauth2.client_id,` +
+		` projections.idp_templates2_oauth2.client_secret,` +
+		` projections.idp_templates2_oauth2.authorization_endpoint,` +
+		` projections.idp_templates2_oauth2.token_endpoint,` +
+		` projections.idp_templates2_oauth2.user_endpoint,` +
+		` projections.idp_templates2_oauth2.scopes,` +
+		` projections.idp_templates2_oauth2.id_attribute,` +
 		// oidc
 		` projections.idp_templates2_oidc.idp_id,` +
 		` projections.idp_templates2_oidc.issuer,` +
@@ -250,7 +253,7 @@ var (
 		` projections.idp_templates2_ldap.profile_attribute,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_templates2` +
-		` LEFT JOIN projections.idp_templates2_oauth ON projections.idp_templates2.id = projections.idp_templates2_oauth.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oauth.instance_id` +
+		` LEFT JOIN projections.idp_templates2_oauth2 ON projections.idp_templates2.id = projections.idp_templates2_oauth2.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oauth2.instance_id` +
 		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates2.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oidc.instance_id` +
 		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates2.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_jwt.instance_id` +
 		` LEFT JOIN projections.idp_templates2_github ON projections.idp_templates2.id = projections.idp_templates2_github.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_github.instance_id` +
@@ -280,6 +283,7 @@ var (
 		"token_endpoint",
 		"user_endpoint",
 		"scopes",
+		"id_attribute",
 		// oidc config
 		"id_id",
 		"issuer",
@@ -395,6 +399,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"token",
 						"user",
 						database.StringArray{"profile"},
+						"id-attribute",
 						// oidc
 						nil,
 						nil,
@@ -473,6 +478,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
 					Scopes:                []string{"profile"},
+					IDAttribute:           "id-attribute",
 				},
 			},
 		},
@@ -498,6 +504,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						// oauth
+						nil,
 						nil,
 						nil,
 						nil,
@@ -606,6 +613,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						// oauth
+						nil,
 						nil,
 						nil,
 						nil,
@@ -828,6 +836,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
 						nil,
 						nil,
@@ -928,6 +937,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						// oauth
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1054,6 +1064,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						// oauth
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1198,6 +1209,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
 							nil,
 							nil,
@@ -1333,6 +1345,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
 							nil,
 							nil,
@@ -1443,6 +1456,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
 							nil,
 							nil,
@@ -1512,6 +1526,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							// oauth
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1595,6 +1610,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"token",
 							"user",
 							database.StringArray{"profile"},
+							"id-attribute",
 							// oidc
 							nil,
 							nil,
@@ -1671,6 +1687,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// oidc
 							"idp-id-oidc",
 							"issuer",
@@ -1740,6 +1757,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							// oauth
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1893,6 +1911,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							TokenEndpoint:         "token",
 							UserEndpoint:          "user",
 							Scopes:                []string{"profile"},
+							IDAttribute:           "id-attribute",
 						},
 					},
 					{

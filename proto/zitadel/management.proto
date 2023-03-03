@@ -453,9 +453,10 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Create User (Human)";
-            description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login."
+            summary: "Create/Import User (Human)";
+            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login."
             tags: "Users";
+            tags: "User Human"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -7136,7 +7137,11 @@ message ImportHumanUserRequest {
                 example: "\"minnie@mouse.com\"";
                 description: "Object that contains the email address and a verified flag."
             }];
-        bool is_email_verified = 2;
+        bool is_email_verified = 2 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "If email verified is set to true, the email will be added as verified and the user doesn't have to verify."
+            }
+        ];
     }
     message Phone {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
@@ -11060,7 +11065,9 @@ message AddGenericOAuthProviderRequest {
     string token_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
-    zitadel.idp.v1.Options provider_options = 8;
+    // identifying attribute of the user in the response of the user_endpoint
+    string id_attribute = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.Options provider_options = 9;
 }
 
 message AddGenericOAuthProviderResponse {
@@ -11078,7 +11085,9 @@ message UpdateGenericOAuthProviderRequest {
     string token_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_endpoint = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 8 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
-    zitadel.idp.v1.Options provider_options = 9;
+    // identifying attribute of the user in the response of the user_endpoint
+    string id_attribute = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.Options provider_options = 10;
 }
 
 message UpdateGenericOAuthProviderResponse {

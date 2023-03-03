@@ -26,7 +26,7 @@ const (
 	IDPTemplateGoogleTable = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
 	IDPTemplateLDAPTable   = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 
-	IDPTemplateOAuthSuffix  = "oauth"
+	IDPTemplateOAuthSuffix  = "oauth2"
 	IDPTemplateOIDCSuffix   = "oidc"
 	IDPTemplateJWTSuffix    = "jwt"
 	IDPTemplateGitHubSuffix           = "github"
@@ -58,6 +58,7 @@ const (
 	OAuthTokenEndpointCol         = "token_endpoint"
 	OAuthUserEndpointCol          = "user_endpoint"
 	OAuthScopesCol                = "scopes"
+	OAuthIDAttributeCol           = "id_attribute"
 
 	OIDCIDCol           = "idp_id"
 	OIDCInstanceIDCol   = "instance_id"
@@ -158,6 +159,7 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(OAuthTokenEndpointCol, crdb.ColumnTypeText),
 			crdb.NewColumn(OAuthUserEndpointCol, crdb.ColumnTypeText),
 			crdb.NewColumn(OAuthScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(OAuthIDAttributeCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(OAuthInstanceIDCol, OAuthIDCol),
 			IDPTemplateOAuthSuffix,
@@ -493,6 +495,7 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(OAuthTokenEndpointCol, idpEvent.TokenEndpoint),
 				handler.NewCol(OAuthUserEndpointCol, idpEvent.UserEndpoint),
 				handler.NewCol(OAuthScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OAuthIDAttributeCol, idpEvent.IDAttribute),
 			},
 			crdb.WithTableSuffix(IDPTemplateOAuthSuffix),
 		),
@@ -1430,6 +1433,9 @@ func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.C
 	}
 	if idpEvent.Scopes != nil {
 		oauthCols = append(oauthCols, handler.NewCol(OAuthScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	if idpEvent.IDAttribute != nil {
+		oauthCols = append(oauthCols, handler.NewCol(OAuthIDAttributeCol, *idpEvent.IDAttribute))
 	}
 	return oauthCols
 }

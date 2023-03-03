@@ -342,6 +342,9 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, writeModel *OrgO
 		if provider.UserEndpoint = strings.TrimSpace(provider.UserEndpoint); provider.UserEndpoint == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Fb8jk", "Errors.Invalid.Argument")
 		}
+		if provider.IDAttribute = strings.TrimSpace(provider.IDAttribute); provider.IDAttribute == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-sadf3d", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -366,6 +369,7 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, writeModel *OrgO
 					provider.AuthorizationEndpoint,
 					provider.TokenEndpoint,
 					provider.UserEndpoint,
+					provider.IDAttribute,
 					provider.Scopes,
 					provider.IDPOptions,
 				),
@@ -394,6 +398,9 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, writeModel *O
 		if provider.UserEndpoint = strings.TrimSpace(provider.UserEndpoint); provider.UserEndpoint == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Fb8jk", "Errors.Invalid.Argument")
 		}
+		if provider.IDAttribute = strings.TrimSpace(provider.IDAttribute); provider.IDAttribute == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SAe4gh", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -417,6 +424,7 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, writeModel *O
 				provider.AuthorizationEndpoint,
 				provider.TokenEndpoint,
 				provider.UserEndpoint,
+				provider.IDAttribute,
 				provider.Scopes,
 				provider.IDPOptions,
 			)
