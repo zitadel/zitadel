@@ -17,14 +17,13 @@ import styles from "./styles.module.css";
 
 const features = [
   {
-    title: "Guides",
+    title: "Documentation",
     darkImageUrl: "img/index/Guides-dark.svg",
     lightImageUrl: "img/index/Guides-light.svg",
     link: "guides/overview",
     description: (
       <>
-        Read our guides on how to manage your data and role associations in
-        ZITADEL and on what we recommend.
+        Read our documentation and learn how you can setup, customize, and integrate authentication and authorization to your project.
       </>
     ),
     content: (
@@ -37,32 +36,52 @@ const features = [
               title="Get started"
               description=""
             />
-            <ListElement
-              link="/docs/guides/manage/cloud/overview"
-              type={ICONTYPE.LOGIN}
-              title="ZITADEL Cloud"
-              description=""
-            />
-            <ListElement
-              link="/docs/guides/integrate/login-users"
-              type={ICONTYPE.LOGIN}
-              title="Login Users"
-              description=""
-            />
-            <ListElement
-              link="/docs/guides/integrate/access-zitadel-apis"
+             <ListElement
+              link="/docs/examples/sdks"
               type={ICONTYPE.APIS}
-              title="Access APIs"
+              title="SDKs"
               description=""
             />
+            <ListElement
+              link="/docs/examples/introduction"
+              type={ICONTYPE.APIS}
+              title="Example Apps"
+              description=""
+            />
+            <ListElement
+              link="/docs/guides/manage/console/overview"
+              type={ICONTYPE.LOGIN}
+              title="Manage"
+              description="All about Console"
+            />
+            <ListElement
+              link="docs/guides/integrate/login-users"
+              type={ICONTYPE.LOGIN}
+              title="Integrate"
+              description="Access our APIs and configure services and tools"
+            />
+           
+            
           </div>
           <div>
-            <ListElement
+          <ListElement
               link="/docs/guides/solution-scenarios/introduction"
               iconClasses="las la-paragraph"
               roundClasses="custom-rounded custom-rounded-split"
               label="B2C"
               title="Solution Scenarios"
+              description=""
+            />
+            <ListElement
+              link="/docs/concepts/introduction"
+              type={ICONTYPE.TASKS}
+              title="Concepts"
+              description=""
+            />
+            <ListElement
+              link="/docs/concepts/architecture/software"
+              type={ICONTYPE.ARCHITECTURE}
+              title="Architecture"
               description=""
             />
             <ListElement
@@ -72,15 +91,9 @@ const features = [
               description=""
             />
             <ListElement
-              link="/docs/self-hosting/deploy/overview"
-              type={ICONTYPE.SYSTEM}
-              title="Deploy"
-              description=""
-            />
-            <ListElement
-              link="/docs/guides/trainings/introduction"
-              type={ICONTYPE.STORAGE}
-              title="Trainings"
+              link="/docs/support/troubleshooting"
+              type={ICONTYPE.HELP}
+              title="Support"
               description=""
             />
           </div>
@@ -89,7 +102,7 @@ const features = [
     ),
   },
   {
-    title: "Quickstarts",
+    title: "Get Started", // Quickstart, Frontend, Backend, Example Apps
     darkImageUrl: "/docs/img/index/Quickstarts-dark.svg",
     lightImageUrl: "img/index/Quickstarts-light.svg",
     link: "examples/introduction",
@@ -130,7 +143,7 @@ const features = [
     ),
   },
   {
-    title: "APIs",
+    title: "APIs", // OIDC endpoints, SAML endpoints, New API docs, Playground
     darkImageUrl: "/docs/img/index/APIs-dark.svg",
     lightImageUrl: "/docs/img/index/APIs-light.svg",
     link: "/apis/introduction",
@@ -157,7 +170,7 @@ const features = [
     ),
   },
   {
-    title: "Concepts",
+    title: "Concepts", // Replace with Self-hosting (incl. prod checklist)
     darkImageUrl: "img/index/Concepts-dark.svg",
     lightImageUrl: "img/index/Concepts-light.svg",
     link: "concepts/introduction",
