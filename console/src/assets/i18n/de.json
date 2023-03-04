@@ -9,8 +9,8 @@
   "FOOTER": {
     "LINKS": {
       "CONTACT": "Kontakt",
-      "TOS": "Terms of Service",
-      "PP": "Privacy Policy"
+      "TOS": "Nutzungsbedingungen",
+      "PP": "Datenschutz-Bestimmungen"
     },
     "THEME": {
       "DARK": "Dunkel",
@@ -31,7 +31,7 @@
     },
     "QUICKSTARTS": {
       "LABEL": "Erste Schritte",
-      "TITLE": "Quickstarts",
+      "TITLE": "Schnellstarts",
       "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
     },
     "SHORTCUTS": {
@@ -78,17 +78,17 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
-    "DASHBOARD": "Home",
+    "INSTANCE": "Instanz",
+    "DASHBOARD": "Startseite",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",
     "INSTANCEOVERVIEW": "Instanz",
     "ORGS": "Organisationen",
-    "VIEWS": "Views",
-    "EVENTS": "Events",
-    "FAILEDEVENTS": "Failed Events",
+    "VIEWS": "Ansichten",
+    "EVENTS": "Veranstaltungen",
+    "FAILEDEVENTS": "Gescheiterte Veranstaltungen",
     "ORGANIZATION": "Organisation",
-    "DOMAINS": "Domains",
+    "DOMAINS": "Domänen",
     "PROJECT": "Projekte",
     "PROJECTOVERVIEW": "Übersicht",
     "PROJECTGRANTS": "Berechtigte Organisationen",
@@ -106,7 +106,7 @@
     "TOS": "AGB",
     "OPENSHORTCUTSTOOLTIP": "Tippe ? um die Tastaturkürzel anzuzeigen",
     "SETTINGS": "Einstellungen",
-    "CUSTOMERPORTAL": "Customer Portal"
+    "CUSTOMERPORTAL": "Kundenportal"
   },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
@@ -203,10 +203,10 @@
     "STATE": "Status",
     "DISPLAYNAME": "Benutzer Display Name",
     "EMAIL": "Email",
-    "USERNAME": "User Name",
+    "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
     "PROJECTNAME": "Projektname",
-    "RESOURCEOWNER": "Resource Owner",
+    "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
       "5": "beinhaltet",
       "7": "endet mit",
@@ -248,13 +248,13 @@
     "SETTINGS": {
       "TITLE": "Einstellungen",
       "GENERAL": "Allgemein",
-      "IDP": "Identity Provider",
+      "IDP": "Identitätsanbieter",
       "SECURITY": "Passwort und Sicherheit",
       "KEYS": "Schlüssel",
-      "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Authorizations",
-      "MEMBERSHIPS": "Memberships",
-      "METADATA": "Metadata"
+      "PAT": "Persönliche Zugriffstoken",
+      "USERGRANTS": "Berechtigungen",
+      "MEMBERSHIPS": "Mitgliedschaften",
+      "METADATA": "Metadaten"
     },
     "TITLE": "Persönliche Informationen",
     "DESCRIPTION": "Verwalte Deine persönlichen Informationen und Sicherheitseinstellungen",
@@ -315,7 +315,7 @@
       "CREATIONDATE": "Erstelldatum",
       "TYPES": {
         "HUMAN": "Benutzer",
-        "MACHINE": "Service Users"
+        "MACHINE": "Dienstbenutzer"
       },
       "FILTER": {
         "0": "Nach Anzeigename filtern",
@@ -416,7 +416,7 @@
       "EMPTY": "Kein IDP gefunden",
       "DIALOG": {
         "DELETE_TITLE": "Idp entfernen",
-        "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu entfernen. Wollen Sie dies wirklich tun?"
+        "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identitätsanbieter zu entfernen. Wollen Sie dies wirklich tun?"
       }
     },
     "CREATE": {
@@ -673,18 +673,18 @@
         "CHOOSEDATEAFTER": "Geben Sie ein valides Ablaufdatum an. Ab"
       },
       "ADDED": {
-        "TITLE": "Personal Access Token",
+        "TITLE": "Persönliches Zugriffstoken",
         "DESCRIPTION": "Kopieren Sie Ihr Access Token. Sie werden später nicht mehr darauf zugreifen können."
       },
       "DELETE": {
         "TITLE": "Token löschen",
         "DESCRIPTION": "Sie sind im Begriff das Token unwiderruflich zu löschen. Wollen Sie dies wirklich tun?"
       },
-      "DELETED": "Personal Access Token gelöscht."
+      "DELETED": "Persönliches Zugriffstoken gelöscht."
     }
   },
   "METADATA": {
-    "TITLE": "Metadata",
+    "TITLE": "Metadaten",
     "DESCRIPTION": "",
     "KEY": "Schlüssel",
     "VALUE": "Wert",
@@ -714,7 +714,7 @@
     "FLOWCLEARED": "Der Ablauf wurde zurückgesetzt",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in Sekunden",
-    "ALLOWEDTOFAIL": "Allowed To Fail",
+    "ALLOWEDTOFAIL": "Scheitern erlaubt",
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Typ",
     "TRIGGERTYPE": "Trigger Typ",
@@ -774,7 +774,7 @@
       "4": "Gestoppt"
     },
     "VIEWS": {
-      "TITLE": "Views",
+      "TITLE": "Ansichten",
       "DESCRIPTION": "Diese Ansicht zeigt die Anzeigen von ZITADEL. Diese können bei Bedarf zurückgesetzt werden.",
       "VIEWNAME": "Name",
       "DATABASE": "Datenbank",
@@ -803,7 +803,7 @@
       "DELETESUCCESS": "Gescheiterte Events entfernt."
     },
     "EVENTS": {
-      "TITLE": "Events",
+      "TITLE": "Veranstaltungen",
       "DESCRIPTION": "Diese Ansicht zeigt alle vorhandenen Events.",
       "EDITOR": "Editor",
       "EDITORID": "Editor ID",
@@ -849,7 +849,7 @@
         "OTHERS": "weitere"
       },
       "DIALOG": {
-        "TITLE": "Event Detail"
+        "TITLE": "Ereignisdetail"
       }
     },
     "TOAST": {
@@ -921,7 +921,7 @@
     },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
-      "TITLE": "Domains",
+      "TITLE": "Domänen",
       "DESCRIPTION": "Konfiguriere die Domains, mit denen sich Deine Benutzer anmelden können.",
       "SETPRIMARY": "Primäre Domain setzen",
       "DELETE": {
@@ -991,7 +991,7 @@
       "NOTIFICATIONS": "Benachrichtigungseinstellungen",
       "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
-      "IDP": "Identity Provider",
+      "IDP": "Identitätsanbieter",
       "DOMAIN": "Domain Einstellungen",
       "LOGINTEXTS": "Login Interface Texte",
       "BRANDING": "Branding",
@@ -1097,7 +1097,7 @@
       "RESET": {
         "DEFAULTTITLE": "Einstellungen zurücksetzen",
         "DEFAULTDESCRIPTION": "Sie sind im Begriff, Einstellungen auf die der Instanz zurückzusetzen? Wollen Sie fortfahren?",
-        "LOGINPOLICY_DESCRIPTION": "Achtung: Wenn Sie fortfahren werden auch Identity Provider auf die Instanzeinstellungen zurückgesetzt."
+        "LOGINPOLICY_DESCRIPTION": "Achtung: Wenn Sie fortfahren werden auch Identitätsanbieter auf die Instanzeinstellungen zurückgesetzt."
       }
     }
   },
@@ -1114,7 +1114,7 @@
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
     "NOTIFICATION": {
-      "TITLE": "Notification",
+      "TITLE": "Benachrichtigung",
       "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
       "PASSWORDCHANGE": "Passwortänderung"
     },
@@ -1142,6 +1142,10 @@
       "MAXSIZEEXCEEDED": "Maximale Grösse von 524kB überschritten",
       "NOSVGSUPPORTED": "SVG werden nicht unterstützt!",
       "FONTINLOGINONLY": "Die Schriftart wird momentan nur im Login interface angezeigt.",
+      "BACKGROUNDCOLOR": "Hintergrundfarbe",
+      "PRIMARYCOLOR": "Primärfarbe",
+      "WARNCOLOR": "Warnfarbe",
+      "FONTCOLOR": "Schriftfarbe",
       "VIEWS": {
         "PREVIEW": "Vorschau",
         "CURRENT": "Aktuelle Konfiguration"
@@ -1304,7 +1308,7 @@
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
       "ALLOWREGISTER": "Registrieren erlaubt",
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
-      "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identity Provider erlaubt.",
+      "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
       "FORCEMFA": "Mfa erzwingen",
       "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden.",
@@ -1646,7 +1650,7 @@
       "0": "kein Styling",
       "1": "Google"
     },
-    "ADD": "Identity Provider hinzufügen",
+    "ADD": "Identitätsanbieter hinzufügen",
     "AUTOREGISTER": "Automatische Registrierung",
     "AUTOREGISTER_DESC": "Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
     "TYPE": "Typ",
@@ -1673,18 +1677,18 @@
     "ACTIVATE": "Aktivieren",
     "DELETE": "Löschen",
     "DELETE_TITLE": "IDP löschen",
-    "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
-    "DELETE_SELECTION_TITLE": "Identity Providers löschen",
-    "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
+    "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "GENERAL": "Generelle Information",
       "TITLE": "OIDC Konfiguration",
-      "DESCRIPTION": "Geben Sie die Daten OIDC Identity Providers ein."
+      "DESCRIPTION": "Geben Sie die Daten OIDC Identitätsanbieter ein."
     },
     "JWT": {
       "TITLE": "JWT Konfiguration",
-      "DESCRIPTION": "Geben Sie die Daten JWT Identity Providers ein. ",
+      "DESCRIPTION": "Geben Sie die Daten JWT Identitätsanbieter ein. ",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
       "JWTKEYSENDPOINT": "JWT Keys Endpoint"
@@ -1737,11 +1741,11 @@
       "TITLE": "Login Einstellungen",
       "DESCRIPTION": "Definieren Sie hier, mit welchen Idps sich Ihre Benutzer anmelden können."
     },
-    "IDPS": "Identity Providers",
+    "IDPS": "Identitätsanbieter",
     "ADDIDP": {
-      "TITLE": "Identity Provider hinzufügen",
+      "TITLE": "Identitätsanbieter hinzufügen",
       "DESCRIPTION": "Sie können vordefinierte oder selbsterstellten Provider auswählen",
-      "SELECTIDPS": "Identity Provider"
+      "SELECTIDPS": "Identitätsanbieter"
     },
     "PASSWORDLESS": "Passwortloser Login",
     "PASSWORDLESSTYPE": {
@@ -1926,10 +1930,10 @@
         "DESCRIPTION": "SAML Applikationen"
       },
       "CONFIGSECTION": "SAML Konfiguration",
-      "URL": "Url des Metadata Files",
+      "URL": "Url des Metadaten Files",
       "OR": "oder",
-      "XML": "Metadata XML hochladen",
-      "METADATA": "Metadata",
+      "XML": "Metadaten XML hochladen",
+      "METADATA": "Metadaten",
       "METADATAFROMFILE": "Metadata aus Datei"
     },
     "AUTHMETHODS": {
