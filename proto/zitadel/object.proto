@@ -47,12 +47,12 @@ message ListQuery {
     };
     uint64 offset = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"10\"";
+            example: "\"0\"";
         }
     ];
     uint32 limit = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "20";
+            example: "100";
             description: "Maximum amount of events returned. The default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If the limit exceeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
         }
     ];
