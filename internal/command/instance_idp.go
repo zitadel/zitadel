@@ -287,7 +287,7 @@ func (c *Commands) AddInstanceGitLabSelfHostedProvider(ctx context.Context, prov
 func (c *Commands) UpdateInstanceGitLabSelfHostedProvider(ctx context.Context, id string, provider GitLabSelfHostedProvider) (*domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	writeModel := NewGitLabInstanceIDPWriteModel(instanceID, id)
+	writeModel := NewGitLabSelfHostedInstanceIDPWriteModel(instanceID, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitLabSelfHostedProvider(instanceAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
@@ -930,6 +930,7 @@ func (c *Commands) prepareAddInstanceGitLabProvider(a *instance.Aggregate, write
 					ctx,
 					&a.Aggregate,
 					writeModel.ID,
+					provider.Name,
 					provider.ClientID,
 					secret,
 					provider.Scopes,
@@ -964,6 +965,7 @@ func (c *Commands) prepareUpdateInstanceGitLabProvider(a *instance.Aggregate, wr
 				ctx,
 				&a.Aggregate,
 				writeModel.ID,
+				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,
 				c.idpConfigEncryption,

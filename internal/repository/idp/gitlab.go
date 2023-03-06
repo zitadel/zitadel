@@ -14,6 +14,7 @@ type GitLabIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID           string              `json:"id"`
+	Name         string              `json:"name,omitempty"`
 	ClientID     string              `json:"client_id"`
 	ClientSecret *crypto.CryptoValue `json:"client_secret"`
 	Scopes       []string            `json:"scopes,omitempty"`
@@ -23,6 +24,7 @@ type GitLabIDPAddedEvent struct {
 func NewGitLabIDPAddedEvent(
 	base *eventstore.BaseEvent,
 	id,
+	name,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
@@ -31,6 +33,7 @@ func NewGitLabIDPAddedEvent(
 	return &GitLabIDPAddedEvent{
 		BaseEvent:    *base,
 		ID:           id,
+		Name:         name,
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Scopes:       scopes,
@@ -63,9 +66,10 @@ type GitLabIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID           string              `json:"id"`
+	Name         *string             `json:"name,omitempty"`
 	ClientID     *string             `json:"client_id,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"client_secret,omitempty"`
-	Scopes       []string            `json:"scopes,omitempty"` // TODO: tristate?
+	Scopes       []string            `json:"scopes,omitempty"`
 	OptionChanges
 }
 
@@ -88,6 +92,12 @@ func NewGitLabIDPChangedEvent(
 }
 
 type GitLabIDPChanges func(*GitLabIDPChangedEvent)
+
+func ChangeGitLabName(name string) func(*GitLabIDPChangedEvent) {
+	return func(e *GitLabIDPChangedEvent) {
+		e.Name = &name
+	}
+}
 
 func ChangeGitLabClientID(clientID string) func(*GitLabIDPChangedEvent) {
 	return func(e *GitLabIDPChangedEvent) {

@@ -596,6 +596,17 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						nil,
 						nil,
@@ -700,6 +711,17 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						// github enterprise
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
 						nil,
 						nil,
 						nil,
@@ -907,6 +929,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// github
 						nil,
 						nil,
@@ -1008,6 +1043,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						// oauth
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
 						nil,
 						nil,
 						nil,
@@ -1997,6 +2045,17 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google
 							nil,
 							nil,
@@ -2069,6 +2128,17 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							// github enterprise
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
 							nil,
 							nil,
 							nil,

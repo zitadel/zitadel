@@ -284,7 +284,7 @@ func (s *Server) UpdateGitHubEnterpriseServerProvider(ctx context.Context, req *
 }
 
 func (s *Server) AddGitLabProvider(ctx context.Context, req *admin_pb.AddGitLabProviderRequest) (*admin_pb.AddGitLabProviderResponse, error) {
-	id, details, err := s.command.AddOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitLabProviderToCommand(req))
+	id, details, err := s.command.AddInstanceGitLabProvider(ctx, addGitLabProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -295,7 +295,7 @@ func (s *Server) AddGitLabProvider(ctx context.Context, req *admin_pb.AddGitLabP
 }
 
 func (s *Server) UpdateGitLabProvider(ctx context.Context, req *admin_pb.UpdateGitLabProviderRequest) (*admin_pb.UpdateGitLabProviderResponse, error) {
-	details, err := s.command.UpdateOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitLabProviderToCommand(req))
+	details, err := s.command.UpdateInstanceGitLabProvider(ctx, req.Id, updateGitLabProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -305,7 +305,7 @@ func (s *Server) UpdateGitLabProvider(ctx context.Context, req *admin_pb.UpdateG
 }
 
 func (s *Server) AddGitLabSelfHostedProvider(ctx context.Context, req *admin_pb.AddGitLabSelfHostedProviderRequest) (*admin_pb.AddGitLabSelfHostedProviderResponse, error) {
-	id, details, err := s.command.AddOrgGitLabSelfHostedProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitLabSelfHostedProviderToCommand(req))
+	id, details, err := s.command.AddInstanceGitLabSelfHostedProvider(ctx, addGitLabSelfHostedProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -316,7 +316,7 @@ func (s *Server) AddGitLabSelfHostedProvider(ctx context.Context, req *admin_pb.
 }
 
 func (s *Server) UpdateGitLabSelfHostedProvider(ctx context.Context, req *admin_pb.UpdateGitLabSelfHostedProviderRequest) (*admin_pb.UpdateGitLabSelfHostedProviderResponse, error) {
-	details, err := s.command.UpdateOrgGitLabSelfHostedProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitLabSelfHostedProviderToCommand(req))
+	details, err := s.command.UpdateInstanceGitLabSelfHostedProvider(ctx, req.Id, updateGitLabSelfHostedProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}

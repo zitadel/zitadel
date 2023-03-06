@@ -58,6 +58,7 @@ type GitHubEnterpriseProvider struct {
 }
 
 type GitLabProvider struct {
+	Name         string
 	ClientID     string
 	ClientSecret string
 	Scopes       []string

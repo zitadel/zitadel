@@ -42,6 +42,9 @@ func (t IDPType) GetCSSClass() string {
 	case IDPTypeGitHub,
 		IDPTypeGitHubEnterprise:
 		return "github"
+	case IDPTypeGitLab,
+		IDPTypeGitLabSelfHosted:
+		return "gitlab"
 	default:
 		return ""
 	}

@@ -1288,7 +1288,7 @@ func (p *idpTemplateProjection) reduceGitLabIDPChanged(event eventstore.Event) (
 	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
 	ops = append(ops,
 		crdb.AddUpdateStatement(
-			reduceIDPChangedTemplateColumns(nil, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -1377,7 +1377,7 @@ func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPChanged(event eventstor
 	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
 	ops = append(ops,
 		crdb.AddUpdateStatement(
-			reduceIDPChangedTemplateColumns(nil, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),

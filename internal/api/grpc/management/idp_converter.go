@@ -338,6 +338,7 @@ func updateGitHubEnterpriseProviderToCommand(req *mgmt_pb.UpdateGitHubEnterprise
 
 func addGitLabProviderToCommand(req *mgmt_pb.AddGitLabProviderRequest) command.GitLabProvider {
 	return command.GitLabProvider{
+		Name:         req.Name,
 		ClientID:     req.ClientId,
 		ClientSecret: req.ClientSecret,
 		Scopes:       req.Scopes,
@@ -347,6 +348,7 @@ func addGitLabProviderToCommand(req *mgmt_pb.AddGitLabProviderRequest) command.G
 
 func updateGitLabProviderToCommand(req *mgmt_pb.UpdateGitLabProviderRequest) command.GitLabProvider {
 	return command.GitLabProvider{
+		Name:         req.Name,
 		ClientID:     req.ClientId,
 		ClientSecret: req.ClientSecret,
 		Scopes:       req.Scopes,

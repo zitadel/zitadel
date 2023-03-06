@@ -888,7 +888,7 @@ func (c *Commands) prepareUpdateOrgGitHubEnterpriseProvider(a *org.Aggregate, wr
 	}
 }
 
-func (c *Commands) prepareAddOrgGitLabProvider(a *org.Aggregate,  writeModel *OrgGitLabIDPWriteModel, provider GitLabProvider) preparation.Validation {
+func (c *Commands) prepareAddOrgGitLabProvider(a *org.Aggregate, writeModel *OrgGitLabIDPWriteModel, provider GitLabProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-adsg2", "Errors.Invalid.Argument")
@@ -914,6 +914,7 @@ func (c *Commands) prepareAddOrgGitLabProvider(a *org.Aggregate,  writeModel *Or
 					ctx,
 					&a.Aggregate,
 					writeModel.ID,
+					provider.Name,
 					provider.ClientID,
 					secret,
 					provider.Scopes,
@@ -924,7 +925,7 @@ func (c *Commands) prepareAddOrgGitLabProvider(a *org.Aggregate,  writeModel *Or
 	}
 }
 
-func (c *Commands) prepareUpdateOrgGitLabProvider(a *org.Aggregate,  writeModel *OrgGitLabIDPWriteModel, provider GitLabProvider) preparation.Validation {
+func (c *Commands) prepareUpdateOrgGitLabProvider(a *org.Aggregate, writeModel *OrgGitLabIDPWriteModel, provider GitLabProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HJK91", "Errors.Invalid.Argument")
@@ -948,6 +949,7 @@ func (c *Commands) prepareUpdateOrgGitLabProvider(a *org.Aggregate,  writeModel 
 				ctx,
 				&a.Aggregate,
 				writeModel.ID,
+				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,
 				c.idpConfigEncryption,
@@ -965,7 +967,7 @@ func (c *Commands) prepareUpdateOrgGitLabProvider(a *org.Aggregate,  writeModel 
 	}
 }
 
-func (c *Commands) prepareAddOrgGitLabSelfHostedProvider(a *org.Aggregate,  writeModel *OrgGitLabSelfHostedIDPWriteModel, provider GitLabSelfHostedProvider) preparation.Validation {
+func (c *Commands) prepareAddOrgGitLabSelfHostedProvider(a *org.Aggregate, writeModel *OrgGitLabSelfHostedIDPWriteModel, provider GitLabSelfHostedProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-jw4ZT", "Errors.Invalid.Argument")
