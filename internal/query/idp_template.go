@@ -54,6 +54,7 @@ type OAuthIDPTemplate struct {
 	TokenEndpoint         string
 	UserEndpoint          string
 	Scopes                database.StringArray
+	IDAttribute           string
 }
 
 type OIDCIDPTemplate struct {
@@ -194,6 +195,10 @@ var (
 	}
 	OAuthScopesCol = Column{
 		name:  projection.OAuthScopesCol,
+		table: oauthIdpTemplateTable,
+	}
+	OAuthIDAttributeCol = Column{
+		name:  projection.OAuthIDAttributeCol,
 		table: oauthIdpTemplateTable,
 	}
 )
@@ -505,6 +510,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OAuthTokenEndpointCol.identifier(),
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
+			OAuthIDAttributeCol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -564,6 +570,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oauthTokenEndpoint := sql.NullString{}
 			oauthUserEndpoint := sql.NullString{}
 			oauthScopes := database.StringArray{}
+			oauthIDAttribute := sql.NullString{}
 
 			oidcID := sql.NullString{}
 			oidcIssuer := sql.NullString{}
@@ -627,6 +634,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oauthTokenEndpoint,
 				&oauthUserEndpoint,
 				&oauthScopes,
+				&oauthIDAttribute,
 				// oidc
 				&oidcID,
 				&oidcIssuer,
@@ -686,6 +694,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					TokenEndpoint:         oauthTokenEndpoint.String,
 					UserEndpoint:          oauthUserEndpoint.String,
 					Scopes:                oauthScopes,
+					IDAttribute:           oauthIDAttribute.String,
 				}
 			}
 			if oidcID.Valid {
@@ -770,6 +779,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OAuthTokenEndpointCol.identifier(),
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
+			OAuthIDAttributeCol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -833,6 +843,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oauthTokenEndpoint := sql.NullString{}
 				oauthUserEndpoint := sql.NullString{}
 				oauthScopes := database.StringArray{}
+				oauthIDAttribute := sql.NullString{}
 
 				oidcID := sql.NullString{}
 				oidcIssuer := sql.NullString{}
@@ -896,6 +907,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oauthTokenEndpoint,
 					&oauthUserEndpoint,
 					&oauthScopes,
+					&oauthIDAttribute,
 					// oidc
 					&oidcID,
 					&oidcIssuer,
@@ -954,6 +966,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						TokenEndpoint:         oauthTokenEndpoint.String,
 						UserEndpoint:          oauthUserEndpoint.String,
 						Scopes:                oauthScopes,
+						IDAttribute:           oauthIDAttribute.String,
 					}
 				}
 				if oidcID.Valid {

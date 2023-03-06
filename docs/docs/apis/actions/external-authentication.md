@@ -26,6 +26,9 @@ The first parameter contains the following fields
       This is a verification errors string representation. If the verification succeeds, this is "none"
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
     - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
+    - `providerInfo` *Any*  
+      Returns the response of the provider. In case the provider is a Generic OAuth Provider, the information is accessible through:
+      - `rawInfo`  *Any*
 - `api`  
   The second parameter contains the following fields
   - `v1`

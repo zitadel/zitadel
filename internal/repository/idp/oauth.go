@@ -20,6 +20,7 @@ type OAuthIDPAddedEvent struct {
 	TokenEndpoint         string              `json:"tokenEndpoint,omitempty"`
 	UserEndpoint          string              `json:"userEndpoint,omitempty"`
 	Scopes                []string            `json:"scopes,omitempty"`
+	IDAttribute           string              `json:"idAttribute,omitempty"`
 	Options
 }
 
@@ -31,7 +32,8 @@ func NewOAuthIDPAddedEvent(
 	clientSecret *crypto.CryptoValue,
 	authorizationEndpoint,
 	tokenEndpoint,
-	userEndpoint string,
+	userEndpoint,
+	idAttribute string,
 	scopes []string,
 	options Options,
 ) *OAuthIDPAddedEvent {
@@ -45,6 +47,7 @@ func NewOAuthIDPAddedEvent(
 		TokenEndpoint:         tokenEndpoint,
 		UserEndpoint:          userEndpoint,
 		Scopes:                scopes,
+		IDAttribute:           idAttribute,
 		Options:               options,
 	}
 }
@@ -81,6 +84,7 @@ type OAuthIDPChangedEvent struct {
 	TokenEndpoint         *string             `json:"tokenEndpoint,omitempty"`
 	UserEndpoint          *string             `json:"userEndpoint,omitempty"`
 	Scopes                []string            `json:"scopes,omitempty"`
+	IDAttribute           *string             `json:"idAttribute,omitempty"`
 	OptionChanges
 }
 
@@ -148,6 +152,12 @@ func ChangeOAuthUserEndpoint(userEndpoint string) func(*OAuthIDPChangedEvent) {
 func ChangeOAuthScopes(scopes []string) func(*OAuthIDPChangedEvent) {
 	return func(e *OAuthIDPChangedEvent) {
 		e.Scopes = scopes
+	}
+}
+
+func ChangeOAuthIDAttribute(idAttribute string) func(*OAuthIDPChangedEvent) {
+	return func(e *OAuthIDPChangedEvent) {
+		e.IDAttribute = &idAttribute
 	}
 }
 

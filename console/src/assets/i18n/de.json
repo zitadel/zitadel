@@ -1117,7 +1117,7 @@
     "NOTIFICATION": {
       "TITLE": "Notification",
       "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
-      "PASSWORDCHANGE": "Passwordänderung"
+      "PASSWORDCHANGE": "Passwortänderung"
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
