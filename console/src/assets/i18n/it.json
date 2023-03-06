@@ -1677,7 +1677,7 @@
     "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
     "TOKENENDPOINT": "Token Endpoint",
     "USERENDPOINT": "User Endpoint",
-    "IDATTRIBUTE": "ID Attribute",
+    "IDATTRIBUTE": "Attributo ID",
     "AVAILABILITY": "Disponibilità",
     "AVAILABLE": "disponibile",
     "AVAILABLEBUTINACTIVE": "disponible ma inattivo",

@@ -1675,7 +1675,7 @@
     "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
     "TOKENENDPOINT": "Token Endpoint",
     "USERENDPOINT": "User Endpoint",
-    "IDATTRIBUTE": "ID Attribute",
+    "IDATTRIBUTE": "标识属性",
     "AVAILABILITY": "可用性",
     "AVAILABLE": "可用的",
     "AVAILABLEBUTINACTIVE": "可用但已停用",

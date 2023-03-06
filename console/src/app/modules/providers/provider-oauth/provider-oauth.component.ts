@@ -190,7 +190,6 @@ export class ProviderOAuthComponent {
         req.setClientSecret(this.clientSecret?.value);
         req.setScopesList(this.scopesList?.value);
 
-        console.log(req.toObject());
         this.loading = true;
         (this.service as ManagementService)
           .updateGenericOAuthProvider(req)
