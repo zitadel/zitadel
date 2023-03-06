@@ -125,6 +125,10 @@ export class ProviderOAuthComponent {
       const req = new MgmtAddGenericOAuthProviderRequest();
 
       req.setName(this.name?.value);
+      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+      req.setIdAttribute(this.idAttribute?.value);
+      req.setTokenEndpoint(this.tokenEndpoint?.value);
+      req.setUserEndpoint(this.userEndpoint?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
@@ -145,6 +149,10 @@ export class ProviderOAuthComponent {
     } else if (PolicyComponentServiceType.ADMIN) {
       const req = new AdminAddGenericOAuthProviderRequest();
       req.setName(this.name?.value);
+      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+      req.setIdAttribute(this.idAttribute?.value);
+      req.setTokenEndpoint(this.tokenEndpoint?.value);
+      req.setUserEndpoint(this.userEndpoint?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
@@ -243,6 +251,22 @@ export class ProviderOAuthComponent {
 
   public get name(): AbstractControl | null {
     return this.oidcFormGroup.get('name');
+  }
+
+  public get authorizationEndpoint(): AbstractControl | null {
+    return this.oidcFormGroup.get('authorizationEndpoint');
+  }
+
+  public get tokenEndpoint(): AbstractControl | null {
+    return this.oidcFormGroup.get('tokenEndpoint');
+  }
+
+  public get userEndpoint(): AbstractControl | null {
+    return this.oidcFormGroup.get('userEndpoint');
+  }
+
+  public get idAttribute(): AbstractControl | null {
+    return this.oidcFormGroup.get('idAttribute');
   }
 
   public get clientId(): AbstractControl | null {
