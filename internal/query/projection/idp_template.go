@@ -245,6 +245,7 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(GitLabSelfHostedIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(GitLabSelfHostedInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GitLabSelfHostedIssuerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(GitLabSelfHostedClientIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(GitLabSelfHostedClientSecretCol, crdb.ColumnTypeJSONB),
 			crdb.NewColumn(GitLabSelfHostedScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
