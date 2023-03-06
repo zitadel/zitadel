@@ -160,6 +160,7 @@
     "MORE": "more",
     "STEP": "Step",
     "SETUP": "Setup",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -1615,41 +1616,51 @@
       "ACTIVETITLE": "Active Identity Providers"
     },
     "CREATE": {
-      "TITLE": "New Identity Provider",
-      "DESCRIPTION": "Choose one of the following Identity Provider types."
+      "TITLE": "Add provider",
+      "DESCRIPTION": "Select one ore more of the following providers.",
+      "STEPPERTITLE": "Create Provider",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Enter the required data for your OIDC provider."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Enter the required data for your JWT provider."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+      }
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "General Configuration of your identity provider.",
+      "DESCRIPTION": "Update your provider configuration",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatic creation",
+      "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
+      "ISAUTOUPDATE": "Automatic update",
+      "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
+      "ISCREATIONALLOWED": "Account creation allowed",
+      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
+      "ISLINKINGALLOWED": "Account linking allowed",
+      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
     },
     "OWNERTYPES": {
       "0": "unknown",
       "1": "Instance",
       "2": "Organization"
     },
-    "TYPES": {
-      "0": "unknown",
-      "1": "OIDC",
-      "3": "JWT"
-    },
     "STATES": {
       "1": "active",
       "2": "inactive"
     },
-    "MAPPINGFIELD": {
-      "1": "Preferred Username",
-      "2": "Email"
-    },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "No Styling",
-      "1": "Google"
-    },
+    "NAMEHINT": "If specified it will be shown in the login interface.",
+    "OPTIONAL": "optional",
+    "UPDATECLIENTSECRET": "update client secret",
     "ADD": "Add Identity Provider",
-    "AUTOREGISTER": "Auto Register",
-    "AUTOREGISTER_DESC": "If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
     "OWNER": "Owner",
     "ID": "ID",

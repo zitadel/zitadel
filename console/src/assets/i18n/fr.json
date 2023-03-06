@@ -159,6 +159,7 @@
     "NEXT": "Suivant",
     "MORE": "plus",
     "STEP": "Étape",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Afficher l'utilisateur{{value}}"
     }
@@ -1614,14 +1615,37 @@
       "ACTIVETITLE": "Fournisseurs d'identité actifs"
     },
     "CREATE": {
-      "TITLE": "Nouveau fournisseur d'identité",
-      "DESCRIPTION": "Choisissez l'un des types de fournisseur d'identité suivants."
+      "TITLE": "Ajouter un fournisseur",
+      "DESCRIPTION": "Sélectionnez un ou plusieurs des fournisseurs suivants.",
+      "STEPPERTITLE": "Créer un fournisseur",
+      "OIDC": {
+        "TITLE": "Fournisseur OIDC",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur OIDC."
+      },
+      "JWT": {
+        "TITLE": "Fournisseur JWT",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Fournisseur Google",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Google"
+      }
     },
     "DETAIL": {
       "TITLE": "Fournisseur d'identité",
-      "DESCRIPTION": "Configuration générale de votre fournisseur d'identité.",
+      "DESCRIPTION": "Mettez à jour la configuration de votre fournisseur",
       "DATECREATED": "Créé",
       "DATECHANGED": "Modifié"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Création automatique",
+      "ISAUTOCREATION_DESC": "Détermine si un compte sera créé s'il n'existe pas déjà.",
+      "ISAUTOUPDATE": "est mise à jour automatiquement",
+      "ISAUTOUPDATE_DESC": "Si cette option est sélectionnée, les comptes sont mis à jour lors de la réauthentification.",
+      "ISCREATIONALLOWED": "la création est-elle autorisée",
+      "ISCREATIONALLOWED_DESC": "Détermine si des comptes peuvent être créés.",
+      "ISLINKINGALLOWED": "la liaison est-elle autorisée",
+      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant."
     },
     "OWNERTYPES": {
       "0": "inconnu",
@@ -1637,18 +1661,10 @@
       "1": "actif",
       "2": "inactif"
     },
-    "MAPPINGFIELD": {
-      "1": "Nom d'utilisateur préféré",
-      "2": "Courriel"
-    },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "Pas de style",
-      "1": "Google"
-    },
+    "NAMEHINT": "Si elle est spécifiée, elle sera affichée dans l'interface de connexion.",
+    "OPTIONAL": "optionnel",
+    "UPDATECLIENTSECRET": "mise à jour du secret client",
     "ADD": "Ajouter un fournisseur d'identité",
-    "AUTOREGISTER": "Enregistrement automatique",
-    "AUTOREGISTER_DESC": "Si cette option est sélectionnée et qu'aucun compte n'existe encore, un compte sera créé.",
     "TYPE": "Type",
     "OWNER": "Propriétaire",
     "ID": "ID",
