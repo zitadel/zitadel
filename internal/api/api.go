@@ -94,7 +94,7 @@ func (a *API) routeGRPC() {
 }
 
 func (a *API) routeGRPCWeb() {
-	grpcwebServer := grpcweb.WrapServer(a.grpcServer,
+	grpcWebServer := grpcweb.WrapServer(a.grpcServer,
 		grpcweb.WithAllowedRequestHeaders(
 			[]string{
 				http_util.Origin,
@@ -115,12 +115,9 @@ func (a *API) routeGRPCWeb() {
 		Methods(http.MethodPost, http.MethodOptions).
 		MatcherFunc(
 			func(r *http.Request, _ *mux.RouteMatch) bool {
-				if grpcwebServer.IsGrpcWebRequest(r) {
-					return true
-				}
-				return grpcwebServer.IsAcceptableGrpcCorsRequest(r)
+				return grpcWebServer.IsGrpcWebRequest(r) || grpcWebServer.IsAcceptableGrpcCorsRequest(r)
 			}).
-		Handler(grpcwebServer)
+		Handler(grpcWebServer)
 }
 
 func (a *API) healthHandler() http.Handler {
