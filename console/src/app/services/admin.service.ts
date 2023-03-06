@@ -917,13 +917,13 @@ export class AdminService {
   }
 
   public addGenericOAuthProvider(req: AddGenericOAuthProviderRequest): Promise<AddGenericOAuthProviderResponse.AsObject> {
-    return this.grpcService.mgmt.addGenericOAuthProvider(req, null).then((resp) => resp.toObject());
+    return this.grpcService.admin.addGenericOAuthProvider(req, null).then((resp) => resp.toObject());
   }
 
   public updateGenericOAuthProvider(
     req: UpdateGenericOAuthProviderRequest,
   ): Promise<UpdateGenericOAuthProviderResponse.AsObject> {
-    return this.grpcService.mgmt.updateGenericOAuthProvider(req, null).then((resp) => resp.toObject());
+    return this.grpcService.admin.updateGenericOAuthProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addJWTProvider(req: AddJWTProviderRequest): Promise<AddJWTProviderResponse.AsObject> {
