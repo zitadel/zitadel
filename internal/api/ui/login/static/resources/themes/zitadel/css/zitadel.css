@@ -580,7 +580,7 @@ a.sub-formfield-link {
   height: 46px;
   width: 46px;
   background-image: url("../../../images/idp/gitlab.png");
-  background-size: 25px;
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
@@ -1573,7 +1573,7 @@ a.sub-formfield-link {
   height: 46px;
   width: 46px;
   background-image: url("../../../images/idp/gitlab.png");
-  background-size: 25px;
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
