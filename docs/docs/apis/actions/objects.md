@@ -170,7 +170,7 @@ This object is based on the Golang struct [http.Request](https://pkg.go.dev/net/
 
 ## Claims
 
-This object represents the claims which will be written into the oidc token.
+This object represents [the claims](../openidoauth/claims) which will be written into the oidc token.
 
 - `sub` *string*
 - `name` *string*
@@ -181,6 +181,8 @@ This object represents the claims which will be written into the oidc token.
 - `preferred_username` *string*
 - `email_verified` *bool*
 - `updated_at` *Number*
+
+Additionally there could additional fields depending on the configuration of your [project](../../guides/manage/console/projects#role-settings) and your [application](../../guides/manage/console/applications#token-settings)
 
 ## user grant list
 

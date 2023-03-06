@@ -24,7 +24,7 @@ This trigger is called before userinfo are set in the token or response.
     - `userinfo`  
       This function is deprecated, please use `api.v1.claims`
       - `setClaim(string, Any)`  
-        Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:$
+        Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:${action.name}:log`
     - `claims`
       - `setClaim(string, Any)`  
         Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:${action.name}:log`
