@@ -332,9 +332,6 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		return err
 	}
 
-	if len(roles) == 0 || applicationID == "" {
-		return o.userinfoFlows(ctx, user.ResourceOwner, userGrants, userInfo)
-	}
 	if len(projectRoles) > 0 {
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
@@ -350,9 +347,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 
 	ctxFields := actions.SetContextFields(
 		actions.SetFields("v1",
-			actions.SetFields("claims", func(c *actions.FieldConfig) interface{} {
-				return c.Runtime.ToValue(userInfo.GetClaims())
-			}),
+			actions.SetFields("claims", userinfoClaims(userInfo)),
 			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 				return func(call goja.FunctionCall) goja.Value {
 					user, err := o.query.GetUserByID(ctx, true, userInfo.GetSubject(), false)
@@ -513,9 +508,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 	if err != nil {
 		return nil, err
 	}
-	if len(roles) == 0 || clientID == "" {
-		return o.privateClaimsFlows(ctx, userID, userGrants, claims)
-	}
+
 	if len(projectRoles) > 0 {
 		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
@@ -732,4 +725,19 @@ func appendClaim(claims map[string]interface{}, claim string, value interface{})
 	}
 	claims[claim] = value
 	return claims
+}
+
+func userinfoClaims(userInfo oidc.UserInfoSetter) func(c *actions.FieldConfig) interface{} {
+	return func(c *actions.FieldConfig) interface{} {
+		marshalled, err := json.Marshal(userInfo)
+		if err != nil {
+			panic(err)
+		}
+
+		claims := make(map[string]interface{}, 10)
+		if err = json.Unmarshal(marshalled, &claims); err != nil {
+			panic(err)
+		}
+		return c.Runtime.ToValue(claims)
+	}
 }
