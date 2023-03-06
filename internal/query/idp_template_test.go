@@ -729,6 +729,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// oidc
 						nil,
 						nil,
