@@ -1622,6 +1622,10 @@
         "TITLE": "Fournisseur OIDC",
         "DESCRIPTION": "Entrez les données requises pour votre fournisseur OIDC."
       },
+      "OAuth": {
+        "TITLE": "Fournisseur OAuth",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur OAuth."
+      },
       "JWT": {
         "TITLE": "Fournisseur JWT",
         "DESCRIPTION": "Entrez les données requises pour votre fournisseur JWT."

@@ -1623,6 +1623,10 @@
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Enter the required data for your OIDC provider."
       },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Enter the required data for your OAuth provider."
+      },
       "JWT": {
         "TITLE": "JWT Provider",
         "DESCRIPTION": "Enter the required data for your JWT provider."

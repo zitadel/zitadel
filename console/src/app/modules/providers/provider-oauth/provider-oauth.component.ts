@@ -37,7 +37,7 @@ export class ProviderOAuthComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  public oidcFormGroup!: UntypedFormGroup;
+  public form!: UntypedFormGroup;
 
   public loading: boolean = false;
 
@@ -51,11 +51,14 @@ export class ProviderOAuthComponent {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    this.oidcFormGroup = new UntypedFormGroup({
+    this.form = new UntypedFormGroup({
       name: new UntypedFormControl('', [Validators.required]),
       clientId: new UntypedFormControl('', [Validators.required]),
       clientSecret: new UntypedFormControl('', [Validators.required]),
-      issuer: new UntypedFormControl('', [Validators.required]),
+      authorizationEndpoint: new UntypedFormControl('', [Validators.required]),
+      tokenEndpoint: new UntypedFormControl('', [Validators.required]),
+      userEndpoint: new UntypedFormControl('', [Validators.required]),
+      idAttribute: new UntypedFormControl('', [Validators.required]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
 
@@ -105,8 +108,8 @@ export class ProviderOAuthComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        if (this.provider?.config?.oidc) {
-          this.oidcFormGroup.patchValue(this.provider.config.oidc);
+        if (this.provider?.config?.oauth) {
+          this.form.patchValue(this.provider.config.oauth);
           this.name?.setValue(this.provider.name);
         }
       })
@@ -179,10 +182,15 @@ export class ProviderOAuthComponent {
         const req = new MgmtUpdateGenericOAuthProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
+        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+        req.setIdAttribute(this.idAttribute?.value);
+        req.setTokenEndpoint(this.tokenEndpoint?.value);
+        req.setUserEndpoint(this.userEndpoint?.value);
         req.setClientId(this.clientId?.value);
         req.setClientSecret(this.clientSecret?.value);
         req.setScopesList(this.scopesList?.value);
 
+        console.log(req.toObject());
         this.loading = true;
         (this.service as ManagementService)
           .updateGenericOAuthProvider(req)
@@ -200,6 +208,10 @@ export class ProviderOAuthComponent {
         const req = new AdminUpdateGenericOAuthProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
+        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+        req.setIdAttribute(this.idAttribute?.value);
+        req.setTokenEndpoint(this.tokenEndpoint?.value);
+        req.setUserEndpoint(this.userEndpoint?.value);
         req.setClientId(this.clientId?.value);
         req.setClientSecret(this.clientSecret?.value);
         req.setScopesList(this.scopesList?.value);
@@ -250,38 +262,38 @@ export class ProviderOAuthComponent {
   }
 
   public get name(): AbstractControl | null {
-    return this.oidcFormGroup.get('name');
+    return this.form.get('name');
   }
 
   public get authorizationEndpoint(): AbstractControl | null {
-    return this.oidcFormGroup.get('authorizationEndpoint');
+    return this.form.get('authorizationEndpoint');
   }
 
   public get tokenEndpoint(): AbstractControl | null {
-    return this.oidcFormGroup.get('tokenEndpoint');
+    return this.form.get('tokenEndpoint');
   }
 
   public get userEndpoint(): AbstractControl | null {
-    return this.oidcFormGroup.get('userEndpoint');
+    return this.form.get('userEndpoint');
   }
 
   public get idAttribute(): AbstractControl | null {
-    return this.oidcFormGroup.get('idAttribute');
+    return this.form.get('idAttribute');
   }
 
   public get clientId(): AbstractControl | null {
-    return this.oidcFormGroup.get('clientId');
+    return this.form.get('clientId');
   }
 
   public get clientSecret(): AbstractControl | null {
-    return this.oidcFormGroup.get('clientSecret');
+    return this.form.get('clientSecret');
   }
 
   public get issuer(): AbstractControl | null {
-    return this.oidcFormGroup.get('issuer');
+    return this.form.get('issuer');
   }
 
   public get scopesList(): AbstractControl | null {
-    return this.oidcFormGroup.get('scopesList');
+    return this.form.get('scopesList');
   }
 }

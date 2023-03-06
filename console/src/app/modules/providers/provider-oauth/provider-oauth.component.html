@@ -2,17 +2,17 @@
   title="{{ id ? ('IDP.DETAIL.TITLE' | translate) : ('IDP.CREATE.TITLE' | translate) }}"
   (closed)="close()"
 >
-  <div class="oidc-create-content">
+  <div class="oauth-create-content">
     <div class="title-row">
       <img class="idp-logo" src="../../../assets/images/idp/oauth.svg" alt="oauth" />
 
-      <h1>{{ 'IDP.CREATE.OIDC.TITLE' | translate }}</h1>
+      <h1>{{ 'IDP.CREATE.OAUTH.TITLE' | translate }}</h1>
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-    <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.OIDC.DESCRIPTION' | translate }}</p>
+    <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.OAUTH.DESCRIPTION' | translate }}</p>
 
-    <form [formGroup]="oidcFormGroup" (ngSubmit)="submitForm()">
+    <form [formGroup]="form" (ngSubmit)="submitForm()">
       <cnsl-form-field class="formfield">
         <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
         <input cnslInput formControlName="name" />
@@ -38,7 +38,7 @@
         <input cnslInput formControlName="idAttribute" />
       </cnsl-form-field>
 
-      <div class="oidc-content">
+      <div class="oauth-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientId" />
@@ -100,8 +100,8 @@
         </div>
       </div>
 
-      <div class="oidc-create-actions">
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="oidcFormGroup.invalid" type="submit">
+      <div class="oauth-create-actions">
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
           <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
         </button>

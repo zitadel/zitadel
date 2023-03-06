@@ -1621,6 +1621,10 @@
         "TITLE": "OIDC供应商",
         "DESCRIPTION": "输入你的OIDC供应商的必要数据。"
       },
+      "OAUTH": {
+        "TITLE": "OAuth供应商",
+        "DESCRIPTION": "输入你的OAuth供应商的必要数据。"
+      },
       "JWT": {
         "TITLE": "JWT供应商",
         "DESCRIPTION": "输入你的JWT供应商所需的数据。"

@@ -1622,6 +1622,10 @@
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OIDC."
       },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OAuth."
+      },
       "JWT": {
         "TITLE": "JWT Provider",
         "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy JWT."
