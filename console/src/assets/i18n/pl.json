@@ -159,6 +159,7 @@
     "NEXT": "Następny",
     "MORE": "więcej",
     "STEP": "Krok",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Pokaż użytkownika {{value}}"
     }
@@ -1614,14 +1615,37 @@
       "ACTIVETITLE": "Aktywni dostawcy tożsamości"
     },
     "CREATE": {
-      "TITLE": "Nowy dostawca tożsamości",
-      "DESCRIPTION": "Wybierz jeden z poniższych typów dostawcy tożsamości."
+      "TITLE": "Dodaj dostawcę",
+      "DESCRIPTION": "Wybierz jednego lub więcej z następujących dostawców.",
+      "STEPPERTITLE": "Utwórz dostawcę",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OIDC."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Google"
+      }
     },
     "DETAIL": {
       "TITLE": "Dostawca tożsamości",
-      "DESCRIPTION": "Ogólna konfiguracja dostawcy tożsamości.",
+      "DESCRIPTION": "Aktualizacja konfiguracji dostawcy",
       "DATECREATED": "Utworzono",
       "DATECHANGED": "Zmieniono"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatyczne tworzenie",
+      "ISAUTOCREATION_DESC": "Jeśli zostanie wybrana, konto zostanie utworzone, jeśli jeszcze nie istnieje.",
+      "ISAUTOUPDATE": "Automatyczna aktualizacja",
+      "ISAUTOUPDATE_DESC": "Jeśli zaznaczone, konta są aktualizowane przy ponownym uwierzytelnianiu.",
+      "ISCREATIONALLOWED": "tworzenie dozwolone",
+      "ISCREATIONALLOWED_DESC": "Określa, czy można tworzyć konta.",
+      "ISLINKINGALLOWED": "dozwolone łączenie rachunków",
+      "ISLINKINGALLOWED_DESC": "Określa, czy tożsamość może być powiązana z istniejącym kontem."
     },
     "OWNERTYPES": {
       "0": "nieznany",
@@ -1637,18 +1661,10 @@
       "1": "aktywny",
       "2": "nieaktywny"
     },
-    "MAPPINGFIELD": {
-      "1": "Preferowana nazwa użytkownika",
-      "2": "E-mail"
-    },
-    "STYLE": "Styl",
-    "STYLEFIELD": {
-      "0": "Bez stylizacji",
-      "1": "Google"
-    },
+    "NAMEHINT": "Jeśli zostanie podany, będzie widoczny w interfejsie logowania.",
+    "OPTIONAL": "opcjonalnie",
+    "UPDATECLIENTSECRET": "aktualizacja tajemnicy klienta",
     "ADD": "Dodaj dostawcę tożsamości",
-    "AUTOREGISTER": "Automatyczna rejestracja",
-    "AUTOREGISTER_DESC": "Jeśli zaznaczone, a konto jeszcze nie istnieje, zostanie utworzone.",
     "TYPE": "Typ",
     "OWNER": "Właściciel",
     "ID": "ID",

@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { IdpCreateComponent } from './idp-create.component';
+import { ProviderGoogleComponent } from './provider-google.component';
 
-describe('IdpCreateComponent', () => {
-  let component: IdpCreateComponent;
-  let fixture: ComponentFixture<IdpCreateComponent>;
+describe('ProviderGoogleComponent', () => {
+  let component: ProviderGoogleComponent;
+  let fixture: ComponentFixture<ProviderGoogleComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [IdpCreateComponent],
+      declarations: [ProviderGoogleComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(IdpCreateComponent);
+    fixture = TestBed.createComponent(ProviderGoogleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

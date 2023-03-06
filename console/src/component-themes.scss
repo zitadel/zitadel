@@ -53,12 +53,13 @@
 @import 'src/app/modules/sidenav/sidenav.component';
 @import 'src/app/modules/user-grants/user-grants.component.scss';
 @import 'src/app/modules/shortcuts/shortcuts.component.scss';
-@import 'src/app/modules/idp-create/idp-type-radio/idp-type-radio.component.scss';
+@import 'src/app/modules/policies/idp-settings/idp-settings.component.scss';
 @import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
 @import 'src/app/pages/events/events.component';
 @import 'src/app/pages/home/home.component.scss';
 @import 'src/app/modules/policies/security-policy/security-policy.component.scss';
+@import 'src/app/modules/idp-table/idp-table.component.scss';
 @import 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component.scss';
 @import 'src/app/modules/policies/login-policy/factor-table/factor-table.component.scss';
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
@@ -72,9 +73,9 @@
   @include nav-toggle-theme($theme);
   @include header-theme($theme);
   @include app-type-radio-theme($theme);
+  @include idp-table-theme($theme);
   @include events-theme($theme);
   @include projects-theme($theme);
-  @include idp-type-radio-theme($theme);
   @include top-view-theme($theme);
   @include info-overlay-theme($theme);
   @include app-auth-method-radio-theme($theme);
@@ -82,6 +83,7 @@
   @include search-user-autocomplete-theme($theme);
   @include project-role-chips-theme($theme);
   @include card-theme($theme);
+  @include idp-settings-theme($theme);
   @include filter-events-theme($theme);
   @include footer-theme($theme);
   @include table-theme($theme);

@@ -2,25 +2,23 @@
   font-size: 14px;
 }
 
-.add-line-btn {
-  margin-bottom: 1rem;
-}
+.jwt-create-content {
+  .title-row {
+    display: flex;
+    align-items: center;
 
-.first-step-actions {
-  margin-top: 1rem;
-}
+    .idp-logo {
+      height: 36px;
+      width: 36px;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
 
-.auto-reg-info {
-  display: block;
-  width: 100%;
-  max-width: 400px;
-
-  .auto-reg-desc {
-    margin: 0 0 1rem 0;
+    h1 {
+      margin: 0 1rem 0 0;
+    }
   }
-}
 
-.idp-create-content {
   .formfield {
     display: block;
     max-width: 400px;
@@ -40,7 +38,7 @@
     }
   }
 
-  .idp-content {
+  .jwt-content {
     .desc {
       margin-bottom: 1rem;
     }
@@ -67,17 +65,21 @@
   }
 }
 
-.idp-create-actions {
+.jwt-create-actions {
   display: flex;
   margin-top: 1rem;
 
-  button[mat-stroked-button] {
-    border-radius: 0.5rem;
-    margin-right: 1rem;
-  }
-
   button[mat-raised-button] {
     border-radius: 0.5rem;
-    margin-right: 1rem;
+    padding: 0.5rem 4rem;
+  }
+}
+
+.optional-h-wrapper {
+  display: flex;
+  align-items: center;
+
+  h2 {
+    margin-right: 0.25rem;
   }
 }

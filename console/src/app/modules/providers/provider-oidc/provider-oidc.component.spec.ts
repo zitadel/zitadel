@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { IdpComponent } from './idp.component';
+import { ProviderOIDCComponent } from './provider-oidc.component';
 
-describe('IdComponent', () => {
-  let component: IdpComponent;
-  let fixture: ComponentFixture<IdpComponent>;
+describe('ProviderOIDCComponent', () => {
+  let component: ProviderOIDCComponent;
+  let fixture: ComponentFixture<ProviderOIDCComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [IdpComponent],
+      declarations: [ProviderOIDCComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(IdpComponent);
+    fixture = TestBed.createComponent(ProviderOIDCComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
