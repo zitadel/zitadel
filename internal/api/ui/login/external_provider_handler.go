@@ -649,11 +649,6 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 }
 
 func (l *Login) githubProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*github.Provider, error) {
-	//errorHandler := func(w http.ResponseWriter, r *http.Request, errorType string, errorDesc string, state string) {
-	//	logging.Errorf("token exchanged failed: %s - %s (state: %s)", errorType, errorType, state)
-	//	rp.DefaultErrorHandler(w, r, errorType, errorDesc, state)
-	//}
-	//openid.WithRelyingPartyOption(rp.WithErrorHandler(errorHandler))
 	secret, err := crypto.DecryptString(identityProvider.GitHubIDPTemplate.ClientSecret, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
@@ -667,11 +662,6 @@ func (l *Login) githubProvider(ctx context.Context, identityProvider *query.IDPT
 }
 
 func (l *Login) githubEnterpriseProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*github.Provider, error) {
-	//errorHandler := func(w http.ResponseWriter, r *http.Request, errorType string, errorDesc string, state string) {
-	//	logging.Errorf("token exchanged failed: %s - %s (state: %s)", errorType, errorType, state)
-	//	rp.DefaultErrorHandler(w, r, errorType, errorDesc, state)
-	//}
-	//openid.WithRelyingPartyOption(rp.WithErrorHandler(errorHandler))
 	secret, err := crypto.DecryptString(identityProvider.GitHubIDPTemplate.ClientSecret, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
