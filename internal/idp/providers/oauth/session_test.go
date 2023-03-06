@@ -93,9 +93,7 @@ func TestProvider_FetchUser(t *testing.T) {
 						Reply(http.StatusInternalServerError)
 				},
 				userMapper: func() idp.User {
-					return &UserMapper{
-						ID: "userID",
-					}
+					return NewUserMapper("userID")
 				},
 				authURL: "https://oauth2.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
 				tokens: &oidc.Tokens{
@@ -135,7 +133,7 @@ func TestProvider_FetchUser(t *testing.T) {
 						})
 				},
 				userMapper: func() idp.User {
-					return &UserMapper{}
+					return NewUserMapper("userID")
 				},
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
 				tokens: &oidc.Tokens{
@@ -147,12 +145,13 @@ func TestProvider_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &UserMapper{
-					info: map[string]interface{}{
+					idAttribute: "userID",
+					RawInfo: map[string]interface{}{
 						"userID": "id",
 						"custom": "claim",
 					},
 				},
-				id:                "",
+				id:                "id",
 				firstName:         "",
 				lastName:          "",
 				displayName:       "",
@@ -202,7 +201,7 @@ func TestProvider_FetchUser(t *testing.T) {
 						})
 				},
 				userMapper: func() idp.User {
-					return &UserMapper{}
+					return NewUserMapper("userID")
 				},
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
 				tokens:  nil,
@@ -210,12 +209,13 @@ func TestProvider_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &UserMapper{
-					info: map[string]interface{}{
+					idAttribute: "userID",
+					RawInfo: map[string]interface{}{
 						"userID": "id",
 						"custom": "claim",
 					},
 				},
-				id:                "",
+				id:                "id",
 				firstName:         "",
 				lastName:          "",
 				displayName:       "",
