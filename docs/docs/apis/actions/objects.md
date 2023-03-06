@@ -191,19 +191,19 @@ This object represents a list of user grant stored in ZITADEL.
 - `count` *Number*
 - `sequence` *Number*
 - `timestamp` *Date*
-- `Grants` Array of
-  - `Id` *string*
-  - `ProjectGrantId` *string*  
+- `grants` Array of
+  - `id` *string*
+  - `projectGrantId` *string*  
     The id of the [project grant](../../concepts/usecases/saas#project-grant)
-  - `State` *Number*  
+  - `state` *Number*  
     <ul><li>0: unspecified</li><li>1: active</li><li>2: inactive</li><li>3: removed</li></ul>
-  - `CreationDate` *Date*
-  - `ChangeDate` *Date*
-  - `Sequence` *Number*
-  - `UserId` *string*
-  - `Roles` Array of *string*
-  - `UserResourceOwner` *string*
-  - `UserGrantResourceOwner` *string*
-  - `UserGrantResourceOwnerName` *string*
-  - `ProjectId` *string*
-  - `ProjectName` *string*
+  - `creationDate` *Date*
+  - `changeDate` *Date*
+  - `sequence` *Number*
+  - `userId` *string*
+  - `roles` Array of *string*
+  - `userResourceOwner` *string*
+  - `userGrantResourceOwner` *string*
+  - `userGrantResourceOwnerName` *string*
+  - `projectId` *string*
+  - `projectName` *string*
