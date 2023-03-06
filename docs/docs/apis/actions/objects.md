@@ -167,3 +167,41 @@ This object is based on the Golang struct [http.Request](https://pkg.go.dev/net/
 - `postForm` Map *string* of Array of *string*
 - `remoteAddr` *string*
 - `headers` Map *string* of Array of *string*
+
+## Claims
+
+This object represents the claims which will be written into the oidc token.
+
+- `sub` *string*
+- `name` *string*
+- `email` *string*
+- `locale` *string*
+- `given_name` *string*
+- `family_name` *string*
+- `preferred_username` *string*
+- `email_verified` *bool*
+- `updated_at` *Number*
+
+## user grant list
+
+This object represents a list of user grant stored in ZITADEL.
+
+- `count` *Number*
+- `sequence` *Number*
+- `timestamp` *Date*
+- `Grants` Array of
+  - `Id` *string*
+  - `ProjectGrantId` *string*  
+    The id of the [project grant](../../concepts/usecases/saas#project-grant)
+  - `State` *Number*  
+    <ul><li>0: unspecified</li><li>1: active</li><li>2: inactive</li><li>3: removed</li></ul>
+  - `CreationDate` *Date*
+  - `ChangeDate` *Date*
+  - `Sequence` *Number*
+  - `UserId` *string*
+  - `Roles` Array of *string*
+  - `UserResourceOwner` *string*
+  - `UserGrantResourceOwner` *string*
+  - `UserGrantResourceOwnerName` *string*
+  - `ProjectId` *string*
+  - `ProjectName` *string*

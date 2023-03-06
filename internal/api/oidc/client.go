@@ -392,7 +392,6 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 
 		apiFields := actions.WithAPIFields(
 			actions.SetFields("v1",
-				// TODO: deprecation warning
 				actions.SetFields("userinfo",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
 						if userInfo.GetClaim(key) == nil {
