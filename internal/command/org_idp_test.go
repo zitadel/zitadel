@@ -151,6 +151,28 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid id attribute",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOAuthProvider{
+					Name:                  "name",
+					ClientID:              "clientID",
+					ClientSecret:          "clientSecret",
+					AuthorizationEndpoint: "auth",
+					TokenEndpoint:         "token",
+					UserEndpoint:          "user",
+				},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "ok",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
@@ -170,6 +192,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 								"auth",
 								"token",
 								"user",
+								"idAttribute",
 								nil,
 								idp.Options{},
 							)),
@@ -188,6 +211,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 					AuthorizationEndpoint: "auth",
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
+					IDAttribute:           "idAttribute",
 				},
 			},
 			res: res{
@@ -215,6 +239,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 								"auth",
 								"token",
 								"user",
+								"idAttribute",
 								[]string{"user"},
 								idp.Options{
 									IsCreationAllowed: true,
@@ -239,6 +264,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
 					Scopes:                []string{"user"},
+					IDAttribute:           "idAttribute",
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -399,6 +425,27 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid id attribute",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GenericOAuthProvider{
+					Name:                  "name",
+					ClientID:              "clientID",
+					AuthorizationEndpoint: "auth",
+					TokenEndpoint:         "token",
+					UserEndpoint:          "user",
+				},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "not found",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
@@ -415,6 +462,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 					AuthorizationEndpoint: "auth",
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
+					IDAttribute:           "idAttribute",
 				},
 			},
 			res: res{
@@ -440,6 +488,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								"auth",
 								"token",
 								"user",
+								"idAttribute",
 								nil,
 								idp.Options{},
 							)),
@@ -456,6 +505,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 					AuthorizationEndpoint: "auth",
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
+					IDAttribute:           "idAttribute",
 				},
 			},
 			res: res{
@@ -481,6 +531,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 								"auth",
 								"token",
 								"user",
+								"idAttribute",
 								nil,
 								idp.Options{},
 							)),
@@ -504,6 +555,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 										idp.ChangeOAuthTokenEndpoint("new token"),
 										idp.ChangeOAuthUserEndpoint("new user"),
 										idp.ChangeOAuthScopes([]string{"openid", "profile"}),
+										idp.ChangeOAuthIDAttribute("newAttribute"),
 										idp.ChangeOAuthOptions(idp.OptionChanges{
 											IsCreationAllowed: &t,
 											IsLinkingAllowed:  &t,
@@ -531,6 +583,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "new token",
 					UserEndpoint:          "new user",
 					Scopes:                []string{"openid", "profile"},
+					IDAttribute:           "newAttribute",
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,

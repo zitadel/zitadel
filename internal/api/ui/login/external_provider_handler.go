@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -134,14 +135,15 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 	}
 	var provider idp.Provider
 	switch identityProvider.Type {
+	case domain.IDPTypeOAuth:
+		provider, err = l.oauthProvider(r.Context(), identityProvider)
 	case domain.IDPTypeOIDC:
 		provider, err = l.oidcProvider(r.Context(), identityProvider)
 	case domain.IDPTypeJWT:
 		provider, err = l.jwtProvider(identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
-	case domain.IDPTypeOAuth,
-		domain.IDPTypeLDAP,
+	case domain.IDPTypeLDAP,
 		domain.IDPTypeAzureAD,
 		domain.IDPTypeGitHub,
 		domain.IDPTypeGitHubEE,
@@ -177,33 +179,39 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
 	if err != nil {
-		l.externalAuthFailed(w, r, authReq, nil, err)
+		l.externalAuthFailed(w, r, authReq, nil, nil, err)
 		return
 	}
 	identityProvider, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
 	if err != nil {
-		l.externalAuthFailed(w, r, authReq, nil, err)
+		l.externalAuthFailed(w, r, authReq, nil, nil, err)
 		return
 	}
 	var provider idp.Provider
 	var session idp.Session
 	switch identityProvider.Type {
+	case domain.IDPTypeOAuth:
+		provider, err = l.oauthProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &oauth.Session{Provider: provider.(*oauth.Provider), Code: data.Code}
 	case domain.IDPTypeOIDC:
 		provider, err = l.oidcProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, err)
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
 		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
-			l.externalAuthFailed(w, r, authReq, nil, err)
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
 		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeJWT,
-		domain.IDPTypeOAuth,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeAzureAD,
 		domain.IDPTypeGitHub,
@@ -219,7 +227,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
-		l.externalAuthFailed(w, r, authReq, tokens(session), err)
+		l.externalAuthFailed(w, r, authReq, tokens(session), user, err)
 		return
 	}
 	l.handleExternalUserAuthenticated(w, r, authReq, identityProvider, session, user, l.renderNextStep)
@@ -236,7 +244,7 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
-	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, nil)
+	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -600,6 +608,31 @@ func (l *Login) jwtProvider(identityProvider *query.IDPTemplate) (*jwt.Provider,
 	)
 }
 
+func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*oauth.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.OAuthIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	config := &oauth2.Config{
+		ClientID:     identityProvider.OAuthIDPTemplate.ClientID,
+		ClientSecret: secret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  identityProvider.OAuthIDPTemplate.AuthorizationEndpoint,
+			TokenURL: identityProvider.OAuthIDPTemplate.TokenEndpoint,
+		},
+		RedirectURL: l.baseURL(ctx) + EndpointExternalLoginCallback,
+		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
+	}
+	return oauth.New(
+		config,
+		identityProvider.Name,
+		identityProvider.OAuthIDPTemplate.UserEndpoint,
+		func() idp.User {
+			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
+		},
+	)
+}
+
 func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserGrant, resourceOwner string) error {
 	if len(userGrants) == 0 {
 		return nil
@@ -613,11 +646,8 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 	return nil
 }
 
-func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens, err error) {
-	if tokens == nil {
-		tokens = &oidc.Tokens{Token: &oauth2.Token{}}
-	}
-	if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, err); actionErr != nil {
+func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens, user idp.User, err error) {
+	if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, user, err); actionErr != nil {
 		logging.WithError(err).Error("both external user authentication and action post authentication failed")
 	}
 	l.renderLogin(w, r, authReq, err)

@@ -21,6 +21,7 @@ type OAuthIDPWriteModel struct {
 	TokenEndpoint         string
 	UserEndpoint          string
 	Scopes                []string
+	IDAttribute           string
 	idp.Options
 
 	State domain.IDPState
@@ -48,6 +49,7 @@ func (wm *OAuthIDPWriteModel) reduceAddedEvent(e *idp.OAuthIDPAddedEvent) {
 	wm.TokenEndpoint = e.TokenEndpoint
 	wm.UserEndpoint = e.UserEndpoint
 	wm.Scopes = e.Scopes
+	wm.IDAttribute = e.IDAttribute
 	wm.State = domain.IDPStateActive
 }
 
@@ -73,6 +75,9 @@ func (wm *OAuthIDPWriteModel) reduceChangedEvent(e *idp.OAuthIDPChangedEvent) {
 	if e.Scopes != nil {
 		wm.Scopes = e.Scopes
 	}
+	if e.IDAttribute != nil {
+		wm.IDAttribute = *e.IDAttribute
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -83,7 +88,8 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	secretCrypto crypto.Crypto,
 	authorizationEndpoint,
 	tokenEndpoint,
-	userEndpoint string,
+	userEndpoint,
+	idAttribute string,
 	scopes []string,
 	options idp.Options,
 ) ([]idp.OAuthIDPChanges, error) {
@@ -114,6 +120,9 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	}
 	if !reflect.DeepEqual(wm.Scopes, scopes) {
 		changes = append(changes, idp.ChangeOAuthScopes(scopes))
+	}
+	if wm.IDAttribute != idAttribute {
+		changes = append(changes, idp.ChangeOAuthIDAttribute(idAttribute))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {

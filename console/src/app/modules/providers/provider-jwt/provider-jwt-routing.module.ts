@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import { IdpCreateComponent } from './idp-create.component';
+import { ProviderJWTComponent } from './provider-jwt.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: IdpCreateComponent,
+    component: ProviderJWTComponent,
     data: { animation: 'DetailPage' },
   },
 ];
@@ -15,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class IdpCreateRoutingModule {}
+export class ProviderJWTCreateRoutingModule {}

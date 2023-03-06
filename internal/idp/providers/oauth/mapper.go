@@ -2,6 +2,8 @@ package oauth
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 
 	"golang.org/x/text/language"
 
@@ -11,92 +13,97 @@ import (
 var _ idp.User = (*UserMapper)(nil)
 
 // UserMapper is an implementation of [idp.User].
-// It can be used in ZITADEL actions to map the raw `info`
+// It can be used in ZITADEL actions to map the `RawInfo`
 type UserMapper struct {
-	ID                string
-	FirstName         string
-	LastName          string
-	DisplayName       string
-	NickName          string
-	PreferredUsername string
-	Email             string
-	EmailVerified     bool
-	Phone             string
-	PhoneVerified     bool
-	PreferredLanguage string
-	AvatarURL         string
-	Profile           string
-	info              map[string]interface{}
+	idAttribute string
+	RawInfo     map[string]interface{}
+}
+
+func NewUserMapper(idAttribute string) *UserMapper {
+	return &UserMapper{
+		idAttribute: idAttribute,
+		RawInfo:     make(map[string]interface{}),
+	}
 }
 
 func (u *UserMapper) UnmarshalJSON(data []byte) error {
-	if u.info == nil {
-		u.info = make(map[string]interface{})
-	}
-	return json.Unmarshal(data, &u.info)
+	return json.Unmarshal(data, &u.RawInfo)
 }
 
 // GetID is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetID() string {
-	return u.ID
+	id, ok := u.RawInfo[u.idAttribute]
+	if !ok {
+		return ""
+	}
+	switch i := id.(type) {
+	case string:
+		return i
+	case int:
+		return strconv.Itoa(i)
+	case float64:
+		return strconv.FormatFloat(i, 'f', -1, 64)
+	default:
+		return fmt.Sprint(i)
+	}
 }
 
 // GetFirstName is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetFirstName() string {
-	return u.FirstName
+	return ""
 }
 
 // GetLastName is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetLastName() string {
-	return u.LastName
+	return ""
 }
 
 // GetDisplayName is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetDisplayName() string {
-	return u.DisplayName
+	return ""
 }
 
 // GetNickname is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetNickname() string {
-	return u.NickName
+	return ""
 }
 
 // GetPreferredUsername is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetPreferredUsername() string {
-	return u.PreferredUsername
+	return ""
 }
 
 // GetEmail is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetEmail() string {
-	return u.Email
+	return ""
 }
 
 // IsEmailVerified is an implementation of the [idp.User] interface.
 func (u *UserMapper) IsEmailVerified() bool {
-	return u.EmailVerified
+	return false
 }
 
 // GetPhone is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetPhone() string {
-	return u.Phone
+	return ""
 }
 
 // IsPhoneVerified is an implementation of the [idp.User] interface.
 func (u *UserMapper) IsPhoneVerified() bool {
-	return u.PhoneVerified
+	return false
 }
 
 // GetPreferredLanguage is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetPreferredLanguage() language.Tag {
-	return language.Make(u.PreferredLanguage)
+	return language.Und
 }
 
 // GetAvatarURL is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetAvatarURL() string {
-	return u.AvatarURL
+	return ""
 }
 
 // GetProfile is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetProfile() string {
-	return u.Profile
+	return ""
 }
