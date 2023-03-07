@@ -20,7 +20,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -73,13 +75,37 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 }
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	res, err := s.query.UserChanges(ctx, req.UserId, sequence, limit, asc, s.auditLogRetention)
+	var (
+		limit    uint64
+		sequence uint64
+		asc      bool
+	)
+	if req.Query != nil {
+		limit = uint64(req.Query.Limit)
+		sequence = req.Query.Sequence
+		asc = req.Query.Asc
+	}
+
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AllowTimeTravel().
+		Limit(limit).
+		OrderDesc().
+		AddQuery().
+		SequenceGreater(sequence).
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(req.UserId).
+		Builder()
+	if asc {
+		query.OrderAsc()
+	}
+
+	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
+
 	return &mgmt_pb.ListUserChangesResponse{
-		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix(ctx)),
+		Result: change_grpc.EventsToChangesPb(changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
