@@ -301,7 +301,7 @@ const Gigi = () => {
     <div className={styles.gigiwrapper}>
       <div className={styles.gigiwrapperrelative}>
         <img height="151px" width="256px" src="/docs/img/gigi.svg" />
-        <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
+        <div className={styles.gigibanner}>Try ZITADEL Cloud for FREE 🚀</div>
       </div>
     </div>
   );
