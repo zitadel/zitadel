@@ -1,6 +1,6 @@
 -- replace agg_type_agg_id
 BEGIN;
-DROP INDEX eventstore.events@agg_type_agg_id;
+DROP INDEX IF EXISTS eventstore.events@agg_type_agg_id;
 COMMIT;
 
 BEGIN;
@@ -23,7 +23,7 @@ COMMIT;
 
 -- replace agg_type
 BEGIN;
-DROP INDEX eventstore.events@agg_type;
+DROP INDEX IF EXISTS eventstore.events@agg_type;
 COMMIT;
 
 BEGIN;
