@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -33,8 +34,12 @@ func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQuer
 		return nil, err
 	}
 
+	callTime := call.FromContext(ctx)
+	if callTime.IsZero() {
+		callTime = time.Now()
+	}
 	for i, event := range events {
-		if event.CreationDate().Before(time.Now().Add(-auditLogRetention)) {
+		if event.CreationDate().Before(callTime.Add(-auditLogRetention)) {
 			events = events[:i]
 			break
 		}
