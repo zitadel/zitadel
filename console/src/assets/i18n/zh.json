@@ -535,7 +535,7 @@
     "EMAILVERIFIED": "电子邮件已验证",
     "NOTVERIFIED": "未验证",
     "PREFERRED_LOGINNAME": "首选登录名",
-    "ISINITIAL": "此用户电子邮件尚未验证。",
+    "ISINITIAL": "用户尚未激活。",
     "LOGINMETHODS": {
       "TITLE": "联系信息",
       "DESCRIPTION": "提供的信息用于向您发送重要信息，例如密码重置电子邮件。",
@@ -612,7 +612,7 @@
     "SIGNEDOUT_BTN": "登录",
     "EDITACCOUNT": "编辑账户",
     "ADDACCOUNT": "登录其他账户",
-    "RESENDINITIALEMAIL": "发送新的初始化邮件",
+    "RESENDINITIALEMAIL": "重新发送初始邮件",
     "RESENDEMAILNOTIFICATION": "重新发送电子邮件通知",
     "TOAST": {
       "CREATED": "用户创建成功。",

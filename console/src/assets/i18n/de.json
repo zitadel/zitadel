@@ -535,7 +535,7 @@
     "EMAILVERIFIED": "Email verifiziert",
     "NOTVERIFIED": "nicht verifiziert",
     "PREFERRED_LOGINNAME": "Bevorzugter Loginname",
-    "ISINITIAL": "Dieser Benutzer wurde noch nicht verifiziert.",
+    "ISINITIAL": "Benutzer ist noch nicht aktiv.",
     "LOGINMETHODS": {
       "TITLE": "Kontaktinformationen",
       "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
@@ -612,7 +612,7 @@
     "SIGNEDOUT_BTN": "Anmelden",
     "EDITACCOUNT": "Konto bearbeiten",
     "ADDACCOUNT": "Konto hinzufügen",
-    "RESENDINITIALEMAIL": "Neue Initialisierungsmail senden",
+    "RESENDINITIALEMAIL": "Ursprüngliche E-Mail erneut senden",
     "RESENDEMAILNOTIFICATION": "Benachrichtigungsmail senden",
     "TOAST": {
       "CREATED": "Benutzer erfolgreich erstellt.",
