@@ -900,17 +900,17 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 									t := true
 									event, _ := instance.NewGitHubIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 										"id1",
-										[]idp.OAuthIDPChanges{
-											idp.ChangeOAuthName("new name"),
-											idp.ChangeOAuthClientID("new clientID"),
-											idp.ChangeOAuthClientSecret(&crypto.CryptoValue{
+										[]idp.GitHubIDPChanges{
+											idp.ChangeGitHubName("new name"),
+											idp.ChangeGitHubClientID("new clientID"),
+											idp.ChangeGitHubClientSecret(&crypto.CryptoValue{
 												CryptoType: crypto.TypeEncryption,
 												Algorithm:  "enc",
 												KeyID:      "id",
 												Crypted:    []byte("new clientSecret"),
 											}),
-											idp.ChangeOAuthScopes([]string{"openid", "profile"}),
-											idp.ChangeOAuthOptions(idp.OptionChanges{
+											idp.ChangeGitHubScopes([]string{"openid", "profile"}),
+											idp.ChangeGitHubOptions(idp.OptionChanges{
 												IsCreationAllowed: &t,
 												IsLinkingAllowed:  &t,
 												IsAutoCreation:    &t,
@@ -1430,20 +1430,20 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 									t := true
 									event, _ := instance.NewGitHubEnterpriseIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
 										"id1",
-										[]idp.OAuthIDPChanges{
-											idp.ChangeOAuthName("new name"),
-											idp.ChangeOAuthClientID("clientID2"),
-											idp.ChangeOAuthClientSecret(&crypto.CryptoValue{
+										[]idp.GitHubEnterpriseIDPChanges{
+											idp.ChangeGitHubEnterpriseName("new name"),
+											idp.ChangeGitHubEnterpriseClientID("clientID2"),
+											idp.ChangeGitHubEnterpriseClientSecret(&crypto.CryptoValue{
 												CryptoType: crypto.TypeEncryption,
 												Algorithm:  "enc",
 												KeyID:      "id",
 												Crypted:    []byte("newSecret"),
 											}),
-											idp.ChangeOAuthAuthorizationEndpoint("new auth"),
-											idp.ChangeOAuthTokenEndpoint("new token"),
-											idp.ChangeOAuthUserEndpoint("new user"),
-											idp.ChangeOAuthScopes([]string{"openid", "profile"}),
-											idp.ChangeOAuthOptions(idp.OptionChanges{
+											idp.ChangeGitHubEnterpriseAuthorizationEndpoint("new auth"),
+											idp.ChangeGitHubEnterpriseTokenEndpoint("new token"),
+											idp.ChangeGitHubEnterpriseUserEndpoint("new user"),
+											idp.ChangeGitHubEnterpriseScopes([]string{"openid", "profile"}),
+											idp.ChangeGitHubEnterpriseOptions(idp.OptionChanges{
 												IsCreationAllowed: &t,
 												IsLinkingAllowed:  &t,
 												IsAutoCreation:    &t,

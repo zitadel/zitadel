@@ -316,7 +316,7 @@ func NewGitHubIDPChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
-	changes []idp.OAuthIDPChanges,
+	changes []idp.GitHubIDPChanges,
 ) (*GitHubIDPChangedEvent, error) {
 
 	changedEvent, err := idp.NewGitHubIDPChangedEvent(
@@ -398,7 +398,7 @@ func NewGitHubEnterpriseIDPChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
-	changes []idp.OAuthIDPChanges,
+	changes []idp.GitHubEnterpriseIDPChanges,
 ) (*GitHubEnterpriseIDPChangedEvent, error) {
 
 	changedEvent, err := idp.NewGitHubEnterpriseIDPChangedEvent(
