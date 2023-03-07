@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/errors"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
@@ -26,8 +28,14 @@ type EmailCode struct {
 	Expiry time.Duration
 }
 
-func (e *Email) IsValid() bool {
-	return e.EmailAddress != "" && EmailRegex.MatchString(e.EmailAddress)
+func (e *Email) IsValid() error {
+	if e == nil || e.EmailAddress == "" {
+		return errors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty")
+	}
+	if !EmailRegex.MatchString(e.EmailAddress) {
+		return errors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Invalid")
+	}
+	return nil
 }
 
 func NewEmailCode(emailGenerator crypto.Generator) (*EmailCode, error) {

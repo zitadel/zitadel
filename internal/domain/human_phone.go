@@ -27,15 +27,17 @@ type PhoneCode struct {
 	Expiry time.Duration
 }
 
-func (p *Phone) IsValid() bool {
-	err := p.formatPhone()
-	return p.PhoneNumber != "" && err == nil
+func (p *Phone) IsValid() error {
+	if p == nil || p.PhoneNumber == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "PHONE-YlbwO", "Errors.User.Phone.Empty")
+	}
+	return p.formatPhone()
 }
 
 func (p *Phone) formatPhone() error {
 	phoneNr, err := libphonenumber.Parse(p.PhoneNumber, defaultRegion)
 	if err != nil {
-		return caos_errs.ThrowInvalidArgument(nil, "EVENT-so0wa", "Errors.User.Phone.Invalid")
+		return caos_errs.ThrowInvalidArgument(nil, "PHONE-so0wa", "Errors.User.Phone.Invalid")
 	}
 	p.PhoneNumber = libphonenumber.Format(phoneNr, libphonenumber.E164)
 	return nil

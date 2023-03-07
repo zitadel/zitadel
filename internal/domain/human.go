@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/errors"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
@@ -60,8 +61,26 @@ func (f Gender) Specified() bool {
 	return f > GenderUnspecified && f < genderCount
 }
 
-func (u *Human) IsValid() bool {
-	return u.Username != "" && u.Profile != nil && u.Profile.IsValid() && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
+func (u *Human) IsValid() error {
+	if u.Username == "" {
+		return errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Username.Empty")
+	}
+	if u.Profile != nil {
+		if err := u.Profile.IsValid(); err != nil {
+			return err
+		}
+	}
+	if u.Email != nil {
+		if err := u.Email.IsValid(); err != nil {
+			return err
+		}
+	}
+	if u.Phone != nil && u.Phone.PhoneNumber != "" {
+		if err := u.Phone.IsValid(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {

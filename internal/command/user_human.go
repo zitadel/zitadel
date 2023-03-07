@@ -387,19 +387,12 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 	return writeModelToHuman(registeredHuman), nil
 }
 
-func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
-	if orgID == "" || !human.IsValid() {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-67Ms8", "Errors.User.Invalid")
-	}
-	if human.Password != nil && human.Password.SecretString != "" {
-		human.Password.ChangeRequired = true
-	}
-	return c.createHuman(ctx, orgID, human, nil, false, false, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
-}
-
 func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (events []eventstore.Command, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
-	if orgID == "" || !human.IsValid() {
-		return nil, nil, nil, "", errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Invalid")
+	if orgID == "" {
+		return nil, nil, nil, "", errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
+	}
+	if err := human.IsValid(); err != nil {
+		return nil, nil, nil, "", err
 	}
 	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, links, false, passwordless, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
@@ -423,8 +416,14 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 	if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
 		human.Username = human.EmailAddress
 	}
-	if orgID == "" || !human.IsValid() || link == nil && (human.Password == nil || human.Password.SecretString == "") {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-9dk45", "Errors.User.Invalid")
+	if orgID == "" {
+		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-hYsVH", "Errors.Org.Empty")
+	}
+	if err := human.IsValid(); err != nil {
+		return nil, nil, err
+	}
+	if link == nil && (human.Password == nil || human.Password.SecretString == "") {
+		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-X23na", "Errors.User.Password.Empty")
 	}
 	if human.Password != nil && human.Password.SecretString != "" {
 		human.Password.ChangeRequired = false
