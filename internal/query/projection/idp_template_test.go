@@ -41,7 +41,7 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_templates2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.idp_templates3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -67,7 +67,7 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -99,7 +99,7 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_templates2 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_templates3 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -170,7 +170,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -241,7 +241,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -298,7 +298,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -354,7 +354,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								true,
@@ -441,7 +441,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -503,7 +503,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -556,7 +556,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -607,7 +607,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								true,
 								true,
@@ -708,7 +708,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -807,7 +807,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -878,7 +878,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								anyArg{},
@@ -948,7 +948,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								true,
@@ -1010,7 +1010,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1080,7 +1080,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1144,7 +1144,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1198,7 +1198,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -1250,7 +1250,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								true,
 								true,
@@ -1270,6 +1270,591 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"issuer",
 								database.StringArray{"profile"},
 								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if !errors.IsErrorInvalidArgument(err) {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
+
+func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceOldConfigAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.IDPConfigAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"idpConfigId": "idp-config-id",
+	"name": "custom-zitadel-instance",
+	"idpType": 0,
+	"stylingType": 0,
+	"autoRegister": true
+}`),
+				), instance.IDPConfigAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldConfigAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"custom-zitadel-instance",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeUnspecified,
+								true,
+								true,
+								true,
+								false,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceOldConfigAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.IDPConfigAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"idpConfigId": "idp-config-id",
+	"name": "custom-zitadel-instance",
+	"idpType": 0,
+	"stylingType": 0,
+	"autoRegister": true
+}`),
+				), org.IDPConfigAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldConfigAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"custom-zitadel-instance",
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeUnspecified,
+								true,
+								true,
+								true,
+								false,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceOldConfigChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.IDPConfigChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "name": "custom-zitadel-instance",
+        "stylingType": 1,
+        "autoRegister": true
+        }`),
+				), instance.IDPConfigChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldConfigChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (name, is_auto_creation, change_date, sequence) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"custom-zitadel-instance",
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceOldConfigChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.IDPConfigChangedEventType),
+					org.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "name": "custom-zitadel-instance",
+        "stylingType": 1,
+        "autoRegister": true
+        }`),
+				), org.IDPConfigChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldConfigChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (name, is_auto_creation, change_date, sequence) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"custom-zitadel-instance",
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceOldOIDCConfigAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.IDPOIDCConfigAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "clientId": "client-id",
+        "clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+        },
+        "issuer": "issuer",
+        "scopes": ["profile"],
+        "idpDisplayNameMapping": 0,
+        "usernameMapping": 1
+        }`),
+				), instance.IDPOIDCConfigAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.IDPTypeOIDC,
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates2_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								"instance-id",
+								"issuer",
+								"client-id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceOldOIDCConfigAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.IDPOIDCConfigAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "clientId": "client-id",
+        "clientSecret": {
+			"cryptoType": 0,
+			"algorithm": "RSA-265",
+			"keyId": "key-id"
+        },
+        "issuer": "issuer",
+        "scopes": ["profile"],
+        "idpDisplayNameMapping": 0,
+        "usernameMapping": 1
+        }`),
+				), org.IDPOIDCConfigAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.IDPTypeOIDC,
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates2_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								"instance-id",
+								"issuer",
+								"client-id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceOldOIDCConfigChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.IDPOIDCConfigChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "clientId": "client-id",
+        "clientSecret": {
+			"cryptoType": 0,
+			"algorithm": "RSA-265",
+			"keyId": "key-id"
+        },
+        "issuer": "issuer",
+        "scopes": ["profile"],
+        "idpDisplayNameMapping": 0,
+        "usernameMapping": 1
+        }`),
+				), instance.IDPOIDCConfigChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates2_oidc SET (client_id, client_secret, issuer, scopes) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"client-id",
+								anyArg{},
+								"issuer",
+								database.StringArray{"profile"},
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceOldOIDCConfigChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.IDPOIDCConfigChangedEventType),
+					org.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "clientId": "client-id",
+        "clientSecret": {
+			"cryptoType": 0,
+			"algorithm": "RSA-265",
+			"keyId": "key-id"
+        },
+        "issuer": "issuer",
+        "scopes": ["profile"],
+        "idpDisplayNameMapping": 0,
+        "usernameMapping": 1
+        }`),
+				), org.IDPOIDCConfigChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates2_oidc SET (client_id, client_secret, issuer, scopes) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"client-id",
+								anyArg{},
+								"issuer",
+								database.StringArray{"profile"},
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceOldJWTConfigAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.IDPJWTConfigAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "jwtEndpoint": "https://api.zitadel.ch/jwt",
+        "issuer": "issuer",
+        "keysEndpoint": "https://api.zitadel.ch/keys",
+        "headerName": "hodor"
+        }`),
+				), instance.IDPJWTConfigAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.IDPTypeJWT,
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates2_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								"instance-id",
+								"issuer",
+								"https://api.zitadel.ch/jwt",
+								"https://api.zitadel.ch/keys",
+								"hodor",
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			name: "org reduceOldJWTConfigAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.IDPJWTConfigAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "jwtEndpoint": "https://api.zitadel.ch/jwt",
+        "issuer": "issuer",
+        "keysEndpoint": "https://api.zitadel.ch/keys",
+        "headerName": "hodor"
+        }`),
+				), org.IDPJWTConfigAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.IDPTypeJWT,
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates2_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								"instance-id",
+								"issuer",
+								"https://api.zitadel.ch/jwt",
+								"https://api.zitadel.ch/keys",
+								"hodor",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceOldJWTConfigChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.IDPJWTConfigChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "jwtEndpoint": "https://api.zitadel.ch/jwt",
+        "issuer": "issuer",
+        "keysEndpoint": "https://api.zitadel.ch/keys",
+        "headerName": "hodor"
+        }`),
+				), instance.IDPJWTConfigChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates2_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"https://api.zitadel.ch/jwt",
+								"https://api.zitadel.ch/keys",
+								"hodor",
+								"issuer",
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceOldJWTConfigChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.IDPJWTConfigChangedEventType),
+					org.AggregateType,
+					[]byte(`{
+        "idpConfigId": "idp-config-id",
+        "jwtEndpoint": "https://api.zitadel.ch/jwt",
+        "issuer": "issuer",
+        "keysEndpoint": "https://api.zitadel.ch/keys",
+        "headerName": "hodor"
+        }`),
+				), org.IDPJWTConfigChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"idp-config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates2_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"https://api.zitadel.ch/jwt",
+								"https://api.zitadel.ch/keys",
+								"hodor",
+								"issuer",
+								"idp-config-id",
 								"instance-id",
 							},
 						},
@@ -1330,7 +1915,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1390,7 +1975,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1444,7 +2029,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -1492,7 +2077,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates2 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								true,
 								true,

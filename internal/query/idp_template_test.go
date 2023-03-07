@@ -15,19 +15,19 @@ import (
 )
 
 var (
-	idpTemplateQuery = `SELECT projections.idp_templates2.id,` +
-		` projections.idp_templates2.resource_owner,` +
-		` projections.idp_templates2.creation_date,` +
-		` projections.idp_templates2.change_date,` +
-		` projections.idp_templates2.sequence,` +
-		` projections.idp_templates2.state,` +
-		` projections.idp_templates2.name,` +
-		` projections.idp_templates2.type,` +
-		` projections.idp_templates2.owner_type,` +
-		` projections.idp_templates2.is_creation_allowed,` +
-		` projections.idp_templates2.is_linking_allowed,` +
-		` projections.idp_templates2.is_auto_creation,` +
-		` projections.idp_templates2.is_auto_update,` +
+	idpTemplateQuery = `SELECT projections.idp_templates3.id,` +
+		` projections.idp_templates3.resource_owner,` +
+		` projections.idp_templates3.creation_date,` +
+		` projections.idp_templates3.change_date,` +
+		` projections.idp_templates3.sequence,` +
+		` projections.idp_templates3.state,` +
+		` projections.idp_templates3.name,` +
+		` projections.idp_templates3.type,` +
+		` projections.idp_templates3.owner_type,` +
+		` projections.idp_templates3.is_creation_allowed,` +
+		` projections.idp_templates3.is_linking_allowed,` +
+		` projections.idp_templates3.is_auto_creation,` +
+		` projections.idp_templates3.is_auto_update,` +
 		// oauth
 		` projections.idp_templates2_oauth2.idp_id,` +
 		` projections.idp_templates2_oauth2.client_id,` +
@@ -77,12 +77,12 @@ var (
 		` projections.idp_templates2_ldap.preferred_language_attribute,` +
 		` projections.idp_templates2_ldap.avatar_url_attribute,` +
 		` projections.idp_templates2_ldap.profile_attribute` +
-		` FROM projections.idp_templates2` +
-		` LEFT JOIN projections.idp_templates2_oauth2 ON projections.idp_templates2.id = projections.idp_templates2_oauth2.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oauth2.instance_id` +
-		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates2.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oidc.instance_id` +
-		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates2.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_jwt.instance_id` +
-		` LEFT JOIN projections.idp_templates2_google ON projections.idp_templates2.id = projections.idp_templates2_google.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_google.instance_id` +
-		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates2.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_ldap.instance_id` +
+		` FROM projections.idp_templates3` +
+		` LEFT JOIN projections.idp_templates2_oauth2 ON projections.idp_templates3.id = projections.idp_templates2_oauth2.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_oauth2.instance_id` +
+		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates3.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_oidc.instance_id` +
+		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates3.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_jwt.instance_id` +
+		` LEFT JOIN projections.idp_templates2_google ON projections.idp_templates3.id = projections.idp_templates2_google.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_google.instance_id` +
+		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates3.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_ldap.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplateCols = []string{
 		"id",
@@ -148,19 +148,19 @@ var (
 		"avatar_url_attribute",
 		"profile_attribute",
 	}
-	idpTemplatesQuery = `SELECT projections.idp_templates2.id,` +
-		` projections.idp_templates2.resource_owner,` +
-		` projections.idp_templates2.creation_date,` +
-		` projections.idp_templates2.change_date,` +
-		` projections.idp_templates2.sequence,` +
-		` projections.idp_templates2.state,` +
-		` projections.idp_templates2.name,` +
-		` projections.idp_templates2.type,` +
-		` projections.idp_templates2.owner_type,` +
-		` projections.idp_templates2.is_creation_allowed,` +
-		` projections.idp_templates2.is_linking_allowed,` +
-		` projections.idp_templates2.is_auto_creation,` +
-		` projections.idp_templates2.is_auto_update,` +
+	idpTemplatesQuery = `SELECT projections.idp_templates3.id,` +
+		` projections.idp_templates3.resource_owner,` +
+		` projections.idp_templates3.creation_date,` +
+		` projections.idp_templates3.change_date,` +
+		` projections.idp_templates3.sequence,` +
+		` projections.idp_templates3.state,` +
+		` projections.idp_templates3.name,` +
+		` projections.idp_templates3.type,` +
+		` projections.idp_templates3.owner_type,` +
+		` projections.idp_templates3.is_creation_allowed,` +
+		` projections.idp_templates3.is_linking_allowed,` +
+		` projections.idp_templates3.is_auto_creation,` +
+		` projections.idp_templates3.is_auto_update,` +
 		// oauth
 		` projections.idp_templates2_oauth2.idp_id,` +
 		` projections.idp_templates2_oauth2.client_id,` +
@@ -211,12 +211,12 @@ var (
 		` projections.idp_templates2_ldap.avatar_url_attribute,` +
 		` projections.idp_templates2_ldap.profile_attribute,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.idp_templates2` +
-		` LEFT JOIN projections.idp_templates2_oauth2 ON projections.idp_templates2.id = projections.idp_templates2_oauth2.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oauth2.instance_id` +
-		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates2.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_oidc.instance_id` +
-		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates2.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_jwt.instance_id` +
-		` LEFT JOIN projections.idp_templates2_google ON projections.idp_templates2.id = projections.idp_templates2_google.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_google.instance_id` +
-		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates2.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_ldap.instance_id` +
+		` FROM projections.idp_templates3` +
+		` LEFT JOIN projections.idp_templates2_oauth2 ON projections.idp_templates3.id = projections.idp_templates2_oauth2.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_oauth2.instance_id` +
+		` LEFT JOIN projections.idp_templates2_oidc ON projections.idp_templates3.id = projections.idp_templates2_oidc.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_oidc.instance_id` +
+		` LEFT JOIN projections.idp_templates2_jwt ON projections.idp_templates3.id = projections.idp_templates2_jwt.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_jwt.instance_id` +
+		` LEFT JOIN projections.idp_templates2_google ON projections.idp_templates3.id = projections.idp_templates2_google.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_google.instance_id` +
+		` LEFT JOIN projections.idp_templates2_ldap ON projections.idp_templates3.id = projections.idp_templates2_ldap.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates2_ldap.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplatesCols = []string{
 		"id",
