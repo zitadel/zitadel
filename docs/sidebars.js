@@ -1,40 +1,4 @@
 module.exports = {
-  examples: [
-    "examples/introduction",
-    {
-      type: "category",
-      label: "Integrate ZITADEL Login in your App",
-      items: [
-        "examples/login/angular",
-        "examples/login/react",
-        "examples/login/flutter",
-        "examples/login/nextjs",
-        "examples/login/nextjs-b2b",
-      ],
-      collapsed: false,
-    },
-    {
-      type: "category",
-      label: "Secure your API",
-      items: ["examples/secure-api/go", "examples/secure-api/python-flask", "examples/secure-api/dot-net"],
-      collapsed: false,
-    },
-    {
-      type: "category",
-      label: "Call the ZITADEL API",
-      items: [
-        "examples/call-zitadel-api/go",
-        "examples/call-zitadel-api/dot-net",
-      ],
-      collapsed: false,
-    },
-    {
-      type: "category",
-      label: "Identity Aware Proxy",
-      items: ["examples/identity-proxy/oauth2-proxy"],
-      collapsed: false,
-    },
-  ],
   guides: [
     "guides/overview",
     {
@@ -43,12 +7,52 @@ module.exports = {
       collapsed: false,
       items: [
         "guides/start/quickstart",
+        {
+          type: "category",
+          label: "Frontend",
+          items: [
+            "examples/login/angular",
+            "examples/login/react",
+            "examples/login/flutter",
+            "examples/login/nextjs",
+          ],
+          collapsed: true,
+        },
+        {
+          type: "category",
+          label: "Backend",
+          items: [
+            "examples/secure-api/go", 
+            "examples/secure-api/python-flask", 
+            "examples/secure-api/dot-net"
+          ],
+          collapsed: true,
+        },
       ],
+    },
+    "examples/sdks",
+    {
+      type: "category",
+      label: "Example Applications",
+      items: [
+        "examples/introduction",
+        {
+          type: 'link',
+          label: 'Frontend', // The link label
+          href: '/examples/introduction#frontend', // The internal path
+        },
+        {
+          type: 'link',
+          label: 'Backend', // The link label
+          href: '/examples/introduction#backend', // The internal path
+        }
+      ],
+      collapsed: true,
     },
     {
       type: "category",
       label: "Manage",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "category",
@@ -84,7 +88,6 @@ module.exports = {
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
-            "guides/manage/customize/user-metadata",
           ],
         },
         {
@@ -92,78 +95,171 @@ module.exports = {
           label: "Terraform",
           items: ["guides/manage/terraform/basics"],
         },
-        "guides/manage/user/reg-create-user",
+        {
+          type: "category",
+          label: "Users",
+          items: [
+            "guides/manage/user/reg-create-user",
+            "guides/manage/customize/user-metadata",
+          ],
+        },
       ],
     },
     {
       type: "category",
       label: "Integrate",
-      collapsed: false,
+      collapsed: true,
+      link: {
+        type: 'generated-index',
+        title: 'Overview',
+        slug: 'guides/integrate',
+      },
       items: [
-        "guides/integrate/login-users",
-        "guides/integrate/identity-brokering",
+        
+        {
+          type: "category",
+          label: "Authenticate Users",
+          collapsed: true,
+          items: [
+            "guides/integrate/login-users",
+            "guides/integrate/oauth-recommended-flows",
+            "guides/integrate/logout",
+          ],
+        },
+        {
+          type: "category",
+          label: "Configure Identity Providers",
+          collapsed: true,
+          items: [
+            "guides/integrate/identity-providers/introduction",
+            "guides/integrate/identity-providers/google-oidc",
+            "guides/integrate/identity-providers/azuread-oidc",
+          ],
+        },
         {
           type: "category",
           label: "Access ZITADEL APIs",
-          collapsed: false,
+          collapsed: true,
           items: [
-            "guides/integrate/serviceusers",
+            {
+              type: "category",
+              label: "Authenticate Service Users",
+              collapsed: true,
+              items: [
+                "guides/integrate/serviceusers",
+                "guides/integrate/client-credentials",
+                "guides/integrate/pat",
+              ],
+            },
             "guides/integrate/access-zitadel-apis",
-            "guides/integrate/client-credentials",
-            "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
-            "guides/integrate/export-and-import",
             "guides/integrate/event-api",
+            "guides/integrate/export-and-import",
+            {
+              type: "category",
+              label: "Example Code",
+              items: [
+                "examples/call-zitadel-api/go",
+                "examples/call-zitadel-api/dot-net",
+              ],
+              collapsed: true,
+            },
           ],
         },
         {
           type: "category",
-          label: "OpenID Connect 1.0 Clients",
-          collapsed: false,
+          label: "Services",
+          collapsed: true,
           items: [
-            "guides/integrate/oauth-recommended-flows",
-            "guides/integrate/auth0-oidc",
-            "guides/integrate/azuread-oidc",
+            "guides/integrate/services/gitlab-self-hosted",
+            "guides/integrate/services/aws-saml",
+            "guides/integrate/services/atlassian-saml",
+            "guides/integrate/services/gitlab-saml",
+            "guides/integrate/services/auth0-oidc",
+            "guides/integrate/services/auth0-saml",
+            "guides/integrate/services/pingidentity-saml",
+          ],
+        },
+        {
+          type: "category",
+          label: "Tools",
+          collapsed: true,
+          items: [
             "guides/integrate/authenticated-mongodb-charts",
-            "guides/integrate/gitlab-self-hosted",
+            "examples/identity-proxy/oauth2-proxy"
           ],
         },
-        {
-          type: "category",
-          label: "SAML 2.0 Clients",
-          collapsed: false,
-          items: [
-            "guides/integrate/auth0-saml",
-            "guides/integrate/aws-saml",
-            "guides/integrate/pingidentity-saml",
-            "guides/integrate/atlassian-saml",
-            "guides/integrate/gitlab-saml",
-          ],
-        },
-        "guides/integrate/logout",
       ],
     },
     {
       type: "category",
       label: "Solution Scenarios",
-      collapsed: false,
+      collapsed: true,
       items: [
         "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
+        "concepts/usecases/saas",
         "guides/solution-scenarios/configurations",
       ],
     },
     {
       type: "category",
-      label: "Trainings",
+      label: "Concepts",
       collapsed: true,
       items: [
-        "guides/trainings/introduction",
-        "guides/trainings/application",
-        "guides/trainings/recurring",
-        "guides/trainings/project",
-      ],
+        "concepts/introduction",
+        "concepts/structure/instance",
+        "concepts/structure/organizations",
+        "concepts/structure/projects",
+        "concepts/structure/applications",
+        "concepts/structure/granted_projects",
+        "concepts/structure/users",
+        "concepts/structure/managers",
+        "concepts/structure/policies",
+        "concepts/structure/jwt_idp",
+        "concepts/features/actions",
+        "concepts/features/selfservice",
+      ]
+    },
+    {
+      type: "category",
+      label: "Architecture",
+      collapsed: true,
+      items: [
+        "concepts/architecture/software",
+        "concepts/architecture/solution",
+        "concepts/architecture/secrets",
+        "concepts/principles",
+        {
+          type: "category",
+          label: "Eventstore",
+          collapsed: true,
+          items: [
+            "concepts/eventstore/overview",
+            "concepts/eventstore/implementation",
+          ],
+        },
+      ]
+    },
+    {
+      type: "category",
+      label: "Support",
+      collapsed: true,
+      items: [
+        "support/troubleshooting",
+        {
+          type: "category",
+          label: "Trainings",
+          collapsed: true,
+          items: [
+            "support/trainings/introduction",
+            "support/trainings/application",
+            "support/trainings/recurring",
+            "support/trainings/project",
+          ],
+        },
+      ]
     },
   ],
   apis: [
@@ -322,66 +418,7 @@ module.exports = {
       ],
     },
   ],
-  concepts: [
-    "concepts/introduction",
-    "concepts/principles",
-    {
-      type: "category",
-      label: "Eventstore",
-      collapsed: false,
-      items: [
-        "concepts/eventstore/overview",
-        "concepts/eventstore/implementation",
-      ],
-    },
-    {
-      type: "category",
-      label: "Architecture",
-      collapsed: false,
-      items: [
-        "concepts/architecture/software",
-        "concepts/architecture/solution",
-        "concepts/architecture/secrets",
-      ],
-    },
-    {
-      type: "category",
-      label: "Structure",
-      collapsed: false,
-      items: [
-        "concepts/structure/overview",
-        "concepts/structure/instance",
-        "concepts/structure/organizations",
-        "concepts/structure/projects",
-        "concepts/structure/applications",
-        "concepts/structure/granted_projects",
-        "concepts/structure/users",
-        "concepts/structure/managers",
-        "concepts/structure/policies",
-        "concepts/structure/jwt_idp",
-      ],
-    },
-    {
-      type: "category",
-      label: "Use Cases",
-      collapsed: false,
-      items: ["concepts/usecases/saas"],
-    },
-    {
-      type: "category",
-      label: "Features",
-      collapsed: false,
-      items: [
-        "concepts/features/actions",
-        "concepts/features/selfservice"
-      ],
-    },
-  ],
-  manuals: [
-    "manuals/introduction",
-    "manuals/user-profile",
-    "manuals/user-login",
-    "manuals/troubleshooting",
+  support: [
   ],
   legal: [
     "legal/introduction",

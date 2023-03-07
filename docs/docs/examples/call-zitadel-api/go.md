@@ -152,6 +152,6 @@ Now you can proceed implementing our APIs by adding more calls or trying to over
     log.Printf("%s was created on: %s", respOverwrite.Org.Name, respOverwrite.Org.Details.CreationDate.AsTime())
 }
 ```
-Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
+Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example) or refer to our [API Docs](/apis/introduction).
 
 > This guide will be updated soon to show you how to use the SDK for your own API as well.
