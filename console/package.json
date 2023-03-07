@@ -68,7 +68,7 @@
     "@types/node": "^18.13.0",
     "@types/qrcode": "^1.5.0",
     "@typescript-eslint/eslint-plugin": "5.51.0",
-    "@typescript-eslint/parser": "5.51.0",
+    "@typescript-eslint/parser": "5.54.1",
     "codelyzer": "^6.0.2",
     "eslint": "^8.33.0",
     "jasmine-core": "~4.5.0",
