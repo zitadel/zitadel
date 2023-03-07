@@ -9,7 +9,7 @@ import (
 )
 
 func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profile) (*domain.Profile, error) {
-	if profile.AggregateID != "" {
+	if profile.AggregateID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-AwbEB", "Errors.User.Profile.IDMissing")
 	}
 	if err := profile.IsValid(); err != nil {

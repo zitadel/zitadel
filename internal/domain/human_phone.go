@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/ttacon/libphonenumber"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -37,7 +38,7 @@ func (p *Phone) IsValid() error {
 func (p *Phone) formatPhone() error {
 	phoneNr, err := libphonenumber.Parse(p.PhoneNumber, defaultRegion)
 	if err != nil {
-		return caos_errs.ThrowInvalidArgument(nil, "PHONE-so0wa", "Errors.User.Phone.Invalid")
+		return caos_errs.ThrowInvalidArgument(err, "PHONE-so0wa", "Errors.User.Phone.Invalid")
 	}
 	p.PhoneNumber = libphonenumber.Format(phoneNr, libphonenumber.E164)
 	return nil

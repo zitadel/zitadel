@@ -13,7 +13,7 @@ import (
 )
 
 func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, emailCodeGenerator crypto.Generator) (*domain.Email, error) {
-	if email.AggregateID != "" {
+	if email.AggregateID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
 	}
 	if err := email.IsValid(); err != nil {
