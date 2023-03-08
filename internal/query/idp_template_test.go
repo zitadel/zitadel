@@ -63,16 +63,16 @@ var (
 		` projections.idp_templates3_github_enterprise.user_endpoint,` +
 		` projections.idp_templates3_github_enterprise.scopes,` +
 		// gitlab
-		` projections.idp_templates2_gitlab.idp_id,` +
-		` projections.idp_templates2_gitlab.client_id,` +
-		` projections.idp_templates2_gitlab.client_secret,` +
-		` projections.idp_templates2_gitlab.scopes,` +
+		` projections.idp_templates3_gitlab.idp_id,` +
+		` projections.idp_templates3_gitlab.client_id,` +
+		` projections.idp_templates3_gitlab.client_secret,` +
+		` projections.idp_templates3_gitlab.scopes,` +
 		// gitlab self hosted
-		` projections.idp_templates2_gitlab_self_hosted.idp_id,` +
-		` projections.idp_templates2_gitlab_self_hosted.issuer,` +
-		` projections.idp_templates2_gitlab_self_hosted.client_id,` +
-		` projections.idp_templates2_gitlab_self_hosted.client_secret,` +
-		` projections.idp_templates2_gitlab_self_hosted.scopes,` +
+		` projections.idp_templates3_gitlab_self_hosted.idp_id,` +
+		` projections.idp_templates3_gitlab_self_hosted.issuer,` +
+		` projections.idp_templates3_gitlab_self_hosted.client_id,` +
+		` projections.idp_templates3_gitlab_self_hosted.client_secret,` +
+		` projections.idp_templates3_gitlab_self_hosted.scopes,` +
 		// google
 		` projections.idp_templates3_google.idp_id,` +
 		` projections.idp_templates3_google.client_id,` +
@@ -107,8 +107,8 @@ var (
 		` LEFT JOIN projections.idp_templates3_jwt ON projections.idp_templates3.id = projections.idp_templates3_jwt.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_jwt.instance_id` +
 		` LEFT JOIN projections.idp_templates3_github ON projections.idp_templates3.id = projections.idp_templates3_github.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github.instance_id` +
 		` LEFT JOIN projections.idp_templates3_github_enterprise ON projections.idp_templates3.id = projections.idp_templates3_github_enterprise.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github_enterprise.instance_id` +
-		` LEFT JOIN projections.idp_templates2_gitlab ON projections.idp_templates2.id = projections.idp_templates2_gitlab.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_gitlab.instance_id` +
-		` LEFT JOIN projections.idp_templates2_gitlab_self_hosted ON projections.idp_templates2.id = projections.idp_templates2_gitlab_self_hosted.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_gitlab_self_hosted.instance_id` +
+		` LEFT JOIN projections.idp_templates3_gitlab ON projections.idp_templates3.id = projections.idp_templates3_gitlab.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_gitlab.instance_id` +
+		` LEFT JOIN projections.idp_templates3_gitlab_self_hosted ON projections.idp_templates3.id = projections.idp_templates3_gitlab_self_hosted.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates3_google ON projections.idp_templates3.id = projections.idp_templates3_google.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_google.instance_id` +
 		` LEFT JOIN projections.idp_templates3_ldap ON projections.idp_templates3.id = projections.idp_templates3_ldap.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_ldap.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
@@ -248,16 +248,16 @@ var (
 		` projections.idp_templates3_github_enterprise.user_endpoint,` +
 		` projections.idp_templates3_github_enterprise.scopes,` +
 		// gitlab
-		` projections.idp_templates2_gitlab.idp_id,` +
-		` projections.idp_templates2_gitlab.client_id,` +
-		` projections.idp_templates2_gitlab.client_secret,` +
-		` projections.idp_templates2_gitlab.scopes,` +
+		` projections.idp_templates3_gitlab.idp_id,` +
+		` projections.idp_templates3_gitlab.client_id,` +
+		` projections.idp_templates3_gitlab.client_secret,` +
+		` projections.idp_templates3_gitlab.scopes,` +
 		// gitlab self hosted
-		` projections.idp_templates2_gitlab_self_hosted.idp_id,` +
-		` projections.idp_templates2_gitlab_self_hosted.issuer,` +
-		` projections.idp_templates2_gitlab_self_hosted.client_id,` +
-		` projections.idp_templates2_gitlab_self_hosted.client_secret,` +
-		` projections.idp_templates2_gitlab_self_hosted.scopes,` +
+		` projections.idp_templates3_gitlab_self_hosted.idp_id,` +
+		` projections.idp_templates3_gitlab_self_hosted.issuer,` +
+		` projections.idp_templates3_gitlab_self_hosted.client_id,` +
+		` projections.idp_templates3_gitlab_self_hosted.client_secret,` +
+		` projections.idp_templates3_gitlab_self_hosted.scopes,` +
 		// google
 		` projections.idp_templates3_google.idp_id,` +
 		` projections.idp_templates3_google.client_id,` +
@@ -293,8 +293,8 @@ var (
 		` LEFT JOIN projections.idp_templates3_jwt ON projections.idp_templates3.id = projections.idp_templates3_jwt.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_jwt.instance_id` +
 		` LEFT JOIN projections.idp_templates3_github ON projections.idp_templates3.id = projections.idp_templates3_github.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github.instance_id` +
 		` LEFT JOIN projections.idp_templates3_github_enterprise ON projections.idp_templates3.id = projections.idp_templates3_github_enterprise.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github_enterprise.instance_id` +
-		` LEFT JOIN projections.idp_templates2_gitlab ON projections.idp_templates2.id = projections.idp_templates2_gitlab.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_gitlab.instance_id` +
-		` LEFT JOIN projections.idp_templates2_gitlab_self_hosted ON projections.idp_templates2.id = projections.idp_templates2_gitlab_self_hosted.idp_id AND projections.idp_templates2.instance_id = projections.idp_templates2_gitlab_self_hosted.instance_id` +
+		` LEFT JOIN projections.idp_templates3_gitlab ON projections.idp_templates3.id = projections.idp_templates3_gitlab.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_gitlab.instance_id` +
+		` LEFT JOIN projections.idp_templates3_gitlab_self_hosted ON projections.idp_templates3.id = projections.idp_templates3_gitlab_self_hosted.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates3_google ON projections.idp_templates3.id = projections.idp_templates3_google.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_google.instance_id` +
 		` LEFT JOIN projections.idp_templates3_ldap ON projections.idp_templates3.id = projections.idp_templates3_ldap.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_ldap.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
