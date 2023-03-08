@@ -24,17 +24,17 @@ message User {
     ];
     string user_name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"mr_long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     repeated string login_names = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"gigi@caos.ch\", \"gigi@caos-ag.zitadel.ch\"]";
+            example: "[\"gigi@zitadel.com\", \"gigi@zitadel.zitadel.ch\"]";
         }
     ];
     string preferred_login_name = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     oneof type {
@@ -83,7 +83,7 @@ message Machine {
             example: "\"true\"";
         }
     ];
-    AccessTokenType access_token_typ = 4 [
+    AccessTokenType access_token_type = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Type of access token to receive";
         }
@@ -103,7 +103,7 @@ message Profile {
     ];
     string nick_name = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     string display_name = 4 [
@@ -125,7 +125,7 @@ message Profile {
     ];
     string avatar_url = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "avatar url of the user"
+            description: "avatar URL of the user"
             example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
@@ -135,7 +135,7 @@ message Email {
     string email = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     bool is_email_verified = 2 [
@@ -192,7 +192,7 @@ message UserNameQuery {
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_length: 200;
-            example: "\"mr_long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
@@ -267,7 +267,7 @@ message EmailQuery {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
             max_length: 200;
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
@@ -294,7 +294,7 @@ message LoginNameQuery {
     ];
 }
 
-//UserStateQuery is always equals
+//UserStateQuery always equals
 message StateQuery {
     UserState state = 1 [
         (validate.rules).enum.defined_only = true,
@@ -304,7 +304,7 @@ message StateQuery {
     ];
 }
 
-//UserTypeQuery is always equals
+//UserTypeQuery always equals
 message TypeQuery {
     Type type = 1 [
         (validate.rules).enum.defined_only = true,
@@ -330,6 +330,7 @@ enum UserFieldName {
     USER_FIELD_NAME_EMAIL = 6;
     USER_FIELD_NAME_STATE = 7;
     USER_FIELD_NAME_TYPE = 8;
+    USER_FIELD_NAME_CREATION_DATE = 9;
 }
 
 message AuthFactor {
@@ -341,12 +342,12 @@ message AuthFactor {
     oneof type {
         AuthFactorOTP otp = 2 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use otp or u2f"
+                description: "one type use OTP or U2F"
             }
         ];
         AuthFactorU2F u2f = 3 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "one of type use otp or u2f"
+                description: "one type use OTP or U2F"
             }
         ];
     }
@@ -378,6 +379,7 @@ message WebAuthNKey {
     bytes public_key = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "json representation of public key credential creation options used by the webauthn client"
+            example: "\"eyJwdWJsaWNLZXkiOnsiY2hhbGxlbmdlIoplfZm4vM21qSzBPdjltN2x6VWhnclYyejFJSlVzZnpLd0Z1TytWTWtzRW1Icz0iLCJycCI6eyJuYW1lIjoiWklUQURFTCIsImlkIjoiYWNtZS1nem9lNHgueml0YWRlbC5jbG91ZCJ9LCJ1c2VyIjp7Im5hbWUiOiJ0ZXN0dXNlcjU1QGFjbWUueml0YWRlbC5jbG91ZCIsImRpc3BsYXlOYW1lIjoiVGVzdCBUZXN0IiwiaWQiOiJNVGd5TVRVMk1qWTBNakk1TXpBMk5qSTEifSwicHViS2V5Q3JlZFBhcmFtcyI6W3sidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi03fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzV9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zNn0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1N30seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OH0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTM3fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzh9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zOX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTh9XSwiYXV0aGVudGljYXRvclNlbGVjdGlvbiI6eyJ1c2VyVmVyaWZpY2F0aW9uIjoiZGlzY291cmFnZWQifn2ilGltZW91dCI6NjAwMDAsImF0dGVzdGF0aW9uIjoibm9uZSJ9fQ==\""
         }
     ];
 }
@@ -386,9 +388,9 @@ message WebAuthNVerification {
     bytes public_key_credential = 1 [
         (validate.rules).bytes.min_len = 55,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "json representation of public key credential issued by the webauthn client";
+            description: "JSON representation of public key credential issued by the webauthn client";
             min_length: 55;
-            max_length: 1048576; //1 mb
+            max_length: 1048576; //1 MB
         }
     ];
     string token_name = 2 [
@@ -474,7 +476,7 @@ message MembershipQuery {
     }
 }
 
-// this query is always equals
+// this query always equals
 message MembershipOrgQuery {
     string org_id = 1 [
         (validate.rules).string = {max_len: 200},
@@ -484,7 +486,7 @@ message MembershipOrgQuery {
     ];
 }
 
-// this query is always equals
+// this query always equals
 message MembershipProjectQuery {
     string project_id = 1 [
         (validate.rules).string = {max_len: 200},
@@ -494,7 +496,7 @@ message MembershipProjectQuery {
     ];
 }
 
-// this query is always equals
+// this query always equals
 message MembershipProjectGrantQuery {
     string project_grant_id = 1 [
         (validate.rules).string = {max_len: 200},
@@ -504,7 +506,7 @@ message MembershipProjectGrantQuery {
     ];
 }
 
-// this query is always equals
+// this query always equals
 message MembershipIAMQuery {
     bool iam = 1;
 }
@@ -532,12 +534,12 @@ message Session {
     ];
     string user_name = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"mr_long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     string login_name = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     string display_name = 8 [
@@ -549,7 +551,7 @@ message Session {
     zitadel.v1.ObjectDetails details = 9;
     string avatar_url = 10 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "avatar url of the user"
+            description: "avatar URL of the user"
             example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
@@ -576,16 +578,19 @@ message RefreshToken {
     ];
     google.protobuf.Timestamp auth_time = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2023-02-13T08:45:00.000000Z\"";
             description: "\"time when the user authenticated, does not have to be the same time the token was created\""
         }
     ];
     google.protobuf.Timestamp idle_expiration = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2023-02-14T08:45:00.000000Z\"";
             description: "\"time the refresh token will expire if not used, the user will have to reauthenticate\""
         }
     ];
     google.protobuf.Timestamp expiration = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2023-02-14T08:45:00.000000Z\"";
             description: "\"time the refresh token will expire, the user will have to reauthenticate\""
         }
     ];
@@ -650,7 +655,7 @@ message UserGrant {
     ];
     string user_name = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"mr_long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     string first_name = 7 [
@@ -667,7 +672,7 @@ message UserGrant {
         (validate.rules).string.email = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     string display_name = 10 [
@@ -684,12 +689,12 @@ message UserGrant {
     ];
     string org_name = 12 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"CAOS AG\"";
+            example: "\"ZITADEL\"";
         }
     ];
     string org_domain = 13 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos.ch\"";
+            example: "\"zitadel.cloud\"";
         }
     ];
     string project_id = 14 [
@@ -709,13 +714,13 @@ message UserGrant {
     ];
     string avatar_url = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "avatar url of the user"
-            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+            description: "avatar URL of the user"
+            example: "\"{your-domain}/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
     string preferred_login_name = 18 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
 }
@@ -797,7 +802,7 @@ message UserGrantUserNameQuery {
     string user_name = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"mr_long_neck\""
+            example: "\"gigi-giraffe\""
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
@@ -842,7 +847,7 @@ message UserGrantEmailQuery {
     string email = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\""
+            example: "\"gigi@zitadel.com\""
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [

@@ -18,9 +18,9 @@ import {
 import { FormGroupDirective, NgControl, NgForm } from '@angular/forms';
 import { CanUpdateErrorState, ErrorStateMatcher, mixinErrorState } from '@angular/material/core';
 import {
-  MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD,
   MatLegacyFormField as MatFormField,
   MatLegacyFormFieldControl as MatFormFieldControl,
+  MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD,
 } from '@angular/material/legacy-form-field';
 import {
   getMatLegacyInputUnsupportedTypeError as getMatInputUnsupportedTypeError,

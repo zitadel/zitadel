@@ -13,6 +13,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -88,7 +89,7 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareCustomTextsQuery()
+	stmt, scan := prepareCustomTextsQuery(ctx, q.client)
 	eq := sq.Eq{
 		CustomTextColAggregateID.identifier(): aggregateID,
 		CustomTextColTemplate.identifier():    template,
@@ -119,7 +120,7 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareCustomTextsQuery()
+	stmt, scan := prepareCustomTextsQuery(ctx, q.client)
 	eq := sq.Eq{
 		CustomTextColAggregateID.identifier(): aggregateID,
 		CustomTextColTemplate.identifier():    template,
@@ -228,7 +229,7 @@ func (q *Queries) readLoginTranslationFile(ctx context.Context, lang string) ([]
 	return contents, nil
 }
 
-func prepareCustomTextsQuery() (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts, error)) {
+func prepareCustomTextsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts, error)) {
 	return sq.Select(
 			CustomTextColAggregateID.identifier(),
 			CustomTextColSequence.identifier(),
@@ -239,7 +240,8 @@ func prepareCustomTextsQuery() (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts,
 			CustomTextColKey.identifier(),
 			CustomTextColText.identifier(),
 			countColumn.identifier()).
-			From(customTextTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(customTextTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*CustomTexts, error) {
 			customTexts := make([]*CustomText, 0)
 			var count uint64

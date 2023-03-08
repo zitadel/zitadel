@@ -1,8 +1,7 @@
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { parsePhoneNumber, CountryCode } from 'libphonenumber-js';
 import { Subject } from 'rxjs';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
@@ -12,9 +11,9 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../validators';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../validators';
 
 function passwordConfirmValidator(c: AbstractControl): any {
   if (!c.parent || !c) {
@@ -44,7 +43,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
 export class UserCreateComponent implements OnInit, OnDestroy {
   public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = ['de', 'en', 'it', 'fr'];
+  public languages: string[] = ['de', 'en', 'it', 'fr', 'pl', 'zh'];
   public selected: CountryPhoneCode | undefined;
   public countryPhoneCodes: CountryPhoneCode[] = [];
   public userForm!: UntypedFormGroup;

@@ -211,6 +211,7 @@ RegistrationUser:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -241,6 +242,7 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -299,6 +301,7 @@ ExternalNotFound:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
 
 Footer:
   PoweredBy: Alimentato da
@@ -367,6 +370,8 @@ Errors:
       ExternalUserIDEmpty: L'ID utente esterno è vuoto
       UserDisplayNameEmpty: Il nome visualizzato dell'utente è vuoto
       NoExternalUserData: Nessun dato utente esterno ricevuto
+      CreationNotAllowed: La creazione di un nuovo utente non è consentita su questo provider.
+      LinkingNotAllowed: Il collegamento di un utente non è consentito su questo provider.
     GrantRequired: Accesso non possibile. L'utente deve avere almeno una sovvenzione sull'applicazione. Contatta il tuo amministratore.
     ProjectRequired: Accesso non possibile. L'organizzazione dell'utente deve essere concessa al progetto. Contatta il tuo amministratore.
   IdentityProvider:

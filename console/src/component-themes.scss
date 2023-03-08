@@ -34,6 +34,7 @@
 @import 'src/app/pages/users/user-list/user-table/user-table.component';
 @import 'src/app/pages/users/user-detail/contact/contact.component';
 @import 'src/app/pages/projects/project-grid/project-grid.component';
+@import 'src/app/pages/actions/actions.component';
 @import 'src/app/app.component.scss';
 @import './styles/color.scss';
 @import 'src/app/pages/instance/instance.component.scss';
@@ -43,6 +44,8 @@
 @import 'src/app/modules/meta-layout/meta.scss';
 @import 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-illustration/project-grant-illustration.component';
 @import 'src/app/modules/accounts-card/accounts-card.component.scss';
+@import 'src/app/modules/onboarding-card/onboarding-card.component.scss';
+@import 'src/app/modules/onboarding/onboarding.component.scss';
 @import 'src/app/modules/filter/filter.component.scss';
 @import 'src/app/modules/policies/message-texts/message-texts.component.scss';
 @import 'src/app/modules/policies/private-labeling-policy/private-labeling-policy.component.scss';
@@ -50,12 +53,13 @@
 @import 'src/app/modules/sidenav/sidenav.component';
 @import 'src/app/modules/user-grants/user-grants.component.scss';
 @import 'src/app/modules/shortcuts/shortcuts.component.scss';
-@import 'src/app/modules/idp-create/idp-type-radio/idp-type-radio.component.scss';
+@import 'src/app/modules/policies/idp-settings/idp-settings.component.scss';
 @import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
 @import 'src/app/pages/events/events.component';
 @import 'src/app/pages/home/home.component.scss';
 @import 'src/app/modules/policies/security-policy/security-policy.component.scss';
+@import 'src/app/modules/idp-table/idp-table.component.scss';
 @import 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component.scss';
 @import 'src/app/modules/policies/login-policy/factor-table/factor-table.component.scss';
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
@@ -69,9 +73,9 @@
   @include nav-toggle-theme($theme);
   @include header-theme($theme);
   @include app-type-radio-theme($theme);
+  @include idp-table-theme($theme);
   @include events-theme($theme);
   @include projects-theme($theme);
-  @include idp-type-radio-theme($theme);
   @include top-view-theme($theme);
   @include info-overlay-theme($theme);
   @include app-auth-method-radio-theme($theme);
@@ -79,6 +83,7 @@
   @include search-user-autocomplete-theme($theme);
   @include project-role-chips-theme($theme);
   @include card-theme($theme);
+  @include idp-settings-theme($theme);
   @include filter-events-theme($theme);
   @include footer-theme($theme);
   @include table-theme($theme);
@@ -109,10 +114,13 @@
   @include toast-theme($theme);
   @include keyboard-shortcuts-theme($theme);
   @include project-grant-illustration-theme($theme);
+  @include onboarding-card-theme($theme);
+  @include onboarding-theme($theme);
   @include refresh-table-theme($theme);
   @include accounts-card-theme($theme);
   @include sidenav-theme($theme);
   @include info-section-theme($theme);
+  @include actions-theme($theme);
   @include filter-theme($theme);
   @include private-label-theme($theme);
   @include project-grid-theme($theme);

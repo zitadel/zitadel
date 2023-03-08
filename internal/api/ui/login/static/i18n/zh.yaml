@@ -211,6 +211,7 @@ RegistrationUser:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -236,11 +237,12 @@ ExternalRegistrationUserOverview:
   NicknameLabel: 昵称
   PhoneLabel: 手机号码
   LanguageLabel: 语言
-  German: 德语
-  English: 英语
-  Italian: 意大利语
-  French: 法语
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
+  Polish: Polski
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -299,6 +301,7 @@ ExternalNotFound:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
 
 Footer:
   PoweredBy: Powered By
@@ -367,6 +370,8 @@ Errors:
       ExternalUserIDEmpty: 外部用户 ID 为空
       UserDisplayNameEmpty: 用户显示名称为空
       NoExternalUserData: 未收到外部用户数据
+      CreationNotAllowed: 不允许在该供应商上创建新用户
+      LinkingNotAllowed: 在此提供者上不允许链接一个用户
     GrantRequired: 无法登录，用户需要在应用程序上拥有至少一项授权，请联系您的管理员。
     ProjectRequired: 无法登录，用户的组织必须授予项目，请联系您的管理员。
   IdentityProvider:

@@ -4,10 +4,12 @@ import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/instance.proto";
 import "zitadel/member.proto";
+import "zitadel/quota.proto";
 import "zitadel/auth_n_key.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -30,7 +32,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
     };
   };
-
+  tags: [
+    {
+        name: "General"
+    }
+  ];
   schemes: HTTPS;
   schemes: HTTP;
 
@@ -43,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "api.zitadel.ch";
+  host: "$ZITADEL_DOMAIN";
   base_path: "/system/v1";
 
   external_docs: {
@@ -84,7 +90,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "probes";
+      tags: "General";
       responses: {
         key: "200";
         value: {
@@ -162,7 +168,7 @@ service SystemService {
     };
   }
 
-  // Removes a instances
+  // Removes an instance
   // This might take some time
   rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
     option (google.api.http) = {
@@ -353,6 +359,29 @@ service SystemService {
       };
     };
   }
+
+  // Creates a new quota
+  rpc AddQuota(AddQuotaRequest) returns (AddQuotaResponse) {
+    option (google.api.http) = {
+      post: "/instances/{instance_id}/quotas"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  // Removes a quota
+  rpc RemoveQuota(RemoveQuotaRequest) returns (RemoveQuotaResponse) {
+    option (google.api.http) = {
+      delete: "/instances/{instance_id}/quotas/{unit}"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
 }
 
 
@@ -520,10 +549,62 @@ message GetUsageRequest {
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetUsageResponse {
+message AddQuotaRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // the unit a quota should be imposed on
+  zitadel.quota.v1.Unit unit = 2 [
+    (validate.rules).enum = {defined_only: true, not_in: [0]},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "the unit a quota should be imposed on";
+    }
+  ];
+  // the starting time from which the current quota period is calculated from. This is relevant for querying the current usage.
+  google.protobuf.Timestamp from = 3 [
+      (validate.rules).timestamp.required = true,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          example: "\"2019-04-01T08:45:00.000000Z\"";
+          description: "the starting time from which the current quota period is calculated from. This is relevant for querying the current usage.";
+      }
+  ];
+  // the quota periods duration
+  google.protobuf.Duration reset_interval = 4 [
+    (validate.rules).duration.required = true,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the quota periods duration";
+      }
+  ];
+  // the quota amount of units
+  uint64 amount = 5 [
+    (validate.rules).uint64.gt = 0,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the quota amount of units";
+    }
+  ];
+  // whether ZITADEL should block further usage when the configured amount is used
+  bool limit = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "whether ZITADEL should block further usage when the configured amount is used";
+    }
+  ];
+  // the handlers, ZITADEL executes when certain quota percentages are reached
+  repeated zitadel.quota.v1.Notification notifications = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the handlers, ZITADEL executes when certain quota percentages are reached";
+    }
+  ];
+}
+
+message AddQuotaResponse {
   zitadel.v1.ObjectDetails details = 1;
-  uint64 executed_requests = 2;
-  uint64 executed_action_mins = 3;
+}
+
+message RemoveQuotaRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  zitadel.quota.v1.Unit unit = 2;
+}
+
+message RemoveQuotaResponse {
+  zitadel.v1.ObjectDetails details = 1;
 }
 
 message ExistsDomainRequest {

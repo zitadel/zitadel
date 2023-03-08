@@ -70,6 +70,8 @@
                     </option>
                     <option value="zh" id="zh" {{if (selectedLanguage "zh")}} selected {{end}}>{{t "ExternalNotFound.Chinese"}}
                     </option>
+                    <option value="pl" id="pl" {{if (selectedLanguage "pl")}} selected {{end}}>{{t "ExternalNotFound.Polish"}}
+                    </option>
                 </select>
             </div>
         </div>
@@ -116,13 +118,17 @@
             <i class="lgn-icon-arrow-left-solid"></i>
         </button>
 
+        {{ if .IsLinkingAllowed }}
         <button type="submit" formaction="{{ externalNotFoundOptionUrl "linkbutton"}}" class="lgn-raised-button lgn-primary" name="linkbutton" value="true">
             {{t "ExternalNotFound.LinkButtonText"}}
         </button>
-            <span class="fill-space"></span>
+        {{ end }}
+        <span class="fill-space"></span>
+        {{ if .IsCreationAllowed }}
         <button type="submit" formaction="{{ externalNotFoundOptionUrl "autoregisterbutton"}}" class="lgn-raised-button lgn-primary" name="autoregisterbutton" value="true">
             {{t "ExternalNotFound.AutoRegisterButtonText"}}
         </button>
+        {{ end }}
     </div>
 </form>
 

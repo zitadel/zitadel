@@ -42,6 +42,41 @@
       "ADD": "Maintenir et faire glisser une tuile pour ajouter"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Votre processus d'intégration",
+    "COMPLETED": "terminé",
+    "DISMISS": "fermer",
+    "CARD": {
+      "TITLE": "Faites fonctionner votre ZITADEL",
+      "DESCRIPTION": "Cette liste de contrôle vous aide à configurer votre instance et vous guide à travers les étapes les plus essentielles."
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Créez votre marque",
+        "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes."
+      },
+      "instance.smtp.config.added": {
+        "title": "Configurez vos paramètres SMTP",
+        "description": "Définissez vos propres paramètres de serveur de messagerie"
+      },
+      "project.added": {
+        "title": "Créez votre premier projet",
+        "description": "Ajoutez votre premier projet et définissez ses rôles et autorisations."
+      },
+      "project.application.added": {
+        "title": "Créez votre première application",
+        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification."
+      },
+      "user.human.added": {
+        "title": "Ajouter des utilisateurs",
+        "description": "Ajouter les utilisateurs de votre application"
+      },
+      "user.grant.added": {
+        "title": "Utilisateurs de subventions",
+        "description": "Autorisez les utilisateurs à accéder à votre application et définissez leur rôle."
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Instance",
     "DASHBOARD": "Accueil",
@@ -124,6 +159,7 @@
     "NEXT": "Suivant",
     "MORE": "plus",
     "STEP": "Étape",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Afficher l'utilisateur{{value}}"
     }
@@ -452,6 +488,11 @@
       "CHOOSEEXPIRY": "Sélectionnez une date d'expiration",
       "CREATIONDATE": "Date de création",
       "KEYDETAILS": "Détails de la clé",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Ajouter une clé",
         "DESCRIPTION": "Sélectionnez votre type de clé et choisissez une date d'expiration facultative."
@@ -843,6 +884,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Saisissez le nom de votre nouvelle organisation.",
       "ORGDETAILUSER_TITLE": "Configurer le propriétaire de l'organisation",
       "DELETE": "Supprimer l'organisation",
+      "DEFAULTLABEL": "Défaut",
+      "SETASDEFAULT": "Définir comme organisation par défaut",
+      "DEFAULTORGSET": "L'organisation par défaut a été modifiée avec succès",
       "RENAME": {
         "ACTION": "Renommer",
         "TITLE": "Renommer l'organisation",
@@ -973,7 +1017,8 @@
       "en": "English",
       "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1164,7 +1209,8 @@
         "en": "English",
         "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1569,14 +1615,37 @@
       "ACTIVETITLE": "Fournisseurs d'identité actifs"
     },
     "CREATE": {
-      "TITLE": "Nouveau fournisseur d'identité",
-      "DESCRIPTION": "Choisissez l'un des types de fournisseur d'identité suivants."
+      "TITLE": "Ajouter un fournisseur",
+      "DESCRIPTION": "Sélectionnez un ou plusieurs des fournisseurs suivants.",
+      "STEPPERTITLE": "Créer un fournisseur",
+      "OIDC": {
+        "TITLE": "Fournisseur OIDC",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur OIDC."
+      },
+      "JWT": {
+        "TITLE": "Fournisseur JWT",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Fournisseur Google",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Google"
+      }
     },
     "DETAIL": {
       "TITLE": "Fournisseur d'identité",
-      "DESCRIPTION": "Configuration générale de votre fournisseur d'identité.",
+      "DESCRIPTION": "Mettez à jour la configuration de votre fournisseur",
       "DATECREATED": "Créé",
       "DATECHANGED": "Modifié"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Création automatique",
+      "ISAUTOCREATION_DESC": "Détermine si un compte sera créé s'il n'existe pas déjà.",
+      "ISAUTOUPDATE": "est mise à jour automatiquement",
+      "ISAUTOUPDATE_DESC": "Si cette option est sélectionnée, les comptes sont mis à jour lors de la réauthentification.",
+      "ISCREATIONALLOWED": "la création est-elle autorisée",
+      "ISCREATIONALLOWED_DESC": "Détermine si des comptes peuvent être créés.",
+      "ISLINKINGALLOWED": "la liaison est-elle autorisée",
+      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant."
     },
     "OWNERTYPES": {
       "0": "inconnu",
@@ -1592,18 +1661,10 @@
       "1": "actif",
       "2": "inactif"
     },
-    "MAPPINGFIELD": {
-      "1": "Nom d'utilisateur préféré",
-      "2": "Courriel"
-    },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "Pas de style",
-      "1": "Google"
-    },
+    "NAMEHINT": "Si elle est spécifiée, elle sera affichée dans l'interface de connexion.",
+    "OPTIONAL": "optionnel",
+    "UPDATECLIENTSECRET": "mise à jour du secret client",
     "ADD": "Ajouter un fournisseur d'identité",
-    "AUTOREGISTER": "Enregistrement automatique",
-    "AUTOREGISTER_DESC": "Si cette option est sélectionnée et qu'aucun compte n'existe encore, un compte sera créé.",
     "TYPE": "Type",
     "OWNER": "Propriétaire",
     "ID": "ID",
@@ -1707,20 +1768,22 @@
   "APP": {
     "LIST": "Applications",
     "COMPLIANCE": "Conformité à l'OIDC",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "Configuration",
     "TOKEN": "Paramètres du jeton",
     "PAGES": {
       "TITLE": "Application",
       "ID": "ID",
       "DESCRIPTION": "Ici vous pouvez modifier les données de votre application et sa configuration.",
-      "CREATE_OIDC": "Application OIDC",
-      "CREATE_OIDC_DESC_TITLE": "Entrez les détails de votre application étape par étape",
-      "CREATE_OIDC_DESC_SUB": "Une configuration recommandée sera automatiquement générée.",
+      "CREATE": "Application OIDC",
+      "CREATE_SELECT_PROJECT": "Sélectionnez d'abord votre projet",
+      "CREATE_NEW_PROJECT": "ou créez-en un nouveau <a href='{{url}}' title='Create project'>here</a>.",
+      "CREATE_DESC_TITLE": "Entrez les détails de votre application étape par étape",
+      "CREATE_DESC_SUB": "Une configuration recommandée sera automatiquement générée.",
       "STATE": "Statut",
       "DATECREATED": "Créé",
       "DATECHANGED": "Modifié",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "Supprimer l'application",
       "DETAIL": {
         "TITLE": "Détail",
@@ -1926,7 +1989,8 @@
     "en": "English",
     "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

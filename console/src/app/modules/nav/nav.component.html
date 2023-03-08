@@ -212,8 +212,52 @@
 
 <ng-template #shortcutKeyRef>
   <ng-container *ngIf="(isHandset$ | async) === false">
-    <span class="fill-space"></span>
-    <div (click)="openHelp()" class="nav-shortcut-action-key" matTooltip="{{ 'MENU.OPENSHORTCUTSTOOLTIP' | translate }}">
+    <ng-template cnslHasRole [hasRole]="['iam.read']">
+      <span class="fill-space"></span>
+      <ng-container *ngIf="!adminService.hideOnboarding && (adminService.progressAllDone | async) === false">
+        <button
+          cdkOverlayOrigin
+          #trigger="cdkOverlayOrigin"
+          matRipple
+          class="progress-bar"
+          (click)="showInstanceProgress = !showInstanceProgress"
+        >
+          <mat-progress-bar
+            class="progress"
+            mode="determinate"
+            [value]="adminService.progressPercentage | async"
+          ></mat-progress-bar>
+        </button>
+
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="trigger"
+          [flexibleDimensions]="true"
+          [lockPosition]="true"
+          [cdkConnectedOverlayOffsetY]="10"
+          [cdkConnectedOverlayHasBackdrop]="true"
+          [cdkConnectedOverlayPositions]="positions"
+          cdkConnectedOverlayBackdropClass="transparent-backdrop"
+          [cdkConnectedOverlayOpen]="showInstanceProgress"
+          (backdropClick)="showInstanceProgress = false"
+          (detach)="showInstanceProgress = false"
+        >
+          <cnsl-onboarding-card
+            (dismissedCard)="dismissOnboarding()"
+            class="onboarding_card"
+            *ngIf="org && showInstanceProgress"
+          >
+          </cnsl-onboarding-card>
+        </ng-template>
+      </ng-container>
+    </ng-template>
+
+    <div
+      (click)="openHelp()"
+      class="nav-shortcut-action-key"
+      tabindex="0"
+      matTooltip="{{ 'MENU.OPENSHORTCUTSTOOLTIP' | translate }}"
+    >
       <div class="nav-key-overlay"></div>
       <span>?</span>
     </div>

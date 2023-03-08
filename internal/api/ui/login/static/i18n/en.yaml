@@ -211,6 +211,7 @@ RegistrationUser:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -241,6 +242,7 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -299,6 +301,7 @@ ExternalNotFound:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
 
 Footer:
   PoweredBy: Powered By
@@ -367,6 +370,8 @@ Errors:
       ExternalUserIDEmpty: External User ID is empty
       UserDisplayNameEmpty: User Display Name is empty
       NoExternalUserData: No external User Data received
+      CreationNotAllowed: Creation of a new user is not allowed on this Provider
+      LinkingNotAllowed: Linking of a user is not allowed on this Provider
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
     ProjectRequired: Login not possible. The organisation of the user must be granted to the project. Please contact your administrator.
   IdentityProvider:

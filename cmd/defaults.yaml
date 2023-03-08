@@ -11,7 +11,7 @@ Metrics:
 Tracing:
   # Choose one in "otel", "google", "log" and "none"
   Type: none
-  Fraction: 1
+  Fraction: 1.0
   MetricPrefix: zitadel
 
 # Port ZITADEL will listen on
@@ -320,6 +320,55 @@ Actions:
       - localhost
       - "127.0.0.1"
 
+LogStore:
+  Access:
+    Database:
+      # If enabled, all access logs are stored in the database table logstore.access
+      Enabled: false
+      # Logs that are older than the keep duration are cleaned up continuously
+      Keep: 2160h # 90 days
+      # CleanupInterval defines the time between cleanup iterations
+      CleanupInterval: 4h
+      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
+      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      Debounce:
+        MinFrequency: 2m
+        MaxBulkSize: 100
+    Stdout:
+      # If enabled, all access logs are printed to the binaries standard output
+      Enabled: false
+      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
+      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      Debounce:
+        MinFrequency: 0s
+        MaxBulkSize: 0
+  Execution:
+    Database:
+      # If enabled, all action execution logs are stored in the database table logstore.execution
+      Enabled: false
+      # Logs that are older than the keep duration are cleaned up continuously
+      Keep: 2160h # 90 days
+      # CleanupInterval defines the time between cleanup iterations
+      CleanupInterval: 4h
+      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
+      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      Debounce:
+        MinFrequency: 0s
+        MaxBulkSize: 0
+    Stdout:
+      # If enabled, all execution logs are printed to the binaries standard output
+      Enabled: true
+      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
+      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      Debounce:
+        MinFrequency: 0s
+        MaxBulkSize: 0
+
+Quotas:
+  Access:
+    ExhaustedCookieKey: "zitadel.quota.exhausted"
+    ExhaustedCookieMaxAge: "300s"
+
 Eventstore:
   PushTimeout: 15s
 
@@ -573,6 +622,40 @@ DefaultInstance:
       Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
       ButtonText: Login
 
+  Quotas:
+    # Items takes a slice of quota configurations, whereas for each unit type and instance, one or zero quotas may exist.
+    # The following unit types are supported
+
+    # "requests.all.authenticated"
+    # The sum of all requests to the ZITADEL API with an authorization header,
+    # excluding the following exceptions
+    # - Calls to the System API
+    # - Calls that cause internal server errors
+    # - Failed authorizations
+    # - Requests after the quota already exceeded
+
+    # "actions.all.runs.seconds"
+    # The sum of all actions run durations in seconds
+    Items:
+#      - Unit: "requests.all.authenticated"
+#        # From defines the starting time from which the current quota period is calculated from.
+#        # This is relevant for querying the current usage.
+#        From: "2023-01-01T00:00:00Z"
+#        # ResetInterval defines the quota periods duration
+#        ResetInterval: 720h # 30 days
+#        # Amount defines the number of units for this quota
+#        Amount: 25000
+#        # Limit defines whether ZITADEL should block further usage when the configured amount is used
+#        Limit: false
+#        # Notifications are emitted by ZITADEL when certain quota percentages are reached
+#        Notifications:
+#            # Percent defines the relative amount of used units, after which a notification should be emitted.
+#          - Percent: 100
+#            # Repeat defines, whether a notification should be emitted each time when a multitude of the configured Percent is used.
+#            Repeat: true
+#            # CallURL is called when a relative amount of the quota is used.
+#            CallURL: "https://httpbin.org/post"
+
 InternalAuthZ:
   RolePermissionMappings:
     - Role: "IAM_OWNER"
@@ -791,6 +874,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
     - Role: "ORG_USER_MANAGER"
       Permissions:
+        - "org.read"
         - "user.read"
         - "user.global.read"
         - "user.write"
@@ -799,6 +883,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "policy.read"
         - "project.read"
         - "project.role.read"
     - Role: "ORG_OWNER_VIEWER"

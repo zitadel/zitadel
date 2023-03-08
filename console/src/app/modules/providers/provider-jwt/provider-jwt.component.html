@@ -1,0 +1,60 @@
+<cnsl-create-layout
+  title="{{ id ? ('IDP.DETAIL.TITLE' | translate) : ('IDP.CREATE.TITLE' | translate) }}"
+  (closed)="close()"
+>
+  <div class="jwt-create-content">
+    <div class="title-row">
+      <mat-icon class="idp-logo" svgIcon="mdi_jwt" alt="jwt" />
+      <h1>{{ 'IDP.CREATE.JWT.TITLE' | translate }}</h1>
+      <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
+    </div>
+
+    <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.JWT.DESCRIPTION' | translate }}</p>
+
+    <form [formGroup]="form" (ngSubmit)="submitForm()">
+      <div class="jwt-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="name" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.JWT.HEADERNAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="headerName" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
+          <input cnslInput formControlName="issuer" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.JWT.JWTENDPOINT' | translate }}</cnsl-label>
+          <input cnslInput formControlName="jwtEndpoint" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.JWT.JWTKEYSENDPOINT' | translate }}</cnsl-label>
+          <input cnslInput formControlName="keysEndpoint" />
+        </cnsl-form-field>
+      </div>
+
+      <div class="optional-h-wrapper">
+        <h2>{{ 'IDP.OPTIONAL' | translate }}</h2>
+        <button (click)="showOptional = !showOptional" type="button" mat-icon-button>
+          <mat-icon *ngIf="showOptional">keyboard_arrow_up</mat-icon
+          ><mat-icon *ngIf="!showOptional">keyboard_arrow_down</mat-icon>
+        </button>
+      </div>
+      <div *ngIf="showOptional">
+        <cnsl-provider-options
+          [initialOptions]="provider?.config?.options"
+          (optionsChanged)="options = $event"
+        ></cnsl-provider-options>
+      </div>
+
+      <div class="jwt-create-actions">
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
+          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
+          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</cnsl-create-layout>

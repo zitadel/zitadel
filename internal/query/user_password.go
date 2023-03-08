@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-type HumanPasswordWriteModel struct {
-	eventstore.WriteModel
+type HumanPasswordReadModel struct {
+	*eventstore.ReadModel
 
 	Secret               *crypto.CryptoValue
 	SecretChangeRequired bool
@@ -33,7 +33,7 @@ func (q *Queries) GetHumanPassword(ctx context.Context, orgID, userID string) (p
 	if userID == "" {
 		return nil, "", errors.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
 	}
-	existingPassword, err := q.passwordWriteModel(ctx, userID, orgID)
+	existingPassword, err := q.passwordReadModel(ctx, userID, orgID)
 	if err != nil {
 		return nil, "", errors.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
 	}
@@ -48,28 +48,32 @@ func (q *Queries) GetHumanPassword(ctx context.Context, orgID, userID string) (p
 	return nil, "", nil
 }
 
-func (q *Queries) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {
+func (q *Queries) passwordReadModel(ctx context.Context, userID, resourceOwner string) (readModel *HumanPasswordReadModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanPasswordWriteModel(userID, resourceOwner)
-	err = q.eventstore.FilterToQueryReducer(ctx, writeModel)
+	readModel = NewHumanPasswordReadModel(userID, resourceOwner)
+	err = q.eventstore.FilterToQueryReducer(ctx, readModel)
 	if err != nil {
 		return nil, err
 	}
-	return writeModel, nil
+	return readModel, nil
 }
 
-func NewHumanPasswordWriteModel(userID, resourceOwner string) *HumanPasswordWriteModel {
-	return &HumanPasswordWriteModel{
-		WriteModel: eventstore.WriteModel{
+func NewHumanPasswordReadModel(userID, resourceOwner string) *HumanPasswordReadModel {
+	return &HumanPasswordReadModel{
+		ReadModel: &eventstore.ReadModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
 	}
 }
 
-func (wm *HumanPasswordWriteModel) Reduce() error {
+func (rm *HumanPasswordReadModel) AppendEvents(events ...eventstore.Event) {
+	rm.ReadModel.AppendEvents(events...)
+}
+
+func (wm *HumanPasswordReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
@@ -107,11 +111,12 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 			wm.UserState = domain.UserStateDeleted
 		}
 	}
-	return wm.WriteModel.Reduce()
+	return wm.ReadModel.Reduce()
 }
 
-func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *HumanPasswordReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AllowTimeTravel().
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).

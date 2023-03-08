@@ -14,14 +14,15 @@ import (
 var (
 	idpUserLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_user_links3.idp_id,` +
 		` projections.idp_user_links3.user_id,` +
-		` projections.idps3.name,` +
+		` projections.idp_templates3.name,` +
 		` projections.idp_user_links3.external_user_id,` +
 		` projections.idp_user_links3.display_name,` +
-		` projections.idps3.type,` +
+		` projections.idp_templates3.type,` +
 		` projections.idp_user_links3.resource_owner,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_user_links3` +
-		` LEFT JOIN projections.idps3 ON projections.idp_user_links3.idp_id = projections.idps3.id`)
+		` LEFT JOIN projections.idp_templates3 ON projections.idp_user_links3.idp_id = projections.idp_templates3.id AND projections.idp_user_links3.instance_id = projections.idp_templates3.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	idpUserLinksCols = []string{
 		"idp_id",
 		"user_id",
@@ -59,7 +60,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 							"idp-name",
 							"external-user-id",
 							"display-name",
-							domain.IDPConfigTypeJWT,
+							domain.IDPTypeJWT,
 							"ro",
 						},
 					},
@@ -76,7 +77,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 						IDPName:          "idp-name",
 						ProvidedUserID:   "external-user-id",
 						ProvidedUsername: "display-name",
-						IDPType:          domain.IDPConfigTypeJWT,
+						IDPType:          domain.IDPTypeJWT,
 						ResourceOwner:    "ro",
 					},
 				},
@@ -113,7 +114,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 						IDPName:          "",
 						ProvidedUserID:   "external-user-id",
 						ProvidedUsername: "display-name",
-						IDPType:          domain.IDPConfigTypeUnspecified,
+						IDPType:          domain.IDPTypeUnspecified,
 						ResourceOwner:    "ro",
 					},
 				},
@@ -139,7 +140,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

@@ -58,7 +58,7 @@ export function login(
           times: 1,
         }).as('password');
 
-        cy.visit(loginUrl, { retryOnNetworkFailure: true });
+        cy.visit(Cypress.config('baseUrl'), { retryOnNetworkFailure: true });
 
         onUsernameScreen ? onUsernameScreen() : null;
         cy.get('#loginName').type(creds.username);
@@ -69,7 +69,7 @@ export function login(
         cy.get('#submit-button').click();
 
         cy.wait('@password').then((interception) => {
-          if (interception.response.body.indexOf('/ui/login/mfa/prompt') === -1) {
+          if (interception.response.body.indexOf(`${loginUrl}/mfa/prompt`) === -1) {
             return;
           }
 
@@ -82,8 +82,10 @@ export function login(
 
         onAuthenticated ? onAuthenticated() : null;
 
+        cy.visit('/');
+
         cy.get('[data-e2e=authenticated-welcome]', {
-          timeout: 10_000,
+          timeout: 50_000,
         });
       },
       {

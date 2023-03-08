@@ -2,60 +2,11 @@ version: '3.8'
 
 services:
   zitadel:
-    restart: 'always'
-    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
-    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
-    environment:
-      ZITADEL_DATABASE_COCKROACH_HOST: db
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
-      ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_MFAINITSKIPLIFETIME: 0
-    depends_on:
-      db:
-        condition: 'service_healthy'
-    ports:
-      - '8080:8080'
-    networks:
-      - zitadel
+    extends:
+      file: './config/localhost/docker-compose.yaml'
+      service: 'zitadel'
 
   db:
-    restart: 'always'
-    image: 'cockroachdb/cockroach:v22.2.2'
-    command: 'start-single-node --insecure --http-addr :9090'
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9090/health?ready=1']
-      interval: '10s'
-      timeout: '30s'
-      retries: 5
-      start_period: '20s'
-    ports:
-      - '9090:8080'
-      - '26257:26257'
-    networks:
-      - zitadel
-
-  prepare:
-    image: node:18-alpine3.15
-    working_dir: /e2e
-    user: '$UID'
-    volumes:
-      - .:/e2e
-    command: 'sh -c "npm ci --omit=dev && npm run lint && npx wait-on http://localhost:8080/debug/ready"'
-    network_mode: host
-
-  e2e:
-    image: cypress/included:10.9.0
-    depends_on:
-      zitadel:
-        condition: 'service_started'
-      db:
-        condition: 'service_healthy'
-      prepare:
-        condition: 'service_completed_successfully'
-    working_dir: /e2e
-    user: '$UID'
-    volumes:
-      - .:/e2e
-    network_mode: host
-
-networks:
-  zitadel:
+    extends:
+      file: './config/localhost/docker-compose.yaml'
+      service: 'db'

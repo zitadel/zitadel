@@ -2,8 +2,8 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatSort, Sort } from '@angular/material/sort';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -199,6 +199,9 @@ export class UserTableComponent implements OnInit {
           break;
         case 'state':
           sortingField = UserFieldName.USER_FIELD_NAME_STATE;
+          break;
+        case 'creationDate':
+          sortingField = UserFieldName.USER_FIELD_NAME_CREATION_DATE;
           break;
       }
     this.userService

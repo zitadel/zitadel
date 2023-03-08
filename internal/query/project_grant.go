@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -118,7 +119,7 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 		projection.ProjectGrantProjection.Trigger(ctx)
 	}
 
-	stmt, scan := prepareProjectGrantQuery()
+	stmt, scan := prepareProjectGrantQuery(ctx, q.client)
 	eq := sq.Eq{
 		ProjectGrantColumnGrantID.identifier():    id,
 		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -140,7 +141,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareProjectGrantQuery()
+	stmt, scan := prepareProjectGrantQuery(ctx, q.client)
 	eq := sq.Eq{
 		ProjectGrantColumnGrantID.identifier():      id,
 		ProjectGrantColumnGrantedOrgID.identifier(): grantedOrg,
@@ -163,7 +164,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProjectGrantsQuery()
+	query, scan := prepareProjectGrantsQuery(ctx, q.client)
 	eq := sq.Eq{
 		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -272,7 +273,7 @@ func (q *ProjectGrantSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBui
 	return query
 }
 
-func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
+func prepareProjectGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
 	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
 	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
 	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
@@ -290,10 +291,11 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 			ProjectGrantColumnGrantedOrgName.identifier(),
 			ProjectGrantColumnGrantedRoleKeys.identifier(),
 			ProjectGrantColumnResourceOwnerName.identifier()).
-			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
+			From(projectGrantsTable.identifier()).
+			PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID) + db.Timetravel(call.Took(ctx))),
 		func(row *sql.Row) (*ProjectGrant, error) {
 			grant := new(ProjectGrant)
 			var (
@@ -330,7 +332,7 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 		}
 }
 
-func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
+func prepareProjectGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
 	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
 	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
 	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
@@ -349,10 +351,11 @@ func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGra
 			ProjectGrantColumnGrantedRoleKeys.identifier(),
 			ProjectGrantColumnResourceOwnerName.identifier(),
 			countColumn.identifier()).
-			From(projectGrantsTable.identifier()).PlaceholderFormat(sq.Dollar).
+			From(projectGrantsTable.identifier()).
+			PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID) + db.Timetravel(call.Took(ctx))),
 		func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var (

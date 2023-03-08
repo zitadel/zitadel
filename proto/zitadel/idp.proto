@@ -95,6 +95,7 @@ message IDPLoginPolicyLink {
     ];
     IDPType idp_type = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"IDP_TYPE_OIDC\"]"
             description: "the authorization framework of the identity provider";
         }
     ];
@@ -124,7 +125,7 @@ enum IDPOwnerType {
     IDP_OWNER_TYPE_UNSPECIFIED = 0;
     // system is managed by the ZITADEL administrators
     IDP_OWNER_TYPE_SYSTEM = 1;
-    // org is managed by de organisation administrators
+    // org is managed by de organization administrators
     IDP_OWNER_TYPE_ORG = 2;
 }
 
@@ -137,7 +138,7 @@ message OIDCConfig {
     string issuer = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the oidc issuer of the identity provider";
+            description: "the OIDC issuer of the identity provider";
         }
     ];
     repeated string scopes = 3 [
@@ -170,21 +171,21 @@ message JWTConfig {
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the endpoint where the jwt can be extracted";
+            description: "the endpoint where the JWT can be extracted";
         }
     ];
     string issuer = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com\"";
-            description: "the issuer of the jwt (for validation)";
+            description: "the issuer of the JWT (for validation)";
         }
     ];
     string keys_endpoint = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://accounts.google.com/keys\"";
-            description: "the endpoint to the key (JWK) which are used to sign the JWT with";
+            description: "the endpoint to the key (JWK) which is used to sign the JWT with";
         }
     ];
     string header_name = 4 [
@@ -233,3 +234,108 @@ enum IDPFieldName {
     IDP_FIELD_NAME_UNSPECIFIED = 0;
     IDP_FIELD_NAME_NAME = 1;
 }
+
+message Provider {
+    string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    IDPState state = 3;
+    string name = 4;
+    IDPOwnerType owner = 5;
+    ProviderType type = 6;
+    ProviderConfig config = 7;
+}
+
+enum ProviderType {
+    PROVIDER_TYPE_UNSPECIFIED = 0;
+    PROVIDER_TYPE_OIDC = 1;
+    PROVIDER_TYPE_JWT = 2;
+    PROVIDER_TYPE_LDAP = 3;
+    PROVIDER_TYPE_OAUTH = 4;
+    PROVIDER_TYPE_AZURE_AD = 5;
+    PROVIDER_TYPE_GITHUB = 6;
+    PROVIDER_TYPE_GITHUB_ES = 7;
+    PROVIDER_TYPE_GITLAB = 8;
+    PROVIDER_TYPE_GITLAB_SELF_HOSTED = 9;
+    PROVIDER_TYPE_GOOGLE = 10;
+}
+
+message ProviderConfig {
+    Options options = 1;
+    oneof config {
+        LDAPConfig ldap = 2;
+        GoogleConfig google = 3;
+        OAuthConfig oauth = 4;
+        GenericOIDCConfig oidc = 5;
+        JWTConfig jwt = 6;
+        GitHubConfig github = 7;
+        GitHubEnterpriseServerConfig github_es = 8;
+    }
+}
+message OAuthConfig {
+    string client_id = 1;
+    string authorization_endpoint = 2;
+    string token_endpoint = 3;
+    string user_endpoint = 4;
+    repeated string scopes = 5;
+    string id_attribute = 6;
+}
+
+message GenericOIDCConfig {
+    string issuer = 1;
+    string client_id = 2;
+    repeated string scopes = 3;
+}
+
+message GitHubConfig {
+    string client_id = 1;
+    repeated string scopes = 2;
+}
+
+message GitHubEnterpriseServerConfig {
+    string client_id = 1;
+    string authorization_endpoint = 2;
+    string token_endpoint = 3;
+    string user_endpoint = 4;
+    repeated string scopes = 5;
+}
+
+message GoogleConfig {
+    string client_id = 1;
+    repeated string scopes = 2;
+}
+
+message LDAPConfig {
+    string host = 1;
+    string port = 2;
+    bool tls = 3;
+    string base_dn = 4;
+    string user_object_class = 5;
+    string user_unique_attribute = 6;
+    string admin = 7;
+    LDAPAttributes attributes = 8;
+    Options provider_options = 9;
+}
+
+message Options {
+    bool is_linking_allowed = 1;
+    bool is_creation_allowed = 2;
+    bool is_auto_creation = 3;
+    bool is_auto_update = 4;
+}
+
+message LDAPAttributes {
+    string id_attribute = 1 [(validate.rules).string = {max_len: 200}];
+    string first_name_attribute = 2 [(validate.rules).string = {max_len: 200}];
+    string last_name_attribute = 3 [(validate.rules).string = {max_len: 200}];
+    string display_name_attribute = 4 [(validate.rules).string = {max_len: 200}];
+    string nick_name_attribute = 5 [(validate.rules).string = {max_len: 200}];
+    string preferred_username_attribute = 6 [(validate.rules).string = {max_len: 200}];
+    string email_attribute = 7 [(validate.rules).string = {max_len: 200}];
+    string email_verified_attribute = 8 [(validate.rules).string = {max_len: 200}];
+    string phone_attribute = 9 [(validate.rules).string = {max_len: 200}];
+    string phone_verified_attribute = 10 [(validate.rules).string = {max_len: 200}];
+    string preferred_language_attribute = 11 [(validate.rules).string = {max_len: 200}];
+    string avatar_url_attribute = 12 [(validate.rules).string = {max_len: 200}];
+    string profile_attribute = 13 [(validate.rules).string = {max_len: 200}];
+}
+

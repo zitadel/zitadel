@@ -3,6 +3,13 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacySelectChange as MatSelectChange } from '@angular/material/legacy-select';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import {
+  GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,
+  GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
+  GetDefaultPasswordChangeMessageTextRequest as AdminGetDefaultPasswordChangeMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextRequest as AdminGetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultPasswordResetMessageTextRequest as AdminGetDefaultPasswordResetMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
   SetDefaultDomainClaimedMessageTextRequest,
   SetDefaultInitMessageTextRequest,
   SetDefaultPasswordChangeMessageTextRequest,
@@ -10,13 +17,6 @@ import {
   SetDefaultPasswordResetMessageTextRequest,
   SetDefaultVerifyEmailMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextRequest,
-  GetDefaultPasswordChangeMessageTextRequest as AdminGetDefaultPasswordChangeMessageTextRequest,
-  GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
-  GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
-  GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
-  GetDefaultPasswordResetMessageTextRequest as AdminGetDefaultPasswordResetMessageTextRequest,
-  GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,
-  GetDefaultPasswordlessRegistrationMessageTextRequest as AdminGetDefaultPasswordlessRegistrationMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
   GetCustomDomainClaimedMessageTextRequest,
@@ -441,7 +441,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
   };
 
   public locale: string = 'en';
-  public LOCALES: string[] = ['en', 'de', 'it'];
+  public LOCALES: string[] = ['en', 'de', 'it', 'fr', 'pl', 'zh'];
   private sub: Subscription = new Subscription();
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN
@@ -596,7 +596,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           return handler((this.service as ManagementService).setCustomDomainClaimedMessageCustomText(this.updateRequest));
         case MESSAGETYPES.PASSWORDLESS:
           return handler(
-            (this.service as ManagementService).getCustomPasswordlessRegistrationMessageText(this.updateRequest),
+            (this.service as ManagementService).setCustomPasswordlessRegistrationMessageCustomText(this.updateRequest),
           );
         case MESSAGETYPES.PASSWORDCHANGE:
           return handler((this.service as ManagementService).getCustomPasswordChangeMessageText(this.updateRequest));

@@ -16,19 +16,19 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type API struct {
-	port           uint16
-	grpcServer     *grpc.Server
-	verifier       *internal_authz.TokenVerifier
-	health         health
-	router         *mux.Router
-	externalSecure bool
-	http1HostName  string
+	port          uint16
+	grpcServer    *grpc.Server
+	verifier      *internal_authz.TokenVerifier
+	health        health
+	router        *mux.Router
+	http1HostName string
 }
 
 type health interface {
@@ -36,16 +36,24 @@ type health interface {
 	Instance(ctx context.Context, shouldTriggerBulk bool) (*query.Instance, error)
 }
 
-func New(port uint16, router *mux.Router, queries *query.Queries, verifier *internal_authz.TokenVerifier, authZ internal_authz.Config, externalSecure bool, tlsConfig *tls.Config, http2HostName, http1HostName string) *API {
+func New(
+	port uint16,
+	router *mux.Router,
+	queries *query.Queries,
+	verifier *internal_authz.TokenVerifier,
+	authZ internal_authz.Config,
+	tlsConfig *tls.Config, http2HostName, http1HostName string,
+	accessSvc *logstore.Service,
+) *API {
 	api := &API{
-		port:           port,
-		verifier:       verifier,
-		health:         queries,
-		router:         router,
-		externalSecure: externalSecure,
-		http1HostName:  http1HostName,
+		port:          port,
+		verifier:      verifier,
+		health:        queries,
+		router:        router,
+		http1HostName: http1HostName,
 	}
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig)
+
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessSvc)
 	api.routeGRPC()
 
 	api.RegisterHandler("/debug", api.healthHandler())
@@ -82,42 +90,34 @@ func (a *API) routeGRPC() {
 		Headers("Content-Type", "application/grpc").
 		Handler(a.grpcServer)
 
-	if !a.externalSecure {
-		a.routeGRPCWeb(a.router)
-		return
-	}
-	a.routeGRPCWeb(http2Route)
+	a.routeGRPCWeb()
 }
 
-func (a *API) routeGRPCWeb(router *mux.Router) {
-	router.NewRoute().
+func (a *API) routeGRPCWeb() {
+	grpcWebServer := grpcweb.WrapServer(a.grpcServer,
+		grpcweb.WithAllowedRequestHeaders(
+			[]string{
+				http_util.Origin,
+				http_util.ContentType,
+				http_util.Accept,
+				http_util.AcceptLanguage,
+				http_util.Authorization,
+				http_util.ZitadelOrgID,
+				http_util.XUserAgent,
+				http_util.XGrpcWeb,
+			},
+		),
+		grpcweb.WithOriginFunc(func(_ string) bool {
+			return true
+		}),
+	)
+	a.router.NewRoute().
 		Methods(http.MethodPost, http.MethodOptions).
 		MatcherFunc(
 			func(r *http.Request, _ *mux.RouteMatch) bool {
-				if strings.Contains(strings.ToLower(r.Header.Get("content-type")), "application/grpc-web+") {
-					return true
-				}
-				return strings.Contains(strings.ToLower(r.Header.Get("access-control-request-headers")), "x-grpc-web")
+				return grpcWebServer.IsGrpcWebRequest(r) || grpcWebServer.IsAcceptableGrpcCorsRequest(r)
 			}).
-		Handler(
-			grpcweb.WrapServer(a.grpcServer,
-				grpcweb.WithAllowedRequestHeaders(
-					[]string{
-						http_util.Origin,
-						http_util.ContentType,
-						http_util.Accept,
-						http_util.AcceptLanguage,
-						http_util.Authorization,
-						http_util.ZitadelOrgID,
-						http_util.XUserAgent,
-						http_util.XGrpcWeb,
-					},
-				),
-				grpcweb.WithOriginFunc(func(_ string) bool {
-					return true
-				}),
-			),
-		)
+		Handler(grpcWebServer)
 }
 
 func (a *API) healthHandler() http.Handler {

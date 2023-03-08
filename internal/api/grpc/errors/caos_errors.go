@@ -55,6 +55,8 @@ func ExtractCaosError(err error) (c codes.Code, msg, id string, ok bool) {
 		return codes.Unavailable, caosErr.GetMessage(), caosErr.GetID(), true
 	case *caos_errs.UnimplementedError:
 		return codes.Unimplemented, caosErr.GetMessage(), caosErr.GetID(), true
+	case *caos_errs.ResourceExhaustedError:
+		return codes.ResourceExhausted, caosErr.GetMessage(), caosErr.GetID(), true
 	default:
 		return codes.Unknown, err.Error(), "", false
 	}

@@ -3,7 +3,6 @@ package start
 import (
 	"context"
 	"crypto/tls"
-	"database/sql"
 	_ "embed"
 	"fmt"
 	"net"
@@ -15,8 +14,7 @@ import (
 
 	"github.com/zitadel/saml/pkg/provider"
 
-	"github.com/zitadel/zitadel/internal/api/saml"
-
+	clockpkg "github.com/benbjohnson/clock"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,6 +25,7 @@ import (
 
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
+	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api"
 	"github.com/zitadel/zitadel/internal/api/assets"
@@ -38,6 +37,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
@@ -48,6 +48,10 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
+	"github.com/zitadel/zitadel/internal/logstore/emitters/execution"
+	"github.com/zitadel/zitadel/internal/logstore/emitters/stdout"
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
@@ -90,7 +94,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start client for projection: %w", err)
 	}
 
-	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient.DB, masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
@@ -115,7 +119,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
 
-	storage, err := config.AssetStorage.NewStorage(dbClient)
+	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
 	if err != nil {
 		return fmt.Errorf("cannot start asset storage client: %w", err)
 	}
@@ -146,6 +150,23 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 
+	clock := clockpkg.New()
+	actionsExecutionStdoutEmitter, err := logstore.NewEmitter(ctx, clock, config.LogStore.Execution.Stdout, stdout.NewStdoutEmitter())
+	if err != nil {
+		return err
+	}
+	actionsExecutionDBEmitter, err := logstore.NewEmitter(ctx, clock, config.LogStore.Execution.Database, execution.NewDatabaseLogStorage(dbClient))
+	if err != nil {
+		return err
+	}
+
+	usageReporter := logstore.UsageReporterFunc(commands.ReportUsage)
+	actionsLogstoreSvc := logstore.New(queries, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
+	if actionsLogstoreSvc.Enabled() {
+		logging.Warn("execution logs are currently in beta")
+	}
+	actions.SetLogstoreService(actionsLogstoreSvc)
+
 	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
@@ -153,14 +174,28 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys)
+	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, queries, usageReporter)
 	if err != nil {
 		return err
 	}
 	return listen(ctx, router, config.Port, tlsConfig)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys) error {
+func startAPIs(
+	ctx context.Context,
+	clock clockpkg.Clock,
+	router *mux.Router,
+	commands *command.Commands,
+	queries *query.Queries,
+	eventstore *eventstore.Eventstore,
+	dbClient *database.DB,
+	config *Config,
+	store static.Storage,
+	authZRepo authz_repo.Repository,
+	keys *encryptionKeys,
+	quotaQuerier logstore.QuotaQuerier,
+	usageReporter logstore.UsageReporter,
+) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -173,7 +208,22 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return err
 	}
-	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader)
+
+	accessStdoutEmitter, err := logstore.NewEmitter(ctx, clock, config.LogStore.Access.Stdout, stdout.NewStdoutEmitter())
+	if err != nil {
+		return err
+	}
+	accessDBEmitter, err := logstore.NewEmitter(ctx, clock, config.LogStore.Access.Database, access.NewDatabaseLogStorage(dbClient))
+	if err != nil {
+		return err
+	}
+
+	accessSvc := logstore.New(quotaQuerier, usageReporter, accessDBEmitter, accessStdoutEmitter)
+	if accessSvc.Enabled() {
+		logging.Warn("access logs are currently in beta")
+	}
+	accessInterceptor := middleware.NewAccessInterceptor(accessSvc, config.Quotas.Access)
+	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
@@ -182,10 +232,10 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.Database(), config.DefaultInstance, config.ExternalDomain)); err != nil {
+	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.Database(), commands, queries, config.SystemDefaults, adminRepo, config.ExternalSecure, keys.User)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, adminRepo, config.ExternalSecure, keys.User)); err != nil {
 		return err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
@@ -194,40 +244,40 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
-
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
-	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, instanceInterceptor.Handler, assetsCache.Handler))
+	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources)
 	if err != nil {
 		return err
 	}
 
+	// TODO: Record openapi access logs?
 	openAPIHandler, err := openapi.Start()
 	if err != nil {
 		return fmt.Errorf("unable to start openapi handler: %w", err)
 	}
 	apis.RegisterHandler(openapi.HandlerPrefix, openAPIHandler)
 
-	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler)
+	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, accessInterceptor.Handle)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
 
-	samlProvider, err := saml.NewProvider(ctx, config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor)
+	samlProvider, err := saml.NewProvider(ctx, config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, accessInterceptor.Handle)
 	if err != nil {
 		return fmt.Errorf("unable to start saml provider: %w", err)
 	}
 	apis.RegisterHandler(saml.HandlerPrefix, samlProvider.HttpHandler())
 
-	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, instanceInterceptor.Handler, config.CustomerPortal)
+	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, accessInterceptor.Handle, config.CustomerPortal)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
