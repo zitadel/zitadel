@@ -98,6 +98,8 @@
   --zitadel-logo-powered-by: url("../logo-dark.svg");
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
+  --zitadel-color-github-text: #8b8d8d;
+  --zitadel-color-github-background: #ffffff;
   --zitadel-color-qr: var(--zitadel-color-black);
   --zitadel-color-qr-background: var(--zitadel-color-white);
 }
@@ -184,6 +186,8 @@
   --zitadel-logo-powered-by: url("../logo-light.svg");
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
+  --zitadel-color-github-text: #8b8d8d;
+  --zitadel-color-github-background: #ffffff;
 }
 
 body {
@@ -210,7 +214,7 @@ body.waiting * {
 footer {
   width: 100%;
   box-sizing: border-box;
-  background: #00000020;
+  background: rgba(0, 0, 0, 0.1254901961);
   min-height: 50px;
   display: flex;
   align-items: center;
@@ -559,6 +563,15 @@ a.sub-formfield-link {
   background-repeat: no-repeat;
   border-radius: 5px;
 }
+.lgn-idp.github span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/github.png");
+  background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
 
 .lgn-error {
   display: flex;
@@ -733,7 +746,7 @@ i {
   letter-spacing: 0.05em;
   font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 0 3px #0000001a;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1019607843);
   width: fit-content;
   line-height: 1rem;
 }
@@ -1185,7 +1198,7 @@ i {
 footer {
   width: 100%;
   box-sizing: border-box;
-  background: #00000020;
+  background: rgba(0, 0, 0, 0.1254901961);
   min-height: 50px;
   display: flex;
   align-items: center;
@@ -1534,6 +1547,15 @@ a.sub-formfield-link {
   background-repeat: no-repeat;
   border-radius: 5px;
 }
+.lgn-idp.github span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/github.png");
+  background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
 
 .lgn-error {
   display: flex;
@@ -1708,7 +1730,7 @@ i {
   letter-spacing: 0.05em;
   font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 0 3px #0000001a;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1019607843);
   width: fit-content;
   line-height: 1rem;
 }
@@ -3046,6 +3068,10 @@ ul li i.lgn-valid {
 .lgn-idp.google {
   color: var(--zitadel-color-google-text);
   background-color: var(--zitadel-color-google-background);
+}
+.lgn-idp.github {
+  color: var(--zitadel-color-github-text);
+  background-color: var(--zitadel-color-github-background);
 }
 
 .lgn-idp-providers .lgn-idp-desc {

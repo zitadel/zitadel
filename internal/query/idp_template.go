@@ -37,6 +37,8 @@ type IDPTemplate struct {
 	*OAuthIDPTemplate
 	*OIDCIDPTemplate
 	*JWTIDPTemplate
+	*GitHubIDPTemplate
+	*GitHubEnterpriseIDPTemplate
 	*GoogleIDPTemplate
 	*LDAPIDPTemplate
 }
@@ -71,6 +73,23 @@ type JWTIDPTemplate struct {
 	KeysEndpoint string
 	HeaderName   string
 	Endpoint     string
+}
+
+type GitHubIDPTemplate struct {
+	IDPID        string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.StringArray
+}
+
+type GitHubEnterpriseIDPTemplate struct {
+	IDPID                 string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	AuthorizationEndpoint string
+	TokenEndpoint         string
+	UserEndpoint          string
+	Scopes                database.StringArray
 }
 
 type GoogleIDPTemplate struct {
@@ -262,6 +281,72 @@ var (
 	JWTHeaderNameCol = Column{
 		name:  projection.JWTHeaderNameCol,
 		table: jwtIdpTemplateTable,
+	}
+)
+
+var (
+	githubIdpTemplateTable = table{
+		name:          projection.IDPTemplateGitHubTable,
+		instanceIDCol: projection.GitHubInstanceIDCol,
+	}
+	GitHubIDCol = Column{
+		name:  projection.GitHubIDCol,
+		table: githubIdpTemplateTable,
+	}
+	GitHubInstanceIDCol = Column{
+		name:  projection.GitHubInstanceIDCol,
+		table: githubIdpTemplateTable,
+	}
+	GitHubClientIDCol = Column{
+		name:  projection.GitHubClientIDCol,
+		table: githubIdpTemplateTable,
+	}
+	GitHubClientSecretCol = Column{
+		name:  projection.GitHubClientSecretCol,
+		table: githubIdpTemplateTable,
+	}
+	GitHubScopesCol = Column{
+		name:  projection.GitHubScopesCol,
+		table: githubIdpTemplateTable,
+	}
+)
+
+var (
+	githubEnterpriseIdpTemplateTable = table{
+		name:          projection.IDPTemplateGitHubEnterpriseTable,
+		instanceIDCol: projection.GitHubEnterpriseInstanceIDCol,
+	}
+	GitHubEnterpriseIDCol = Column{
+		name:  projection.GitHubEnterpriseIDCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseInstanceIDCol = Column{
+		name:  projection.GitHubEnterpriseInstanceIDCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseClientIDCol = Column{
+		name:  projection.GitHubEnterpriseClientIDCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseClientSecretCol = Column{
+		name:  projection.GitHubEnterpriseClientSecretCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseAuthorizationEndpointCol = Column{
+		name:  projection.GitHubEnterpriseAuthorizationEndpointCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseTokenEndpointCol = Column{
+		name:  projection.GitHubEnterpriseTokenEndpointCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseUserEndpointCol = Column{
+		name:  projection.GitHubEnterpriseUserEndpointCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseScopesCol = Column{
+		name:  projection.GitHubEnterpriseScopesCol,
+		table: githubEnterpriseIdpTemplateTable,
 	}
 )
 
@@ -523,6 +608,19 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			// github
+			GitHubIDCol.identifier(),
+			GitHubClientIDCol.identifier(),
+			GitHubClientSecretCol.identifier(),
+			GitHubScopesCol.identifier(),
+			// github enterprise
+			GitHubEnterpriseIDCol.identifier(),
+			GitHubEnterpriseClientIDCol.identifier(),
+			GitHubEnterpriseClientSecretCol.identifier(),
+			GitHubEnterpriseAuthorizationEndpointCol.identifier(),
+			GitHubEnterpriseTokenEndpointCol.identifier(),
+			GitHubEnterpriseUserEndpointCol.identifier(),
+			GitHubEnterpriseScopesCol.identifier(),
 			// google
 			GoogleIDCol.identifier(),
 			GoogleClientIDCol.identifier(),
@@ -555,6 +653,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitHubIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitHubEnterpriseIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -583,6 +683,19 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			jwtEndpoint := sql.NullString{}
 			jwtKeysEndpoint := sql.NullString{}
 			jwtHeaderName := sql.NullString{}
+
+			githubID := sql.NullString{}
+			githubClientID := sql.NullString{}
+			githubClientSecret := new(crypto.CryptoValue)
+			githubScopes := database.StringArray{}
+
+			githubEnterpriseID := sql.NullString{}
+			githubEnterpriseClientID := sql.NullString{}
+			githubEnterpriseClientSecret := new(crypto.CryptoValue)
+			githubEnterpriseAuthorizationEndpoint := sql.NullString{}
+			githubEnterpriseTokenEndpoint := sql.NullString{}
+			githubEnterpriseUserEndpoint := sql.NullString{}
+			githubEnterpriseScopes := database.StringArray{}
 
 			googleID := sql.NullString{}
 			googleClientID := sql.NullString{}
@@ -647,6 +760,19 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&jwtEndpoint,
 				&jwtKeysEndpoint,
 				&jwtHeaderName,
+				// github
+				&githubID,
+				&githubClientID,
+				&githubClientSecret,
+				&githubScopes,
+				// github enterprise
+				&githubEnterpriseID,
+				&githubEnterpriseClientID,
+				&githubEnterpriseClientSecret,
+				&githubEnterpriseAuthorizationEndpoint,
+				&githubEnterpriseTokenEndpoint,
+				&githubEnterpriseUserEndpoint,
+				&githubEnterpriseScopes,
 				// google
 				&googleID,
 				&googleClientID,
@@ -713,6 +839,25 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					KeysEndpoint: jwtKeysEndpoint.String,
 					HeaderName:   jwtHeaderName.String,
 					Endpoint:     jwtEndpoint.String,
+				}
+			}
+			if githubID.Valid {
+				idpTemplate.GitHubIDPTemplate = &GitHubIDPTemplate{
+					IDPID:        githubID.String,
+					ClientID:     githubClientID.String,
+					ClientSecret: githubClientSecret,
+					Scopes:       githubScopes,
+				}
+			}
+			if githubEnterpriseID.Valid {
+				idpTemplate.GitHubEnterpriseIDPTemplate = &GitHubEnterpriseIDPTemplate{
+					IDPID:                 githubEnterpriseID.String,
+					ClientID:              githubEnterpriseClientID.String,
+					ClientSecret:          githubEnterpriseClientSecret,
+					AuthorizationEndpoint: githubEnterpriseAuthorizationEndpoint.String,
+					TokenEndpoint:         githubEnterpriseTokenEndpoint.String,
+					UserEndpoint:          githubEnterpriseUserEndpoint.String,
+					Scopes:                githubEnterpriseScopes,
 				}
 			}
 			if googleID.Valid {
@@ -792,6 +937,19 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			// github
+			GitHubIDCol.identifier(),
+			GitHubClientIDCol.identifier(),
+			GitHubClientSecretCol.identifier(),
+			GitHubScopesCol.identifier(),
+			// github enterprise
+			GitHubEnterpriseIDCol.identifier(),
+			GitHubEnterpriseClientIDCol.identifier(),
+			GitHubEnterpriseClientSecretCol.identifier(),
+			GitHubEnterpriseAuthorizationEndpointCol.identifier(),
+			GitHubEnterpriseTokenEndpointCol.identifier(),
+			GitHubEnterpriseUserEndpointCol.identifier(),
+			GitHubEnterpriseScopesCol.identifier(),
 			// google
 			GoogleIDCol.identifier(),
 			GoogleClientIDCol.identifier(),
@@ -825,6 +983,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitHubIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitHubEnterpriseIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -856,6 +1016,19 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				jwtEndpoint := sql.NullString{}
 				jwtKeysEndpoint := sql.NullString{}
 				jwtHeaderName := sql.NullString{}
+
+				githubID := sql.NullString{}
+				githubClientID := sql.NullString{}
+				githubClientSecret := new(crypto.CryptoValue)
+				githubScopes := database.StringArray{}
+
+				githubEnterpriseID := sql.NullString{}
+				githubEnterpriseClientID := sql.NullString{}
+				githubEnterpriseClientSecret := new(crypto.CryptoValue)
+				githubEnterpriseAuthorizationEndpoint := sql.NullString{}
+				githubEnterpriseTokenEndpoint := sql.NullString{}
+				githubEnterpriseUserEndpoint := sql.NullString{}
+				githubEnterpriseScopes := database.StringArray{}
 
 				googleID := sql.NullString{}
 				googleClientID := sql.NullString{}
@@ -920,6 +1093,19 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&jwtEndpoint,
 					&jwtKeysEndpoint,
 					&jwtHeaderName,
+					// github
+					&githubID,
+					&githubClientID,
+					&githubClientSecret,
+					&githubScopes,
+					// github enterprise
+					&githubEnterpriseID,
+					&githubEnterpriseClientID,
+					&githubEnterpriseClientSecret,
+					&githubEnterpriseAuthorizationEndpoint,
+					&githubEnterpriseTokenEndpoint,
+					&githubEnterpriseUserEndpoint,
+					&githubEnterpriseScopes,
 					// google
 					&googleID,
 					&googleClientID,
@@ -985,6 +1171,25 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						KeysEndpoint: jwtKeysEndpoint.String,
 						HeaderName:   jwtHeaderName.String,
 						Endpoint:     jwtEndpoint.String,
+					}
+				}
+				if githubID.Valid {
+					idpTemplate.GitHubIDPTemplate = &GitHubIDPTemplate{
+						IDPID:        githubID.String,
+						ClientID:     githubClientID.String,
+						ClientSecret: githubClientSecret,
+						Scopes:       githubScopes,
+					}
+				}
+				if githubEnterpriseID.Valid {
+					idpTemplate.GitHubEnterpriseIDPTemplate = &GitHubEnterpriseIDPTemplate{
+						IDPID:                 githubEnterpriseID.String,
+						ClientID:              githubEnterpriseClientID.String,
+						ClientSecret:          githubEnterpriseClientSecret,
+						AuthorizationEndpoint: githubEnterpriseAuthorizationEndpoint.String,
+						TokenEndpoint:         githubEnterpriseTokenEndpoint.String,
+						UserEndpoint:          githubEnterpriseUserEndpoint.String,
+						Scopes:                githubEnterpriseScopes,
 					}
 				}
 				if googleID.Valid {
