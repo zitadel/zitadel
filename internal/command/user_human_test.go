@@ -3503,7 +3503,7 @@ func TestAddHumanCommand(t *testing.T) {
 				},
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument"),
+				ValidationErr: errors.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid"),
 			},
 		},
 		{

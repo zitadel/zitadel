@@ -21,7 +21,7 @@ func (e EmailAddress) Validate() error {
 		return errors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty")
 	}
 	if !emailRegex.MatchString(string(e)) {
-		return errors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Invalid")
+		return errors.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid")
 	}
 	return nil
 }
