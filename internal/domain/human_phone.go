@@ -28,7 +28,7 @@ type PhoneCode struct {
 	Expiry time.Duration
 }
 
-func (p *Phone) IsValid() error {
+func (p *Phone) Validate() error {
 	if p == nil || p.PhoneNumber == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "PHONE-YlbwO", "Errors.User.Phone.Empty")
 	}

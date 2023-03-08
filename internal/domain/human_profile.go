@@ -20,7 +20,7 @@ type Profile struct {
 	LoginNames         []string
 }
 
-func (p *Profile) IsValid() error {
+func (p *Profile) Validate() error {
 	if p == nil {
 		return errors.ThrowInvalidArgument(nil, "PROFILE-GPY3p", "Errors.User.Profile.Empty")
 	}

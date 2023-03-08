@@ -12,7 +12,7 @@ func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profi
 	if profile.AggregateID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-AwbEB", "Errors.User.Profile.IDMissing")
 	}
-	if err := profile.IsValid(); err != nil {
+	if err := profile.Validate(); err != nil {
 		return nil, err
 	}
 	existingProfile, err := c.profileWriteModelByID(ctx, profile.AggregateID, profile.ResourceOwner)

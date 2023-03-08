@@ -44,7 +44,7 @@ type EmailCode struct {
 	Expiry time.Duration
 }
 
-func (e *Email) IsValid() error {
+func (e *Email) Validate() error {
 	if e == nil {
 		return errors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty")
 	}

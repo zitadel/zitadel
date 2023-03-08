@@ -14,7 +14,7 @@ import (
 )
 
 func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, resourceOwner string, phoneCodeGenerator crypto.Generator) (*domain.Phone, error) {
-	if err := phone.IsValid(); err != nil {
+	if err := phone.Validate(); err != nil {
 		return nil, err
 	}
 	existingPhone, err := c.phoneWriteModelByID(ctx, phone.AggregateID, resourceOwner)

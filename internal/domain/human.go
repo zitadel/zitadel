@@ -61,18 +61,18 @@ func (f Gender) Specified() bool {
 	return f > GenderUnspecified && f < genderCount
 }
 
-func (u *Human) IsValid() error {
+func (u *Human) Validate() error {
 	if u.Username == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Username.Empty")
 	}
-	if err := u.Profile.IsValid(); err != nil {
+	if err := u.Profile.Validate(); err != nil {
 		return err
 	}
-	if err := u.Email.IsValid(); err != nil {
+	if err := u.Email.Validate(); err != nil {
 		return err
 	}
 	if u.Phone != nil && u.Phone.PhoneNumber != "" {
-		if err := u.Phone.IsValid(); err != nil {
+		if err := u.Phone.Validate(); err != nil {
 			return err
 		}
 	}
