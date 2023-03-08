@@ -135,6 +135,14 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 	var provider idp.Provider
+	params := []any{authReq.AgentID}
+	if authReq.LoginHint != "" {
+		params = append(params, rp.AuthURLOpt(
+			func() []oauth2.AuthCodeOption {
+				return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("login_hint", authReq.LoginHint)}
+			},
+		))
+	}
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
@@ -162,7 +170,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	session, err := provider.BeginAuth(r.Context(), authReq.ID, authReq.AgentID)
+	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
