@@ -431,6 +431,7 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 			TokenEndpoint:         template.TokenEndpoint,
 			UserEndpoint:          template.UserEndpoint,
 			Scopes:                template.Scopes,
+			IdAttribute:           template.IDAttribute,
 		},
 	}
 }
