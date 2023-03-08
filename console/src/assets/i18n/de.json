@@ -1930,7 +1930,7 @@
         "DESCRIPTION": "SAML Applikationen"
       },
       "CONFIGSECTION": "SAML Konfiguration",
-      "URL": "Url des Metadaten Files",
+      "URL": "Url der Metadaten-Datei",
       "OR": "oder",
       "XML": "Metadaten XML hochladen",
       "METADATA": "Metadaten",
