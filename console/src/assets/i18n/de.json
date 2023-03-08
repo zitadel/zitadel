@@ -251,7 +251,7 @@
       "IDP": "Identitätsanbieter",
       "SECURITY": "Passwort und Sicherheit",
       "KEYS": "Schlüssel",
-      "PAT": "Persönliche Zugriffstoken",
+      "PAT": "Personal Access Tokens",
       "USERGRANTS": "Berechtigungen",
       "MEMBERSHIPS": "Mitgliedschaften",
       "METADATA": "Metadaten"
