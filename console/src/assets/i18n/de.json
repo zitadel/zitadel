@@ -315,7 +315,7 @@
       "CREATIONDATE": "Erstelldatum",
       "TYPES": {
         "HUMAN": "Benutzer",
-        "MACHINE": "Dienstbenutzer"
+        "MACHINE": "Service User"
       },
       "FILTER": {
         "0": "Nach Anzeigename filtern",
