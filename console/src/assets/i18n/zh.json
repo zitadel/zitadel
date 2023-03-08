@@ -612,7 +612,7 @@
     "SIGNEDOUT_BTN": "登录",
     "EDITACCOUNT": "编辑账户",
     "ADDACCOUNT": "登录其他账户",
-    "RESENDINITIALEMAIL": "重新发送初始邮件",
+    "RESENDINITIALEMAIL": "重新发送激活邮件",
     "RESENDEMAILNOTIFICATION": "重新发送电子邮件通知",
     "TOAST": {
       "CREATED": "用户创建成功。",

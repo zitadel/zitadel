@@ -612,7 +612,7 @@
     "SIGNEDOUT_BTN": "Zaloguj się",
     "EDITACCOUNT": "Edytuj konto",
     "ADDACCOUNT": "Zaloguj się z innym kontem",
-    "RESENDINITIALEMAIL": "Wyślij ponownie pocztę początkową",
+    "RESENDINITIALEMAIL": "Wyślij ponownie wiadomość aktywacyjną",
     "RESENDEMAILNOTIFICATION": "Wyślij ponownie powiadomienie e-mailem",
     "TOAST": {
       "CREATED": "Użytkownik został utworzony pomyślnie.",
