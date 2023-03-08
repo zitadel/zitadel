@@ -50,6 +50,7 @@ func (wm *OAuthIDPWriteModel) reduceAddedEvent(e *idp.OAuthIDPAddedEvent) {
 	wm.UserEndpoint = e.UserEndpoint
 	wm.Scopes = e.Scopes
 	wm.IDAttribute = e.IDAttribute
+	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
 
@@ -412,6 +413,206 @@ func (wm *JWTIDPWriteModel) reduceJWTConfigChangedEvent(e *idpconfig.JWTConfigCh
 	}
 }
 
+type GitHubIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	Name         string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *GitHubIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GitHubIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.GitHubIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GitHubIDPWriteModel) reduceAddedEvent(e *idp.GitHubIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *GitHubIDPWriteModel) reduceChangedEvent(e *idp.GitHubIDPChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GitHubIDPWriteModel) NewChanges(
+	name,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) ([]idp.GitHubIDPChanges, error) {
+	changes := make([]idp.GitHubIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeGitHubClientSecret(clientSecret))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeGitHubName(name))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeGitHubClientID(clientID))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeGitHubScopes(scopes))
+	}
+
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeGitHubOptions(opts))
+	}
+	return changes, nil
+}
+
+type GitHubEnterpriseIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID                    string
+	Name                  string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	AuthorizationEndpoint string
+	TokenEndpoint         string
+	UserEndpoint          string
+	Scopes                []string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *GitHubEnterpriseIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GitHubEnterpriseIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.GitHubEnterpriseIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GitHubEnterpriseIDPWriteModel) reduceAddedEvent(e *idp.GitHubEnterpriseIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.AuthorizationEndpoint = e.AuthorizationEndpoint
+	wm.TokenEndpoint = e.TokenEndpoint
+	wm.UserEndpoint = e.UserEndpoint
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *GitHubEnterpriseIDPWriteModel) reduceChangedEvent(e *idp.GitHubEnterpriseIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.AuthorizationEndpoint != nil {
+		wm.AuthorizationEndpoint = *e.AuthorizationEndpoint
+	}
+	if e.TokenEndpoint != nil {
+		wm.TokenEndpoint = *e.TokenEndpoint
+	}
+	if e.UserEndpoint != nil {
+		wm.UserEndpoint = *e.UserEndpoint
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GitHubEnterpriseIDPWriteModel) NewChanges(
+	name,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	authorizationEndpoint,
+	tokenEndpoint,
+	userEndpoint string,
+	scopes []string,
+	options idp.Options,
+) ([]idp.GitHubEnterpriseIDPChanges, error) {
+	changes := make([]idp.GitHubEnterpriseIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeGitHubEnterpriseClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeGitHubEnterpriseClientID(clientID))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeGitHubEnterpriseName(name))
+	}
+	if wm.AuthorizationEndpoint != authorizationEndpoint {
+		changes = append(changes, idp.ChangeGitHubEnterpriseAuthorizationEndpoint(authorizationEndpoint))
+	}
+	if wm.TokenEndpoint != tokenEndpoint {
+		changes = append(changes, idp.ChangeGitHubEnterpriseTokenEndpoint(tokenEndpoint))
+	}
+	if wm.UserEndpoint != userEndpoint {
+		changes = append(changes, idp.ChangeGitHubEnterpriseUserEndpoint(userEndpoint))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeGitHubEnterpriseScopes(scopes))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeGitHubEnterpriseOptions(opts))
+	}
+	return changes, nil
+}
+
 type GoogleIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -665,6 +866,10 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 		case *idp.OIDCIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.JWTIDPAddedEvent:
+			wm.reduceAdded(e.ID)
+		case *idp.GitHubIDPAddedEvent:
+			wm.reduceAdded(e.ID)
+		case *idp.GitHubEnterpriseIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.GoogleIDPAddedEvent:
 			wm.reduceAdded(e.ID)
