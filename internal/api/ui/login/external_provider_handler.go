@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -141,12 +142,14 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.oidcProvider(r.Context(), identityProvider)
 	case domain.IDPTypeJWT:
 		provider, err = l.jwtProvider(identityProvider)
+	case domain.IDPTypeGitHub:
+		provider, err = l.githubProvider(r.Context(), identityProvider)
+	case domain.IDPTypeGitHubEnterprise:
+		provider, err = l.githubEnterpriseProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 	case domain.IDPTypeLDAP,
 		domain.IDPTypeAzureAD,
-		domain.IDPTypeGitHub,
-		domain.IDPTypeGitHubEE,
 		domain.IDPTypeGitLab,
 		domain.IDPTypeGitLabSelfHosted,
 		domain.IDPTypeUnspecified:
@@ -204,6 +207,20 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
+	case domain.IDPTypeGitHub:
+		provider, err = l.githubProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+	case domain.IDPTypeGitHubEnterprise:
+		provider, err = l.githubEnterpriseProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -214,8 +231,6 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeAzureAD,
-		domain.IDPTypeGitHub,
-		domain.IDPTypeGitHubEE,
 		domain.IDPTypeGitLab,
 		domain.IDPTypeGitLabSelfHosted,
 		domain.IDPTypeUnspecified:
@@ -630,6 +645,36 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+	)
+}
+
+func (l *Login) githubProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*github.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.GitHubIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return github.New(
+		identityProvider.GitHubIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.GitHubIDPTemplate.Scopes,
+	)
+}
+
+func (l *Login) githubEnterpriseProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*github.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.GitHubIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return github.NewCustomURL(
+		identityProvider.Name,
+		identityProvider.GitHubIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.GitHubEnterpriseIDPTemplate.AuthorizationEndpoint,
+		identityProvider.GitHubEnterpriseIDPTemplate.TokenEndpoint,
+		identityProvider.GitHubEnterpriseIDPTemplate.UserEndpoint,
+		identityProvider.GitHubIDPTemplate.Scopes,
 	)
 }
 
