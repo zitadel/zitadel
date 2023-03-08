@@ -1626,8 +1626,12 @@
         "DESCRIPTION": "输入你的JWT供应商所需的数据。"
       },
       "GOOGLE": {
-        "TITLE": "谷歌供应商",
-        "DESCRIPTION": "输入你的谷歌身份提供者的凭证"
+        "TITLE": "Google 身份提供者",
+        "DESCRIPTION": "输入您的 Google 身份提供商的凭据"
+      },
+      "GITHUB": {
+        "TITLE": "Github 身份提供者",
+        "DESCRIPTION": "输入您的 Github 身份提供商的凭据"
       }
     },
     "DETAIL": {

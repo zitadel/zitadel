@@ -6,15 +6,15 @@ import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import {
-  AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
+  AddGitHubProviderRequest as AdminAddGithubProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
-  UpdateGoogleProviderRequest as AdminUpdateGoogleProviderRequest,
+  UpdateGitHubProviderRequest as AdminUpdateGithubProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  AddGoogleProviderRequest as MgmtAddGoogleProviderRequest,
+  AddGitHubProviderRequest as MgmtAddGithubProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
-  UpdateGoogleProviderRequest as MgmtUpdateGoogleProviderRequest,
+  UpdateGitHubProviderRequest as MgmtUpdateGithubProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -104,8 +104,8 @@ export class ProviderGithubComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        if (this.provider?.config?.google) {
-          this.form.patchValue(this.provider.config.google);
+        if (this.provider?.config?.github) {
+          this.form.patchValue(this.provider.config.github);
           this.name?.setValue(this.provider.name);
         }
       })
@@ -116,12 +116,12 @@ export class ProviderGithubComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGoogleProvider() : this.addGoogleProvider();
+    this.provider ? this.updateGithubProvider() : this.addGithubProvider();
   }
 
-  public addGoogleProvider(): void {
+  public addGithubProvider(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGoogleProviderRequest();
+      const req = new MgmtAddGithubProviderRequest();
 
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
@@ -131,7 +131,7 @@ export class ProviderGithubComponent {
 
       this.loading = true;
       (this.service as ManagementService)
-        .addGoogleProvider(req)
+        .addGitHubProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -143,7 +143,7 @@ export class ProviderGithubComponent {
           this.loading = false;
         });
     } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGoogleProviderRequest();
+      const req = new AdminAddGithubProviderRequest();
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
@@ -152,7 +152,7 @@ export class ProviderGithubComponent {
 
       this.loading = true;
       (this.service as AdminService)
-        .addGoogleProvider(req)
+        .addGitHubProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -166,10 +166,10 @@ export class ProviderGithubComponent {
     }
   }
 
-  public updateGoogleProvider(): void {
+  public updateGithubProvider(): void {
     if (this.provider) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGoogleProviderRequest();
+        const req = new MgmtUpdateGithubProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
@@ -182,7 +182,7 @@ export class ProviderGithubComponent {
 
         this.loading = true;
         (this.service as ManagementService)
-          .updateGoogleProvider(req)
+          .updateGitHubProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
@@ -194,7 +194,7 @@ export class ProviderGithubComponent {
             this.loading = false;
           });
       } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGoogleProviderRequest();
+        const req = new AdminUpdateGithubProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
@@ -207,7 +207,7 @@ export class ProviderGithubComponent {
 
         this.loading = true;
         (this.service as AdminService)
-          .updateGoogleProvider(req)
+          .updateGitHubProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;

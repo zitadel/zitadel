@@ -1629,6 +1629,10 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Google-Identitätsprovider ein."
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Github-Identitätsprovider ein."
       }
     },
     "DETAIL": {

@@ -2,72 +2,84 @@
   font-size: 14px;
 }
 
-.google-create-content {
-  .title-row {
-    display: flex;
-    align-items: center;
+@mixin provider-github-theme($theme) {
+  $is-dark-theme: map-get($theme, is-dark);
 
-    .idp-logo {
-      height: 36px;
-      width: 36px;
-      margin-right: 1rem;
-      flex-shrink: 0;
-    }
+  .github-create-content {
+    .title-row {
+      display: flex;
+      align-items: center;
 
-    h1 {
-      margin: 0 1rem 0 0;
-    }
-  }
+      .idp-logo {
+        height: 36px;
+        width: 36px;
+        margin-right: 1rem;
+        flex-shrink: 0;
 
-  .formfield {
-    display: block;
-    max-width: 400px;
-
-    .name-hint {
-      font-size: 12px;
-    }
-
-    .mat-chip-input {
-      width: 100%;
-      margin: 0;
-    }
-
-    .chip {
-      border-radius: 0.5rem;
-      height: 40px;
-    }
-
-    @media only screen and (max-width: 450px) {
-      max-width: none;
-    }
-  }
-
-  .google-content {
-    .desc {
-      margin-bottom: 1rem;
-    }
-
-    .idp-scopes {
-      padding-bottom: 0.5rem;
-
-      .flex-line {
-        display: flex;
-        align-items: flex-start;
-        max-width: 400px;
-
-        .formfield {
-          flex: 1;
+        &.dark {
+          display: if($is-dark-theme, block, none);
         }
 
-        .scope-add-button {
-          margin-top: 1.75rem;
+        &.light {
+          display: if($is-dark-theme, none, block);
+        }
+      }
+
+      h1 {
+        margin: 0 1rem 0 0;
+      }
+    }
+
+    .formfield {
+      display: block;
+      max-width: 400px;
+
+      .name-hint {
+        font-size: 12px;
+      }
+
+      .mat-chip-input {
+        width: 100%;
+        margin: 0;
+      }
+
+      .chip {
+        border-radius: 0.5rem;
+        height: 40px;
+      }
+
+      @media only screen and (max-width: 450px) {
+        max-width: none;
+      }
+    }
+
+    .github-content {
+      .desc {
+        margin-bottom: 1rem;
+      }
+
+      .idp-scopes {
+        padding-bottom: 0.5rem;
+
+        .flex-line {
+          display: flex;
+          align-items: flex-start;
+          max-width: 400px;
+
+          .formfield {
+            flex: 1;
+          }
+
+          .scope-add-button {
+            margin-top: 1.75rem;
+          }
         }
       }
     }
   }
 }
 
-.google-create-actions {
+.github-create-actions {
   display: flex;
   margin-top: 1rem;
 
