@@ -65,15 +65,11 @@ func (u *Human) IsValid() error {
 	if u.Username == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Username.Empty")
 	}
-	if u.Profile != nil {
-		if err := u.Profile.IsValid(); err != nil {
-			return err
-		}
+	if err := u.Profile.IsValid(); err != nil {
+		return err
 	}
-	if u.Email != nil {
-		if err := u.Email.IsValid(); err != nil {
-			return err
-		}
+	if err := u.Email.IsValid(); err != nil {
+		return err
 	}
 	if u.Phone != nil && u.Phone.PhoneNumber != "" {
 		if err := u.Phone.IsValid(); err != nil {
