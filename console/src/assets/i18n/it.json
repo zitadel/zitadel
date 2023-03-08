@@ -1120,7 +1120,7 @@
       "PASSWORDCHANGE": "Cambiamento della password"
     },
     "PRIVATELABELING": {
-      "TITLE": "Marchio",
+      "TITLE": "Branding",
       "DESCRIPTION": "Dai al login il tuo stile personalizzato e modifica il suo comportamento.",
       "PREVIEW_DESCRIPTION": "Le impostazioni saranno automaticamente disponibili al preview environment.",
       "BTN": "Seleziona File",
