@@ -673,7 +673,7 @@
         "CHOOSEDATEAFTER": "Geben Sie ein valides Ablaufdatum an. Ab"
       },
       "ADDED": {
-        "TITLE": "Persönliches Zugriffstoken",
+        "TITLE": "Personal Access Token",
         "DESCRIPTION": "Kopieren Sie Ihr Access Token. Sie werden später nicht mehr darauf zugreifen können."
       },
       "DELETE": {
