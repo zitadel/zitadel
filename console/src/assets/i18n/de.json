@@ -803,7 +803,7 @@
       "DELETESUCCESS": "Gescheiterte Events entfernt."
     },
     "EVENTS": {
-      "TITLE": "Veranstaltungen",
+      "TITLE": "Events",
       "DESCRIPTION": "Diese Ansicht zeigt alle vorhandenen Events.",
       "EDITOR": "Editor",
       "EDITORID": "Editor ID",
