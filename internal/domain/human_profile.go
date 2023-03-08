@@ -1,9 +1,9 @@
 package domain
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
