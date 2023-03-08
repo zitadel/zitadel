@@ -13,14 +13,21 @@ This trigger is called before userinfo are set in the token or response.
 - `ctx`  
   The first parameter contains the following fields:
   - `v1`
+    - `claims` [*Claims*](./objects#claims)
+    - `getUser()` [*User*](./objects#user)
     - `user`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
+    - `grants` [*UserGrantList*](./objects#user-grant-list)
 - `api`  
   The second parameter contains the following fields:
   - `v1`
-    - `userinfo`
+    - `userinfo`  
+      This function is deprecated, please use `api.v1.claims`
       - `setClaim(string, Any)`  
-        Key of the claim and any value
+        Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:${action.name}:log`
+    - `claims`
+      - `setClaim(string, Any)`  
+        Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:${action.name}:log`
     - `user`
       - `setMetadata(string, Any)`  
         Key of the metadata and any value
@@ -34,14 +41,17 @@ This trigger is called before the claims are set in the access token and the tok
 - `ctx`  
   The first parameter contains the following fields:
   - `v1`
+    - `claims` [*Claims*](./objects#claims)
+    - `getUser()` [*User*](./objects#user)
     - `user`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
+    - `grants` [*UserGrantList*](./objects#user-grant-list)
 - `api`  
   The second parameter contains the following fields:
   - `v1`
     - `claims`
       - `setClaim(string, Any)`  
-        Sets any value if the key is not already present
+        Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:${action.name}:log`
       - `appendLogIntoClaims(string)`  
         Appends the entry into the claim `urn:zitadel:action:{action.name}:log` the value of the claim is an Array of *string*
     - `user`
