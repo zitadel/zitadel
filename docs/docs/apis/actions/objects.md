@@ -167,3 +167,43 @@ This object is based on the Golang struct [http.Request](https://pkg.go.dev/net/
 - `postForm` Map *string* of Array of *string*
 - `remoteAddr` *string*
 - `headers` Map *string* of Array of *string*
+
+## Claims
+
+This object represents [the claims](../openidoauth/claims) which will be written into the oidc token.
+
+- `sub` *string*
+- `name` *string*
+- `email` *string*
+- `locale` *string*
+- `given_name` *string*
+- `family_name` *string*
+- `preferred_username` *string*
+- `email_verified` *bool*
+- `updated_at` *Number*
+
+Additionally there could additional fields depending on the configuration of your [project](../../guides/manage/console/projects#role-settings) and your [application](../../guides/manage/console/applications#token-settings)
+
+## user grant list
+
+This object represents a list of user grant stored in ZITADEL.
+
+- `count` *Number*
+- `sequence` *Number*
+- `timestamp` *Date*
+- `grants` Array of
+  - `id` *string*
+  - `projectGrantId` *string*  
+    The id of the [project grant](../../concepts/usecases/saas#project-grant)
+  - `state` *Number*  
+    <ul><li>0: unspecified</li><li>1: active</li><li>2: inactive</li><li>3: removed</li></ul>
+  - `creationDate` *Date*
+  - `changeDate` *Date*
+  - `sequence` *Number*
+  - `userId` *string*
+  - `roles` Array of *string*
+  - `userResourceOwner` *string*
+  - `userGrantResourceOwner` *string*
+  - `userGrantResourceOwnerName` *string*
+  - `projectId` *string*
+  - `projectName` *string*
