@@ -328,6 +328,19 @@ Errors:
     Invalid: Invalid userdata
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
     NotAllowedToLink: User is not allowed to link with external login provider
+    Profile:
+      Empty: Profile is empty
+      FirstNameEmpty: First name in profile is empty
+      LastNameEmpty: Last name in profile is empty
+      IDMissing: Profile ID is missing
+    Email:
+      Empty: Email is empty
+      IDMissing: Email ID is missing
+    Phone:
+      Empty: Phone is empty
+      NotChanged: Phone not changed
+    Username:
+      Empty: Username is empty
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty

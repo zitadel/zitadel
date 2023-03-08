@@ -328,6 +328,19 @@ Errors:
     Invalid: Données utilisateur non valides
     DomainNotAllowedAsUsername: Le domaine est déjà réservé et ne peut pas être utilisé.
     NotAllowedToLink: L'utilisateur n'est pas autorisé à établir un lien avec un fournisseur de connexion externe
+    Profile:
+      Empty: Profil est vide
+      FirstNameEmpty: Le prénom dans le profil est vide
+      LastNameEmpty: Le nom de famille dans le profil est vide
+      IDMissing: Profil ID manquant
+    Email:
+      Empty: Email est vide
+      IDMissing: Email ID manquant
+    Phone:
+      Empty: Téléphone est vide
+      NotChanged: Téléphone n'a pas changé
+    Username:
+      Empty: Le nom d'utilisateur est vide
     Password:
       ConfirmationWrong: La confirmation du mot de passe est erronée
       Empty: Le mot de passe est vide

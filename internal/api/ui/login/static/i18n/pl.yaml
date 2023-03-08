@@ -328,6 +328,19 @@ Errors:
     Invalid: Nieprawidłowe dane użytkownika
     DomainNotAllowedAsUsername: Domena jest już zarezerwowana i nie może być użyta
     NotAllowedToLink: Użytkownik nie jest upoważniony do łączenia z zewnętrznym dostawcą logowania
+    Profile:
+      Empty: Profil jest pusty
+      FirstNameEmpty: Imię w profilu jest puste
+      LastNameEmpty: Nazwisko w profilu jest puste
+      IDMissing: Profil ID brakuje
+    Email:
+      Empty: Adres e-mail jest pusty
+      IDMissing: Adres e-mail ID brakuje
+    Phone:
+      Empty: Numer telefonu jest pusty
+      NotChanged: Numer telefonu nie zmieniony
+    Username:
+      Empty: Nazwa użytkownika jest pusty
     Password:
       ConfirmationWrong: Potwierdzenie hasła jest niepoprawne
       Empty: Hasło jest puste

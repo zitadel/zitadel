@@ -328,6 +328,19 @@ Errors:
     Invalid: 无效的用户数据
     DomainNotAllowedAsUsername: 域名已存在，但无法使用
     NotAllowedToLink: 不允许用户使用外部身份提供者注册
+    Profile:
+      Empty: 简介是空的
+      FirstNameEmpty: 简介中的名字是空的
+      LastNameEmpty: 简介中的姓氏是空的
+      IDMissing: 简介ID丢失
+    Email:
+      Empty: 电子邮件是空的
+      IDMissing: 电子邮件ID丢失
+    Phone:
+      Empty: 电话号码是空的
+      NotChanged: 电话号码没有改变
+    Username:
+      Empty: 用户名是空的
     Password:
       ConfirmationWrong: 密码不一致
       Empty: 密码为空
