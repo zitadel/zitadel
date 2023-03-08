@@ -18,13 +18,15 @@ import (
 )
 
 type UserGrant struct {
+	// ID represents the aggregate id (id of the user grant)
 	ID           string
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
 	Roles        database.StringArray
-	GrantID      string
-	State        domain.UserGrantState
+	// GrantID represents the project grant id
+	GrantID string
+	State   domain.UserGrantState
 
 	UserID             string
 	Username           string
