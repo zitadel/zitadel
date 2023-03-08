@@ -90,6 +90,7 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
+		ResourceOwner(authz.GetCtxData(ctx).OrgID).
 		AddQuery().
 		SequenceGreater(sequence).
 		AggregateTypes(user.AggregateType).

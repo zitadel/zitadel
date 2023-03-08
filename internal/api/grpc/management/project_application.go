@@ -56,6 +56,7 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
+		ResourceOwner(authz.GetCtxData(ctx).OrgID).
 		AddQuery().
 		SequenceGreater(sequence).
 		AggregateTypes(project.AggregateType).

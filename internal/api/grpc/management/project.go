@@ -73,6 +73,7 @@ func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListP
 		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
+		ResourceOwner(authz.GetCtxData(ctx).OrgID).
 		AddQuery().
 		SequenceGreater(sequence).
 		AggregateTypes(project.AggregateType).
@@ -153,6 +154,7 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
+		ResourceOwner(authz.GetCtxData(ctx).OrgID).
 		AddQuery().
 		SequenceGreater(sequence).
 		AggregateTypes(project.AggregateType).
