@@ -47,7 +47,7 @@ type Human struct {
 	AvatarKey         string
 	PreferredLanguage language.Tag
 	Gender            domain.Gender
-	Email             string
+	Email             domain.EmailAddress
 	IsEmailVerified   bool
 	Phone             string
 	IsPhoneVerified   bool
@@ -74,7 +74,7 @@ type Email struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	Sequence      uint64
-	Email         string
+	Email         domain.EmailAddress
 	IsVerified    bool
 }
 
@@ -847,7 +847,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 					AvatarKey:         avatarKey.String,
 					PreferredLanguage: language.Make(preferredLanguage.String),
 					Gender:            domain.Gender(gender.Int32),
-					Email:             email.String,
+					Email:             domain.EmailAddress(email.String),
 					IsEmailVerified:   isEmailVerified.Bool,
 					Phone:             phone.String,
 					IsPhoneVerified:   isPhoneVerified.Bool,
@@ -970,7 +970,7 @@ func prepareEmailQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				return nil, errors.ThrowPreconditionFailed(nil, "QUERY-pt7HY", "Errors.User.NotHuman")
 			}
 
-			e.Email = email.String
+			e.Email = domain.EmailAddress(email.String)
 			e.IsVerified = isEmailVerified.Bool
 
 			return e, nil
@@ -1318,7 +1318,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 						AvatarKey:         avatarKey.String,
 						PreferredLanguage: language.Make(preferredLanguage.String),
 						Gender:            domain.Gender(gender.Int32),
-						Email:             email.String,
+						Email:             domain.EmailAddress(email.String),
 						IsEmailVerified:   isEmailVerified.Bool,
 						Phone:             phone.String,
 						IsPhoneVerified:   isPhoneVerified.Bool,

@@ -2,6 +2,7 @@ package domain
 
 import (
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -10,13 +11,29 @@ import (
 )
 
 var (
-	EmailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
+
+type EmailAddress string
+
+func (e EmailAddress) Validate() error {
+	if e == "" {
+		return errors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty")
+	}
+	if !emailRegex.MatchString(string(e)) {
+		return errors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Invalid")
+	}
+	return nil
+}
+
+func (e EmailAddress) Normalize() EmailAddress {
+	return EmailAddress(strings.TrimSpace(string(e)))
+}
 
 type Email struct {
 	es_models.ObjectRoot
 
-	EmailAddress    string
+	EmailAddress    EmailAddress
 	IsEmailVerified bool
 }
 
@@ -28,13 +45,10 @@ type EmailCode struct {
 }
 
 func (e *Email) IsValid() error {
-	if e == nil || e.EmailAddress == "" {
+	if e == nil {
 		return errors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty")
 	}
-	if !EmailRegex.MatchString(e.EmailAddress) {
-		return errors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Invalid")
-	}
-	return nil
+	return e.EmailAddress.Validate()
 }
 
 func NewEmailCode(emailGenerator crypto.Generator) (*EmailCode, error) {

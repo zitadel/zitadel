@@ -268,7 +268,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			if user.Human == nil {
 				continue
 			}
-			userInfo.SetEmail(user.Human.Email, user.Human.IsEmailVerified)
+			userInfo.SetEmail(string(user.Human.Email), user.Human.IsEmailVerified)
 		case oidc.ScopeProfile:
 			userInfo.SetPreferredUsername(user.PreferredLoginName)
 			userInfo.SetUpdatedAt(user.ChangeDate)

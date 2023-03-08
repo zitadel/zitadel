@@ -208,7 +208,7 @@ func AddHumanUserRequestToAddHuman(req *mgmt_pb.AddHumanUserRequest) *command.Ad
 		NickName:    req.Profile.NickName,
 		DisplayName: req.Profile.DisplayName,
 		Email: command.Email{
-			Address:  req.Email.Email,
+			Address:  domain.EmailAddress(req.Email.Email),
 			Verified: req.Email.IsEmailVerified,
 		},
 		PreferredLanguage:      lang,
@@ -446,7 +446,7 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.ResendInitialMail(ctx, req.UserId, req.Email, authz.GetCtxData(ctx).OrgID, initCodeGenerator)
+	details, err := s.command.ResendInitialMail(ctx, req.UserId, domain.EmailAddress(req.Email), authz.GetCtxData(ctx).OrgID, initCodeGenerator)
 	if err != nil {
 		return nil, err
 	}

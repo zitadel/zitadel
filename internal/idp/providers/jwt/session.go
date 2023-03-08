@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/domain"
+
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -120,4 +122,8 @@ func (u *User) GetPreferredLanguage() language.Tag {
 
 func (u *User) GetAvatarURL() string {
 	return u.IDTokenClaims.GetPicture()
+}
+
+func (u *User) GetEmail() domain.EmailAddress {
+	return domain.EmailAddress(u.IDTokenClaims.GetEmail())
 }

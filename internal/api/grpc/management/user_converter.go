@@ -106,7 +106,7 @@ func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human
 		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
 	}
 	h.Email = &domain.Email{
-		EmailAddress:    req.Email.Email,
+		EmailAddress:    domain.EmailAddress(req.Email.Email),
 		IsEmailVerified: req.Email.IsEmailVerified,
 	}
 	if req.Phone != nil {
@@ -137,7 +137,7 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
 	}
 	human.Email = &domain.Email{
-		EmailAddress:    req.Email.Email,
+		EmailAddress:    domain.EmailAddress(req.Email.Email),
 		IsEmailVerified: req.Email.IsEmailVerified,
 	}
 	if req.Phone != nil {
@@ -199,7 +199,7 @@ func UpdateHumanEmailRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateHum
 			AggregateID:   req.UserId,
 			ResourceOwner: authz.GetCtxData(ctx).OrgID,
 		},
-		EmailAddress:    req.Email,
+		EmailAddress:    domain.EmailAddress(req.Email),
 		IsEmailVerified: req.IsEmailVerified,
 	}
 }

@@ -84,7 +84,7 @@ func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {
 		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-zSH7j", "Errors.Users.DomainPolicyNil")
 	}
 	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.Username == "" && u.Email != nil {
-		u.Username = u.EmailAddress
+		u.Username = string(u.EmailAddress)
 	}
 	return nil
 }

@@ -110,8 +110,8 @@ type humanCreationCommand interface {
 
 func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if !human.Email.Valid() {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument")
+		if err := human.Email.Validate(); err != nil {
+			return nil, err
 		}
 		if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument")
@@ -414,7 +414,7 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-JKefw", "Errors.User.Invalid")
 	}
 	if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
-		human.Username = human.EmailAddress
+		human.Username = string(human.EmailAddress)
 	}
 	if orgID == "" {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-hYsVH", "Errors.Org.Empty")
@@ -440,7 +440,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 		return nil, nil, err
 	}
 	human.Username = strings.TrimSpace(human.Username)
-	human.EmailAddress = strings.TrimSpace(human.EmailAddress)
+	human.EmailAddress = human.EmailAddress.Normalize()
 	if !domainPolicy.UserLoginMustBeDomain {
 		index := strings.LastIndex(human.Username, "@")
 		if index > 1 {

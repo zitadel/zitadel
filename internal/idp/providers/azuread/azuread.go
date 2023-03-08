@@ -3,6 +3,8 @@ package azuread
 import (
 	"fmt"
 
+	"github.com/zitadel/zitadel/internal/domain"
+
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
@@ -120,13 +122,13 @@ func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes [
 // AzureAD does not return an `email_verified` claim.
 // The verification can be automatically activated on the provider ([WithEmailVerified])
 type User struct {
-	Sub               string `json:"sub"`
-	FamilyName        string `json:"family_name"`
-	GivenName         string `json:"given_name"`
-	Name              string `json:"name"`
-	PreferredUsername string `json:"preferred_username"`
-	Email             string `json:"email"`
-	Picture           string `json:"picture"`
+	Sub               string              `json:"sub"`
+	FamilyName        string              `json:"family_name"`
+	GivenName         string              `json:"given_name"`
+	Name              string              `json:"name"`
+	PreferredUsername string              `json:"preferred_username"`
+	Email             domain.EmailAddress `json:"email"`
+	Picture           string              `json:"picture"`
 	isEmailVerified   bool
 }
 
@@ -162,7 +164,7 @@ func (u *User) GetPreferredUsername() string {
 }
 
 // GetEmail is an implementation of the [idp.User] interface.
-func (u *User) GetEmail() string {
+func (u *User) GetEmail() domain.EmailAddress {
 	return u.Email
 }
 

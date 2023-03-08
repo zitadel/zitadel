@@ -65,7 +65,7 @@ type ExternalUser struct {
 	FirstName         string
 	LastName          string
 	NickName          string
-	Email             string
+	Email             EmailAddress
 	IsEmailVerified   bool
 	PreferredLanguage language.Tag
 	Phone             string

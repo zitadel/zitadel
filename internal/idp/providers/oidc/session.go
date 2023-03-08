@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/zitadel/zitadel/internal/domain"
+
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
@@ -96,4 +98,8 @@ func (u *User) GetPreferredLanguage() language.Tag {
 
 func (u *User) GetAvatarURL() string {
 	return u.GetPicture()
+}
+
+func (u *User) GetEmail() domain.EmailAddress {
+	return domain.EmailAddress(u.UserInfo.GetEmail())
 }

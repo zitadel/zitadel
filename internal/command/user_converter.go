@@ -22,7 +22,7 @@ func writeModelToHuman(wm *HumanWriteModel) *domain.Human {
 			Gender:            wm.Gender,
 		},
 		Email: &domain.Email{
-			EmailAddress:    wm.Email,
+			EmailAddress:    domain.EmailAddress(wm.Email),
 			IsEmailVerified: wm.IsEmailVerified,
 		},
 	}
@@ -58,7 +58,7 @@ func writeModelToProfile(wm *HumanProfileWriteModel) *domain.Profile {
 func writeModelToEmail(wm *HumanEmailWriteModel) *domain.Email {
 	return &domain.Email{
 		ObjectRoot:      writeModelToObjectRoot(wm.WriteModel),
-		EmailAddress:    wm.Email,
+		EmailAddress:    domain.EmailAddress(wm.Email),
 		IsEmailVerified: wm.IsEmailVerified,
 	}
 }

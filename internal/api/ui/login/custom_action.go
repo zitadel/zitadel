@@ -55,7 +55,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 		actions.SetFields("setPreferredUsername", func(username string) {
 			user.PreferredUsername = username
 		}),
-		actions.SetFields("setEmail", func(email string) {
+		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			user.Email = email
 		}),
 		actions.SetFields("setEmailVerified", func(verified bool) {
@@ -222,7 +222,7 @@ func (l *Login) runPreCreationActions(
 		actions.SetFields("setUsername", func(username string) {
 			user.Username = username
 		}),
-		actions.SetFields("setEmail", func(email string) {
+		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			if user.Email == nil {
 				user.Email = &domain.Email{}
 			}

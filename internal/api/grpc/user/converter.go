@@ -58,7 +58,7 @@ func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 			AvatarUrl:         domain.AvatarURL(assetPrefix, owner, view.AvatarKey),
 		},
 		Email: &user_pb.Email{
-			Email:           view.Email,
+			Email:           string(view.Email),
 			IsEmailVerified: view.IsEmailVerified,
 		},
 		Phone: &user_pb.Phone{
@@ -91,7 +91,7 @@ func ProfileToPb(profile *query.Profile, assetPrefix string) *user_pb.Profile {
 
 func EmailToPb(email *query.Email) *user_pb.Email {
 	return &user_pb.Email{
-		Email:           email.Email,
+		Email:           string(email.Email),
 		IsEmailVerified: email.IsVerified,
 	}
 }
@@ -105,7 +105,7 @@ func PhoneToPb(phone *query.Phone) *user_pb.Phone {
 
 func ModelEmailToPb(email *query.Email) *user_pb.Email {
 	return &user_pb.Email{
-		Email:           email.Email,
+		Email:           string(email.Email),
 		IsEmailVerified: email.IsVerified,
 	}
 }

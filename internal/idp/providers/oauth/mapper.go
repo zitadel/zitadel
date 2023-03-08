@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/zitadel/zitadel/internal/domain"
+
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/idp"
@@ -74,7 +76,7 @@ func (u *UserMapper) GetPreferredUsername() string {
 }
 
 // GetEmail is an implementation of the [idp.User] interface.
-func (u *UserMapper) GetEmail() string {
+func (u *UserMapper) GetEmail() domain.EmailAddress {
 	return ""
 }
 

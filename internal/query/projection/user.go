@@ -786,7 +786,7 @@ func (p *userProjection) reduceHumanEmailChanged(event eventstore.Event) (*handl
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(NotifyLastEmailCol, &sql.NullString{String: e.EmailAddress, Valid: e.EmailAddress != ""}),
+				handler.NewCol(NotifyLastEmailCol, &sql.NullString{String: string(e.EmailAddress), Valid: e.EmailAddress != "" /* TODO: e.EmailAddress.Validate() == nil */}),
 			},
 			[]handler.Condition{
 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),

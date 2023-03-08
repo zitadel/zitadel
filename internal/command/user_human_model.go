@@ -22,7 +22,7 @@ type HumanWriteModel struct {
 	Gender            domain.Gender
 	Avatar            string
 
-	Email           string
+	Email           domain.EmailAddress
 	IsEmailVerified bool
 
 	Phone           string

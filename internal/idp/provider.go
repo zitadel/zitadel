@@ -3,6 +3,8 @@ package idp
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/domain"
+
 	"golang.org/x/text/language"
 )
 
@@ -24,7 +26,7 @@ type User interface {
 	GetDisplayName() string
 	GetNickname() string
 	GetPreferredUsername() string
-	GetEmail() string
+	GetEmail() domain.EmailAddress
 	IsEmailVerified() bool
 	GetPhone() string
 	IsPhoneVerified() bool

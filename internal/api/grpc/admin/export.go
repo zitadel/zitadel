@@ -564,7 +564,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			}
 			if user.Human.Email != "" {
 				dataUser.User.Email = &management_pb.ImportHumanUserRequest_Email{
-					Email:           user.Human.Email,
+					Email:           string(user.Human.Email),
 					IsEmailVerified: user.Human.IsEmailVerified,
 				}
 			}

@@ -38,7 +38,7 @@ type HumanAddedEvent struct {
 	PreferredLanguage language.Tag  `json:"preferredLanguage,omitempty"`
 	Gender            domain.Gender `json:"gender,omitempty"`
 
-	EmailAddress string `json:"email,omitempty"`
+	EmailAddress domain.EmailAddress `json:"email,omitempty"`
 
 	PhoneNumber string `json:"phone,omitempty"`
 
@@ -99,7 +99,7 @@ func NewHumanAddedEvent(
 	displayName string,
 	preferredLanguage language.Tag,
 	gender domain.Gender,
-	emailAddress string,
+	emailAddress domain.EmailAddress,
 	userLoginMustBeDomain bool,
 ) *HumanAddedEvent {
 	return &HumanAddedEvent{
@@ -145,7 +145,7 @@ type HumanRegisteredEvent struct {
 	PreferredLanguage language.Tag  `json:"preferredLanguage,omitempty"`
 	Gender            domain.Gender `json:"gender,omitempty"`
 
-	EmailAddress string `json:"email,omitempty"`
+	EmailAddress domain.EmailAddress `json:"email,omitempty"`
 
 	PhoneNumber string `json:"phone,omitempty"`
 
@@ -206,7 +206,7 @@ func NewHumanRegisteredEvent(
 	displayName string,
 	preferredLanguage language.Tag,
 	gender domain.Gender,
-	emailAddress string,
+	emailAddress domain.EmailAddress,
 	userLoginMustBeDomain bool,
 ) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{
