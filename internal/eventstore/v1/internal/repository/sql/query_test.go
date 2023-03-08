@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
 	"reflect"
 	"testing"
@@ -435,7 +436,7 @@ func Test_buildQuery(t *testing.T) {
 				queryFactory: es_models.NewSearchQueryFactory().OrderDesc().AddQuery().AggregateTypes("user").Factory(),
 			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE ( aggregate_type = $1 ) ORDER BY event_sequence DESC",
+				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events AS OF SYSTEM TIME '-1 ms'  WHERE ( aggregate_type = $1 ) ORDER BY event_sequence DESC",
 				rowScanner: true,
 				values:     []interface{}{es_models.AggregateType("user")},
 			},
@@ -446,7 +447,7 @@ func Test_buildQuery(t *testing.T) {
 				queryFactory: es_models.NewSearchQueryFactory().Limit(5).AddQuery().AggregateTypes("user").Factory(),
 			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE ( aggregate_type = $1 ) ORDER BY event_sequence LIMIT $2",
+				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events AS OF SYSTEM TIME '-1 ms'  WHERE ( aggregate_type = $1 ) ORDER BY event_sequence LIMIT $2",
 				rowScanner: true,
 				values:     []interface{}{es_models.AggregateType("user"), uint64(5)},
 				limit:      5,
@@ -458,7 +459,7 @@ func Test_buildQuery(t *testing.T) {
 				queryFactory: es_models.NewSearchQueryFactory().Limit(5).OrderDesc().AddQuery().AggregateTypes("user").Factory(),
 			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE ( aggregate_type = $1 ) ORDER BY event_sequence DESC LIMIT $2",
+				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events AS OF SYSTEM TIME '-1 ms'  WHERE ( aggregate_type = $1 ) ORDER BY event_sequence DESC LIMIT $2",
 				rowScanner: true,
 				values:     []interface{}{es_models.AggregateType("user"), uint64(5)},
 				limit:      5,
@@ -466,8 +467,10 @@ func Test_buildQuery(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		ctx := context.Background()
+		db := new(testDB)
 		t.Run(tt.name, func(t *testing.T) {
-			gotQuery, gotLimit, gotValues, gotRowScanner := buildQuery(tt.args.queryFactory)
+			gotQuery, gotLimit, gotValues, gotRowScanner := buildQuery(ctx, db, tt.args.queryFactory)
 			if gotQuery != tt.res.query {
 				t.Errorf("buildQuery() gotQuery = %v, want %v", gotQuery, tt.res.query)
 			}
@@ -489,3 +492,13 @@ func Test_buildQuery(t *testing.T) {
 		})
 	}
 }
+
+type testDB struct{}
+
+func (_ *testDB) Timetravel(time.Duration) string { return " AS OF SYSTEM TIME '-1 ms' " }
+
+func (*testDB) DatabaseName() string { return "db" }
+
+func (*testDB) Username() string { return "user" }
+
+func (*testDB) Type() string { return "type" }

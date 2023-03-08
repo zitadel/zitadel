@@ -421,11 +421,7 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyUserSessions(req, null).then((resp) => resp.toObject());
   }
 
-  public listMyUserGrants(
-    limit?: number,
-    offset?: number,
-    queryList?: ListQuery[],
-  ): Promise<ListMyUserGrantsResponse.AsObject> {
+  public listMyUserGrants(limit?: number, offset?: number, asc?: boolean): Promise<ListMyUserGrantsResponse.AsObject> {
     const req = new ListMyUserGrantsRequest();
     const query = new ListQuery();
     if (limit) {
@@ -433,6 +429,9 @@ export class GrpcAuthService {
     }
     if (offset) {
       query.setOffset(offset);
+    }
+    if (asc !== undefined) {
+      query.setAsc(asc);
     }
     req.setQuery(query);
     return this.grpcService.auth.listMyUserGrants(req, null).then((resp) => resp.toObject());

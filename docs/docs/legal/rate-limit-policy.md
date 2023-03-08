@@ -27,5 +27,5 @@ For ZITADEL Cloud, we have a rate limiting rule for login paths (login, register
 
 ## Load Testing
 
-If you would like to conduct load testing of ZITADEL Cloud or a managed instance, you MUST request to do so with a minimum of 2 weeks notice before the test by contacting us at support@zitadel.com.
+If you would like to conduct load testing of ZITADEL Cloud or a managed instance, you MUST request to do so with a minimum of 2 weeks notice before the test by contacting us at [support@zitadel.com](mailto:support@zitadel.com).
 You MUST NOT conduct load testing without prior approval by us. Without prior approval and setup there is a high risk of being flagged by our DDoS solution as malicious traffic. This can have a severe impact on your service quality or result in termination of your agreement.

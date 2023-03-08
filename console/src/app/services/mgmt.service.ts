@@ -3,9 +3,6 @@ import { SortDirection } from '@angular/material/sort';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
-
-import { FlowType, TriggerType } from '../proto/generated/zitadel/action_pb';
-import { RemoveLabelPolicyLogoDarkRequest } from '../proto/generated/zitadel/admin_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
@@ -32,10 +29,16 @@ import {
   AddCustomPasswordComplexityPolicyResponse,
   AddCustomPrivacyPolicyRequest,
   AddCustomPrivacyPolicyResponse,
+  AddGenericOIDCProviderRequest,
+  AddGenericOIDCProviderResponse,
+  AddGoogleProviderRequest,
+  AddGoogleProviderResponse,
   AddHumanUserRequest,
   AddHumanUserResponse,
   AddIDPToLoginPolicyRequest,
   AddIDPToLoginPolicyResponse,
+  AddJWTProviderRequest,
+  AddJWTProviderResponse,
   AddMachineKeyRequest,
   AddMachineKeyResponse,
   AddMachineUserRequest,
@@ -46,12 +49,8 @@ import {
   AddOIDCAppResponse,
   AddOrgDomainRequest,
   AddOrgDomainResponse,
-  AddOrgJWTIDPRequest,
-  AddOrgJWTIDPResponse,
   AddOrgMemberRequest,
   AddOrgMemberResponse,
-  AddOrgOIDCIDPRequest,
-  AddOrgOIDCIDPResponse,
   AddOrgRequest,
   AddOrgResponse,
   AddPersonalAccessTokenRequest,
@@ -98,6 +97,8 @@ import {
   DeactivateUserResponse,
   DeleteActionRequest,
   DeleteActionResponse,
+  DeleteProviderRequest,
+  DeleteProviderResponse,
   GenerateMachineSecretRequest,
   GenerateMachineSecretResponse,
   GenerateOrgDomainValidationRequest,
@@ -170,8 +171,6 @@ import {
   GetOIDCInformationResponse,
   GetOrgByDomainGlobalRequest,
   GetOrgByDomainGlobalResponse,
-  GetOrgIDPByIDRequest,
-  GetOrgIDPByIDResponse,
   GetPasswordAgePolicyRequest,
   GetPasswordAgePolicyResponse,
   GetPasswordComplexityPolicyRequest,
@@ -184,6 +183,8 @@ import {
   GetProjectByIDResponse,
   GetProjectGrantByIDRequest,
   GetProjectGrantByIDResponse,
+  GetProviderByIDRequest,
+  GetProviderByIDResponse,
   GetSupportedLanguagesRequest,
   GetSupportedLanguagesResponse,
   GetUserByIDRequest,
@@ -194,7 +195,6 @@ import {
   GetUserGrantByIDResponse,
   GetUserMetadataRequest,
   GetUserMetadataResponse,
-  IDPQuery,
   ListActionsRequest,
   ListActionsResponse,
   ListAppChangesRequest,
@@ -228,8 +228,6 @@ import {
   ListOrgChangesResponse,
   ListOrgDomainsRequest,
   ListOrgDomainsResponse,
-  ListOrgIDPsRequest,
-  ListOrgIDPsResponse,
   ListOrgMemberRolesRequest,
   ListOrgMemberRolesResponse,
   ListOrgMembersRequest,
@@ -256,6 +254,8 @@ import {
   ListProjectRolesResponse,
   ListProjectsRequest,
   ListProjectsResponse,
+  ListProvidersRequest,
+  ListProvidersResponse,
   ListUserChangesRequest,
   ListUserChangesResponse,
   ListUserGrantRequest,
@@ -427,22 +427,22 @@ import {
   UpdateCustomPasswordComplexityPolicyResponse,
   UpdateCustomPrivacyPolicyRequest,
   UpdateCustomPrivacyPolicyResponse,
+  UpdateGenericOIDCProviderRequest,
+  UpdateGenericOIDCProviderResponse,
+  UpdateGoogleProviderRequest,
+  UpdateGoogleProviderResponse,
   UpdateHumanEmailRequest,
   UpdateHumanEmailResponse,
   UpdateHumanPhoneRequest,
   UpdateHumanPhoneResponse,
   UpdateHumanProfileRequest,
   UpdateHumanProfileResponse,
+  UpdateJWTProviderRequest,
+  UpdateJWTProviderResponse,
   UpdateMachineRequest,
   UpdateMachineResponse,
   UpdateOIDCAppConfigRequest,
   UpdateOIDCAppConfigResponse,
-  UpdateOrgIDPJWTConfigRequest,
-  UpdateOrgIDPJWTConfigResponse,
-  UpdateOrgIDPOIDCConfigRequest,
-  UpdateOrgIDPOIDCConfigResponse,
-  UpdateOrgIDPRequest,
-  UpdateOrgIDPResponse,
   UpdateOrgMemberRequest,
   UpdateOrgMemberResponse,
   UpdateOrgRequest,
@@ -694,23 +694,6 @@ export class ManagementService {
       .then((resp) => resp.toObject());
   }
 
-  public listOrgIDPs(limit?: number, offset?: number, queryList?: IDPQuery[]): Promise<ListOrgIDPsResponse.AsObject> {
-    const req = new ListOrgIDPsRequest();
-    const query = new ListQuery();
-
-    if (limit) {
-      query.setLimit(limit);
-    }
-    if (offset) {
-      query.setOffset(offset);
-    }
-    req.setQuery(query);
-    if (queryList) {
-      req.setQueriesList(queryList);
-    }
-    return this.grpcService.mgmt.listOrgIDPs(req, null).then((resp) => resp.toObject());
-  }
-
   public updateUserName(userId: string, username: string): Promise<UpdateUserNameResponse.AsObject> {
     const req = new UpdateUserNameRequest();
     req.setUserId(userId);
@@ -850,24 +833,6 @@ export class ManagementService {
     return this.grpcService.mgmt.listLoginPolicyIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public getOrgIDPByID(id: string): Promise<GetOrgIDPByIDResponse.AsObject> {
-    const req = new GetOrgIDPByIDRequest();
-    req.setId(id);
-    return this.grpcService.mgmt.getOrgIDPByID(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateOrgIDP(req: UpdateOrgIDPRequest): Promise<UpdateOrgIDPResponse.AsObject> {
-    return this.grpcService.mgmt.updateOrgIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public addOrgOIDCIDP(req: AddOrgOIDCIDPRequest): Promise<AddOrgOIDCIDPResponse.AsObject> {
-    return this.grpcService.mgmt.addOrgOIDCIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateOrgIDPOIDCConfig(req: UpdateOrgIDPOIDCConfigRequest): Promise<UpdateOrgIDPOIDCConfigResponse.AsObject> {
-    return this.grpcService.mgmt.updateOrgIDPOIDCConfig(req, null).then((resp) => resp.toObject());
-  }
-
   public removeOrgIDP(idpId: string): Promise<RemoveOrgIDPResponse.AsObject> {
     const req = new RemoveOrgIDPRequest();
     req.setIdpId(idpId);
@@ -886,12 +851,44 @@ export class ManagementService {
     return this.grpcService.mgmt.reactivateOrgIDP(req, null).then((resp) => resp.toObject());
   }
 
-  public addOrgJWTIDP(req: AddOrgJWTIDPRequest): Promise<AddOrgJWTIDPResponse.AsObject> {
-    return this.grpcService.mgmt.addOrgJWTIDP(req, null).then((resp) => resp.toObject());
+  //   idp templates
+
+  public addGoogleProvider(req: AddGoogleProviderRequest): Promise<AddGoogleProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGoogleProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public updateOrgIDPJWTConfig(req: UpdateOrgIDPJWTConfigRequest): Promise<UpdateOrgIDPJWTConfigResponse.AsObject> {
-    return this.grpcService.mgmt.updateOrgIDPJWTConfig(req, null).then((resp) => resp.toObject());
+  public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOIDCProvider(
+    req: UpdateGenericOIDCProviderRequest,
+  ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addJWTProvider(req: AddJWTProviderRequest): Promise<AddJWTProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {
+    return this.grpcService.mgmt.deleteProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public listProviders(req: ListProvidersRequest): Promise<ListProvidersResponse.AsObject> {
+    return this.grpcService.mgmt.listProviders(req, null).then((resp) => resp.toObject());
+  }
+
+  public getProviderByID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse.AsObject> {
+    return this.grpcService.mgmt.getProviderByID(req, null).then((resp) => resp.toObject());
   }
 
   public addHumanUser(req: AddHumanUserRequest): Promise<AddHumanUserResponse.AsObject> {

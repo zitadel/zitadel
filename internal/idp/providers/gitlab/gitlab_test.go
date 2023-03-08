@@ -16,6 +16,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		opts         []oidc.ProviderOpts
 	}
 	tests := []struct {
@@ -29,9 +30,10 @@ func TestProvider_BeginAuth(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 			},
 			want: &oidc.Session{
-				AuthURL: "https://gitlab.com/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				AuthURL: "https://gitlab.com/oauth/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
 			},
 		},
 	}
@@ -40,7 +42,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.opts...)
+			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.opts...)
 			r.NoError(err)
 
 			session, err := provider.BeginAuth(context.Background(), "testState")

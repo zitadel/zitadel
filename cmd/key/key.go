@@ -128,5 +128,5 @@ func keyStorage(config database.Config, masterKey string) (crypto.KeyStorage, er
 	if err != nil {
 		return nil, err
 	}
-	return cryptoDB.NewKeyStorage(db, masterKey)
+	return cryptoDB.NewKeyStorage(db.DB, masterKey)
 }

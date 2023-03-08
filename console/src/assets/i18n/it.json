@@ -42,6 +42,41 @@
       "ADD": "Per aggiungere, tieni premuto e trascina il riquadro"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Your onboarding process",
+    "COMPLETED": "completed",
+    "DISMISS": "chiudi",
+    "CARD": {
+      "TITLE": "Fate funzionare il vostro ZITADEL",
+      "DESCRIPTION": "Questa lista di azioni aiuta a configurare la vostra istanza e vi guida attraverso i passaggi più essenziali."
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Imposta il tuo marchio",
+        "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone."
+      },
+      "instance.smtp.config.added": {
+        "title": "Configura le impostazioni SMTP",
+        "description": "Imposta il proprio server di posta"
+      },
+      "project.added": {
+        "title": "Crea il tuo primo progetto",
+        "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni."
+      },
+      "project.application.added": {
+        "title": "Crea la tua prima applicazione",
+        "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione."
+      },
+      "user.human.added": {
+        "title": "Aggiungi utenti",
+        "description": "Aggiungi gli utenti dell'applicazione"
+      },
+      "user.grant.added": {
+        "title": "Crea autorizzazioni per gli utenti",
+        "description": "Consenti agli utenti di accedere alla tua applicazione e imposta il loro ruolo."
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Impostazioni",
     "DASHBOARD": "Pagina iniziale",
@@ -121,6 +156,7 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     }
@@ -1580,14 +1616,37 @@
       "ACTIVETITLE": "Identity Providers"
     },
     "CREATE": {
-      "TITLE": "Nuovo IDP",
-      "DESCRIPTION": "Configura l'endpoint del tuo nuovo IDP."
+      "TITLE": "Aggiungi provider",
+      "DESCRIPTION": "Seleziona uno dei seguenti provider.",
+      "STEPPERTITLE": "Create Provider",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider OIDC."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Google provider."
+      }
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "Configurazione generale del tuo fornitore di identit\u00e0.",
+      "DESCRIPTION": "Aggiorna la configurazione del tuo provider",
       "DATECREATED": "Creato",
       "DATECHANGED": "Cambiato"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Creazione automatica",
+      "ISAUTOCREATION_DESC": "Se selezionato, verrà creato un account se non esiste ancora.",
+      "ISAUTOUPDATE": "Aggiornamento automatico",
+      "ISAUTOUPDATE_DESC": "Se selezionato, gli account vengono aggiornati alla riautenticazione.",
+      "ISCREATIONALLOWED": "Creazione consentita",
+      "ISCREATIONALLOWED_DESC": "Determina se i conti possono essere creati.",
+      "ISLINKINGALLOWED": "Collegamento consentito",
+      "ISLINKINGALLOWED_DESC": "Determina se un'identità può essere collegata a un account esistente."
     },
     "OWNERTYPES": {
       "0": "sconosciuto",
@@ -1603,18 +1662,10 @@
       "1": "attivo",
       "2": "inattivo"
     },
-    "MAPPINGFIELD": {
-      "1": "Nome utente preferito",
-      "2": "Email"
-    },
-    "STYLE": "Stile",
-    "STYLEFIELD": {
-      "0": "No Styling",
-      "1": "Google"
-    },
+    "NAMEHINT": "Se specificato, verrà mostrato nell'interfaccia di accesso.",
+    "OPTIONAL": "opzionale",
+    "UPDATECLIENTSECRET": "Aggiorna secret",
     "ADD": "Aggiungi Identity Provider",
-    "AUTOREGISTER": "Registrazione automatica",
-    "AUTOREGISTER_DESC": "Se \u00e8 selezionato e non esiste ancora un account, ne verr\u00e0 creato uno.",
     "TYPE": "Tipo",
     "OWNER": "Owner",
     "ID": "ID",
@@ -1718,7 +1769,7 @@
   "APP": {
     "LIST": "Applicazioni",
     "COMPLIANCE": "Conformità con OIDC",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "Configurazione",
     "TOKEN": "Impostazioni Token",
     "PAGES": {
@@ -1726,6 +1777,8 @@
       "ID": "ID",
       "DESCRIPTION": "Qui puoi modificare i dati della tua applicazione e la sua configurazione.",
       "CREATE": "Crea Applicazione",
+      "CREATE_SELECT_PROJECT": "Seleziona il tuo progetto",
+      "CREATE_NEW_PROJECT": "o crea uno nuovo <a href='{{url}}' title='Crea progetto'>qui</a>.",
       "CREATE_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",
       "CREATE_DESC_SUB": "Una configurazione raccomandata sar\u00e0 generata automaticamente.",
       "STATE": "Stato",

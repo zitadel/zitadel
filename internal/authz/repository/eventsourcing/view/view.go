@@ -1,8 +1,7 @@
 package view
 
 import (
-	"database/sql"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
 
@@ -15,7 +14,7 @@ type View struct {
 	idGenerator id.Generator
 }
 
-func StartView(sqlClient *sql.DB, idGenerator id.Generator, queries *query.Queries) (*View, error) {
+func StartView(sqlClient *database.DB, idGenerator id.Generator, queries *query.Queries) (*View, error) {
 	gorm, err := gorm.Open("postgres", sqlClient)
 	if err != nil {
 		return nil, err

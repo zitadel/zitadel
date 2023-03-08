@@ -95,6 +95,7 @@ message IDPLoginPolicyLink {
     ];
     IDPType idp_type = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"IDP_TYPE_OIDC\"]"
             description: "the authorization framework of the identity provider";
         }
     ];
@@ -263,7 +264,24 @@ message ProviderConfig {
     oneof config {
         LDAPConfig ldap = 2;
         GoogleConfig google = 3;
+        OAuthConfig oauth = 4;
+        GenericOIDCConfig oidc = 5;
+        JWTConfig jwt = 6;
     }
+}
+message OAuthConfig {
+    string client_id = 1;
+    string authorization_endpoint = 2;
+    string token_endpoint = 3;
+    string user_endpoint = 4;
+    repeated string scopes = 5;
+    string id_attribute = 6;
+}
+
+message GenericOIDCConfig {
+    string issuer = 1;
+    string client_id = 2;
+    repeated string scopes = 3;
 }
 
 message GoogleConfig {

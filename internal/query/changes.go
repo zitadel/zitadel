@@ -93,7 +93,7 @@ func (q *Queries) UserChanges(ctx context.Context, userID string, lastSequence u
 }
 
 func (q *Queries) changes(ctx context.Context, query func(query *eventstore.SearchQuery), lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
-	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(limit)
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(limit).AllowTimeTravel()
 	if !sortAscending {
 		builder.OrderDesc()
 	}
