@@ -61,7 +61,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 		actions.SetFields("setEmailVerified", func(verified bool) {
 			user.IsEmailVerified = verified
 		}),
-		actions.SetFields("setPhone", func(phone string) {
+		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			user.Phone = phone
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
@@ -234,11 +234,11 @@ func (l *Login) runPreCreationActions(
 			}
 			user.Email.IsEmailVerified = verified
 		}),
-		actions.SetFields("setPhone", func(email string) {
+		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			if user.Phone == nil {
 				user.Phone = &domain.Phone{}
 			}
-			user.Phone.PhoneNumber = email
+			user.Phone.PhoneNumber = phone
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			if user.Phone == nil {

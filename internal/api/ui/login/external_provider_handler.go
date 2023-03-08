@@ -61,7 +61,7 @@ type externalNotFoundOptionData struct {
 	OrgRegister                bool
 	ExternalEmail              domain.EmailAddress
 	ExternalEmailVerified      bool
-	ExternalPhone              string
+	ExternalPhone              domain.PhoneNumber
 	ExternalPhoneVerified      bool
 }
 
@@ -76,9 +76,9 @@ type externalRegisterFormData struct {
 	Firstname              string              `schema:"firstname"`
 	Lastname               string              `schema:"lastname"`
 	Nickname               string              `schema:"nickname"`
-	ExternalPhone          string              `schema:"external-phone"`
+	ExternalPhone          domain.PhoneNumber  `schema:"external-phone"`
 	ExternalPhoneVerified  bool                `schema:"external-phone-verified"`
-	Phone                  string              `schema:"phone"`
+	Phone                  domain.PhoneNumber  `schema:"phone"`
 	Language               string              `schema:"language"`
 	TermsConfirm           bool                `schema:"terms-confirm"`
 }

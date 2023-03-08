@@ -68,7 +68,7 @@ type ExternalUser struct {
 	Email             EmailAddress
 	IsEmailVerified   bool
 	PreferredLanguage language.Tag
-	Phone             string
+	Phone             PhoneNumber
 	IsPhoneVerified   bool
 	Metadatas         []*Metadata
 }

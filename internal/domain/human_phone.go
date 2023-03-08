@@ -10,14 +10,25 @@ import (
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
-const (
-	defaultRegion = "CH"
-)
+const defaultRegion = "CH"
+
+type PhoneNumber string
+
+func (p PhoneNumber) Normalize() (PhoneNumber, error) {
+	if p == "" {
+		return p, caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty")
+	}
+	phoneNr, err := libphonenumber.Parse(string(p), defaultRegion)
+	if err != nil {
+		return p, caos_errs.ThrowInvalidArgument(err, "PHONE-so0wa", "Errors.User.Phone.Invalid")
+	}
+	return PhoneNumber(libphonenumber.Format(phoneNr, libphonenumber.E164)), nil
+}
 
 type Phone struct {
 	es_models.ObjectRoot
 
-	PhoneNumber     string
+	PhoneNumber     PhoneNumber
 	IsPhoneVerified bool
 }
 
@@ -29,18 +40,15 @@ type PhoneCode struct {
 }
 
 func (p *Phone) Normalize() error {
-	if p == nil || p.PhoneNumber == "" {
+	if p == nil {
 		return caos_errs.ThrowInvalidArgument(nil, "PHONE-YlbwO", "Errors.User.Phone.Empty")
 	}
-	return p.formatPhone()
-}
-
-func (p *Phone) formatPhone() error {
-	phoneNr, err := libphonenumber.Parse(p.PhoneNumber, defaultRegion)
+	normalizedNumber, err := p.PhoneNumber.Normalize()
 	if err != nil {
-		return caos_errs.ThrowInvalidArgument(err, "PHONE-so0wa", "Errors.User.Phone.Invalid")
+		return err
 	}
-	p.PhoneNumber = libphonenumber.Format(phoneNr, libphonenumber.E164)
+	// TODO: Let's stop mutating state
+	p.PhoneNumber = normalizedNumber
 	return nil
 }
 

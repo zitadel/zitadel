@@ -49,7 +49,7 @@ type Human struct {
 	Gender            domain.Gender
 	Email             domain.EmailAddress
 	IsEmailVerified   bool
-	Phone             string
+	Phone             domain.PhoneNumber
 	IsPhoneVerified   bool
 }
 
@@ -849,7 +849,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 					Gender:            domain.Gender(gender.Int32),
 					Email:             domain.EmailAddress(email.String),
 					IsEmailVerified:   isEmailVerified.Bool,
-					Phone:             phone.String,
+					Phone:             domain.PhoneNumber(phone.String),
 					IsPhoneVerified:   isPhoneVerified.Bool,
 				}
 			} else if machineID.Valid {
@@ -1320,7 +1320,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 						Gender:            domain.Gender(gender.Int32),
 						Email:             domain.EmailAddress(email.String),
 						IsEmailVerified:   isEmailVerified.Bool,
-						Phone:             phone.String,
+						Phone:             domain.PhoneNumber(phone.String),
 						IsPhoneVerified:   isPhoneVerified.Bool,
 					}
 				} else if machineID.Valid {

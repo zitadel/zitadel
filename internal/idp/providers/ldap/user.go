@@ -15,7 +15,7 @@ type User struct {
 	preferredUsername string
 	email             domain.EmailAddress
 	emailVerified     bool
-	phone             string
+	phone             domain.PhoneNumber
 	phoneVerified     bool
 	preferredLanguage language.Tag
 	avatarURL         string
@@ -31,7 +31,7 @@ func NewUser(
 	preferredUsername string,
 	email domain.EmailAddress,
 	emailVerified bool,
-	phone string,
+	phone domain.PhoneNumber,
 	phoneVerified bool,
 	preferredLanguage language.Tag,
 	avatarURL string,
@@ -78,7 +78,7 @@ func (u *User) GetEmail() domain.EmailAddress {
 func (u *User) IsEmailVerified() bool {
 	return u.emailVerified
 }
-func (u *User) GetPhone() string {
+func (u *User) GetPhone() domain.PhoneNumber {
 	return u.phone
 }
 func (u *User) IsPhoneVerified() bool {

@@ -83,8 +83,8 @@ func (u *User) GetDisplayName() string {
 	return u.GetName()
 }
 
-func (u *User) GetPhone() string {
-	return u.GetPhoneNumber()
+func (u *User) GetPhone() domain.PhoneNumber {
+	return domain.PhoneNumber(u.GetPhoneNumber())
 }
 
 func (u *User) IsPhoneVerified() bool {

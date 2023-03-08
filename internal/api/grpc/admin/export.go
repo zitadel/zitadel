@@ -570,7 +570,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			}
 			if user.Human.Phone != "" {
 				dataUser.User.Phone = &management_pb.ImportHumanUserRequest_Phone{
-					Phone:           user.Human.Phone,
+					Phone:           string(user.Human.Phone),
 					IsPhoneVerified: user.Human.IsPhoneVerified,
 				}
 			}

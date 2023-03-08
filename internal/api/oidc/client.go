@@ -287,7 +287,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			if user.Human == nil {
 				continue
 			}
-			userInfo.SetPhone(user.Human.Phone, user.Human.IsPhoneVerified)
+			userInfo.SetPhone(string(user.Human.Phone), user.Human.IsPhoneVerified)
 		case oidc.ScopeAddress:
 			//TODO: handle address for human users as soon as implemented
 		case ScopeUserMetaData:

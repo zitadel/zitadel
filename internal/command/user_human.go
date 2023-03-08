@@ -104,7 +104,7 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 
 type humanCreationCommand interface {
 	eventstore.Command
-	AddPhoneData(phoneNumber string)
+	AddPhoneData(phoneNumber domain.PhoneNumber)
 	AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
 }
 
@@ -125,8 +125,10 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 		}
 		human.ensureDisplayName()
 
-		if human.Phone.Number, err = FormatPhoneNumber(human.Phone.Number); err != nil {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-tD6ax", "Errors.Invalid.Argument")
+		if human.Phone.Number != "" {
+			if human.Phone.Number, err = human.Phone.Number.Normalize(); err != nil {
+				return nil, err
+			}
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {

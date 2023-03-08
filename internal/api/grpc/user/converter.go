@@ -62,7 +62,7 @@ func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 			IsEmailVerified: view.IsEmailVerified,
 		},
 		Phone: &user_pb.Phone{
-			Phone:           view.Phone,
+			Phone:           string(view.Phone),
 			IsPhoneVerified: view.IsPhoneVerified,
 		},
 	}

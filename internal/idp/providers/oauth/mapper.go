@@ -85,7 +85,7 @@ func (u *UserMapper) IsEmailVerified() bool {
 }
 
 // GetPhone is an implementation of the [idp.User] interface.
-func (u *UserMapper) GetPhone() string {
+func (u *UserMapper) GetPhone() domain.PhoneNumber {
 	return ""
 }
 

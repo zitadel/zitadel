@@ -28,7 +28,7 @@ type User interface {
 	GetPreferredUsername() string
 	GetEmail() domain.EmailAddress
 	IsEmailVerified() bool
-	GetPhone() string
+	GetPhone() domain.PhoneNumber
 	IsPhoneVerified() bool
 	GetPreferredLanguage() language.Tag
 	GetAvatarURL() string

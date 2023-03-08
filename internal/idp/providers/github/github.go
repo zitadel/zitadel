@@ -164,7 +164,7 @@ func (u *User) IsEmailVerified() bool {
 
 // GetPhone is an implementation of the [idp.User] interface.
 // It returns an empty string because GitHub does not provide the user's phone.
-func (u *User) GetPhone() string {
+func (u *User) GetPhone() domain.PhoneNumber {
 	return ""
 }
 

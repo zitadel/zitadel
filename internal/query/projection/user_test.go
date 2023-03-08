@@ -879,7 +879,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.users8_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
-								"+41 00 000 00 00",
+								domain.PhoneNumber("+41 00 000 00 00"),
 								false,
 								"agg-id",
 								"instance-id",
@@ -927,7 +927,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.users8_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
-								"+41 00 000 00 00",
+								domain.PhoneNumber("+41 00 000 00 00"),
 								false,
 								"agg-id",
 								"instance-id",

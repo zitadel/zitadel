@@ -221,7 +221,7 @@ func AddHumanUserRequestToAddHuman(req *mgmt_pb.AddHumanUserRequest) *command.Ad
 	}
 	if req.Phone != nil {
 		human.Phone = command.Phone{
-			Number:   req.Phone.Phone,
+			Number:   domain.PhoneNumber(req.Phone.Phone),
 			Verified: req.Phone.IsPhoneVerified,
 		}
 	}

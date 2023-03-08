@@ -107,8 +107,8 @@ func (u *User) GetNickname() string {
 	return u.IDTokenClaims.GetNickname()
 }
 
-func (u *User) GetPhone() string {
-	return u.IDTokenClaims.GetPhoneNumber()
+func (u *User) GetPhone() domain.PhoneNumber {
+	return domain.PhoneNumber(u.IDTokenClaims.GetPhoneNumber())
 }
 
 func (u *User) IsPhoneVerified() bool {

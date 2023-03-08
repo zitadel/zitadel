@@ -158,7 +158,7 @@ type human struct {
 	Gender            domain.Gender
 	Email             domain.EmailAddress
 	IsEmailVerified   bool
-	Phone             string
+	Phone             domain.PhoneNumber
 	IsPhoneVerified   bool
 }
 

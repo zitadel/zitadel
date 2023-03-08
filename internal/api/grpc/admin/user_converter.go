@@ -40,7 +40,7 @@ func setUpOrgHumanPhoneToDomain(phone *admin_grpc.SetUpOrgRequest_Human_Phone) c
 		return command.Phone{}
 	}
 	return command.Phone{
-		Number:   phone.Phone,
+		Number:   domain.PhoneNumber(phone.Phone),
 		Verified: phone.IsPhoneVerified,
 	}
 }

@@ -3445,7 +3445,7 @@ func newAddHumanEvent(password string, changeRequired bool, phone string) *user.
 			changeRequired)
 	}
 	if phone != "" {
-		event.AddPhoneData(phone)
+		event.AddPhoneData(domain.PhoneNumber(phone))
 	}
 	return event
 }
@@ -3473,7 +3473,7 @@ func newRegisterHumanEvent(username, password string, changeRequired bool, phone
 			changeRequired)
 	}
 	if phone != "" {
-		event.AddPhoneData(phone)
+		event.AddPhoneData(domain.PhoneNumber(phone))
 	}
 	return event
 }
