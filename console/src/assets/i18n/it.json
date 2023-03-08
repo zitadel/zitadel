@@ -1397,7 +1397,7 @@
         "GRANTED_SINGULAR": "Progetto delegato"
       },
       "PRIVATELABEL": {
-        "TITLE": "Impostazione marchio",
+        "TITLE": "Impostazione branding",
         "0": {
           "TITLE": "Non specificato",
           "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione branding dell'organizzazione, prima che venga mostrato il default del sistema."
