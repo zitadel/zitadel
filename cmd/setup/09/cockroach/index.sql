@@ -49,17 +49,3 @@ COMMIT;
 BEGIN;
 DROP INDEX IF EXISTS eventstore.events@agg_type_seq;
 COMMIT;
-
--- index to search event payload
-BEGIN;
-DROP INDEX IF EXISTS eventstore.events@event_search;
-COMMIT;
-
-BEGIN;
-CREATE INVERTED INDEX event_search ON eventstore.events (
-    instance_id
-    , aggregate_type
-    , event_type
-    , event_data
-);
-COMMIT;
