@@ -680,7 +680,7 @@
         "TITLE": "Token löschen",
         "DESCRIPTION": "Sie sind im Begriff das Token unwiderruflich zu löschen. Wollen Sie dies wirklich tun?"
       },
-      "DELETED": "Persönliches Zugriffstoken gelöscht."
+      "DELETED": "Personal Access Token gelöscht."
     }
   },
   "METADATA": {
