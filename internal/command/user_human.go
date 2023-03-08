@@ -391,7 +391,7 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 	if orgID == "" {
 		return nil, nil, nil, "", errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
 	}
-	if err := human.Validate(); err != nil {
+	if err := human.Normalize(); err != nil {
 		return nil, nil, nil, "", err
 	}
 	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, links, false, passwordless, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
@@ -419,7 +419,7 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 	if orgID == "" {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-hYsVH", "Errors.Org.Empty")
 	}
-	if err := human.Validate(); err != nil {
+	if err := human.Normalize(); err != nil {
 		return nil, nil, err
 	}
 	if link == nil && (human.Password == nil || human.Password.SecretString == "") {

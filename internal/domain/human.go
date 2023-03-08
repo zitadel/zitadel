@@ -61,7 +61,7 @@ func (f Gender) Specified() bool {
 	return f > GenderUnspecified && f < genderCount
 }
 
-func (u *Human) Validate() error {
+func (u *Human) Normalize() error {
 	if u.Username == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Username.Empty")
 	}
@@ -72,7 +72,7 @@ func (u *Human) Validate() error {
 		return err
 	}
 	if u.Phone != nil && u.Phone.PhoneNumber != "" {
-		if err := u.Phone.Validate(); err != nil {
+		if err := u.Phone.Normalize(); err != nil {
 			return err
 		}
 	}
