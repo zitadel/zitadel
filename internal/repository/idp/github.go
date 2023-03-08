@@ -1,6 +1,8 @@
 package idp
 
 import (
+	"encoding/json"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -8,7 +10,14 @@ import (
 )
 
 type GitHubIDPAddedEvent struct {
-	OAuthIDPAddedEvent
+	eventstore.BaseEvent `json:"-"`
+
+	ID           string              `json:"id"`
+	Name         string              `json:"name,omitempty"`
+	ClientID     string              `json:"clientId,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Scopes       []string            `json:"scopes,omitempty"`
+	Options
 }
 
 func NewGitHubIDPAddedEvent(
@@ -21,15 +30,13 @@ func NewGitHubIDPAddedEvent(
 	options Options,
 ) *GitHubIDPAddedEvent {
 	return &GitHubIDPAddedEvent{
-		OAuthIDPAddedEvent: OAuthIDPAddedEvent{
-			BaseEvent:    *base,
-			ID:           id,
-			Name:         name,
-			ClientID:     clientID,
-			ClientSecret: clientSecret,
-			Scopes:       scopes,
-			Options:      options,
-		},
+		BaseEvent:    *base,
+		ID:           id,
+		Name:         name,
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		Scopes:       scopes,
+		Options:      options,
 	}
 }
 
@@ -42,36 +49,76 @@ func (e *GitHubIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 }
 
 func GitHubIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e, err := OAuthIDPAddedEventMapper(event)
-	if err != nil {
-		return nil, err
+	e := &GitHubIDPAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	return &GitHubIDPAddedEvent{OAuthIDPAddedEvent: *e.(*OAuthIDPAddedEvent)}, nil
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-sdfs3", "unable to unmarshal event")
+	}
+
+	return e, nil
 }
 
 type GitHubIDPChangedEvent struct {
-	OAuthIDPChangedEvent
+	eventstore.BaseEvent `json:"-"`
+
+	ID           string              `json:"id"`
+	Name         *string             `json:"name,omitempty"`
+	ClientID     *string             `json:"clientId,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Scopes       []string            `json:"scopes,omitempty"`
+	OptionChanges
 }
 
 func NewGitHubIDPChangedEvent(
 	base *eventstore.BaseEvent,
 	id string,
-	changes []OAuthIDPChanges,
+	changes []GitHubIDPChanges,
 ) (*GitHubIDPChangedEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
 	}
 	changedEvent := &GitHubIDPChangedEvent{
-		OAuthIDPChangedEvent: OAuthIDPChangedEvent{
-			BaseEvent: *base,
-			ID:        id,
-		},
+		BaseEvent: *base,
+		ID:        id,
 	}
 	for _, change := range changes {
-		change(&changedEvent.OAuthIDPChangedEvent)
+		change(changedEvent)
 	}
 	return changedEvent, nil
+}
+
+type GitHubIDPChanges func(*GitHubIDPChangedEvent)
+
+func ChangeGitHubName(name string) func(*GitHubIDPChangedEvent) {
+	return func(e *GitHubIDPChangedEvent) {
+		e.Name = &name
+	}
+}
+func ChangeGitHubClientID(clientID string) func(*GitHubIDPChangedEvent) {
+	return func(e *GitHubIDPChangedEvent) {
+		e.ClientID = &clientID
+	}
+}
+
+func ChangeGitHubClientSecret(clientSecret *crypto.CryptoValue) func(*GitHubIDPChangedEvent) {
+	return func(e *GitHubIDPChangedEvent) {
+		e.ClientSecret = clientSecret
+	}
+}
+
+func ChangeGitHubOptions(options OptionChanges) func(*GitHubIDPChangedEvent) {
+	return func(e *GitHubIDPChangedEvent) {
+		e.OptionChanges = options
+	}
+}
+
+func ChangeGitHubScopes(scopes []string) func(*GitHubIDPChangedEvent) {
+	return func(e *GitHubIDPChangedEvent) {
+		e.Scopes = scopes
+	}
 }
 
 func (e *GitHubIDPChangedEvent) Data() interface{} {
@@ -83,16 +130,30 @@ func (e *GitHubIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 }
 
 func GitHubIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e, err := OAuthIDPChangedEventMapper(event)
-	if err != nil {
-		return nil, err
+	e := &GitHubIDPChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	return &GitHubIDPChangedEvent{OAuthIDPChangedEvent: *e.(*OAuthIDPChangedEvent)}, nil
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-Sfrth", "unable to unmarshal event")
+	}
+
+	return e, nil
 }
 
 type GitHubEnterpriseIDPAddedEvent struct {
-	OAuthIDPAddedEvent
+	eventstore.BaseEvent `json:"-"`
+
+	ID                    string              `json:"id"`
+	Name                  string              `json:"name,omitempty"`
+	ClientID              string              `json:"clientId,omitempty"`
+	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	AuthorizationEndpoint string              `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint         string              `json:"tokenEndpoint,omitempty"`
+	UserEndpoint          string              `json:"userEndpoint,omitempty"`
+	Scopes                []string            `json:"scopes,omitempty"`
+	Options
 }
 
 func NewGitHubEnterpriseIDPAddedEvent(
@@ -108,19 +169,16 @@ func NewGitHubEnterpriseIDPAddedEvent(
 	options Options,
 ) *GitHubEnterpriseIDPAddedEvent {
 	return &GitHubEnterpriseIDPAddedEvent{
-		OAuthIDPAddedEvent: *NewOAuthIDPAddedEvent(
-			base,
-			id,
-			name,
-			clientID,
-			clientSecret,
-			authorizationEndpoint,
-			tokenEndpoint,
-			userEndpoint,
-			"",
-			scopes,
-			options,
-		),
+		*base,
+		id,
+		name,
+		clientID,
+		clientSecret,
+		authorizationEndpoint,
+		tokenEndpoint,
+		userEndpoint,
+		scopes,
+		options,
 	}
 }
 
@@ -133,36 +191,97 @@ func (e *GitHubEnterpriseIDPAddedEvent) UniqueConstraints() []*eventstore.EventU
 }
 
 func GitHubEnterpriseIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e, err := OAuthIDPAddedEventMapper(event)
-	if err != nil {
-		return nil, err
+	e := &GitHubEnterpriseIDPAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	return &GitHubEnterpriseIDPAddedEvent{OAuthIDPAddedEvent: *e.(*OAuthIDPAddedEvent)}, nil
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-sdfs3", "unable to unmarshal event")
+	}
+
+	return e, nil
 }
 
 type GitHubEnterpriseIDPChangedEvent struct {
-	OAuthIDPChangedEvent
+	eventstore.BaseEvent `json:"-"`
+
+	ID                    string              `json:"id"`
+	Name                  *string             `json:"name,omitempty"`
+	ClientID              *string             `json:"clientId,omitempty"`
+	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	AuthorizationEndpoint *string             `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint         *string             `json:"tokenEndpoint,omitempty"`
+	UserEndpoint          *string             `json:"userEndpoint,omitempty"`
+	Scopes                []string            `json:"scopes,omitempty"`
+	OptionChanges
 }
 
 func NewGitHubEnterpriseIDPChangedEvent(
 	base *eventstore.BaseEvent,
 	id string,
-	changes []OAuthIDPChanges,
+	changes []GitHubEnterpriseIDPChanges,
 ) (*GitHubEnterpriseIDPChangedEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "IDP-JHKs9", "Errors.NoChangesFound")
 	}
 	changedEvent := &GitHubEnterpriseIDPChangedEvent{
-		OAuthIDPChangedEvent: OAuthIDPChangedEvent{
-			BaseEvent: *base,
-			ID:        id,
-		},
+		BaseEvent: *base,
+		ID:        id,
 	}
 	for _, change := range changes {
-		change(&changedEvent.OAuthIDPChangedEvent)
+		change(changedEvent)
 	}
 	return changedEvent, nil
+}
+
+type GitHubEnterpriseIDPChanges func(*GitHubEnterpriseIDPChangedEvent)
+
+func ChangeGitHubEnterpriseName(name string) func(*GitHubEnterpriseIDPChangedEvent) {
+	return func(e *GitHubEnterpriseIDPChangedEvent) {
+		e.Name = &name
+	}
+}
+func ChangeGitHubEnterpriseClientID(clientID string) func(*GitHubEnterpriseIDPChangedEvent) {
+	return func(e *GitHubEnterpriseIDPChangedEvent) {
+		e.ClientID = &clientID
+	}
+}
+
+func ChangeGitHubEnterpriseClientSecret(clientSecret *crypto.CryptoValue) func(*GitHubEnterpriseIDPChangedEvent) {
+	return func(e *GitHubEnterpriseIDPChangedEvent) {
+		e.ClientSecret = clientSecret
+	}
+}
+
+func ChangeGitHubEnterpriseOptions(options OptionChanges) func(*GitHubEnterpriseIDPChangedEvent) {
+	return func(e *GitHubEnterpriseIDPChangedEvent) {
+		e.OptionChanges = options
+	}
+}
+
+func ChangeGitHubEnterpriseAuthorizationEndpoint(authorizationEndpoint string) func(*GitHubEnterpriseIDPChangedEvent) {
+	return func(e *GitHubEnterpriseIDPChangedEvent) {
+		e.AuthorizationEndpoint = &authorizationEndpoint
+	}
+}
+
+func ChangeGitHubEnterpriseTokenEndpoint(tokenEndpoint string) func(*GitHubEnterpriseIDPChangedEvent) {
+	return func(e *GitHubEnterpriseIDPChangedEvent) {
+		e.TokenEndpoint = &tokenEndpoint
+	}
+}
+
+func ChangeGitHubEnterpriseUserEndpoint(userEndpoint string) func(*GitHubEnterpriseIDPChangedEvent) {
+	return func(e *GitHubEnterpriseIDPChangedEvent) {
+		e.UserEndpoint = &userEndpoint
+	}
+}
+
+func ChangeGitHubEnterpriseScopes(scopes []string) func(*GitHubEnterpriseIDPChangedEvent) {
+	return func(e *GitHubEnterpriseIDPChangedEvent) {
+		e.Scopes = scopes
+	}
 }
 
 func (e *GitHubEnterpriseIDPChangedEvent) Data() interface{} {
@@ -174,10 +293,14 @@ func (e *GitHubEnterpriseIDPChangedEvent) UniqueConstraints() []*eventstore.Even
 }
 
 func GitHubEnterpriseIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e, err := OAuthIDPChangedEventMapper(event)
-	if err != nil {
-		return nil, err
+	e := &GitHubEnterpriseIDPChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	return &GitHubEnterpriseIDPChangedEvent{OAuthIDPChangedEvent: *e.(*OAuthIDPChangedEvent)}, nil
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-ASf3r", "unable to unmarshal event")
+	}
+
+	return e, nil
 }

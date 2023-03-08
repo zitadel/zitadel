@@ -472,8 +472,8 @@ func (wm *GitHubIDPWriteModel) NewChanges(
 	secretCrypto crypto.Crypto,
 	scopes []string,
 	options idp.Options,
-) ([]idp.OAuthIDPChanges, error) {
-	changes := make([]idp.OAuthIDPChanges, 0)
+) ([]idp.GitHubIDPChanges, error) {
+	changes := make([]idp.GitHubIDPChanges, 0)
 	var clientSecret *crypto.CryptoValue
 	var err error
 	if clientSecretString != "" {
@@ -481,21 +481,21 @@ func (wm *GitHubIDPWriteModel) NewChanges(
 		if err != nil {
 			return nil, err
 		}
-		changes = append(changes, idp.ChangeOAuthClientSecret(clientSecret))
+		changes = append(changes, idp.ChangeGitHubClientSecret(clientSecret))
 	}
 	if wm.Name != name {
-		changes = append(changes, idp.ChangeOAuthName(name))
+		changes = append(changes, idp.ChangeGitHubName(name))
 	}
 	if wm.ClientID != clientID {
-		changes = append(changes, idp.ChangeOAuthClientID(clientID))
+		changes = append(changes, idp.ChangeGitHubClientID(clientID))
 	}
 	if !reflect.DeepEqual(wm.Scopes, scopes) {
-		changes = append(changes, idp.ChangeOAuthScopes(scopes))
+		changes = append(changes, idp.ChangeGitHubScopes(scopes))
 	}
 
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
-		changes = append(changes, idp.ChangeOAuthOptions(opts))
+		changes = append(changes, idp.ChangeGitHubOptions(opts))
 	}
 	return changes, nil
 }
@@ -577,8 +577,8 @@ func (wm *GitHubEnterpriseIDPWriteModel) NewChanges(
 	userEndpoint string,
 	scopes []string,
 	options idp.Options,
-) ([]idp.OAuthIDPChanges, error) {
-	changes := make([]idp.OAuthIDPChanges, 0)
+) ([]idp.GitHubEnterpriseIDPChanges, error) {
+	changes := make([]idp.GitHubEnterpriseIDPChanges, 0)
 	var clientSecret *crypto.CryptoValue
 	var err error
 	if clientSecretString != "" {
@@ -586,29 +586,29 @@ func (wm *GitHubEnterpriseIDPWriteModel) NewChanges(
 		if err != nil {
 			return nil, err
 		}
-		changes = append(changes, idp.ChangeOAuthClientSecret(clientSecret))
+		changes = append(changes, idp.ChangeGitHubEnterpriseClientSecret(clientSecret))
 	}
 	if wm.ClientID != clientID {
-		changes = append(changes, idp.ChangeOAuthClientID(clientID))
+		changes = append(changes, idp.ChangeGitHubEnterpriseClientID(clientID))
 	}
 	if wm.Name != name {
-		changes = append(changes, idp.ChangeOAuthName(name))
+		changes = append(changes, idp.ChangeGitHubEnterpriseName(name))
 	}
 	if wm.AuthorizationEndpoint != authorizationEndpoint {
-		changes = append(changes, idp.ChangeOAuthAuthorizationEndpoint(authorizationEndpoint))
+		changes = append(changes, idp.ChangeGitHubEnterpriseAuthorizationEndpoint(authorizationEndpoint))
 	}
 	if wm.TokenEndpoint != tokenEndpoint {
-		changes = append(changes, idp.ChangeOAuthTokenEndpoint(tokenEndpoint))
+		changes = append(changes, idp.ChangeGitHubEnterpriseTokenEndpoint(tokenEndpoint))
 	}
 	if wm.UserEndpoint != userEndpoint {
-		changes = append(changes, idp.ChangeOAuthUserEndpoint(userEndpoint))
+		changes = append(changes, idp.ChangeGitHubEnterpriseUserEndpoint(userEndpoint))
 	}
 	if !reflect.DeepEqual(wm.Scopes, scopes) {
-		changes = append(changes, idp.ChangeOAuthScopes(scopes))
+		changes = append(changes, idp.ChangeGitHubEnterpriseScopes(scopes))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
-		changes = append(changes, idp.ChangeOAuthOptions(opts))
+		changes = append(changes, idp.ChangeGitHubEnterpriseOptions(opts))
 	}
 	return changes, nil
 }

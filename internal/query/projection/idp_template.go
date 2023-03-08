@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTemplateTable                 = "projections.idp_templates2"
+	IDPTemplateTable                 = "projections.idp_templates3"
 	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
@@ -855,8 +855,8 @@ func (p *idpTemplateProjection) reduceOldConfigChanged(event eventstore.Event) (
 		event,
 		cols,
 		[]handler.Condition{
-			handler.NewCond(OIDCIDCol, idpEvent.ConfigID),
-			handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
