@@ -416,7 +416,7 @@
       "EMPTY": "Nessun IDP esterno trovato",
       "DIALOG": {
         "DELETE_TITLE": "Rimuovere l'IDP",
-        "DELETE_DESCRIPTION": "Stai per eliminare un Fornitore di identità da un utente. Vuoi continuare?"
+        "DELETE_DESCRIPTION": "Stai per eliminare un fornitore di identità da un utente. Vuoi continuare?"
       }
     },
     "CREATE": {
