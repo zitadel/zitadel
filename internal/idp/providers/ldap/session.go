@@ -7,11 +7,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/go-ldap/ldap/v3"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 

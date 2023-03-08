@@ -7,8 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/golang/mock/gomock"
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
@@ -19,6 +17,7 @@ import (
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func TestSession_FetchUser(t *testing.T) {

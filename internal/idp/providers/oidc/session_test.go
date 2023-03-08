@@ -7,8 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,6 +17,7 @@ import (
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 

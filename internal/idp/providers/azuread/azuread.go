@@ -3,12 +3,11 @@ package azuread
 import (
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 )

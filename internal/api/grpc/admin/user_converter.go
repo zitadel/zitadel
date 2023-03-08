@@ -2,11 +2,11 @@ package admin
 
 import (
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/domain"
 	"golang.org/x/text/language"
 
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	admin_grpc "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 

@@ -1,8 +1,9 @@
 package ldap
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 type User struct {

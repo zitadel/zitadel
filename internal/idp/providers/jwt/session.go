@@ -7,13 +7,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 

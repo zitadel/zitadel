@@ -3,9 +3,9 @@ package idp
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 // Provider is the minimal implementation for a 3rd party authentication provider
