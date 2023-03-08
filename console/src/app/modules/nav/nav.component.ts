@@ -105,9 +105,7 @@ export class NavComponent implements OnDestroy {
     private breakpointObserver: BreakpointObserver,
     private shortcutService: KeyboardShortcutsService,
     private storageService: StorageService,
-  ) {
-    this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
-  }
+  ) {}
 
   public ngOnDestroy() {
     this.destroy$.next();
