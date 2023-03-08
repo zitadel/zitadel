@@ -63,7 +63,7 @@ http_address = "127.0.0.1:4180" #localdev only
 
 ### Check for groups
 
-If you want oauth2-proxy to check for roles in the tokens you have to add an [action](../../apis/actions/introduction) in ZITADEL to [complement the token](../../apis/actions/complement-token) according to [this example](https://github.com/zitadel/actions/blob/main/examples/custom_roles.js) and add the following configuration to the config:
+If you want oauth2-proxy to check for roles in the tokens you have to add an [action](/docs/apis/actions/introduction) in ZITADEL to [complement the token](/docs/apis/actions/complement-token) according to [this example](https://github.com/zitadel/actions/blob/main/examples/custom_roles.js) and add the following configuration to the config:
 
 ```toml
 oidc_groups_claim = "{your_actions_group_key}"
