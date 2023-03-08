@@ -82,6 +82,10 @@ func (p *idpLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceIDPConfigRemoved,
 				},
 				{
+					Event:  org.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
+				},
+				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
 				},
@@ -105,6 +109,10 @@ func (p *idpLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
+				},
+				{
+					Event:  instance.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
 				},
 				{
 					Event:  instance.InstanceRemovedEventType,
@@ -198,6 +206,27 @@ func (p *idpLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 		idpID = e.ConfigID
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-u6tze", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+	}
+
+	return crdb.NewDeleteStatement(event,
+		[]handler.Condition{
+			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idpID),
+			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, event.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *idpLoginPolicyLinkProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var idpID string
+
+	switch e := event.(type) {
+	case *org.IDPRemovedEvent:
+		idpID = e.ID
+	case *instance.IDPRemovedEvent:
+		idpID = e.ID
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SFED3", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(event,

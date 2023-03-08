@@ -12,6 +12,29 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
+var (
+	prepareNotificationProviderStmt = `SELECT projections.notification_providers.aggregate_id,` +
+		` projections.notification_providers.creation_date,` +
+		` projections.notification_providers.change_date,` +
+		` projections.notification_providers.sequence,` +
+		` projections.notification_providers.resource_owner,` +
+		` projections.notification_providers.state,` +
+		` projections.notification_providers.provider_type,` +
+		` projections.notification_providers.compact` +
+		` FROM projections.notification_providers` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareNotificationProviderCols = []string{
+		"aggregate_id",
+		"creation_date",
+		"change_date",
+		"sequence",
+		"resource_owner",
+		"state",
+		"provider_type",
+		"compact",
+	}
+)
+
 func Test_NotificationProviderPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -28,15 +51,7 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 			prepare: prepareDebugNotificationProviderQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.notification_providers.aggregate_id,`+
-						` projections.notification_providers.creation_date,`+
-						` projections.notification_providers.change_date,`+
-						` projections.notification_providers.sequence,`+
-						` projections.notification_providers.resource_owner,`+
-						` projections.notification_providers.state,`+
-						` projections.notification_providers.provider_type,`+
-						` projections.notification_providers.compact`+
-						` FROM projections.notification_providers`),
+					regexp.QuoteMeta(prepareNotificationProviderStmt),
 					nil,
 					nil,
 				),
@@ -54,25 +69,8 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 			prepare: prepareDebugNotificationProviderQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.notification_providers.aggregate_id,`+
-						` projections.notification_providers.creation_date,`+
-						` projections.notification_providers.change_date,`+
-						` projections.notification_providers.sequence,`+
-						` projections.notification_providers.resource_owner,`+
-						` projections.notification_providers.state,`+
-						` projections.notification_providers.provider_type,`+
-						` projections.notification_providers.compact`+
-						` FROM projections.notification_providers`),
-					[]string{
-						"aggregate_id",
-						"creation_date",
-						"change_date",
-						"sequence",
-						"resource_owner",
-						"state",
-						"provider_type",
-						"compact",
-					},
+					regexp.QuoteMeta(prepareNotificationProviderStmt),
+					prepareNotificationProviderCols,
 					[]driver.Value{
 						"agg-id",
 						testNow,
@@ -101,15 +99,7 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 			prepare: prepareDebugNotificationProviderQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.notification_providers.aggregate_id,`+
-						` projections.notification_providers.creation_date,`+
-						` projections.notification_providers.change_date,`+
-						` projections.notification_providers.sequence,`+
-						` projections.notification_providers.resource_owner,`+
-						` projections.notification_providers.state,`+
-						` projections.notification_providers.provider_type,`+
-						` projections.notification_providers.compact`+
-						` FROM projections.notification_providers`),
+					regexp.QuoteMeta(prepareNotificationProviderStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -124,7 +114,7 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

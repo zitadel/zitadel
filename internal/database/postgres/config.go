@@ -89,6 +89,10 @@ func (c *Config) Type() string {
 	return "postgres"
 }
 
+func (c *Config) Timetravel(time.Duration) string {
+	return ""
+}
+
 type User struct {
 	Username string
 	Password string
@@ -141,6 +145,8 @@ func (c Config) String(useAdmin bool) string {
 	}
 	if !useAdmin {
 		fields = append(fields, "dbname="+c.Database)
+	} else {
+		fields = append(fields, "dbname=postgres")
 	}
 	if user.SSL.Mode != sslDisabledMode {
 		fields = append(fields, "sslrootcert="+user.SSL.RootCert)

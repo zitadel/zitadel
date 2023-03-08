@@ -42,6 +42,41 @@
       "ADD": "Zum Hinzufügen Kachel halten und ziehen"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Dein Onboarding-prozess",
+    "COMPLETED": "abgeschlossen",
+    "DISMISS": "schließen",
+    "CARD": {
+      "TITLE": "Bringe deine Instanz zum Laufen",
+      "DESCRIPTION": "Diese Checkliste hilft bei der Einrichtung Ihrer Instanz und führt Sie durch die wichtigsten Schritte"
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Branding anpassen",
+        "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons."
+      },
+      "instance.smtp.config.added": {
+        "title": "SMTP Benachrichtigungseinstellungen",
+        "description": "Konfiguriere deinen Mailserver."
+      },
+      "project.added": {
+        "title": "Erstelle ein Projekt",
+        "description": "Erstelle dein erstes Projekt und definiere Rollen"
+      },
+      "project.application.added": {
+        "title": "Erstelle eine App",
+        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow."
+      },
+      "user.human.added": {
+        "title": "Erfasse Benutzer",
+        "description": "Erstelle Benutzer die später deine Apps nutzen können."
+      },
+      "user.grant.added": {
+        "title": "Berechtige Benutzer",
+        "description": "Erlaube es deinen Nutzern auf deine Apps zuzugreifen und gebe ihnen Rollen."
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Instance",
     "DASHBOARD": "Home",
@@ -124,6 +159,7 @@
     "NEXT": "Weiter",
     "MORE": "mehr",
     "STEP": "Schritt",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     }
@@ -1081,7 +1117,7 @@
     "NOTIFICATION": {
       "TITLE": "Notification",
       "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
-      "PASSWORDCHANGE": "Passwordänderung"
+      "PASSWORDCHANGE": "Passwortänderung"
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
@@ -1579,14 +1615,37 @@
       "ACTIVETITLE": "Aktive Identitäts Provider"
     },
     "CREATE": {
-      "TITLE": "Neuer Identitäts Provider",
-      "DESCRIPTION": "Wählen Sie einen der folgenden Typen von Identitäts Providern"
+      "TITLE": "Provider hinzufügen",
+      "DESCRIPTION": "Wähle einen der verfügbaren Provider.",
+      "STEPPERTITLE": "Provider hinzufügen",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren OIDC-Provider ein."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren JWT-Provider ein."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Google-Identitätsprovider ein."
+      }
     },
     "DETAIL": {
       "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Generelle Konfiguration deines Identitäts Providers",
+      "DESCRIPTION": "Bearbeite deine Providerkonfiguration",
       "DATECREATED": "Erstellt",
       "DATECHANGED": "Geändert"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatisches Erstellen",
+      "ISAUTOCREATION_DESC": "Legt fest ob ein Konto erstellt wird, falls es noch nicht existiert.",
+      "ISAUTOUPDATE": "Automatisches Update",
+      "ISAUTOUPDATE_DESC": "Legt fest ob Konten bei der erneuten Authentifizierung aktualisiert werden.",
+      "ISCREATIONALLOWED": "Account erstellen erlaubt",
+      "ISCREATIONALLOWED_DESC": "Legt fest, ob Konten erstellt werden können.",
+      "ISLINKINGALLOWED": "Account linking erlaubt",
+      "ISLINKINGALLOWED_DESC": "Legt fest, ob eine Identität mit einem bestehenden Konto verknüpft werden kann."
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -1602,18 +1661,10 @@
       "1": "aktiv",
       "2": "inaktiv"
     },
-    "MAPPINGFIELD": {
-      "1": "Preferred Username",
-      "2": "Email"
-    },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "kein Styling",
-      "1": "Google"
-    },
+    "NAMEHINT": "Wenn angegeben, wir er im Login interface angezeigt.",
+    "OPTIONAL": "optional",
+    "UPDATECLIENTSECRET": "Client Secret updaten",
     "ADD": "Identity Provider hinzufügen",
-    "AUTOREGISTER": "Automatische Registrierung",
-    "AUTOREGISTER_DESC": "Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
     "TYPE": "Typ",
     "OWNER": "Besitzer",
     "ID": "ID",
@@ -1717,7 +1768,7 @@
   "APP": {
     "LIST": "Apps",
     "COMPLIANCE": "OIDC Einhaltung",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "Konfiguration",
     "TOKEN": "Token Einstellungen",
     "PAGES": {
@@ -1725,12 +1776,14 @@
       "ID": "ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
       "CREATE": "Applikation erstellen",
+      "CREATE_SELECT_PROJECT": "Wähle zuerst dein Projekt aus",
+      "CREATE_NEW_PROJECT": "oder erstelle ein neues <a href='{{url}}' title='Create project'>hier</a>.",
       "CREATE_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",
       "CREATE_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert.",
       "STATE": "Status",
       "DATECREATED": "Erstellt",
       "DATECHANGED": "Geändert",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "App löschen",
       "DETAIL": {
         "TITLE": "Detail",

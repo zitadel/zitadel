@@ -52,7 +52,8 @@ var (
 		` FROM projections.apps4` +
 		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
 		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
+		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps4.id,` +
 		` projections.apps4.name,` +
 		` projections.apps4.project_id,` +
@@ -91,17 +92,20 @@ var (
 		` FROM projections.apps4` +
 		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
 		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
+		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps4_api_configs.client_id,` +
 		` projections.apps4_oidc_configs.client_id` +
 		` FROM projections.apps4` +
 		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id`)
+		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps4.project_id` +
 		` FROM projections.apps4` +
 		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
 		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
+		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects3.id,` +
 		` projections.projects3.creation_date,` +
 		` projections.projects3.change_date,` +
@@ -117,7 +121,8 @@ var (
 		` JOIN projections.apps4 ON projections.projects3.id = projections.apps4.project_id AND projections.projects3.instance_id = projections.apps4.instance_id` +
 		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
 		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
+		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 
 	appCols = database.StringArray{
 		"id",
@@ -1009,7 +1014,7 @@ func Test_AppsPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
@@ -1628,7 +1633,7 @@ func Test_AppPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
@@ -1714,7 +1719,7 @@ func Test_AppIDsPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
@@ -1780,7 +1785,7 @@ func Test_ProjectIDByAppPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
@@ -1978,7 +1983,7 @@ func Test_ProjectByAppPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

@@ -42,6 +42,41 @@
       "ADD": "按住并拖动来添加"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "你的入职过程",
+    "COMPLETED": "已完成",
+    "DISMISS": "隐藏",
+    "CARD": {
+      "TITLE": "让你的ZITADEL运转起来",
+      "DESCRIPTION": "这份清单有助于设置你的实例，并指导你完成最重要的步骤"
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "设置你的品牌",
+        "description": "定义你的登录的颜色和形状，上传你的标志和图标。"
+      },
+      "instance.smtp.config.added": {
+        "title": "SMTP设置",
+        "description": "设置你自己的邮件服务器设置"
+      },
+      "project.added": {
+        "title": "创建你的第一个项目",
+        "description": "添加你的第一个项目并定义其角色和授权。"
+      },
+      "project.application.added": {
+        "title": "创建你的第一个应用程序",
+        "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。"
+      },
+      "user.human.added": {
+        "title": "添加用户",
+        "description": "添加你的应用程序用户"
+      },
+      "user.grant.added": {
+        "title": "授予用户",
+        "description": "允许用户访问你的应用程序并设置他们的角色。"
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "实例",
     "DASHBOARD": "首页",
@@ -124,6 +159,7 @@
     "NEXT": "下一页",
     "MORE": "更多",
     "STEP": "Step",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -1578,14 +1614,37 @@
       "ACTIVETITLE": "启用的身份提供者"
     },
     "CREATE": {
-      "TITLE": "创建身份提供者",
-      "DESCRIPTION": "选择以下身份提供者类型之一。"
+      "TITLE": "创建供应商",
+      "DESCRIPTION": "选择以下一个或多个供应商。",
+      "STEPPERTITLE": "创建供应商",
+      "OIDC": {
+        "TITLE": "OIDC供应商",
+        "DESCRIPTION": "输入你的OIDC供应商的必要数据。"
+      },
+      "JWT": {
+        "TITLE": "JWT供应商",
+        "DESCRIPTION": "输入你的JWT供应商所需的数据。"
+      },
+      "GOOGLE": {
+        "TITLE": "谷歌供应商",
+        "DESCRIPTION": "输入你的谷歌身份提供者的凭证"
+      }
     },
     "DETAIL": {
       "TITLE": "身份提供者",
-      "DESCRIPTION": "身份提供者的常规配置。",
+      "DESCRIPTION": "更新你的供应商配置",
       "DATECREATED": "已创建",
       "DATECHANGED": "已更新"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "是自动创建",
+      "ISAUTOCREATION_DESC": "如果选择了，如果账户还不存在，就会创建一个账户。",
+      "ISAUTOUPDATE": "正在自动更新",
+      "ISAUTOUPDATE_DESC": "如果选择，账户将在重新认证时更新。",
+      "ISCREATIONALLOWED": "是否允许创作",
+      "ISCREATIONALLOWED_DESC": "确定是否可以创建账户。",
+      "ISLINKINGALLOWED": "是否允许连接",
+      "ISLINKINGALLOWED_DESC": "确定一个身份是否可以与一个现有的账户相联系。"
     },
     "OWNERTYPES": {
       "0": "未知",
@@ -1601,18 +1660,10 @@
       "1": "启用",
       "2": "停用"
     },
-    "MAPPINGFIELD": {
-      "1": "首选用户名",
-      "2": "电子邮箱"
-    },
-    "STYLE": "样式",
-    "STYLEFIELD": {
-      "0": "没有样式",
-      "1": "Google"
-    },
+    "NAMEHINT": "如果指定，它将显示在登录界面。",
+    "OPTIONAL": "可选",
+    "UPDATECLIENTSECRET": "更新客户秘密",
     "ADD": "添加身份提供者",
-    "AUTOREGISTER": "自动注册",
-    "AUTOREGISTER_DESC": "如果勾选，当使用 IDP 登录且用户不存在时，则会创建一个。",
     "TYPE": "类型",
     "OWNER": "所有者",
     "ID": "ID",
@@ -1716,20 +1767,22 @@
   "APP": {
     "LIST": "应用",
     "COMPLIANCE": "OIDC 兼容性",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "配置",
     "TOKEN": "令牌设置",
     "PAGES": {
       "TITLE": "应用",
       "ID": "ID",
       "DESCRIPTION": "在这里您可以编辑您的应用程序数据及其配置。",
-      "CREATE_OIDC": "OIDC 应用",
-      "CREATE_OIDC_DESC_TITLE": "逐步输入您的应用详情",
-      "CREATE_OIDC_DESC_SUB": "将自动生成推荐的配置。",
+      "CREATE": "OIDC 应用",
+      "CREATE_SELECT_PROJECT": "首先选择你的项目",
+      "CREATE_NEW_PROJECT": "或创建一个新的<a href='{url}}' title='创建项目'>这里</a>。",
+      "CREATE_DESC_TITLE": "逐步输入您的应用详情",
+      "CREATE_DESC_SUB": "将自动生成推荐的配置。",
       "STATE": "状态",
       "DATECREATED": "创建于",
       "DATECHANGED": "修改于",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "删除应用",
       "DETAIL": {
         "TITLE": "详情",

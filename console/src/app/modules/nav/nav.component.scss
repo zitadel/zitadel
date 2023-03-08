@@ -181,8 +181,39 @@
     flex: 1;
   }
 
+  .progress-bar {
+    margin-right: 0.5rem;
+    width: 100px;
+    min-width: 50px;
+    background: if($is-dark-theme, #ffffff20, #00000010);
+    border: none;
+    padding: 2px;
+    border-radius: 50vw;
+
+    &:hover {
+      background: if($is-dark-theme, #ffffff, $primary-color);
+      transition: background ease 0.15s;
+    }
+
+    .progress {
+      border-radius: 50vw;
+      height: 8px;
+
+      .mat-progress-bar-buffer {
+        background-color: if($is-dark-theme, rgb(69, 91, 84), #cccccc) !important;
+      }
+      .mat-progress-bar-background {
+        fill: if($is-dark-theme, rgb(69, 91, 84), #cccccc) !important;
+      }
+      .mat-progress-bar-fill:after {
+        background-color: var(--success);
+      }
+    }
+  }
+
   .nav-shortcut-action-key {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     font-size: 12px;
@@ -212,4 +243,10 @@
       opacity: 1;
     }
   }
+}
+
+.onboarding_card {
+  border-radius: 0.5rem;
+  box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+  border: 1px solid rgba(#8795a1, 0.2);
 }

@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/spooler"
@@ -11,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	eventstore2 "github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_spol "github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
@@ -34,7 +34,7 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *database.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			UserViewProvider:          view,
 			UserCommandProvider:       command,
 			UserEventProvider:         &userRepo,
-			IDPProviderViewProvider:   view,
+			IDPProviderViewProvider:   queries,
 			IDPUserLinksProvider:      queries,
 			LockoutPolicyViewProvider: queries,
 			LoginPolicyViewProvider:   queries,

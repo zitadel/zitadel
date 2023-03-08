@@ -13,15 +13,18 @@ import (
 
 var (
 	loginPolicyIDPLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_login_policy_links4.idp_id,` +
-		` projections.idps3.name,` +
-		` projections.idps3.type,` +
+		` projections.idp_templates3.name,` +
+		` projections.idp_templates3.type,` +
+		` projections.idp_templates3.owner_type,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_login_policy_links4` +
-		` LEFT JOIN projections.idps3 ON projections.idp_login_policy_links4.idp_id = projections.idps3.id`)
+		` LEFT JOIN projections.idp_templates3 ON projections.idp_login_policy_links4.idp_id = projections.idp_templates3.id AND projections.idp_login_policy_links4.instance_id = projections.idp_templates3.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	loginPolicyIDPLinksCols = []string{
 		"idp_id",
 		"name",
 		"type",
+		"owner_type",
 		"count",
 	}
 )
@@ -48,7 +51,8 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 						{
 							"idp-id",
 							"idp-name",
-							domain.IDPConfigTypeJWT,
+							domain.IDPTypeJWT,
+							domain.IdentityProviderTypeSystem,
 						},
 					},
 				),
@@ -59,9 +63,10 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 				},
 				Links: []*IDPLoginPolicyLink{
 					{
-						IDPID:   "idp-id",
-						IDPName: "idp-name",
-						IDPType: domain.IDPConfigTypeJWT,
+						IDPID:     "idp-id",
+						IDPName:   "idp-name",
+						IDPType:   domain.IDPTypeJWT,
+						OwnerType: domain.IdentityProviderTypeSystem,
 					},
 				},
 			},
@@ -78,6 +83,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 							"idp-id",
 							nil,
 							nil,
+							nil,
 						},
 					},
 				),
@@ -90,7 +96,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 					{
 						IDPID:   "idp-id",
 						IDPName: "",
-						IDPType: domain.IDPConfigTypeUnspecified,
+						IDPType: domain.IDPTypeUnspecified,
 					},
 				},
 			},
@@ -115,7 +121,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
