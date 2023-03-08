@@ -1615,7 +1615,7 @@
   "IDP": {
     "LIST": {
       "TITLE": "Fornitori di identità",
-      "DESCRIPTION": "Definisci ulteriori Fornitore di identità, che possono essere utilizzati per l'autenticazione nelle tue organizzazioni.",
+      "DESCRIPTION": "Definisci ulteriori fornitori di identità, che possono essere utilizzati per l'autenticazione nelle tue organizzazioni.",
       "ACTIVETITLE": "Fornitori di identità"
     },
     "CREATE": {
