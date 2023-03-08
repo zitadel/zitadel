@@ -6,7 +6,7 @@ import { ProjectType } from 'src/app/modules/project-members/project-members-dat
 import { UserTarget } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
-import { GrantedProject, Project, Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';

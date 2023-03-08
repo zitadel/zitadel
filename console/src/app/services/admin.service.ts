@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
 
 import {
   ActivateLabelPolicyRequest,
@@ -7,16 +8,22 @@ import {
   ActivateSMSProviderResponse,
   AddCustomDomainPolicyRequest,
   AddCustomOrgIAMPolicyResponse,
+  AddGenericOIDCProviderRequest,
+  AddGenericOIDCProviderResponse,
+  AddGoogleProviderRequest,
+  AddGoogleProviderResponse,
   AddIAMMemberRequest,
   AddIAMMemberResponse,
   AddIDPToLoginPolicyRequest,
   AddIDPToLoginPolicyResponse,
-  AddJWTIDPRequest,
-  AddJWTIDPResponse,
+  AddJWTProviderRequest,
+  AddJWTProviderResponse,
   AddMultiFactorToLoginPolicyRequest,
   AddMultiFactorToLoginPolicyResponse,
-  AddOIDCIDPRequest,
-  AddOIDCIDPResponse,
+  AddNotificationPolicyRequest,
+  AddNotificationPolicyResponse,
+  AddOIDCSettingsRequest,
+  AddOIDCSettingsResponse,
   AddSecondFactorToLoginPolicyRequest,
   AddSecondFactorToLoginPolicyResponse,
   AddSMSProviderTwilioRequest,
@@ -27,6 +34,8 @@ import {
   DeactivateIDPResponse,
   DeactivateSMSProviderRequest,
   DeactivateSMSProviderResponse,
+  DeleteProviderRequest,
+  DeleteProviderResponse,
   GetCustomDomainClaimedMessageTextRequest,
   GetCustomDomainClaimedMessageTextResponse,
   GetCustomDomainPolicyRequest,
@@ -35,6 +44,8 @@ import {
   GetCustomInitMessageTextResponse,
   GetCustomLoginTextsRequest,
   GetCustomLoginTextsResponse,
+  GetCustomPasswordChangeMessageTextRequest,
+  GetCustomPasswordChangeMessageTextResponse,
   GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordlessRegistrationMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
@@ -51,6 +62,8 @@ import {
   GetDefaultLanguageResponse,
   GetDefaultLoginTextsRequest,
   GetDefaultLoginTextsResponse,
+  GetDefaultPasswordChangeMessageTextRequest,
+  GetDefaultPasswordChangeMessageTextResponse,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultPasswordlessRegistrationMessageTextResponse,
   GetDefaultPasswordResetMessageTextRequest,
@@ -63,8 +76,6 @@ import {
   GetDomainPolicyResponse,
   GetFileSystemNotificationProviderRequest,
   GetFileSystemNotificationProviderResponse,
-  GetIDPByIDRequest,
-  GetIDPByIDResponse,
   GetLabelPolicyRequest,
   GetLabelPolicyResponse,
   GetLockoutPolicyRequest,
@@ -75,6 +86,8 @@ import {
   GetLogNotificationProviderResponse,
   GetMyInstanceRequest,
   GetMyInstanceResponse,
+  GetNotificationPolicyRequest,
+  GetNotificationPolicyResponse,
   GetOIDCSettingsRequest,
   GetOIDCSettingsResponse,
   GetPasswordAgePolicyRequest,
@@ -85,29 +98,38 @@ import {
   GetPreviewLabelPolicyResponse,
   GetPrivacyPolicyRequest,
   GetPrivacyPolicyResponse,
+  GetProviderByIDRequest,
+  GetProviderByIDResponse,
   GetSecretGeneratorRequest,
   GetSecretGeneratorResponse,
+  GetSecurityPolicyRequest,
+  GetSecurityPolicyResponse,
   GetSMSProviderRequest,
   GetSMSProviderResponse,
   GetSMTPConfigRequest,
   GetSMTPConfigResponse,
   GetSupportedLanguagesRequest,
   GetSupportedLanguagesResponse,
-  IDPQuery,
+  ListAggregateTypesRequest,
+  ListAggregateTypesResponse,
+  ListEventsRequest,
+  ListEventsResponse,
+  ListEventTypesRequest,
+  ListEventTypesResponse,
   ListFailedEventsRequest,
   ListFailedEventsResponse,
   ListIAMMemberRolesRequest,
   ListIAMMemberRolesResponse,
   ListIAMMembersRequest,
   ListIAMMembersResponse,
-  ListIDPsRequest,
-  ListIDPsResponse,
   ListLoginPolicyIDPsRequest,
   ListLoginPolicyIDPsResponse,
   ListLoginPolicyMultiFactorsRequest,
   ListLoginPolicyMultiFactorsResponse,
   ListLoginPolicySecondFactorsRequest,
   ListLoginPolicySecondFactorsResponse,
+  ListProvidersRequest,
+  ListProvidersResponse,
   ListSecretGeneratorsRequest,
   ListSecretGeneratorsResponse,
   ListSMSProvidersRequest,
@@ -152,6 +174,10 @@ import {
   SetDefaultInitMessageTextResponse,
   SetDefaultLanguageRequest,
   SetDefaultLanguageResponse,
+  SetDefaultOrgRequest,
+  SetDefaultOrgResponse,
+  SetDefaultPasswordChangeMessageTextRequest,
+  SetDefaultPasswordChangeMessageTextResponse,
   SetDefaultPasswordlessRegistrationMessageTextRequest,
   SetDefaultPasswordlessRegistrationMessageTextResponse,
   SetDefaultPasswordResetMessageTextRequest,
@@ -160,28 +186,30 @@ import {
   SetDefaultVerifyEmailMessageTextResponse,
   SetDefaultVerifyPhoneMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextResponse,
+  SetSecurityPolicyRequest,
+  SetSecurityPolicyResponse,
   SetUpOrgRequest,
   SetUpOrgResponse,
   UpdateCustomDomainPolicyRequest,
   UpdateCustomDomainPolicyResponse,
   UpdateDomainPolicyRequest,
   UpdateDomainPolicyResponse,
+  UpdateGenericOIDCProviderRequest,
+  UpdateGenericOIDCProviderResponse,
+  UpdateGoogleProviderRequest,
+  UpdateGoogleProviderResponse,
   UpdateIAMMemberRequest,
   UpdateIAMMemberResponse,
-  UpdateIDPJWTConfigRequest,
-  UpdateIDPJWTConfigResponse,
-  UpdateIDPOIDCConfigRequest,
-  UpdateIDPOIDCConfigResponse,
-  UpdateIDPRequest,
-  UpdateIDPResponse,
+  UpdateJWTProviderRequest,
+  UpdateJWTProviderResponse,
   UpdateLabelPolicyRequest,
   UpdateLabelPolicyResponse,
   UpdateLockoutPolicyRequest,
   UpdateLockoutPolicyResponse,
   UpdateLoginPolicyRequest,
   UpdateLoginPolicyResponse,
-  AddOIDCSettingsRequest,
-  AddOIDCSettingsResponse,
+  UpdateNotificationPolicyRequest,
+  UpdateNotificationPolicyResponse,
   UpdateOIDCSettingsRequest,
   UpdateOIDCSettingsResponse,
   UpdatePasswordAgePolicyRequest,
@@ -200,40 +228,85 @@ import {
   UpdateSMTPConfigPasswordResponse,
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
-  GetSecurityPolicyRequest,
-  GetSecurityPolicyResponse,
-  SetSecurityPolicyRequest,
-  SetSecurityPolicyResponse,
-  ListEventsResponse,
-  ListEventsRequest,
-  ListEventTypesRequest,
-  ListEventTypesResponse,
-  ListAggregateTypesRequest,
-  ListAggregateTypesResponse,
-  GetNotificationPolicyRequest,
-  GetNotificationPolicyResponse,
-  UpdateNotificationPolicyRequest,
-  UpdateNotificationPolicyResponse,
-  GetDefaultPasswordChangeMessageTextResponse,
-  GetDefaultPasswordChangeMessageTextRequest,
-  GetCustomPasswordChangeMessageTextResponse,
-  SetDefaultPasswordChangeMessageTextRequest,
-  SetDefaultPasswordChangeMessageTextResponse,
-  GetCustomPasswordChangeMessageTextRequest,
-  AddNotificationPolicyRequest,
-  AddNotificationPolicyResponse,
-  SetDefaultOrgRequest,
-  SetDefaultOrgResponse,
 } from '../proto/generated/zitadel/admin_pb';
+import { Event } from '../proto/generated/zitadel/event_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
+import { StorageLocation, StorageService } from './storage.service';
+
+export interface OnboardingActions {
+  order: number;
+  eventType: string;
+  oneof: string[];
+  link: string | string[];
+  fragment?: string | undefined;
+}
+
+type OnboardingEvent = { order: number; link: string; fragment: string | undefined; event: Event.AsObject | undefined };
+type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
-  constructor(private readonly grpcService: GrpcService) {}
+  public hideOnboarding: boolean = false;
+  public loadEvents: Subject<OnboardingActions[]> = new Subject();
+  public onboardingLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public progressEvents$: Observable<OnboardingEventEntries> = this.loadEvents.pipe(
+    tap(() => this.onboardingLoading.next(true)),
+    switchMap((actions) => {
+      const searchForTypes = actions.map((oe) => oe.oneof).flat();
+      const eventsReq = new ListEventsRequest().setAsc(true).setEventTypesList(searchForTypes).setAsc(false);
+      return from(this.listEvents(eventsReq)).pipe(
+        map((events) => {
+          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API');
+
+          let obj: { [type: string]: OnboardingEvent } = {};
+          actions.map((action) => {
+            const filtered = el.filter((event) => event.type?.type && action.oneof.includes(event.type.type));
+            (obj as any)[action.eventType] = filtered.length
+              ? { order: action.order, link: action.link, fragment: action.fragment, event: filtered[0] }
+              : { order: action.order, link: action.link, fragment: action.fragment, event: undefined };
+          });
+
+          const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
+
+          const toDo = toArray.filter(([key, value]) => value.event === undefined);
+          const done = toArray.filter(([key, value]) => !!value.event);
+
+          return [...toDo, ...done];
+        }),
+        tap((events) => {
+          const total = events.length;
+          const done = events.map(([type, value]) => value.event !== undefined).filter((res) => !!res).length;
+          const percentage = Math.round((done / total) * 100);
+          this.progressDone.next(done);
+          this.progressTotal.next(total);
+          this.progressPercentage.next(percentage);
+          this.progressAllDone.next(done === total);
+        }),
+        catchError((error) => {
+          console.error(error);
+          return of([]);
+        }),
+        finalize(() => this.onboardingLoading.next(false)),
+      );
+    }),
+  );
+
+  public progressEvents: BehaviorSubject<OnboardingEventEntries> = new BehaviorSubject<OnboardingEventEntries>([]);
+  public progressPercentage: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressDone: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressTotal: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressAllDone: BehaviorSubject<boolean> = new BehaviorSubject(true);
+
+  constructor(private readonly grpcService: GrpcService, private storageService: StorageService) {
+    this.progressEvents$.subscribe(this.progressEvents);
+
+    this.hideOnboarding =
+      this.storageService.getItem('onboarding-dismissed', StorageLocation.local) === 'true' ? true : false;
+  }
 
   public setDefaultOrg(orgId: string): Promise<SetDefaultOrgResponse.AsObject> {
     const req = new SetDefaultOrgRequest();
@@ -801,41 +874,6 @@ export class AdminService {
     return this.grpcService.admin.listLoginPolicyIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public listIDPs(limit?: number, offset?: number, queriesList?: IDPQuery[]): Promise<ListIDPsResponse.AsObject> {
-    const req = new ListIDPsRequest();
-    const query = new ListQuery();
-
-    if (limit) {
-      query.setLimit(limit);
-    }
-    if (offset) {
-      query.setOffset(offset);
-    }
-    if (queriesList) {
-      req.setQueriesList(queriesList);
-    }
-    req.setQuery(query);
-    return this.grpcService.admin.listIDPs(req, null).then((resp) => resp.toObject());
-  }
-
-  public getIDPByID(id: string): Promise<GetIDPByIDResponse.AsObject> {
-    const req = new GetIDPByIDRequest();
-    req.setId(id);
-    return this.grpcService.admin.getIDPByID(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateIDP(req: UpdateIDPRequest): Promise<UpdateIDPResponse.AsObject> {
-    return this.grpcService.admin.updateIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public addOIDCIDP(req: AddOIDCIDPRequest): Promise<AddOIDCIDPResponse.AsObject> {
-    return this.grpcService.admin.addOIDCIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateIDPOIDCConfig(req: UpdateIDPOIDCConfigRequest): Promise<UpdateIDPOIDCConfigResponse.AsObject> {
-    return this.grpcService.admin.updateIDPOIDCConfig(req, null).then((resp) => resp.toObject());
-  }
-
   public removeIDP(id: string): Promise<RemoveIDPResponse.AsObject> {
     const req = new RemoveIDPRequest();
     req.setIdpId(id);
@@ -854,12 +892,44 @@ export class AdminService {
     return this.grpcService.admin.reactivateIDP(req, null).then((resp) => resp.toObject());
   }
 
-  public addJWTIDP(req: AddJWTIDPRequest): Promise<AddJWTIDPResponse.AsObject> {
-    return this.grpcService.admin.addJWTIDP(req, null).then((resp) => resp.toObject());
+  //   idp templates
+
+  public addGoogleProvider(req: AddGoogleProviderRequest): Promise<AddGoogleProviderResponse.AsObject> {
+    return this.grpcService.admin.addGoogleProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public updateIDPJWTConfig(req: UpdateIDPJWTConfigRequest): Promise<UpdateIDPJWTConfigResponse.AsObject> {
-    return this.grpcService.admin.updateIDPJWTConfig(req, null).then((resp) => resp.toObject());
+  public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.admin.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOIDCProvider(
+    req: UpdateGenericOIDCProviderRequest,
+  ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addJWTProvider(req: AddJWTProviderRequest): Promise<AddJWTProviderResponse.AsObject> {
+    return this.grpcService.admin.addJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
+    return this.grpcService.admin.updateJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {
+    return this.grpcService.admin.deleteProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public listProviders(req: ListProvidersRequest): Promise<ListProvidersResponse.AsObject> {
+    return this.grpcService.admin.listProviders(req, null).then((resp) => resp.toObject());
+  }
+
+  public getProviderByID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse.AsObject> {
+    return this.grpcService.admin.getProviderByID(req, null).then((resp) => resp.toObject());
   }
 
   public listIAMMembers(

@@ -201,6 +201,144 @@ func providerQueryToQuery(idpQuery *admin_pb.ProviderQuery) (query.SearchQuery, 
 	}
 }
 
+func addGenericOAuthProviderToCommand(req *admin_pb.AddGenericOAuthProviderRequest) command.GenericOAuthProvider {
+	return command.GenericOAuthProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDAttribute:           req.IdAttribute,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGenericOAuthProviderToCommand(req *admin_pb.UpdateGenericOAuthProviderRequest) command.GenericOAuthProvider {
+	return command.GenericOAuthProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDAttribute:           req.IdAttribute,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGenericOIDCProviderToCommand(req *admin_pb.AddGenericOIDCProviderRequest) command.GenericOIDCProvider {
+	return command.GenericOIDCProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGenericOIDCProviderToCommand(req *admin_pb.UpdateGenericOIDCProviderRequest) command.GenericOIDCProvider {
+	return command.GenericOIDCProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addJWTProviderToCommand(req *admin_pb.AddJWTProviderRequest) command.JWTProvider {
+	return command.JWTProvider{
+		Name:        req.Name,
+		Issuer:      req.Issuer,
+		JWTEndpoint: req.JwtEndpoint,
+		KeyEndpoint: req.KeysEndpoint,
+		HeaderName:  req.HeaderName,
+		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateJWTProviderToCommand(req *admin_pb.UpdateJWTProviderRequest) command.JWTProvider {
+	return command.JWTProvider{
+		Name:        req.Name,
+		Issuer:      req.Issuer,
+		JWTEndpoint: req.JwtEndpoint,
+		KeyEndpoint: req.KeysEndpoint,
+		HeaderName:  req.HeaderName,
+		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGitHubProviderToCommand(req *admin_pb.AddGitHubProviderRequest) command.GitHubProvider {
+	return command.GitHubProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitHubProviderToCommand(req *admin_pb.UpdateGitHubProviderRequest) command.GitHubProvider {
+	return command.GitHubProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGitHubEnterpriseProviderToCommand(req *admin_pb.AddGitHubEnterpriseServerProviderRequest) command.GitHubEnterpriseProvider {
+	return command.GitHubEnterpriseProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitHubEnterpriseProviderToCommand(req *admin_pb.UpdateGitHubEnterpriseServerProviderRequest) command.GitHubEnterpriseProvider {
+	return command.GitHubEnterpriseProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGoogleProviderToCommand(req *admin_pb.AddGoogleProviderRequest) command.GoogleProvider {
+	return command.GoogleProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGoogleProviderToCommand(req *admin_pb.UpdateGoogleProviderRequest) command.GoogleProvider {
+	return command.GoogleProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
 func addLDAPProviderToCommand(req *admin_pb.AddLDAPProviderRequest) command.LDAPProvider {
 	return command.LDAPProvider{
 		Name:                req.Name,

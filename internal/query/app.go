@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -250,7 +251,7 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 		projection.AppProjection.Trigger(ctx)
 	}
 
-	stmt, scan := prepareAppQuery()
+	stmt, scan := prepareAppQuery(ctx, q.client)
 	eq := sq.Eq{
 		AppColumnID.identifier():         appID,
 		AppColumnProjectID.identifier():  projectID,
@@ -272,7 +273,7 @@ func (q *Queries) AppByID(ctx context.Context, appID string, withOwnerRemoved bo
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAppQuery()
+	stmt, scan := prepareAppQuery(ctx, q.client)
 	eq := sq.Eq{
 		AppColumnID.identifier():         appID,
 		AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -293,7 +294,7 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string, withOw
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAppQuery()
+	stmt, scan := prepareAppQuery(ctx, q.client)
 	eq := sq.Eq{
 		AppSAMLConfigColumnEntityID.identifier(): entityID,
 		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
@@ -314,7 +315,7 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string, withOwner
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareProjectByAppQuery()
+	stmt, scan := prepareProjectByAppQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[ProjectColumnOwnerRemoved.identifier()] = false
@@ -339,7 +340,7 @@ func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string, w
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareProjectIDByAppQuery()
+	stmt, scan := prepareProjectIDByAppQuery(ctx, q.client)
 	eq := sq.Eq{
 		AppOIDCConfigColumnClientID.identifier(): appID,
 		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
@@ -360,7 +361,7 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string, withO
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareProjectIDByAppQuery()
+	stmt, scan := prepareProjectIDByAppQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[AppColumnOwnerRemoved.identifier()] = false
@@ -386,7 +387,7 @@ func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string, withOwne
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareProjectByAppQuery()
+	stmt, scan := prepareProjectByAppQuery(ctx, q.client)
 	eq := sq.Eq{
 		AppOIDCConfigColumnClientID.identifier(): id,
 		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
@@ -407,7 +408,7 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string, withOw
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAppQuery()
+	stmt, scan := prepareAppQuery(ctx, q.client)
 	eq := sq.Eq{
 		AppOIDCConfigColumnClientID.identifier(): clientID,
 		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
@@ -428,7 +429,7 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string, withOwnerR
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAppQuery()
+	stmt, scan := prepareAppQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[AppColumnOwnerRemoved.identifier()] = false
@@ -452,7 +453,7 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareAppsQuery()
+	query, scan := prepareAppsQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[AppColumnOwnerRemoved.identifier()] = false
@@ -478,7 +479,7 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareClientIDsQuery()
+	query, scan := prepareClientIDsQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		eq[AppColumnOwnerRemoved.identifier()] = false
@@ -503,7 +504,7 @@ func NewAppProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnProjectID, id, TextEquals)
 }
 
-func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+func prepareAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 	return sq.Select(
 			AppColumnID.identifier(),
 			AppColumnName.identifier(),
@@ -542,7 +543,7 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
 			app := new(App)
 
@@ -604,13 +605,13 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 		}
 }
 
-func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID string, err error)) {
+func prepareProjectIDByAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (projectID string, err error)) {
 	return sq.Select(
 			AppColumnProjectID.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (projectID string, err error) {
 			err = row.Scan(
 				&projectID,
@@ -627,7 +628,7 @@ func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID s
 		}
 }
 
-func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
+func prepareProjectByAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
 	return sq.Select(
 			ProjectColumnID.identifier(),
 			ProjectColumnCreationDate.identifier(),
@@ -644,7 +645,7 @@ func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, err
 			Join(join(AppColumnProjectID, ProjectColumnID)).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
@@ -671,7 +672,7 @@ func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, err
 		}
 }
 
-func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
+func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 	return sq.Select(
 			AppColumnID.identifier(),
 			AppColumnName.identifier(),
@@ -711,7 +712,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*Apps, error) {
 			apps := &Apps{Apps: []*App{}}
 
@@ -777,13 +778,13 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 		}
 }
 
-func prepareClientIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error)) {
+func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) ([]string, error)) {
 	return sq.Select(
 			AppAPIConfigColumnClientID.identifier(),
 			AppOIDCConfigColumnClientID.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
 			ids := database.StringArray{}
 

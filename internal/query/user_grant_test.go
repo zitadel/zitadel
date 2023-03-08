@@ -43,6 +43,7 @@ var (
 			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id AND projections.user_grants3.instance_id = projections.orgs.instance_id" +
 			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id AND projections.user_grants3.instance_id = projections.projects3.instance_id" +
 			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id AND projections.user_grants3.instance_id = projections.login_names2.instance_id" +
+			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names2.is_primary = $1")
 	userGrantCols = []string{
 		"id",
@@ -98,6 +99,7 @@ var (
 			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id AND projections.user_grants3.instance_id = projections.orgs.instance_id" +
 			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id AND projections.user_grants3.instance_id = projections.projects3.instance_id" +
 			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id AND projections.user_grants3.instance_id = projections.login_names2.instance_id" +
+			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names2.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,
@@ -923,7 +925,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

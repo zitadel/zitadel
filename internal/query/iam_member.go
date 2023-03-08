@@ -7,6 +7,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -78,7 +79,7 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, with
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareInstanceMembersQuery()
+	query, scan := prepareInstanceMembersQuery(ctx, q.client)
 	eq := sq.Eq{InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		addIamMemberWithoutOwnerRemoved(eq)
@@ -106,7 +107,7 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, with
 	return members, err
 }
 
-func prepareInstanceMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
+func prepareInstanceMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
 			InstanceMemberCreationDate.identifier(),
 			InstanceMemberChangeDate.identifier(),
@@ -125,7 +126,7 @@ func prepareInstanceMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members,
 		).From(instanceMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, InstanceMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, InstanceMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, InstanceMemberUserID)).
+			LeftJoin(join(LoginNameUserIDCol, InstanceMemberUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

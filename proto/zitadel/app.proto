@@ -106,17 +106,17 @@ message OIDCConfig {
     ];
     OIDCVersion version = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "the oidc version used by the application";
+            description: "the OIDC version used by the application";
         }
     ];
     bool none_compliant = 10 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "specifies wheter the config is oidc compliant. A production configuration SHOULD be compliant";
+            description: "specifies whether the config is OIDC compliant. A production configuration SHOULD be compliant";
         }
     ];
     repeated zitadel.v1.LocalizedMessage compliance_problems = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "lists the problems for non compliancy";
+            description: "lists the problems for non-compliancy";
         }
     ];
     bool dev_mode = 12 [
@@ -131,7 +131,7 @@ message OIDCConfig {
     ];
     bool access_token_role_assertion = 14 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "adds roles to the claims of the access token (only if type == jwt) even if they are not requested by scopes";
+            description: "adds roles to the claims of the access token (only if type == JWT) even if they are not requested by scopes";
         }
     ];
     bool id_token_role_assertion = 15 [
@@ -141,12 +141,12 @@ message OIDCConfig {
     ];
     bool id_token_userinfo_assertion = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "claims of profile, email, address and phone scopes are added to the id token even if an access token is issued. Attention this violates the oidc specification";
+            description: "claims of profile, email, address and phone scopes are added to the id token even if an access token is issued. Attention this violates the OIDC specification";
         }
     ];
     google.protobuf.Duration clock_skew = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Used to compensate time difference of servers. Duration added to the \"exp\" claim and substracted from \"iat\", \"auth_time\" and \"nbf\" claims";
+            description: "Used to compensate time difference of servers. Duration added to the \"exp\" claim and subtracted from \"iat\", \"auth_time\" and \"nbf\" claims";
             // min: "0s";
             // max: "5s";
         }
@@ -154,13 +154,13 @@ message OIDCConfig {
     repeated string additional_origins = 18 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://console.zitadel.ch/auth/callback\"]";
-            description: "additional origins (other than the redirect_uris) from where the api can be used";
+            description: "additional origins (other than the redirect_uris) from where the API can be used";
         }
     ];
     repeated string allowed_origins = 19 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://console.zitadel.ch/auth/callback\"]";
-            description: "all allowed origins from where the api can be used";
+            description: "all allowed origins from where the API can be used";
         }
     ];
 }
@@ -222,7 +222,7 @@ message APIConfig {
     ];
     APIAuthMethodType auth_method_type = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines how the api passes the login credentials";
+            description: "defines how the API passes the login credentials";
         }
     ];
 }

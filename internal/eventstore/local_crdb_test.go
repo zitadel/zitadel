@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
 	"github.com/zitadel/logging"
@@ -14,7 +15,7 @@ import (
 )
 
 var (
-	testCRDBClient *sql.DB
+	testCRDBClient *database.DB
 )
 
 func TestMain(m *testing.M) {
@@ -23,7 +24,11 @@ func TestMain(m *testing.M) {
 		logging.WithFields("error", err).Fatal("unable to start db")
 	}
 
-	testCRDBClient, err = sql.Open("postgres", ts.PGURL().String())
+	testCRDBClient = &database.DB{
+		Database: new(testDB),
+	}
+
+	testCRDBClient.DB, err = sql.Open("postgres", ts.PGURL().String())
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to connect to db")
 	}
@@ -39,7 +44,7 @@ func TestMain(m *testing.M) {
 		ts.Stop()
 	}()
 
-	if err = initDB(testCRDBClient); err != nil {
+	if err = initDB(testCRDBClient.DB); err != nil {
 		logging.WithFields("error", err).Fatal("migrations failed")
 	}
 
@@ -57,10 +62,20 @@ func initDB(db *sql.DB) error {
 	})
 	err := initialise.Init(db,
 		initialise.VerifyUser(config.Username(), ""),
-		initialise.VerifyDatabase(config.Database()),
-		initialise.VerifyGrant(config.Database(), config.Username()))
+		initialise.VerifyDatabase(config.DatabaseName()),
+		initialise.VerifyGrant(config.DatabaseName(), config.Username()))
 	if err != nil {
 		return err
 	}
 	return initialise.VerifyZitadel(db, *config)
 }
+
+type testDB struct{}
+
+func (_ *testDB) Timetravel(time.Duration) string { return " AS OF SYSTEM TIME '-1 ms' " }
+
+func (*testDB) DatabaseName() string { return "db" }
+
+func (*testDB) Username() string { return "user" }
+
+func (*testDB) Type() string { return "type" }

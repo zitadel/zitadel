@@ -187,6 +187,7 @@ func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return o.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
+			AllowTimeTravel().
 			AddQuery().
 			AggregateTypes(keypair.AggregateType, instance.AggregateType).
 			Builder(),

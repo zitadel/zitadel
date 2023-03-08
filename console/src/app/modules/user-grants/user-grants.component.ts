@@ -2,13 +2,14 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacyInput as MatInput } from '@angular/material/legacy-input';
-import { MatLegacySelectChange as MatSelectChange } from '@angular/material/legacy-select';
 import { MatLegacyTable as MatTable } from '@angular/material/legacy-table';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
+import { UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
-import { Type, UserGrant, UserGrantQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { Type, UserGrant as MgmtUserGrant, UserGrantQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -24,6 +25,9 @@ export enum UserGrantListSearchKey {
   PROJECT_NAME,
   ROLE_KEY,
 }
+
+type UserGrantAsObject = AuthUserGrant.AsObject | MgmtUserGrant.AsObject;
+
 @Component({
   selector: 'cnsl-user-grants',
   templateUrl: './user-grants.component.html',
@@ -38,10 +42,10 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() context: UserGrantContext = UserGrantContext.NONE;
   @Input() refreshOnPreviousRoutes: string[] = [];
 
-  public dataSource: UserGrantsDataSource = new UserGrantsDataSource(this.userService);
-  public selection: SelectionModel<UserGrant.AsObject> = new SelectionModel<UserGrant.AsObject>(true, []);
+  public dataSource: UserGrantsDataSource = new UserGrantsDataSource(this.authService, this.userService);
+  public selection: SelectionModel<UserGrantAsObject> = new SelectionModel<UserGrantAsObject>(true, []);
   @ViewChild(PaginatorComponent) public paginator?: PaginatorComponent;
-  @ViewChild(MatTable) public table?: MatTable<UserGrant.AsObject>;
+  @ViewChild(MatTable) public table?: MatTable<UserGrantAsObject>;
 
   @Input() disableWrite: boolean = false;
   @Input() disableDelete: boolean = false;
@@ -66,6 +70,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public filterOpen: boolean = false;
 
   constructor(
+    private authService: GrpcAuthService,
     private userService: ManagementService,
     private toast: ToastService,
     private dialog: MatDialog,
@@ -88,18 +93,21 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     switch (this.context) {
       case UserGrantContext.OWNED_PROJECT:
         if (this.projectId) {
-          // this.getProjectRoleOptions(this.projectId);
           this.routerLink = ['/grant-create', 'project', this.projectId];
         }
         break;
       case UserGrantContext.GRANTED_PROJECT:
         if (this.grantId) {
           this.routerLink = ['/grant-create', 'project', this.projectId, 'grant', this.grantId];
-          // this.getGrantRoleOptions(this.grantId, this.projectId);
         }
         break;
       case UserGrantContext.USER:
         if (this.userId) {
+          this.routerLink = ['/grant-create', 'user', this.userId];
+        }
+        break;
+      case UserGrantContext.AUTHUSER:
+        if (this.grantId) {
           this.routerLink = ['/grant-create', 'user', this.userId];
         }
         break;
@@ -119,7 +127,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     this.loadGrantsPage(type);
   }
 
-  public getType(grant: UserGrant.AsObject): string {
+  public getType(grant: UserGrantAsObject): string {
     if (grant.projectGrantId) {
       return 'Project Grant';
     } else if (grant.projectId) {
@@ -161,11 +169,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       : this.dataSource.grantsSubject.value.forEach((row) => this.selection.select(row));
   }
 
-  public openEditDialog(grant: UserGrant.AsObject): void {
+  public openEditDialog(grant: UserGrantAsObject): void {
     const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
       data: {
         projectId: grant.projectId,
-        grantId: grant.projectGrantId,
+        grantId: grant?.projectGrantId,
         selectedRoleKeysList: grant.roleKeysList,
         i18nTitle: 'GRANTS.EDIT.TITLE',
       },
@@ -175,7 +183,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp && resp.roles) {
         this.userService
-          .updateUserGrant(grant.id, grant.userId, resp.roles)
+          .updateUserGrant(
+            (grant as MgmtUserGrant.AsObject).id ?? (grant as AuthUserGrant.AsObject).grantId,
+            grant.userId,
+            resp.roles,
+          )
           .then(() => {
             this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
             grant.roleKeysList = resp.roles;
@@ -187,18 +199,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updateRoles(grant: UserGrant.AsObject, selectionChange: MatSelectChange): void {
-    this.userService
-      .updateUserGrant(grant.id, grant.userId, selectionChange.value)
-      .then(() => {
-        this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public deleteGrant(event: any, grant: UserGrant.AsObject): void {
+  public deleteGrant(event: any, grant: MgmtUserGrant.AsObject): void {
     event.stopPropagation();
 
     const dialogRef = this.dialog.open(WarnDialogComponent, {
@@ -219,7 +220,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             this.toast.showInfo('GRANTS.TOAST.REMOVED', true);
             const data = this.dataSource.grantsSubject.getValue();
 
-            const index = data.findIndex((i) => i.id === grant.id);
+            const index = data.findIndex(
+              (i) => (i as MgmtUserGrant.AsObject).id && (i as MgmtUserGrant.AsObject).id === grant.id,
+            );
             if (index > -1) {
               data.splice(index, 1);
               this.dataSource.grantsSubject.next(data);
@@ -246,12 +249,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         this.userService
-          .bulkRemoveUserGrant(this.selection.selected.map((grant) => grant.id))
+          .bulkRemoveUserGrant(this.selection.selected.map((grant) => (grant as MgmtUserGrant.AsObject).id))
           .then(() => {
             this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
             const data = this.dataSource.grantsSubject.getValue();
             this.selection.selected.forEach((item) => {
-              const index = data.findIndex((i) => i.id === item.id);
+              const index = data.findIndex((i) => (i as MgmtUserGrant.AsObject).id === (item as MgmtUserGrant.AsObject).id);
               if (index > -1) {
                 data.splice(index, 1);
                 this.dataSource.grantsSubject.next(data);

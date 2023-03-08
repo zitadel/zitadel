@@ -3,3 +3,86 @@
 <div class="cnsl-idp-table-wrapper">
   <cnsl-idp-table [service]="service" [serviceType]="serviceType"></cnsl-idp-table>
 </div>
+
+<h2>{{ 'IDP.CREATE.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'IDP.CREATE.DESCRIPTION' | translate }}</p>
+
+<div class="new-idp-wrapper">
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'google', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'google', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
+    <div class="text-container">
+      <span class="title">Google</span>
+    </div>
+  </a>
+
+  <div class="item card coming-soon" matRipple>
+    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
+    <img class="idp-logo" src="../../../assets/images/idp/ms.svg" alt="microsoft" />
+    <div class="text-container">
+      <span class="title">Microsoft</span>
+    </div>
+  </div>
+
+  <div class="item card coming-soon" matRipple>
+    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
+    <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="GitHub" />
+    <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="GitHub" />
+
+    <div class="text-container">
+      <span class="title">GitHub</span>
+    </div>
+  </div>
+
+  <div class="item card coming-soon" matRipple>
+    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
+    <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="GitLab" />
+    <div class="text-container">
+      <span class="title">GitLab</span>
+    </div>
+  </div>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'oidc', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'oidc', 'create']
+        : []
+    "
+  >
+    <div class="idp-icon">
+      <mat-icon class="icon" svgIcon="mdi_openid" alt="openid" />
+    </div>
+    <div class="text-container">
+      <span class="title">Generic OIDC</span>
+    </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'jwt', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'jwt', 'create']
+        : []
+    "
+  >
+    <div class="idp-icon">
+      <mat-icon class="icon" svgIcon="mdi_jwt" alt="jwt" />
+    </div>
+    <div class="text-container">
+      <span class="title">Generic JWT</span>
+    </div>
+  </a>
+</div>

@@ -18,7 +18,7 @@ func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner s
 	if userID == "" {
 		return "", errors.ThrowPreconditionFailed(nil, "QUERY-8N9ds", "Errors.User.UserIDMissing")
 	}
-	existingOTP, err := q.otpWriteModelByID(ctx, userID, resourceowner)
+	existingOTP, err := q.otpReadModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return "", err
 	}
@@ -29,35 +29,39 @@ func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner s
 	return crypto.DecryptString(existingOTP.Secret, q.multifactors.OTP.CryptoMFA)
 }
 
-func (q *Queries) otpWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanOTPWriteModel, err error) {
+func (q *Queries) otpReadModelByID(ctx context.Context, userID, resourceOwner string) (readModel *HumanOTPReadModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanOTPWriteModel(userID, resourceOwner)
-	err = q.eventstore.FilterToQueryReducer(ctx, writeModel)
+	readModel = NewHumanOTPReadModel(userID, resourceOwner)
+	err = q.eventstore.FilterToQueryReducer(ctx, readModel)
 	if err != nil {
 		return nil, err
 	}
-	return writeModel, nil
+	return readModel, nil
 }
 
-type HumanOTPWriteModel struct {
-	eventstore.WriteModel
+type HumanOTPReadModel struct {
+	*eventstore.ReadModel
 
 	State  domain.MFAState
 	Secret *crypto.CryptoValue
 }
 
-func NewHumanOTPWriteModel(userID, resourceOwner string) *HumanOTPWriteModel {
-	return &HumanOTPWriteModel{
-		WriteModel: eventstore.WriteModel{
+func (rm *HumanOTPReadModel) AppendEvents(events ...eventstore.Event) {
+	rm.ReadModel.AppendEvents(events...)
+}
+
+func NewHumanOTPReadModel(userID, resourceOwner string) *HumanOTPReadModel {
+	return &HumanOTPReadModel{
+		ReadModel: &eventstore.ReadModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
 	}
 }
 
-func (wm *HumanOTPWriteModel) Reduce() error {
+func (wm *HumanOTPReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanOTPAddedEvent:
@@ -71,10 +75,10 @@ func (wm *HumanOTPWriteModel) Reduce() error {
 			wm.State = domain.MFAStateRemoved
 		}
 	}
-	return wm.WriteModel.Reduce()
+	return wm.ReadModel.Reduce()
 }
 
-func (wm *HumanOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *HumanOTPReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(user.AggregateType).

@@ -11,7 +11,7 @@ Metrics:
 Tracing:
   # Choose one in "otel", "google", "log" and "none"
   Type: none
-  Fraction: 1
+  Fraction: 1.0
   MetricPrefix: zitadel
 
 # Port ZITADEL will listen on
@@ -874,6 +874,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
     - Role: "ORG_USER_MANAGER"
       Permissions:
+        - "org.read"
         - "user.read"
         - "user.global.read"
         - "user.write"
@@ -882,6 +883,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "policy.read"
         - "project.read"
         - "project.role.read"
     - Role: "ORG_OWNER_VIEWER"

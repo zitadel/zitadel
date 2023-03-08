@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
 type Options struct {
@@ -47,8 +46,8 @@ func (o *Options) ReduceChanges(changes OptionChanges) {
 	if changes.IsLinkingAllowed != nil {
 		o.IsLinkingAllowed = *changes.IsLinkingAllowed
 	}
-	if changes.IsAutoUpdate != nil {
-		o.IsAutoUpdate = *changes.IsAutoUpdate
+	if changes.IsAutoCreation != nil {
+		o.IsAutoCreation = *changes.IsAutoCreation
 	}
 	if changes.IsAutoUpdate != nil {
 		o.IsAutoUpdate = *changes.IsAutoUpdate
@@ -63,19 +62,15 @@ type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID string `json:"id"`
-
-	name string
 }
 
 func NewRemovedEvent(
 	base *eventstore.BaseEvent,
 	id string,
-	name string,
 ) *RemovedEvent {
 	return &RemovedEvent{
 		BaseEvent: *base,
 		ID:        id,
-		name:      name,
 	}
 }
 
@@ -84,10 +79,7 @@ func (e *RemovedEvent) Data() interface{} {
 }
 
 func (e *RemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	if e.name == "" {
-		return nil
-	}
-	return []*eventstore.EventUniqueConstraint{idpconfig.NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
+	return nil
 }
 
 func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {

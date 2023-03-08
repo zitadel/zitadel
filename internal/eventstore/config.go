@@ -1,16 +1,16 @@
 package eventstore
 
 import (
-	"database/sql"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	z_sql "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 )
 
 type Config struct {
 	PushTimeout time.Duration
-	Client      *sql.DB
+	Client      *database.DB
 
 	repo repository.Repository
 }
