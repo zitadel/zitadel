@@ -1178,7 +1178,7 @@
     },
     "LOGIN_POLICY": {
       "TITLE": "Impostazioni di accesso",
-      "DESCRIPTION": "Definisci come gli utenti possono essere autenticati e configura gli Fornitore di identità",
+      "DESCRIPTION": "Definisci come gli utenti possono essere autenticati e configura i fornitori di identità",
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
       "ADVANCED": "Impostazioni avanzate",
