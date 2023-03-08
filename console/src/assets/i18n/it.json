@@ -1146,7 +1146,7 @@
       "BACKGROUNDCOLOR": "Colore di sfondo",
       "PRIMARYCOLOR": "Colore primario",
       "WARNCOLOR": "Colore di avviso",
-      "FONTCOLOR": "Colore del carattere",
+      "FONTCOLOR": "Colore del testo",
       "VIEWS": {
         "PREVIEW": "Anteprima",
         "CURRENT": "Configurazione attuale"
