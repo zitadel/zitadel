@@ -24,7 +24,7 @@ CREATE INDEX agg_type ON eventstore.events (
 );
 COMMIT;
 
--- drop unused index
+-- drop unused index 
 BEGIN;
 DROP INDEX IF EXISTS eventstore.agg_type_seq;
 COMMIT;
