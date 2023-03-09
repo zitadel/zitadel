@@ -166,7 +166,6 @@ module.exports = {
             "guides/integrate/access-zitadel-apis",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/event-api",
-            "guides/integrate/export-and-import",
             {
               type: "category",
               label: "Example Code",
