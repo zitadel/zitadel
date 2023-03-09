@@ -118,10 +118,10 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 		}
 
 		if human.FirstName = strings.TrimSpace(human.FirstName); human.FirstName == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.Invalid.Argument")
+			return nil, errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty")
 		}
 		if human.LastName = strings.TrimSpace(human.LastName); human.LastName == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-DiAq8", "Errors.Invalid.Argument")
+			return nil, errors.ThrowInvalidArgument(nil, "USER-DiAq8", "Errors.User.Username.Empty")
 		}
 		human.ensureDisplayName()
 
