@@ -1632,6 +1632,10 @@
       "GOOGLE": {
         "TITLE": "谷歌供应商",
         "DESCRIPTION": "输入你的谷歌身份提供者的凭证"
+      },
+      "GITHUBES": {
+        "TITLE": "Github Enterprise Server 身份提供者",
+        "DESCRIPTION": "输入您的GitHubEnterpriseServer身份提供者的凭据"
       }
     },
     "DETAIL": {

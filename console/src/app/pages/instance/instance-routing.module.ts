@@ -58,6 +58,19 @@ const routes: Routes = [
         ],
       },
       {
+        path: 'github-es',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-github-es/provider-github-es.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-github-es/provider-github-es.module'),
+          },
+        ],
+      },
+      {
         path: 'jwt',
         children: [
           {

@@ -33,6 +33,8 @@ import {
   AddGenericOAuthProviderResponse,
   AddGenericOIDCProviderRequest,
   AddGenericOIDCProviderResponse,
+  AddGitHubEnterpriseServerProviderRequest,
+  AddGitHubEnterpriseServerProviderResponse,
   AddGoogleProviderRequest,
   AddGoogleProviderResponse,
   AddHumanUserRequest,
@@ -433,6 +435,8 @@ import {
   UpdateGenericOAuthProviderResponse,
   UpdateGenericOIDCProviderRequest,
   UpdateGenericOIDCProviderResponse,
+  UpdateGitHubEnterpriseServerProviderRequest,
+  UpdateGitHubEnterpriseServerProviderResponse,
   UpdateGoogleProviderRequest,
   UpdateGoogleProviderResponse,
   UpdateHumanEmailRequest,
@@ -891,6 +895,18 @@ export class ManagementService {
 
   public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitHubEnterpriseServerProvider(
+    req: AddGitHubEnterpriseServerProviderRequest,
+  ): Promise<AddGitHubEnterpriseServerProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitHubEnterpriseServerProvider(
+    req: UpdateGitHubEnterpriseServerProviderRequest,
+  ): Promise<UpdateGitHubEnterpriseServerProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
   }
 
   public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {

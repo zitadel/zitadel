@@ -228,6 +228,8 @@ export class IdpTableComponent implements OnInit {
       switch (row.type) {
         case ProviderType.PROVIDER_TYPE_OIDC:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'oidc', row.id];
+        case ProviderType.PROVIDER_TYPE_GITHUB_ES:
+          return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'github-es', row.id];
         case ProviderType.PROVIDER_TYPE_OAUTH:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'oauth', row.id];
         case ProviderType.PROVIDER_TYPE_JWT:
