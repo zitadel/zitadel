@@ -59,7 +59,16 @@ cookie_secure = false #localdev only false
 http_address = "127.0.0.1:4180" #localdev only
 ```
 
-> This was tested with version `oauth2-proxy v6.1.1 (built with go1.14.2)`
+> This was tested with version `oauth2-proxy v7.4.0 (built with go1.20.0)`
+
+### Check for groups
+
+If you want oauth2-proxy to check for roles in the tokens you have to add an [action](/docs/apis/actions/introduction) in ZITADEL to [complement the token](/docs/apis/actions/complement-token) according to [this example](https://github.com/zitadel/actions/blob/main/examples/custom_roles.js) and add the following configuration to the config:
+
+```toml
+oidc_groups_claim = "{your_actions_group_key}"
+allowed_groups = ["list", "of", "allowed", "roles"]
+```
 
 ## Completion
 

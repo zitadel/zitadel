@@ -1,6 +1,6 @@
 -- replace agg_type_agg_id
 BEGIN;
-DROP INDEX eventstore.events@agg_type_agg_id;
+DROP INDEX IF EXISTS eventstore.events@agg_type_agg_id;
 COMMIT;
 
 BEGIN;
@@ -23,7 +23,7 @@ COMMIT;
 
 -- replace agg_type
 BEGIN;
-DROP INDEX eventstore.events@agg_type;
+DROP INDEX IF EXISTS eventstore.events@agg_type;
 COMMIT;
 
 BEGIN;
@@ -48,18 +48,4 @@ COMMIT;
 -- drop unused index
 BEGIN;
 DROP INDEX IF EXISTS eventstore.events@agg_type_seq;
-COMMIT;
-
--- index to search event payload
-BEGIN;
-DROP INDEX IF EXISTS eventstore.events@event_search;
-COMMIT;
-
-BEGIN;
-CREATE INVERTED INDEX event_search ON eventstore.events (
-    instance_id
-    , aggregate_type
-    , event_type
-    , event_data
-);
 COMMIT;
