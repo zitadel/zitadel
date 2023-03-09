@@ -784,11 +784,8 @@ func (c *Commands) prepareUpdateInstanceGitHubProvider(a *instance.Aggregate, wr
 				provider.Scopes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
@@ -893,11 +890,8 @@ func (c *Commands) prepareUpdateInstanceGitHubEnterpriseProvider(a *instance.Agg
 				provider.Scopes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
@@ -972,11 +966,8 @@ func (c *Commands) prepareUpdateInstanceGitLabProvider(a *instance.Aggregate, wr
 				provider.Scopes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil
@@ -1065,11 +1056,8 @@ func (c *Commands) prepareUpdateInstanceGitLabSelfHostedProvider(a *instance.Agg
 				provider.Scopes,
 				provider.IDPOptions,
 			)
-			if err != nil {
+			if err != nil || event == nil {
 				return nil, err
-			}
-			if event == nil {
-				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
 		}, nil

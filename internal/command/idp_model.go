@@ -686,7 +686,7 @@ func (wm *GitLabIDPWriteModel) NewChanges(
 	if wm.Name != name {
 		changes = append(changes, idp.ChangeGitLabName(name))
 	}
-	if wm.Name != clientID {
+	if wm.ClientID != clientID {
 		changes = append(changes, idp.ChangeGitLabClientID(clientID))
 	}
 	if !reflect.DeepEqual(wm.Scopes, scopes) {

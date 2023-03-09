@@ -578,7 +578,7 @@ func (wm *InstanceGitLabSelfHostedIDPWriteModel) NewChangedEvent(
 	if err != nil || len(changes) == 0 {
 		return nil, err
 	}
-	return instance.NewGitLabSelfHostedIDPChangedEvent(ctx, aggregate, id, wm.Name, changes)
+	return instance.NewGitLabSelfHostedIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceGoogleIDPWriteModel struct {
