@@ -24,16 +24,7 @@ CREATE INDEX agg_type ON eventstore.events (
 );
 COMMIT;
 
--- drop unused index
+-- drop unused index 
 BEGIN;
 DROP INDEX IF EXISTS eventstore.agg_type_seq;
-COMMIT;
-
--- index to search event payload
-BEGIN;
-DROP INDEX IF EXISTS eventstore.event_search;
-COMMIT;
-
-BEGIN;
-CREATE INDEX event_search ON eventstore.events USING gin (event_data);
 COMMIT;
