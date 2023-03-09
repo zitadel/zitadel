@@ -253,7 +253,7 @@ enum ProviderType {
     PROVIDER_TYPE_OAUTH = 4;
     PROVIDER_TYPE_AZURE_AD = 5;
     PROVIDER_TYPE_GITHUB = 6;
-    PROVIDER_TYPE_GITHUB_EE = 7;
+    PROVIDER_TYPE_GITHUB_ES = 7;
     PROVIDER_TYPE_GITLAB = 8;
     PROVIDER_TYPE_GITLAB_SELF_HOSTED = 9;
     PROVIDER_TYPE_GOOGLE = 10;
@@ -267,6 +267,8 @@ message ProviderConfig {
         OAuthConfig oauth = 4;
         GenericOIDCConfig oidc = 5;
         JWTConfig jwt = 6;
+        GitHubConfig github = 7;
+        GitHubEnterpriseServerConfig github_es = 8;
     }
 }
 message OAuthConfig {
@@ -282,6 +284,19 @@ message GenericOIDCConfig {
     string issuer = 1;
     string client_id = 2;
     repeated string scopes = 3;
+}
+
+message GitHubConfig {
+    string client_id = 1;
+    repeated string scopes = 2;
+}
+
+message GitHubEnterpriseServerConfig {
+    string client_id = 1;
+    string authorization_endpoint = 2;
+    string token_endpoint = 3;
+    string user_endpoint = 4;
+    repeated string scopes = 5;
 }
 
 message GoogleConfig {
