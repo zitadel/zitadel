@@ -106,8 +106,8 @@ export class ProviderGithubESComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        if (this.provider?.config?.oauth) {
-          this.form.patchValue(this.provider.config.oauth);
+        if (this.provider?.config?.githubEs) {
+          this.form.patchValue(this.provider.config.githubEs);
           this.name?.setValue(this.provider.name);
         }
       })
