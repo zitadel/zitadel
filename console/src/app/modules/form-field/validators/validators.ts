@@ -1,4 +1,4 @@
-import { UntypedFormControl } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, ValidationErrors } from '@angular/forms';
 
 export function symbolValidator(c: UntypedFormControl): any {
   const REGEXP: RegExp = /[^a-z0-9]/gi;
@@ -48,6 +48,20 @@ export function lowerCaseValidator(c: UntypedFormControl): any {
         invalid: true,
         lowerCaseValidator: {
           valid: false,
+        },
+      };
+}
+
+export function phoneValidator(c: AbstractControl): ValidationErrors | null {
+  const REGEXP = /^($|(\+|00)[0-9 ]+$)/;
+
+  return REGEXP.test(c.value)
+    ? null
+    : {
+        invalid: true,
+        phoneValidator: {
+          valid: false,
+          i18nKey: "ERRORS.INVALID_FORMAT"
         },
       };
 }

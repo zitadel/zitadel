@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValuePipe } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -82,7 +82,9 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     PhoneDetailComponent,
     MachineSecretDialogComponent,
   ],
-  providers: [CountryCallingCodesService],
+  providers: [
+    CountryCallingCodesService
+  ],
   imports: [
     ChangesModule,
     CommonModule,

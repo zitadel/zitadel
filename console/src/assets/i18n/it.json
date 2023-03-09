@@ -239,11 +239,12 @@
     "NOROWS": "Nessun dato"
   },
   "ERRORS": {
-    "REQUIRED": "Mancano alcuni campi obbligatori.",
+    "REQUIRED": "Compilare questo campo.",
     "TOKENINVALID": {
       "TITLE": "Il tuo Access Token \u00e8 scaduto.",
       "DESCRIPTION": "Clicca il pulsante per richiedere una nuova sessione."
-    }
+    },
+    "INVALID_FORMAT": "Il formato non è valido"
   },
   "USER": {
     "SETTINGS": {

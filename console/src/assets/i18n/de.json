@@ -239,11 +239,12 @@
     "NOROWS": "Keine Daten"
   },
   "ERRORS": {
-    "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
+    "REQUIRED": "Bitte fülle dieses Feld aus.",
     "TOKENINVALID": {
       "TITLE": "Du bist abgemeldet",
       "DESCRIPTION": "Klicke auf \"Einloggen\", um Dich erneut anzumelden."
-    }
+    },
+    "INVALID_FORMAT": "Das Format is ungültig"
   },
   "USER": {
     "SETTINGS": {

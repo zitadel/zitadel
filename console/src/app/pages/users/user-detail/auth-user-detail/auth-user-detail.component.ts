@@ -22,6 +22,8 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
+import { Validators } from '@angular/forms';
+import { phoneValidator } from 'src/app/modules/form-field/validators/validators';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -304,6 +306,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user?.human?.phone?.phone,
             type: type,
+            validator: Validators.compose([phoneValidator, Validators.required])
           },
           width: '400px',
         });

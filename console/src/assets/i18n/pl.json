@@ -239,11 +239,12 @@
     "NOROWS": "Brak danych"
   },
   "ERRORS": {
-    "REQUIRED": "Brakuje niektórych wymaganych pól.",
+    "REQUIRED": "Proszę wypełnić to pole.",
     "TOKENINVALID": {
       "TITLE": "Twój token autoryzacji wygasł.",
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
-    }
+    },
+    "INVALID_FORMAT": "Format jest nieprawidłowy"
   },
   "USER": {
     "SETTINGS": {

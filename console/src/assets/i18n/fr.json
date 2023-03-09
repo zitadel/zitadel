@@ -239,11 +239,12 @@
     "NOROWS": "Pas de données"
   },
   "ERRORS": {
-    "REQUIRED": "Certains champs obligatoires sont manquants.",
+    "REQUIRED": "Remplis ce champ s'il te plaît.",
     "TOKENINVALID": {
       "TITLE": "Votre jeton d'autorisation a expiré.",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
-    }
+    },
+    "INVALID_FORMAT": "Le format n'est pas valide"
   },
   "USER": {
     "SETTINGS": {

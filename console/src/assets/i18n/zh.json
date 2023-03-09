@@ -239,11 +239,12 @@
     "NOROWS": "没有数据"
   },
   "ERRORS": {
-    "REQUIRED": "缺少一些必填字段。",
+    "REQUIRED": "请填写此栏",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
-    }
+    },
+    "INVALID_FORMAT": "格式是无效的"
   },
   "USER": {
     "SETTINGS": {

@@ -13,7 +13,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../validators';
+import { lowerCaseValidator, numberValidator, phoneValidator, symbolValidator, upperCaseValidator } from '../../../modules/form-field/validators/validators';
 
 function passwordConfirmValidator(c: AbstractControl): any {
   if (!c.parent || !c) {
@@ -120,7 +120,7 @@ export class UserCreateComponent implements OnInit, OnDestroy {
       nickName: [''],
       gender: [],
       preferredLanguage: [''],
-      phone: [''],
+      phone: ['', phoneValidator],
       isVerified: [false, []],
     });
 
@@ -203,14 +203,13 @@ export class UserCreateComponent implements OnInit, OnDestroy {
 
   public setCountryCallingCode(): void {
     let value = (this.phone?.value as string) || '';
-    this.phone?.setValue('+' + this.selected?.countryCallingCode + ' ' + value.replace(/\+[0-9]*\s/, ''));
+    this.countryPhoneCodes.forEach(code => value = value.replace(`+${code.countryCallingCode}`, ""))
+    value = value.trim()
+    this.phone?.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
   }
 
   ngOnInit(): void {
-    // Set default selected country for phone numbers
-    const defaultCountryCallingCode = 'CH';
     this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
-    this.selected = this.countryPhoneCodes.find((code) => code.countryCode === defaultCountryCallingCode);
   }
 
   ngOnDestroy(): void {
