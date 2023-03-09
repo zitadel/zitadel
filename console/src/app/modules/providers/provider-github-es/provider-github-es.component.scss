@@ -2,7 +2,7 @@
   font-size: 14px;
 }
 
-@mixin provider-github-theme($theme) {
+@mixin provider-github-es-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
 
   .github-es-create-content {
