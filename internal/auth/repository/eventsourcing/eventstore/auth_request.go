@@ -1470,5 +1470,9 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 		return false, nil
 	}
 	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, project.ID, request.InstanceID)
-	return errors.IsNotFound(err), err
+	if errors.IsNotFound(err) {
+		// if not found there is no error returned
+		return true, nil
+	}
+	return false, err
 }
