@@ -21,7 +21,7 @@ type IDPUserLink struct {
 	ProvidedUserID   string
 	ProvidedUsername string
 	ResourceOwner    string
-	IDPType          domain.IDPConfigType
+	IDPType          domain.IDPType
 }
 
 type IDPUserLinks struct {
@@ -127,18 +127,22 @@ func NewIDPUserLinksResourceOwnerSearchQuery(value string) (SearchQuery, error) 
 	return NewTextQuery(IDPUserLinkResourceOwnerCol, value, TextEquals)
 }
 
+func NewIDPUserLinksExternalIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(IDPUserLinkExternalUserIDCol, value, TextEquals)
+}
+
 func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),
 			IDPUserLinkUserIDCol.identifier(),
-			IDPNameCol.identifier(),
+			IDPTemplateNameCol.identifier(),
 			IDPUserLinkExternalUserIDCol.identifier(),
 			IDPUserLinkDisplayNameCol.identifier(),
-			IDPTypeCol.identifier(),
+			IDPTemplateTypeCol.identifier(),
 			IDPUserLinkResourceOwnerCol.identifier(),
 			countColumn.identifier()).
 			From(idpUserLinkTable.identifier()).
-			LeftJoin(join(IDPIDCol, IDPUserLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(IDPTemplateIDCol, IDPUserLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPUserLinks, error) {
 			idps := make([]*IDPUserLink, 0)
@@ -165,9 +169,9 @@ func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				idp.IDPName = idpName.String
 				//IDPType 0 is oidc so we have to set unspecified manually
 				if idpType.Valid {
-					idp.IDPType = domain.IDPConfigType(idpType.Int16)
+					idp.IDPType = domain.IDPType(idpType.Int16)
 				} else {
-					idp.IDPType = domain.IDPConfigTypeUnspecified
+					idp.IDPType = domain.IDPTypeUnspecified
 				}
 				idps = append(idps, idp)
 			}

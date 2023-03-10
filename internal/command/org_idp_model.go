@@ -69,7 +69,8 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.Crypto,
 	authorizationEndpoint,
 	tokenEndpoint,
-	userEndpoint string,
+	userEndpoint,
+	idAttribute string,
 	scopes []string,
 	options idp.Options,
 ) (*org.OAuthIDPChangedEvent, error) {
@@ -82,6 +83,7 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 		authorizationEndpoint,
 		tokenEndpoint,
 		userEndpoint,
+		idAttribute,
 		scopes,
 		options,
 	)
@@ -291,6 +293,159 @@ func (wm *OrgJWTIDPWriteModel) NewChangedEvent(
 	return org.NewJWTIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
+type OrgGitHubIDPWriteModel struct {
+	GitHubIDPWriteModel
+}
+
+func NewGitHubOrgIDPWriteModel(orgID, id string) *OrgGitHubIDPWriteModel {
+	return &OrgGitHubIDPWriteModel{
+		GitHubIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgGitHubIDPWriteModel) Reduce() error {
+	return wm.GitHubIDPWriteModel.Reduce()
+}
+
+func (wm *OrgGitHubIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.GitHubIDPAddedEvent:
+			wm.GitHubIDPWriteModel.AppendEvents(&e.GitHubIDPAddedEvent)
+		case *org.GitHubIDPChangedEvent:
+			wm.GitHubIDPWriteModel.AppendEvents(&e.GitHubIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			wm.GitHubIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.GitHubIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgGitHubIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.GitHubIDPAddedEventType,
+			org.GitHubIDPChangedEventType,
+			org.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *OrgGitHubIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) (*org.GitHubIDPChangedEvent, error) {
+
+	changes, err := wm.GitHubIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
+
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return org.NewGitHubIDPChangedEvent(ctx, aggregate, id, changes)
+}
+
+type OrgGitHubEnterpriseIDPWriteModel struct {
+	GitHubEnterpriseIDPWriteModel
+}
+
+func NewGitHubEnterpriseOrgIDPWriteModel(orgID, id string) *OrgGitHubEnterpriseIDPWriteModel {
+	return &OrgGitHubEnterpriseIDPWriteModel{
+		GitHubEnterpriseIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgGitHubEnterpriseIDPWriteModel) Reduce() error {
+	return wm.GitHubEnterpriseIDPWriteModel.Reduce()
+}
+
+func (wm *OrgGitHubEnterpriseIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.GitHubEnterpriseIDPAddedEvent:
+			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(&e.GitHubEnterpriseIDPAddedEvent)
+		case *org.GitHubEnterpriseIDPChangedEvent:
+			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(&e.GitHubEnterpriseIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgGitHubEnterpriseIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.GitHubEnterpriseIDPAddedEventType,
+			org.GitHubEnterpriseIDPChangedEventType,
+			org.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *OrgGitHubEnterpriseIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	authorizationEndpoint,
+	tokenEndpoint,
+	userEndpoint string,
+	scopes []string,
+	options idp.Options,
+) (*org.GitHubEnterpriseIDPChangedEvent, error) {
+
+	changes, err := wm.GitHubEnterpriseIDPWriteModel.NewChanges(
+		name,
+		clientID,
+		clientSecretString,
+		secretCrypto,
+		authorizationEndpoint,
+		tokenEndpoint,
+		userEndpoint,
+		scopes,
+		options,
+	)
+
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return org.NewGitHubEnterpriseIDPChangedEvent(ctx, aggregate, id, changes)
+}
+
 type OrgGoogleIDPWriteModel struct {
 	GoogleIDPWriteModel
 }
@@ -478,6 +633,10 @@ func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.IDPRemoveWriteModel.AppendEvents(&e.OIDCIDPAddedEvent)
 		case *org.JWTIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.JWTIDPAddedEvent)
+		case *org.GitHubIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubIDPAddedEvent)
+		case *org.GitHubEnterpriseIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubEnterpriseIDPAddedEvent)
 		case *org.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *org.LDAPIDPAddedEvent:
@@ -504,6 +663,8 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.OAuthIDPAddedEventType,
 			org.OIDCIDPAddedEventType,
 			org.JWTIDPAddedEventType,
+			org.GitHubIDPAddedEventType,
+			org.GitHubEnterpriseIDPAddedEventType,
 			org.GoogleIDPAddedEventType,
 			org.LDAPIDPAddedEventType,
 			org.IDPRemovedEventType,

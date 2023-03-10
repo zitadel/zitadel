@@ -3,6 +3,7 @@ $lgn-idp-padding: 0 1px;
 $lgn-idp-provider-name-line-height: 36px;
 $lgn-idp-border-radius: .5rem;
 $googlelogosource: '../../../images/idp/google';
+$githublogosource: '../../../images/idp/github';
 
 @mixin lgn-idp-base {
     display: block;
@@ -33,6 +34,18 @@ $googlelogosource: '../../../images/idp/google';
             height: 46px;
             width: 46px;
             background-image: url($googlelogosource + '.png');
+            background-size: 25px;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 5px;
+        }
+    }
+
+    &.github {
+        span.logo {
+            height: 46px;
+            width: 46px;
+            background-image: url($githublogosource + '.png');
             background-size: 25px;
             background-position: center;
             background-repeat: no-repeat;

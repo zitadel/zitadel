@@ -152,7 +152,11 @@ func (s *Server) UpdateIDPJWTConfig(ctx context.Context, req *admin_pb.UpdateIDP
 }
 
 func (s *Server) GetProviderByID(ctx context.Context, req *admin_pb.GetProviderByIDRequest) (*admin_pb.GetProviderByIDResponse, error) {
-	idp, err := s.query.IDPTemplateByIDAndResourceOwner(ctx, true, req.Id, authz.GetInstance(ctx).InstanceID(), false)
+	instanceIDQuery, err := query.NewIDPTemplateResourceOwnerSearchQuery(authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
+	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, instanceIDQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -233,6 +237,48 @@ func (s *Server) UpdateJWTProvider(ctx context.Context, req *admin_pb.UpdateJWTP
 		return nil, err
 	}
 	return &admin_pb.UpdateJWTProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitHubProvider(ctx context.Context, req *admin_pb.AddGitHubProviderRequest) (*admin_pb.AddGitHubProviderResponse, error) {
+	id, details, err := s.command.AddInstanceGitHubProvider(ctx, addGitHubProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGitHubProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitHubProvider(ctx context.Context, req *admin_pb.UpdateGitHubProviderRequest) (*admin_pb.UpdateGitHubProviderResponse, error) {
+	details, err := s.command.UpdateInstanceGitHubProvider(ctx, req.Id, updateGitHubProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGitHubProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitHubEnterpriseServerProvider(ctx context.Context, req *admin_pb.AddGitHubEnterpriseServerProviderRequest) (*admin_pb.AddGitHubEnterpriseServerProviderResponse, error) {
+	id, details, err := s.command.AddInstanceGitHubEnterpriseProvider(ctx, addGitHubEnterpriseProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGitHubEnterpriseServerProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitHubEnterpriseServerProvider(ctx context.Context, req *admin_pb.UpdateGitHubEnterpriseServerProviderRequest) (*admin_pb.UpdateGitHubEnterpriseServerProviderResponse, error) {
+	details, err := s.command.UpdateInstanceGitHubEnterpriseProvider(ctx, req.Id, updateGitHubEnterpriseProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGitHubEnterpriseServerProviderResponse{
 		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }

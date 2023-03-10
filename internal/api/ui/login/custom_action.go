@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/idp"
 )
 
 func (l *Login) runPostExternalAuthenticationActions(
@@ -21,18 +21,14 @@ func (l *Login) runPostExternalAuthenticationActions(
 	tokens *oidc.Tokens,
 	authRequest *domain.AuthRequest,
 	httpRequest *http.Request,
-	config *iam_model.IDPConfigView,
+	idpUser idp.User,
 	authenticationError error,
 ) (*domain.ExternalUser, error) {
 	ctx := httpRequest.Context()
 
 	resourceOwner := authRequest.RequestedOrgID
 	if resourceOwner == "" {
-		resourceOwner = config.AggregateID
-	}
-	instance := authz.GetInstance(ctx)
-	if resourceOwner == instance.InstanceID() {
-		resourceOwner = instance.DefaultOrganisationID()
+		resourceOwner = authz.GetInstance(ctx).DefaultOrganisationID()
 	}
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
 	if err != nil {
@@ -91,6 +87,9 @@ func (l *Login) runPostExternalAuthenticationActions(
 			actions.SetFields("v1",
 				actions.SetFields("externalUser", func(c *actions.FieldConfig) interface{} {
 					return object.UserFromExternalUser(c, user)
+				}),
+				actions.SetFields("providerInfo", func(c *actions.FieldConfig) interface{} {
+					return c.Runtime.ToValue(idpUser)
 				}),
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 				actions.SetFields("httpRequest", object.HTTPRequestField(httpRequest)),
@@ -343,18 +342,39 @@ func (l *Login) runPostCreationActions(
 }
 
 func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
-	return []actions.FieldOption{
-		actions.SetFields("accessToken", tokens.AccessToken),
-		actions.SetFields("idToken", tokens.IDToken),
-		actions.SetFields("getClaim", func(claim string) interface{} {
+	var accessToken, idToken string
+	getClaim := func(claim string) interface{} {
+		return nil
+	}
+	claimsJSON := func() (string, error) {
+		return "", nil
+	}
+	if tokens == nil {
+		return []actions.FieldOption{
+			actions.SetFields("accessToken", accessToken),
+			actions.SetFields("idToken", idToken),
+			actions.SetFields("getClaim", getClaim),
+			actions.SetFields("claimsJSON", claimsJSON),
+		}
+	}
+	accessToken = tokens.AccessToken
+	idToken = tokens.IDToken
+	if tokens.IDTokenClaims != nil {
+		getClaim = func(claim string) interface{} {
 			return tokens.IDTokenClaims.GetClaim(claim)
-		}),
-		actions.SetFields("claimsJSON", func() (string, error) {
+		}
+		claimsJSON = func() (string, error) {
 			c, err := json.Marshal(tokens.IDTokenClaims)
 			if err != nil {
 				return "", err
 			}
 			return string(c), nil
-		}),
+		}
+	}
+	return []actions.FieldOption{
+		actions.SetFields("accessToken", accessToken),
+		actions.SetFields("idToken", idToken),
+		actions.SetFields("getClaim", getClaim),
+		actions.SetFields("claimsJSON", claimsJSON),
 	}
 }

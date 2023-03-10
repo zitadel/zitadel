@@ -146,12 +146,13 @@ func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string
 		return nil, caos_errs.ThrowNotFound(nil, "Org-Ffgw2", "Errors.Org.LoginPolicy.NotFound")
 	}
 
+	var exists bool
 	if idpProvider.Type == domain.IdentityProviderTypeOrg {
-		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
+		exists, err = ExistsOrgIDP(ctx, c.eventstore.Filter, idpProvider.IDPConfigID, resourceOwner)
 	} else {
-		_, err = c.getInstanceIDPConfigByID(ctx, idpProvider.IDPConfigID)
+		exists, err = ExistsInstanceIDP(ctx, c.eventstore.Filter, idpProvider.IDPConfigID)
 	}
-	if err != nil {
+	if !exists || err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")
 	}
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)

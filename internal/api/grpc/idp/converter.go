@@ -84,13 +84,11 @@ func IDPUserLinkToPb(link *query.IDPUserLink) *idp_pb.IDPUserLink {
 	}
 }
 
-func IDPTypeToPb(idpType domain.IDPConfigType) idp_pb.IDPType {
+func IDPTypeToPb(idpType domain.IDPType) idp_pb.IDPType {
 	switch idpType {
-	case domain.IDPConfigTypeOIDC:
+	case domain.IDPTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
-	case domain.IDPConfigTypeSAML:
-		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
-	case domain.IDPConfigTypeJWT:
+	case domain.IDPTypeJWT:
 		return idp_pb.IDPType_IDP_TYPE_JWT
 	default:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
@@ -378,8 +376,8 @@ func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
 		return idp_pb.ProviderType_PROVIDER_TYPE_AZURE_AD
 	case domain.IDPTypeGitHub:
 		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB
-	case domain.IDPTypeGitHubEE:
-		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB_EE
+	case domain.IDPTypeGitHubEnterprise:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB_ES
 	case domain.IDPTypeGitLab:
 		return idp_pb.ProviderType_PROVIDER_TYPE_GITLAB
 	case domain.IDPTypeGitLabSelfHosted:
@@ -414,6 +412,14 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		jwtConfigToPb(providerConfig, config.JWTIDPTemplate)
 		return providerConfig
 	}
+	if config.GitHubIDPTemplate != nil {
+		githubConfigToPb(providerConfig, config.GitHubIDPTemplate)
+		return providerConfig
+	}
+	if config.GitHubEnterpriseIDPTemplate != nil {
+		githubEnterpriseConfigToPb(providerConfig, config.GitHubEnterpriseIDPTemplate)
+		return providerConfig
+	}
 	if config.GoogleIDPTemplate != nil {
 		googleConfigToPb(providerConfig, config.GoogleIDPTemplate)
 		return providerConfig
@@ -433,6 +439,7 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 			TokenEndpoint:         template.TokenEndpoint,
 			UserEndpoint:          template.UserEndpoint,
 			Scopes:                template.Scopes,
+			IdAttribute:           template.IDAttribute,
 		},
 	}
 }
@@ -454,6 +461,27 @@ func jwtConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.JWTIDP
 			Issuer:       template.Issuer,
 			KeysEndpoint: template.KeysEndpoint,
 			HeaderName:   template.HeaderName,
+		},
+	}
+}
+
+func githubConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitHubIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Github{
+		Github: &idp_pb.GitHubConfig{
+			ClientId: template.ClientID,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func githubEnterpriseConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitHubEnterpriseIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_GithubEs{
+		GithubEs: &idp_pb.GitHubEnterpriseServerConfig{
+			ClientId:              template.ClientID,
+			AuthorizationEndpoint: template.AuthorizationEndpoint,
+			TokenEndpoint:         template.TokenEndpoint,
+			UserEndpoint:          template.UserEndpoint,
+			Scopes:                template.Scopes,
 		},
 	}
 }

@@ -332,6 +332,66 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "org IDPRemovedEvent",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.IDPRemovedEventType),
+					org.AggregateType,
+					[]byte(`{
+						"id": "id"
+					}`),
+				), org.IDPRemovedEventMapper),
+			},
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPRemoved,
+			want: wantReduce{
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"ro-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "iam IDPRemovedEvent",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.IDPRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{
+						"id": "id"
+					}`),
+				), instance.IDPRemovedEventMapper),
+			},
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPRemoved,
+			want: wantReduce{
+				aggregateType:    instance.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"ro-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceOwnerRemoved,
 			args: args{

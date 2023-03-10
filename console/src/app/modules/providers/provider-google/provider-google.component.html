@@ -1,0 +1,93 @@
+<cnsl-create-layout
+  title="{{ id ? ('IDP.DETAIL.TITLE' | translate) : ('IDP.CREATE.TITLE' | translate) }}"
+  (closed)="close()"
+>
+  <div class="google-create-content">
+    <div class="title-row">
+      <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
+      <h1>{{ 'IDP.CREATE.GOOGLE.TITLE' | translate }}</h1>
+      <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
+    </div>
+
+    <p class="desc cnsl-secondary-text">
+      {{ !provider ? ('IDP.CREATE.GOOGLE.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="submitForm()">
+      <div class="google-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
+          <input cnslInput formControlName="clientId" />
+        </cnsl-form-field>
+
+        <mat-checkbox *ngIf="provider" [(ngModel)]="updateClientSecret" [ngModelOptions]="{ standalone: true }">{{
+          'IDP.UPDATECLIENTSECRET' | translate
+        }}</mat-checkbox>
+        <cnsl-form-field *ngIf="!provider || (provider && updateClientSecret)" class="formfield">
+          <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
+          <input cnslInput formControlName="clientSecret" />
+        </cnsl-form-field>
+
+        <div class="optional-h-wrapper">
+          <h2>{{ 'IDP.OPTIONAL' | translate }}</h2>
+          <button (click)="showOptional = !showOptional" type="button" mat-icon-button>
+            <mat-icon *ngIf="showOptional">keyboard_arrow_up</mat-icon
+            ><mat-icon *ngIf="!showOptional">keyboard_arrow_down</mat-icon>
+          </button>
+        </div>
+        <div *ngIf="showOptional">
+          <div class="idp-scopes">
+            <div class="flex-line">
+              <cnsl-form-field class="formfield">
+                <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
+
+                <input
+                  cnslInput
+                  [matChipInputFor]="chipScopesList"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  [matChipInputAddOnBlur]="true"
+                  (matChipInputTokenEnd)="addScope($event)"
+                />
+              </cnsl-form-field>
+              <button class="scope-add-button" (click)="addScope($any($event))" mat-icon-button>
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+            <cnsl-form-field class="formfield">
+              <mat-chip-list #chipScopesList aria-label="scope selection">
+                <mat-chip
+                  class="chip"
+                  *ngFor="let scope of scopesList?.value"
+                  selectable="false"
+                  removable
+                  (removed)="removeScope(scope)"
+                >
+                  {{ scope }} <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </cnsl-form-field>
+          </div>
+
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+            <input cnslInput formControlName="name" />
+            <span class="name-hint cnsl-secondary-text" cnslHint>{{ 'IDP.NAMEHINT' | translate }}</span>
+          </cnsl-form-field>
+
+          <cnsl-provider-options
+            [initialOptions]="provider?.config?.options"
+            (optionsChanged)="options = $event"
+          ></cnsl-provider-options>
+        </div>
+      </div>
+
+      <div class="google-create-actions">
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
+          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
+          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</cnsl-create-layout>

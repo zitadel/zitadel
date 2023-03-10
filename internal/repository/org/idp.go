@@ -10,17 +10,21 @@ import (
 )
 
 const (
-	OAuthIDPAddedEventType    eventstore.EventType = "org.idp.oauth.added"
-	OAuthIDPChangedEventType  eventstore.EventType = "org.idp.oauth.changed"
-	OIDCIDPAddedEventType     eventstore.EventType = "org.idp.oidc.added"
-	OIDCIDPChangedEventType   eventstore.EventType = "org.idp.oidc.changed"
-	JWTIDPAddedEventType      eventstore.EventType = "org.idp.jwt.added"
-	JWTIDPChangedEventType    eventstore.EventType = "org.idp.jwt.changed"
-	GoogleIDPAddedEventType   eventstore.EventType = "org.idp.google.added"
-	GoogleIDPChangedEventType eventstore.EventType = "org.idp.google.changed"
-	LDAPIDPAddedEventType     eventstore.EventType = "org.idp.ldap.added"
-	LDAPIDPChangedEventType   eventstore.EventType = "org.idp.ldap.changed"
-	IDPRemovedEventType       eventstore.EventType = "org.idp.removed"
+	OAuthIDPAddedEventType              eventstore.EventType = "org.idp.oauth.added"
+	OAuthIDPChangedEventType            eventstore.EventType = "org.idp.oauth.changed"
+	OIDCIDPAddedEventType               eventstore.EventType = "org.idp.oidc.added"
+	OIDCIDPChangedEventType             eventstore.EventType = "org.idp.oidc.changed"
+	JWTIDPAddedEventType                eventstore.EventType = "org.idp.jwt.added"
+	JWTIDPChangedEventType              eventstore.EventType = "org.idp.jwt.changed"
+	GitHubIDPAddedEventType             eventstore.EventType = "org.idp.github.added"
+	GitHubIDPChangedEventType           eventstore.EventType = "org.idp.github.changed"
+	GitHubEnterpriseIDPAddedEventType   eventstore.EventType = "org.idp.github_enterprise.added"
+	GitHubEnterpriseIDPChangedEventType eventstore.EventType = "org.idp.github_enterprise.changed"
+	GoogleIDPAddedEventType             eventstore.EventType = "org.idp.google.added"
+	GoogleIDPChangedEventType           eventstore.EventType = "org.idp.google.changed"
+	LDAPIDPAddedEventType               eventstore.EventType = "org.idp.ldap.added"
+	LDAPIDPChangedEventType             eventstore.EventType = "org.idp.ldap.changed"
+	IDPRemovedEventType                 eventstore.EventType = "org.idp.removed"
 )
 
 type OAuthIDPAddedEvent struct {
@@ -36,7 +40,8 @@ func NewOAuthIDPAddedEvent(
 	clientSecret *crypto.CryptoValue,
 	authorizationEndpoint,
 	tokenEndpoint,
-	userEndpoint string,
+	userEndpoint,
+	idAttribute string,
 	scopes []string,
 	options idp.Options,
 ) *OAuthIDPAddedEvent {
@@ -55,6 +60,7 @@ func NewOAuthIDPAddedEvent(
 			authorizationEndpoint,
 			tokenEndpoint,
 			userEndpoint,
+			idAttribute,
 			scopes,
 			options,
 		),
@@ -259,6 +265,164 @@ func JWTIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error)
 	}
 
 	return &JWTIDPChangedEvent{JWTIDPChangedEvent: *e.(*idp.JWTIDPChangedEvent)}, nil
+}
+
+type GitHubIDPAddedEvent struct {
+	idp.GitHubIDPAddedEvent
+}
+
+func NewGitHubIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	options idp.Options,
+) *GitHubIDPAddedEvent {
+
+	return &GitHubIDPAddedEvent{
+		GitHubIDPAddedEvent: *idp.NewGitHubIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				GitHubIDPAddedEventType,
+			),
+			id,
+			name,
+			clientID,
+			clientSecret,
+			scopes,
+			options,
+		),
+	}
+}
+
+func GitHubIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.GitHubIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitHubIDPAddedEvent{GitHubIDPAddedEvent: *e.(*idp.GitHubIDPAddedEvent)}, nil
+}
+
+type GitHubIDPChangedEvent struct {
+	idp.GitHubIDPChangedEvent
+}
+
+func NewGitHubIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.GitHubIDPChanges,
+) (*GitHubIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewGitHubIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GitHubIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &GitHubIDPChangedEvent{GitHubIDPChangedEvent: *changedEvent}, nil
+}
+
+func GitHubIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.GitHubIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitHubIDPChangedEvent{GitHubIDPChangedEvent: *e.(*idp.GitHubIDPChangedEvent)}, nil
+}
+
+type GitHubEnterpriseIDPAddedEvent struct {
+	idp.GitHubEnterpriseIDPAddedEvent
+}
+
+func NewGitHubEnterpriseIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	authorizationEndpoint,
+	tokenEndpoint,
+	userEndpoint string,
+	scopes []string,
+	options idp.Options,
+) *GitHubEnterpriseIDPAddedEvent {
+
+	return &GitHubEnterpriseIDPAddedEvent{
+		GitHubEnterpriseIDPAddedEvent: *idp.NewGitHubEnterpriseIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				GitHubEnterpriseIDPAddedEventType,
+			),
+			id,
+			name,
+			clientID,
+			clientSecret,
+			authorizationEndpoint,
+			tokenEndpoint,
+			userEndpoint,
+			scopes,
+			options,
+		),
+	}
+}
+
+func GitHubEnterpriseIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.GitHubEnterpriseIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitHubEnterpriseIDPAddedEvent{GitHubEnterpriseIDPAddedEvent: *e.(*idp.GitHubEnterpriseIDPAddedEvent)}, nil
+}
+
+type GitHubEnterpriseIDPChangedEvent struct {
+	idp.GitHubEnterpriseIDPChangedEvent
+}
+
+func NewGitHubEnterpriseIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.GitHubEnterpriseIDPChanges,
+) (*GitHubEnterpriseIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewGitHubEnterpriseIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GitHubEnterpriseIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &GitHubEnterpriseIDPChangedEvent{GitHubEnterpriseIDPChangedEvent: *changedEvent}, nil
+}
+
+func GitHubEnterpriseIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.GitHubEnterpriseIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitHubEnterpriseIDPChangedEvent{GitHubEnterpriseIDPChangedEvent: *e.(*idp.GitHubEnterpriseIDPChangedEvent)}, nil
 }
 
 type GoogleIDPAddedEvent struct {
