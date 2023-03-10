@@ -27,9 +27,9 @@ Use the `--steps` flag of the `zitadel` binary to provide this configuration fil
 ### Multiple Configuration Files
 
 ZITADEL merges configuration files when multiple `--config` and `--steps` flags are provided.
-You can use these flags to treat secret configuration files differently from standard configuration files.
-For example, configuration files stored in git may contain public information such as a database hostname.
-To avoid storing private information — such as a database admin credential — in git, use a `--steps` flag that requests the private information from a secret manager.
+You can use these flags to handle standard configuration files differently from secret configuration files.
+For example, standard configuration files stored in git may contain public information such as a database hostname.
+To use private information — such as a database admin credential — without storing it in git, use an extra `--config` or `--steps` flag that requests the private information from a secret manager.
 
 ## Environment Variables
 
