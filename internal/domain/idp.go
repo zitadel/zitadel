@@ -29,7 +29,7 @@ const (
 	IDPTypeLDAP
 	IDPTypeAzureAD
 	IDPTypeGitHub
-	IDPTypeGitHubEE
+	IDPTypeGitHubEnterprise
 	IDPTypeGitLab
 	IDPTypeGitLabSelfHosted
 	IDPTypeGoogle
@@ -39,6 +39,9 @@ func (t IDPType) GetCSSClass() string {
 	switch t { //nolint:exhaustive
 	case IDPTypeGoogle:
 		return "google"
+	case IDPTypeGitHub,
+		IDPTypeGitHubEnterprise:
+		return "github"
 	default:
 		return ""
 	}

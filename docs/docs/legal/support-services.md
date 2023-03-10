@@ -124,6 +124,6 @@ Severity Level | Description
 The customer may escalate support requests following the escalation process:
 
 1. For non-urgent needs, the client may request management escalation within the ticket. A manager will review the request and provide a response within one business day.
-2. For urgent needs, the client may escalate directly by calling +41 43 456 84 69 and emailing to hi@zitadel.com. A manager will review the request and provide response within two business hours.
+2. For urgent needs, the client may escalate directly by calling +41 43 456 84 69 and emailing to [hi@zitadel.com](mailto:hi@zitadel.com). A manager will review the request and provide response within two business hours.
 
 If we fail to provide a response to the escalation, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.

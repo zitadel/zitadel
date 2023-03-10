@@ -535,7 +535,7 @@
     "EMAILVERIFIED": "Email verificata",
     "NOTVERIFIED": "non verificato",
     "PREFERRED_LOGINNAME": "Loginname preferito",
-    "ISINITIAL": "L'e-mail di questo utente non è ancora stata verificata.",
+    "ISINITIAL": "L'utente non è ancora attivo.",
     "LOGINMETHODS": {
       "TITLE": "Informazioni di contatto",
       "DESCRIPTION": "Le informazioni fornite sono utilizzate per inviare informazioni importanti, come le e-mail di reset della password.",
@@ -612,7 +612,7 @@
     "SIGNEDOUT_BTN": "Accedi",
     "EDITACCOUNT": "Modifica account",
     "ADDACCOUNT": "Accedi con un altro account",
-    "RESENDINITIALEMAIL": "Invia una nuova mail di inizializzazione",
+    "RESENDINITIALEMAIL": "Invia nuovamente la mail di attivazione",
     "RESENDEMAILNOTIFICATION": "Invia di nuovo la notifica via e-mail",
     "TOAST": {
       "CREATED": "Utente creato con successo.",
