@@ -536,7 +536,7 @@
     "EMAILVERIFIED": "Email verified",
     "NOTVERIFIED": "not verified",
     "PREFERRED_LOGINNAME": "Preferred Loginname",
-    "ISINITIAL": "This users email is not verified yet.",
+    "ISINITIAL": "User is not active, yet.",
     "LOGINMETHODS": {
       "TITLE": "Contact Information",
       "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -613,7 +613,7 @@
     "SIGNEDOUT_BTN": "Sign In",
     "EDITACCOUNT": "Edit Account",
     "ADDACCOUNT": "Log in With Another Account",
-    "RESENDINITIALEMAIL": "Send new initialization mail",
+    "RESENDINITIALEMAIL": "Resend activation mail",
     "RESENDEMAILNOTIFICATION": "Resend Email notification",
     "TOAST": {
       "CREATED": "User created successfully.",
