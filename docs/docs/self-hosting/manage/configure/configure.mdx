@@ -10,14 +10,14 @@ import Helm from './_helm.mdx'
 
 # Configure ZITADEL
 
-This guide assumes you are familiar with [running ZITADEL using the most minimal configuration possible](/docs/self-hosting/deploy/overview).
+This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/docs/self-hosting/deploy/overview).
 
 ## Configuration Files
 
 ### Runtime Configuration File
 
 You can configure the runtime using the `--config` flag of the `zitadel` binary.
-For a description of all _runtime configuration_ options and their defaults, read the [ZITADEL source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
+For a description of all _runtime configuration options_ and their defaults, read the [ZITADEL source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
 
 ### Database Initialization File
 
@@ -27,9 +27,9 @@ Use the `--steps` flag of the `zitadel` binary to provide this configuration fil
 ### Multiple Configuration Files
 
 ZITADEL merges configuration files when multiple `--config` and `--steps` flags are provided.
-Use these flags to treat secret configuration files differently from standard configuration files.
-For example, configuration files stored in `git` may contain public information such as a database hostname.
-To avoid storing private information — such as a database admin credential — in `git`, use a `--steps` flag that requests the information from a secret manager.
+You can use these flags to treat secret configuration files differently from standard configuration files.
+For example, configuration files stored in git may contain public information such as a database hostname.
+To avoid storing private information — such as a database admin credential — in git, use a `--steps` flag that requests the private information from a secret manager.
 
 ## Environment Variables
 
@@ -47,7 +47,7 @@ For more information on the `NO_PROXY` environment variable, read the [`httpprox
 ## Masterkey
 
 The masterkey is used to AES256-encrypt other generated encryption keys.
-It must have 32 bytes.
+It must be 32 bytes.
 There are three ways to pass the masterkey to the `zitadel` binary:
 - By value: Use the flag `--masterkey My_Master_Key_Which_Has_32_Bytes`
 - By environment variable `ZITADEL_MASTERKEY`: Use the flag `--masterkeyFromEnv`
