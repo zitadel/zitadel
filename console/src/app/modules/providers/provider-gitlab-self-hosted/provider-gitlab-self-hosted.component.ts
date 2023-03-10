@@ -6,15 +6,15 @@ import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import {
-  AddGitLabProviderRequest as AdminAddGitLabProviderRequest,
+  AddGitLabSelfHostedProviderRequest as AdminAddGitLabSelfHostedProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
-  UpdateGitLabProviderRequest as AdminUpdateGitLabProviderRequest,
+  UpdateGitLabSelfHostedProviderRequest as AdminUpdateGitLabSelfHostedProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  AddGitLabProviderRequest as MgmtAddGitLabProviderRequest,
+  AddGitLabSelfHostedProviderRequest as MgmtAddGitLabSelfHostedProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
-  UpdateGitLabProviderRequest as MgmtUpdateGitLabProviderRequest,
+  UpdateGitLabSelfHostedProviderRequest as MgmtUpdateGitLabSelfHostedProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -53,6 +53,7 @@ export class ProviderGitlabSelfHostedComponent {
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
+      issuer: new FormControl('', [Validators.required]),
       clientId: new FormControl('', [Validators.required]),
       clientSecret: new FormControl('', [Validators.required]),
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
@@ -120,9 +121,10 @@ export class ProviderGitlabSelfHostedComponent {
 
   public addGitlabSelfHostedProvider(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGitLabProviderRequest();
+      const req = new MgmtAddGitLabSelfHostedProviderRequest();
 
       req.setName(this.name?.value);
+      req.setIssuer(this.issuer?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
@@ -130,7 +132,7 @@ export class ProviderGitlabSelfHostedComponent {
 
       this.loading = true;
       (this.service as ManagementService)
-        .addGitLabProvider(req)
+        .addGitLabSelfHostedProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -142,8 +144,9 @@ export class ProviderGitlabSelfHostedComponent {
           this.loading = false;
         });
     } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGitLabProviderRequest();
+      const req = new AdminAddGitLabSelfHostedProviderRequest();
       req.setName(this.name?.value);
+      req.setIssuer(this.issuer?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
@@ -151,7 +154,7 @@ export class ProviderGitlabSelfHostedComponent {
 
       this.loading = true;
       (this.service as AdminService)
-        .addGitLabProvider(req)
+        .addGitLabSelfHostedProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -168,9 +171,10 @@ export class ProviderGitlabSelfHostedComponent {
   public updateGitlabSelfHostedProvider(): void {
     if (this.provider) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGitLabProviderRequest();
+        const req = new MgmtUpdateGitLabSelfHostedProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
+        req.setIssuer(this.issuer?.value);
         req.setClientId(this.clientId?.value);
         req.setScopesList(this.scopesList?.value);
         req.setProviderOptions(this.options);
@@ -181,7 +185,7 @@ export class ProviderGitlabSelfHostedComponent {
 
         this.loading = true;
         (this.service as ManagementService)
-          .updateGitLabProvider(req)
+          .updateGitLabSelfHostedProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
@@ -193,9 +197,10 @@ export class ProviderGitlabSelfHostedComponent {
             this.loading = false;
           });
       } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGitLabProviderRequest();
+        const req = new AdminUpdateGitLabSelfHostedProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
+        req.setIssuer(this.issuer?.value);
         req.setClientId(this.clientId?.value);
         req.setScopesList(this.scopesList?.value);
         req.setProviderOptions(this.options);
@@ -206,7 +211,7 @@ export class ProviderGitlabSelfHostedComponent {
 
         this.loading = true;
         (this.service as AdminService)
-          .updateGoogleProvider(req)
+          .updateGitLabSelfHostedProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
@@ -259,6 +264,10 @@ export class ProviderGitlabSelfHostedComponent {
 
   public get clientSecret(): AbstractControl | null {
     return this.form.get('clientSecret');
+  }
+
+  public get issuer(): AbstractControl | null {
+    return this.form.get('issuer');
   }
 
   public get scopesList(): AbstractControl | null {

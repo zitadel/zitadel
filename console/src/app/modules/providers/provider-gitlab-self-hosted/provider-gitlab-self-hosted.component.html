@@ -16,6 +16,11 @@
     <form [formGroup]="form" (ngSubmit)="submitForm()">
       <div class="gitlab-content">
         <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
+          <input cnslInput formControlName="issuer" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientId" />
         </cnsl-form-field>
