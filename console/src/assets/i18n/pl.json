@@ -1622,6 +1622,10 @@
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OIDC."
       },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OAuth."
+      },
       "JWT": {
         "TITLE": "JWT Provider",
         "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy JWT."
@@ -1669,6 +1673,10 @@
     "OWNER": "Właściciel",
     "ID": "ID",
     "NAME": "Nazwa",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "Atrybut identyfikatora",
     "AVAILABILITY": "Dostępność",
     "AVAILABLE": "dostępny",
     "AVAILABLEBUTINACTIVE": "dostępny ale nieaktywny",
