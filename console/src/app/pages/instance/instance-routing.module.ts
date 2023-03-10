@@ -70,6 +70,34 @@ const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'gitlab',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-gitlab/provider-gitlab.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-gitlab/provider-gitlab.module'),
+          },
+        ],
+      },
+      {
+        path: 'gitlab-self-hosted',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () =>
+              import('src/app/modules/providers/provider-gitlab-self-hosted/provider-gitlab-self-hosted.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () =>
+              import('src/app/modules/providers/provider-gitlab-self-hosted/provider-gitlab-self-hosted.module'),
+          },
+        ],
+      },
     ],
   },
 ];

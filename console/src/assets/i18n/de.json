@@ -1629,6 +1629,14 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Google-Identitätsprovider ein."
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Gitlab Self Hosted Identitätsprovider ein."
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self hosted Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Gitlab Self Hosted Identitätsprovider ein."
       }
     },
     "DETAIL": {

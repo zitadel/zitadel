@@ -1629,6 +1629,14 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Google"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Gitlab Self Hosted"
       }
     },
     "DETAIL": {

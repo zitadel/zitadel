@@ -15,13 +15,13 @@ import { CardModule } from '../../card/card.module';
 import { CreateLayoutModule } from '../../create-layout/create-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { ProviderOptionsModule } from '../../provider-options/provider-options.module';
-import { ProviderGitlabRoutingModule } from './provider-gitlab-routing.module';
-import { ProviderGitlabComponent } from './provider-gitlab.component';
+import { ProviderGitlabSelfHostedRoutingModule } from './provider-gitlab-self-hosted-routing.module';
+import { ProviderGitlabSelfHostedComponent } from './provider-gitlab-self-hosted.component';
 
 @NgModule({
-  declarations: [ProviderGitlabComponent],
+  declarations: [ProviderGitlabSelfHostedComponent],
   imports: [
-    ProviderGitlabRoutingModule,
+    ProviderGitlabSelfHostedRoutingModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -40,4 +40,4 @@ import { ProviderGitlabComponent } from './provider-gitlab.component';
     MatLegacyProgressSpinnerModule,
   ],
 })
-export default class ProviderGitlabModule {}
+export default class ProviderGitlabSelfHostedModule {}

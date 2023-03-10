@@ -24,11 +24,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
-  selector: 'cnsl-provider-gitlab',
-  templateUrl: './provider-gitlab.component.html',
-  styleUrls: ['./provider-gitlab.component.scss'],
+  selector: 'cnsl-provider-gitlab-self-hosted',
+  templateUrl: './provider-gitlab-self-hosted.component.html',
+  styleUrls: ['./provider-gitlab-self-hosted.component.scss'],
 })
-export class ProviderGitlabComponent {
+export class ProviderGitlabSelfHostedComponent {
   public showOptional: boolean = false;
   public options: Options = new Options();
   public id: string | null = '';
@@ -103,8 +103,8 @@ export class ProviderGitlabComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        if (this.provider?.config?.gitlab) {
-          this.form.patchValue(this.provider.config.gitlab);
+        if (this.provider?.config?.gitlabSelfHosted) {
+          this.form.patchValue(this.provider.config.gitlabSelfHosted);
           this.name?.setValue(this.provider.name);
         }
       })
@@ -115,10 +115,10 @@ export class ProviderGitlabComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGitlabProvider() : this.addGitlabProvider();
+    this.provider ? this.updateGitlabSelfHostedProvider() : this.addGitlabSelfHostedProvider();
   }
 
-  public addGitlabProvider(): void {
+  public addGitlabSelfHostedProvider(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       const req = new MgmtAddGitLabProviderRequest();
 
@@ -165,7 +165,7 @@ export class ProviderGitlabComponent {
     }
   }
 
-  public updateGitlabProvider(): void {
+  public updateGitlabSelfHostedProvider(): void {
     if (this.provider) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
         const req = new MgmtUpdateGitLabProviderRequest();
