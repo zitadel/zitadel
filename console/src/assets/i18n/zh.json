@@ -1621,6 +1621,10 @@
         "TITLE": "OIDC供应商",
         "DESCRIPTION": "输入你的OIDC供应商的必要数据。"
       },
+      "OAUTH": {
+        "TITLE": "OAuth供应商",
+        "DESCRIPTION": "输入你的OAuth供应商的必要数据。"
+      },
       "JWT": {
         "TITLE": "JWT供应商",
         "DESCRIPTION": "输入你的JWT供应商所需的数据。"
@@ -1668,6 +1672,10 @@
     "OWNER": "所有者",
     "ID": "ID",
     "NAME": "名称",
+    "AUTHORIZATIONENDPOINT": "授权端点",
+    "TOKENENDPOINT": "令牌端点",
+    "USERENDPOINT": "用户端点",
+    "IDATTRIBUTE": "标识属性",
     "AVAILABILITY": "可用性",
     "AVAILABLE": "可用的",
     "AVAILABLEBUTINACTIVE": "可用但已停用",
