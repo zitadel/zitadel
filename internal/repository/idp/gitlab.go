@@ -127,7 +127,6 @@ func (e *GitLabIDPChangedEvent) Data() interface{} {
 }
 
 func (e *GitLabIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	// return []*eventstore.EventUniqueConstraint{NewAddGitLabIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)} // TODO: ?
 	return nil
 }
 
@@ -207,7 +206,7 @@ type GitLabSelfHostedIDPChangedEvent struct {
 	Issuer       *string             `json:"issuer,omitempty"`
 	ClientID     *string             `json:"client_id,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"client_secret,omitempty"`
-	Scopes       []string            `json:"scopes,omitempty"` // TODO: tristate?
+	Scopes       []string            `json:"scopes,omitempty"`
 	OptionChanges
 }
 

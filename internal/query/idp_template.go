@@ -424,6 +424,7 @@ var (
 		table: gitlabSelfHostedIdpTemplateTable,
 	}
 )
+
 var (
 	googleIdpTemplateTable = table{
 		name:          projection.IDPTemplateGoogleTable,
