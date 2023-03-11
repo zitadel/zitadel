@@ -90,7 +90,7 @@ func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProj
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery, grantQuery},
-	}, false, false)
+	}, true, false)
 	if err != nil {
 		return nil, err
 	}

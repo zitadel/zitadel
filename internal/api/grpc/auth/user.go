@@ -31,7 +31,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID}}
-	grants, err := s.query.UserGrants(ctx, queries, false, false)
+	grants, err := s.query.UserGrants(ctx, queries, true, false)
 	if err != nil {
 		return nil, err
 	}

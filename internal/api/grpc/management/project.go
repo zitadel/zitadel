@@ -172,7 +172,7 @@ func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRe
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery},
-	}, false, false)
+	}, true, false)
 	if err != nil {
 		return nil, err
 	}
