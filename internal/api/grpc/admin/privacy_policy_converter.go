@@ -10,5 +10,6 @@ func UpdatePrivacyPolicyToDomain(req *admin_pb.UpdatePrivacyPolicyRequest) *doma
 		TOSLink:     req.TosLink,
 		PrivacyLink: req.PrivacyLink,
 		HelpLink:    req.HelpLink,
+		SupportEmail: req.SupportEmail,
 	}
 }

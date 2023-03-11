@@ -49,7 +49,8 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 			orgAgg,
 			policy.TOSLink,
 			policy.PrivacyLink,
-			policy.HelpLink))
+			policy.HelpLink,
+			policy.SupportEmail))
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +76,7 @@ func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4N9fs", "Errors.Org.PrivacyPolicy.NotChanged")
 	}

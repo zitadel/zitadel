@@ -458,6 +458,7 @@ func FooterTextToPb(text domain.FooterText) *text_pb.FooterText {
 		Tos:           text.TOS,
 		PrivacyPolicy: text.PrivacyPolicy,
 		Help:          text.Help,
+		Support:  text.Support,
 	}
 }
 
@@ -949,5 +950,6 @@ func FooterTextPbToDomain(text *text_pb.FooterText) domain.FooterText {
 		TOS:           text.Tos,
 		PrivacyPolicy: text.PrivacyPolicy,
 		Help:          text.Help,
+		Support: text.Support,
 	}
 }

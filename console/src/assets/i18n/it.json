@@ -8,9 +8,10 @@
   },
   "FOOTER": {
     "LINKS": {
-      "CONTACT": "Kontakt",
+      "CONTACT": "Contatto",
       "TOS": "Terms of Service",
-      "PP": "Privacy Policy"
+      "PP": "Privacy Policy",
+      "SUPPORT": "Supporto"
     },
     "THEME": {
       "DARK": "Scuro",

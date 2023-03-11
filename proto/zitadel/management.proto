@@ -9762,6 +9762,13 @@ message AddCustomPrivacyPolicyRequest {
             example: "\"https://zitadel.com/docs/manuals/introduction\"";
         }
     ];
+    string support_email = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"support-email@test.com\"";
+            description: "help / support email address."
+        }
+    ];
 }
 
 message AddCustomPrivacyPolicyResponse {
@@ -9785,6 +9792,13 @@ message UpdateCustomPrivacyPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Variable {{.Lang}} can be set to have different links based on the language.";
             example: "\"https://zitadel.com/docs/manuals/introduction\"";
+        }
+    ];
+    string support_email = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"support-email@test.com\"";
+            description: "help / support email address."
         }
     ];
 }

@@ -25,6 +25,7 @@ func NewPrivacyPolicyAddedEvent(
 	tosLink,
 	privacyLink,
 	helpLink string,
+	supportEmail string,
 ) *PrivacyPolicyAddedEvent {
 	return &PrivacyPolicyAddedEvent{
 		PrivacyPolicyAddedEvent: *policy.NewPrivacyPolicyAddedEvent(
@@ -34,7 +35,8 @@ func NewPrivacyPolicyAddedEvent(
 				PrivacyPolicyAddedEventType),
 			tosLink,
 			privacyLink,
-			helpLink),
+			helpLink,
+			supportEmail),
 	}
 }
 

@@ -58,7 +58,8 @@ func (wm *OrgPrivacyPolicyWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	tosLink,
 	privacyLink,
-	helpLink string,
+	helpLink,
+	supportEmail string,
 ) (*org.PrivacyPolicyChangedEvent, bool) {
 
 	changes := make([]policy.PrivacyPolicyChanges, 0)
@@ -70,6 +71,9 @@ func (wm *OrgPrivacyPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.HelpLink != helpLink {
 		changes = append(changes, policy.ChangeHelpLink(helpLink))
+	}
+	if wm.SupportEmail != supportEmail {
+		changes = append(changes, policy.ChangeSupportEmail(supportEmail))
 	}
 	if len(changes) == 0 {
 		return nil, false

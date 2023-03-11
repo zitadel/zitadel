@@ -1,20 +1,41 @@
 {{define "footer"}}
 <footer>
-    {{ if hasWatermark .LabelPolicy }}
-    <span class="watermark" >
-        <span class="powered">{{t "Footer.PoweredBy"}}</span>
-        <span class="lgn-logo-watermark" sourcelight="logo-light.svg" sourcedark="logo-dark.svg" alt="logo"></span>
-    </span>
-    {{end}}
-    <span class="fill-space"></span>
-    {{ if .TOSLink }}
-        <a href="{{.TOSLink}}" rel="noopener noreferrer" target="_blank" alt="TOS">{{t "Footer.Tos"}}</a>
-    {{ end }}
-    {{ if .PrivacyLink }}
-        <a href="{{.PrivacyLink}}" rel="noopener noreferrer" target="_blank" alt="Privacy Policy">{{t "Footer.PrivacyPolicy"}}</a>
-    {{end}}
-    {{ if .HelpLink }}
-        <a href="{{.HelpLink}}" rel="noopener noreferrer" target="_blank" alt="Help">{{t "Footer.Help"}}</a>
-    {{end}}
+  {{ if hasWatermark .LabelPolicy }}
+  <span class="watermark">
+    <span class="powered">{{t "Footer.PoweredBy"}}</span>
+    <span
+      class="lgn-logo-watermark"
+      sourcelight="logo-light.svg"
+      sourcedark="logo-dark.svg"
+      alt="logo"
+    ></span>
+  </span>
+  {{end}}
+  <span class="fill-space"></span>
+  {{ if .TOSLink }}
+  <a href="{{.TOSLink}}" rel="noopener noreferrer" target="_blank" alt="TOS"
+    >{{t "Footer.Tos"}}</a
+  >
+  {{ end }} {{ if .PrivacyLink }}
+  <a
+    href="{{.PrivacyLink}}"
+    rel="noopener noreferrer"
+    target="_blank"
+    alt="Privacy Policy"
+    >{{t "Footer.PrivacyPolicy"}}</a
+  >
+  {{end}} {{ if .HelpLink }}
+  <a href="{{.HelpLink}}" rel="noopener noreferrer" target="_blank" alt="Help"
+    >{{t "Footer.Help"}}</a
+  >
+  {{end}} {{ if .SupportEmail }}
+  <a
+    mailto="{{.SupportEmail}}"
+    rel="noopener noreferrer"
+    target="_blank"
+    alt="Help"
+    >{{t "Footer.SupportEmail"}}</a
+  >
+  {{end}}
 </footer>
 {{end}}

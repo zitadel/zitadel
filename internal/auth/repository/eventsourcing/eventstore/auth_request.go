@@ -1149,6 +1149,7 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 		TOSLink:     p.TOSLink,
 		PrivacyLink: p.PrivacyLink,
 		HelpLink:    p.HelpLink,
+		SupportEmail: p.SupportEmail,
 	}
 }
 

@@ -524,6 +524,7 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *managem
 			TosLink:     queriedPrivacy.TOSLink,
 			PrivacyLink: queriedPrivacy.PrivacyLink,
 			HelpLink:    queriedPrivacy.HelpLink,
+			SupportEmail: queriedPrivacy.SupportEmail,
 		}, nil
 	}
 	return nil, nil

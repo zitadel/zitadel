@@ -21,6 +21,7 @@ type PrivacyPolicyAddedEvent struct {
 	TOSLink     string `json:"tosLink,omitempty"`
 	PrivacyLink string `json:"privacyLink,omitempty"`
 	HelpLink    string `json:"helpLink,omitempty"`
+	SupportEmail string `json:"supportEmail,omitempty"`
 }
 
 func (e *PrivacyPolicyAddedEvent) Data() interface{} {
@@ -36,12 +37,14 @@ func NewPrivacyPolicyAddedEvent(
 	tosLink,
 	privacyLink,
 	helpLink string,
+	supportEmail string,
 ) *PrivacyPolicyAddedEvent {
 	return &PrivacyPolicyAddedEvent{
 		BaseEvent:   *base,
 		TOSLink:     tosLink,
 		PrivacyLink: privacyLink,
 		HelpLink:    helpLink,
+		SupportEmail: supportEmail,
 	}
 }
 
@@ -63,6 +66,7 @@ type PrivacyPolicyChangedEvent struct {
 	TOSLink     *string `json:"tosLink,omitempty"`
 	PrivacyLink *string `json:"privacyLink,omitempty"`
 	HelpLink    *string `json:"helpLink,omitempty"`
+	SupportEmail *string `json:"supportEmail,omitempty"`
 }
 
 func (e *PrivacyPolicyChangedEvent) Data() interface{} {
@@ -106,6 +110,12 @@ func ChangePrivacyLink(privacyLink string) func(*PrivacyPolicyChangedEvent) {
 func ChangeHelpLink(helpLink string) func(*PrivacyPolicyChangedEvent) {
 	return func(e *PrivacyPolicyChangedEvent) {
 		e.HelpLink = &helpLink
+	}
+}
+
+func ChangeSupportEmail(supportEmail string) func(*PrivacyPolicyChangedEvent) {
+	return func(e *PrivacyPolicyChangedEvent) {
+		e.SupportEmail = &supportEmail
 	}
 }
 
