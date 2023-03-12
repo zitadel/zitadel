@@ -66,8 +66,7 @@ func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-22N89f", "Errors.ResourceOwnerMissing")
 	}
 
-	existingPolicy := NewOrgPrivacyPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	existingPolicy, err := c.orgPrivacyPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

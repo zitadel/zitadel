@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 
 	"golang.org/x/text/language"
 
@@ -1102,7 +1101,6 @@ func (c *Commands) createFooterTextEvents(ctx context.Context, agg *eventstore.A
 }
 
 func (c *Commands) createCustomLoginTextEvent(ctx context.Context, agg *eventstore.Aggregate, textKey, existingText, newText string, lang language.Tag, defaultText bool) eventstore.Command {
-	fmt.Println("Here")
 	if existingText == newText {
 		return nil
 	}
