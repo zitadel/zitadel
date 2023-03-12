@@ -1189,6 +1189,7 @@
       "TOSLINK": "Link to Terms of Service",
       "POLICYLINK": "Link to Privacy Policy",
       "HELPLINK": "Link to Help",
+      "SUPPORTEMAIL": "Support Email",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"

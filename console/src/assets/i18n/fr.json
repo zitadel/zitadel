@@ -1188,6 +1188,7 @@
       "TOSLINK": "Lien vers les conditions d'utilisation",
       "POLICYLINK": "Lien vers la politique de confidentialité",
       "HELPLINK": "Lien vers l'aide",
+      "SUPPORTEMAIL": "E-mail d'assistance",
       "SAVED": "Enregistré avec succès !",
       "RESET_TITLE": "Restaurer les valeurs par défaut",
       "RESET_DESCRIPTION": "Vous êtes sur le point de restaurer les liens par défaut pour les CGS et la politique de confidentialité. Voulez-vous vraiment continuer ?"
