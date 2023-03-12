@@ -4325,8 +4325,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
-								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, "Support", language.English,
+								instance.NewCustomTextRemovedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, language.English,
 								),
 							),
 						},
@@ -7023,8 +7023,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
-							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, "Support", language.English,
+							instance.NewCustomTextRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, language.English,
 							),
 						),
 					),
