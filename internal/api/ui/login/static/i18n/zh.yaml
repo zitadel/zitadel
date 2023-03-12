@@ -165,6 +165,7 @@ PasswordChange:
   NewPasswordConfirmLabel: 确认密码
   CancelButtonText: 取消
   NextButtonText: 继续
+  Footer: 页脚
 
 PasswordChangeDone:
   Title: 更改密码
@@ -308,6 +309,7 @@ Footer:
   Tos: 服务条款
   PrivacyPolicy: 隐私政策
   Help: 帮助
+  SupportEmail: 支持邮箱
 
 Errors:
   Internal: 发生了内部错误

@@ -1181,7 +1181,7 @@ func footerKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyFooterHelp {
 		result.Footer.Help = text.Text
 	}
-	if text.Key == domain.LoginKeyFooterSupport{
-		result.Footer.Support = text.Text
+	if text.Key == domain.LoginKeyFooterSupportEmail{
+		result.Footer.SupportEmail = text.Text
 	}
 }

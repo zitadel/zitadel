@@ -28,13 +28,13 @@
   <a href="{{.HelpLink}}" rel="noopener noreferrer" target="_blank" alt="Help"
     >{{t "Footer.Help"}}</a
   >
-  {{end}} {{ if .Support }}
+  {{end}} {{ if .SupportEmail }}
   <a
-    mailto="{{.SupportEmail}}"
+    href="mailto:{{.SupportEmail}}"
     rel="noopener noreferrer"
     target="_blank"
     alt="Help"
-    >{{t "Footer.Support"}}</a
+    >{{t "Footer.SupportEmail"}}</a
   >
   {{end}}
 </footer>

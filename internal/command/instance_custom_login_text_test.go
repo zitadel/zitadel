@@ -1373,7 +1373,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, "Support", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, "Support Email", language.English,
 								),
 							),
 						},
@@ -1670,7 +1670,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOS:           "TOS",
 						PrivacyPolicy: "PrivacyPolicy",
 						Help:          "Help",
-						Support: "Support",
+						SupportEmail: "Support Email",
 					},
 				},
 			},
@@ -3003,7 +3003,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, "Support", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, "Support Email", language.English,
 							),
 						),
 					),
@@ -4326,7 +4326,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, language.English,
 								),
 							),
 						},
@@ -5703,7 +5703,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, "Support", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, "Support Email", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -7024,7 +7024,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, language.English,
 							),
 						),
 					),
@@ -8347,7 +8347,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupport, "Support", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, "Support Email", language.English,
 								),
 							),
 						},
@@ -8644,7 +8644,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOS:           "TOS",
 						PrivacyPolicy: "PrivacyPolicy",
 						Help:          "Help",
-						Support: "Support",
+						SupportEmail: "Support Email",
 					},
 				},
 			},

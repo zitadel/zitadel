@@ -165,6 +165,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Passwort Bestätigung
   CancelButtonText: abbrechen
   NextButtonText: weiter
+  Footer: Fusszeile
 
 PasswordChangeDone:
   Title: Passwort ändern
@@ -308,6 +309,7 @@ Footer:
   Tos: AGB
   PrivacyPolicy: Datenschutzerklärung
   Help: Hilfe
+  SupportEmail: Support E-Mail
 
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten

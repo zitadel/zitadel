@@ -395,11 +395,11 @@ message LogoutDoneScreenText {
 
 message FooterText {
     reserved 2, 4, 6, 8;
-    reserved "tos_link", "privacy_policy_link", "help_link", "support_email";
+    reserved "tos_link", "privacy_policy_link", "help_link";
     string tos = 1 [(validate.rules).string = {max_len: 200}];
     string privacy_policy = 3 [(validate.rules).string = {max_len: 200}];
     string help = 5 [(validate.rules).string = {max_len: 200}];
-    string support = 7 [(validate.rules).string = {max_len: 200}];
+    string support_email = 7 [(validate.rules).string = {max_len: 200}];
 }
 
 message PasswordlessPromptScreenText {

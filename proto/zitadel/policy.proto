@@ -347,7 +347,7 @@ message PrivacyPolicy {
         }
     ];
     string support_email = 6 [
-        (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+        (validate.rules).string = {ignore_empty: true, max_len: 320, email: true},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"support-email@test.com\"";
             description: "help / support email address."
