@@ -100,15 +100,16 @@ type GoogleIDPTemplate struct {
 }
 
 type LDAPIDPTemplate struct {
-	IDPID               string
-	Host                string
-	Port                string
-	TLS                 bool
-	BaseDN              string
-	UserObjectClass     string
-	UserUniqueAttribute string
-	Admin               string
-	Password            *crypto.CryptoValue
+	IDPID             string
+	Servers           []string
+	StartTLS          bool
+	BaseDN            string
+	BindDN            string
+	BindPassword      *crypto.CryptoValue
+	UserBase          string
+	UserObjectClasses []string
+	UserFilters       []string
+	Timeout           time.Duration
 	idp.LDAPAttributes
 }
 
@@ -390,36 +391,40 @@ var (
 		name:  projection.LDAPInstanceIDCol,
 		table: ldapIdpTemplateTable,
 	}
-	LDAPHostCol = Column{
-		name:  projection.LDAPHostCol,
+	LDAPServersCol = Column{
+		name:  projection.LDAPServersCol,
 		table: ldapIdpTemplateTable,
 	}
-	LDAPPortCol = Column{
-		name:  projection.LDAPPortCol,
-		table: ldapIdpTemplateTable,
-	}
-	LDAPTlsCol = Column{
-		name:  projection.LDAPTlsCol,
+	LDAPStartTLSCol = Column{
+		name:  projection.LDAPStartTLSCol,
 		table: ldapIdpTemplateTable,
 	}
 	LDAPBaseDNCol = Column{
 		name:  projection.LDAPBaseDNCol,
 		table: ldapIdpTemplateTable,
 	}
-	LDAPUserObjectClassCol = Column{
-		name:  projection.LDAPUserObjectClassCol,
+	LDAPBindDNCol = Column{
+		name:  projection.LDAPBindDNCol,
 		table: ldapIdpTemplateTable,
 	}
-	LDAPUserUniqueAttributeCol = Column{
-		name:  projection.LDAPUserUniqueAttributeCol,
+	LDAPBindPasswordCol = Column{
+		name:  projection.LDAPBindPasswordCol,
 		table: ldapIdpTemplateTable,
 	}
-	LDAPAdminCol = Column{
-		name:  projection.LDAPAdminCol,
+	LDAPUserBaseCol = Column{
+		name:  projection.LDAPUserBaseCol,
 		table: ldapIdpTemplateTable,
 	}
-	LDAPPasswordCol = Column{
-		name:  projection.LDAPPasswordCol,
+	LDAPUserObjectClassesCol = Column{
+		name:  projection.LDAPUserObjectClassesCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPUserFiltersCol = Column{
+		name:  projection.LDAPUserFiltersCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPTimeoutCol = Column{
+		name:  projection.LDAPTimeoutCol,
 		table: ldapIdpTemplateTable,
 	}
 	LDAPIDAttributeCol = Column{
@@ -628,14 +633,15 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			GoogleScopesCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
-			LDAPHostCol.identifier(),
-			LDAPPortCol.identifier(),
-			LDAPTlsCol.identifier(),
+			LDAPServersCol.identifier(),
+			LDAPStartTLSCol.identifier(),
 			LDAPBaseDNCol.identifier(),
-			LDAPUserObjectClassCol.identifier(),
-			LDAPUserUniqueAttributeCol.identifier(),
-			LDAPAdminCol.identifier(),
-			LDAPPasswordCol.identifier(),
+			LDAPBindDNCol.identifier(),
+			LDAPBindPasswordCol.identifier(),
+			LDAPUserBaseCol.identifier(),
+			LDAPUserObjectClassesCol.identifier(),
+			LDAPUserFiltersCol.identifier(),
+			LDAPTimeoutCol.identifier(),
 			LDAPIDAttributeCol.identifier(),
 			LDAPFirstNameAttributeCol.identifier(),
 			LDAPLastNameAttributeCol.identifier(),
@@ -703,14 +709,15 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			googleScopes := database.StringArray{}
 
 			ldapID := sql.NullString{}
-			ldapHost := sql.NullString{}
-			ldapPort := sql.NullString{}
-			ldapTls := sql.NullBool{}
+			ldapServers := database.StringArray{}
+			ldapStartTls := sql.NullBool{}
 			ldapBaseDN := sql.NullString{}
-			ldapUserObjectClass := sql.NullString{}
-			ldapUserUniqueAttribute := sql.NullString{}
-			ldapAdmin := sql.NullString{}
-			ldapPassword := new(crypto.CryptoValue)
+			ldapBindDN := sql.NullString{}
+			ldapBindPassword := new(crypto.CryptoValue)
+			ldapUserBase := sql.NullString{}
+			ldapUserObjectClasses := database.StringArray{}
+			ldapUserFilters := database.StringArray{}
+			ldapTimeout := new(time.Duration)
 			ldapIDAttribute := sql.NullString{}
 			ldapFirstNameAttribute := sql.NullString{}
 			ldapLastNameAttribute := sql.NullString{}
@@ -780,14 +787,15 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&googleScopes,
 				// ldap
 				&ldapID,
-				&ldapHost,
-				&ldapPort,
-				&ldapTls,
+				&ldapServers,
+				&ldapStartTls,
 				&ldapBaseDN,
-				&ldapUserObjectClass,
-				&ldapUserUniqueAttribute,
-				&ldapAdmin,
-				&ldapPassword,
+				&ldapBindDN,
+				&ldapBindPassword,
+				&ldapUserBase,
+				&ldapUserObjectClasses,
+				&ldapUserFilters,
+				&ldapTimeout,
 				&ldapIDAttribute,
 				&ldapFirstNameAttribute,
 				&ldapLastNameAttribute,
@@ -870,15 +878,16 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			}
 			if ldapID.Valid {
 				idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
-					IDPID:               ldapID.String,
-					Host:                ldapHost.String,
-					Port:                ldapPort.String,
-					TLS:                 ldapTls.Bool,
-					BaseDN:              ldapBaseDN.String,
-					UserObjectClass:     ldapUserObjectClass.String,
-					UserUniqueAttribute: ldapUserUniqueAttribute.String,
-					Admin:               ldapAdmin.String,
-					Password:            ldapPassword,
+					IDPID:             ldapID.String,
+					Servers:           ldapServers,
+					StartTLS:          ldapStartTls.Bool,
+					BaseDN:            ldapBaseDN.String,
+					BindDN:            ldapBindDN.String,
+					BindPassword:      ldapBindPassword,
+					UserBase:          ldapUserBase.String,
+					UserObjectClasses: ldapUserObjectClasses,
+					UserFilters:       ldapUserFilters,
+					Timeout:           ldapTimeout.Abs(),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                ldapIDAttribute.String,
 						FirstNameAttribute:         ldapFirstNameAttribute.String,
@@ -957,14 +966,15 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			GoogleScopesCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
-			LDAPHostCol.identifier(),
-			LDAPPortCol.identifier(),
-			LDAPTlsCol.identifier(),
+			LDAPServersCol.identifier(),
+			LDAPStartTLSCol.identifier(),
 			LDAPBaseDNCol.identifier(),
-			LDAPUserObjectClassCol.identifier(),
-			LDAPUserUniqueAttributeCol.identifier(),
-			LDAPAdminCol.identifier(),
-			LDAPPasswordCol.identifier(),
+			LDAPBindDNCol.identifier(),
+			LDAPBindPasswordCol.identifier(),
+			LDAPUserBaseCol.identifier(),
+			LDAPUserObjectClassesCol.identifier(),
+			LDAPUserFiltersCol.identifier(),
+			LDAPTimeoutCol.identifier(),
 			LDAPIDAttributeCol.identifier(),
 			LDAPFirstNameAttributeCol.identifier(),
 			LDAPLastNameAttributeCol.identifier(),
@@ -1036,14 +1046,15 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				googleScopes := database.StringArray{}
 
 				ldapID := sql.NullString{}
-				ldapHost := sql.NullString{}
-				ldapPort := sql.NullString{}
-				ldapTls := sql.NullBool{}
+				ldapServers := database.StringArray{}
+				ldapStartTls := sql.NullBool{}
 				ldapBaseDN := sql.NullString{}
-				ldapUserObjectClass := sql.NullString{}
-				ldapUserUniqueAttribute := sql.NullString{}
-				ldapAdmin := sql.NullString{}
-				ldapPassword := new(crypto.CryptoValue)
+				ldapBindDN := sql.NullString{}
+				ldapBindPassword := new(crypto.CryptoValue)
+				ldapUserBase := sql.NullString{}
+				ldapUserObjectClasses := database.StringArray{}
+				ldapUserFilters := database.StringArray{}
+				ldapTimeout := new(time.Duration)
 				ldapIDAttribute := sql.NullString{}
 				ldapFirstNameAttribute := sql.NullString{}
 				ldapLastNameAttribute := sql.NullString{}
@@ -1113,14 +1124,15 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&googleScopes,
 					// ldap
 					&ldapID,
-					&ldapHost,
-					&ldapPort,
-					&ldapTls,
+					&ldapServers,
+					&ldapStartTls,
 					&ldapBaseDN,
-					&ldapUserObjectClass,
-					&ldapUserUniqueAttribute,
-					&ldapAdmin,
-					&ldapPassword,
+					&ldapBindDN,
+					&ldapBindPassword,
+					&ldapUserBase,
+					&ldapUserObjectClasses,
+					&ldapUserFilters,
+					&ldapTimeout,
 					&ldapIDAttribute,
 					&ldapFirstNameAttribute,
 					&ldapLastNameAttribute,
@@ -1202,15 +1214,16 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				}
 				if ldapID.Valid {
 					idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
-						IDPID:               ldapID.String,
-						Host:                ldapHost.String,
-						Port:                ldapPort.String,
-						TLS:                 ldapTls.Bool,
-						BaseDN:              ldapBaseDN.String,
-						UserObjectClass:     ldapUserObjectClass.String,
-						UserUniqueAttribute: ldapUserUniqueAttribute.String,
-						Admin:               ldapAdmin.String,
-						Password:            ldapPassword,
+						IDPID:             ldapID.String,
+						Servers:           ldapServers,
+						StartTLS:          ldapStartTls.Bool,
+						BaseDN:            ldapBaseDN.String,
+						BindDN:            ldapBindDN.String,
+						BindPassword:      ldapBindPassword,
+						UserBase:          ldapUserBase.String,
+						UserObjectClasses: ldapUserObjectClasses,
+						UserFilters:       ldapUserFilters,
+						Timeout:           ldapTimeout.Abs(),
 						LDAPAttributes: idp.LDAPAttributes{
 							IDAttribute:                ldapIDAttribute.String,
 							FirstNameAttribute:         ldapFirstNameAttribute.String,

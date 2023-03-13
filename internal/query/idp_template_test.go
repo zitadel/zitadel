@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -69,14 +70,15 @@ var (
 		` projections.idp_templates3_google.scopes,` +
 		// ldap
 		` projections.idp_templates3_ldap.idp_id,` +
-		` projections.idp_templates3_ldap.host,` +
-		` projections.idp_templates3_ldap.port,` +
-		` projections.idp_templates3_ldap.tls,` +
+		` projections.idp_templates3_ldap.servers,` +
+		` projections.idp_templates3_ldap.start_tls,` +
 		` projections.idp_templates3_ldap.base_dn,` +
-		` projections.idp_templates3_ldap.user_object_class,` +
-		` projections.idp_templates3_ldap.user_unique_attribute,` +
-		` projections.idp_templates3_ldap.admin,` +
-		` projections.idp_templates3_ldap.password,` +
+		` projections.idp_templates3_ldap.bind_dn,` +
+		` projections.idp_templates3_ldap.bind_password,` +
+		` projections.idp_templates3_ldap.user_base,` +
+		` projections.idp_templates3_ldap.user_object_classes,` +
+		` projections.idp_templates3_ldap.user_filters,` +
+		` projections.idp_templates3_ldap.timeout,` +
 		` projections.idp_templates3_ldap.id_attribute,` +
 		` projections.idp_templates3_ldap.first_name_attribute,` +
 		` projections.idp_templates3_ldap.last_name_attribute,` +
@@ -154,14 +156,15 @@ var (
 		"scopes",
 		// ldap config
 		"idp_id",
-		"host",
-		"port",
-		"tls",
+		"servers",
+		"start_tls",
 		"base_dn",
-		"user_object_class",
-		"user_unique_attribute",
-		"admin",
-		"password",
+		"bind_dn",
+		"bind_password",
+		"user_base",
+		"user_object_classes",
+		"user_filters",
+		"timeout",
 		"id_attribute",
 		"first_name_attribute",
 		"last_name_attribute",
@@ -230,14 +233,15 @@ var (
 		` projections.idp_templates3_google.scopes,` +
 		// ldap
 		` projections.idp_templates3_ldap.idp_id,` +
-		` projections.idp_templates3_ldap.host,` +
-		` projections.idp_templates3_ldap.port,` +
-		` projections.idp_templates3_ldap.tls,` +
+		` projections.idp_templates3_ldap.servers,` +
+		` projections.idp_templates3_ldap.start_tls,` +
 		` projections.idp_templates3_ldap.base_dn,` +
-		` projections.idp_templates3_ldap.user_object_class,` +
-		` projections.idp_templates3_ldap.user_unique_attribute,` +
-		` projections.idp_templates3_ldap.admin,` +
-		` projections.idp_templates3_ldap.password,` +
+		` projections.idp_templates3_ldap.bind_dn,` +
+		` projections.idp_templates3_ldap.bind_password,` +
+		` projections.idp_templates3_ldap.user_base,` +
+		` projections.idp_templates3_ldap.user_object_classes,` +
+		` projections.idp_templates3_ldap.user_filters,` +
+		` projections.idp_templates3_ldap.timeout,` +
 		` projections.idp_templates3_ldap.id_attribute,` +
 		` projections.idp_templates3_ldap.first_name_attribute,` +
 		` projections.idp_templates3_ldap.last_name_attribute,` +
@@ -316,14 +320,15 @@ var (
 		"scopes",
 		// ldap config
 		"idp_id",
-		"host",
-		"port",
-		"tls",
+		"servers",
+		"start_tls",
 		"base_dn",
-		"user_object_class",
-		"user_unique_attribute",
-		"admin",
-		"password",
+		"bind_dn",
+		"bind_password",
+		"user_base",
+		"user_object_classes",
+		"user_filters",
+		"timeout",
 		"id_attribute",
 		"first_name_attribute",
 		"last_name_attribute",
@@ -431,6 +436,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -565,6 +571,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 					},
 				),
 			},
@@ -652,6 +659,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -783,6 +791,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 					},
 				),
 			},
@@ -869,6 +878,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						database.StringArray{"profile"},
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -978,14 +988,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						// ldap config
 						"idp-id",
-						"host",
-						"port",
+						database.StringArray{"server"},
 						true,
 						"base",
-						"user",
-						"uid",
-						"admin",
+						"dn",
 						nil,
+						"user",
+						database.StringArray{"object"},
+						database.StringArray{"filter"},
+						time.Duration(30000000000),
 						"id",
 						"first",
 						"last",
@@ -1017,14 +1028,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
 				LDAPIDPTemplate: &LDAPIDPTemplate{
-					IDPID:               "idp-id",
-					Host:                "host",
-					Port:                "port",
-					TLS:                 true,
-					BaseDN:              "base",
-					UserObjectClass:     "user",
-					UserUniqueAttribute: "uid",
-					Admin:               "admin",
+					IDPID:             "idp-id",
+					Servers:           []string{"server"},
+					StartTLS:          true,
+					BaseDN:            "base",
+					BindDN:            "dn",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					Timeout:           time.Duration(30000000000),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "first",
@@ -1104,6 +1116,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1243,14 +1256,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							// ldap config
 							"idp-id",
-							"host",
-							"port",
+							database.StringArray{"server"},
 							true,
 							"base",
-							"user",
-							"uid",
-							"admin",
+							"dn",
 							nil,
+							"user",
+							database.StringArray{"object"},
+							database.StringArray{"filter"},
+							time.Duration(30000000000),
 							"id",
 							"first",
 							"last",
@@ -1288,14 +1302,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
 						LDAPIDPTemplate: &LDAPIDPTemplate{
-							IDPID:               "idp-id",
-							Host:                "host",
-							Port:                "port",
-							TLS:                 true,
-							BaseDN:              "base",
-							UserObjectClass:     "user",
-							UserUniqueAttribute: "uid",
-							Admin:               "admin",
+							IDPID:             "idp-id",
+							Servers:           []string{"server"},
+							StartTLS:          true,
+							BaseDN:            "base",
+							BindDN:            "dn",
+							UserBase:          "user",
+							UserObjectClasses: []string{"object"},
+							UserFilters:       []string{"filter"},
+							Timeout:           time.Duration(30000000000),
 							LDAPAttributes: idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "first",
@@ -1378,6 +1393,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1490,14 +1506,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							// ldap config
 							"idp-id-ldap",
-							"host",
-							"port",
+							database.StringArray{"server"},
 							true,
 							"base",
-							"user",
-							"uid",
-							"admin",
+							"dn",
 							nil,
+							"user",
+							database.StringArray{"object"},
+							database.StringArray{"filter"},
+							time.Duration(30000000000),
 							"id",
 							"first",
 							"last",
@@ -1566,6 +1583,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							database.StringArray{"profile"},
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1665,6 +1683,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 						},
 						{
 							"idp-id-oidc",
@@ -1720,6 +1739,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1819,6 +1839,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 						},
 					},
 				),
@@ -1843,14 +1864,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
 						LDAPIDPTemplate: &LDAPIDPTemplate{
-							IDPID:               "idp-id-ldap",
-							Host:                "host",
-							Port:                "port",
-							TLS:                 true,
-							BaseDN:              "base",
-							UserObjectClass:     "user",
-							UserUniqueAttribute: "uid",
-							Admin:               "admin",
+							IDPID:             "idp-id-ldap",
+							Servers:           []string{"server"},
+							StartTLS:          true,
+							BaseDN:            "base",
+							BindDN:            "dn",
+							UserBase:          "user",
+							UserObjectClasses: []string{"object"},
+							UserFilters:       []string{"filter"},
+							Timeout:           time.Duration(30000000000),
 							LDAPAttributes: idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "first",
