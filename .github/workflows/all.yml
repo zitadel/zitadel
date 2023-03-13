@@ -21,8 +21,8 @@ jobs:
       node: 18
 
   release:
-    name: releasing
+    name: release zitadel
     runs-on: ubuntu-latest
-    needs: [console, docs]
+    needs: [api, console, docs]
     steps:
     - run: echo "This is a placeholder"

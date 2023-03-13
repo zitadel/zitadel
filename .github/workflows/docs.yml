@@ -25,7 +25,7 @@ jobs:
         cache-dependency-path: docs/yarn.lock
     - run: yarn install --frozen-lockfile
     - run: yarn build
-    - run: zip bundle.zip build/*
+    - run: zip -r bundle.zip build
     - uses: actions/upload-artifact@v3
       with:
         name: docs
