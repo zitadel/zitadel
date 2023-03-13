@@ -121,6 +121,16 @@ https://github.com/zitadel/zitadel-nextjs/blob/main/components/profile.tsx#L4-L3
 
 Note that the signIn method requires the id of our provider which is in our case `zitadel`.
 
+### Userinfo API
+
+To show userinformation you can either use the data from the idToken, or call the userinfo endpoint. In our case we implement the Userinfo API which loads user data.
+To implement the API you have to create a file under the `pages/api` folder, called `userinfo.ts`.
+The file should look like the following.
+
+```ts reference
+https://github.com/zitadel/zitadel-nextjs/blob/main/pages/api/userinfo.ts
+```
+
 ### Session state
 
 To allow session state to be shared between pages - which improves performance, reduces network traffic and avoids component state changes while rendering - you can use the NextAuth.js Provider in `/pages/_app.tsx`.
