@@ -425,7 +425,6 @@ var (
 	}
 )
 
-
 var (
 	googleIdpTemplateTable = table{
 		name:          projection.IDPTemplateGoogleTable,
