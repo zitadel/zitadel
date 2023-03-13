@@ -25,10 +25,6 @@ func NewOAuthInstanceIDPWriteModel(instanceID, id string) *InstanceOAuthIDPWrite
 	}
 }
 
-func (wm *InstanceOAuthIDPWriteModel) Reduce() error {
-	return wm.OAuthIDPWriteModel.Reduce()
-}
-
 func (wm *InstanceOAuthIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -105,10 +101,6 @@ func NewOIDCInstanceIDPWriteModel(instanceID, id string) *InstanceOIDCIDPWriteMo
 			ID: id,
 		},
 	}
-}
-
-func (wm *InstanceOIDCIDPWriteModel) Reduce() error {
-	return wm.OIDCIDPWriteModel.Reduce()
 }
 
 func (wm *InstanceOIDCIDPWriteModel) AppendEvents(events ...eventstore.Event) {
@@ -208,10 +200,6 @@ func NewJWTInstanceIDPWriteModel(instanceID, id string) *InstanceJWTIDPWriteMode
 	}
 }
 
-func (wm *InstanceJWTIDPWriteModel) Reduce() error {
-	return wm.JWTIDPWriteModel.Reduce()
-}
-
 func (wm *InstanceJWTIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -307,10 +295,6 @@ func NewGitHubInstanceIDPWriteModel(instanceID, id string) *InstanceGitHubIDPWri
 	}
 }
 
-func (wm *InstanceGitHubIDPWriteModel) Reduce() error {
-	return wm.GitHubIDPWriteModel.Reduce()
-}
-
 func (wm *InstanceGitHubIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -376,10 +360,6 @@ func NewGitHubEnterpriseInstanceIDPWriteModel(instanceID, id string) *InstanceGi
 	}
 }
 
-func (wm *InstanceGitHubEnterpriseIDPWriteModel) Reduce() error {
-	return wm.GitHubEnterpriseIDPWriteModel.Reduce()
-}
-
 func (wm *InstanceGitHubEnterpriseIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -442,6 +422,137 @@ func (wm *InstanceGitHubEnterpriseIDPWriteModel) NewChangedEvent(
 	return instance.NewGitHubEnterpriseIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
+type InstanceGitLabIDPWriteModel struct {
+	GitLabIDPWriteModel
+}
+
+func NewGitLabInstanceIDPWriteModel(instanceID, id string) *InstanceGitLabIDPWriteModel {
+	return &InstanceGitLabIDPWriteModel{
+		GitLabIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *InstanceGitLabIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *instance.GitLabIDPAddedEvent:
+			wm.GitLabIDPWriteModel.AppendEvents(&e.GitLabIDPAddedEvent)
+		case *instance.GitLabIDPChangedEvent:
+			wm.GitLabIDPWriteModel.AppendEvents(&e.GitLabIDPChangedEvent)
+		case *instance.IDPRemovedEvent:
+			wm.GitLabIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.GitLabIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *InstanceGitLabIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			instance.GitLabIDPAddedEventType,
+			instance.GitLabIDPChangedEventType,
+			instance.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *InstanceGitLabIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) (*instance.GitLabIDPChangedEvent, error) {
+
+	changes, err := wm.GitLabIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return instance.NewGitLabIDPChangedEvent(ctx, aggregate, id, changes)
+}
+
+type InstanceGitLabSelfHostedIDPWriteModel struct {
+	GitLabSelfHostedIDPWriteModel
+}
+
+func NewGitLabSelfHostedInstanceIDPWriteModel(instanceID, id string) *InstanceGitLabSelfHostedIDPWriteModel {
+	return &InstanceGitLabSelfHostedIDPWriteModel{
+		GitLabSelfHostedIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *InstanceGitLabSelfHostedIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *instance.GitLabSelfHostedIDPAddedEvent:
+			wm.GitLabSelfHostedIDPWriteModel.AppendEvents(&e.GitLabSelfHostedIDPAddedEvent)
+		case *instance.GitLabSelfHostedIDPChangedEvent:
+			wm.GitLabSelfHostedIDPWriteModel.AppendEvents(&e.GitLabSelfHostedIDPChangedEvent)
+		case *instance.IDPRemovedEvent:
+			wm.GitLabSelfHostedIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.GitLabSelfHostedIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *InstanceGitLabSelfHostedIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			instance.GitLabSelfHostedIDPAddedEventType,
+			instance.GitLabSelfHostedIDPChangedEventType,
+			instance.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *InstanceGitLabSelfHostedIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	issuer,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) (*instance.GitLabSelfHostedIDPChangedEvent, error) {
+
+	changes, err := wm.GitLabSelfHostedIDPWriteModel.NewChanges(name, issuer, clientID, clientSecretString, secretCrypto, scopes, options)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return instance.NewGitLabSelfHostedIDPChangedEvent(ctx, aggregate, id, changes)
+}
+
 type InstanceGoogleIDPWriteModel struct {
 	GoogleIDPWriteModel
 }
@@ -456,10 +567,6 @@ func NewGoogleInstanceIDPWriteModel(instanceID, id string) *InstanceGoogleIDPWri
 			ID: id,
 		},
 	}
-}
-
-func (wm *InstanceGoogleIDPWriteModel) Reduce() error {
-	return wm.GoogleIDPWriteModel.Reduce()
 }
 
 func (wm *InstanceGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) {
@@ -523,10 +630,6 @@ func NewLDAPInstanceIDPWriteModel(instanceID, id string) *InstanceLDAPIDPWriteMo
 			ID: id,
 		},
 	}
-}
-
-func (wm *InstanceLDAPIDPWriteModel) Reduce() error {
-	return wm.LDAPIDPWriteModel.Reduce()
 }
 
 func (wm *InstanceLDAPIDPWriteModel) AppendEvents(events ...eventstore.Event) {
@@ -614,10 +717,6 @@ func NewInstanceIDPRemoveWriteModel(instanceID, id string) *InstanceIDPRemoveWri
 	}
 }
 
-func (wm *InstanceIDPRemoveWriteModel) Reduce() error {
-	return wm.IDPRemoveWriteModel.Reduce()
-}
-
 func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -631,6 +730,10 @@ func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) 
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubIDPAddedEvent)
 		case *instance.GitHubEnterpriseIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubEnterpriseIDPAddedEvent)
+		case *instance.GitLabIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitLabIDPAddedEvent)
+		case *instance.GitLabSelfHostedIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitLabSelfHostedIDPAddedEvent)
 		case *instance.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *instance.LDAPIDPAddedEvent:
@@ -659,6 +762,8 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.JWTIDPAddedEventType,
 			instance.GitHubIDPAddedEventType,
 			instance.GitHubEnterpriseIDPAddedEventType,
+			instance.GitLabIDPAddedEventType,
+			instance.GitLabSelfHostedIDPAddedEventType,
 			instance.GoogleIDPAddedEventType,
 			instance.LDAPIDPAddedEventType,
 			instance.IDPRemovedEventType,
