@@ -6,6 +6,7 @@ import {
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 
@@ -39,7 +40,7 @@ export class EditDialogComponent implements OnInit {
       this.isPhone = true;
     }
     this.dialogForm = new FormGroup({
-      [this.controlKey]: new UntypedFormControl(data.value, data.validator || Validators.required)
+      [this.controlKey]: new UntypedFormControl(data.value, data.validator || requiredValidator)
     })
   }
 
