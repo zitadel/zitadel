@@ -8,6 +8,11 @@ jobs:
   api:
     uses: ./.github/workflows/api.yml
     with:
+      buf: v1.15.1
+
+  core:
+    uses: ./.github/workflows/core.yml
+    with:
       go: 1.19
 
   console:
@@ -23,6 +28,6 @@ jobs:
   release:
     name: release zitadel
     runs-on: ubuntu-latest
-    needs: [api, console, docs]
+    needs: [api, core, console, docs]
     steps:
     - run: echo "This is a placeholder"

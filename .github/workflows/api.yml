@@ -1,15 +1,11 @@
-name: Api
+name: api
 
 on:
   workflow_call:
     inputs:
-      go:
+      buf:
         required: true
         type: string
-
-defaults:
-  run:
-    working-directory: console
 
 jobs:
   
@@ -18,7 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
+    - uses: bufbuild/buf-setup-action@v1
       with:
-        go-version: ${{ inputs.go }}
-    - run: go version
+        version: ${{ inputs.buf }}
+    - uses: bufbuild/buf-lint-action@v1
+
+  breaking:
+    name: breaking
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf }}
+    - uses: bufbuild/buf-breaking-action@v1
+      with:
+        against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
