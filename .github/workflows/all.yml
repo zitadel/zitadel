@@ -10,20 +10,23 @@ jobs:
     with:
       buf: v1.15.1
 
-  core:
-    uses: ./.github/workflows/core.yml
-    with:
-      go: 1.19
-
   console:
     uses: ./.github/workflows/console.yml
     with:
       node: 18
 
+  core:
+    uses: ./.github/workflows/core.yml
+    with:
+      go: 1.19
+
   docs:
     uses: ./.github/workflows/docs.yml
     with:
       node: 18
+
+  # login:
+  # placeholder 
 
   release:
     name: release zitadel

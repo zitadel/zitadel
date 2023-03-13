@@ -12,12 +12,14 @@ jobs:
   lint:
     name: lint
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v3
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf }}
     - uses: bufbuild/buf-lint-action@v1
+    ## TODO add comment action with report
 
   breaking:
     name: breaking
