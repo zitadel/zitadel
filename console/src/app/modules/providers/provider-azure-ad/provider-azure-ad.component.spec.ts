@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { ProviderGoogleComponent } from './provider-google.component';
+import { ProviderAzureADComponent } from './provider-azure-ad.component';
 
-describe('ProviderGoogleComponent', () => {
-  let component: ProviderGoogleComponent;
-  let fixture: ComponentFixture<ProviderGoogleComponent>;
+describe('ProviderAzureADComponent', () => {
+  let component: ProviderAzureADComponent;
+  let fixture: ComponentFixture<ProviderAzureADComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ProviderGoogleComponent],
+      declarations: [ProviderAzureADComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProviderGoogleComponent);
+    fixture = TestBed.createComponent(ProviderAzureADComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

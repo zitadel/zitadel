@@ -38,6 +38,10 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.TYPE' | translate }}</th>
         <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
           <div [ngSwitch]="idp.type">
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_AZURE_AD">
+              <img class="idp-logo" src="../../../assets/images/idp/ms.svg" alt="azure ad" />
+              Microsoft
+            </div>
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GOOGLE">
               <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
               Google

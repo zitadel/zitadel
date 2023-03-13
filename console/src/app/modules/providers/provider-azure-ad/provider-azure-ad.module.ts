@@ -40,4 +40,4 @@ import { ProviderAzureADComponent } from './provider-azure-ad.component';
     MatLegacyProgressSpinnerModule,
   ],
 })
-export default class ProviderGoogleModule {}
+export default class ProviderAzureADModule {}

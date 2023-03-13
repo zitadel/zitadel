@@ -24,13 +24,21 @@
     </div>
   </a>
 
-  <div class="item card coming-soon" matRipple>
-    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'azure-ad', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'azure-ad', 'create']
+        : []
+    "
+  >
     <img class="idp-logo" src="../../../assets/images/idp/ms.svg" alt="microsoft" />
     <div class="text-container">
       <span class="title">Microsoft</span>
     </div>
-  </div>
+  </a>
 
   <div class="item card coming-soon" matRipple>
     <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
