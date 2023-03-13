@@ -15,3 +15,9 @@ jobs:
     with:
       node: 18
 
+  release:
+    name: releasing
+    runs-on: ubuntu-latest
+    needs: [console, docs]
+    steps:
+    - run: echo "This is a placeholder"

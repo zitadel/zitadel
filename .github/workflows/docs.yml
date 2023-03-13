@@ -14,7 +14,7 @@ defaults:
 jobs:
 
   building:
-    name: Building
+    name: building
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
     - run: yarn build
 
   uploading:
-    name: Uploading
+    name: uploading
     runs-on: ubuntu-latest
     needs: [building]
     steps:
