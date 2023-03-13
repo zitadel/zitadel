@@ -40,6 +40,8 @@ type IDPTemplate struct {
 	*AzureADIDPTemplate
 	*GitHubIDPTemplate
 	*GitHubEnterpriseIDPTemplate
+	*GitLabIDPTemplate
+	*GitLabSelfHostedIDPTemplate
 	*GoogleIDPTemplate
 	*LDAPIDPTemplate
 }
@@ -100,6 +102,21 @@ type GitHubEnterpriseIDPTemplate struct {
 	TokenEndpoint         string
 	UserEndpoint          string
 	Scopes                database.StringArray
+}
+
+type GitLabIDPTemplate struct {
+	IDPID        string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.StringArray
+}
+
+type GitLabSelfHostedIDPTemplate struct {
+	IDPID        string
+	Issuer       string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.StringArray
 }
 
 type GoogleIDPTemplate struct {
@@ -396,6 +413,64 @@ var (
 )
 
 var (
+	gitlabIdpTemplateTable = table{
+		name:          projection.IDPTemplateGitLabTable,
+		instanceIDCol: projection.GitLabInstanceIDCol,
+	}
+	GitLabIDCol = Column{
+		name:  projection.GitLabIDCol,
+		table: gitlabIdpTemplateTable,
+	}
+	GitLabInstanceIDCol = Column{
+		name:  projection.GitLabInstanceIDCol,
+		table: gitlabIdpTemplateTable,
+	}
+	GitLabClientIDCol = Column{
+		name:  projection.GitLabClientIDCol,
+		table: gitlabIdpTemplateTable,
+	}
+	GitLabClientSecretCol = Column{
+		name:  projection.GitLabClientSecretCol,
+		table: gitlabIdpTemplateTable,
+	}
+	GitLabScopesCol = Column{
+		name:  projection.GitLabScopesCol,
+		table: gitlabIdpTemplateTable,
+	}
+)
+
+var (
+	gitlabSelfHostedIdpTemplateTable = table{
+		name:          projection.IDPTemplateGitLabSelfHostedTable,
+		instanceIDCol: projection.GitLabSelfHostedInstanceIDCol,
+	}
+	GitLabSelfHostedIDCol = Column{
+		name:  projection.GitLabSelfHostedIDCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedInstanceIDCol = Column{
+		name:  projection.GitLabSelfHostedInstanceIDCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedIssuerCol = Column{
+		name:  projection.GitLabSelfHostedIssuerCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedClientIDCol = Column{
+		name:  projection.GitLabSelfHostedClientIDCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedClientSecretCol = Column{
+		name:  projection.GitLabSelfHostedClientSecretCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedScopesCol = Column{
+		name:  projection.GitLabSelfHostedScopesCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+)
+
+var (
 	googleIdpTemplateTable = table{
 		name:          projection.IDPTemplateGoogleTable,
 		instanceIDCol: projection.GoogleInstanceIDCol,
@@ -673,6 +748,17 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			GitHubEnterpriseTokenEndpointCol.identifier(),
 			GitHubEnterpriseUserEndpointCol.identifier(),
 			GitHubEnterpriseScopesCol.identifier(),
+			// gitlab
+			GitLabIDCol.identifier(),
+			GitLabClientIDCol.identifier(),
+			GitLabClientSecretCol.identifier(),
+			GitLabScopesCol.identifier(),
+			// gitlab self hosted
+			GitLabSelfHostedIDCol.identifier(),
+			GitLabSelfHostedIssuerCol.identifier(),
+			GitLabSelfHostedClientIDCol.identifier(),
+			GitLabSelfHostedClientSecretCol.identifier(),
+			GitLabSelfHostedScopesCol.identifier(),
 			// google
 			GoogleIDCol.identifier(),
 			GoogleClientIDCol.identifier(),
@@ -708,6 +794,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(AzureADIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitHubIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitHubEnterpriseIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -756,6 +844,17 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			githubEnterpriseTokenEndpoint := sql.NullString{}
 			githubEnterpriseUserEndpoint := sql.NullString{}
 			githubEnterpriseScopes := database.StringArray{}
+
+			gitlabID := sql.NullString{}
+			gitlabClientID := sql.NullString{}
+			gitlabClientSecret := new(crypto.CryptoValue)
+			gitlabScopes := database.StringArray{}
+
+			gitlabSelfHostedID := sql.NullString{}
+			gitlabSelfHostedIssuer := sql.NullString{}
+			gitlabSelfHostedClientID := sql.NullString{}
+			gitlabSelfHostedClientSecret := new(crypto.CryptoValue)
+			gitlabSelfHostedScopes := database.StringArray{}
 
 			googleID := sql.NullString{}
 			googleClientID := sql.NullString{}
@@ -840,6 +939,17 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&githubEnterpriseTokenEndpoint,
 				&githubEnterpriseUserEndpoint,
 				&githubEnterpriseScopes,
+				// gitlab
+				&gitlabID,
+				&gitlabClientID,
+				&gitlabClientSecret,
+				&gitlabScopes,
+				// gitlab self hosted
+				&gitlabSelfHostedID,
+				&gitlabSelfHostedIssuer,
+				&gitlabSelfHostedClientID,
+				&gitlabSelfHostedClientSecret,
+				&gitlabSelfHostedScopes,
 				// google
 				&googleID,
 				&googleClientID,
@@ -935,6 +1045,23 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					TokenEndpoint:         githubEnterpriseTokenEndpoint.String,
 					UserEndpoint:          githubEnterpriseUserEndpoint.String,
 					Scopes:                githubEnterpriseScopes,
+				}
+			}
+			if gitlabID.Valid {
+				idpTemplate.GitLabIDPTemplate = &GitLabIDPTemplate{
+					IDPID:        gitlabID.String,
+					ClientID:     gitlabClientID.String,
+					ClientSecret: gitlabClientSecret,
+					Scopes:       gitlabScopes,
+				}
+			}
+			if gitlabSelfHostedID.Valid {
+				idpTemplate.GitLabSelfHostedIDPTemplate = &GitLabSelfHostedIDPTemplate{
+					IDPID:        gitlabSelfHostedID.String,
+					Issuer:       gitlabSelfHostedIssuer.String,
+					ClientID:     gitlabSelfHostedClientID.String,
+					ClientSecret: gitlabSelfHostedClientSecret,
+					Scopes:       gitlabSelfHostedScopes,
 				}
 			}
 			if googleID.Valid {
@@ -1034,6 +1161,17 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			GitHubEnterpriseTokenEndpointCol.identifier(),
 			GitHubEnterpriseUserEndpointCol.identifier(),
 			GitHubEnterpriseScopesCol.identifier(),
+			// gitlab
+			GitLabIDCol.identifier(),
+			GitLabClientIDCol.identifier(),
+			GitLabClientSecretCol.identifier(),
+			GitLabScopesCol.identifier(),
+			// gitlab self hosted
+			GitLabSelfHostedIDCol.identifier(),
+			GitLabSelfHostedIssuerCol.identifier(),
+			GitLabSelfHostedClientIDCol.identifier(),
+			GitLabSelfHostedClientSecretCol.identifier(),
+			GitLabSelfHostedScopesCol.identifier(),
 			// google
 			GoogleIDCol.identifier(),
 			GoogleClientIDCol.identifier(),
@@ -1070,6 +1208,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(AzureADIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitHubIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitHubEnterpriseIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -1121,6 +1261,17 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				githubEnterpriseTokenEndpoint := sql.NullString{}
 				githubEnterpriseUserEndpoint := sql.NullString{}
 				githubEnterpriseScopes := database.StringArray{}
+
+				gitlabID := sql.NullString{}
+				gitlabClientID := sql.NullString{}
+				gitlabClientSecret := new(crypto.CryptoValue)
+				gitlabScopes := database.StringArray{}
+
+				gitlabSelfHostedID := sql.NullString{}
+				gitlabSelfHostedIssuer := sql.NullString{}
+				gitlabSelfHostedClientID := sql.NullString{}
+				gitlabSelfHostedClientSecret := new(crypto.CryptoValue)
+				gitlabSelfHostedScopes := database.StringArray{}
 
 				googleID := sql.NullString{}
 				googleClientID := sql.NullString{}
@@ -1205,6 +1356,17 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&githubEnterpriseTokenEndpoint,
 					&githubEnterpriseUserEndpoint,
 					&githubEnterpriseScopes,
+					// gitlab
+					&gitlabID,
+					&gitlabClientID,
+					&gitlabClientSecret,
+					&gitlabScopes,
+					// gitlab self hosted
+					&gitlabSelfHostedID,
+					&gitlabSelfHostedIssuer,
+					&gitlabSelfHostedClientID,
+					&gitlabSelfHostedClientSecret,
+					&gitlabSelfHostedScopes,
 					// google
 					&googleID,
 					&googleClientID,
@@ -1299,6 +1461,23 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						TokenEndpoint:         githubEnterpriseTokenEndpoint.String,
 						UserEndpoint:          githubEnterpriseUserEndpoint.String,
 						Scopes:                githubEnterpriseScopes,
+					}
+				}
+				if gitlabID.Valid {
+					idpTemplate.GitLabIDPTemplate = &GitLabIDPTemplate{
+						IDPID:        gitlabID.String,
+						ClientID:     gitlabClientID.String,
+						ClientSecret: gitlabClientSecret,
+						Scopes:       gitlabScopes,
+					}
+				}
+				if gitlabSelfHostedID.Valid {
+					idpTemplate.GitLabSelfHostedIDPTemplate = &GitLabSelfHostedIDPTemplate{
+						IDPID:        gitlabSelfHostedID.String,
+						Issuer:       gitlabSelfHostedIssuer.String,
+						ClientID:     gitlabSelfHostedClientID.String,
+						ClientSecret: gitlabSelfHostedClientSecret,
+						Scopes:       gitlabSelfHostedScopes,
 					}
 				}
 				if googleID.Valid {

@@ -718,6 +718,188 @@ func (wm *GitHubEnterpriseIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
+type GitLabIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	Name         string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *GitLabIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GitLabIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.GitLabIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GitLabIDPWriteModel) reduceAddedEvent(e *idp.GitLabIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *GitLabIDPWriteModel) reduceChangedEvent(e *idp.GitLabIDPChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GitLabIDPWriteModel) NewChanges(
+	name,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) ([]idp.GitLabIDPChanges, error) {
+	changes := make([]idp.GitLabIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeGitLabClientSecret(clientSecret))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeGitLabName(name))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeGitLabClientID(clientID))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeGitLabScopes(scopes))
+	}
+
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeGitLabOptions(opts))
+	}
+	return changes, nil
+}
+
+type GitLabSelfHostedIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	Name         string
+	Issuer       string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *GitLabSelfHostedIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GitLabSelfHostedIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.GitLabSelfHostedIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GitLabSelfHostedIDPWriteModel) reduceAddedEvent(e *idp.GitLabSelfHostedIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.Issuer = e.Issuer
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *GitLabSelfHostedIDPWriteModel) reduceChangedEvent(e *idp.GitLabSelfHostedIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GitLabSelfHostedIDPWriteModel) NewChanges(
+	name string,
+	issuer string,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) ([]idp.GitLabSelfHostedIDPChanges, error) {
+	changes := make([]idp.GitLabSelfHostedIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeGitLabSelfHostedClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeGitLabSelfHostedClientID(clientID))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeGitLabSelfHostedName(name))
+	}
+	if wm.Issuer != issuer {
+		changes = append(changes, idp.ChangeGitLabSelfHostedIssuer(issuer))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeGitLabSelfHostedScopes(scopes))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeGitLabSelfHostedOptions(opts))
+	}
+	return changes, nil
+}
+
 type GoogleIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -977,6 +1159,10 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 		case *idp.GitHubIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.GitHubEnterpriseIDPAddedEvent:
+			wm.reduceAdded(e.ID)
+		case *idp.GitLabIDPAddedEvent:
+			wm.reduceAdded(e.ID)
+		case *idp.GitLabSelfHostedIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.GoogleIDPAddedEvent:
 			wm.reduceAdded(e.ID)

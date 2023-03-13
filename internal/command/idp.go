@@ -67,6 +67,23 @@ type GitHubEnterpriseProvider struct {
 	IDPOptions            idp.Options
 }
 
+type GitLabProvider struct {
+	Name         string
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
+type GitLabSelfHostedProvider struct {
+	Name         string
+	Issuer       string
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
 type GoogleProvider struct {
 	Name         string
 	ClientID     string

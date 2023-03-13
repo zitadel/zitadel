@@ -13,6 +13,15 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
+var (
+	idpTemplateInsertStmt = `INSERT INTO projections.idp_templates3` +
+		` (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update)` +
+		` VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`
+	idpTemplateUpdateMinimalStmt = `UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)`
+	idpTemplateUpdateStmt        = `UPDATE projections.idp_templates3 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence)` +
+		` = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)`
+)
+
 func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
@@ -170,7 +179,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -241,7 +250,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -298,7 +307,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: idpTemplateUpdateMinimalStmt,
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -354,7 +363,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: idpTemplateUpdateStmt,
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								true,
@@ -700,7 +709,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -763,7 +772,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -816,7 +825,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: idpTemplateUpdateMinimalStmt,
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -868,7 +877,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: idpTemplateUpdateStmt,
 							expectedArgs: []interface{}{
 								"name",
 								true,
@@ -955,7 +964,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1024,7 +1033,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1080,7 +1089,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: idpTemplateUpdateMinimalStmt,
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -1135,7 +1144,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: idpTemplateUpdateStmt,
 							expectedArgs: []interface{}{
 								"name",
 								true,
@@ -1156,6 +1165,514 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 								"auth",
 								"token",
 								"user",
+								database.StringArray{"profile"},
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if !errors.IsErrorInvalidArgument(err) {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
+
+func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceGitLabIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitLabIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.GitLabIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitLabIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeGitLab,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3_gitlab (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceGitLabIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.GitLabIDPAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.GitLabIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitLabIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"",
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeGitLab,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3_gitlab (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceGitLabIDPChanged minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitLabIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"client_id": "id"
+}`),
+				), instance.GitLabIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitLabIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateMinimalStmt,
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates3_gitlab SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceGitLabIDPChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitLabIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.GitLabIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitLabIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates3_gitlab SET (client_id, client_secret, scopes) = ($1, $2, $3) WHERE (idp_id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if !errors.IsErrorInvalidArgument(err) {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
+
+func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceGitLabSelfHostedIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitLabSelfHostedIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.GitLabSelfHostedIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"name",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeGitLabSelfHosted,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3_gitlab_self_hosted (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceGitLabSelfHostedIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.GitLabSelfHostedIDPAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.GitLabSelfHostedIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"name",
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeGitLabSelfHosted,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3_gitlab_self_hosted (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceGitLabSelfHostedIDPChanged minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitLabSelfHostedIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"issuer": "issuer"
+}`),
+				), instance.GitLabSelfHostedIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateMinimalStmt,
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates3_gitlab_self_hosted SET issuer = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"issuer",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceGitLabSelfHostedIDPChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitLabSelfHostedIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.GitLabSelfHostedIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates3_gitlab_self_hosted SET (issuer, client_id, client_secret, scopes) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								"issuer",
+								"client_id",
+								anyArg{},
 								database.StringArray{"profile"},
 								"idp-id",
 								"instance-id",
@@ -1221,7 +1738,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1283,7 +1800,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1336,7 +1853,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: idpTemplateUpdateMinimalStmt,
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -1365,6 +1882,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
+	"name": "name",
 	"clientId": "client_id",
 	"clientSecret": {
         "cryptoType": 0,
@@ -1387,8 +1905,9 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: idpTemplateUpdateStmt,
 							expectedArgs: []interface{}{
+								"name",
 								true,
 								true,
 								true,
@@ -1488,7 +2007,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1587,7 +2106,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1728,7 +2247,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: idpTemplateUpdateStmt,
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								true,
@@ -1860,7 +2379,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1924,7 +2443,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -1978,7 +2497,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: idpTemplateUpdateMinimalStmt,
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -2007,6 +2526,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
+	"name": "name",
 	"issuer": "issuer",
 	"clientId": "client_id",
 	"clientSecret": {
@@ -2030,8 +2550,9 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: idpTemplateUpdateStmt,
 							expectedArgs: []interface{}{
+								"name",
 								true,
 								true,
 								true,
@@ -2106,7 +2627,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
@@ -2151,7 +2672,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
@@ -2695,7 +3216,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -2755,7 +3276,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -2809,7 +3330,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates3 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: idpTemplateUpdateMinimalStmt,
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
