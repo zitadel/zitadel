@@ -14,6 +14,7 @@
 @import 'src/app/modules/nav/nav.component';
 @import 'src/app/modules/nav-toggle/nav-toggle.component';
 @import './styles/toast.scss';
+@import 'src/app/modules/providers/provider-github-es/provider-github-es.component';
 @import 'src/app/modules/table-actions/table-actions.component';
 @import 'src/app/modules/org-context/org-context.component.scss';
 @import 'src/app/modules/action-keys/action-keys.component.scss';
@@ -89,6 +90,7 @@
   @include footer-theme($theme);
   @include table-theme($theme);
   @include detail-layout-theme($theme);
+  @include provider-github-es-theme($theme);
   @include app-card-theme($theme);
   @include provider-github-theme($theme);
   @include login-policy-mfas-theme($theme);
