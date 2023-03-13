@@ -17,11 +17,12 @@ import {
 } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { MatLegacyFormFieldControl as MatFormFieldControl } from '@angular/material/legacy-form-field';
-import { Subject } from 'rxjs';
-import { startWith, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { distinctUntilChanged, map, mergeMap, startWith, takeUntil } from 'rxjs/operators';
 
 import { cnslFormFieldAnimations } from './animations';
 import { CnslErrorDirective, CNSL_ERROR } from '../error/error.directive';
+import { KeyValue, KeyValuePipe } from '@angular/common';
 
 export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslFormFieldComponent');
 
@@ -67,6 +68,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
   private _explicitFormFieldControl!: MatFormFieldControl<any>;
   readonly stateChanges: Subject<void> = new Subject<void>();
+  public errori18nKeys$?: Observable<Array<string>>;
 
   _subscriptAnimationState: string = '';
 
@@ -86,6 +88,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     @Inject(ElementRef)
     _labelOptions: // Use `ElementRef` here so Angular has something to inject.
     any,
+    private kvPipe: KeyValuePipe,
   ) {
     super(_elementRef);
   }
@@ -103,6 +106,10 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
   public ngAfterContentInit(): void {
     this._validateControlChild();
+    this.defineI18nErrors()
+
+    this._changeDetectorRef.markForCheck();
+    this._changeDetectorRef.detectChanges();
 
     const control = this._control;
     control.stateChanges.pipe(startWith(null)).subscribe(() => {
@@ -146,6 +153,43 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
       this._control.setDescribedByIds(ids);
     }
   }
+
+  private defineI18nErrors(): void {
+    console.log(this._control.ngControl?.control)
+    let ctrl = this._control.ngControl?.control
+    this.errori18nKeys$ = ctrl?.valueChanges?.pipe(
+      mergeMap(() => ctrl?.statusChanges || of([])),
+      map(() => this.currentErrors()),
+      distinctUntilChanged(),
+    ) || of([]);
+  }
+
+  private currentErrors(): Array<string> {
+    console.log("currentErrors", this._control.ngControl?.control?.errors)
+    return (
+      this.kvPipe
+        .transform(this._control.ngControl?.control?.errors)
+        ?.filter(this.filterErrorsProperties)
+        .map(this.mapErrorToI18nKey)
+        .filter(this.distinctFilter) || []
+    );
+  }
+
+  private filterErrorsProperties(kv: KeyValue<unknown, unknown>): boolean {
+    console.log("filterErrorsProperties", kv)
+    return (kv.key as string) != 'invalid' && (kv.key as string) != 'required' && !(kv.value as any).invalid;
+  }
+
+  private mapErrorToI18nKey(kv: KeyValue<unknown, unknown>): string {
+    console.log("mapErrorToI18nKey", kv)
+    return (kv.value as { i18nKey: string }).i18nKey || 'ERRORS.INVALID_FORMAT';
+  }
+
+  private distinctFilter(item: string, index: number, arr: Array<string>): boolean {
+    console.log("distinctFilter", arr)
+    return arr.indexOf(item) === index;
+  }
+
 
   /** Determines whether a class from the NgControl should be forwarded to the host element. */
   _shouldForward(prop: keyof NgControl): boolean {

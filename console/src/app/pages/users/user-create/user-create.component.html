@@ -11,31 +11,25 @@
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}*</cnsl-label>
             <input cnslInput matRipple formControlName="email" required />
-            <cnsl-i18n-errors [ctrl]="email"></cnsl-i18n-errors>
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}*</cnsl-label>
             <input cnslInput formControlName="userName" required
               [ngStyle]="{ 'padding-right': suffixPadding ? suffixPadding : '10px' }" />
             <span #suffix *ngIf="envSuffix" cnslSuffix>{{ envSuffix }}</span>
-            <cnsl-i18n-errors [ctrl]="userName"></cnsl-i18n-errors>
           </cnsl-form-field>
 
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}*</cnsl-label>
             <input cnslInput formControlName="firstName" required />
-            <cnsl-i18n-errors [ctrl]="firstName"></cnsl-i18n-errors>
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}*</cnsl-label>
             <input cnslInput formControlName="lastName" required />
-            <cnsl-i18n-errors [ctrl]="lastName"></cnsl-i18n-errors>
-
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</cnsl-label>
             <input cnslInput formControlName="nickName" />
-            <cnsl-i18n-errors [ctrl]="nickName"></cnsl-i18n-errors>
           </cnsl-form-field>
         </div>
 
@@ -60,13 +54,11 @@
               <cnsl-form-field *ngIf="password">
                 <cnsl-label>{{ 'USER.PASSWORD.NEWINITIAL' | translate }}</cnsl-label>
                 <input cnslInput autocomplete="off" name="firstpassword" formControlName="password" type="password" />
-                <cnsl-i18n-errors [ctrl]="password"></cnsl-i18n-errors>
               </cnsl-form-field>
               <cnsl-form-field *ngIf="confirmPassword">
                 <cnsl-label>{{ 'USER.PASSWORD.CONFIRMINITIAL' | translate }}</cnsl-label>
                 <input cnslInput autocomplete="off" name="confirmPassword" formControlName="confirmPassword"
                   type="password" />
-                <cnsl-i18n-errors [ctrl]="confirmPassword"></cnsl-i18n-errors>
               </cnsl-form-field>
             </div>
           </form>
@@ -82,7 +74,6 @@
                 {{ 'GENDERS.' + gender | translate }}
               </mat-option>
             </mat-select>
-            <cnsl-i18n-errors [ctrl]="gender"></cnsl-i18n-errors>
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</cnsl-label>
@@ -90,7 +81,6 @@
               <mat-option *ngFor="let language of languages" [value]="language">
                 {{ 'LANGUAGES.' + language | translate }}
               </mat-option>
-              <cnsl-i18n-errors [ctrl]="preferredLanguage"></cnsl-i18n-errors>
             </mat-select>
           </cnsl-form-field>
         </div>
@@ -113,7 +103,6 @@
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.PHONE' | translate }}</cnsl-label>
             <input cnslInput formControlName="phone" matTooltip="{{ 'USER.PROFILE.PHONE_HINT' | translate }}" />
-            <cnsl-i18n-errors [ctrl]="phone"></cnsl-i18n-errors>
           </cnsl-form-field>
         </div>
       </div>
