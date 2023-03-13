@@ -82,9 +82,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     PhoneDetailComponent,
     MachineSecretDialogComponent,
   ],
-  providers: [
-    CountryCallingCodesService
-  ],
+  providers: [CountryCallingCodesService],
   imports: [
     ChangesModule,
     CommonModule,

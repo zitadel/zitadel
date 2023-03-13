@@ -2,7 +2,12 @@ import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription, take, takeUntil } from 'rxjs';
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/modules/form-field/validators/validators';
+import {
+  containsLowerCaseValidator,
+  containsNumberValidator,
+  containsSymbolValidator,
+  containsUpperCaseValidator,
+} from 'src/app/modules/form-field/validators/validators';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -87,16 +92,16 @@ export class PasswordComponent implements OnDestroy {
             validators.push(Validators.minLength(this.policy.minLength));
           }
           if (this.policy.hasLowercase) {
-            validators.push(lowerCaseValidator);
+            validators.push(containsLowerCaseValidator);
           }
           if (this.policy.hasUppercase) {
-            validators.push(upperCaseValidator);
+            validators.push(containsUpperCaseValidator);
           }
           if (this.policy.hasNumber) {
-            validators.push(numberValidator);
+            validators.push(containsNumberValidator);
           }
           if (this.policy.hasSymbol) {
-            validators.push(symbolValidator);
+            validators.push(containsSymbolValidator);
           }
 
           this.setupForm(validators);

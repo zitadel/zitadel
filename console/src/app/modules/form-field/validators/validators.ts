@@ -1,82 +1,56 @@
-import { AbstractControl, UntypedFormControl, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 
-export function symbolValidator(c: UntypedFormControl): any {
-  const REGEXP: RegExp = /[^a-z0-9]/gi;
-
-  return REGEXP.test(c.value)
-    ? null
-    : {
-        invalid: true,
-        symbolValidator: {
-          valid: false,
-        },
-      };
+export function containsSymbolValidator(c: AbstractControl): ValidationErrors | null {
+  return regexpValidator(c, /[^a-z0-9]/gi, "ERRORS.CONTAINSSYMBOL")
 }
 
-export function numberValidator(c: UntypedFormControl): any {
-  const REGEXP = /[0-9]/g;
-
-  return REGEXP.test(c.value)
-    ? null
-    : {
-        invalid: true,
-        numberValidator: {
-          valid: false,
-        },
-      };
+export function containsNumberValidator(c: AbstractControl): ValidationErrors | null {
+  return regexpValidator(c, /[0-9]/g, "ERRORS.CONTAINSNUMBER")
 }
 
-export function upperCaseValidator(c: UntypedFormControl): any {
-  const REGEXP = /[A-Z]/g;
-
-  return REGEXP.test(c.value)
-    ? null
-    : {
-        invalid: true,
-        upperCaseValidator: {
-          valid: false,
-        },
-      };
+export function containsUpperCaseValidator(c: AbstractControl): ValidationErrors | null {
+  return regexpValidator(c, /[A-Z]/g, "ERRORS.CONTAINSUPPERCASE")
 }
 
-export function lowerCaseValidator(c: UntypedFormControl): any {
-  const REGEXP = /[a-z]/g;
-
-  return REGEXP.test(c.value)
-    ? null
-    : {
-        invalid: true,
-        lowerCaseValidator: {
-          valid: false,
-        },
-      };
+export function containsLowerCaseValidator(c: AbstractControl): ValidationErrors | null {
+  return regexpValidator(c, /[a-z]/g, "ERRORS.CONTAINSLOWERCASE")
 }
 
 export function phoneValidator(c: AbstractControl): ValidationErrors | null {
-  const REGEXP = /^($|(\+|00)[0-9 ]+$)/;
-
-  return !c.value || REGEXP.test(c.value)
-    ? null
-    : {
-        invalid: true,
-        phoneValidator: {
-          valid: false,
-          i18nKey: "ERRORS.INVALID_FORMAT"
-        },
-      };
+  return regexpValidator(c, /^($|(\+|00)[0-9 ]+$)/, "ERRORS.PHONE")
 }
 
 export function requiredValidator(c: AbstractControl): ValidationErrors | null {
-  let err = Validators.required(c)
+  return i18nErr(Validators.required(c), 'ERRORS.REQUIRED');
+}
+
+
+export function emailValidator(c: AbstractControl): ValidationErrors | null {
+  return i18nErr(Validators.email(c), "ERRORS.EMAIL");
+}
+
+export function minLengthValidator(minLength: number): ValidatorFn {
+  return (c: AbstractControl): ValidationErrors | null  => {
+    return i18nErr(Validators.minLength(minLength)(c), 'ERRORS.MINLENGTH');
+  }
+}
+
+function regexpValidator(c: AbstractControl, regexp: RegExp, i18nKey: string): ValidationErrors | null {
+  return !c.value || regexp.test(c.value)
+  ? null
+  : i18nErr({invalid: true}, i18nKey)
+}
+
+function i18nErr(err: ValidationErrors | null, i18nKey: string): ValidationErrors | null{
   if (err) {
     err = {
       ...err,
       invalid: true,
-      requiredValidator: {
+      [i18nKey.toLowerCase().replaceAll(".","")]: {
         valid: false,
-        i18nKey: "ERRORS.REQUIRED"
-      }
-    }
+        i18nKey: i18nKey,
+      },
+    };
   }
-  return err
+  return err;
 }

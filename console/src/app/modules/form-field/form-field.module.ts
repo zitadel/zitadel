@@ -10,23 +10,9 @@ import { CnslFormFieldComponent } from './field/form-field.component';
 import { I18nErrorsComponent } from './i18n-errors/i18n-errors.component';
 
 @NgModule({
-  declarations: [
-    CnslFormFieldComponent,
-    CnslErrorDirective,
-     I18nErrorsComponent
-    ],
-  imports: [
-    CommonModule,
-     MatRippleModule,
-      LabelModule,
-      TranslateModule,
-    ],
-  exports: [
-    CnslFormFieldComponent,
-     LabelComponent,
-      CnslErrorDirective,
-       I18nErrorsComponent,
-      ],
-  providers: [KeyValuePipe]
+  declarations: [CnslFormFieldComponent, CnslErrorDirective, I18nErrorsComponent],
+  imports: [CommonModule, MatRippleModule, LabelModule, TranslateModule],
+  exports: [CnslFormFieldComponent, LabelComponent, CnslErrorDirective, I18nErrorsComponent],
+  providers: [KeyValuePipe],
 })
 export class FormFieldModule {}

@@ -13,7 +13,16 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-import { lowerCaseValidator, numberValidator, phoneValidator, symbolValidator, upperCaseValidator } from '../../../modules/form-field/validators/validators';
+import {
+  containsLowerCaseValidator,
+  minLengthValidator,
+  containsNumberValidator,
+  phoneValidator,
+  requiredValidator,
+  containsSymbolValidator,
+  containsUpperCaseValidator,
+  emailValidator,
+} from '../../../modules/form-field/validators/validators';
 
 function passwordConfirmValidator(c: AbstractControl): any {
   if (!c.parent || !c) {
@@ -113,10 +122,10 @@ export class UserCreateComponent implements OnInit, OnDestroy {
 
   private initForm(): void {
     this.userForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      userName: ['', [Validators.required, Validators.minLength(2)]],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      email: ['', [requiredValidator, emailValidator]],
+      userName: ['', [requiredValidator, minLengthValidator(2)]],
+      firstName: ['', requiredValidator],
+      lastName: ['', requiredValidator],
       nickName: [''],
       gender: [],
       preferredLanguage: [''],
@@ -124,26 +133,26 @@ export class UserCreateComponent implements OnInit, OnDestroy {
       isVerified: [false, []],
     });
 
-    const validators: Validators[] = [Validators.required];
+    const validators: Validators[] = [requiredValidator];
 
     this.mgmtService.getPasswordComplexityPolicy().then((data) => {
       if (data.policy) {
         this.policy = data.policy;
 
         if (this.policy.minLength) {
-          validators.push(Validators.minLength(this.policy.minLength));
+          validators.push(minLengthValidator(this.policy.minLength));
         }
         if (this.policy.hasLowercase) {
-          validators.push(lowerCaseValidator);
+          validators.push(containsLowerCaseValidator);
         }
         if (this.policy.hasUppercase) {
-          validators.push(upperCaseValidator);
+          validators.push(containsUpperCaseValidator);
         }
         if (this.policy.hasNumber) {
-          validators.push(numberValidator);
+          validators.push(containsNumberValidator);
         }
         if (this.policy.hasSymbol) {
-          validators.push(symbolValidator);
+          validators.push(containsSymbolValidator);
         }
         const pwdValidators = [...validators] as ValidatorFn[];
         const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
@@ -203,8 +212,8 @@ export class UserCreateComponent implements OnInit, OnDestroy {
 
   public setCountryCallingCode(): void {
     let value = (this.phone?.value as string) || '';
-    this.countryPhoneCodes.forEach(code => value = value.replace(`+${code.countryCallingCode}`, ""))
-    value = value.trim()
+    this.countryPhoneCodes.forEach((code) => (value = value.replace(`+${code.countryCallingCode}`, '')));
+    value = value.trim();
     this.phone?.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
   }
 

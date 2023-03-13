@@ -1,6 +1,14 @@
 import { KeyValue, KeyValuePipe } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+} from '@angular/forms';
 import {
   MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
@@ -21,7 +29,7 @@ export enum EditDialogType {
   styleUrls: ['./edit-dialog.component.scss'],
 })
 export class EditDialogComponent implements OnInit {
-  public controlKey = "editingField"
+  public controlKey = 'editingField';
   public isPhone: boolean = false;
   public isVerified: boolean = false;
   public phoneCountry: string = 'CH';
@@ -34,23 +42,23 @@ export class EditDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private countryCallingCodesService: CountryCallingCodesService,
     private translateSvc: TranslateService,
-    private kvPipe: KeyValuePipe
+    private kvPipe: KeyValuePipe,
   ) {
     if (data.type === EditDialogType.PHONE) {
       this.isPhone = true;
     }
     this.dialogForm = new FormGroup({
-      [this.controlKey]: new UntypedFormControl(data.value, data.validator || requiredValidator)
-    })
+      [this.controlKey]: new UntypedFormControl(data.value, data.validator || requiredValidator),
+    });
   }
 
   public setCountryCallingCode(): void {
-    console.log(this)
+    console.log(this);
     let value = (this.dialogForm.controls[this.controlKey]?.value as string) || '';
-    this.countryPhoneCodes.forEach(code => value = value.replace(`+${code.countryCallingCode}`, ""))
-    value = value.trim()
+    this.countryPhoneCodes.forEach((code) => (value = value.replace(`+${code.countryCallingCode}`, '')));
+    value = value.trim();
     this.dialogForm.controls[this.controlKey]?.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
-    console.log(this)
+    console.log(this);
   }
 
   ngOnInit(): void {
@@ -71,8 +79,7 @@ export class EditDialogComponent implements OnInit {
     this.dialogRef.close({ value: this.dialogForm.controls[this.controlKey].value, isVerified: this.isVerified });
   }
 
-  public get ctrl(): AbstractControl {
-    return this.dialogForm.get(this.controlKey) as AbstractControl;
+  public get ctrl(){
+    return this.dialogForm.get(this.controlKey);
   }
 }
-

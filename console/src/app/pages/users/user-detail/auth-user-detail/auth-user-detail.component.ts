@@ -306,7 +306,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user?.human?.phone?.phone,
             type: type,
-            validator: Validators.compose([phoneValidator, requiredValidator])
+            validator: Validators.compose([phoneValidator, requiredValidator]),
           },
           width: '400px',
         });

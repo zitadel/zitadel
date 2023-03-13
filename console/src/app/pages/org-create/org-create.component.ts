@@ -4,7 +4,12 @@ import { Component } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatLegacySlideToggleChange as MatSlideToggleChange } from '@angular/material/legacy-slide-toggle';
 import { Router } from '@angular/router';
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/modules/form-field/validators/validators';
+import {
+  containsLowerCaseValidator,
+  containsNumberValidator,
+  containsSymbolValidator,
+  containsUpperCaseValidator,
+} from 'src/app/modules/form-field/validators/validators';
 import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
@@ -156,16 +161,16 @@ export class OrgCreateComponent {
             validators.push(Validators.minLength(this.policy.minLength));
           }
           if (this.policy.hasLowercase) {
-            validators.push(lowerCaseValidator);
+            validators.push(containsLowerCaseValidator);
           }
           if (this.policy.hasUppercase) {
-            validators.push(upperCaseValidator);
+            validators.push(containsUpperCaseValidator);
           }
           if (this.policy.hasNumber) {
-            validators.push(numberValidator);
+            validators.push(containsNumberValidator);
           }
           if (this.policy.hasSymbol) {
-            validators.push(symbolValidator);
+            validators.push(containsSymbolValidator);
           }
 
           const pwdValidators = [...validators] as ValidatorFn[];
