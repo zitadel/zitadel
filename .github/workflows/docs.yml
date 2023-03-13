@@ -13,8 +13,8 @@ defaults:
 
 jobs:
 
-  building:
-    name: building
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -25,10 +25,7 @@ jobs:
         cache-dependency-path: docs/yarn.lock
     - run: yarn install --frozen-lockfile
     - run: yarn build
-
-  uploading:
-    name: uploading
-    runs-on: ubuntu-latest
-    needs: [building]
-    steps:
-    - run: echo "This is a placeholder"
+    - uses: actions/upload-artifact@v3
+      with:
+        name: docs
+        path: build
