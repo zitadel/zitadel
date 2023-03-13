@@ -4,6 +4,7 @@ on:
   push:
     paths:
     - 'console/**'
+    - '.github/workflows/console.yml'
 
   caching:
     name: Caching
