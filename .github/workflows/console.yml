@@ -37,3 +37,18 @@ jobs:
     - run: npm ci
     - run: npm run generate
     - run: npm run lint
+
+  building:
+    name: Building
+    runs-on: ubuntu-latest
+    needs: [caching]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: console/package-lock.json
+    - run: npm ci
+    - run: npm run generate
+    - run: npm run build
