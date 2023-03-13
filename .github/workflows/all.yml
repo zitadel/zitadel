@@ -1,0 +1,57 @@
+name: All in one build
+
+on:
+  push:
+    
+jobs:
+
+  ## Console
+  console-linting:
+    name: Console Linting
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: console
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: console/package-lock.json
+    - run: npm ci
+    - run: npm run generate
+    - run: npm run lint
+  console-building:
+    name: Console Building
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: console
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: console/package-lock.json
+    - run: npm ci
+    - run: npm run generate
+    - run: npm run build
+
+  ## Docs
+  docs-building:
+    name: Docs Building
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'yarn'
+        cache-dependency-path: console/yarn.lock
+    - run: yarn install --frozen-lockfile
+    - run: yarn build
