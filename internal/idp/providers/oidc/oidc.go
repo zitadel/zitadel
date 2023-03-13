@@ -77,9 +77,9 @@ func WithSelectAccount() ProviderOpts {
 	}
 }
 
-type UserInfoMapper func(info oidc.UserInfo) idp.User
+type UserInfoMapper func(info *oidc.UserInfo) idp.User
 
-var DefaultMapper UserInfoMapper = func(info oidc.UserInfo) idp.User {
+var DefaultMapper UserInfoMapper = func(info *oidc.UserInfo) idp.User {
 	return NewUser(info)
 }
 

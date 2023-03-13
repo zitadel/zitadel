@@ -21,7 +21,7 @@ type Session struct {
 	Provider *Provider
 	AuthURL  string
 	Code     string
-	Tokens   *oidc.Tokens
+	Tokens   *oidc.Tokens[*oidc.IDTokenClaims]
 }
 
 // GetAuthURL implements the [idp.Session] interface.
@@ -58,48 +58,68 @@ func (s *Session) authorize(ctx context.Context) (err error) {
 	if s.Code == "" {
 		return ErrCodeMissing
 	}
-	s.Tokens, err = rp.CodeExchange(ctx, s.Code, s.Provider.RelyingParty)
+	s.Tokens, err = rp.CodeExchange[*oidc.IDTokenClaims](ctx, s.Code, s.Provider.RelyingParty)
 	return err
 }
 
-func NewUser(info oidc.UserInfo) *User {
+func NewUser(info *oidc.UserInfo) *User {
 	return &User{UserInfo: info}
 }
 
 type User struct {
-	oidc.UserInfo
+	*oidc.UserInfo
 }
 
 func (u *User) GetID() string {
-	return u.GetSubject()
+	return u.Subject
 }
 
 func (u *User) GetFirstName() string {
-	return u.GetGivenName()
+	return u.GivenName
 }
 
 func (u *User) GetLastName() string {
-	return u.GetFamilyName()
+	return u.FamilyName
 }
 
 func (u *User) GetDisplayName() string {
-	return u.GetName()
+	return u.Name
+}
+
+func (u *User) GetNickname() string {
+	return u.Nickname
+}
+
+func (u *User) GetPreferredUsername() string {
+	return u.PreferredUsername
+}
+
+func (u *User) GetEmail() string {
+	return u.Email
+}
+
+func (u *User) IsEmailVerified() bool {
+	return bool(u.EmailVerified)
 }
 
 func (u *User) GetPhone() domain.PhoneNumber {
-	return domain.PhoneNumber(u.GetPhoneNumber())
+	return domain.PhoneNumber(u.PhoneNumber)
 }
 
 func (u *User) IsPhoneVerified() bool {
-	return u.IsPhoneNumberVerified()
+	return u.PhoneNumberVerified
 }
 
 func (u *User) GetPreferredLanguage() language.Tag {
-	return u.GetLocale()
+	return u.Locale.Tag()
 }
 
 func (u *User) GetAvatarURL() string {
-	return u.GetPicture()
+	return u.Picture
+}
+
+func (u *User) GetProfile() string {
+	return u.Profile
 }
 
 func (u *User) GetEmail() domain.EmailAddress {

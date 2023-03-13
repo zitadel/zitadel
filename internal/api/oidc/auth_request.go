@@ -203,6 +203,17 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 	return oidc.ErrServerError().WithParent(err)
 }
 
+func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {
+	refreshToken, err := o.repo.RefreshTokenByID(ctx, token)
+	if err != nil {
+		return "", "", oidc.ErrServerError().WithParent(err)
+	}
+	if refreshToken.ClientID != clientID {
+		return "", "", oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
+	}
+	return refreshToken.UserID, refreshToken.ID, nil
+}
+
 func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string, scopes []string) ([]string, error) {
 	for _, scope := range scopes {
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {

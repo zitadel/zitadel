@@ -57,7 +57,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.3.4
-	github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.9
+	github.com/zitadel/oidc/v2 v2.0.0-next.3
 	github.com/zitadel/saml v0.0.10
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.27.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.27.0
@@ -90,6 +90,7 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.3 // indirect
+	github.com/muhlemmer/gu v0.3.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect

@@ -92,7 +92,7 @@ func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
 	return crypto.BytesToPublicKey(s.KeyData)
 }
 
-func (s *systemJWTStorage) GetKeyByIDAndUserID(_ context.Context, _, userID string) (*jose.JSONWebKey, error) {
+func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID string) (*jose.JSONWebKey, error) {
 	cachedKey, ok := s.cachedKeys[userID]
 	if ok {
 		return &jose.JSONWebKey{KeyID: userID, Key: cachedKey}, nil
