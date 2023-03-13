@@ -1634,6 +1634,10 @@
         "TITLE": "Google Provider",
         "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Google"
       },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości GitHub Enterprise Server"
+      },
       "GITHUB": {
         "TITLE": "Github Provider",
         "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Github"
