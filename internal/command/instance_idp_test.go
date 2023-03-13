@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -1535,7 +1536,13 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 				provider: GitLabProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-adsg2"
+				},
 			},
 		},
 		{
@@ -1551,7 +1558,13 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-GD1j2"
+				},
 			},
 		},
 		{
@@ -1699,7 +1712,13 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 				provider: GitLabProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-HJK91"
+				},
 			},
 		},
 		{
@@ -1713,7 +1732,13 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 				provider: GitLabProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-D12t6"
+				},
 			},
 		},
 		{
@@ -1892,7 +1917,13 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 				provider: GitLabSelfHostedProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-jw4ZT"
+				},
 			},
 		},
 		{
@@ -1908,7 +1939,13 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-AST4S"
+				},
 			},
 		},
 		{
@@ -1925,7 +1962,13 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-DBZHJ"
+				},
 			},
 		},
 		{
@@ -1943,7 +1986,13 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-SDGJ4"
+				},
 			},
 		},
 		{
@@ -2097,7 +2146,13 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 				provider: GitLabSelfHostedProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-SAFG4"
+				},
 			},
 		},
 		{
@@ -2111,7 +2166,13 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 				provider: GitLabSelfHostedProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-DG4H"
+				},
 			},
 		},
 		{
@@ -2127,7 +2188,13 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-SD4eb"
+				},
 			},
 		},
 		{
@@ -2144,7 +2211,13 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					invalidArgErr := new(caos_errors.InvalidArgumentError)
+					if !errors.As(err, &invalidArgErr) {
+						return false
+					}
+					return invalidArgErr.ID == "INST-GHWE3"
+				},
 			},
 		},
 		{
