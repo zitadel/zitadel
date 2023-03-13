@@ -14,7 +14,7 @@ defaults:
 jobs:
   
   linting:
-    name: Console Linting
+    name: Linting
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
     - run: npm run lint
 
   building:
-    name: Console Building
+    name: Building
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -42,7 +42,7 @@ jobs:
     - run: npm run build
 
   uploading:
-    name: Console Upload Artifacts
+    name: Uploading
     runs-on: ubuntu-latest
     needs: [linting, building]
     steps:

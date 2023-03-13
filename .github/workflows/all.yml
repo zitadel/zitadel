@@ -10,24 +10,8 @@ jobs:
     with:
       node: 18
 
-  # docs-start:
-  #   name: Docs Start
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - run: echo "Start Docs Build"
-  # docs-building:
-  #   name: Docs Building
-  #   runs-on: ubuntu-latest
-  #   needs: [docs-start]
-  #   defaults:
-  #     run:
-  #       working-directory: docs
-  #   steps:
-  #   - uses: actions/checkout@v3
-  #   - uses: actions/setup-node@v3
-  #     with:
-  #       node-version: 18
-  #       cache: 'yarn'
-  #       cache-dependency-path: docs/yarn.lock
-  #   - run: yarn install --frozen-lockfile
-  #   - run: yarn build
+  docs:
+    uses: ./.github/workflows/docs.yml
+    with:
+      node: 18
+

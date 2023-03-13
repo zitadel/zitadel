@@ -1,0 +1,34 @@
+name: Docs
+
+on:
+  workflow_call:
+    inputs:
+      node:
+        required: true
+        type: string
+
+defaults:
+  run:
+    working-directory: docs
+
+jobs:
+
+  building:
+    name: Building
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node }}
+        cache: 'yarn'
+        cache-dependency-path: docs/yarn.lock
+    - run: yarn install --frozen-lockfile
+    - run: yarn build
+
+  uploading:
+    name: Uploading
+    runs-on: ubuntu-latest
+    needs: [building]
+    steps:
+    - run: echo "This is a placeholder"
