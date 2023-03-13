@@ -789,45 +789,49 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 
 func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) ([]any, error) {
 	params := []any{authReq.AgentID}
-	if authReq.LoginName != "" {
-		if authReq.UserID != "" && identityProviderID != "" {
-			userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(authReq.UserID)
-			if err != nil {
-				return nil, err
-			}
-			idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(identityProviderID)
-			if err != nil {
-				return nil, err
-			}
-			links, err := l.query.IDPUserLinks(ctx,
-				&query.IDPUserLinksSearchQuery{
-					Queries: []query.SearchQuery{
-						userIDQuery,
-						idpIDQuery,
-					},
-				}, false,
-			)
-			if err != nil {
-				return nil, err
-			}
-			if len(links.Links) == 1 {
-				params = append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername))
-			}
-		} else if authReq.UserName != "" {
-			params = append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName))
-		} else {
-			params = append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName))
+
+	if authReq.UserID != "" && identityProviderID != "" {
+		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
+		if err != nil {
+			return nil, err
 		}
-	} else if authReq.LoginHint != "" {
-		params = append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint))
+		if len(links.Links) == 1 {
+			return append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername)), nil
+		}
+	}
+	if authReq.UserName != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName)), nil
+	}
+	if authReq.LoginName != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName)), nil
+	}
+	if authReq.LoginHint != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint)), nil
 	}
 	return params, nil
 }
 
 func keyAndValueToAuthURLOpt(key, value string) rp.AuthURLOpt {
-	return rp.AuthURLOpt(
-		func() []oauth2.AuthCodeOption {
-			return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
-		},
+	return func() []oauth2.AuthCodeOption {
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
+	}
+}
+
+func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.IDPUserLinks, error) {
+	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpID)
+	if err != nil {
+		return nil, err
+	}
+	return l.query.IDPUserLinks(ctx,
+		&query.IDPUserLinksSearchQuery{
+			Queries: []query.SearchQuery{
+				userIDQuery,
+				idpIDQuery,
+			},
+		}, false,
 	)
 }
