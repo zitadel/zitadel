@@ -39,11 +39,14 @@ jobs:
   push:
     name: push
     runs-on: ubuntu-latest
+    need: [lint, breaking]
     steps:
     - uses: actions/checkout@v3
     - uses: bufbuild/buf-setup-action@v1
       with:
-        version: ${{ inputs.buf }}
+        version: ${{ inputs.buf_version }}
     - uses: bufbuild/buf-push-action@v1
       with:
         buf_token: ${{ secrets.buf_token }}
+        ## Currently no tags are supported in the action https://github.com/bufbuild/buf-push-action/issues/20
+        draft: ${{ github.ref_name != 'main'}}
