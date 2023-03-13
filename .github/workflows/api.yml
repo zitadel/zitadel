@@ -39,7 +39,7 @@ jobs:
   push:
     name: push
     runs-on: ubuntu-latest
-    need: [lint, breaking]
+    needs: [lint, breaking]
     steps:
     - uses: actions/checkout@v3
     - uses: bufbuild/buf-setup-action@v1
