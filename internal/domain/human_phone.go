@@ -47,7 +47,7 @@ func (p *Phone) Normalize() error {
 	if err != nil {
 		return err
 	}
-	// TODO: Let's stop mutating state
+	// Issue for avoiding mutating state: https://github.com/zitadel/zitadel/issues/5412
 	p.PhoneNumber = normalizedNumber
 	return nil
 }

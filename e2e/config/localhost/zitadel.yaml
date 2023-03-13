@@ -3,6 +3,7 @@ ExternalSecure: false
 
 Database:
   cockroach:
+    # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
     Host: host.docker.internal
 
 TLS:
