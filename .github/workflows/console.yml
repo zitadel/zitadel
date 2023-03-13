@@ -5,6 +5,10 @@ on:
     paths:
     - 'console/**'
     - '.github/workflows/console.yml'
+
+defaults:
+  run:
+    working-directory: console
     
 jobs:
   caching:
