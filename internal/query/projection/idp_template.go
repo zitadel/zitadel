@@ -1112,6 +1112,7 @@ func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzureAD),
 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),

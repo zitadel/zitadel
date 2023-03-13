@@ -428,6 +428,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
+	"name": "name",
 	"client_id": "client_id",
 	"client_secret": {
         "cryptoType": 0,
@@ -452,7 +453,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -461,6 +462,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 								"ro-id",
 								"instance-id",
 								domain.IDPStateActive,
+								"name",
 								domain.IdentityProviderTypeSystem,
 								domain.IDPTypeAzureAD,
 								true,
@@ -493,6 +495,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 					org.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
+	"name": "name",
 	"client_id": "client_id",
 	"client_secret": {
         "cryptoType": 0,
@@ -517,7 +520,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: idpTemplateInsertStmt,
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -526,6 +529,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 								"ro-id",
 								"instance-id",
 								domain.IDPStateActive,
+								"name",
 								domain.IdentityProviderTypeOrg,
 								domain.IDPTypeAzureAD,
 								true,
@@ -571,7 +575,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: idpTemplateUpdateMinimalStmt,
 							expectedArgs: []interface{}{
 								true,
 								anyArg{},
@@ -600,6 +604,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 					instance.AggregateType,
 					[]byte(`{
 	"id": "idp-id",
+	"name": "name",
 	"client_id": "client_id",
 	"client_secret": {
         "cryptoType": 0,
@@ -624,8 +629,9 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: idpTemplateUpdateStmt,
 							expectedArgs: []interface{}{
+								"name",
 								true,
 								true,
 								true,
