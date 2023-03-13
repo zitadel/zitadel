@@ -5,60 +5,29 @@ on:
     
 jobs:
 
-  console-start:
-    name: Console Start
-    runs-on: ubuntu-latest
-    steps:
-    - run: echo "Start Console Build"
+  console:
+    uses: ./.github/workflows/console.yml
+    with:
+      node: 18
 
-  console-linting:
-    name: Console Linting
-    runs-on: ubuntu-latest
-    needs: [console-start]
-    defaults:
-      run:
-        working-directory: console
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
-        cache: 'npm'
-        cache-dependency-path: console/package-lock.json
-    - run: npm ci
-    - run: npm run generate
-    - run: npm run lint
-
-  console-building:
-    name: Console Building
-    runs-on: ubuntu-latest
-    needs: [console-start]
-    defaults:
-      run:
-        working-directory: console
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
-        cache: 'npm'
-        cache-dependency-path: console/package-lock.json
-    - run: npm ci
-    - run: npm run generate
-    - run: npm run build
-
-  docs-building:
-    name: Docs Building
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: docs
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
-        cache: 'yarn'
-        cache-dependency-path: docs/yarn.lock
-    - run: yarn install --frozen-lockfile
-    - run: yarn build
+  # docs-start:
+  #   name: Docs Start
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - run: echo "Start Docs Build"
+  # docs-building:
+  #   name: Docs Building
+  #   runs-on: ubuntu-latest
+  #   needs: [docs-start]
+  #   defaults:
+  #     run:
+  #       working-directory: docs
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - uses: actions/setup-node@v3
+  #     with:
+  #       node-version: 18
+  #       cache: 'yarn'
+  #       cache-dependency-path: docs/yarn.lock
+  #   - run: yarn install --frozen-lockfile
+  #   - run: yarn build
