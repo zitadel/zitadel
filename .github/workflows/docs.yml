@@ -14,7 +14,7 @@ defaults:
 jobs:
 
   build:
-    name: build
+    name: build and upload
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
