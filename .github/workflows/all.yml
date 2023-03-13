@@ -5,6 +5,11 @@ on:
     
 jobs:
 
+  api:
+    uses: ./.github/workflows/api.yml
+    with:
+      go: 1.19
+
   console:
     uses: ./.github/workflows/console.yml
     with:

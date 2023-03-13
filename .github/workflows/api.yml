@@ -1,0 +1,24 @@
+name: Api
+
+on:
+  workflow_call:
+    inputs:
+      go:
+        required: true
+        type: string
+
+defaults:
+  run:
+    working-directory: console
+
+jobs:
+  
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ inputs.go }}
+    - run: go version
