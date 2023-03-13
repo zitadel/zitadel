@@ -17,7 +17,7 @@ import {
 } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { MatLegacyFormFieldControl as MatFormFieldControl } from '@angular/material/legacy-form-field';
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { distinctUntilChanged, map, mergeMap, startWith, takeUntil } from 'rxjs/operators';
 
 import { cnslFormFieldAnimations } from './animations';
@@ -108,9 +108,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     this._validateControlChild();
     this.defineI18nErrors()
 
-    this._changeDetectorRef.markForCheck();
-    this._changeDetectorRef.detectChanges();
-
     const control = this._control;
     control.stateChanges.pipe(startWith(null)).subscribe(() => {
       this._syncDescribedByIds();
@@ -123,12 +120,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
         .pipe(takeUntil(this._destroyed))
         .subscribe(() => this._changeDetectorRef.markForCheck());
     }
-
-    // Update the aria-described by when the number of errors changes.
-    this._errorChildren.changes.pipe(startWith(null)).subscribe(() => {
-      this._syncDescribedByIds();
-      this._changeDetectorRef.markForCheck();
-    });
   }
 
   /** Throws an error if the form field's control is missing. */
@@ -155,7 +146,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   private defineI18nErrors(): void {
-    console.log(this._control.ngControl?.control)
     let ctrl = this._control.ngControl?.control
     this.errori18nKeys$ = ctrl?.valueChanges?.pipe(
       mergeMap(() => ctrl?.statusChanges || of([])),
@@ -165,7 +155,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   private currentErrors(): Array<string> {
-    console.log("currentErrors", this._control.ngControl?.control?.errors)
     return (
       this.kvPipe
         .transform(this._control.ngControl?.control?.errors)
@@ -176,17 +165,14 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   private filterErrorsProperties(kv: KeyValue<unknown, unknown>): boolean {
-    console.log("filterErrorsProperties", kv)
-    return (kv.key as string) != 'invalid' && (kv.key as string) != 'required' && !(kv.value as any).invalid;
+    return typeof kv.value == "object" && (kv.value as {valid: boolean}).valid === false
   }
 
   private mapErrorToI18nKey(kv: KeyValue<unknown, unknown>): string {
-    console.log("mapErrorToI18nKey", kv)
     return (kv.value as { i18nKey: string }).i18nKey || 'ERRORS.INVALID_FORMAT';
   }
 
   private distinctFilter(item: string, index: number, arr: Array<string>): boolean {
-    console.log("distinctFilter", arr)
     return arr.indexOf(item) === index;
   }
 
@@ -195,10 +181,5 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   _shouldForward(prop: keyof NgControl): boolean {
     const ngControl: any = this._control ? this._control.ngControl : null;
     return ngControl && ngControl[prop];
-  }
-
-  /** Determines whether to display hints or errors. */
-  _getDisplayedMessages(): 'error' | 'hint' {
-    return this._errorChildren && this._errorChildren.length > 0 ? 'error' : 'hint';
   }
 }
