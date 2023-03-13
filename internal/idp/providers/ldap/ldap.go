@@ -2,6 +2,7 @@ package ldap
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/idp"
 )
@@ -12,16 +13,18 @@ var _ idp.Provider = (*Provider)(nil)
 
 // Provider is the [idp.Provider] implementation for a generic LDAP provider
 type Provider struct {
-	name                string
-	host                string
-	port                string
-	tls                 bool
-	baseDN              string
-	userObjectClass     string
-	userUniqueAttribute string
-	admin               string
-	password            string
-	loginUrl            string
+	name              string
+	servers           []string
+	startTLS          bool
+	baseDN            string
+	bindDN            string
+	bindPassword      string
+	userBase          string
+	userObjectClasses []string
+	userFilters       []string
+	timeout           time.Duration
+
+	loginUrl string
 
 	isLinkingAllowed  bool
 	isCreationAllowed bool
@@ -74,17 +77,10 @@ func WithAutoUpdate() ProviderOpts {
 	}
 }
 
-// WithCustomPort configures a custom port used for the communication instead of :389 as per default
-func WithCustomPort(port string) ProviderOpts {
+// WithoutStartTLS configures to communication insecure with the LDAP server without startTLS
+func WithoutStartTLS() ProviderOpts {
 	return func(p *Provider) {
-		p.port = port
-	}
-}
-
-// Insecure configures to communication insecure with the LDAP server without TLS
-func Insecure() ProviderOpts {
-	return func(p *Provider) {
-		p.tls = false
+		p.startTLS = false
 	}
 }
 
@@ -181,27 +177,28 @@ func WithProfileAttribute(name string) ProviderOpts {
 
 func New(
 	name string,
-	host string,
+	servers []string,
 	baseDN string,
-	userObjectClass string,
-	userUniqueAttribute string,
-	admin string,
-	password string,
+	bindDN string,
+	bindPassword string,
+	userBase string,
+	userObjectClasses []string,
+	userFilters []string,
+	timeout time.Duration,
 	loginUrl string,
 	options ...ProviderOpts,
 ) *Provider {
 	provider := &Provider{
-		name:                name,
-		host:                host,
-		port:                DefaultPort,
-		tls:                 true,
-		baseDN:              baseDN,
-		userObjectClass:     userObjectClass,
-		userUniqueAttribute: userUniqueAttribute,
-		admin:               admin,
-		password:            password,
-		loginUrl:            loginUrl,
-		idAttribute:         userUniqueAttribute,
+		name:              name,
+		servers:           servers,
+		baseDN:            baseDN,
+		bindDN:            bindDN,
+		bindPassword:      bindPassword,
+		userBase:          userBase,
+		userObjectClasses: userObjectClasses,
+		userFilters:       userFilters,
+		timeout:           timeout,
+		loginUrl:          loginUrl,
 	}
 	for _, option := range options {
 		option(provider)

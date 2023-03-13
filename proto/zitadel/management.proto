@@ -11242,14 +11242,14 @@ message UpdateGoogleProviderResponse {
 
 message AddLDAPProviderRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string host = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string port = 3 [(validate.rules).string = {max_len: 5}];
-    bool tls = 4;
-    string base_dn = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_object_class = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_unique_attribute = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string admin = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string password = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string servers = 2 [(validate.rules).repeated = {min_items: 1, max_items: 20, items: {string: {min_len: 1, max_len: 200}}}];
+    string base_dn = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string bind_dn = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string bind_password = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_base = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string user_object_classes = 7 [(validate.rules).repeated = {min_items: 1, max_items: 20, items: {string: {min_len: 1, max_len: 200}}}];
+    repeated string user_filters = 8 [(validate.rules).repeated = {min_items: 1, max_items: 20, items: {string: {min_len: 1, max_len: 200}}}];
+    google.protobuf.Duration timeout = 9;
     zitadel.idp.v1.LDAPAttributes attributes = 10;
     zitadel.idp.v1.Options provider_options = 11;
 }
@@ -11262,14 +11262,14 @@ message AddLDAPProviderResponse {
 message UpdateLDAPProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string host = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string port = 4 [(validate.rules).string = {max_len: 5}];
-    bool tls = 5;
-    string base_dn = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_object_class = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_unique_attribute = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string admin = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string password = 10 [(validate.rules).string = {max_len: 200}];
+    repeated string servers = 3 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 200}}}];
+    string base_dn = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string bind_dn = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string bind_password = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_base = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string user_object_classes = 8 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 200}}}];
+    repeated string user_filters = 9 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 200}}}];
+    google.protobuf.Duration timeout = 10;
     zitadel.idp.v1.LDAPAttributes attributes = 11;
     zitadel.idp.v1.Options provider_options = 12;
 }

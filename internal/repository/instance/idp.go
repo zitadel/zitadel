@@ -2,6 +2,7 @@ package instance
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -509,15 +510,16 @@ func NewLDAPIDPAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
-	name,
-	host,
-	port string,
-	tls bool,
-	baseDN,
-	userObjectClass,
-	userUniqueAttribute,
-	admin string,
-	password *crypto.CryptoValue,
+	name string,
+	servers []string,
+	startTLS bool,
+	baseDN string,
+	bindDN string,
+	bindPassword *crypto.CryptoValue,
+	userBase string,
+	userObjectClasses []string,
+	userFilters []string,
+	timeout time.Duration,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
 ) *LDAPIDPAddedEvent {
@@ -531,14 +533,15 @@ func NewLDAPIDPAddedEvent(
 			),
 			id,
 			name,
-			host,
-			port,
-			tls,
+			servers,
+			startTLS,
 			baseDN,
-			userObjectClass,
-			userUniqueAttribute,
-			admin,
-			password,
+			bindDN,
+			bindPassword,
+			userBase,
+			userObjectClasses,
+			userFilters,
+			timeout,
 			attributes,
 			options,
 		),

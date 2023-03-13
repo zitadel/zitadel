@@ -901,23 +901,17 @@ func (c *Commands) prepareAddInstanceLDAPProvider(a *instance.Aggregate, writeMo
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SAfdd", "Errors.Invalid.Argument")
 		}
-		if provider.Host = strings.TrimSpace(provider.Host); provider.Host == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SDVg2", "Errors.Invalid.Argument")
-		}
 		if provider.BaseDN = strings.TrimSpace(provider.BaseDN); provider.BaseDN == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sv31s", "Errors.Invalid.Argument")
 		}
-		if provider.UserObjectClass = strings.TrimSpace(provider.UserObjectClass); provider.UserObjectClass == "" {
+		if provider.BindDN = strings.TrimSpace(provider.BindDN); provider.BindDN == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdgf4", "Errors.Invalid.Argument")
 		}
-		if provider.UserUniqueAttribute = strings.TrimSpace(provider.UserUniqueAttribute); provider.UserUniqueAttribute == "" {
+		if provider.BindPassword = strings.TrimSpace(provider.BindPassword); provider.BindPassword == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-AEG2w", "Errors.Invalid.Argument")
 		}
-		if provider.Admin = strings.TrimSpace(provider.Admin); provider.Admin == "" {
+		if provider.UserBase = strings.TrimSpace(provider.UserBase); provider.UserBase == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SAD5n", "Errors.Invalid.Argument")
-		}
-		if provider.Password = strings.TrimSpace(provider.Password); provider.Password == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdf5h", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -928,7 +922,7 @@ func (c *Commands) prepareAddInstanceLDAPProvider(a *instance.Aggregate, writeMo
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			secret, err := crypto.Encrypt([]byte(provider.Password), c.idpConfigEncryption)
+			secret, err := crypto.Encrypt([]byte(provider.BindPassword), c.idpConfigEncryption)
 			if err != nil {
 				return nil, err
 			}
@@ -938,14 +932,15 @@ func (c *Commands) prepareAddInstanceLDAPProvider(a *instance.Aggregate, writeMo
 					&a.Aggregate,
 					writeModel.ID,
 					provider.Name,
-					provider.Host,
-					provider.Port,
-					provider.TLS,
+					provider.Servers,
+					provider.StartTLS,
 					provider.BaseDN,
-					provider.UserObjectClass,
-					provider.UserUniqueAttribute,
-					provider.Admin,
+					provider.BindDN,
 					secret,
+					provider.UserBase,
+					provider.UserObjectClasses,
+					provider.UserFilters,
+					provider.Timeout,
 					provider.LDAPAttributes,
 					provider.IDPOptions,
 				),
@@ -962,19 +957,13 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Sffgd", "Errors.Invalid.Argument")
 		}
-		if provider.Host = strings.TrimSpace(provider.Host); provider.Host == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Dz62d", "Errors.Invalid.Argument")
-		}
 		if provider.BaseDN = strings.TrimSpace(provider.BaseDN); provider.BaseDN == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-vb3ss", "Errors.Invalid.Argument")
 		}
-		if provider.UserObjectClass = strings.TrimSpace(provider.UserObjectClass); provider.UserObjectClass == "" {
+		if provider.BindDN = strings.TrimSpace(provider.BindDN); provider.BindDN == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-hbere", "Errors.Invalid.Argument")
 		}
-		if provider.UserUniqueAttribute = strings.TrimSpace(provider.UserUniqueAttribute); provider.UserUniqueAttribute == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-ASFt6", "Errors.Invalid.Argument")
-		}
-		if provider.Admin = strings.TrimSpace(provider.Admin); provider.Admin == "" {
+		if provider.UserBase = strings.TrimSpace(provider.UserBase); provider.UserBase == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-DG45z", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -995,14 +984,15 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 				writeModel.ID,
 				writeModel.Name,
 				provider.Name,
-				provider.Host,
-				provider.Port,
-				provider.TLS,
+				provider.Servers,
+				provider.StartTLS,
 				provider.BaseDN,
-				provider.UserObjectClass,
-				provider.UserUniqueAttribute,
-				provider.Admin,
-				provider.Password,
+				provider.BindDN,
+				provider.BindPassword,
+				provider.UserBase,
+				provider.UserObjectClasses,
+				provider.UserFilters,
+				provider.Timeout,
 				c.idpConfigEncryption,
 				provider.LDAPAttributes,
 				provider.IDPOptions,
