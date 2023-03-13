@@ -1,0 +1,26 @@
+name: Docs
+
+on:
+  push:
+    paths:
+    - 'docs/**'
+    - '.github/workflows/docs.yml'
+
+defaults:
+  run:
+    working-directory: docs
+    
+jobs:
+
+  building:
+    name: Building
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'yarn'
+        cache-dependency-path: console/yarn.lock
+    - run: yarn install --frozen-lockfile
+    - run: yarn build
