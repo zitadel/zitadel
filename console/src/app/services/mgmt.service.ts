@@ -35,6 +35,8 @@ import {
   AddGenericOIDCProviderResponse,
   AddGitHubEnterpriseServerProviderRequest,
   AddGitHubEnterpriseServerProviderResponse,
+  AddGitHubProviderRequest,
+  AddGitHubProviderResponse,
   AddGoogleProviderRequest,
   AddGoogleProviderResponse,
   AddHumanUserRequest,
@@ -437,6 +439,8 @@ import {
   UpdateGenericOIDCProviderResponse,
   UpdateGitHubEnterpriseServerProviderRequest,
   UpdateGitHubEnterpriseServerProviderResponse,
+  UpdateGitHubProviderRequest,
+  UpdateGitHubProviderResponse,
   UpdateGoogleProviderRequest,
   UpdateGoogleProviderResponse,
   UpdateHumanEmailRequest,
@@ -867,6 +871,14 @@ export class ManagementService {
 
   public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitHubProvider(req: AddGitHubProviderRequest): Promise<AddGitHubProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitHubProvider(req: UpdateGitHubProviderRequest): Promise<UpdateGitHubProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGitHubProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {

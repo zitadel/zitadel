@@ -1633,6 +1633,10 @@
       "GITHUBES": {
         "TITLE": "GitHub Enterprise Server Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren GitHub Enterprise Server ein."
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Github-Identitätsprovider ein."
       }
     },
     "DETAIL": {
