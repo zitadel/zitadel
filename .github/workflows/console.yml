@@ -40,7 +40,8 @@ jobs:
     - run: yarn install --frozen-lockfile
     - run: yarn generate
     - run: yarn build
+    - run: zip bundle.zip build/*
     - uses: actions/upload-artifact@v3
       with:
         name: console
-        path: console/dist/console
+        path: console/bundle.zip
