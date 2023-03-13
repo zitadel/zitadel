@@ -16,7 +16,6 @@ jobs:
   linting:
     name: Console Linting
     runs-on: ubuntu-latest
-    needs: [console-start]
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
@@ -31,7 +30,6 @@ jobs:
   building:
     name: Console Building
     runs-on: ubuntu-latest
-    needs: [console-start]
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
@@ -46,5 +44,6 @@ jobs:
   uploading:
     name: Console Upload Artifacts
     runs-on: ubuntu-latest
+        needs: [linting, building]
     steps:
     - run: echo "This is a placeholder"
