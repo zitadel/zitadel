@@ -8,6 +8,8 @@ jobs:
   console-start:
   name: Console Start
     runs-on: ubuntu-latest
+  steps:
+  - run: echo "Start Console Build"
   console-linting:
     name: Console Linting
     runs-on: ubuntu-latest
@@ -42,7 +44,7 @@ jobs:
     - run: npm ci
     - run: npm run generate
     - run: npm run build
-    
+
   docs-building:
     name: Docs Building
     runs-on: ubuntu-latest
