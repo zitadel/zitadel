@@ -1643,6 +1643,10 @@
         "TITLE": "Gitlab Self Hosted Provider",
         "DESCRIPTION": "Inserisci i dati necessari per il tuo Gitlab Self Hosted provider."
       },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo GitHub Enterprise Server provider."
+      },
       "GITHUB": {
         "TITLE": "Github Provider",
         "DESCRIPTION": "Inserisci i dati necessari per il tuo Github provider."

@@ -1642,6 +1642,10 @@
         "TITLE": "Fournisseur Gitlab Self Hosted",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Gitlab Self Hosted"
       },
+      "GITHUBES": {
+        "TITLE": "Fournisseur GitHub Enterprise Server",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité GitHub Enterprise Server"
+      },
       "GITHUB": {
         "TITLE": "Fournisseur Github",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Github"

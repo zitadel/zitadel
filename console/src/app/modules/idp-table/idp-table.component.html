@@ -67,6 +67,11 @@
               <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="gitlab self hosted" />
               Gitlab Self Hosted
             </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB_ES">
+              <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="github" />
+              <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="github" />
+              GitHub Enterprise Server
+            </div>
             <div class="idp-table-provider-type" *ngSwitchDefault>coming soon</div>
           </div>
         </td>

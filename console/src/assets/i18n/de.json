@@ -1638,6 +1638,10 @@
         "TITLE": "Gitlab Self hosted Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Gitlab Self Hosted Identitätsprovider ein."
       },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren GitHub Enterprise Server ein."
+      },
       "GITHUB": {
         "TITLE": "Github Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Github-Identitätsprovider ein."
@@ -1686,9 +1690,9 @@
     "SETAVAILABLE": "verfügbar setzen",
     "SETUNAVAILABLE": "auf nicht verfügbar setzen",
     "NAME": "Name",
-    "AUTHORIZATIONENDPOINT": "Authorization Endpunkt",
-    "TOKENENDPOINT": "Token Endpunkt",
-    "USERENDPOINT": "User Endpunkt",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
     "IDATTRIBUTE": "ID Attribut",
     "CONFIG": "Konfiguration",
     "STATE": "Status",
