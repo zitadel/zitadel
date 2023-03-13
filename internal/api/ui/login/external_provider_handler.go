@@ -135,14 +135,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 	var provider idp.Provider
-	params := []any{authReq.AgentID}
-	if authReq.LoginHint != "" {
-		params = append(params, rp.AuthURLOpt(
-			func() []oauth2.AuthCodeOption {
-				return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("login_hint", authReq.LoginHint)}
-			},
-		))
-	}
+
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
@@ -168,6 +161,11 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 	}
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
+		return
+	}
+	params, err := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
@@ -787,4 +785,49 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 		IsPhoneVerified:   isPhoneVerified,
 		PreferredLanguage: language.Make(formData.Language),
 	}
+}
+
+func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) ([]any, error) {
+	params := []any{authReq.AgentID}
+	if authReq.LoginName != "" {
+		if authReq.UserID != "" && identityProviderID != "" {
+			userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(authReq.UserID)
+			if err != nil {
+				return nil, err
+			}
+			idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(identityProviderID)
+			if err != nil {
+				return nil, err
+			}
+			links, err := l.query.IDPUserLinks(ctx,
+				&query.IDPUserLinksSearchQuery{
+					Queries: []query.SearchQuery{
+						userIDQuery,
+						idpIDQuery,
+					},
+				}, false,
+			)
+			if err != nil {
+				return nil, err
+			}
+			if len(links.Links) == 1 {
+				params = append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername))
+			}
+		} else if authReq.UserName != "" {
+			params = append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName))
+		} else {
+			params = append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName))
+		}
+	} else if authReq.LoginHint != "" {
+		params = append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint))
+	}
+	return params, nil
+}
+
+func keyAndValueToAuthURLOpt(key, value string) rp.AuthURLOpt {
+	return rp.AuthURLOpt(
+		func() []oauth2.AuthCodeOption {
+			return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
+		},
+	)
 }
