@@ -9,6 +9,7 @@ jobs:
     uses: ./.github/workflows/api.yml
     with:
       buf_version: v1.15.1
+    secrets:
       buf_token: ${{ secrets.buf_token }}
 
   console:
