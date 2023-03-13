@@ -18,14 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: pnpm/action-setup@v2
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
-        cache: 'pnpm'
-        cache-dependency-path: docs/pnpm-lock.json
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm build
+        cache: 'yarn'
+        cache-dependency-path: docs/yarn.lock
+    - run: yarn install --frozen-lockfile
+    - run: yarn build
     - uses: actions/upload-artifact@v3
       with:
         name: docs

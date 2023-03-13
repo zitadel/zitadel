@@ -18,30 +18,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: pnpm/action-setup@v2
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
-        cache: 'pnpm'
-        cache-dependency-path: console/pnpm-lock.json
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm generate
-    - run: pnpm lint
+        cache: 'yarn'
+        cache-dependency-path: console/yarn.lock
+    - run: yarn install --frozen-lockfile
+    - run: yarn generate
+    - run: yarn lint
 
   build:
     name: build and upload
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: pnpm/action-setup@v2
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
-        cache: 'pnpm'
-        cache-dependency-path: console/pnpm-lock.json
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm generate
-    - run: pnpm build
+        cache: 'yarn'
+        cache-dependency-path: console/yarn.lock
+    - run: yarn install --frozen-lockfile
+    - run: yarn generate
+    - run: yarn build
     - uses: actions/upload-artifact@v3
       with:
         name: console
