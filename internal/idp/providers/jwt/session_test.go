@@ -122,7 +122,8 @@ func TestSession_FetchUser(t *testing.T) {
 				},
 				authURL: "https://auth.com/jwt?authRequestID=testState",
 				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
-					Token: &oauth2.Token{},
+					Token:   &oauth2.Token{},
+					IDToken: idToken(t, "https://jwt.com"),
 					IDTokenClaims: &oidc.IDTokenClaims{
 						TokenClaims: oidc.TokenClaims{
 							Subject: "sub",
