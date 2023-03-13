@@ -7,11 +7,17 @@ on:
         required: true
         type: string
 
-defaults:
-  run:
-    working-directory: console
-
 jobs:
+
+  tidy:
+    name: tidy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ inputs.go_version }}
+    - run: go tidy
   
   lint:
     name: lint
