@@ -25,6 +25,7 @@
 @import 'src/app/pages/projects/granted-projects/granted-project-detail/granted-project-detail.component';
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
 @import 'src/app/pages/projects/apps/redirect-uris/redirect-uris.component';
+@import 'src/app/modules/providers/provider-github/provider-github.component';
 @import 'src/app/modules/filter-events/filter-events.component';
 @import 'src/app/modules/top-view/top-view.component';
 @import 'src/app/pages/projects/projects.component';
@@ -89,6 +90,7 @@
   @include table-theme($theme);
   @include detail-layout-theme($theme);
   @include app-card-theme($theme);
+  @include provider-github-theme($theme);
   @include login-policy-mfas-theme($theme);
   @include changes-theme($theme);
   @include home-theme($theme);
