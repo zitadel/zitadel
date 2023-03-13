@@ -339,3 +339,15 @@ message LDAPAttributes {
     string profile_attribute = 13 [(validate.rules).string = {max_len: 200}];
 }
 
+enum AzureADTenantType {
+    AZURE_AD_TENANT_TYPE_COMMON = 0;
+    AZURE_AD_TENANT_TYPE_ORGANISATIONS = 1;
+    AZURE_AD_TENANT_TYPE_CONSUMERS = 2;
+}
+
+message AzureADTenant {
+    oneof type {
+        AzureADTenantType tenant_type = 1;
+        string tenant_id = 2;
+    }
+}

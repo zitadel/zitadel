@@ -329,6 +329,10 @@ func LDAPAttributesToCommand(attributes *idp_pb.LDAPAttributes) idp.LDAPAttribut
 	}
 }
 
+func AzureADTenantToCommand(tenant *idp_pb.AzureADTenant) string {
+	return "" //TODO: ?
+}
+
 func ProvidersToPb(providers []*query.IDPTemplate) []*idp_pb.Provider {
 	list := make([]*idp_pb.Provider, len(providers))
 	for i, provider := range providers {

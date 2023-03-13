@@ -76,6 +76,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, OIDCIDPChangedEventType, OIDCIDPChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, JWTIDPAddedEventType, JWTIDPAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, JWTIDPChangedEventType, JWTIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, AzureADIDPAddedEventType, AzureADIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, AzureADIDPChangedEventType, AzureADIDPChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, GitHubIDPAddedEventType, GitHubIDPAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, GitHubIDPChangedEventType, GitHubIDPChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, GitHubEnterpriseIDPAddedEventType, GitHubEnterpriseIDPAddedEventMapper).

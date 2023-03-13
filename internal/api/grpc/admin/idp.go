@@ -241,6 +241,27 @@ func (s *Server) UpdateJWTProvider(ctx context.Context, req *admin_pb.UpdateJWTP
 	}, nil
 }
 
+func (s *Server) AddAzureADProvider(ctx context.Context, req *admin_pb.AddAzureADProviderRequest) (*admin_pb.AddAzureADProviderResponse, error) {
+	id, details, err := s.command.AddInstanceAzureADProvider(ctx, addAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddAzureADProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateAzureADProvider(ctx context.Context, req *admin_pb.UpdateAzureADProviderRequest) (*admin_pb.UpdateAzureADProviderResponse, error) {
+	details, err := s.command.UpdateInstanceAzureADProvider(ctx, req.Id, updateAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateAzureADProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddGitHubProvider(ctx context.Context, req *admin_pb.AddGitHubProviderRequest) (*admin_pb.AddGitHubProviderResponse, error) {
 	id, details, err := s.command.AddInstanceGitHubProvider(ctx, addGitHubProviderToCommand(req))
 	if err != nil {

@@ -17,22 +17,24 @@ import (
 )
 
 const (
-	IDPTemplateTable       = "projections.idp_templates3"
-	IDPTemplateOAuthTable  = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
-	IDPTemplateOIDCTable   = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
-	IDPTemplateJWTTable    = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
+	IDPTemplateTable                 = "projections.idp_templates3"
+	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
+	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
+	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
+	IDPTemplateAzureADTable          = IDPTemplateTable + "_" + IDPTemplateAzureADSuffix
 	IDPTemplateGitHubTable           = IDPTemplateTable + "_" + IDPTemplateGitHubSuffix
 	IDPTemplateGitHubEnterpriseTable = IDPTemplateTable + "_" + IDPTemplateGitHubEnterpriseSuffix
-	IDPTemplateGoogleTable = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
-	IDPTemplateLDAPTable   = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
+	IDPTemplateGoogleTable           = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
+	IDPTemplateLDAPTable             = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 
-	IDPTemplateOAuthSuffix  = "oauth2"
-	IDPTemplateOIDCSuffix   = "oidc"
-	IDPTemplateJWTSuffix    = "jwt"
+	IDPTemplateOAuthSuffix            = "oauth2"
+	IDPTemplateOIDCSuffix             = "oidc"
+	IDPTemplateJWTSuffix              = "jwt"
+	IDPTemplateAzureADSuffix          = "azure"
 	IDPTemplateGitHubSuffix           = "github"
 	IDPTemplateGitHubEnterpriseSuffix = "github_enterprise"
-	IDPTemplateGoogleSuffix = "google"
-	IDPTemplateLDAPSuffix   = "ldap"
+	IDPTemplateGoogleSuffix           = "google"
+	IDPTemplateLDAPSuffix             = "ldap"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -73,6 +75,14 @@ const (
 	JWTEndpointCol     = "jwt_endpoint"
 	JWTKeysEndpointCol = "keys_endpoint"
 	JWTHeaderNameCol   = "header_name"
+
+	AzureADIDCol           = "idp_id"
+	AzureADInstanceIDCol   = "instance_id"
+	AzureADClientIDCol     = "client_id"
+	AzureADClientSecretCol = "client_secret"
+	AzureADScopesCol       = "scopes"
+	AzureADTenantCol       = "tenant"
+	AzureADIsEmailVerified = "is_email_verified"
 
 	GitHubIDCol           = "idp_id"
 	GitHubInstanceIDCol   = "instance_id"
@@ -187,6 +197,19 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 		},
 			crdb.NewPrimaryKey(JWTInstanceIDCol, JWTIDCol),
 			IDPTemplateJWTSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AzureADIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AzureADInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AzureADClientIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AzureADClientSecretCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(AzureADScopesCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(AzureADTenantCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(AzureADIsEmailVerified, crdb.ColumnTypeBool, crdb.Default(false)),
+		},
+			crdb.NewPrimaryKey(AzureADInstanceIDCol, AzureADIDCol),
+			IDPTemplateAzureADSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
@@ -313,6 +336,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOldJWTConfigChanged,
 				},
 				{
+					Event:  instance.AzureADIDPAddedEventType,
+					Reduce: p.reduceAzureADIDPAdded,
+				},
+				{
+					Event:  instance.AzureADIDPChangedEventType,
+					Reduce: p.reduceAzureADIDPChanged,
+				},
+				{
 					Event:  instance.GitHubIDPAddedEventType,
 					Reduce: p.reduceGitHubIDPAdded,
 				},
@@ -373,7 +404,6 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Event:  org.OIDCIDPChangedEventType,
 					Reduce: p.reduceOIDCIDPChanged,
 				},
-
 				{
 					Event:  org.JWTIDPAddedEventType,
 					Reduce: p.reduceJWTIDPAdded,
@@ -405,6 +435,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.IDPJWTConfigChangedEventType,
 					Reduce: p.reduceOldJWTConfigChanged,
+				},
+				{
+					Event:  org.AzureADIDPAddedEventType,
+					Reduce: p.reduceAzureADIDPAdded,
+				},
+				{
+					Event:  org.AzureADIDPChangedEventType,
+					Reduce: p.reduceAzureADIDPChanged,
 				},
 				{
 					Event:  org.GitHubIDPAddedEventType,
@@ -977,6 +1015,95 @@ func (p *idpTemplateProjection) reduceOldJWTConfigChanged(event eventstore.Event
 	), nil
 }
 
+func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.AzureADIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.AzureADIDPAddedEvent:
+		idpEvent = e.AzureADIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.AzureADIDPAddedEvent:
+		idpEvent = e.AzureADIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzureAD),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(AzureADIDCol, idpEvent.ID),
+				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
+				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
+				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
+			},
+			crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceAzureADIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.AzureADIDPChangedEvent
+	switch e := event.(type) {
+	case *org.AzureADIDPChangedEvent:
+		idpEvent = e.AzureADIDPChangedEvent
+	case *instance.AzureADIDPChangedEvent:
+		idpEvent = e.AzureADIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	githubCols := reduceAzureADIDPChangedColumns(idpEvent)
+	if len(githubCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				githubCols,
+				[]handler.Condition{
+					handler.NewCond(AzureADIDCol, idpEvent.ID),
+					handler.NewCond(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
 func (p *idpTemplateProjection) reduceGitHubIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idp.GitHubIDPAddedEvent
 	var idpOwnerType domain.IdentityProviderType
@@ -1472,6 +1599,26 @@ func reduceJWTIDPChangedColumns(idpEvent idp.JWTIDPChangedEvent) []handler.Colum
 		jwtCols = append(jwtCols, handler.NewCol(JWTIssuerCol, *idpEvent.Issuer))
 	}
 	return jwtCols
+}
+
+func reduceAzureADIDPChangedColumns(idpEvent idp.AzureADIDPChangedEvent) []handler.Column {
+	azureADCols := make([]handler.Column, 0, 5)
+	if idpEvent.ClientID != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Scopes != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	if idpEvent.Tenant != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADTenantCol, *idpEvent.Tenant))
+	}
+	if idpEvent.IsEmailVerified != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADIsEmailVerified, *idpEvent.IsEmailVerified))
+	}
+	return azureADCols
 }
 
 func reduceGitHubIDPChangedColumns(idpEvent idp.GitHubIDPChangedEvent) []handler.Column {

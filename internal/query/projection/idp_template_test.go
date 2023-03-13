@@ -401,6 +401,264 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	}
 }
 
+func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceAzureADIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.AzureADIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"tenant": "tenant",
+	"isEmailVerified": true,
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.AzureADIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceAzureADIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeAzureAD,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3_azure (idp_id, instance_id, client_id, client_secret, scopes, tenant, is_email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+								"tenant",
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceAzureADIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.AzureADIDPAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"tenant": "tenant",
+	"isEmailVerified": true,
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.AzureADIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceAzureADIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeAzureAD,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3_azure (idp_id, instance_id, client_id, client_secret, scopes, tenant, is_email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+								"tenant",
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceAzureADIDPChanged minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.AzureADIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"client_id": "id"
+}`),
+				), instance.AzureADIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceAzureADIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates3_azure SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceAzureADIDPChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.AzureADIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"tenant": "tenant",
+	"isEmailVerified": true,
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.AzureADIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceAzureADIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedArgs: []interface{}{
+								true,
+								true,
+								true,
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates3_azure SET (client_id, client_secret, scopes, tenant, is_email_verified) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+								"tenant",
+								true,
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if _, ok := err.(errors.InvalidArgument); !ok {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
+
 func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event

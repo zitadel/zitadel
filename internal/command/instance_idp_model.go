@@ -291,6 +291,82 @@ func (wm *InstanceJWTIDPWriteModel) NewChangedEvent(
 	return instance.NewJWTIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
+type InstanceAzureADIDPWriteModel struct {
+	AzureADIDPWriteModel
+}
+
+func NewAzureADInstanceIDPWriteModel(instanceID, id string) *InstanceAzureADIDPWriteModel {
+	return &InstanceAzureADIDPWriteModel{
+		AzureADIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *InstanceAzureADIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *instance.AzureADIDPAddedEvent:
+			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPAddedEvent)
+		case *instance.AzureADIDPChangedEvent:
+			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPChangedEvent)
+		case *instance.IDPRemovedEvent:
+			wm.AzureADIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.AzureADIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *InstanceAzureADIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			instance.AzureADIDPAddedEventType,
+			instance.AzureADIDPChangedEventType,
+			instance.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Builder()
+}
+
+func (wm *InstanceAzureADIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	tenant string,
+	isEmailVerified bool,
+	options idp.Options,
+) (*instance.AzureADIDPChangedEvent, error) {
+
+	changes, err := wm.AzureADIDPWriteModel.NewChanges(
+		name,
+		clientID,
+		clientSecretString,
+		secretCrypto,
+		scopes,
+		tenant,
+		isEmailVerified,
+		options,
+	)
+	if err != nil || len(changes) == 0 {
+		return nil, err
+	}
+	return instance.NewAzureADIDPChangedEvent(ctx, aggregate, id, changes)
+}
+
 type InstanceGitHubIDPWriteModel struct {
 	GitHubIDPWriteModel
 }
