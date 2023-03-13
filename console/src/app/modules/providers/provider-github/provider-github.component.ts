@@ -1,20 +1,20 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import {
-  AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
+  AddGitHubProviderRequest as AdminAddGithubProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
-  UpdateGenericOIDCProviderRequest as AdminUpdateGenericOIDCProviderRequest,
+  UpdateGitHubProviderRequest as AdminUpdateGithubProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest,
+  AddGitHubProviderRequest as MgmtAddGithubProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
-  UpdateGenericOIDCProviderRequest as MgmtUpdateGenericOIDCProviderRequest,
+  UpdateGitHubProviderRequest as MgmtUpdateGithubProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -24,38 +24,38 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
-  selector: 'cnsl-provider-oidc',
-  templateUrl: './provider-oidc.component.html',
-  styleUrls: ['./provider-oidc.component.scss'],
+  selector: 'cnsl-provider-github',
+  templateUrl: './provider-github.component.html',
+  styleUrls: ['./provider-github.component.scss'],
 })
-export class ProviderOIDCComponent {
+export class ProviderGithubComponent {
   public showOptional: boolean = false;
   public options: Options = new Options();
-
   public id: string | null = '';
-  public updateClientSecret: boolean = false;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
+
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  public oidcFormGroup!: UntypedFormGroup;
+
+  public form!: FormGroup;
 
   public loading: boolean = false;
 
   public provider?: Provider.AsObject;
+  public updateClientSecret: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private _location: Location,
-    breadcrumbService: BreadcrumbService,
+    private breadcrumbService: BreadcrumbService,
   ) {
-    this.oidcFormGroup = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      clientId: new UntypedFormControl('', [Validators.required]),
-      clientSecret: new UntypedFormControl('', [Validators.required]),
-      issuer: new UntypedFormControl('', [Validators.required]),
-      scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
+    this.form = new FormGroup({
+      name: new FormControl('', []),
+      clientId: new FormControl('', [Validators.required]),
+      clientSecret: new FormControl('', [Validators.required]),
+      scopesList: new FormControl(['openid', 'profile', 'email'], []),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -70,7 +70,7 @@ export class ProviderOIDCComponent {
             routerLink: ['/org'],
           };
 
-          breadcrumbService.setBreadcrumb([bread]);
+          this.breadcrumbService.setBreadcrumb([bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
@@ -80,7 +80,7 @@ export class ProviderOIDCComponent {
             name: 'Instance',
             routerLink: ['/instance'],
           });
-          breadcrumbService.setBreadcrumb([iamBread]);
+          this.breadcrumbService.setBreadcrumb([iamBread]);
           break;
       }
 
@@ -93,7 +93,6 @@ export class ProviderOIDCComponent {
   }
 
   private getData(id: string): void {
-    this.loading = true;
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
         ? new AdminGetProviderByIDRequest()
@@ -104,8 +103,8 @@ export class ProviderOIDCComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        if (this.provider?.config?.oidc) {
-          this.oidcFormGroup.patchValue(this.provider.config.oidc);
+        if (this.provider?.config?.github) {
+          this.form.patchValue(this.provider.config.github);
           this.name?.setValue(this.provider.name);
         }
       })
@@ -116,22 +115,22 @@ export class ProviderOIDCComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGenericOIDCProvider() : this.addGenericOIDCProvider();
+    this.provider ? this.updateGithubProvider() : this.addGithubProvider();
   }
 
-  public addGenericOIDCProvider(): void {
+  public addGithubProvider(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGenericOIDCProviderRequest();
+      const req = new MgmtAddGithubProviderRequest();
 
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
-      req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       (this.service as ManagementService)
-        .addGenericOIDCProvider(req)
+        .addGitHubProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -143,16 +142,16 @@ export class ProviderOIDCComponent {
           this.loading = false;
         });
     } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGenericOIDCProviderRequest();
+      const req = new AdminAddGithubProviderRequest();
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
-      req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       (this.service as AdminService)
-        .addGenericOIDCProvider(req)
+        .addGitHubProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -160,26 +159,29 @@ export class ProviderOIDCComponent {
           }, 2000);
         })
         .catch((error) => {
-          this.toast.showError(error);
           this.loading = false;
+          this.toast.showError(error);
         });
     }
   }
 
-  public updateGenericOIDCProvider(): void {
+  public updateGithubProvider(): void {
     if (this.provider) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGenericOIDCProviderRequest();
+        const req = new MgmtUpdateGithubProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
         req.setScopesList(this.scopesList?.value);
+        req.setProviderOptions(this.options);
+
+        if (this.updateClientSecret) {
+          req.setClientSecret(this.clientSecret?.value);
+        }
 
         this.loading = true;
         (this.service as ManagementService)
-          .updateGenericOIDCProvider(req)
+          .updateGitHubProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
@@ -191,17 +193,20 @@ export class ProviderOIDCComponent {
             this.loading = false;
           });
       } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGenericOIDCProviderRequest();
+        const req = new AdminUpdateGithubProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
         req.setScopesList(this.scopesList?.value);
+        req.setProviderOptions(this.options);
+
+        if (this.updateClientSecret) {
+          req.setClientSecret(this.clientSecret?.value);
+        }
 
         this.loading = true;
         (this.service as AdminService)
-          .updateGenericOIDCProvider(req)
+          .updateGitHubProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
@@ -209,8 +214,8 @@ export class ProviderOIDCComponent {
             }, 2000);
           })
           .catch((error) => {
-            this.toast.showError(error);
             this.loading = false;
+            this.toast.showError(error);
           });
       }
     }
@@ -245,22 +250,18 @@ export class ProviderOIDCComponent {
   }
 
   public get name(): AbstractControl | null {
-    return this.oidcFormGroup.get('name');
+    return this.form.get('name');
   }
 
   public get clientId(): AbstractControl | null {
-    return this.oidcFormGroup.get('clientId');
+    return this.form.get('clientId');
   }
 
   public get clientSecret(): AbstractControl | null {
-    return this.oidcFormGroup.get('clientSecret');
-  }
-
-  public get issuer(): AbstractControl | null {
-    return this.oidcFormGroup.get('issuer');
+    return this.form.get('clientSecret');
   }
 
   public get scopesList(): AbstractControl | null {
-    return this.oidcFormGroup.get('scopesList');
+    return this.form.get('scopesList');
   }
 }

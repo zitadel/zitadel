@@ -1633,6 +1633,10 @@
       "GOOGLE": {
         "TITLE": "Fournisseur Google",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Google"
+      },
+      "GITHUB": {
+        "TITLE": "Fournisseur Github",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Github"
       }
     },
     "DETAIL": {
