@@ -8,22 +8,23 @@ jobs:
   api:
     uses: ./.github/workflows/api.yml
     with:
-      buf: v1.15.1
+      buf_version: v1.15.1
+      buf_token: ${{ secrets.buf_token }}
 
   console:
     uses: ./.github/workflows/console.yml
     with:
-      node: 18
+      node_version: 18
 
   core:
     uses: ./.github/workflows/core.yml
     with:
-      go: 1.19
+      go_version: 1.19
 
   docs:
     uses: ./.github/workflows/docs.yml
     with:
-      node: 18
+      node_version: 18
 
   # login:
   # placeholder 

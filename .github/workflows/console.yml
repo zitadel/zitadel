@@ -3,7 +3,7 @@ name: Console
 on:
   workflow_call:
     inputs:
-      node:
+      node_version:
         required: true
         type: string
 
@@ -20,7 +20,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
       with:
-        node-version: ${{ inputs.node }}
+        node-version: ${{ inputs.node_version }}
         cache: 'yarn'
         cache-dependency-path: console/yarn.lock
     - run: yarn install --frozen-lockfile
@@ -34,7 +34,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
       with:
-        node-version: ${{ inputs.node }}
+        node-version: ${{ inputs.node_version }}
         cache: 'yarn'
         cache-dependency-path: console/yarn.lock
     - run: yarn install --frozen-lockfile

@@ -3,9 +3,12 @@ name: api
 on:
   workflow_call:
     inputs:
-      buf:
+      buf_version:
         required: true
         type: string
+    secrets:
+      buf_token:
+        required: true
 
 jobs:
   
@@ -17,7 +20,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: bufbuild/buf-setup-action@v1
       with:
-        version: ${{ inputs.buf }}
+        version: ${{ inputs.buf_version }}
     - uses: bufbuild/buf-lint-action@v1
     ## TODO add comment action with report
 
@@ -28,7 +31,19 @@ jobs:
     - uses: actions/checkout@v3
     - uses: bufbuild/buf-setup-action@v1
       with:
-        version: ${{ inputs.buf }}
+        version: ${{ inputs.buf_version }}
     - uses: bufbuild/buf-breaking-action@v1
       with:
         against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
+
+  push:
+    name: push
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf }}
+    - uses: bufbuild/buf-push-action@v1
+      with:
+        buf_token: ${{ secrets.buf_token }}
