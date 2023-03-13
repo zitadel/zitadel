@@ -91,7 +91,7 @@ func (p IDPProvider) DisplayName() string {
 		fallthrough
 	default:
 		// we should never get here, so log it
-		logging.Errorf("name of provider (type %v) is empty: %v", p.IDPConfigID, p.Type)
+		logging.Errorf("name of provider (type %d) is empty - id: %s", p.IDPType, p.IDPConfigID)
 		return ""
 	}
 }

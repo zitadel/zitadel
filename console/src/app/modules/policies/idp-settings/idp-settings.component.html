@@ -32,15 +32,24 @@
     </div>
   </div>
 
-  <div class="item card coming-soon" matRipple>
-    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
+  <a
+    class="item card"
+    matRipple
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'github', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'github', 'create']
+        : []
+    "
+  >
     <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="GitHub" />
     <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="GitHub" />
 
     <div class="text-container">
       <span class="title">GitHub</span>
     </div>
-  </div>
+  </a>
 
   <a
     class="item card"
@@ -89,6 +98,23 @@
     </div>
     <div class="text-container">
       <span class="title">Generic OIDC</span>
+    </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'oauth', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'oauth', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo" src="../../../assets/images/idp/oauth.svg" alt="oauth" />
+
+    <div class="text-container">
+      <span class="title">Generic OAuth</span>
     </div>
   </a>
 

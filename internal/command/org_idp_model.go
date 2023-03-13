@@ -25,10 +25,6 @@ func NewOAuthOrgIDPWriteModel(orgID, id string) *OrgOAuthIDPWriteModel {
 	}
 }
 
-func (wm *OrgOAuthIDPWriteModel) Reduce() error {
-	return wm.OAuthIDPWriteModel.Reduce()
-}
-
 func (wm *OrgOAuthIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -107,10 +103,6 @@ func NewOIDCOrgIDPWriteModel(orgID, id string) *OrgOIDCIDPWriteModel {
 			ID: id,
 		},
 	}
-}
-
-func (wm *OrgOIDCIDPWriteModel) Reduce() error {
-	return wm.OIDCIDPWriteModel.Reduce()
 }
 
 func (wm *OrgOIDCIDPWriteModel) AppendEvents(events ...eventstore.Event) {
@@ -210,10 +202,6 @@ func NewJWTOrgIDPWriteModel(orgID, id string) *OrgJWTIDPWriteModel {
 	}
 }
 
-func (wm *OrgJWTIDPWriteModel) Reduce() error {
-	return wm.JWTIDPWriteModel.Reduce()
-}
-
 func (wm *OrgJWTIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -309,10 +297,6 @@ func NewGitHubOrgIDPWriteModel(orgID, id string) *OrgGitHubIDPWriteModel {
 	}
 }
 
-func (wm *OrgGitHubIDPWriteModel) Reduce() error {
-	return wm.GitHubIDPWriteModel.Reduce()
-}
-
 func (wm *OrgGitHubIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -377,10 +361,6 @@ func NewGitHubEnterpriseOrgIDPWriteModel(orgID, id string) *OrgGitHubEnterpriseI
 			ID: id,
 		},
 	}
-}
-
-func (wm *OrgGitHubEnterpriseIDPWriteModel) Reduce() error {
-	return wm.GitHubEnterpriseIDPWriteModel.Reduce()
 }
 
 func (wm *OrgGitHubEnterpriseIDPWriteModel) AppendEvents(events ...eventstore.Event) {
@@ -462,10 +442,6 @@ func NewGitLabOrgIDPWriteModel(orgID, id string) *OrgGitLabIDPWriteModel {
 	}
 }
 
-func (wm *OrgGitLabIDPWriteModel) Reduce() error {
-	return wm.GitLabIDPWriteModel.Reduce()
-}
-
 func (wm *OrgGitLabIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -529,10 +505,6 @@ func NewGitLabSelfHostedOrgIDPWriteModel(orgID, id string) *OrgGitLabSelfHostedI
 			ID: id,
 		},
 	}
-}
-
-func (wm *OrgGitLabSelfHostedIDPWriteModel) Reduce() error {
-	return wm.GitLabSelfHostedIDPWriteModel.Reduce()
 }
 
 func (wm *OrgGitLabSelfHostedIDPWriteModel) AppendEvents(events ...eventstore.Event) {
@@ -601,10 +573,6 @@ func NewGoogleOrgIDPWriteModel(orgID, id string) *OrgGoogleIDPWriteModel {
 	}
 }
 
-func (wm *OrgGoogleIDPWriteModel) Reduce() error {
-	return wm.GoogleIDPWriteModel.Reduce()
-}
-
 func (wm *OrgGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
@@ -668,10 +636,6 @@ func NewLDAPOrgIDPWriteModel(orgID, id string) *OrgLDAPIDPWriteModel {
 			ID: id,
 		},
 	}
-}
-
-func (wm *OrgLDAPIDPWriteModel) Reduce() error {
-	return wm.LDAPIDPWriteModel.Reduce()
 }
 
 func (wm *OrgLDAPIDPWriteModel) AppendEvents(events ...eventstore.Event) {
@@ -757,10 +721,6 @@ func NewOrgIDPRemoveWriteModel(orgID, id string) *OrgIDPRemoveWriteModel {
 			ID: id,
 		},
 	}
-}
-
-func (wm *OrgIDPRemoveWriteModel) Reduce() error {
-	return wm.IDPRemoveWriteModel.Reduce()
 }
 
 func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {

@@ -42,9 +42,18 @@
               <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
               Google
             </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB">
+              <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="github" />
+              <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="github" />
+              GitHub
+            </div>
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OIDC">
               <mat-icon class="idp-icon" svgIcon="mdi_openid" alt="oidc" />
               Generic OIDC
+            </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OAUTH">
+              <img class="idp-logo" src="../../../assets/images/idp/oauth.svg" alt="oauth" />
+              Generic OAuth
             </div>
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_JWT">
               <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />

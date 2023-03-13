@@ -3,18 +3,18 @@ import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import {
-  AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
+  AddGenericOAuthProviderRequest as AdminAddGenericOAuthProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
-  UpdateGenericOIDCProviderRequest as AdminUpdateGenericOIDCProviderRequest,
+  UpdateGenericOAuthProviderRequest as AdminUpdateGenericOAuthProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest,
+  AddGenericOAuthProviderRequest as MgmtAddGenericOAuthProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
-  UpdateGenericOIDCProviderRequest as MgmtUpdateGenericOIDCProviderRequest,
+  UpdateGenericOAuthProviderRequest as MgmtUpdateGenericOAuthProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -24,11 +24,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
-  selector: 'cnsl-provider-oidc',
-  templateUrl: './provider-oidc.component.html',
-  styleUrls: ['./provider-oidc.component.scss'],
+  selector: 'cnsl-provider-oauth',
+  templateUrl: './provider-oauth.component.html',
+  styleUrls: ['./provider-oauth.component.scss'],
 })
-export class ProviderOIDCComponent {
+export class ProviderOAuthComponent {
   public showOptional: boolean = false;
   public options: Options = new Options();
 
@@ -37,24 +37,28 @@ export class ProviderOIDCComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  public oidcFormGroup!: UntypedFormGroup;
+  public form!: UntypedFormGroup;
 
   public loading: boolean = false;
 
   public provider?: Provider.AsObject;
 
   constructor(
+    private router: Router,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    this.oidcFormGroup = new UntypedFormGroup({
+    this.form = new UntypedFormGroup({
       name: new UntypedFormControl('', [Validators.required]),
       clientId: new UntypedFormControl('', [Validators.required]),
       clientSecret: new UntypedFormControl('', [Validators.required]),
-      issuer: new UntypedFormControl('', [Validators.required]),
+      authorizationEndpoint: new UntypedFormControl('', [Validators.required]),
+      tokenEndpoint: new UntypedFormControl('', [Validators.required]),
+      userEndpoint: new UntypedFormControl('', [Validators.required]),
+      idAttribute: new UntypedFormControl('', [Validators.required]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
 
@@ -104,8 +108,8 @@ export class ProviderOIDCComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        if (this.provider?.config?.oidc) {
-          this.oidcFormGroup.patchValue(this.provider.config.oidc);
+        if (this.provider?.config?.oauth) {
+          this.form.patchValue(this.provider.config.oauth);
           this.name?.setValue(this.provider.name);
         }
       })
@@ -116,26 +120,29 @@ export class ProviderOIDCComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGenericOIDCProvider() : this.addGenericOIDCProvider();
+    this.provider ? this.updateGenericOAuthProvider() : this.addGenericOAuthProvider();
   }
 
-  public addGenericOIDCProvider(): void {
+  public addGenericOAuthProvider(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGenericOIDCProviderRequest();
+      const req = new MgmtAddGenericOAuthProviderRequest();
 
       req.setName(this.name?.value);
+      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+      req.setIdAttribute(this.idAttribute?.value);
+      req.setTokenEndpoint(this.tokenEndpoint?.value);
+      req.setUserEndpoint(this.userEndpoint?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
-      req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
 
       this.loading = true;
       (this.service as ManagementService)
-        .addGenericOIDCProvider(req)
+        .addGenericOAuthProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.close();
+            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
           }, 2000);
         })
         .catch((error) => {
@@ -143,20 +150,23 @@ export class ProviderOIDCComponent {
           this.loading = false;
         });
     } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGenericOIDCProviderRequest();
+      const req = new AdminAddGenericOAuthProviderRequest();
       req.setName(this.name?.value);
+      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+      req.setIdAttribute(this.idAttribute?.value);
+      req.setTokenEndpoint(this.tokenEndpoint?.value);
+      req.setUserEndpoint(this.userEndpoint?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
-      req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
 
       this.loading = true;
       (this.service as AdminService)
-        .addGenericOIDCProvider(req)
+        .addGenericOAuthProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.close();
+            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
           }, 2000);
         })
         .catch((error) => {
@@ -166,24 +176,27 @@ export class ProviderOIDCComponent {
     }
   }
 
-  public updateGenericOIDCProvider(): void {
+  public updateGenericOAuthProvider(): void {
     if (this.provider) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGenericOIDCProviderRequest();
+        const req = new MgmtUpdateGenericOAuthProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
+        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+        req.setIdAttribute(this.idAttribute?.value);
+        req.setTokenEndpoint(this.tokenEndpoint?.value);
+        req.setUserEndpoint(this.userEndpoint?.value);
         req.setClientId(this.clientId?.value);
         req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
         req.setScopesList(this.scopesList?.value);
 
         this.loading = true;
         (this.service as ManagementService)
-          .updateGenericOIDCProvider(req)
+          .updateGenericOAuthProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.close();
+              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
             }, 2000);
           })
           .catch((error) => {
@@ -191,21 +204,24 @@ export class ProviderOIDCComponent {
             this.loading = false;
           });
       } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGenericOIDCProviderRequest();
+        const req = new AdminUpdateGenericOAuthProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
+        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+        req.setIdAttribute(this.idAttribute?.value);
+        req.setTokenEndpoint(this.tokenEndpoint?.value);
+        req.setUserEndpoint(this.userEndpoint?.value);
         req.setClientId(this.clientId?.value);
         req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
         req.setScopesList(this.scopesList?.value);
 
         this.loading = true;
         (this.service as AdminService)
-          .updateGenericOIDCProvider(req)
+          .updateGenericOAuthProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.close();
+              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
             }, 2000);
           })
           .catch((error) => {
@@ -245,22 +261,38 @@ export class ProviderOIDCComponent {
   }
 
   public get name(): AbstractControl | null {
-    return this.oidcFormGroup.get('name');
+    return this.form.get('name');
+  }
+
+  public get authorizationEndpoint(): AbstractControl | null {
+    return this.form.get('authorizationEndpoint');
+  }
+
+  public get tokenEndpoint(): AbstractControl | null {
+    return this.form.get('tokenEndpoint');
+  }
+
+  public get userEndpoint(): AbstractControl | null {
+    return this.form.get('userEndpoint');
+  }
+
+  public get idAttribute(): AbstractControl | null {
+    return this.form.get('idAttribute');
   }
 
   public get clientId(): AbstractControl | null {
-    return this.oidcFormGroup.get('clientId');
+    return this.form.get('clientId');
   }
 
   public get clientSecret(): AbstractControl | null {
-    return this.oidcFormGroup.get('clientSecret');
+    return this.form.get('clientSecret');
   }
 
   public get issuer(): AbstractControl | null {
-    return this.oidcFormGroup.get('issuer');
+    return this.form.get('issuer');
   }
 
   public get scopesList(): AbstractControl | null {
-    return this.oidcFormGroup.get('scopesList');
+    return this.form.get('scopesList');
   }
 }

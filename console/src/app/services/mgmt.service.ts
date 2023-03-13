@@ -29,8 +29,12 @@ import {
   AddCustomPasswordComplexityPolicyResponse,
   AddCustomPrivacyPolicyRequest,
   AddCustomPrivacyPolicyResponse,
+  AddGenericOAuthProviderRequest,
+  AddGenericOAuthProviderResponse,
   AddGenericOIDCProviderRequest,
   AddGenericOIDCProviderResponse,
+  AddGitHubProviderRequest,
+  AddGitHubProviderResponse,
   AddGitLabProviderRequest,
   AddGitLabProviderResponse,
   AddGitLabSelfHostedProviderRequest,
@@ -431,8 +435,12 @@ import {
   UpdateCustomPasswordComplexityPolicyResponse,
   UpdateCustomPrivacyPolicyRequest,
   UpdateCustomPrivacyPolicyResponse,
+  UpdateGenericOAuthProviderRequest,
+  UpdateGenericOAuthProviderResponse,
   UpdateGenericOIDCProviderRequest,
   UpdateGenericOIDCProviderResponse,
+  UpdateGitHubProviderRequest,
+  UpdateGitHubProviderResponse,
   UpdateGitLabProviderRequest,
   UpdateGitLabProviderResponse,
   UpdateGitLabSelfHostedProviderRequest,
@@ -889,6 +897,14 @@ export class ManagementService {
     return this.grpcService.mgmt.updateGitLabSelfHostedProvider(req, null).then((resp) => resp.toObject());
   }
 
+  public addGitHubProvider(req: AddGitHubProviderRequest): Promise<AddGitHubProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitHubProvider(req: UpdateGitHubProviderRequest): Promise<UpdateGitHubProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
   public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
     return this.grpcService.mgmt.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
   }
@@ -897,6 +913,16 @@ export class ManagementService {
     req: UpdateGenericOIDCProviderRequest,
   ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGenericOAuthProvider(req: AddGenericOAuthProviderRequest): Promise<AddGenericOAuthProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGenericOAuthProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOAuthProvider(
+    req: UpdateGenericOAuthProviderRequest,
+  ): Promise<UpdateGenericOAuthProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGenericOAuthProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addJWTProvider(req: AddJWTProviderRequest): Promise<AddJWTProviderResponse.AsObject> {
