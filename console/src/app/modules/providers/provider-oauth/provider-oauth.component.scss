@@ -1,0 +1,84 @@
+.desc {
+  font-size: 14px;
+}
+
+.oauth-create-content {
+  .title-row {
+    display: flex;
+    align-items: center;
+
+    .idp-logo {
+      height: 36px;
+      width: 36px;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0 1rem 0 0;
+    }
+  }
+
+  .formfield {
+    display: block;
+    max-width: 400px;
+
+    .mat-chip-input {
+      width: 100%;
+      margin: 0;
+    }
+
+    .chip {
+      border-radius: 0.5rem;
+      height: 40px;
+    }
+
+    @media only screen and (max-width: 450px) {
+      max-width: none;
+    }
+  }
+
+  .oauth-content {
+    .desc {
+      margin-bottom: 1rem;
+    }
+
+    .idp-scopes {
+      padding-bottom: 0.5rem;
+
+      .flex-line {
+        display: flex;
+        align-items: flex-start;
+        max-width: 400px;
+
+        .formfield {
+          flex: 1;
+        }
+
+        .scope-add-button {
+          margin-top: 1.75rem;
+        }
+      }
+    }
+  }
+}
+
+.oauth-create-actions {
+  display: flex;
+  margin-top: 1rem;
+
+  button[mat-raised-button] {
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+    padding: 0.5rem 4rem;
+  }
+}
+
+.optional-h-wrapper {
+  display: flex;
+  align-items: center;
+
+  h2 {
+    margin-right: 0.25rem;
+  }
+}

@@ -45,6 +45,19 @@ const routes: Routes = [
         ],
       },
       {
+        path: 'oauth',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-oauth/provider-oauth.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-oauth/provider-oauth.module'),
+          },
+        ],
+      },
+      {
         path: 'jwt',
         children: [
           {

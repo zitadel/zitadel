@@ -81,6 +81,23 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'oauth', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'oauth', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo" src="../../../assets/images/idp/oauth.svg" alt="oauth" />
+
+    <div class="text-container">
+      <span class="title">Generic OAuth</span>
+    </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'jwt', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
         ? ['/org', 'provider', 'jwt', 'create']

@@ -1678,6 +1678,10 @@
     "SETAVAILABLE": "verfügbar setzen",
     "SETUNAVAILABLE": "auf nicht verfügbar setzen",
     "NAME": "Name",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpunkt",
+    "TOKENENDPOINT": "Token Endpunkt",
+    "USERENDPOINT": "User Endpunkt",
+    "IDATTRIBUTE": "ID Attribut",
     "CONFIG": "Konfiguration",
     "STATE": "Status",
     "ISSUER": "Issuer",
@@ -1698,9 +1702,12 @@
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
-      "GENERAL": "Generelle Information",
       "TITLE": "OIDC Konfiguration",
       "DESCRIPTION": "Geben Sie die Daten OIDC Identity Providers ein."
+    },
+    "OAUTH": {
+      "TITLE": "OAuth Konfiguration",
+      "DESCRIPTION": "Geben Sie die Daten OAuth Identity Providers ein."
     },
     "JWT": {
       "TITLE": "JWT Konfiguration",
