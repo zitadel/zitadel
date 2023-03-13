@@ -21,11 +21,11 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
-        cache: 'npm'
-        cache-dependency-path: console/package-lock.json
-    - run: npm ci
-    - run: npm run generate
-    - run: npm run lint
+        cache: 'pnpm'
+        cache-dependency-path: console/pnpm-lock.json
+    - run: pnpm install --frozen-lockfile
+    - run: pnpm generate
+    - run: pnpm lint
 
   build:
     name: build and upload
@@ -35,11 +35,11 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
-        cache: 'npm'
-        cache-dependency-path: console/package-lock.json
-    - run: npm ci
-    - run: npm run generate
-    - run: npm run build
+        cache: 'pnpm'
+        cache-dependency-path: console/pnpm-lock.json
+    - run: pnpm install --frozen-lockfile
+    - run: pnpm generate
+    - run: pnpm build
     - uses: actions/upload-artifact@v3
       with:
         name: console

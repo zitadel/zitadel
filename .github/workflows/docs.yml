@@ -21,10 +21,10 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
-        cache: 'yarn'
-        cache-dependency-path: docs/yarn.lock
-    - run: yarn install --frozen-lockfile
-    - run: yarn build
+        cache: 'pnpm'
+        cache-dependency-path: docs/pnpm-lock.json
+    - run: pnpm install --frozen-lockfile
+    - run: pnpm build
     - uses: actions/upload-artifact@v3
       with:
         name: docs
