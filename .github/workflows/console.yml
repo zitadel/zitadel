@@ -5,7 +5,8 @@ on:
     paths:
     - 'console/**'
     - '.github/workflows/console.yml'
-
+    
+jobs:
   caching:
     name: Caching
     runs-on: ubuntu-latest
