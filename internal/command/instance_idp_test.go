@@ -53,7 +53,9 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				provider: GenericOAuthProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D32ef", ""))
+				},
 			},
 		},
 		{
@@ -69,7 +71,9 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dbgzf", ""))
+				},
 			},
 		},
 		{
@@ -86,7 +90,9 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DF4ga", ""))
+				},
 			},
 		},
 		{
@@ -104,7 +110,9 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-B23bs", ""))
+				},
 			},
 		},
 		{
@@ -123,7 +131,9 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D2gj8", ""))
+				},
 			},
 		},
 		{
@@ -143,7 +153,9 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Fb8jk", ""))
+				},
 			},
 		},
 		{
@@ -164,7 +176,9 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf3f", ""))
+				},
 			},
 		},
 		{
@@ -330,7 +344,9 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 				provider: GenericOAuthProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAffg", ""))
+				},
 			},
 		},
 		{
@@ -344,7 +360,9 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 				provider: GenericOAuthProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sf3gh", ""))
+				},
 			},
 		},
 		{
@@ -360,7 +378,9 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SHJ3ui", ""))
+				},
 			},
 		},
 		{
@@ -372,11 +392,14 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: GenericOAuthProvider{
-					Name: "name",
+					Name:     "name",
+					ClientID: "clientID",
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SVrgh", ""))
+				},
 			},
 		},
 		{
@@ -394,7 +417,9 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DJKeio", ""))
+				},
 			},
 		},
 		{
@@ -413,7 +438,9 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ILSJi", ""))
+				},
 			},
 		},
 		{
@@ -433,7 +460,9 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-JKD3h", ""))
+				},
 			},
 		},
 		{
@@ -640,7 +669,9 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 				provider: GitHubProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Jdsgf", ""))
+				},
 			},
 		},
 		{
@@ -656,7 +687,9 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dsgz3", ""))
+				},
 			},
 		},
 		{
@@ -805,7 +838,9 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 				provider: GitHubProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf4h", ""))
+				},
 			},
 		},
 		{
@@ -819,7 +854,9 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 				provider: GitHubProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-fdh5z", ""))
+				},
 			},
 		},
 		{
@@ -1000,7 +1037,9 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				provider: GitHubEnterpriseProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dg4td", ""))
+				},
 			},
 		},
 		{
@@ -1016,7 +1055,9 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dgj53", ""))
+				},
 			},
 		},
 		{
@@ -1033,7 +1074,9 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Ghjjs", ""))
+				},
 			},
 		},
 		{
@@ -1051,7 +1094,9 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sani2", ""))
+				},
 			},
 		},
 		{
@@ -1070,7 +1115,9 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-agj42", ""))
+				},
 			},
 		},
 		{
@@ -1090,7 +1137,9 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sd5hn", ""))
+				},
 			},
 		},
 		{
@@ -1252,7 +1301,9 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 				provider: GitHubEnterpriseProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdfh3", ""))
+				},
 			},
 		},
 		{
@@ -1266,7 +1317,9 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 				provider: GitHubEnterpriseProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-shj42", ""))
+				},
 			},
 		},
 		{
@@ -1282,7 +1335,9 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdh73", ""))
+				},
 			},
 		},
 		{
@@ -1294,11 +1349,14 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: GitHubEnterpriseProvider{
-					Name: "name",
+					Name:     "name",
+					ClientID: "clientID",
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-acx2w", ""))
+				},
 			},
 		},
 		{
@@ -1316,7 +1374,9 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dgj6q", ""))
+				},
 			},
 		},
 		{
@@ -1335,7 +1395,9 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ybj62", ""))
+				},
 			},
 		},
 		{
@@ -1537,11 +1599,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-adsg2"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-adsg2", ""))
 				},
 			},
 		},
@@ -1559,11 +1617,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-GD1j2"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GD1j2", ""))
 				},
 			},
 		},
@@ -1713,11 +1767,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-HJK91"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-HJK91", ""))
 				},
 			},
 		},
@@ -1733,11 +1783,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-D12t6"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D12t6", ""))
 				},
 			},
 		},
@@ -1918,11 +1964,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-jw4ZT"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jw4ZT", ""))
 				},
 			},
 		},
@@ -1940,11 +1982,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-AST4S"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-AST4S", ""))
 				},
 			},
 		},
@@ -1963,11 +2001,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-DBZHJ"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DBZHJ", ""))
 				},
 			},
 		},
@@ -1987,11 +2021,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-SDGJ4"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SDGJ4", ""))
 				},
 			},
 		},
@@ -2147,11 +2177,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-SAFG4"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAFG4", ""))
 				},
 			},
 		},
@@ -2167,11 +2193,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-DG4H"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DG4H", ""))
 				},
 			},
 		},
@@ -2189,11 +2211,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-SD4eb"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SD4eb", ""))
 				},
 			},
 		},
@@ -2212,11 +2230,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					invalidArgErr := new(caos_errors.InvalidArgumentError)
-					if !errors.As(err, &invalidArgErr) {
-						return false
-					}
-					return invalidArgErr.ID == "INST-GHWE3"
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GHWE3", ""))
 				},
 			},
 		},
@@ -2406,7 +2420,9 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 				provider: GoogleProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
+				},
 			},
 		},
 		{
@@ -2422,7 +2438,9 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
+				},
 			},
 		},
 		{
@@ -2570,7 +2588,9 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 				provider: GoogleProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S32t1", ""))
+				},
 			},
 		},
 		{
@@ -2584,7 +2604,9 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 				provider: GoogleProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ds432", ""))
+				},
 			},
 		},
 		{
@@ -2763,7 +2785,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				provider: LDAPProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAfdd", ""))
+				},
 			},
 		},
 		{
@@ -2779,7 +2803,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SDVg2", ""))
+				},
 			},
 		},
 		{
@@ -2796,7 +2822,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sv31s", ""))
+				},
 			},
 		},
 		{
@@ -2814,7 +2842,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdgf4", ""))
+				},
 			},
 		},
 		{
@@ -2833,7 +2863,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-AEG2w", ""))
+				},
 			},
 		},
 		{
@@ -2853,7 +2885,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAD5n", ""))
+				},
 			},
 		},
 		{
@@ -2874,7 +2908,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf5h", ""))
+				},
 			},
 		},
 		{
@@ -3076,7 +3112,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				provider: LDAPProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dgdbs", ""))
+				},
 			},
 		},
 		{
@@ -3090,7 +3128,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				provider: LDAPProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sffgd", ""))
+				},
 			},
 		},
 		{
@@ -3106,7 +3146,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dz62d", ""))
+				},
 			},
 		},
 		{
@@ -3123,7 +3165,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-vb3ss", ""))
+				},
 			},
 		},
 		{
@@ -3141,7 +3185,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-hbere", ""))
+				},
 			},
 		},
 		{
@@ -3160,7 +3206,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ASFt6", ""))
+				},
 			},
 		},
 		{
@@ -3180,7 +3228,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DG45z", ""))
+				},
 			},
 		},
 		{
