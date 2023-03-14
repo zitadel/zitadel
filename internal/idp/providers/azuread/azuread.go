@@ -72,7 +72,7 @@ func WithOAuthOptions(opts ...oauth.ProviderOpts) ProviderOptions {
 
 // New creates an AzureAD provider using the [oauth.Provider] (OAuth 2.0 generic provider).
 // By default, it uses the [CommonTenant] and unverified emails.
-func New(name, clientID, clientSecret, redirectURI string, opts ...ProviderOptions) (*Provider, error) {
+func New(name, clientID, clientSecret, redirectURI string, scopes []string, opts ...ProviderOptions) (*Provider, error) {
 	provider := &Provider{
 		tenant:  CommonTenant,
 		options: make([]oauth.ProviderOpts, 0),
@@ -80,7 +80,7 @@ func New(name, clientID, clientSecret, redirectURI string, opts ...ProviderOptio
 	for _, opt := range opts {
 		opt(provider)
 	}
-	config := newConfig(provider.tenant, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail})
+	config := newConfig(provider.tenant, clientID, clientSecret, redirectURI, scopes)
 	rp, err := oauth.New(
 		config,
 		name,
