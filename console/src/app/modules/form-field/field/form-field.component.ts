@@ -85,6 +85,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
   @ContentChildren(CNSL_ERROR as any, { descendants: true }) _errorChildren!: QueryList<CnslErrorDirective>;
 
+  // TODO: Remove?
   @HostListener('blur', ['false'])
   _focusChanged(isFocused: boolean): void {
     if (isFocused !== this.focused && !isFocused) {
@@ -117,12 +118,13 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     this.mapHelp();
 
     const control = this._control;
-    control.stateChanges.pipe(startWith(null)).subscribe(() => {
+    control.stateChanges.pipe(startWith(null), takeUntil(this._destroyed)).subscribe(() => {
       this._syncDescribedByIds();
       this._changeDetectorRef.markForCheck();
     });
 
     // Run change detection if the value changes.
+    // TODO: Is that not redundant (see immediately above)?
     if (control.ngControl && control.ngControl.valueChanges) {
       control.ngControl.valueChanges
         .pipe(takeUntil(this._destroyed))
@@ -154,11 +156,9 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   private mapHelp(): void {
-    let ctrl = this._control.ngControl?.control;
-
     const validationErrors$: Observable<Array<ValidationError>> = this.disableValidationErrors
       ? of([])
-      : ctrl?.valueChanges?.pipe(
+      : this._control.stateChanges?.pipe(
           map(() => this.currentValidationErrors()),
           startWith([]),
         ) || of([]);
