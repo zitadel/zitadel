@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
@@ -20,6 +20,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
@@ -53,8 +54,8 @@ export class ProviderGoogleComponent {
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
-      clientId: new FormControl('', [Validators.required]),
-      clientSecret: new FormControl('', [Validators.required]),
+      clientId: new FormControl('', [requiredValidator]),
+      clientSecret: new FormControl('', [requiredValidator]),
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
     });
 
