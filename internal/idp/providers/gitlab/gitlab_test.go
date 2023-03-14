@@ -33,7 +33,18 @@ func TestProvider_BeginAuth(t *testing.T) {
 				scopes:       []string{"openid"},
 			},
 			want: &oidc.Session{
-				AuthURL: "https://gitlab.com/oauth/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				AuthURL: "https://gitlab.com/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+			},
+		},
+		{
+			name: "successful auth default scopes",
+			fields: fields{
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+			},
+			want: &oidc.Session{
+				AuthURL: "https://gitlab.com/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
 			},
 		},
 	}

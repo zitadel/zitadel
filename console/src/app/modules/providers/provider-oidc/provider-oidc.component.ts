@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import {
   AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
@@ -44,7 +44,6 @@ export class ProviderOIDCComponent {
   public provider?: Provider.AsObject;
 
   constructor(
-    private router: Router,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -136,7 +135,7 @@ export class ProviderOIDCComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -157,7 +156,7 @@ export class ProviderOIDCComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -184,7 +183,7 @@ export class ProviderOIDCComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {
@@ -206,7 +205,7 @@ export class ProviderOIDCComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {

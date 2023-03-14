@@ -535,7 +535,7 @@
     "EMAILVERIFIED": "Email zweryfikowany",
     "NOTVERIFIED": "niezweryfikowany",
     "PREFERRED_LOGINNAME": "Preferowana nazwa użytkownika",
-    "ISINITIAL": "Ten użytkownik nie zweryfikował jeszcze swojego adresu e-mail.",
+    "ISINITIAL": "Użytkownik nie jest jeszcze aktywny.",
     "LOGINMETHODS": {
       "TITLE": "Informacje kontaktowe",
       "DESCRIPTION": "Podane informacje służą do wysyłania ważnych informacji, takich jak e-maile z linkiem resetowania hasła.",
@@ -612,7 +612,7 @@
     "SIGNEDOUT_BTN": "Zaloguj się",
     "EDITACCOUNT": "Edytuj konto",
     "ADDACCOUNT": "Zaloguj się z innym kontem",
-    "RESENDINITIALEMAIL": "Wyślij nowego maila inicjalizującego",
+    "RESENDINITIALEMAIL": "Wyślij ponownie wiadomość aktywacyjną",
     "RESENDEMAILNOTIFICATION": "Wyślij ponownie powiadomienie e-mailem",
     "TOAST": {
       "CREATED": "Użytkownik został utworzony pomyślnie.",
@@ -1622,6 +1622,10 @@
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OIDC."
       },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OAuth."
+      },
       "JWT": {
         "TITLE": "JWT Provider",
         "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy JWT."
@@ -1629,6 +1633,14 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Google"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Github"
       }
     },
     "DETAIL": {
@@ -1669,6 +1681,10 @@
     "OWNER": "Właściciel",
     "ID": "ID",
     "NAME": "Nazwa",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "Atrybut identyfikatora",
     "AVAILABILITY": "Dostępność",
     "AVAILABLE": "dostępny",
     "AVAILABLEBUTINACTIVE": "dostępny ale nieaktywny",

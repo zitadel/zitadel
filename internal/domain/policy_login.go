@@ -4,6 +4,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -63,6 +65,35 @@ type IDPProvider struct {
 
 func (p IDPProvider) IsValid() bool {
 	return p.IDPConfigID != ""
+}
+
+// DisplayName returns the name or a default
+// to be used when always a name must be displayed (e.g. login)
+func (p IDPProvider) DisplayName() string {
+	if p.Name != "" {
+		return p.Name
+	}
+	switch p.IDPType {
+	case IDPTypeGitHub:
+		return "GitHub"
+	case IDPTypeGitLab:
+		return "GitLab"
+	case IDPTypeGoogle:
+		return "Google"
+	case IDPTypeUnspecified,
+		IDPTypeOIDC,
+		IDPTypeJWT,
+		IDPTypeOAuth,
+		IDPTypeLDAP,
+		IDPTypeAzureAD,
+		IDPTypeGitHubEnterprise,
+		IDPTypeGitLabSelfHosted:
+		fallthrough
+	default:
+		// we should never get here, so log it
+		logging.Errorf("name of provider (type %d) is empty - id: %s", p.IDPType, p.IDPConfigID)
+		return ""
+	}
 }
 
 type PasswordlessType int32

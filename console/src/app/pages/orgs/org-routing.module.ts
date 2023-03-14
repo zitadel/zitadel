@@ -20,6 +20,19 @@ const routes: Routes = [
     },
     children: [
       {
+        path: 'oauth',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-oauth/provider-oauth.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-oauth/provider-oauth.module'),
+          },
+        ],
+      },
+      {
         path: 'oidc',
         children: [
           {
@@ -29,6 +42,19 @@ const routes: Routes = [
           {
             path: ':id',
             loadChildren: () => import('src/app/modules/providers/provider-oidc/provider-oidc.module'),
+          },
+        ],
+      },
+      {
+        path: 'github-es',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-github-es/provider-github-es.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-github-es/provider-github-es.module'),
           },
         ],
       },
@@ -55,6 +81,19 @@ const routes: Routes = [
           {
             path: ':id',
             loadChildren: () => import('src/app/modules/providers/provider-google/provider-google.module'),
+          },
+        ],
+      },
+      {
+        path: 'github',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-github/provider-github.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-github/provider-github.module'),
           },
         ],
       },
