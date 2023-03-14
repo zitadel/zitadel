@@ -2,7 +2,7 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
 import {
   AddJWTProviderRequest as AdminAddJWTProviderRequest,
@@ -43,7 +43,6 @@ export class ProviderJWTComponent {
   public provider?: Provider.AsObject;
 
   constructor(
-    private router: Router,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -135,7 +134,7 @@ export class ProviderJWTComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -158,7 +157,7 @@ export class ProviderJWTComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -186,7 +185,7 @@ export class ProviderJWTComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {
@@ -209,7 +208,7 @@ export class ProviderJWTComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {
