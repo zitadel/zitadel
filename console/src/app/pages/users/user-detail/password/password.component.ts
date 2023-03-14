@@ -110,13 +110,13 @@ export class PasswordComponent implements OnDestroy {
     if (this.userId) {
       this.passwordForm = this.fb.group({
         password: ['', validators],
-        confirmPassword: ['', [...validators, passwordConfirmValidator('password')]],
+        confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
       });
     } else {
       this.passwordForm = this.fb.group({
         currentPassword: ['', requiredValidator],
         newPassword: ['', validators],
-        confirmPassword: ['', [...validators, passwordConfirmValidator('password')]],
+        confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
       });
     }
   }

@@ -157,7 +157,7 @@ export class OrgCreateComponent {
           }
 
           const pwdValidators = [...validators] as ValidatorFn[];
-          const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+          const confirmPwdValidators = [requiredValidator, passwordConfirmValidator()] as ValidatorFn[];
           this.pwdForm = this.fb.group({
             password: ['', pwdValidators],
             confirmPassword: ['', confirmPwdValidators],

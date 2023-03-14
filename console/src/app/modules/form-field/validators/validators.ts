@@ -34,13 +34,13 @@ export function minLengthValidator(minLength: number): ValidatorFn {
   };
 }
 
-export function passwordConfirmValidator(passwordControlName: string) {
+export function passwordConfirmValidator(passwordControlName: string = "password", passwordConfirmControlName: string = "confirmPassword") {
   return (c: AbstractControl): ValidationErrors | null => {
     if (!c.parent || !c) {
       return null;
     }
     const pwd = c.parent.get(passwordControlName);
-    const cpwd = c;
+    const cpwd = c.parent.get(passwordConfirmControlName);
 
     if (!pwd || !cpwd) {
       return null;
