@@ -63,6 +63,7 @@ jobs:
       with:
         name: console
         path: console/bundle.zip
+    - run: ls -latr
     - run: unzip bundle.zip
     - uses: docker/build-push-action@v4
       with:
