@@ -237,7 +237,7 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LDAPUserBaseCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LDAPUserObjectClassesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
 			crdb.NewColumn(LDAPUserFiltersCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			crdb.NewColumn(LDAPTimeoutCol, crdb.ColumnTypeTimestamp, crdb.Nullable()),
+			crdb.NewColumn(LDAPTimeoutCol, crdb.ColumnTypeInt64, crdb.Nullable()),
 			crdb.NewColumn(LDAPIDAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LDAPFirstNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LDAPLastNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),

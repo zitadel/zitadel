@@ -22,8 +22,8 @@ var _ idp.Session = (*Session)(nil)
 type Session struct {
 	Provider *Provider
 	loginUrl string
-	user     string
-	password string
+	User     string
+	Password string
 }
 
 func (s *Session) GetAuthURL() string {
@@ -38,11 +38,11 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 			s.Provider.bindDN,
 			s.Provider.bindPassword,
 			s.Provider.baseDN,
-			s.Provider.userBase,
+			s.Provider.getNecessaryAttributes(),
 			s.Provider.userObjectClasses,
 			s.Provider.userFilters,
-			s.user,
-			s.password,
+			s.User,
+			s.Password,
 			s.Provider.timeout,
 		)
 		if err != nil {
@@ -52,13 +52,20 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 		break
 	}
 
-	emailVerified, err := strconv.ParseBool(user.GetAttributeValue(s.Provider.emailVerifiedAttribute))
-	if err != nil {
-		return nil, err
+	var err error
+	var emailVerified bool
+	if v := user.GetAttributeValue(s.Provider.emailVerifiedAttribute); v != "" {
+		emailVerified, err = strconv.ParseBool(user.GetAttributeValue(s.Provider.emailVerifiedAttribute))
+		if err != nil {
+			return nil, err
+		}
 	}
-	phoneVerified, err := strconv.ParseBool(user.GetAttributeValue(s.Provider.phoneVerifiedAttribute))
-	if err != nil {
-		return nil, err
+	var phoneVerified bool
+	if v := user.GetAttributeValue(s.Provider.phoneVerifiedAttribute); v != "" {
+		phoneVerified, err = strconv.ParseBool(v)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return NewUser(
@@ -84,7 +91,7 @@ func tryLogin(
 	bindDN string,
 	bindPassword string,
 	baseDN string,
-	userBase string,
+	attributes []string,
 	objectClasses []string,
 	userFilters []string,
 	username string,
@@ -119,7 +126,7 @@ func tryLogin(
 		baseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, int(timeout.Seconds()), false,
 		searchQuery,
-		[]string{userBase},
+		attributes,
 		nil,
 	)
 

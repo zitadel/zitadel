@@ -191,6 +191,7 @@ func New(
 	provider := &Provider{
 		name:              name,
 		servers:           servers,
+		startTLS:          true,
 		baseDN:            baseDN,
 		bindDN:            bindDN,
 		bindPassword:      bindPassword,
@@ -213,7 +214,7 @@ func (p *Provider) Name() string {
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
 	return &Session{
 		Provider: p,
-		loginUrl: p.loginUrl + "?state=" + state,
+		loginUrl: p.loginUrl + state,
 	}, nil
 }
 
@@ -231,4 +232,48 @@ func (p *Provider) IsAutoCreation() bool {
 
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
+}
+
+func (p *Provider) getNecessaryAttributes() []string {
+	attributes := []string{p.userBase}
+	if p.idAttribute != "" {
+		attributes = append(attributes, p.idAttribute)
+	}
+	if p.firstNameAttribute != "" {
+		attributes = append(attributes, p.firstNameAttribute)
+	}
+	if p.lastNameAttribute != "" {
+		attributes = append(attributes, p.lastNameAttribute)
+	}
+	if p.displayNameAttribute != "" {
+		attributes = append(attributes, p.displayNameAttribute)
+	}
+	if p.nickNameAttribute != "" {
+		attributes = append(attributes, p.nickNameAttribute)
+	}
+	if p.preferredUsernameAttribute != "" {
+		attributes = append(attributes, p.preferredUsernameAttribute)
+	}
+	if p.emailAttribute != "" {
+		attributes = append(attributes, p.emailAttribute)
+	}
+	if p.emailVerifiedAttribute != "" {
+		attributes = append(attributes, p.emailVerifiedAttribute)
+	}
+	if p.phoneAttribute != "" {
+		attributes = append(attributes, p.phoneAttribute)
+	}
+	if p.phoneVerifiedAttribute != "" {
+		attributes = append(attributes, p.phoneVerifiedAttribute)
+	}
+	if p.preferredLanguageAttribute != "" {
+		attributes = append(attributes, p.preferredLanguageAttribute)
+	}
+	if p.avatarURLAttribute != "" {
+		attributes = append(attributes, p.avatarURLAttribute)
+	}
+	if p.profileAttribute != "" {
+		attributes = append(attributes, p.profileAttribute)
+	}
+	return attributes
 }

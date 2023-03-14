@@ -34,4 +34,5 @@ type AuthRequestRepository interface {
 	LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *domain.BrowserInfo) error
 	AutoRegisterExternalUser(ctx context.Context, user *domain.Human, externalIDP *domain.UserIDPLink, orgMemberRoles []string, authReqID, userAgentID, resourceOwner string, metadatas []*domain.Metadata, info *domain.BrowserInfo) error
 	ResetLinkingUsers(ctx context.Context, authReqID, userAgentID string) error
+	ResetSelectedIDP(ctx context.Context, authReqID, userAgentID string) error
 }
