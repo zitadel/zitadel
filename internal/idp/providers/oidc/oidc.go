@@ -112,8 +112,14 @@ func (p *Provider) Name() string {
 
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an OIDC authorization request as AuthURL.
-func (p *Provider) BeginAuth(ctx context.Context, state string, _ ...any) (idp.Session, error) {
-	url := rp.AuthURL(state, p.RelyingParty, p.authOptions...)
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
+	opts := p.authOptions
+	for _, param := range params {
+		if option, ok := param.(rp.AuthURLOpt); ok {
+			opts = append(opts, option)
+		}
+	}
+	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p}, nil
 }
 
