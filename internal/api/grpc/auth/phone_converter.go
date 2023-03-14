@@ -10,6 +10,6 @@ import (
 func UpdateMyPhoneToDomain(ctx context.Context, phone *auth.SetMyPhoneRequest) *domain.Phone {
 	return &domain.Phone{
 		ObjectRoot:  ctxToObjectRoot(ctx),
-		PhoneNumber: phone.Phone,
+		PhoneNumber: domain.PhoneNumber(phone.Phone),
 	}
 }

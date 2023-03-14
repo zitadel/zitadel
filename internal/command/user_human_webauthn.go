@@ -155,7 +155,7 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner s
 	}
 	accountName := domain.GenerateLoginName(user.GetUsername(), org.PrimaryDomain, orgPolicy.UserLoginMustBeDomain)
 	if accountName == "" {
-		accountName = user.EmailAddress
+		accountName = string(user.EmailAddress)
 	}
 	webAuthN, err := c.webauthnConfig.BeginRegistration(ctx, user, accountName, authenticatorPlatform, userVerification, isLoginUI, tokens...)
 	if err != nil {

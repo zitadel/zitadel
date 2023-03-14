@@ -94,10 +94,9 @@ func TestFormatPhoneNumber(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.phone.formatPhone()
-
-			if tt.errFunc == nil && tt.result.PhoneNumber != tt.args.phone.PhoneNumber {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.args.phone.PhoneNumber, tt.result.PhoneNumber)
+			normalized, err := tt.args.phone.PhoneNumber.Normalize()
+			if tt.errFunc == nil && tt.result.PhoneNumber != normalized {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.PhoneNumber, normalized)
 			}
 			if tt.errFunc != nil && !tt.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
