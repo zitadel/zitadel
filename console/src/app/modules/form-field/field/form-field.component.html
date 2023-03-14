@@ -5,7 +5,6 @@
     <ng-content select="cnslSuffix"></ng-content>
   </div>
   <div *ngIf="help$ && help$ | async as help">
-    {{ help | json }}
     <div [ngSwitch]="help.type" class="cnsl-form-field-subscript-wrapper">
       <div *ngSwitchCase="'hints'" class="cnsl-form-field-hint-wrapper"
         [@transitionMessages]="_subscriptAnimationState">

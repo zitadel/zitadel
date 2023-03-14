@@ -163,7 +163,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
     const childrenErrors$: Observable<boolean> = this._errorChildren.changes.pipe(
       map(() => {
-        console.log('childrenErrors$ length', this._errorChildren.length)
         return this._errorChildren.length > 0
       }),
       startWith(false)
@@ -171,24 +170,18 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
     this.help$ = combineLatest([validationErrors$, childrenErrors$]).pipe(
       map(combined => {
-        console.log("combined", combined)
-        return combined[0].length > 1 ? {
-        type: 'errors',
-        validationErrors: combined[0]
-      } : combined[1] ? {
-        type: 'errors'
-      } : {
-        type: 'hints'
-      }})
+        return combined[0].length >= 1 ? <Help>{
+          type: 'errors',
+          validationErrors: combined[0]
+        } : combined[1] ? <Help>{
+          type: 'errors'
+        } : <Help>{
+          type: 'hints',
+          validationErrors: undefined
+        }
+      }),
     )
     this._changeDetectorRef.markForCheck();
-    this._changeDetectorRef.detectChanges();
-
-    this.help$.subscribe(help => {
-      console.log("help", help)
-      this._changeDetectorRef.markForCheck();
-      this._changeDetectorRef.detectChanges();
-    })
   }
 
   private currentValidationErrors(): Array<ValidationError> {
