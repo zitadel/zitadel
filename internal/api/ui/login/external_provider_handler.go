@@ -60,28 +60,28 @@ type externalNotFoundOptionData struct {
 	ShowUsername               bool
 	ShowUsernameSuffix         bool
 	OrgRegister                bool
-	ExternalEmail              string
+	ExternalEmail              domain.EmailAddress
 	ExternalEmailVerified      bool
-	ExternalPhone              string
+	ExternalPhone              domain.PhoneNumber
 	ExternalPhoneVerified      bool
 }
 
 type externalRegisterFormData struct {
-	ExternalIDPConfigID    string `schema:"external-idp-config-id"`
-	ExternalIDPExtUserID   string `schema:"external-idp-ext-user-id"`
-	ExternalIDPDisplayName string `schema:"external-idp-display-name"`
-	ExternalEmail          string `schema:"external-email"`
-	ExternalEmailVerified  bool   `schema:"external-email-verified"`
-	Email                  string `schema:"email"`
-	Username               string `schema:"username"`
-	Firstname              string `schema:"firstname"`
-	Lastname               string `schema:"lastname"`
-	Nickname               string `schema:"nickname"`
-	ExternalPhone          string `schema:"external-phone"`
-	ExternalPhoneVerified  bool   `schema:"external-phone-verified"`
-	Phone                  string `schema:"phone"`
-	Language               string `schema:"language"`
-	TermsConfirm           bool   `schema:"terms-confirm"`
+	ExternalIDPConfigID    string              `schema:"external-idp-config-id"`
+	ExternalIDPExtUserID   string              `schema:"external-idp-ext-user-id"`
+	ExternalIDPDisplayName string              `schema:"external-idp-display-name"`
+	ExternalEmail          domain.EmailAddress `schema:"external-email"`
+	ExternalEmailVerified  bool                `schema:"external-email-verified"`
+	Email                  domain.EmailAddress `schema:"email"`
+	Username               string              `schema:"username"`
+	Firstname              string              `schema:"firstname"`
+	Lastname               string              `schema:"lastname"`
+	Nickname               string              `schema:"nickname"`
+	ExternalPhone          domain.PhoneNumber  `schema:"external-phone"`
+	ExternalPhoneVerified  bool                `schema:"external-phone-verified"`
+	Phone                  domain.PhoneNumber  `schema:"phone"`
+	Language               string              `schema:"language"`
+	TermsConfirm           bool                `schema:"terms-confirm"`
 }
 
 // handleExternalLoginStep is called as nextStep
@@ -815,7 +815,7 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 		IDPConfigID:       formData.ExternalIDPConfigID,
 		ExternalUserID:    formData.ExternalIDPExtUserID,
 		PreferredUsername: formData.Username,
-		DisplayName:       formData.Email,
+		DisplayName:       string(formData.Email),
 		FirstName:         formData.Firstname,
 		LastName:          formData.Lastname,
 		NickName:          formData.Nickname,
