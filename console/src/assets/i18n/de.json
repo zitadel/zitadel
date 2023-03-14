@@ -1637,6 +1637,10 @@
       "GITHUB": {
         "TITLE": "Github Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Github-Identitätsprovider ein."
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Microsoft-Identitätsprovider ein."
       }
     },
     "DETAIL": {
@@ -1669,6 +1673,14 @@
       "1": "aktiv",
       "2": "inaktiv"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Tenant Typ",
+    "AZUREADTENANTID": "Tenant ID",
+    "EMAILVERIFIED": "Email verifiziert",
     "NAMEHINT": "Wenn angegeben, wir er im Login interface angezeigt.",
     "OPTIONAL": "optional",
     "UPDATECLIENTSECRET": "Client Secret updaten",

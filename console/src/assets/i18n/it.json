@@ -1642,6 +1642,10 @@
       "GITHUB": {
         "TITLE": "Github Provider",
         "DESCRIPTION": "Inserisci i dati necessari per il tuo Github provider."
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Microsoft provider."
       }
     },
     "DETAIL": {
@@ -1674,6 +1678,14 @@
       "1": "attivo",
       "2": "inattivo"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Tipo tenant",
+    "AZUREADTENANTID": "tenant ID",
+    "EMAILVERIFIED": "Email verificata",
     "NAMEHINT": "Se specificato, verrà mostrato nell'interfaccia di accesso.",
     "OPTIONAL": "opzionale",
     "UPDATECLIENTSECRET": "Aggiorna secret",

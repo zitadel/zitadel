@@ -16,6 +16,11 @@
     <form [formGroup]="form" (ngSubmit)="submitForm()">
       <div class="azure-ad-content">
         <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="name" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientId" />
         </cnsl-form-field>
@@ -69,10 +74,20 @@
             </cnsl-form-field>
           </div>
 
+          <mat-checkbox formControlName="emailVerified">{{ 'IDP.EMAILVERIFIED' | translate }}</mat-checkbox>
+
           <cnsl-form-field class="formfield">
-            <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
-            <input cnslInput formControlName="name" />
-            <span class="name-hint cnsl-secondary-text" cnslHint>{{ 'IDP.NAMEHINT' | translate }}</span>
+            <cnsl-label>{{ 'IDP.AZUREADTENANTTYPE' | translate }}</cnsl-label>
+            <mat-select formControlName="tenantType">
+              <mat-option *ngFor="let type of tenantTypes" [value]="type">
+                {{ 'IDP.AZUREADTENANTTYPES.' + type | translate }}
+              </mat-option>
+            </mat-select>
+          </cnsl-form-field>
+
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.AZUREADTENANTID' | translate }}</cnsl-label>
+            <input cnslInput formControlName="tenantId" />
           </cnsl-form-field>
 
           <cnsl-provider-options

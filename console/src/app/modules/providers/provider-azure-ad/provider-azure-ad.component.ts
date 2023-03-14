@@ -6,15 +6,15 @@ import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import {
-  AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
+  AddAzureADProviderRequest as AdminAddAzureADProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
-  UpdateGoogleProviderRequest as AdminUpdateGoogleProviderRequest,
+  UpdateAzureADProviderRequest as AdminUpdateAzureADProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { AzureADTenant, AzureADTenantType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  AddGoogleProviderRequest as MgmtAddGoogleProviderRequest,
+  AddAzureADProviderRequest as MgmtAddAzureADProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
-  UpdateGoogleProviderRequest as MgmtUpdateGoogleProviderRequest,
+  UpdateAzureADProviderRequest as MgmtUpdateAzureADProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -43,6 +43,11 @@ export class ProviderAzureADComponent {
 
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
+  public tenantTypes = [
+    AzureADTenantType.AZURE_AD_TENANT_TYPE_COMMON,
+    AzureADTenantType.AZURE_AD_TENANT_TYPE_ORGANISATIONS,
+    AzureADTenantType.AZURE_AD_TENANT_TYPE_CONSUMERS,
+  ];
 
   constructor(
     private router: Router,
@@ -57,6 +62,9 @@ export class ProviderAzureADComponent {
       clientId: new FormControl('', [Validators.required]),
       clientSecret: new FormControl('', [Validators.required]),
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
+      tenantType: new FormControl<AzureADTenantType>(AzureADTenantType.AZURE_AD_TENANT_TYPE_COMMON),
+      tenantId: new FormControl<string>(''),
+      emailVerified: new FormControl(false),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -104,9 +112,11 @@ export class ProviderAzureADComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        if (this.provider?.config?.google) {
-          this.form.patchValue(this.provider.config.google);
+        if (this.provider?.config?.azureAd) {
+          this.form.patchValue(this.provider.config.azureAd);
           this.name?.setValue(this.provider.name);
+          this.tenantId?.setValue(this.provider.config.azureAd.tenant?.tenantId);
+          this.tenantType?.setValue(this.provider.config.azureAd.tenant?.tenantType);
         }
       })
       .catch((error) => {
@@ -116,22 +126,29 @@ export class ProviderAzureADComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGoogleProvider() : this.addGoogleProvider();
+    this.provider ? this.updateAzureADProvider() : this.addAzureADProvider();
   }
 
-  public addGoogleProvider(): void {
+  public addAzureADProvider(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGoogleProviderRequest();
+      const req = new MgmtAddAzureADProviderRequest();
 
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
+      req.setEmailVerified(this.emailVerified?.value);
+
+      const tenant = new AzureADTenant();
+      tenant.setTenantId(this.tenantId?.value);
+      tenant.setTenantType(this.tenantType?.value);
+      req.setTenant(tenant);
+
       req.setScopesList(this.scopesList?.value);
       req.setProviderOptions(this.options);
 
       this.loading = true;
       (this.service as ManagementService)
-        .addGoogleProvider(req)
+        .addAzureADProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -143,16 +160,23 @@ export class ProviderAzureADComponent {
           this.loading = false;
         });
     } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGoogleProviderRequest();
+      const req = new AdminAddAzureADProviderRequest();
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
+      req.setEmailVerified(this.emailVerified?.value);
+
+      const tenant = new AzureADTenant();
+      tenant.setTenantId(this.tenantId?.value);
+      tenant.setTenantType(this.tenantType?.value);
+      req.setTenant(tenant);
+
       req.setScopesList(this.scopesList?.value);
       req.setProviderOptions(this.options);
 
       this.loading = true;
       (this.service as AdminService)
-        .addGoogleProvider(req)
+        .addAzureADProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -166,13 +190,21 @@ export class ProviderAzureADComponent {
     }
   }
 
-  public updateGoogleProvider(): void {
+  public updateAzureADProvider(): void {
     if (this.provider) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGoogleProviderRequest();
+        const req = new MgmtUpdateAzureADProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
+        req.setEmailVerified(this.emailVerified?.value);
+
+        const tenant = new AzureADTenant();
+
+        tenant.setTenantId(this.tenantId?.value);
+        tenant.setTenantType(this.tenantType?.value);
+        req.setTenant(tenant);
+
         req.setScopesList(this.scopesList?.value);
         req.setProviderOptions(this.options);
 
@@ -182,7 +214,7 @@ export class ProviderAzureADComponent {
 
         this.loading = true;
         (this.service as ManagementService)
-          .updateGoogleProvider(req)
+          .updateAzureADProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
@@ -194,10 +226,17 @@ export class ProviderAzureADComponent {
             this.loading = false;
           });
       } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGoogleProviderRequest();
+        const req = new AdminUpdateAzureADProviderRequest();
         req.setId(this.provider.id);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
+        req.setEmailVerified(this.emailVerified?.value);
+
+        const tenant = new AzureADTenant();
+        tenant.setTenantId(this.tenantId?.value);
+        tenant.setTenantType(this.tenantType?.value);
+        req.setTenant(tenant);
+
         req.setScopesList(this.scopesList?.value);
         req.setProviderOptions(this.options);
 
@@ -207,7 +246,7 @@ export class ProviderAzureADComponent {
 
         this.loading = true;
         (this.service as AdminService)
-          .updateGoogleProvider(req)
+          .updateAzureADProvider(req)
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
@@ -264,5 +303,17 @@ export class ProviderAzureADComponent {
 
   public get scopesList(): AbstractControl | null {
     return this.form.get('scopesList');
+  }
+
+  public get emailVerified(): AbstractControl | null {
+    return this.form.get('emailVerified');
+  }
+
+  public get tenantId(): AbstractControl | null {
+    return this.form.get('tenantId');
+  }
+
+  public get tenantType(): AbstractControl | null {
+    return this.form.get('tenantType');
   }
 }
