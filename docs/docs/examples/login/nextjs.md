@@ -174,7 +174,7 @@ Note that the signIn method requires the id of our provider which is in our case
 
 To show user information, you can either use the idToken data, or call the userinfo endpoint.
 In this example, we call the userinfo endpoint to load user data.
-To implement the API you have to create a file under the `pages/api` folder, called `userinfo.ts`.
+To implement the API, you can create a file under the `pages/api` folder and call it `userinfo.ts`.
 The file should look like the following.
 
 ```ts reference
