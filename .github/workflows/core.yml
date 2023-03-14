@@ -101,7 +101,7 @@ jobs:
         tags: zitadel/core-alpine:${{ github.sha }}
 
   success:
-    name: check success
+    name: success
     runs-on: ubuntu-latest
     needs: [test, tidy, lint, build]
     steps:

@@ -28,7 +28,7 @@ jobs:
     - run: yarn lint
 
   build:
-    name: build and upload
+    name: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -62,7 +62,7 @@ jobs:
         tags: zitadel/console:${{ github.sha }} 
  
   success:
-    name: check success
+    name: success
     runs-on: ubuntu-latest
     needs: [lint, build]
     steps:
