@@ -30,8 +30,8 @@ class CnslFormFieldBase {
 }
 
 interface Help {
-  type: 'hints' | 'errors'
-  validationErrors?: Array<ValidationError>
+  type: 'hints' | 'errors';
+  validationErrors?: Array<ValidationError>;
 }
 interface ValidationError {
   i18nKey: string;
@@ -156,39 +156,47 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   private mapHelp(): void {
     let ctrl = this._control.ngControl?.control;
 
-    const validationErrors$: Observable<Array<ValidationError>> = this.disableValidationErrors ? of([]) :ctrl?.valueChanges?.pipe(
-      map(() => this.currentValidationErrors()),
-      startWith([])
-    ) || of([]);
+    const validationErrors$: Observable<Array<ValidationError>> = this.disableValidationErrors
+      ? of([])
+      : ctrl?.valueChanges?.pipe(
+          map(() => this.currentValidationErrors()),
+          startWith([]),
+        ) || of([]);
 
     const childrenErrors$: Observable<boolean> = this._errorChildren.changes.pipe(
       map(() => {
-        return this._errorChildren.length > 0
+        return this._errorChildren.length > 0;
       }),
-      startWith(false)
-    )
+      startWith(false),
+    );
 
     this.help$ = combineLatest([validationErrors$, childrenErrors$]).pipe(
-      map(combined => {
-        return combined[0].length >= 1 ? <Help>{
-          type: 'errors',
-          validationErrors: combined[0]
-        } : combined[1] ? <Help>{
-          type: 'errors'
-        } : <Help>{
-          type: 'hints',
-          validationErrors: undefined
-        }
+      map((combined) => {
+        return combined[0].length >= 1
+          ? <Help>{
+              type: 'errors',
+              validationErrors: combined[0],
+            }
+          : combined[1]
+          ? <Help>{
+              type: 'errors',
+            }
+          : <Help>{
+              type: 'hints',
+              validationErrors: undefined,
+            };
       }),
-    )
+    );
     this._changeDetectorRef.markForCheck();
   }
 
   private currentValidationErrors(): Array<ValidationError> {
-    return Object.entries(this._control.ngControl?.control?.errors || [])
+    return (
+      Object.entries(this._control.ngControl?.control?.errors || [])
         ?.filter(this.filterErrorsProperties)
         .map(this.mapToValidationError)
         .filter(this.distinctFilter) || []
+    );
   }
 
   private filterErrorsProperties(kv: [string, any]): boolean {

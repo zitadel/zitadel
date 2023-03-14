@@ -34,7 +34,7 @@ export function minLengthValidator(minLength: number): ValidatorFn {
   };
 }
 
-export function passwordConfirmValidator(passwordControlName: string = "password") {
+export function passwordConfirmValidator(passwordControlName: string = 'password') {
   return (c: AbstractControl): ValidationErrors | null => {
     if (!c.parent || !c) {
       return null;
@@ -57,8 +57,8 @@ function regexpValidator(c: AbstractControl, regexp: RegExp, i18nKey: string): V
 }
 
 function i18nErr(err: ValidationErrors | null | undefined, i18nKey: string, params?: any): ValidationErrors | null {
-  if (err === null){
-    return null
+  if (err === null) {
+    return null;
   } else {
     return {
       ...err,
