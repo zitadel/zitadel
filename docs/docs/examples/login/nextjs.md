@@ -86,7 +86,7 @@ ZitadelProvider({
 ...
 ```
 
-To request a refresh token, you have to overwrite the jwt callback, and add the `offline_access` scope.
+If you want to request a refresh token, you can overwrite the JWT callback and add the `offline_access` scope.
 
 ```ts
 ...
