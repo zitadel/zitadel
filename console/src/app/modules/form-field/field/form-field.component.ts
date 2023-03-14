@@ -10,6 +10,7 @@ import {
   HostListener,
   Inject,
   InjectionToken,
+  Input,
   OnDestroy,
   QueryList,
   ViewChild,
@@ -17,12 +18,10 @@ import {
 } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { MatLegacyFormFieldControl as MatFormFieldControl } from '@angular/material/legacy-form-field';
-import { Observable, of, Subject } from 'rxjs';
-import { distinctUntilChanged, map, mergeMap, startWith, takeUntil } from 'rxjs/operators';
+import { combineLatest, map, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
 
 import { cnslFormFieldAnimations } from './animations';
 import { CnslErrorDirective, CNSL_ERROR } from '../error/error.directive';
-import { KeyValue, KeyValuePipe } from '@angular/common';
 
 export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslFormFieldComponent');
 
@@ -30,6 +29,10 @@ class CnslFormFieldBase {
   constructor(public _elementRef: ElementRef) {}
 }
 
+interface Help {
+  type: 'hints' | 'errors'
+  validationErrors?: Array<ValidationError>
+}
 interface ValidationError {
   i18nKey: string;
   params: any;
@@ -65,6 +68,8 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   @ViewChild('inputContainer') _inputContainerRef!: ElementRef;
   @ContentChild(MatFormFieldControl) _controlNonStatic!: MatFormFieldControl<any>;
   @ContentChild(MatFormFieldControl, { static: true }) _controlStatic!: MatFormFieldControl<any>;
+  @Input() public disableValidationErrors = false;
+
   get _control(): MatFormFieldControl<any> {
     return this._explicitFormFieldControl || this._controlNonStatic || this._controlStatic;
   }
@@ -74,7 +79,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
   private _explicitFormFieldControl!: MatFormFieldControl<any>;
   readonly stateChanges: Subject<void> = new Subject<void>();
-  public errori18nKeys$: Observable<Array<ValidationError>> = of([]);
+  public help$?: Observable<Help>;
 
   _subscriptAnimationState: string = '';
 
@@ -94,7 +99,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     @Inject(ElementRef)
     _labelOptions: // Use `ElementRef` here so Angular has something to inject.
     any,
-    private kvPipe: KeyValuePipe,
   ) {
     super(_elementRef);
   }
@@ -110,7 +114,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
   public ngAfterContentInit(): void {
     this._validateControlChild();
-    this.mapErrors();
+    this.mapHelp();
 
     const control = this._control;
     control.stateChanges.pipe(startWith(null)).subscribe(() => {
@@ -149,35 +153,59 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     }
   }
 
-  private mapErrors(): void {
+  private mapHelp(): void {
     let ctrl = this._control.ngControl?.control;
-    this.errori18nKeys$ =
-      ctrl?.valueChanges?.pipe(
-        mergeMap(() => ctrl?.statusChanges || of([])),
-        map(() => this.currentErrors()),
-        distinctUntilChanged(),
-      ) || of([]);
+
+    const validationErrors$: Observable<Array<ValidationError>> = this.disableValidationErrors ? of([]) :ctrl?.valueChanges?.pipe(
+      map(() => this.currentValidationErrors()),
+      startWith([])
+    ) || of([]);
+
+    const childrenErrors$: Observable<boolean> = this._errorChildren.changes.pipe(
+      map(() => {
+        console.log('childrenErrors$ length', this._errorChildren.length)
+        return this._errorChildren.length > 0
+      }),
+      startWith(false)
+    )
+
+    this.help$ = combineLatest([validationErrors$, childrenErrors$]).pipe(
+      map(combined => {
+        console.log("combined", combined)
+        return combined[0].length > 1 ? {
+        type: 'errors',
+        validationErrors: combined[0]
+      } : combined[1] ? {
+        type: 'errors'
+      } : {
+        type: 'hints'
+      }})
+    )
     this._changeDetectorRef.markForCheck();
+    this._changeDetectorRef.detectChanges();
+
+    this.help$.subscribe(help => {
+      console.log("help", help)
+      this._changeDetectorRef.markForCheck();
+      this._changeDetectorRef.detectChanges();
+    })
   }
 
-  private currentErrors(): Array<ValidationError> {
-    return (
-      this.kvPipe
-        .transform(this._control.ngControl?.control?.errors)
+  private currentValidationErrors(): Array<ValidationError> {
+    return Object.entries(this._control.ngControl?.control?.errors || [])
         ?.filter(this.filterErrorsProperties)
         .map(this.mapToValidationError)
         .filter(this.distinctFilter) || []
-    );
   }
 
-  private filterErrorsProperties(kv: KeyValue<unknown, unknown>): boolean {
-    return typeof kv.value == 'object' && (kv.value as { valid: boolean }).valid === false;
+  private filterErrorsProperties(kv: [string, any]): boolean {
+    return typeof kv[1] == 'object' && (kv[1] as { valid: boolean }).valid === false;
   }
 
-  private mapToValidationError(kv: KeyValue<unknown, unknown>): ValidationError {
+  private mapToValidationError(kv: [string, any]): ValidationError {
     return {
       i18nKey: 'ERRORS.INVALID_FORMAT',
-      ...(kv.value as ValidationError | any),
+      ...(kv[1] as ValidationError | any),
     };
   }
 
