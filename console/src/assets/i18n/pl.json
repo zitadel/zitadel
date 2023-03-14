@@ -244,7 +244,15 @@
       "TITLE": "Twój token autoryzacji wygasł.",
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
     },
-    "INVALID_FORMAT": "Format jest nieprawidłowy"
+    "INVALID_FORMAT": "Format jest nieprawidłowy.",
+    "NOTANEMAIL": "Podana wartość nie jest adresem e-mail.",
+    "MINLENGTH": "Musi mieć co najmniej {{requiredLength}} znaków.",
+    "UPPERCASEMISSING": "Musi zawierać wielką literę.",
+    "LOWERCASEMISSING": "Musi zawierać małą literę.",
+    "SYMBOLERROR": "Musi zawierać symbol lub znak interpunkcyjny.",
+    "NUMBERERROR": "Musi zawierać cyfrę.",
+    "PWNOTEQUAL": "Podane hasła nie są identyczne.",
+    "PHONE": "Numer telefonu musi zaczynać się od 00 lub +."
   },
   "USER": {
     "SETTINGS": {
@@ -525,8 +533,7 @@
       "SET": "Ustaw nowe hasło",
       "RESENDNOTIFICATION": "Wyślij link resetowania hasła",
       "REQUIRED": "Brakuje niektórych wymaganych pól.",
-      "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków.",
-      "NOTEQUAL": "Podane hasła nie są identyczne."
+      "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -579,17 +586,6 @@
         "2": "filtruj po nazwie projektu",
         "3": "filtruj po roli"
       }
-    },
-    "VALIDATION": {
-      "INVALIDPATTERN": "Hasło nie spełnia określonych reguł.",
-      "NOTANEMAIL": "Podana wartość nie jest adresem e-mail",
-      "REQUIRED": "Pole jest puste.",
-      "MINLENGTH": "Hasło musi mieć co najmniej {{requiredLength}} znaków.",
-      "NOEMAIL": "Nazwa użytkownika nie może być adresem e-mail.",
-      "UPPERCASEMISSING": "Musi zawierać wielką literę.",
-      "LOWERCASEMISSING": "Musi zawierać małą literę.",
-      "SYMBOLERROR": "Musi zawierać symbol lub znak interpunkcyjny.",
-      "NUMBERERROR": "Musi zawierać cyfrę."
     },
     "STATE": {
       "0": "Nieznany",

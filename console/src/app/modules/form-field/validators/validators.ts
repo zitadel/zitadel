@@ -1,19 +1,19 @@
 import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 
 export function containsSymbolValidator(c: AbstractControl): ValidationErrors | null {
-  return regexpValidator(c, /[^a-z0-9]/gi, "ERRORS.CONTAINSSYMBOL")
+  return regexpValidator(c, /[^a-z0-9]/gi, "ERRORS.SYMBOLERROR")
 }
 
 export function containsNumberValidator(c: AbstractControl): ValidationErrors | null {
-  return regexpValidator(c, /[0-9]/g, "ERRORS.CONTAINSNUMBER")
+  return regexpValidator(c, /[0-9]/g, "ERRORS.NUMBERERROR")
 }
 
 export function containsUpperCaseValidator(c: AbstractControl): ValidationErrors | null {
-  return regexpValidator(c, /[A-Z]/g, "ERRORS.CONTAINSUPPERCASE")
+  return regexpValidator(c, /[A-Z]/g, "ERRORS.UPPERCASEMISSING")
 }
 
 export function containsLowerCaseValidator(c: AbstractControl): ValidationErrors | null {
-  return regexpValidator(c, /[a-z]/g, "ERRORS.CONTAINSLOWERCASE")
+  return regexpValidator(c, /[a-z]/g, "ERRORS.LOWERCASEMISSING")
 }
 
 export function phoneValidator(c: AbstractControl): ValidationErrors | null {
@@ -26,7 +26,7 @@ export function requiredValidator(c: AbstractControl): ValidationErrors | null {
 
 
 export function emailValidator(c: AbstractControl): ValidationErrors | null {
-  return i18nErr(Validators.email(c), "ERRORS.EMAIL");
+  return i18nErr(Validators.email(c), "ERRORS.NOTANEMAIL");
 }
 
 export function minLengthValidator(minLength: number): ValidatorFn {
@@ -47,7 +47,7 @@ export function passwordConfirmValidator(passwordControlName: string){
       return null;
     }
     if (pwd.value !== cpwd.value) {
-      return i18nErr(null, 'USER.PASSWORD.NOTEQUAL')
+      return i18nErr(null, 'ERRORS.PWNOTEQUAL')
     }
     return null
   }

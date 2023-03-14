@@ -244,7 +244,15 @@
       "TITLE": "Il tuo Access Token \u00e8 scaduto.",
       "DESCRIPTION": "Clicca il pulsante per richiedere una nuova sessione."
     },
-    "INVALID_FORMAT": "Il formato non è valido"
+    "INVALID_FORMAT": "Il formato non è valido.",
+    "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail.",
+    "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
+    "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
+    "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
+    "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
+    "NUMBERERROR": "Deve includere una cifra.",
+    "PWNOTEQUAL": "Le password fornite non corrispondono.",
+    "PHONE": "Il numero di telefono deve iniziare con 00 o +."
   },
   "USER": {
     "SETTINGS": {
@@ -525,8 +533,7 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
-      "NOTEQUAL": "Le password fornite non corrispondono."
+      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -579,17 +586,6 @@
         "2": "filtro per projectname",
         "3": "filtro per rolename"
       }
-    },
-    "VALIDATION": {
-      "INVALIDPATTERN": "La password non soddisfa le regole definite.",
-      "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail",
-      "REQUIRED": "Il campo di input \u00e8 vuoto.",
-      "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
-      "NOEMAIL": "Il nome utente non pu\u00f2 essere un indirizzo e-mail.",
-      "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
-      "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
-      "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
-      "NUMBERERROR": "Deve includere una cifra."
     },
     "STATE": {
       "0": "Sconosciuto",
