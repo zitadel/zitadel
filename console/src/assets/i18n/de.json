@@ -1015,10 +1015,11 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
-      "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1207,10 +1208,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -2014,10 +2016,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

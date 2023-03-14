@@ -1016,10 +1016,11 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
-      "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1208,10 +1209,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -2016,10 +2018,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",
