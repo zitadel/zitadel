@@ -20,6 +20,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
@@ -51,12 +52,12 @@ export class ProviderGithubESComponent {
     breadcrumbService: BreadcrumbService,
   ) {
     this.form = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      clientId: new UntypedFormControl('', [Validators.required]),
-      clientSecret: new UntypedFormControl('', [Validators.required]),
-      authorizationEndpoint: new UntypedFormControl('', [Validators.required]),
-      tokenEndpoint: new UntypedFormControl('', [Validators.required]),
-      userEndpoint: new UntypedFormControl('', [Validators.required]),
+      name: new UntypedFormControl('', [requiredValidator]),
+      clientId: new UntypedFormControl('', [requiredValidator]),
+      clientSecret: new UntypedFormControl('', [requiredValidator]),
+      authorizationEndpoint: new UntypedFormControl('', [requiredValidator]),
+      tokenEndpoint: new UntypedFormControl('', [requiredValidator]),
+      userEndpoint: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
 
