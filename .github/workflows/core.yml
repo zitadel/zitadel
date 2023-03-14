@@ -76,15 +76,6 @@ jobs:
         sha256sum: true
         build_command: make build
         asset_name: zitadel-core-${{ matrix.goos }}/${{ matrix.goarch }}
-
-  container:
-    runs-on: ubuntu-latest
-    needs: [build]
-    strategy:
-      matrix:
-        container-os: [scratch, alpine]
-    steps:
-      - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v2
       - uses: docker/setup-buildx-action@v2
         # uses: docker/login-action@v2
@@ -93,16 +84,25 @@ jobs:
         #   username: ${{ github.actor }}
         #   password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v4
+        if: ${{ goos.linux }}
         with:
           context: .
-          file: build/${{ matrix.container-os }}
-          platforms: linux/amd64,linux/arm64
+          file: build/core/scratch
+          platforms: ${{ matrix.goos }}/${{ matrix.goarch }}
           push: false
-          tags: zitadel/core-${{ matrix.container-os }}:${{ github.sha }}
+          tags: zitadel/core-scratch:${{ github.sha }}
+      - uses: docker/build-push-action@v4
+        if: ${{ goos.linux }}
+        with:
+          context: .
+          file: build/core/alpine
+          platforms: ${{ matrix.goos }}/${{ matrix.goarch }}
+          push: false
+          tags: zitadel/core-alpine:${{ github.sha }}
 
   success:
     name: check success
     runs-on: ubuntu-latest
-    needs: [test, tidy, lint, build, container]
+    needs: [test, tidy, lint, build]
     steps:
     - run: echo "core sucessful built"
