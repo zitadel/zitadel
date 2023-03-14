@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { AccessTokenType, Human, Machine } from 'src/app/proto/generated/zitadel/user_pb';

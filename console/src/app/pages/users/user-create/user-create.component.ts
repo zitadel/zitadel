@@ -15,14 +15,14 @@ import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/c
 import { formatPhone } from 'src/app/utils/formatPhone';
 import {
   containsLowerCaseValidator,
-  minLengthValidator,
   containsNumberValidator,
-  phoneValidator,
-  requiredValidator,
   containsSymbolValidator,
   containsUpperCaseValidator,
   emailValidator,
+  minLengthValidator,
   passwordConfirmValidator,
+  phoneValidator,
+  requiredValidator,
 } from '../../../modules/form-field/validators/validators';
 
 @Component({

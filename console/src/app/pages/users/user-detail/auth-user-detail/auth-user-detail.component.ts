@@ -1,12 +1,14 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
+import { Validators } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
 import { Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
@@ -22,8 +24,6 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
-import { Validators } from '@angular/forms';
-import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
