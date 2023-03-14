@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Subscription } from 'rxjs';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Gender, Human, Profile } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
@@ -30,11 +31,11 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
 
   constructor(private fb: UntypedFormBuilder, private dialog: MatDialog) {
     this.profileForm = this.fb.group({
-      userName: [{ value: '', disabled: true }, [Validators.required]],
-      firstName: [{ value: '', disabled: this.disabled }, Validators.required],
-      lastName: [{ value: '', disabled: this.disabled }, Validators.required],
+      userName: [{ value: '', disabled: true }, [requiredValidator]],
+      firstName: [{ value: '', disabled: this.disabled }, requiredValidator],
+      lastName: [{ value: '', disabled: this.disabled }, requiredValidator],
       nickName: [{ value: '', disabled: this.disabled }],
-      displayName: [{ value: '', disabled: this.disabled }, Validators.required],
+      displayName: [{ value: '', disabled: this.disabled }, requiredValidator],
       gender: [{ value: 0, disabled: this.disabled }],
       preferredLanguage: [{ value: '', disabled: this.disabled }],
     });
@@ -42,11 +43,11 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
 
   public ngOnChanges(): void {
     this.profileForm = this.fb.group({
-      userName: [{ value: '', disabled: true }, [Validators.required]],
-      firstName: [{ value: '', disabled: this.disabled }, Validators.required],
-      lastName: [{ value: '', disabled: this.disabled }, Validators.required],
+      userName: [{ value: '', disabled: true }, [requiredValidator]],
+      firstName: [{ value: '', disabled: this.disabled }, requiredValidator],
+      lastName: [{ value: '', disabled: this.disabled }, requiredValidator],
       nickName: [{ value: '', disabled: this.disabled }],
-      displayName: [{ value: '', disabled: this.disabled }, Validators.required],
+      displayName: [{ value: '', disabled: this.disabled }, requiredValidator],
       gender: [{ value: 0, disabled: this.disabled }],
       preferredLanguage: [{ value: '', disabled: this.disabled }],
     });
