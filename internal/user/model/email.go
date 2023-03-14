@@ -21,10 +21,6 @@ type EmailCode struct {
 	Expiry time.Duration
 }
 
-func (e *Email) IsValid() bool {
-	return e.EmailAddress != ""
-}
-
 func (e *Email) GenerateEmailCodeIfNeeded(emailGenerator crypto.Generator) (*EmailCode, error) {
 	var emailCode *EmailCode
 	if e.IsEmailVerified {
