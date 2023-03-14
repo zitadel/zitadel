@@ -1,3 +1,4 @@
+import { APP_BASE_HREF } from '@angular/common';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
@@ -129,6 +130,10 @@ const authConfig: AuthConfig = {
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
   ],
   providers: [
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/' + (window.location.pathname.split('/')[1] || '')
+    },
     AuthGuard,
     RoleGuard,
     UserGuard,

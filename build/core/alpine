@@ -1,0 +1,11 @@
+#######################
+## Final Production Image
+#######################
+FROM alpine:3 as artifact
+COPY zitadel-core-$TARGETPLATFORM /app/zitadel
+RUN adduser -D zitadel && \
+    chown zitadel /app/zitadel && \
+    chmod +x /app/zitadel
+USER zitadel
+HEALTHCHECK NONE
+ENTRYPOINT ["/zitadel"]
