@@ -331,6 +331,9 @@ func LDAPAttributesToCommand(attributes *idp_pb.LDAPAttributes) idp.LDAPAttribut
 }
 
 func AzureADTenantToCommand(tenant *idp_pb.AzureADTenant) string {
+	if tenant == nil {
+		return string(azuread.CommonTenant)
+	}
 	switch t := tenant.Type.(type) {
 	case *idp_pb.AzureADTenant_TenantType:
 		return string(azureADTenantTypeToCommand(t.TenantType))

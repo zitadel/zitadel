@@ -802,6 +802,8 @@ func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) 
 			wm.IDPRemoveWriteModel.AppendEvents(&e.OIDCIDPAddedEvent)
 		case *instance.JWTIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.JWTIDPAddedEvent)
+		case *instance.AzureADIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.AzureADIDPAddedEvent)
 		case *instance.GitHubIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubIDPAddedEvent)
 		case *instance.GitHubEnterpriseIDPAddedEvent:
@@ -836,6 +838,7 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.OAuthIDPAddedEventType,
 			instance.OIDCIDPAddedEventType,
 			instance.JWTIDPAddedEventType,
+			instance.AzureADIDPAddedEventType,
 			instance.GitHubIDPAddedEventType,
 			instance.GitHubEnterpriseIDPAddedEventType,
 			instance.GitLabIDPAddedEventType,
