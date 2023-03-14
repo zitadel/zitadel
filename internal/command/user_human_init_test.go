@@ -289,7 +289,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ResendInitialMail(tt.args.ctx, tt.args.userID, tt.args.email, tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.ResendInitialMail(tt.args.ctx, tt.args.userID, domain.EmailAddress(tt.args.email), tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
