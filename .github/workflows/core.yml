@@ -27,6 +27,7 @@ jobs:
   tidy:
     name: tidy
     runs-on: ubuntu-latest
+    needs: [grpc]
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
@@ -42,6 +43,7 @@ jobs:
   lint:
     name: lint
     runs-on: ubuntu-latest
+    needs: [grpc]
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
