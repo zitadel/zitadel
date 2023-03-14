@@ -42,6 +42,11 @@
               <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
               Google
             </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB">
+              <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="github" />
+              <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="github" />
+              GitHub
+            </div>
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OIDC">
               <mat-icon class="idp-icon" svgIcon="mdi_openid" alt="oidc" />
               Generic OIDC
@@ -53,6 +58,11 @@
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_JWT">
               <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
               Generic JWT
+            </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB_ES">
+              <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="github" />
+              <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="github" />
+              GitHub Enterprise Server
             </div>
             <div class="idp-table-provider-type" *ngSwitchDefault>coming soon</div>
           </div>
