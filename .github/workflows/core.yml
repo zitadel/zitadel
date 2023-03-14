@@ -9,6 +9,21 @@ on:
 
 jobs:
 
+  grpc:
+    name: generate grpc stub
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ inputs.go_version }}
+        cache-dependency-path: go.sum
+    - run: make grpc
+    - uses: actions/upload-artifact@v3
+      with:
+        name: core-grpc-stub
+        path: .artifacts/grpc/go-client
+
   tidy:
     name: tidy
     runs-on: ubuntu-latest
@@ -17,15 +32,30 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
-    - run: go mod tidy
-  
+    - uses: actions/download-artifact@v3
+      with:
+        name: core-grpc-stub
+        path: .artifacts/grpc/go-client
+    - run: make grpc_copy
+    - run: make tidy
+
   lint:
     name: lint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: bufbuild/buf-setup-action@v1
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
-    - run: go version
+    - name: linting
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: v1.50.1
+        only-new-issues: true
+        skip-pkg-cache: true
+    - uses: actions/download-artifact@v3
+      with:
+        name: core-grpc-stub
+        path: .artifacts/grpc/go-client
+    - run: make grpc_copy
+    - run: make lint
