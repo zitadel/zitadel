@@ -91,37 +91,6 @@ func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) (*query.User
 	}, nil
 }
 
-func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human {
-	h := &domain.Human{
-		Username: req.UserName,
-	}
-	preferredLanguage, err := language.Parse(req.Profile.PreferredLanguage)
-	logging.Log("MANAG-M029f").OnError(err).Debug("language malformed")
-	h.Profile = &domain.Profile{
-		FirstName:         req.Profile.FirstName,
-		LastName:          req.Profile.LastName,
-		NickName:          req.Profile.NickName,
-		DisplayName:       req.Profile.DisplayName,
-		PreferredLanguage: preferredLanguage,
-		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
-	}
-	h.Email = &domain.Email{
-		EmailAddress:    req.Email.Email,
-		IsEmailVerified: req.Email.IsEmailVerified,
-	}
-	if req.Phone != nil {
-		h.Phone = &domain.Phone{
-			PhoneNumber:     req.Phone.Phone,
-			IsPhoneVerified: req.Phone.IsPhoneVerified,
-		}
-	}
-	if req.InitialPassword != "" {
-		h.Password = &domain.Password{SecretString: req.InitialPassword, ChangeRequired: true}
-	}
-
-	return h
-}
-
 func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool, links []*domain.UserIDPLink) {
 	human = &domain.Human{
 		Username: req.UserName,
@@ -137,12 +106,12 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
 	}
 	human.Email = &domain.Email{
-		EmailAddress:    req.Email.Email,
+		EmailAddress:    domain.EmailAddress(req.Email.Email),
 		IsEmailVerified: req.Email.IsEmailVerified,
 	}
 	if req.Phone != nil {
 		human.Phone = &domain.Phone{
-			PhoneNumber:     req.Phone.Phone,
+			PhoneNumber:     domain.PhoneNumber(req.Phone.Phone),
 			IsPhoneVerified: req.Phone.IsPhoneVerified,
 		}
 	}
@@ -199,7 +168,7 @@ func UpdateHumanEmailRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateHum
 			AggregateID:   req.UserId,
 			ResourceOwner: authz.GetCtxData(ctx).OrgID,
 		},
-		EmailAddress:    req.Email,
+		EmailAddress:    domain.EmailAddress(req.Email),
 		IsEmailVerified: req.IsEmailVerified,
 	}
 }
@@ -207,7 +176,7 @@ func UpdateHumanEmailRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateHum
 func UpdateHumanPhoneRequestToDomain(req *mgmt_pb.UpdateHumanPhoneRequest) *domain.Phone {
 	return &domain.Phone{
 		ObjectRoot:      models.ObjectRoot{AggregateID: req.UserId},
-		PhoneNumber:     req.Phone,
+		PhoneNumber:     domain.PhoneNumber(req.Phone),
 		IsPhoneVerified: req.IsPhoneVerified,
 	}
 }

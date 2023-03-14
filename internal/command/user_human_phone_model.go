@@ -14,7 +14,7 @@ import (
 type HumanPhoneWriteModel struct {
 	eventstore.WriteModel
 
-	Phone           string
+	Phone           domain.PhoneNumber
 	IsPhoneVerified bool
 
 	Code             *crypto.CryptoValue
@@ -107,7 +107,7 @@ func (wm *HumanPhoneWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *HumanPhoneWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	phone string,
+	phone domain.PhoneNumber,
 ) (*user.HumanPhoneChangedEvent, bool) {
 	changedEvent := user.NewHumanPhoneChangedEvent(ctx, aggregate, phone)
 	return changedEvent, phone != wm.Phone
