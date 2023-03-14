@@ -48,5 +48,6 @@ jobs:
     - uses: bufbuild/buf-push-action@v1
       with:
         buf_token: ${{ secrets.buf_token }}
+        input: proto
         ## Currently no tags are supported in the action https://github.com/bufbuild/buf-push-action/issues/20
         draft: ${{ github.ref_name != 'main'}}

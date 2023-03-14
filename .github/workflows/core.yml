@@ -17,7 +17,7 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
-    - run: go tidy
+    - run: go mod tidy
   
   lint:
     name: lint
