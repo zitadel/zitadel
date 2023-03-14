@@ -30,6 +30,11 @@ class CnslFormFieldBase {
   constructor(public _elementRef: ElementRef) {}
 }
 
+interface ValidationError {
+  i18nKey: string
+  params: any
+}
+
 @Component({
   selector: 'cnsl-form-field',
   templateUrl: './form-field.component.html',
@@ -66,9 +71,10 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   set _control(value: MatFormFieldControl<any>) {
     this._explicitFormFieldControl = value;
   }
+
   private _explicitFormFieldControl!: MatFormFieldControl<any>;
   readonly stateChanges: Subject<void> = new Subject<void>();
-  public errori18nKeys$: Observable<Array<string>> = of([]);
+  public errori18nKeys$: Observable<Array<ValidationError>> = of([]);
 
   _subscriptAnimationState: string = '';
 
@@ -153,29 +159,29 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     this._changeDetectorRef.markForCheck()
   }
 
-  private currentErrors(): Array<string> {
+  private currentErrors(): Array<ValidationError> {
     return (
       this.kvPipe
         .transform(this._control.ngControl?.control?.errors)
         ?.filter(this.filterErrorsProperties)
-        .map(this.mapErrorToI18nKey)
+        .map(this.mapToValidationError)
         .filter(this.distinctFilter) || []
     );
   }
 
   private filterErrorsProperties(kv: KeyValue<unknown, unknown>): boolean {
-    console.log("filterErrorsProperties", kv)
     return typeof kv.value == "object" && (kv.value as {valid: boolean}).valid === false
   }
 
-  private mapErrorToI18nKey(kv: KeyValue<unknown, unknown>): string {
-    console.log("mapErrorToI18nKey", kv)
-    return (kv.value as { i18nKey: string }).i18nKey || 'ERRORS.INVALID_FORMAT';
+  private mapToValidationError(kv: KeyValue<unknown, unknown>): ValidationError {
+    return {
+      i18nKey: 'ERRORS.INVALID_FORMAT',
+      ...kv.value as ValidationError | any,
+    }
   }
 
-  private distinctFilter(item: string, index: number, arr: Array<string>): boolean {
-    console.log("distinctFilter", arr)
-    return arr.indexOf(item) === index;
+  private distinctFilter(_: ValidationError, index: number, arr: Array<ValidationError>): boolean {
+    return arr.findIndex(item => item.i18nKey) === index;
   }
 
 

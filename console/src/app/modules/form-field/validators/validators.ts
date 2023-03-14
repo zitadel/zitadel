@@ -31,7 +31,7 @@ export function emailValidator(c: AbstractControl): ValidationErrors | null {
 
 export function minLengthValidator(minLength: number): ValidatorFn {
   return (c: AbstractControl): ValidationErrors | null  => {
-    return i18nErr(Validators.minLength(minLength)(c), 'ERRORS.MINLENGTH');
+    return i18nErr(Validators.minLength(minLength)(c), 'ERRORS.MINLENGTH', {requiredLength: minLength})
   }
 }
 
@@ -56,10 +56,10 @@ export function passwordConfirmValidator(passwordControlName: string){
 function regexpValidator(c: AbstractControl, regexp: RegExp, i18nKey: string): ValidationErrors | null {
   return !c.value || regexp.test(c.value)
   ? null
-  : i18nErr({invalid: true}, i18nKey)
+  : i18nErr({invalid: true}, i18nKey, {regexp: regexp})
 }
 
-function i18nErr(err: ValidationErrors | null, i18nKey: string): ValidationErrors | null{
+function i18nErr(err: ValidationErrors | null, i18nKey: string, params?: any): ValidationErrors | null{
   if (err) {
     err = {
       ...err,
@@ -67,6 +67,7 @@ function i18nErr(err: ValidationErrors | null, i18nKey: string): ValidationError
       [i18nKey.toLowerCase().replaceAll(".","")]: {
         valid: false,
         i18nKey: i18nKey,
+        params: params
       },
     };
   }

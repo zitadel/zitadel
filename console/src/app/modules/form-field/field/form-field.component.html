@@ -13,7 +13,7 @@
       <div class="cnsl-form-field-error-wrapper" *ngIf="errs.length > 0"
         [@transitionMessages]="_subscriptAnimationState">
         <span cnslError *ngFor="let err of errs">
-          {{ err | translate }}
+          {{ err.i18nKey | translate : err.params }}
         </span>
       </div>
     </div>
