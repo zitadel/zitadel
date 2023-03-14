@@ -296,6 +296,48 @@ func (s *Server) UpdateGitHubEnterpriseServerProvider(ctx context.Context, req *
 	}, nil
 }
 
+func (s *Server) AddGitLabProvider(ctx context.Context, req *mgmt_pb.AddGitLabProviderRequest) (*mgmt_pb.AddGitLabProviderResponse, error) {
+	id, details, err := s.command.AddOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitLabProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddGitLabProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitLabProvider(ctx context.Context, req *mgmt_pb.UpdateGitLabProviderRequest) (*mgmt_pb.UpdateGitLabProviderResponse, error) {
+	details, err := s.command.UpdateOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitLabProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateGitLabProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitLabSelfHostedProvider(ctx context.Context, req *mgmt_pb.AddGitLabSelfHostedProviderRequest) (*mgmt_pb.AddGitLabSelfHostedProviderResponse, error) {
+	id, details, err := s.command.AddOrgGitLabSelfHostedProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitLabSelfHostedProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddGitLabSelfHostedProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitLabSelfHostedProvider(ctx context.Context, req *mgmt_pb.UpdateGitLabSelfHostedProviderRequest) (*mgmt_pb.UpdateGitLabSelfHostedProviderResponse, error) {
+	details, err := s.command.UpdateOrgGitLabSelfHostedProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitLabSelfHostedProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateGitLabSelfHostedProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddGoogleProvider(ctx context.Context, req *mgmt_pb.AddGoogleProviderRequest) (*mgmt_pb.AddGoogleProviderResponse, error) {
 	id, details, err := s.command.AddOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, addGoogleProviderToCommand(req))
 	if err != nil {

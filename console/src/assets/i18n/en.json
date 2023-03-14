@@ -1634,6 +1634,14 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Enter the credentials for your GitHub Enterprise Server Identity Provider"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Enter the credentials for your Github Identity Provider"
       }
     },
     "DETAIL": {
