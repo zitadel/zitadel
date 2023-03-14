@@ -420,6 +420,14 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		githubEnterpriseConfigToPb(providerConfig, config.GitHubEnterpriseIDPTemplate)
 		return providerConfig
 	}
+	if config.GitLabIDPTemplate != nil {
+		gitlabConfigToPb(providerConfig, config.GitLabIDPTemplate)
+		return providerConfig
+	}
+	if config.GitLabSelfHostedIDPTemplate != nil {
+		gitlabSelfHostedConfigToPb(providerConfig, config.GitLabSelfHostedIDPTemplate)
+		return providerConfig
+	}
 	if config.GoogleIDPTemplate != nil {
 		googleConfigToPb(providerConfig, config.GoogleIDPTemplate)
 		return providerConfig
@@ -439,6 +447,7 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 			TokenEndpoint:         template.TokenEndpoint,
 			UserEndpoint:          template.UserEndpoint,
 			Scopes:                template.Scopes,
+			IdAttribute:           template.IDAttribute,
 		},
 	}
 }
@@ -481,6 +490,25 @@ func githubEnterpriseConfigToPb(providerConfig *idp_pb.ProviderConfig, template 
 			TokenEndpoint:         template.TokenEndpoint,
 			UserEndpoint:          template.UserEndpoint,
 			Scopes:                template.Scopes,
+		},
+	}
+}
+
+func gitlabConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitLabIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Gitlab{
+		Gitlab: &idp_pb.GitLabConfig{
+			ClientId: template.ClientID,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func gitlabSelfHostedConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitLabSelfHostedIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_GitlabSelfHosted{
+		GitlabSelfHosted: &idp_pb.GitLabSelfHostedConfig{
+			ClientId: template.ClientID,
+			Issuer:   template.Issuer,
+			Scopes:   template.Scopes,
 		},
 	}
 }
