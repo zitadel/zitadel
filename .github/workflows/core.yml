@@ -84,7 +84,7 @@ jobs:
       #   username: ${{ github.actor }}
       #   password: ${{ secrets.GITHUB_TOKEN }}
     - uses: docker/build-push-action@v4
-      if: ${{ matrix.goos == "linux" }}
+      if: matrix.goos == 'linux'
       with:
         context: .
         file: build/core/scratch
@@ -92,7 +92,7 @@ jobs:
         push: false
         tags: zitadel/core-scratch:${{ github.sha }}
     - uses: docker/build-push-action@v4
-      if: ${{ matrix.goos == "linux" }}
+      if: matrix.goos == 'linux'
       with:
         context: .
         file: build/core/alpine
