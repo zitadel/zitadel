@@ -66,6 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, build]
     steps:
+    - uses: actions/checkout@v3
     - run: echo "console sucessful built"
 
 

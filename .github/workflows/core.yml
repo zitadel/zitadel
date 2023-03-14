@@ -105,4 +105,5 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, tidy, lint, build]
     steps:
+    - uses: actions/checkout@v3
     - run: echo "core sucessful built"
