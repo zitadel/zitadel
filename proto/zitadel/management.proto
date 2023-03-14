@@ -6551,7 +6551,7 @@ service ManagementService {
     // Change an existing Azure AD identity provider in the organisation
     rpc UpdateAzureADProvider(UpdateAzureADProviderRequest) returns (UpdateAzureADProviderResponse) {
         option (google.api.http) = {
-            post: "/idps/azure/{id}"
+            put: "/idps/azure/{id}"
             body: "*"
         };
 
