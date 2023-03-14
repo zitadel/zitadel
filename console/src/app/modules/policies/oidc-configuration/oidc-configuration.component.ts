@@ -12,6 +12,7 @@ import { OIDCSettings } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 @Component({
   selector: 'cnsl-oidc-configuration',
@@ -31,10 +32,10 @@ export class OIDCConfigurationComponent implements OnInit {
     private authService: GrpcAuthService,
   ) {
     this.form = this.fb.group({
-      accessTokenLifetime: [{ disabled: true }, [Validators.required]],
-      idTokenLifetime: [{ disabled: true }, [Validators.required]],
-      refreshTokenExpiration: [{ disabled: true }, [Validators.required]],
-      refreshTokenIdleExpiration: [{ disabled: true }, [Validators.required]],
+      accessTokenLifetime: [{ disabled: true }, [requiredValidator]],
+      idTokenLifetime: [{ disabled: true }, [requiredValidator]],
+      refreshTokenExpiration: [{ disabled: true }, [requiredValidator]],
+      refreshTokenIdleExpiration: [{ disabled: true }, [requiredValidator]],
     });
   }
 

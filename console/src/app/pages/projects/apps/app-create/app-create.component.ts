@@ -9,6 +9,7 @@ import { Buffer } from 'buffer';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import {
   APIAuthMethodType,
   OIDCAppType,
@@ -127,8 +128,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     private breadcrumbService: BreadcrumbService,
   ) {
     this.form = this.fb.group({
-      name: ['', [Validators.required]],
-      appType: ['', [Validators.required]],
+      name: ['', [requiredValidator]],
+      appType: ['', [requiredValidator]],
       // apptype OIDC
       responseTypesList: ['', []],
       grantTypesList: ['', []],
@@ -140,8 +141,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     this.initForm();
 
     this.firstFormGroup = this.fb.group({
-      name: ['', [Validators.required]],
-      appType: [WEB_TYPE, [Validators.required]],
+      name: ['', [requiredValidator]],
+      appType: [WEB_TYPE, [requiredValidator]],
     });
 
     this.samlConfigForm = this.fb.group({
@@ -192,7 +193,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     });
 
     this.secondFormGroup = this.fb.group({
-      authMethod: [this.authMethods[0].key, [Validators.required]],
+      authMethod: [this.authMethods[0].key, [requiredValidator]],
     });
 
     this.secondFormGroup.valueChanges.subscribe((form) => {
@@ -276,8 +277,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public setDevFormValidators(): void {
     if (this.isDevOIDC) {
-      const grantTypesControl = new UntypedFormControl('', [Validators.required]);
-      const responseTypesControl = new UntypedFormControl('', [Validators.required]);
+      const grantTypesControl = new UntypedFormControl('', [requiredValidator]);
+      const responseTypesControl = new UntypedFormControl('', [requiredValidator]);
 
       this.form.addControl('grantTypesList', grantTypesControl);
       this.form.addControl('responseTypesList', responseTypesControl);

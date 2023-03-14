@@ -7,27 +7,15 @@ import {
   containsNumberValidator,
   containsSymbolValidator,
   containsUpperCaseValidator,
+  minLengthValidator,
+  passwordConfirmValidator,
+  requiredValidator,
 } from 'src/app/modules/form-field/validators/validators';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
-function passwordConfirmValidator(c: AbstractControl): any {
-  if (!c.parent || !c) {
-    return;
-  }
-  const pwd = c.parent.get('password');
-  const cpwd = c.parent.get('confirmPassword');
-
-  if (!pwd || !cpwd) {
-    return;
-  }
-  if (pwd.value !== cpwd.value) {
-    return { invalid: true, notequal: 'Password is not equal' };
-  }
-}
 
 @Component({
   selector: 'cnsl-password',
@@ -81,7 +69,7 @@ export class PasswordComponent implements OnDestroy {
         });
       }
 
-      const validators: Validators[] = [Validators.required];
+      const validators: Validators[] = [requiredValidator];
       this.authService
         .getMyPasswordComplexityPolicy()
         .then((resp) => {
@@ -89,7 +77,7 @@ export class PasswordComponent implements OnDestroy {
             this.policy = resp.policy;
           }
           if (this.policy.minLength) {
-            validators.push(Validators.minLength(this.policy.minLength));
+            validators.push(minLengthValidator(this.policy.minLength));
           }
           if (this.policy.hasLowercase) {
             validators.push(containsLowerCaseValidator);
@@ -122,13 +110,13 @@ export class PasswordComponent implements OnDestroy {
     if (this.userId) {
       this.passwordForm = this.fb.group({
         password: ['', validators],
-        confirmPassword: ['', [...validators, passwordConfirmValidator]],
+        confirmPassword: ['', [...validators, passwordConfirmValidator('password')]],
       });
     } else {
       this.passwordForm = this.fb.group({
-        currentPassword: ['', Validators.required],
+        currentPassword: ['', requiredValidator],
         newPassword: ['', validators],
-        confirmPassword: ['', [...validators, passwordConfirmValidator]],
+        confirmPassword: ['', [...validators, passwordConfirmValidator('password')]],
       });
     }
   }

@@ -7,12 +7,11 @@ import { LabelModule } from 'src/app/modules/label/label.module';
 import { LabelComponent } from '../label/label.component';
 import { CnslErrorDirective } from './error/error.directive';
 import { CnslFormFieldComponent } from './field/form-field.component';
-import { I18nErrorsComponent } from './i18n-errors/i18n-errors.component';
 
 @NgModule({
-  declarations: [CnslFormFieldComponent, CnslErrorDirective, I18nErrorsComponent],
+  declarations: [CnslFormFieldComponent, CnslErrorDirective],
   imports: [CommonModule, MatRippleModule, LabelModule, TranslateModule],
-  exports: [CnslFormFieldComponent, LabelComponent, CnslErrorDirective, I18nErrorsComponent],
+  exports: [CnslFormFieldComponent, LabelComponent, CnslErrorDirective],
   providers: [KeyValuePipe],
 })
 export class FormFieldModule {}

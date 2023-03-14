@@ -4,13 +4,18 @@
     <ng-content></ng-content>
     <ng-content select="cnslSuffix"></ng-content>
   </div>
-  <div class="cnsl-form-field-subscript-wrapper">
-    <div class="cnsl-form-field-error-wrapper" [@transitionMessages]="_subscriptAnimationState">
-      <span *ngIf="errori18nKeys$">
-        <span cnslError *ngFor="let err of errori18nKeys$ | async">
+  <div *ngIf="errori18nKeys$ | async; let errs">
+    <div class="cnsl-form-field-subscript-wrapper">
+      <div class="cnsl-form-field-hint-wrapper" *ngIf="errs.length === 0"
+        [@transitionMessages]="_subscriptAnimationState">
+        <ng-content select="cnsl-hint"></ng-content>
+      </div>
+      <div class="cnsl-form-field-error-wrapper" *ngIf="errs.length > 0"
+        [@transitionMessages]="_subscriptAnimationState">
+        <span cnslError *ngFor="let err of errs">
           {{ err | translate }}
         </span>
-      </span>
+      </div>
     </div>
   </div>
 </div>

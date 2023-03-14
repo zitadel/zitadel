@@ -22,27 +22,9 @@ import {
   containsSymbolValidator,
   containsUpperCaseValidator,
   emailValidator,
+  passwordConfirmValidator,
 } from '../../../modules/form-field/validators/validators';
 
-function passwordConfirmValidator(c: AbstractControl): any {
-  if (!c.parent || !c) {
-    return;
-  }
-  const pwd = c.parent.get('password');
-  const cpwd = c.parent.get('confirmPassword');
-
-  if (!pwd || !cpwd) {
-    return;
-  }
-  if (pwd.value !== cpwd.value) {
-    return {
-      invalid: true,
-      notequal: {
-        valid: false,
-      },
-    };
-  }
-}
 
 @Component({
   selector: 'cnsl-user-create',
@@ -155,7 +137,7 @@ export class UserCreateComponent implements OnInit, OnDestroy {
           validators.push(containsSymbolValidator);
         }
         const pwdValidators = [...validators] as ValidatorFn[];
-        const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+        const confirmPwdValidators = [...validators, passwordConfirmValidator('password')] as ValidatorFn[];
 
         this.pwdForm = this.fb.group({
           password: ['', pwdValidators],

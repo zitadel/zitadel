@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
-import { phoneValidator } from 'src/app/modules/form-field/validators/validators';
+import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
@@ -463,7 +463,7 @@ export class UserDetailComponent implements OnInit {
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user.human?.phone?.phone,
             type: EditDialogType.PHONE,
-            validator: Validators.compose([phoneValidator, Validators.required]),
+            validator: Validators.compose([phoneValidator, requiredValidator]),
           },
           width: '400px',
         });

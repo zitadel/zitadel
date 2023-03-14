@@ -35,6 +35,24 @@ export function minLengthValidator(minLength: number): ValidatorFn {
   }
 }
 
+export function passwordConfirmValidator(passwordControlName: string){
+  return (c: AbstractControl): ValidationErrors | null => {
+    if (!c.parent || !c) {
+      return null;
+    }
+    const pwd = c.parent.get(passwordControlName);
+    const cpwd = c;
+
+    if (!pwd || !cpwd) {
+      return null;
+    }
+    if (pwd.value !== cpwd.value) {
+      return i18nErr(null, 'USER.PASSWORD.NOTEQUAL')
+    }
+    return null
+  }
+}
+
 function regexpValidator(c: AbstractControl, regexp: RegExp, i18nKey: string): ValidationErrors | null {
   return !c.value || regexp.test(c.value)
   ? null

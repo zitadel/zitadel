@@ -19,6 +19,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
@@ -83,11 +84,11 @@ export class ProviderJWTComponent {
     });
 
     this.form = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      headerName: new UntypedFormControl('', [Validators.required]),
-      issuer: new UntypedFormControl('', [Validators.required]),
-      jwtEndpoint: new UntypedFormControl('', [Validators.required]),
-      keysEndpoint: new UntypedFormControl('', [Validators.required]),
+      name: new UntypedFormControl('', [requiredValidator]),
+      headerName: new UntypedFormControl('', [requiredValidator]),
+      issuer: new UntypedFormControl('', [requiredValidator]),
+      jwtEndpoint: new UntypedFormControl('', [requiredValidator]),
+      keysEndpoint: new UntypedFormControl('', [requiredValidator]),
     });
   }
 

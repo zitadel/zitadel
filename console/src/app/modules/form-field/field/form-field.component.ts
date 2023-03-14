@@ -68,7 +68,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
   private _explicitFormFieldControl!: MatFormFieldControl<any>;
   readonly stateChanges: Subject<void> = new Subject<void>();
-  public errori18nKeys$?: Observable<Array<string>>;
+  public errori18nKeys$: Observable<Array<string>> = of([]);
 
   _subscriptAnimationState: string = '';
 
@@ -94,8 +94,6 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   public ngAfterViewInit(): void {
-    // Avoid animations on load.
-    this._subscriptAnimationState = 'enter';
     this._changeDetectorRef.detectChanges();
   }
 
@@ -106,7 +104,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
   public ngAfterContentInit(): void {
     this._validateControlChild();
-    this.defineI18nErrors()
+    this.mapErrors()
 
     const control = this._control;
     control.stateChanges.pipe(startWith(null)).subscribe(() => {
@@ -145,13 +143,14 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     }
   }
 
-  private defineI18nErrors(): void {
+  private mapErrors(): void {
     let ctrl = this._control.ngControl?.control
     this.errori18nKeys$ = ctrl?.valueChanges?.pipe(
       mergeMap(() => ctrl?.statusChanges || of([])),
       map(() => this.currentErrors()),
       distinctUntilChanged(),
     ) || of([]);
+    this._changeDetectorRef.markForCheck()
   }
 
   private currentErrors(): Array<string> {
@@ -165,14 +164,17 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   private filterErrorsProperties(kv: KeyValue<unknown, unknown>): boolean {
+    console.log("filterErrorsProperties", kv)
     return typeof kv.value == "object" && (kv.value as {valid: boolean}).valid === false
   }
 
   private mapErrorToI18nKey(kv: KeyValue<unknown, unknown>): string {
+    console.log("mapErrorToI18nKey", kv)
     return (kv.value as { i18nKey: string }).i18nKey || 'ERRORS.INVALID_FORMAT';
   }
 
   private distinctFilter(item: string, index: number, arr: Array<string>): boolean {
+    console.log("distinctFilter", arr)
     return arr.indexOf(item) === index;
   }
 
