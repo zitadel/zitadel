@@ -1,27 +1,15 @@
-#ARG BUILDARCH=x86_64
-
-#######################
-## These steps set platform / arch type specific variables
-#######################
-FROM alpine:3 AS arm64-base
-ENV PROTOC_ARCH aarch_64
-
-FROM alpine:3 AS amd64-base
-ENV PROTOC_ARCH x86_64
-
 #######################
 ## This step sets up the folder structure,
 ## initalices go mods,
 ## downloads the protofiles,
 ## protoc and protoc-gen-grpc-web for later use
 #######################
-FROM ${BUILDARCH}-base
+FROM alpine:3
 ARG PROTOC_VERSION=3.18.0
-ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip
+ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-x86_64.zip
 ARG GRPC_WEB_VERSION=1.3.0
 ARG GATEWAY_VERSION=2.15.1
 ARG VALIDATOR_VERSION=0.6.2
-# no arm specific version available and x86 works fine at the moment:
 ARG GRPC_WEB=protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64
 
 RUN apk add tar curl
