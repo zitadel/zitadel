@@ -1,5 +1,4 @@
-import { APP_BASE_HREF } from '@angular/common';
-import { CommonModule, registerLocaleData } from '@angular/common';
+import { APP_BASE_HREF, CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import localeEn from '@angular/common/locales/en';
@@ -132,7 +131,7 @@ const authConfig: AuthConfig = {
   providers: [
     {
       provide: APP_BASE_HREF,
-      useValue: '/' + (window.location.pathname.split('/')[1] || '')
+      useValue: '/' + (window.location.pathname.split('/')[1] || ''),
     },
     AuthGuard,
     RoleGuard,

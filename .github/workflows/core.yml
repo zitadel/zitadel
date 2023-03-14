@@ -71,12 +71,11 @@ jobs:
         goarch: ${{ matrix.goarch }}
         goversion: ${{ inputs.go_version }}
         project_path: "."
-        binary_name: "test-binary"
         extra_files: LICENSE README.md
         md5sum: false
         sha256sum: true
         build_command: make build
-        asset_name: zitadel-core--${{ matrix.goos }}/${{ matrix.goarch }}
+        asset_name: zitadel-core-${{ matrix.goos }}/${{ matrix.goarch }}
 
   container:
     runs-on: ubuntu-latest
