@@ -163,11 +163,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	params, err := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
+	params := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
 	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
@@ -787,28 +783,29 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 	}
 }
 
-func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) ([]any, error) {
+func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []any {
 	params := []any{authReq.AgentID}
 
 	if authReq.UserID != "" && identityProviderID != "" {
 		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
 		if err != nil {
-			return nil, err
+			logging.WithFields("authReqID", authReq.ID, "userID", authReq.UserID, "providerID", identityProviderID).WithError(err).Warn("failed to get user links for")
+			return params
 		}
 		if len(links.Links) == 1 {
-			return append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername)), nil
+			return append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername))
 		}
 	}
 	if authReq.UserName != "" {
-		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName)), nil
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName))
 	}
 	if authReq.LoginName != "" {
-		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName)), nil
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName))
 	}
 	if authReq.LoginHint != "" {
-		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint)), nil
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint))
 	}
-	return params, nil
+	return params
 }
 
 func keyAndValueToAuthURLOpt(key, value string) rp.AuthURLOpt {
