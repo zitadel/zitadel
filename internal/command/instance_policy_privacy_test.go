@@ -103,6 +103,24 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 			},
 		},
 		{
+			name: "wrong email, can't add policy",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:         authz.WithInstanceID(context.Background(), "INSTANCE"),
+				tosLink:     "TOSLink",
+				privacyLink: "PrivacyLink",
+				helpLink:    "HelpLink",
+				supportEmail: "wrong email",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "add empty policy,ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -225,6 +243,26 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "wrong email, can't change policy",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				policy: &domain.PrivacyPolicy{
+					TOSLink:     "TOSLink",
+					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
+					SupportEmail: "wrong email",
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{

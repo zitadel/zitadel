@@ -29,6 +29,15 @@ func (c *Commands) orgPrivacyPolicyWriteModelByID(ctx context.Context, orgID str
 }
 
 func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
+	
+	if policy.SupportEmail != "" {
+		email := domain.Email{EmailAddress: policy.SupportEmail}
+
+		if !email.IsValid() {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
+		}
+	}
+		
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-MMk9fs", "Errors.ResourceOwnerMissing")
 	}
@@ -62,6 +71,15 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 }
 
 func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
+	
+	if policy.SupportEmail != "" {
+		email := domain.Email{EmailAddress: policy.SupportEmail}
+
+		if !email.IsValid() {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
+		}
+	}
+	
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-22N89f", "Errors.ResourceOwnerMissing")
 	}

@@ -13,6 +13,14 @@ import (
 )
 
 func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacyLink, helpLink, supportEmail string) (*domain.ObjectDetails, error) {
+	if supportEmail != "" {
+		email := domain.Email{EmailAddress: supportEmail}
+
+		if !email.IsValid() {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
+		}
+	}
+
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPrivacyPolicy(instanceAgg, tosLink, privacyLink, helpLink, supportEmail))
 	if err != nil {
@@ -26,6 +34,14 @@ func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacy
 }
 
 func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
+	if policy.SupportEmail != "" {
+		email := domain.Email{EmailAddress: policy.SupportEmail}
+
+		if !email.IsValid() {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
+		}
+	}
+
 	existingPolicy, err := c.defaultPrivacyPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
