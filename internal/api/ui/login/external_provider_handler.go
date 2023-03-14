@@ -137,6 +137,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 	var provider idp.Provider
+
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
@@ -167,7 +168,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	session, err := provider.BeginAuth(r.Context(), authReq.ID, authReq.AgentID)
+	params := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
+	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -831,7 +833,7 @@ func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain 
 	externalIDP := &domain.UserIDPLink{
 		IDPConfigID:    externalUser.IDPConfigID,
 		ExternalUserID: externalUser.ExternalUserID,
-		DisplayName:    externalUser.DisplayName,
+		DisplayName:    externalUser.PreferredUsername,
 	}
 	return human, externalIDP, externalUser.Metadatas
 }
@@ -853,4 +855,54 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 		IsPhoneVerified:   isPhoneVerified,
 		PreferredLanguage: language.Make(formData.Language),
 	}
+}
+
+func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []any {
+	params := []any{authReq.AgentID}
+
+	if authReq.UserID != "" && identityProviderID != "" {
+		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
+		if err != nil {
+			logging.WithFields("authReqID", authReq.ID, "userID", authReq.UserID, "providerID", identityProviderID).WithError(err).Warn("failed to get user links for")
+			return params
+		}
+		if len(links.Links) == 1 {
+			return append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername))
+		}
+	}
+	if authReq.UserName != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName))
+	}
+	if authReq.LoginName != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName))
+	}
+	if authReq.LoginHint != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint))
+	}
+	return params
+}
+
+func keyAndValueToAuthURLOpt(key, value string) rp.AuthURLOpt {
+	return func() []oauth2.AuthCodeOption {
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
+	}
+}
+
+func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.IDPUserLinks, error) {
+	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpID)
+	if err != nil {
+		return nil, err
+	}
+	return l.query.IDPUserLinks(ctx,
+		&query.IDPUserLinksSearchQuery{
+			Queries: []query.SearchQuery{
+				userIDQuery,
+				idpIDQuery,
+			},
+		}, false,
+	)
 }
