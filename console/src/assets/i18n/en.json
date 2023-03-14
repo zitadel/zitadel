@@ -1623,6 +1623,10 @@
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Enter the required data for your OIDC provider."
       },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Enter the required data for your OAuth provider."
+      },
       "JWT": {
         "TITLE": "JWT Provider",
         "DESCRIPTION": "Enter the required data for your JWT provider."
@@ -1630,6 +1634,14 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Enter the credentials for your GitHub Enterprise Server Identity Provider"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Enter the credentials for your Github Identity Provider"
       }
     },
     "DETAIL": {
@@ -1665,6 +1677,10 @@
     "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Name",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "ID Attribute",
     "AVAILABILITY": "Availability",
     "AVAILABLE": "available",
     "AVAILABLEBUTINACTIVE": "available but inactive",

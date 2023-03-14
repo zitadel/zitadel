@@ -1622,6 +1622,10 @@
         "TITLE": "Fournisseur OIDC",
         "DESCRIPTION": "Entrez les données requises pour votre fournisseur OIDC."
       },
+      "OAuth": {
+        "TITLE": "Fournisseur OAuth",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur OAuth."
+      },
       "JWT": {
         "TITLE": "Fournisseur JWT",
         "DESCRIPTION": "Entrez les données requises pour votre fournisseur JWT."
@@ -1629,6 +1633,14 @@
       "GOOGLE": {
         "TITLE": "Fournisseur Google",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Google"
+      },
+      "GITHUBES": {
+        "TITLE": "Fournisseur GitHub Enterprise Server",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Fournisseur Github",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Github"
       }
     },
     "DETAIL": {
@@ -1669,6 +1681,10 @@
     "OWNER": "Propriétaire",
     "ID": "ID",
     "NAME": "Nom",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "Attribut d'identification",
     "AVAILABILITY": "Disponibilité",
     "AVAILABLE": "disponible",
     "AVAILABLEBUTINACTIVE": "disponible mais inactif",
