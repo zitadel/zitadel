@@ -13,8 +13,8 @@ defaults:
 
 jobs:
 
-  grpc:
-    name: generate grpc stub
+  lint:
+    name: lint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -25,33 +25,11 @@ jobs:
         cache-dependency-path: console/yarn.lock
     - run: yarn install --frozen-lockfile
     - run: yarn generate
-    - uses: actions/upload-artifact@v3
-      with:
-        name: console-grpc-stub
-        path: console/src/app/proto/generated
-  
-  lint:
-    name: lint
-    runs-on: ubuntu-latest
-    needs: [grpc]
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: ${{ inputs.node_version }}
-        cache: 'yarn'
-        cache-dependency-path: console/yarn.lock
-    - run: yarn install --frozen-lockfile
-    - uses: actions/download-artifact@v3
-      with:
-        name: console-grpc-stub
-        path: console/src/app/proto/generated
     - run: yarn lint
 
   build:
     name: build and upload
     runs-on: ubuntu-latest
-    needs: [grpc]
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
@@ -60,10 +38,7 @@ jobs:
         cache: 'yarn'
         cache-dependency-path: console/yarn.lock
     - run: yarn install --frozen-lockfile
-    - uses: actions/download-artifact@v3
-      with:
-        name: console-grpc-stub
-        path: console/src/app/proto/generated
+    - run: yarn generate
     - run: yarn build
     ## The upload action is slow with multiple small artifacts
     - run: zip -r bundle.zip dist/console
@@ -71,3 +46,10 @@ jobs:
       with:
         name: console
         path: console/bundle.zip
+  
+  success:
+    name: check success
+    runs-on: ubuntu-latest
+    needs: [lint, build]
+    steps:
+    - run: echo "console sucessful built"
