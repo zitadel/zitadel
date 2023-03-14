@@ -79,7 +79,7 @@ export class EditDialogComponent implements OnInit {
     this.dialogRef.close({ value: this.dialogForm.controls[this.controlKey].value, isVerified: this.isVerified });
   }
 
-  public get ctrl(){
+  public get ctrl() {
     return this.dialogForm.get(this.controlKey);
   }
 }

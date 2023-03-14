@@ -25,7 +25,6 @@ import {
   passwordConfirmValidator,
 } from '../../../modules/form-field/validators/validators';
 
-
 @Component({
   selector: 'cnsl-user-create',
   templateUrl: './user-create.component.html',

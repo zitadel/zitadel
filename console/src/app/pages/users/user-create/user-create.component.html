@@ -1,5 +1,9 @@
-<cnsl-create-layout title="{{ 'USER.CREATE.TITLE' | translate }}" [createSteps]="1" [currentCreateStep]="1"
-  (closed)="close()">
+<cnsl-create-layout
+  title="{{ 'USER.CREATE.TITLE' | translate }}"
+  [createSteps]="1"
+  [currentCreateStep]="1"
+  (closed)="close()"
+>
   <div class="user-create-main-content">
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
@@ -14,8 +18,12 @@
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}*</cnsl-label>
-            <input cnslInput formControlName="userName" required
-              [ngStyle]="{ 'padding-right': suffixPadding ? suffixPadding : '10px' }" />
+            <input
+              cnslInput
+              formControlName="userName"
+              required
+              [ngStyle]="{ 'padding-right': suffixPadding ? suffixPadding : '10px' }"
+            />
             <span #suffix *ngIf="envSuffix" cnslSuffix>{{ envSuffix }}</span>
           </cnsl-form-field>
 
@@ -57,8 +65,13 @@
               </cnsl-form-field>
               <cnsl-form-field *ngIf="confirmPassword">
                 <cnsl-label>{{ 'USER.PASSWORD.CONFIRMINITIAL' | translate }}</cnsl-label>
-                <input cnslInput autocomplete="off" name="confirmPassword" formControlName="confirmPassword"
-                  type="password" />
+                <input
+                  cnslInput
+                  autocomplete="off"
+                  name="confirmPassword"
+                  formControlName="confirmPassword"
+                  type="password"
+                />
               </cnsl-form-field>
             </div>
           </form>
@@ -91,8 +104,7 @@
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.COUNTRY' | translate }}</cnsl-label>
             <mat-select [(value)]="selected" (selectionChange)="setCountryCallingCode()" data-cy="country-calling-code">
-              <mat-select-trigger> <span
-                  class="fi fi-{{ selected?.countryCode | lowercase }}"></span></mat-select-trigger>
+              <mat-select-trigger> <span class="fi fi-{{ selected?.countryCode | lowercase }}"></span></mat-select-trigger>
               <mat-option *ngFor="let country of countryPhoneCodes" [value]="country">
                 <span class="fi fi-{{ country.countryCode | lowercase }}"></span>
                 <span class="phone-country-name">{{ country.countryName }}</span>
@@ -107,8 +119,13 @@
         </div>
       </div>
       <div class="user-create-btn-container">
-        <button data-e2e="create-button" color="primary"
-          [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)" type="submit" mat-raised-button>
+        <button
+          data-e2e="create-button"
+          color="primary"
+          [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)"
+          type="submit"
+          mat-raised-button
+        >
           {{ 'ACTIONS.CREATE' | translate }}
         </button>
       </div>

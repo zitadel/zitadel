@@ -31,8 +31,8 @@ class CnslFormFieldBase {
 }
 
 interface ValidationError {
-  i18nKey: string
-  params: any
+  i18nKey: string;
+  params: any;
 }
 
 @Component({
@@ -110,7 +110,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
   public ngAfterContentInit(): void {
     this._validateControlChild();
-    this.mapErrors()
+    this.mapErrors();
 
     const control = this._control;
     control.stateChanges.pipe(startWith(null)).subscribe(() => {
@@ -150,13 +150,14 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   private mapErrors(): void {
-    let ctrl = this._control.ngControl?.control
-    this.errori18nKeys$ = ctrl?.valueChanges?.pipe(
-      mergeMap(() => ctrl?.statusChanges || of([])),
-      map(() => this.currentErrors()),
-      distinctUntilChanged(),
-    ) || of([]);
-    this._changeDetectorRef.markForCheck()
+    let ctrl = this._control.ngControl?.control;
+    this.errori18nKeys$ =
+      ctrl?.valueChanges?.pipe(
+        mergeMap(() => ctrl?.statusChanges || of([])),
+        map(() => this.currentErrors()),
+        distinctUntilChanged(),
+      ) || of([]);
+    this._changeDetectorRef.markForCheck();
   }
 
   private currentErrors(): Array<ValidationError> {
@@ -170,20 +171,19 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   private filterErrorsProperties(kv: KeyValue<unknown, unknown>): boolean {
-    return typeof kv.value == "object" && (kv.value as {valid: boolean}).valid === false
+    return typeof kv.value == 'object' && (kv.value as { valid: boolean }).valid === false;
   }
 
   private mapToValidationError(kv: KeyValue<unknown, unknown>): ValidationError {
     return {
       i18nKey: 'ERRORS.INVALID_FORMAT',
-      ...kv.value as ValidationError | any,
-    }
+      ...(kv.value as ValidationError | any),
+    };
   }
 
   private distinctFilter(_: ValidationError, index: number, arr: Array<ValidationError>): boolean {
-    return arr.findIndex(item => item.i18nKey) === index;
+    return arr.findIndex((item) => item.i18nKey) === index;
   }
-
 
   /** Determines whether a class from the NgControl should be forwarded to the host element. */
   _shouldForward(prop: keyof NgControl): boolean {

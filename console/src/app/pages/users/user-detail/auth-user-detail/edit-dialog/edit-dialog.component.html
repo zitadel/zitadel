@@ -18,8 +18,12 @@
       </cnsl-form-field>
       <cnsl-form-field>
         <cnsl-label>{{ data.labelKey | translate }}</cnsl-label>
-        <input cnslInput [formControlName]="controlKey" matTooltip="{{ 'USER.PROFILE.PHONE_HINT' | translate }}"
-          [matTooltipDisabled]="!isPhone" />
+        <input
+          cnslInput
+          [formControlName]="controlKey"
+          matTooltip="{{ 'USER.PROFILE.PHONE_HINT' | translate }}"
+          [matTooltipDisabled]="!isPhone"
+        />
       </cnsl-form-field>
     </div>
 
@@ -38,8 +42,14 @@
     {{ data.cancelKey | translate }}
   </button>
 
-  <button [disabled]="dialogForm.invalid" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
-    (click)="closeDialogWithValue()">
+  <button
+    [disabled]="dialogForm.invalid"
+    cdkFocusInitial
+    color="primary"
+    mat-raised-button
+    class="ok-button"
+    (click)="closeDialogWithValue()"
+  >
     {{ data.confirmKey | translate }}
   </button>
 </div>

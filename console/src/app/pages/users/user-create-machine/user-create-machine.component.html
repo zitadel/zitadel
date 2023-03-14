@@ -1,5 +1,9 @@
-<cnsl-create-layout title="{{ 'USER.CREATE.TITLE' | translate }}" [createSteps]="1" [currentCreateStep]="1"
-  (closed)="close()">
+<cnsl-create-layout
+  title="{{ 'USER.CREATE.TITLE' | translate }}"
+  [createSteps]="1"
+  [currentCreateStep]="1"
+  (closed)="close()"
+>
   <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
   <div class="machine-create-main-content">
