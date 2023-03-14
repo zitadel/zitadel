@@ -65,7 +65,7 @@ func TestEmailValid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := tt.args.email.IsValid()
+			result := tt.args.email.Validate() == nil
 			if result != tt.result {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result, result)
 			}

@@ -10,6 +10,6 @@ import (
 func UpdateMyEmailToDomain(ctx context.Context, email *auth.SetMyEmailRequest) *domain.Email {
 	return &domain.Email{
 		ObjectRoot:   ctxToObjectRoot(ctx),
-		EmailAddress: email.Email,
+		EmailAddress: domain.EmailAddress(email.Email),
 	}
 }
