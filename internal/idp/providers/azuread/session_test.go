@@ -61,7 +61,7 @@ func TestSession_FetchUser(t *testing.T) {
 				redirectURI:  "redirectURI",
 				httpMock: func() {
 					gock.New("https://graph.microsoft.com").
-						Get("/oidc/userinfo").
+						Get("/v1.0/me").
 						Reply(200).
 						JSON(userinfo())
 				},
@@ -82,7 +82,7 @@ func TestSession_FetchUser(t *testing.T) {
 				redirectURI:  "redirectURI",
 				httpMock: func() {
 					gock.New("https://graph.microsoft.com").
-						Get("/oidc/userinfo").
+						Get("/v1.0/me").
 						Reply(http.StatusInternalServerError)
 				},
 				authURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
@@ -119,7 +119,7 @@ func TestSession_FetchUser(t *testing.T) {
 				redirectURI:  "redirectURI",
 				httpMock: func() {
 					gock.New("https://graph.microsoft.com").
-						Get("/oidc/userinfo").
+						Get("/v1.0/me").
 						Reply(200).
 						JSON(userinfo())
 				},
@@ -145,16 +145,20 @@ func TestSession_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &User{
-					Sub:               "sub",
-					FamilyName:        "lastname",
-					GivenName:         "firstname",
-					Name:              "firstname lastname",
-					PreferredUsername: "username",
+					ID:                "id",
+					BusinessPhones:    []string{"phone1", "phone2"},
+					DisplayName:       "firstname lastname",
+					FirstName:         "firstname",
+					JobTitle:          "title",
 					Email:             "email",
-					Picture:           "picture",
+					MobilePhone:       "mobile",
+					OfficeLocation:    "office",
+					PreferredLanguage: "en",
+					LastName:          "lastname",
+					UserPrincipalName: "username",
 					isEmailVerified:   false,
 				},
-				id:                "sub",
+				id:                "id",
 				firstName:         "firstname",
 				lastName:          "lastname",
 				displayName:       "firstname lastname",
@@ -164,8 +168,7 @@ func TestSession_FetchUser(t *testing.T) {
 				isEmailVerified:   false,
 				phone:             "",
 				isPhoneVerified:   false,
-				preferredLanguage: language.Und,
-				avatarURL:         "picture",
+				preferredLanguage: language.English,
 				profile:           "",
 			},
 		},
@@ -180,7 +183,7 @@ func TestSession_FetchUser(t *testing.T) {
 				},
 				httpMock: func() {
 					gock.New("https://graph.microsoft.com").
-						Get("/oidc/userinfo").
+						Get("/v1.0/me").
 						Reply(200).
 						JSON(userinfo())
 				},
@@ -206,16 +209,20 @@ func TestSession_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &User{
-					Sub:               "sub",
-					FamilyName:        "lastname",
-					GivenName:         "firstname",
-					Name:              "firstname lastname",
-					PreferredUsername: "username",
+					ID:                "id",
+					BusinessPhones:    []string{"phone1", "phone2"},
+					DisplayName:       "firstname lastname",
+					FirstName:         "firstname",
+					JobTitle:          "title",
 					Email:             "email",
-					Picture:           "picture",
+					MobilePhone:       "mobile",
+					OfficeLocation:    "office",
+					PreferredLanguage: "en",
+					LastName:          "lastname",
+					UserPrincipalName: "username",
 					isEmailVerified:   true,
 				},
-				id:                "sub",
+				id:                "id",
 				firstName:         "firstname",
 				lastName:          "lastname",
 				displayName:       "firstname lastname",
@@ -225,8 +232,7 @@ func TestSession_FetchUser(t *testing.T) {
 				isEmailVerified:   true,
 				phone:             "",
 				isPhoneVerified:   false,
-				preferredLanguage: language.Und,
-				avatarURL:         "picture",
+				preferredLanguage: language.English,
 				profile:           "",
 			},
 		},
@@ -272,15 +278,18 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 }
 
-func userinfo() oidc.UserInfoSetter {
-	userinfo := oidc.NewUserInfo()
-	userinfo.SetSubject("sub")
-	userinfo.SetName("firstname lastname")
-	userinfo.SetPreferredUsername("username")
-	userinfo.SetNickname("nickname")
-	userinfo.SetEmail("email", false) // azure add does not send the email_verified claim
-	userinfo.SetPicture("picture")
-	userinfo.SetGivenName("firstname")
-	userinfo.SetFamilyName("lastname")
-	return userinfo
+func userinfo() *User {
+	return &User{
+		ID:                "id",
+		BusinessPhones:    []string{"phone1", "phone2"},
+		DisplayName:       "firstname lastname",
+		FirstName:         "firstname",
+		JobTitle:          "title",
+		Email:             "email",
+		MobilePhone:       "mobile",
+		OfficeLocation:    "office",
+		PreferredLanguage: "en",
+		LastName:          "lastname",
+		UserPrincipalName: "username",
+	}
 }

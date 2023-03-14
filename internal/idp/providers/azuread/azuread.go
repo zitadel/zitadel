@@ -191,10 +191,8 @@ func (u *User) IsPhoneVerified() bool {
 }
 
 // GetPreferredLanguage is an implementation of the [idp.User] interface.
-// It returns [language.Und] because AzureAD does not provide the user's language
 func (u *User) GetPreferredLanguage() language.Tag {
-	// AzureAD does not provide the user's language
-	return language.Und
+	return language.Make(u.PreferredLanguage)
 }
 
 // GetProfile is an implementation of the [idp.User] interface.
