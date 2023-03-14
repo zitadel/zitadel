@@ -34,19 +34,19 @@ export function minLengthValidator(minLength: number): ValidatorFn {
   };
 }
 
-export function passwordConfirmValidator(passwordControlName: string = "password", passwordConfirmControlName: string = "confirmPassword") {
+export function passwordConfirmValidator(passwordControlName: string = "password") {
   return (c: AbstractControl): ValidationErrors | null => {
     if (!c.parent || !c) {
       return null;
     }
     const pwd = c.parent.get(passwordControlName);
-    const cpwd = c.parent.get(passwordConfirmControlName);
+    const cpwd = c;
 
     if (!pwd || !cpwd) {
       return null;
     }
     if (pwd.value !== cpwd.value) {
-      return i18nErr(null, 'ERRORS.PWNOTEQUAL');
+      return i18nErr(undefined, 'ERRORS.PWNOTEQUAL');
     }
     return null;
   };
@@ -56,9 +56,11 @@ function regexpValidator(c: AbstractControl, regexp: RegExp, i18nKey: string): V
   return !c.value || regexp.test(c.value) ? null : i18nErr({ invalid: true }, i18nKey, { regexp: regexp });
 }
 
-function i18nErr(err: ValidationErrors | null, i18nKey: string, params?: any): ValidationErrors | null {
-  if (err) {
-    err = {
+function i18nErr(err: ValidationErrors | null | undefined, i18nKey: string, params?: any): ValidationErrors | null {
+  if (err === null){
+    return null
+  } else {
+    return {
       ...err,
       invalid: true,
       [i18nKey.toLowerCase().replaceAll('.', '')]: {
@@ -68,5 +70,4 @@ function i18nErr(err: ValidationErrors | null, i18nKey: string, params?: any): V
       },
     };
   }
-  return err;
 }
