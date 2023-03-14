@@ -12,7 +12,6 @@ jobs:
   tidy:
     name: tidy
     runs-on: ubuntu-latest
-    needs: [grpc]
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
@@ -25,7 +24,6 @@ jobs:
   lint:
     name: lint
     runs-on: ubuntu-latest
-    needs: [grpc]
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
@@ -41,9 +39,35 @@ jobs:
     - run: make grpc_copy
     - run: make lint
 
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        exclude:
+          - goarch: arm64
+            goos: windows
+    steps:
+    - uses: actions/checkout@v3
+    ## Check if caching is needed
+    - uses: wangyoucao577/go-release-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: ${{ matrix.goos }}
+        goarch: ${{ matrix.goarch }}
+        goversion: ${{ inputs.go_version }}
+        project_path: "."
+        binary_name: "test-binary"
+        extra_files: LICENSE README.md
+        md5sum: false
+        sha256sum: true
+        build_command: make build
+
   success:
     name: check success
     runs-on: ubuntu-latest
-    needs: [tidy, lint]
+    needs: [tidy, lint, build]
     steps:
     - run: echo "core sucessful built"
