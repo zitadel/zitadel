@@ -62,6 +62,7 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         name: console
+        path: console/bundle.zip
     - run: unzip bundle.zip
     - uses: docker/build-push-action@v4
       with:
