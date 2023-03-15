@@ -413,6 +413,111 @@ func (wm *JWTIDPWriteModel) reduceJWTConfigChangedEvent(e *idpconfig.JWTConfigCh
 	}
 }
 
+type AzureADIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID              string
+	Name            string
+	ClientID        string
+	ClientSecret    *crypto.CryptoValue
+	Scopes          []string
+	Tenant          string
+	IsEmailVerified bool
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *AzureADIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.AzureADIDPAddedEvent:
+			wm.reduceAddedEvent(e)
+		case *idp.AzureADIDPChangedEvent:
+			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *AzureADIDPWriteModel) reduceAddedEvent(e *idp.AzureADIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.ClientID = e.ClientID
+	wm.ClientSecret = e.ClientSecret
+	wm.Scopes = e.Scopes
+	wm.Tenant = e.Tenant
+	wm.IsEmailVerified = e.IsEmailVerified
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *AzureADIDPWriteModel) reduceChangedEvent(e *idp.AzureADIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	if e.Tenant != nil {
+		wm.Tenant = *e.Tenant
+	}
+	if e.IsEmailVerified != nil {
+		wm.IsEmailVerified = *e.IsEmailVerified
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *AzureADIDPWriteModel) NewChanges(
+	name string,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	tenant string,
+	isEmailVerified bool,
+	options idp.Options,
+) ([]idp.AzureADIDPChanges, error) {
+	changes := make([]idp.AzureADIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeAzureADClientSecret(clientSecret))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeAzureADName(name))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeAzureADClientID(clientID))
+	}
+	if wm.Tenant != tenant {
+		changes = append(changes, idp.ChangeAzureADTenant(tenant))
+	}
+	if wm.IsEmailVerified != isEmailVerified {
+		changes = append(changes, idp.ChangeAzureADIsEmailVerified(isEmailVerified))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeAzureADScopes(scopes))
+	}
+
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeAzureADOptions(opts))
+	}
+	return changes, nil
+}
+
 type GitHubIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -1048,6 +1153,8 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 		case *idp.OIDCIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.JWTIDPAddedEvent:
+			wm.reduceAdded(e.ID)
+		case *idp.AzureADIDPAddedEvent:
 			wm.reduceAdded(e.ID)
 		case *idp.GitHubIDPAddedEvent:
 			wm.reduceAdded(e.ID)
