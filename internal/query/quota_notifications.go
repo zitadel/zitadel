@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
-func (q *Queries) GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, usedAbs uint64) ([]*quota.NotifiedEvent, error) {
+func (q *Queries) GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, usedAbs uint64) ([]*quota.NotificationDueEvent, error) {
 	if len(config.Notifications) == 0 {
 		return nil, nil
 	}
@@ -22,7 +22,7 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, config *quota.Ad
 
 	usedRel := uint16(math.Floor(float64(usedAbs*100) / float64(config.Amount)))
 
-	var dueNotifications []*quota.NotifiedEvent
+	var dueNotifications []*quota.NotificationDueEvent
 	for _, notification := range config.Notifications {
 		if notification.Percent > usedRel {
 			continue
@@ -36,7 +36,7 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, config *quota.Ad
 		if wm.latestNotifiedThresholds[notification.ID] < threshold {
 			dueNotifications = append(
 				dueNotifications,
-				quota.NewNotifiedEvent(
+				quota.NewNotificationDueEvent(
 					ctx,
 					&aggregate,
 					config.Unit,

@@ -1,7 +1,7 @@
 package channels
 
 type Message interface {
-	GetContent() string
+	GetContent() (string, error)
 }
 
 type NotificationChannel interface {

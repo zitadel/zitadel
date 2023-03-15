@@ -25,7 +25,7 @@ type Email struct {
 	Content     string
 }
 
-func (msg *Email) GetContent() string {
+func (msg *Email) GetContent() (string, error) {
 	headers := make(map[string]string)
 	from := msg.SenderEmail
 	if msg.SenderName != "" {
@@ -49,7 +49,7 @@ func (msg *Email) GetContent() string {
 	subject := "Subject: " + msg.Subject + lineBreak
 	message += subject + mime + lineBreak + msg.Content
 
-	return message
+	return message, nil
 }
 
 func isHTML(input string) bool {

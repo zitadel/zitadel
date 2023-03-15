@@ -22,7 +22,7 @@ type Email struct {
 	senderName    string
 }
 
-func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context) (*EmailConfig, error)) (*Email, error) {
+func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context) (*Config, error)) (*Email, error) {
 	smtpConfig, err := getSMTPConfig(ctx)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,12 @@ func (email *Email) HandleMessage(message channels.Message) error {
 		return err
 	}
 
-	_, err = w.Write([]byte(emailMsg.GetContent()))
+	content, err := emailMsg.GetContent()
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write([]byte(content))
 	if err != nil {
 		return err
 	}

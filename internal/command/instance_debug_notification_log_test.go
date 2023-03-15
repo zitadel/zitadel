@@ -22,7 +22,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		provider *fs.FSConfig
+		provider *fs.Config
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -52,7 +52,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				provider: &fs.FSConfig{
+				provider: &fs.Config{
 					Compact: true,
 					Enabled: true,
 				},
@@ -82,7 +82,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				provider: &fs.FSConfig{
+				provider: &fs.Config{
 					Compact: true,
 				},
 			},
@@ -113,7 +113,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				provider: &fs.FSConfig{
+				provider: &fs.Config{
 					Compact: true,
 					Enabled: true,
 				},
@@ -150,7 +150,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		provider *fs.FSConfig
+		provider *fs.Config
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -172,7 +172,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				provider: &fs.FSConfig{
+				provider: &fs.Config{
 					Compact: true,
 					Enabled: true,
 				},
@@ -198,7 +198,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				provider: &fs.FSConfig{
+				provider: &fs.Config{
 					Compact: true,
 					Enabled: false,
 				},
@@ -234,7 +234,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				provider: &fs.FSConfig{
+				provider: &fs.Config{
 					Compact: false,
 					Enabled: false,
 				},
@@ -271,7 +271,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				provider: &fs.FSConfig{
+				provider: &fs.Config{
 					Compact: false,
 					Enabled: true,
 				},

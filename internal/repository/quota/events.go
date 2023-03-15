@@ -19,6 +19,7 @@ const (
 	eventTypePrefix               = eventstore.EventType("quota.")
 	AddedEventType                = eventTypePrefix + "added"
 	NotifiedEventType             = eventTypePrefix + "notified"
+	NotificationDueEventType      = eventTypePrefix + "notificationdue"
 	RemovedEventType              = eventTypePrefix + "removed"
 )
 
@@ -101,7 +102,63 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal quota added")
+		return nil, errors.ThrowInternal(err, "QUOTA-4n8vs", "unable to unmarshal quota added")
+	}
+
+	return e, nil
+}
+
+type NotificationDueEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	Unit                 Unit      `json:"unit"`
+	ID                   string    `json:"id"`
+	CallURL              string    `json:"callURL"`
+	PeriodStart          time.Time `json:"periodStart"`
+	Threshold            uint16    `json:"threshold"`
+	Usage                uint64    `json:"usage"`
+}
+
+func (n *NotificationDueEvent) Data() interface{} {
+	return n
+}
+
+func (n *NotificationDueEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewNotificationDueEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	unit Unit,
+	id string,
+	callURL string,
+	periodStart time.Time,
+	threshold uint16,
+	usage uint64,
+) *NotificationDueEvent {
+	return &NotificationDueEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			NotificationDueEventType,
+		),
+		Unit:        unit,
+		ID:          id,
+		CallURL:     callURL,
+		PeriodStart: periodStart,
+		Threshold:   threshold,
+		Usage:       usage,
+	}
+}
+
+func NotificationDueEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &NotificationDueEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUOTA-4bReE", "unable to unmarshal notification due")
 	}
 
 	return e, nil
@@ -115,6 +172,7 @@ type NotifiedEvent struct {
 	PeriodStart          time.Time `json:"periodStart"`
 	Threshold            uint16    `json:"threshold"`
 	Usage                uint64    `json:"usage"`
+	DueEventID           string    `json:"dueEventID"`
 }
 
 func (e *NotifiedEvent) Data() interface{} {
@@ -127,26 +185,23 @@ func (e *NotifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint 
 
 func NewNotifiedEvent(
 	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	unit Unit,
 	id string,
-	callURL string,
-	periodStart time.Time,
-	threshold uint16,
-	usage uint64,
+	dueEvent *NotificationDueEvent,
 ) *NotifiedEvent {
+	aggregate := dueEvent.Aggregate()
 	return &NotifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			aggregate,
+			&aggregate,
 			NotifiedEventType,
 		),
-		Unit:        unit,
+		Unit:        dueEvent.Unit,
 		ID:          id,
-		CallURL:     callURL,
-		PeriodStart: periodStart,
-		Threshold:   threshold,
-		Usage:       usage,
+		CallURL:     dueEvent.CallURL,
+		PeriodStart: dueEvent.PeriodStart,
+		Threshold:   dueEvent.Threshold,
+		Usage:       dueEvent.Usage,
+		DueEventID:  dueEvent.ID,
 	}
 }
 
@@ -157,7 +212,7 @@ func NotifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal quota notified")
+		return nil, errors.ThrowInternal(err, "QUOTA-4n8vs", "unable to unmarshal quota notified")
 	}
 
 	return e, nil
@@ -198,7 +253,7 @@ func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ACTION-4bReE", "unable to unmarshal quota removed")
+		return nil, errors.ThrowInternal(err, "QUOTA-4bReE", "unable to unmarshal quota removed")
 	}
 
 	return e, nil

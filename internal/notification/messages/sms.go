@@ -10,6 +10,6 @@ type SMS struct {
 	Content              string
 }
 
-func (msg *SMS) GetContent() string {
-	return msg.Content
+func (msg *SMS) GetContent() (string, error) {
+	return msg.Content, nil
 }
