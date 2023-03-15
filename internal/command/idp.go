@@ -38,6 +38,16 @@ type JWTProvider struct {
 	IDPOptions  idp.Options
 }
 
+type AzureADProvider struct {
+	Name          string
+	ClientID      string
+	ClientSecret  string
+	Scopes        []string
+	Tenant        string
+	EmailVerified bool
+	IDPOptions    idp.Options
+}
+
 type GitHubProvider struct {
 	Name         string
 	ClientID     string
