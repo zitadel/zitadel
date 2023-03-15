@@ -29,8 +29,14 @@ import {
   AddCustomPasswordComplexityPolicyResponse,
   AddCustomPrivacyPolicyRequest,
   AddCustomPrivacyPolicyResponse,
+  AddGenericOAuthProviderRequest,
+  AddGenericOAuthProviderResponse,
   AddGenericOIDCProviderRequest,
   AddGenericOIDCProviderResponse,
+  AddGitHubEnterpriseServerProviderRequest,
+  AddGitHubEnterpriseServerProviderResponse,
+  AddGitHubProviderRequest,
+  AddGitHubProviderResponse,
   AddGoogleProviderRequest,
   AddGoogleProviderResponse,
   AddHumanUserRequest,
@@ -427,8 +433,14 @@ import {
   UpdateCustomPasswordComplexityPolicyResponse,
   UpdateCustomPrivacyPolicyRequest,
   UpdateCustomPrivacyPolicyResponse,
+  UpdateGenericOAuthProviderRequest,
+  UpdateGenericOAuthProviderResponse,
   UpdateGenericOIDCProviderRequest,
   UpdateGenericOIDCProviderResponse,
+  UpdateGitHubEnterpriseServerProviderRequest,
+  UpdateGitHubEnterpriseServerProviderResponse,
+  UpdateGitHubProviderRequest,
+  UpdateGitHubProviderResponse,
   UpdateGoogleProviderRequest,
   UpdateGoogleProviderResponse,
   UpdateHumanEmailRequest,
@@ -861,6 +873,14 @@ export class ManagementService {
     return this.grpcService.mgmt.updateGoogleProvider(req, null).then((resp) => resp.toObject());
   }
 
+  public addGitHubProvider(req: AddGitHubProviderRequest): Promise<AddGitHubProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitHubProvider(req: UpdateGitHubProviderRequest): Promise<UpdateGitHubProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
   public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
     return this.grpcService.mgmt.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
   }
@@ -871,12 +891,34 @@ export class ManagementService {
     return this.grpcService.mgmt.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
   }
 
+  public addGenericOAuthProvider(req: AddGenericOAuthProviderRequest): Promise<AddGenericOAuthProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGenericOAuthProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOAuthProvider(
+    req: UpdateGenericOAuthProviderRequest,
+  ): Promise<UpdateGenericOAuthProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGenericOAuthProvider(req, null).then((resp) => resp.toObject());
+  }
+
   public addJWTProvider(req: AddJWTProviderRequest): Promise<AddJWTProviderResponse.AsObject> {
     return this.grpcService.mgmt.addJWTProvider(req, null).then((resp) => resp.toObject());
   }
 
   public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitHubEnterpriseServerProvider(
+    req: AddGitHubEnterpriseServerProviderRequest,
+  ): Promise<AddGitHubEnterpriseServerProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitHubEnterpriseServerProvider(
+    req: UpdateGitHubEnterpriseServerProviderRequest,
+  ): Promise<UpdateGitHubEnterpriseServerProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
   }
 
   public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {

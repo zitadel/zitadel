@@ -1,9 +1,9 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
@@ -20,6 +20,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
@@ -45,7 +46,6 @@ export class ProviderGoogleComponent {
   public updateClientSecret: boolean = false;
 
   constructor(
-    private router: Router,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -54,8 +54,8 @@ export class ProviderGoogleComponent {
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
-      clientId: new FormControl('', [Validators.required]),
-      clientSecret: new FormControl('', [Validators.required]),
+      clientId: new FormControl('', [requiredValidator]),
+      clientSecret: new FormControl('', [requiredValidator]),
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
     });
 
@@ -135,7 +135,7 @@ export class ProviderGoogleComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -156,7 +156,7 @@ export class ProviderGoogleComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -186,7 +186,7 @@ export class ProviderGoogleComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {
@@ -211,7 +211,7 @@ export class ProviderGoogleComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {

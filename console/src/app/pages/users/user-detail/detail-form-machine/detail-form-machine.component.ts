@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { AccessTokenType, Human, Machine } from 'src/app/proto/generated/zitadel/user_pb';
 
 @Component({
@@ -25,10 +26,10 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
 
   constructor(private fb: UntypedFormBuilder) {
     this.machineForm = this.fb.group({
-      userName: [{ value: '', disabled: true }, [Validators.required]],
-      name: [{ value: '', disabled: this.disabled }, Validators.required],
+      userName: [{ value: '', disabled: true }, [requiredValidator]],
+      name: [{ value: '', disabled: this.disabled }, requiredValidator],
       description: [{ value: '', disabled: this.disabled }],
-      accessTokenType: [AccessTokenType.ACCESS_TOKEN_TYPE_BEARER, [Validators.required]],
+      accessTokenType: [AccessTokenType.ACCESS_TOKEN_TYPE_BEARER, [requiredValidator]],
     });
   }
 

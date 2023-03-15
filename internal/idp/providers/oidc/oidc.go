@@ -21,6 +21,7 @@ type Provider struct {
 	isAutoCreation    bool
 	isAutoUpdate      bool
 	userInfoMapper    func(info oidc.UserInfo) idp.User
+	authOptions       []rp.AuthURLOpt
 }
 
 type ProviderOpts func(provider *Provider)
@@ -58,6 +59,13 @@ func WithAutoUpdate() ProviderOpts {
 func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	return func(p *Provider) {
 		p.options = append(p.options, option)
+	}
+}
+
+// WithSelectAccount adds the select_account prompt to the auth request
+func WithSelectAccount() ProviderOpts {
+	return func(p *Provider) {
+		p.authOptions = append(p.authOptions, rp.WithPrompt(oidc.PromptSelectAccount))
 	}
 }
 
@@ -104,8 +112,14 @@ func (p *Provider) Name() string {
 
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an OIDC authorization request as AuthURL.
-func (p *Provider) BeginAuth(ctx context.Context, state string, _ ...any) (idp.Session, error) {
-	url := rp.AuthURL(state, p.RelyingParty, rp.WithPrompt(oidc.PromptSelectAccount))
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
+	opts := p.authOptions
+	for _, param := range params {
+		if option, ok := param.(rp.AuthURLOpt); ok {
+			opts = append(opts, option)
+		}
+	}
+	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p}, nil
 }
 

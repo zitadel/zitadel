@@ -268,7 +268,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			if user.Human == nil {
 				continue
 			}
-			userInfo.SetEmail(user.Human.Email, user.Human.IsEmailVerified)
+			userInfo.SetEmail(string(user.Human.Email), user.Human.IsEmailVerified)
 		case oidc.ScopeProfile:
 			userInfo.SetPreferredUsername(user.PreferredLoginName)
 			userInfo.SetUpdatedAt(user.ChangeDate)
@@ -287,7 +287,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			if user.Human == nil {
 				continue
 			}
-			userInfo.SetPhone(user.Human.Phone, user.Human.IsPhoneVerified)
+			userInfo.SetPhone(string(user.Human.Phone), user.Human.IsPhoneVerified)
 		case oidc.ScopeAddress:
 			//TODO: handle address for human users as soon as implemented
 		case ScopeUserMetaData:
@@ -649,7 +649,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	}
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery, userIDQuery},
-	}, false)
+	}, true, false)
 	if err != nil {
 		return nil, nil, err
 	}

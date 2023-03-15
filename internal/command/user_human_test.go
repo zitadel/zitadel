@@ -3445,7 +3445,7 @@ func newAddHumanEvent(password string, changeRequired bool, phone string) *user.
 			changeRequired)
 	}
 	if phone != "" {
-		event.AddPhoneData(phone)
+		event.AddPhoneData(domain.PhoneNumber(phone))
 	}
 	return event
 }
@@ -3473,7 +3473,7 @@ func newRegisterHumanEvent(username, password string, changeRequired bool, phone
 			changeRequired)
 	}
 	if phone != "" {
-		event.AddPhoneData(phone)
+		event.AddPhoneData(domain.PhoneNumber(phone))
 	}
 	return event
 }
@@ -3503,7 +3503,7 @@ func TestAddHumanCommand(t *testing.T) {
 				},
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument"),
+				ValidationErr: errors.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid"),
 			},
 		},
 		{
@@ -3519,7 +3519,7 @@ func TestAddHumanCommand(t *testing.T) {
 				},
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.Invalid.Argument"),
+				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty"),
 			},
 		},
 		{
@@ -3534,7 +3534,7 @@ func TestAddHumanCommand(t *testing.T) {
 				},
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-DiAq8", "Errors.Invalid.Argument"),
+				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty"),
 			},
 		},
 		{
