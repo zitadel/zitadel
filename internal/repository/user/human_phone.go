@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -24,7 +25,7 @@ const (
 type HumanPhoneChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	PhoneNumber string `json:"phone,omitempty"`
+	PhoneNumber domain.PhoneNumber `json:"phone,omitempty"`
 }
 
 func (e *HumanPhoneChangedEvent) Data() interface{} {
@@ -35,7 +36,7 @@ func (e *HumanPhoneChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, phone string) *HumanPhoneChangedEvent {
+func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, phone domain.PhoneNumber) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

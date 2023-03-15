@@ -240,11 +240,20 @@
     "NOROWS": "No data"
   },
   "ERRORS": {
-    "REQUIRED": "Some required fields are missing.",
+    "REQUIRED": "Please fill in this field.",
     "TOKENINVALID": {
       "TITLE": "Your authorization token has expired.",
       "DESCRIPTION": "Click the button below to log in again."
-    }
+    },
+    "INVALID_FORMAT": "The formatting is invalid.",
+    "NOTANEMAIL": "The given value is not an e-mail address.",
+    "MINLENGTH": "Must be at least {{requiredLength}} characters long.",
+    "UPPERCASEMISSING": "Must include an uppercase character.",
+    "LOWERCASEMISSING": "Must include a lowercase character.",
+    "SYMBOLERROR": "Must include a symbol or punctuation mark.",
+    "NUMBERERROR": "Must include a digit.",
+    "PWNOTEQUAL": "The passwords provided do not match.",
+    "PHONE": "The phone number must start with 00 or +."
   },
   "USER": {
     "SETTINGS": {
@@ -525,8 +534,7 @@
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Send Password Reset Link",
       "REQUIRED": "Some required fields are missing.",
-      "MINLENGTHERROR": "Has to be at least {{value}} characters long.",
-      "NOTEQUAL": "The passwords provided do not match."
+      "MINLENGTHERROR": "Has to be at least {{value}} characters long."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -579,17 +587,6 @@
         "2": "filter for projectname",
         "3": "filter for rolename"
       }
-    },
-    "VALIDATION": {
-      "INVALIDPATTERN": "The password does not fulfil the defined rules.",
-      "NOTANEMAIL": "The given value is not an e-mail address",
-      "REQUIRED": "The input field is empty.",
-      "MINLENGTH": "The password has to be at least {{requiredLength}} characters long.",
-      "NOEMAIL": "The user name cannot be an e-mail address.",
-      "UPPERCASEMISSING": "Must include an uppercase character.",
-      "LOWERCASEMISSING": "Must include a lowercase character.",
-      "SYMBOLERROR": "Must include a symbol or punctuation mark.",
-      "NUMBERERROR": "Must include a digit."
     },
     "STATE": {
       "0": "Unknown",
@@ -1634,6 +1631,26 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Enter the credentials for your Gitlab Identity Provider"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Enter the credentials for your Gitlab Self Hosted Identity Provider"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Enter the credentials for your GitHub Enterprise Server Identity Provider"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Enter the credentials for your Github Identity Provider"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Enter the credentials for your Microsoft Identity Provider"
       }
     },
     "DETAIL": {
@@ -1661,6 +1678,14 @@
       "1": "active",
       "2": "inactive"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Tenant Type",
+    "AZUREADTENANTID": "Tenant ID",
+    "EMAILVERIFIED": "Email verified",
     "NAMEHINT": "If specified it will be shown in the login interface.",
     "OPTIONAL": "optional",
     "UPDATECLIENTSECRET": "update client secret",

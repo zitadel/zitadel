@@ -154,7 +154,7 @@ func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes [
 		if user.Human == nil {
 			return
 		}
-		userinfo.SetEmail(user.Human.Email)
+		userinfo.SetEmail(string(user.Human.Email))
 		userinfo.SetSurname(user.Human.LastName)
 		userinfo.SetGivenName(user.Human.FirstName)
 		userinfo.SetFullName(user.Human.DisplayName)
@@ -164,7 +164,7 @@ func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes [
 		switch attribute {
 		case provider.AttributeEmail:
 			if user.Human != nil {
-				userinfo.SetEmail(user.Human.Email)
+				userinfo.SetEmail(string(user.Human.Email))
 			}
 		case provider.AttributeSurname:
 			if user.Human != nil {

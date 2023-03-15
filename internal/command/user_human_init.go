@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-//ResendInitialMail resend inital mail and changes email if provided
-func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourceOwner string, initCodeGenerator crypto.Generator) (objectDetails *domain.ObjectDetails, err error) {
+// ResendInitialMail resend initial mail and changes email if provided
+func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email domain.EmailAddress, resourceOwner string, initCodeGenerator crypto.Generator) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
 	}

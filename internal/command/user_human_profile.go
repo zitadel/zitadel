@@ -9,10 +9,12 @@ import (
 )
 
 func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profile) (*domain.Profile, error) {
-	if !profile.IsValid() && profile.AggregateID != "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8io0d", "Errors.User.Profile.Invalid")
+	if profile.AggregateID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-AwbEB", "Errors.User.Profile.IDMissing")
 	}
-
+	if err := profile.Validate(); err != nil {
+		return nil, err
+	}
 	existingProfile, err := c.profileWriteModelByID(ctx, profile.AggregateID, profile.ResourceOwner)
 	if err != nil {
 		return nil, err

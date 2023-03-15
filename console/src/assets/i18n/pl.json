@@ -239,11 +239,20 @@
     "NOROWS": "Brak danych"
   },
   "ERRORS": {
-    "REQUIRED": "Brakuje niektórych wymaganych pól.",
+    "REQUIRED": "Proszę wypełnić to pole.",
     "TOKENINVALID": {
       "TITLE": "Twój token autoryzacji wygasł.",
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
-    }
+    },
+    "INVALID_FORMAT": "Format jest nieprawidłowy.",
+    "NOTANEMAIL": "Podana wartość nie jest adresem e-mail.",
+    "MINLENGTH": "Musi mieć co najmniej {{requiredLength}} znaków.",
+    "UPPERCASEMISSING": "Musi zawierać wielką literę.",
+    "LOWERCASEMISSING": "Musi zawierać małą literę.",
+    "SYMBOLERROR": "Musi zawierać symbol lub znak interpunkcyjny.",
+    "NUMBERERROR": "Musi zawierać cyfrę.",
+    "PWNOTEQUAL": "Podane hasła nie są identyczne.",
+    "PHONE": "Numer telefonu musi zaczynać się od 00 lub +."
   },
   "USER": {
     "SETTINGS": {
@@ -524,8 +533,7 @@
       "SET": "Ustaw nowe hasło",
       "RESENDNOTIFICATION": "Wyślij link resetowania hasła",
       "REQUIRED": "Brakuje niektórych wymaganych pól.",
-      "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków.",
-      "NOTEQUAL": "Podane hasła nie są identyczne."
+      "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -578,17 +586,6 @@
         "2": "filtruj po nazwie projektu",
         "3": "filtruj po roli"
       }
-    },
-    "VALIDATION": {
-      "INVALIDPATTERN": "Hasło nie spełnia określonych reguł.",
-      "NOTANEMAIL": "Podana wartość nie jest adresem e-mail",
-      "REQUIRED": "Pole jest puste.",
-      "MINLENGTH": "Hasło musi mieć co najmniej {{requiredLength}} znaków.",
-      "NOEMAIL": "Nazwa użytkownika nie może być adresem e-mail.",
-      "UPPERCASEMISSING": "Musi zawierać wielką literę.",
-      "LOWERCASEMISSING": "Musi zawierać małą literę.",
-      "SYMBOLERROR": "Musi zawierać symbol lub znak interpunkcyjny.",
-      "NUMBERERROR": "Musi zawierać cyfrę."
     },
     "STATE": {
       "0": "Nieznany",
@@ -1633,6 +1630,26 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Google"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Gitlab Self Hosted"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Microsoft"
       }
     },
     "DETAIL": {
@@ -1665,6 +1682,14 @@
       "1": "aktywny",
       "2": "nieaktywny"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Rodzaj najemcy",
+    "AZUREADTENANTID": "Identyfikator najemcy",
+    "EMAILVERIFIED": "Email zweryfikowany",
     "NAMEHINT": "Jeśli zostanie podany, będzie widoczny w interfejsie logowania.",
     "OPTIONAL": "opcjonalnie",
     "UPDATECLIENTSECRET": "aktualizacja tajemnicy klienta",

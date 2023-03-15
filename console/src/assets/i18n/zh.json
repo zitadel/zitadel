@@ -239,11 +239,20 @@
     "NOROWS": "没有数据"
   },
   "ERRORS": {
-    "REQUIRED": "缺少一些必填字段。",
+    "REQUIRED": "请填写此栏",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
-    }
+    },
+    "INVALID_FORMAT": "格式是无效的。",
+    "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
+    "MINLENGTH": "长度必须至少是{{requiredLength}}字符。",
+    "UPPERCASEMISSING": "密码必须包含大写字符。",
+    "LOWERCASEMISSING": "密码必须包含小写字符。",
+    "SYMBOLERROR": "密码必须包含符号或标点符号。",
+    "NUMBERERROR": "密码必须包含数字。",
+    "PWNOTEQUAL": "提供的密码不匹配。",
+    "PHONE": "电话号码必须以00或+开头。"
   },
   "USER": {
     "SETTINGS": {
@@ -524,8 +533,7 @@
       "SET": "设置新密码",
       "RESENDNOTIFICATION": "发送重置密码链接",
       "REQUIRED": "缺少必填字段。",
-      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
-      "NOTEQUAL": "提供的密码不匹配。"
+      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。"
     },
     "ID": "ID",
     "EMAIL": "电子邮件",
@@ -578,17 +586,6 @@
         "2": "过滤项目名称",
         "3": "过滤角色名称"
       }
-    },
-    "VALIDATION": {
-      "INVALIDPATTERN": "密码不符合定义的规则。",
-      "NOTANEMAIL": "给定的值不是合法电子邮件地址",
-      "REQUIRED": "输入字段为空。",
-      "MINLENGTH": "密码长度必须至少为 {{requiredLength}} 个字符。",
-      "NOEMAIL": "用户名不能是电子邮件地址。",
-      "UPPERCASEMISSING": "密码必须包含大写字符。",
-      "LOWERCASEMISSING": "密码必须包含小写字符。",
-      "SYMBOLERROR": "密码必须包含符号或标点符号。",
-      "NUMBERERROR": "密码必须包含数字。"
     },
     "STATE": {
       "0": "未知",
@@ -1630,8 +1627,28 @@
         "DESCRIPTION": "输入你的JWT供应商所需的数据。"
       },
       "GOOGLE": {
-        "TITLE": "谷歌供应商",
-        "DESCRIPTION": "输入你的谷歌身份提供者的凭证"
+        "TITLE": "Google 身份提供者",
+        "DESCRIPTION": "输入您的 Google 身份提供商的凭据"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab身份提供商",
+        "DESCRIPTION": "输入您的Gitlab身份提供者的凭据"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab自我托管供应商",
+        "DESCRIPTION": "输入您的Gitlab自我托管身份提供商的凭据"
+      },
+      "GITHUBES": {
+        "TITLE": "Github Enterprise Server 身份提供者",
+        "DESCRIPTION": "输入您的GitHubEnterpriseServer身份提供者的凭据"
+      },
+      "GITHUB": {
+        "TITLE": "Github 身份提供者",
+        "DESCRIPTION": "输入您的 Github 身份提供商的凭据"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft 身份提供者",
+        "DESCRIPTION": "输入您的 Microsoft 身份提供商的凭据"
       }
     },
     "DETAIL": {
@@ -1664,6 +1681,14 @@
       "1": "启用",
       "2": "停用"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "租户类型",
+    "AZUREADTENANTID": "租户编号",
+    "EMAILVERIFIED": "电子邮件已验证",
     "NAMEHINT": "如果指定，它将显示在登录界面。",
     "OPTIONAL": "可选",
     "UPDATECLIENTSECRET": "更新客户秘密",

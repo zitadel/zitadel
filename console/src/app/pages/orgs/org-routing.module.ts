@@ -46,6 +46,19 @@ const routes: Routes = [
         ],
       },
       {
+        path: 'github-es',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-github-es/provider-github-es.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-github-es/provider-github-es.module'),
+          },
+        ],
+      },
+      {
         path: 'jwt',
         children: [
           {
@@ -68,6 +81,60 @@ const routes: Routes = [
           {
             path: ':id',
             loadChildren: () => import('src/app/modules/providers/provider-google/provider-google.module'),
+          },
+        ],
+      },
+      {
+        path: 'gitlab',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-gitlab/provider-gitlab.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-gitlab/provider-gitlab.module'),
+          },
+        ],
+      },
+      {
+        path: 'gitlab-self-hosted',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () =>
+              import('src/app/modules/providers/provider-gitlab-self-hosted/provider-gitlab-self-hosted.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () =>
+              import('src/app/modules/providers/provider-gitlab-self-hosted/provider-gitlab-self-hosted.module'),
+          },
+        ],
+      },
+      {
+        path: 'github',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-github/provider-github.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-github/provider-github.module'),
+          },
+        ],
+      },
+      {
+        path: 'azure-ad',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-azure-ad/provider-azure-ad.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-azure-ad/provider-azure-ad.module'),
           },
         ],
       },

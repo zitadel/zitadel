@@ -70,16 +70,23 @@ Errors:
     Profile:
       NotFound: Profilo non trovato
       NotChanged: Profilo non cambiato
-      Invalid: Dati non sono validi
+      Empty: Profilo è vuoto
+      FirstNameEmpty: Il nome nel profilo è vuoto
+      LastNameEmpty: Il cognome nel profilo è vuoto
+      IDMissing: Profilo ID mancante
     Email:
       NotFound: Email non trovata
       Invalid: L'e-mail non è valida
       AlreadyVerified: L'e-mail è già verificata
       NotChanged: Email non cambiata
+      Empty: Email è vuota
+      IDMissing: Email ID mancante
     Phone:
       NotFound: Telefono non trovato
       Invalid: Il telefono non è valido
       AlreadyVerified: Telefono già verificato
+      Empty: Il telefono è vuoto
+      NotChanged: Telefono non cambiato
     Address:
       NotFound: Indirizzo non trovato
       NotChanged: Indirizzo non cambiato
@@ -100,6 +107,7 @@ Errors:
     Username:
       AlreadyExists: Nome utente già preso
       Reserved: Il nome utente è già preso
+      Empty: Il nome utente è vuoto
     Code:
       Empty: Il codice è vuoto
       NotFound: Codice non trovato

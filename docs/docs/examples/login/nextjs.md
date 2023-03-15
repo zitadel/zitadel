@@ -63,9 +63,58 @@ You can directly import the ZITADEL provider from [next-auth](https://next-auth.
 https://github.com/zitadel/zitadel-nextjs/blob/main/pages/api/auth/%5B...nextauth%5D.tsx
 ```
 
-You can overwrite the default callbacks, just append them to the ZITADEL provider.
+You can overwrite the profile callback, just append it to the ZITADEL provider.
 
 ```ts
+...
+ZitadelProvider({
+    issuer: process.env.ZITADEL_ISSUER,
+    clientId: process.env.ZITADEL_CLIENT_ID,
+    clientSecret: process.env.ZITADEL_CLIENT_SECRET,
+    async profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          firstName: profile.given_name,
+          lastName: profile.family_name,
+          email: profile.email,
+          loginName: profile.preferred_username,
+          image: profile.picture,
+        };
+    },
+}),
+...
+```
+
+If you want to request a refresh token, you can overwrite the JWT callback and add the `offline_access` scope.
+
+```ts
+...
+async function refreshAccessToken(token: JWT): Promise<JWT> {
+  try {
+    const issuer = await Issuer.discover(process.env.ZITADEL_ISSUER ?? '');
+    const client = new issuer.Client({
+      client_id: process.env.ZITADEL_CLIENT_ID || '',
+      token_endpoint_auth_method: 'none',
+    });
+
+    const { refresh_token, access_token, expires_at } = await client.refresh(token.refreshToken as string);
+
+    return {
+      ...token,
+      accessToken: access_token,
+      expiresAt: (expires_at ?? 0) * 1000,
+      refreshToken: refresh_token, // Fall back to old refresh token
+    };
+  } catch (error) {
+    console.error('Error during refreshAccessToken', error);
+
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+}
 ...
 ZitadelProvider({
     issuer: process.env.ZITADEL_ISSUER,
@@ -120,6 +169,17 @@ https://github.com/zitadel/zitadel-nextjs/blob/main/components/profile.tsx#L4-L3
 ```
 
 Note that the signIn method requires the id of our provider which is in our case `zitadel`.
+
+### Userinfo API
+
+To show user information, you can either use the idToken data, or call the userinfo endpoint.
+In this example, we call the userinfo endpoint to load user data.
+To implement the API, you can create a file under the `pages/api` folder and call it `userinfo.ts`.
+The file should look like the following.
+
+```ts reference
+https://github.com/zitadel/zitadel-nextjs/blob/main/pages/api/userinfo.ts
+```
 
 ### Session state
 

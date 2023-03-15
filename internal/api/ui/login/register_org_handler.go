@@ -14,14 +14,14 @@ const (
 )
 
 type registerOrgFormData struct {
-	RegisterOrgName string `schema:"orgname"`
-	Email           string `schema:"email"`
-	Username        string `schema:"username"`
-	Firstname       string `schema:"firstname"`
-	Lastname        string `schema:"lastname"`
-	Password        string `schema:"register-password"`
-	Password2       string `schema:"register-password-confirmation"`
-	TermsConfirm    bool   `schema:"terms-confirm"`
+	RegisterOrgName string              `schema:"orgname"`
+	Email           domain.EmailAddress `schema:"email"`
+	Username        string              `schema:"username"`
+	Firstname       string              `schema:"firstname"`
+	Lastname        string              `schema:"lastname"`
+	Password        string              `schema:"register-password"`
+	Password2       string              `schema:"register-password-confirmation"`
+	TermsConfirm    bool                `schema:"terms-confirm"`
 }
 
 type registerOrgData struct {
@@ -121,7 +121,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {
 	if d.Username == "" {
-		d.Username = d.Email
+		d.Username = string(d.Email)
 	}
 	return &domain.Human{
 		Username: d.Username,
@@ -140,7 +140,7 @@ func (d registerOrgFormData) toUserDomain() *domain.Human {
 
 func (d registerOrgFormData) toCommandOrg() *command.OrgSetup {
 	if d.Username == "" {
-		d.Username = d.Email
+		d.Username = string(d.Email)
 	}
 	return &command.OrgSetup{
 		Name: d.RegisterOrgName,

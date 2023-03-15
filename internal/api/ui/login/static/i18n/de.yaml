@@ -320,6 +320,7 @@ Errors:
     MissingParameters: Benötigte Parameter fehlen
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    AlreadyExists: Benutzer existiert bereits
     Inactive: Benutzer ist inaktiv
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
@@ -328,6 +329,33 @@ Errors:
     Invalid: Userdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
+    Profile:
+      NotFound: Profil nicht gefunden
+      NotChanged: Profil nicht verändert
+      Empty: Profil ist leer
+      FirstNameEmpty: Vorname im Profil ist leer
+      LastNameEmpty: Nachname im Profil ist leer
+      IDMissing: Profil ID fehlt
+    Email:
+      NotFound: Email nicht gefunden
+      Invalid: Email ist ungültig
+      AlreadyVerified: Email ist bereits verifiziert
+      NotChanged: Email wurde nicht geändert
+      Empty: Email ist leer
+      IDMissing: Email ID fehlt
+    Phone:
+      NotFound: Telefonnummer nicht gefunden
+      Invalid: Telefonnummer ist ungültig
+      AlreadyVerified: Telefonnummer bereits verifiziert
+      Empty: Telefonnummer ist leer
+      NotChanged: Telefonnummer wurde nicht geändert
+    Address:
+      NotFound: Adresse nicht gefunden
+      NotChanged: Adresse wurde nicht geändert
+    Username:
+      AlreadyExists: Benutzername ist bereits vergeben
+      Reserved: Benutzername ist bereits vergeben
+      Empty: Benutzername ist leer
     Password:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer

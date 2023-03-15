@@ -273,6 +273,30 @@ func updateJWTProviderToCommand(req *admin_pb.UpdateJWTProviderRequest) command.
 	}
 }
 
+func addAzureADProviderToCommand(req *admin_pb.AddAzureADProviderRequest) command.AzureADProvider {
+	return command.AzureADProvider{
+		Name:          req.Name,
+		ClientID:      req.ClientId,
+		ClientSecret:  req.ClientSecret,
+		Scopes:        req.Scopes,
+		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
+		EmailVerified: req.EmailVerified,
+		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateAzureADProviderToCommand(req *admin_pb.UpdateAzureADProviderRequest) command.AzureADProvider {
+	return command.AzureADProvider{
+		Name:          req.Name,
+		ClientID:      req.ClientId,
+		ClientSecret:  req.ClientSecret,
+		Scopes:        req.Scopes,
+		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
+		EmailVerified: req.EmailVerified,
+		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
 func addGitHubProviderToCommand(req *admin_pb.AddGitHubProviderRequest) command.GitHubProvider {
 	return command.GitHubProvider{
 		Name:         req.Name,
@@ -316,6 +340,48 @@ func updateGitHubEnterpriseProviderToCommand(req *admin_pb.UpdateGitHubEnterpris
 		UserEndpoint:          req.UserEndpoint,
 		Scopes:                req.Scopes,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGitLabProviderToCommand(req *admin_pb.AddGitLabProviderRequest) command.GitLabProvider {
+	return command.GitLabProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitLabProviderToCommand(req *admin_pb.UpdateGitLabProviderRequest) command.GitLabProvider {
+	return command.GitLabProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGitLabSelfHostedProviderToCommand(req *admin_pb.AddGitLabSelfHostedProviderRequest) command.GitLabSelfHostedProvider {
+	return command.GitLabSelfHostedProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitLabSelfHostedProviderToCommand(req *admin_pb.UpdateGitLabSelfHostedProviderRequest) command.GitLabSelfHostedProvider {
+	return command.GitLabSelfHostedProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 

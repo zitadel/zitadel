@@ -4,7 +4,15 @@ import { Component } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatLegacySlideToggleChange as MatSlideToggleChange } from '@angular/material/legacy-slide-toggle';
 import { Router } from '@angular/router';
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
+import {
+  containsLowerCaseValidator,
+  containsNumberValidator,
+  containsSymbolValidator,
+  containsUpperCaseValidator,
+  minLengthValidator,
+  passwordConfirmValidator,
+  requiredValidator,
+} from 'src/app/modules/form-field/validators/validators';
 import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
@@ -12,26 +20,6 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
-function passwordConfirmValidator(c: AbstractControl): any {
-  if (!c.parent || !c) {
-    return;
-  }
-  const pwd = c.parent.get('password');
-  const cpwd = c.parent.get('confirmPassword');
-
-  if (!pwd || !cpwd) {
-    return;
-  }
-  if (pwd.value !== cpwd.value) {
-    return {
-      invalid: true,
-      notequal: {
-        valid: false,
-      },
-    };
-  }
-}
 
 @Component({
   selector: 'cnsl-org-create',
@@ -49,7 +37,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
 })
 export class OrgCreateComponent {
   public orgForm: UntypedFormGroup = this.fb.group({
-    name: ['', [Validators.required]],
+    name: ['', [requiredValidator]],
     domain: [''],
   });
 
@@ -133,10 +121,10 @@ export class OrgCreateComponent {
 
   private initForm(): void {
     this.userForm = this.fb.group({
-      userName: ['', [Validators.required]],
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
-      email: ['', [Validators.required]],
+      userName: ['', [requiredValidator]],
+      firstName: ['', [requiredValidator]],
+      lastName: ['', [requiredValidator]],
+      email: ['', [requiredValidator]],
       isVerified: [false, []],
       gender: [''],
       nickName: [''],
@@ -145,7 +133,7 @@ export class OrgCreateComponent {
   }
 
   public initPwdValidators(): void {
-    const validators: Validators[] = [Validators.required];
+    const validators: Validators[] = [requiredValidator];
 
     if (this.usePassword) {
       this.mgmtService.getDefaultPasswordComplexityPolicy().then((data) => {
@@ -153,23 +141,23 @@ export class OrgCreateComponent {
           this.policy = data.policy;
 
           if (this.policy.minLength) {
-            validators.push(Validators.minLength(this.policy.minLength));
+            validators.push(minLengthValidator(this.policy.minLength));
           }
           if (this.policy.hasLowercase) {
-            validators.push(lowerCaseValidator);
+            validators.push(containsLowerCaseValidator);
           }
           if (this.policy.hasUppercase) {
-            validators.push(upperCaseValidator);
+            validators.push(containsUpperCaseValidator);
           }
           if (this.policy.hasNumber) {
-            validators.push(numberValidator);
+            validators.push(containsNumberValidator);
           }
           if (this.policy.hasSymbol) {
-            validators.push(symbolValidator);
+            validators.push(containsSymbolValidator);
           }
 
           const pwdValidators = [...validators] as ValidatorFn[];
-          const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+          const confirmPwdValidators = [requiredValidator, passwordConfirmValidator()] as ValidatorFn[];
           this.pwdForm = this.fb.group({
             password: ['', pwdValidators],
             confirmPassword: ['', confirmPwdValidators],
@@ -189,13 +177,13 @@ export class OrgCreateComponent {
       this.createSteps = 1;
 
       this.orgForm = this.fb.group({
-        name: ['', [Validators.required]],
+        name: ['', [requiredValidator]],
       });
     } else {
       this.createSteps = 2;
 
       this.orgForm = this.fb.group({
-        name: ['', [Validators.required]],
+        name: ['', [requiredValidator]],
         domain: [''],
       });
     }
