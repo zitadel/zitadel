@@ -59,6 +59,14 @@
               <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
               Generic JWT
             </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITLAB">
+              <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="gitlab" />
+              Gitlab
+            </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITLAB_SELF_HOSTED">
+              <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="gitlab self hosted" />
+              Gitlab Self Hosted
+            </div>
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB_ES">
               <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="github" />
               <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="github" />
