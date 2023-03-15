@@ -3,9 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/ttacon/libphonenumber"
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -25,20 +23,6 @@ type PhoneCode struct {
 
 	Code   *crypto.CryptoValue
 	Expiry time.Duration
-}
-
-func (p *Phone) IsValid() bool {
-	err := p.formatPhone()
-	return p.PhoneNumber != "" && err == nil
-}
-
-func (p *Phone) formatPhone() error {
-	phoneNr, err := libphonenumber.Parse(p.PhoneNumber, defaultRegion)
-	if err != nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-so0wa", "Phonenumber is invalid")
-	}
-	p.PhoneNumber = libphonenumber.Format(phoneNr, libphonenumber.E164)
-	return nil
 }
 
 func (p *Phone) GeneratePhoneCodeIfNeeded(phoneGenerator crypto.Generator) (*PhoneCode, error) {

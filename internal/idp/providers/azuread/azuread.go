@@ -7,6 +7,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 )
@@ -120,17 +121,17 @@ func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes [
 // AzureAD does not return an `email_verified` claim.
 // The verification can be automatically activated on the provider ([WithEmailVerified])
 type User struct {
-	ID                string   `json:"id"`
-	BusinessPhones    []string `json:"businessPhones"`
-	DisplayName       string   `json:"displayName"`
-	FirstName         string   `json:"givenName"`
-	JobTitle          string   `json:"jobTitle"`
-	Email             string   `json:"mail"`
-	MobilePhone       string   `json:"mobilePhone"`
-	OfficeLocation    string   `json:"officeLocation"`
-	PreferredLanguage string   `json:"preferredLanguage"`
-	LastName          string   `json:"surname"`
-	UserPrincipalName string   `json:"userPrincipalName"`
+	ID                string               `json:"id"`
+	BusinessPhones    []domain.PhoneNumber `json:"businessPhones"`
+	DisplayName       string               `json:"displayName"`
+	FirstName         string               `json:"givenName"`
+	JobTitle          string               `json:"jobTitle"`
+	Email             domain.EmailAddress  `json:"mail"`
+	MobilePhone       domain.PhoneNumber   `json:"mobilePhone"`
+	OfficeLocation    string               `json:"officeLocation"`
+	PreferredLanguage string               `json:"preferredLanguage"`
+	LastName          string               `json:"surname"`
+	UserPrincipalName string               `json:"userPrincipalName"`
 	isEmailVerified   bool
 }
 
@@ -166,7 +167,7 @@ func (u *User) GetPreferredUsername() string {
 }
 
 // GetEmail is an implementation of the [idp.User] interface.
-func (u *User) GetEmail() string {
+func (u *User) GetEmail() domain.EmailAddress {
 	return u.Email
 }
 
@@ -180,7 +181,7 @@ func (u *User) IsEmailVerified() bool {
 
 // GetPhone is an implementation of the [idp.User] interface.
 // It returns an empty string because AzureAD does not provide the user's phone.
-func (u *User) GetPhone() string {
+func (u *User) GetPhone() domain.PhoneNumber {
 	return ""
 }
 

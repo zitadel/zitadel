@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 // Provider is the minimal implementation for a 3rd party authentication provider
@@ -24,9 +26,9 @@ type User interface {
 	GetDisplayName() string
 	GetNickname() string
 	GetPreferredUsername() string
-	GetEmail() string
+	GetEmail() domain.EmailAddress
 	IsEmailVerified() bool
-	GetPhone() string
+	GetPhone() domain.PhoneNumber
 	IsPhoneVerified() bool
 	GetPreferredLanguage() language.Tag
 	GetAvatarURL() string

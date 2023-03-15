@@ -75,7 +75,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -84,7 +84,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								false,
 							},
@@ -144,7 +144,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -153,7 +153,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								false,
 							},
@@ -208,7 +208,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{},
 								&sql.NullString{String: "und", Valid: false},
 								&sql.NullInt16{},
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{},
 							},
 						},
@@ -217,7 +217,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "", Valid: false},
 								false,
 							},
@@ -277,7 +277,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -286,7 +286,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								false,
 							},
@@ -346,7 +346,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -355,7 +355,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								false,
 							},
@@ -410,7 +410,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{},
 								&sql.NullString{String: "und", Valid: false},
 								&sql.NullInt16{},
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{},
 							},
 						},
@@ -419,7 +419,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "", Valid: false},
 								false,
 							},
@@ -879,7 +879,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.users8_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
-								"+41 00 000 00 00",
+								domain.PhoneNumber("+41 00 000 00 00"),
 								false,
 								"agg-id",
 								"instance-id",
@@ -927,7 +927,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.users8_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
-								"+41 00 000 00 00",
+								domain.PhoneNumber("+41 00 000 00 00"),
 								false,
 								"agg-id",
 								"instance-id",
@@ -1157,7 +1157,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.users8_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								false,
 								"agg-id",
 								"instance-id",
@@ -1205,7 +1205,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.users8_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
-								"email@zitadel.com",
+								domain.EmailAddress("email@zitadel.com"),
 								false,
 								"agg-id",
 								"instance-id",

@@ -10,6 +10,7 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
@@ -87,9 +88,9 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 		user.GetAttributeValue(s.Provider.displayNameAttribute),
 		user.GetAttributeValue(s.Provider.nickNameAttribute),
 		user.GetAttributeValue(s.Provider.preferredUsernameAttribute),
-		user.GetAttributeValue(s.Provider.emailAttribute),
+		domain.EmailAddress(user.GetAttributeValue(s.Provider.emailAttribute)),
 		emailVerified,
-		user.GetAttributeValue(s.Provider.phoneAttribute),
+		domain.PhoneNumber(user.GetAttributeValue(s.Provider.phoneAttribute)),
 		phoneVerified,
 		language.Make(user.GetAttributeValue(s.Provider.preferredLanguageAttribute)),
 		user.GetAttributeValue(s.Provider.avatarURLAttribute),
