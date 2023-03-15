@@ -57,37 +57,22 @@
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
                   <input cnslInput formControlName="userName" required />
-                  <span cnslError *ngIf="userName?.invalid && userName?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                  </span>
                 </cnsl-form-field>
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}</cnsl-label>
                   <input cnslInput formControlName="email" required />
-                  <span cnslError *ngIf="email?.invalid && email?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                  </span>
                 </cnsl-form-field>
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</cnsl-label>
                   <input cnslInput formControlName="firstName" required />
-                  <span cnslError *ngIf="firstName?.invalid && firstName?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                  </span>
                 </cnsl-form-field>
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</cnsl-label>
                   <input cnslInput formControlName="lastName" required />
-                  <span cnslError *ngIf="lastName?.invalid && lastName?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                  </span>
                 </cnsl-form-field>
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</cnsl-label>
                   <input cnslInput formControlName="nickName" />
-                  <span cnslError *ngIf="nickName?.invalid && nickName?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                  </span>
                 </cnsl-form-field>
 
                 <p class="section cnsl-secondary-text">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
@@ -99,9 +84,6 @@
                       {{ 'GENDERS.' + gender | translate }}
                     </mat-option>
                   </mat-select>
-                  <span cnslError *ngIf="gender?.invalid && gender?.errors?.required">
-                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                  </span>
                 </cnsl-form-field>
                 <cnsl-form-field class="formfield">
                   <cnsl-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</cnsl-label>
@@ -109,9 +91,6 @@
                     <mat-option *ngFor="let language of languages" [value]="language">
                       {{ 'LANGUAGES.' + language | translate }}
                     </mat-option>
-                    <span cnslError *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
-                      {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                    </span>
                   </mat-select>
                 </cnsl-form-field>
 
@@ -148,10 +127,6 @@
                     <cnsl-form-field class="pwd" *ngIf="password">
                       <cnsl-label>{{ 'USER.PASSWORD.NEW' | translate }}</cnsl-label>
                       <input cnslInput autocomplete="off" name="firstpassword" formControlName="password" type="password" />
-
-                      <span cnslError *ngIf="password?.errors?.required">
-                        {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                      </span>
                     </cnsl-form-field>
                     <cnsl-form-field class="pwd" *ngIf="confirmPassword">
                       <cnsl-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</cnsl-label>
@@ -162,13 +137,6 @@
                         formControlName="confirmPassword"
                         type="password"
                       />
-
-                      <span cnslError *ngIf="confirmPassword?.errors?.required">
-                        {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                      </span>
-                      <span cnslError *ngIf="confirmPassword?.errors?.notequal">
-                        {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
-                      </span>
                     </cnsl-form-field>
                   </form>
                 </ng-container>

@@ -1,6 +1,10 @@
 package ldap
 
-import "golang.org/x/text/language"
+import (
+	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/domain"
+)
 
 type User struct {
 	id                string
@@ -9,9 +13,9 @@ type User struct {
 	displayName       string
 	nickName          string
 	preferredUsername string
-	email             string
+	email             domain.EmailAddress
 	emailVerified     bool
-	phone             string
+	phone             domain.PhoneNumber
 	phoneVerified     bool
 	preferredLanguage language.Tag
 	avatarURL         string
@@ -25,9 +29,9 @@ func NewUser(
 	displayName string,
 	nickName string,
 	preferredUsername string,
-	email string,
+	email domain.EmailAddress,
 	emailVerified bool,
-	phone string,
+	phone domain.PhoneNumber,
 	phoneVerified bool,
 	preferredLanguage language.Tag,
 	avatarURL string,
@@ -68,13 +72,13 @@ func (u *User) GetNickname() string {
 func (u *User) GetPreferredUsername() string {
 	return u.preferredUsername
 }
-func (u *User) GetEmail() string {
+func (u *User) GetEmail() domain.EmailAddress {
 	return u.email
 }
 func (u *User) IsEmailVerified() bool {
 	return u.emailVerified
 }
-func (u *User) GetPhone() string {
+func (u *User) GetPhone() domain.PhoneNumber {
 	return u.phone
 }
 func (u *User) IsPhoneVerified() bool {

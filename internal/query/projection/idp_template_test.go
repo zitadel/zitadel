@@ -421,6 +421,66 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 		want   wantReduce
 	}{
 		{
+			name: "instance reduceAzureADIDPAdded minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.AzureADIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    }
+}`),
+				), instance.AzureADIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceAzureADIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"name",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeAzureAD,
+								false,
+								false,
+								false,
+								false,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates3_azure (idp_id, instance_id, client_id, client_secret, scopes, tenant, is_email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray(nil),
+								"",
+								false,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "instance reduceAzureADIDPAdded",
 			args: args{
 				event: getEvent(testEvent(

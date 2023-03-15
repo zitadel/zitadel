@@ -10,12 +10,12 @@ import (
 )
 
 type Email struct {
-	Address  string
+	Address  domain.EmailAddress
 	Verified bool
 }
 
-func (e *Email) Valid() bool {
-	return e.Address != "" && domain.EmailRegex.MatchString(e.Address)
+func (e *Email) Validate() error {
+	return e.Address.Validate()
 }
 
 func newEmailCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, expiry time.Duration, err error) {
