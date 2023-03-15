@@ -111,8 +111,8 @@ func (u *User) GetPreferredUsername() string {
 	return u.PreferredUsername
 }
 
-func (u *User) GetEmail() string {
-	return u.Email
+func (u *User) GetEmail() domain.EmailAddress {
+	return domain.EmailAddress(u.Email)
 }
 
 func (u *User) IsEmailVerified() bool {
@@ -137,8 +137,4 @@ func (u *User) GetAvatarURL() string {
 
 func (u *User) GetProfile() string {
 	return u.Profile
-}
-
-func (u *User) GetEmail() domain.EmailAddress {
-	return domain.EmailAddress(u.IDTokenClaims.GetEmail())
 }

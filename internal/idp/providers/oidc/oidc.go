@@ -21,7 +21,7 @@ type Provider struct {
 	isAutoCreation    bool
 	isAutoUpdate      bool
 	useIDToken        bool
-	userInfoMapper    func(info oidc.UserInfo) idp.User
+	userInfoMapper    func(info *oidc.UserInfo) idp.User
 	authOptions       []rp.AuthURLOpt
 }
 
