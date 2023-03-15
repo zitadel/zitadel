@@ -1645,6 +1645,10 @@
       "GITHUB": {
         "TITLE": "Github 身份提供者",
         "DESCRIPTION": "输入您的 Github 身份提供商的凭据"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft 身份提供者",
+        "DESCRIPTION": "输入您的 Microsoft 身份提供商的凭据"
       }
     },
     "DETAIL": {
@@ -1677,6 +1681,14 @@
       "1": "启用",
       "2": "停用"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "租户类型",
+    "AZUREADTENANTID": "租户编号",
+    "EMAILVERIFIED": "电子邮件已验证",
     "NAMEHINT": "如果指定，它将显示在登录界面。",
     "OPTIONAL": "可选",
     "UPDATECLIENTSECRET": "更新客户秘密",

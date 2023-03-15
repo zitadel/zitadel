@@ -1646,6 +1646,10 @@
       "GITHUB": {
         "TITLE": "Github Provider",
         "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Microsoft"
       }
     },
     "DETAIL": {
@@ -1678,6 +1682,14 @@
       "1": "aktywny",
       "2": "nieaktywny"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Rodzaj najemcy",
+    "AZUREADTENANTID": "Identyfikator najemcy",
+    "EMAILVERIFIED": "Email zweryfikowany",
     "NAMEHINT": "Jeśli zostanie podany, będzie widoczny w interfejsie logowania.",
     "OPTIONAL": "opcjonalnie",
     "UPDATECLIENTSECRET": "aktualizacja tajemnicy klienta",

@@ -226,6 +226,8 @@ export class IdpTableComponent implements OnInit {
   public routerLinkForRow(row: Provider.AsObject): any {
     if (row.id) {
       switch (row.type) {
+        case ProviderType.PROVIDER_TYPE_AZURE_AD:
+          return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'azure-ad', row.id];
         case ProviderType.PROVIDER_TYPE_OIDC:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'oidc', row.id];
         case ProviderType.PROVIDER_TYPE_GITHUB_ES:

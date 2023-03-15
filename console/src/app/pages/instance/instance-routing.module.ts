@@ -32,6 +32,19 @@ const routes: Routes = [
     },
     children: [
       {
+        path: 'azure-ad',
+        children: [
+          {
+            path: 'create',
+            loadChildren: () => import('src/app/modules/providers/provider-azure-ad/provider-azure-ad.module'),
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('src/app/modules/providers/provider-azure-ad/provider-azure-ad.module'),
+          },
+        ],
+      },
+      {
         path: 'oidc',
         children: [
           {
