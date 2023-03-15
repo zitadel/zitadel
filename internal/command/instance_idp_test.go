@@ -637,6 +637,428 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 	}
 }
 
+func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		idGenerator  id.Generator
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		provider AzureADProvider
+	}
+	type res struct {
+		id   string
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid name",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AzureADProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
+				},
+			},
+		},
+		{
+			"invalid client id",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AzureADProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
+				},
+			},
+		},
+		{
+			"invalid client secret",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AzureADProvider{
+					Name:     "name",
+					ClientID: "clientID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
+				},
+			},
+		},
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+									"id1",
+									"name",
+									"clientID",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("clientSecret"),
+									},
+									nil,
+									"",
+									false,
+									idp.Options{},
+								)),
+						},
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AzureADProvider{
+					Name:         "name",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "ok all set",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+									"id1",
+									"name",
+									"clientID",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("clientSecret"),
+									},
+									[]string{"openid"},
+									"tenant",
+									true,
+									idp.Options{
+										IsCreationAllowed: true,
+										IsLinkingAllowed:  true,
+										IsAutoCreation:    true,
+										IsAutoUpdate:      true,
+									},
+								)),
+						},
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AzureADProvider{
+					Name:          "name",
+					ClientID:      "clientID",
+					ClientSecret:  "clientSecret",
+					Scopes:        []string{"openid"},
+					Tenant:        "tenant",
+					EmailVerified: true,
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idGenerator:         tt.fields.idGenerator,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			id, got, err := c.AddInstanceAzureADProvider(tt.args.ctx, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.id, id)
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		id       string
+		provider AzureADProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AzureADProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAgh2", ""))
+				},
+			},
+		},
+		{
+			"invalid name",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				id:       "id1",
+				provider: AzureADProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-fh3h1", ""))
+				},
+			},
+		},
+		{
+			"invalid client id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AzureADProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dmitg", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AzureADProvider{
+					Name:     "name",
+					ClientID: "clientID",
+				},
+			},
+			res: res{
+				err: caos_errors.IsNotFound,
+			},
+		},
+		{
+			name: "no changes",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								"",
+								false,
+								idp.Options{},
+							)),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AzureADProvider{
+					Name:     "name",
+					ClientID: "clientID",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "change ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								"",
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								func() eventstore.Command {
+									t := true
+									event, _ := instance.NewAzureADIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+										"id1",
+										[]idp.AzureADIDPChanges{
+											idp.ChangeAzureADName("new name"),
+											idp.ChangeAzureADClientID("new clientID"),
+											idp.ChangeAzureADClientSecret(&crypto.CryptoValue{
+												CryptoType: crypto.TypeEncryption,
+												Algorithm:  "enc",
+												KeyID:      "id",
+												Crypted:    []byte("new clientSecret"),
+											}),
+											idp.ChangeAzureADScopes([]string{"openid", "profile"}),
+											idp.ChangeAzureADTenant("new tenant"),
+											idp.ChangeAzureADIsEmailVerified(true),
+											idp.ChangeAzureADOptions(idp.OptionChanges{
+												IsCreationAllowed: &t,
+												IsLinkingAllowed:  &t,
+												IsAutoCreation:    &t,
+												IsAutoUpdate:      &t,
+											}),
+										},
+									)
+									return event
+								}(),
+							),
+						},
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AzureADProvider{
+					Name:          "new name",
+					ClientID:      "new clientID",
+					ClientSecret:  "new clientSecret",
+					Scopes:        []string{"openid", "profile"},
+					Tenant:        "new tenant",
+					EmailVerified: true,
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.UpdateInstanceAzureADProvider(tt.args.ctx, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
 func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
