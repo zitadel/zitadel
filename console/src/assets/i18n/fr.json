@@ -1631,6 +1631,14 @@
         "TITLE": "Fournisseur Google",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Google"
       },
+      "GITLAB": {
+        "TITLE": "Fournisseur Gitlab",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Fournisseur Gitlab Self Hosted",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Gitlab Self Hosted"
+      },
       "GITHUBES": {
         "TITLE": "Fournisseur GitHub Enterprise Server",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité GitHub Enterprise Server"

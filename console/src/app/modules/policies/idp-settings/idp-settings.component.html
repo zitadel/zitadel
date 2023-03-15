@@ -77,13 +77,38 @@
     </div>
   </a>
 
-  <div class="item card coming-soon" matRipple>
+  <a
+    class="item card coming-soon"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'gitlab', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'gitlab', 'create']
+        : []
+    "
+  >
     <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
     <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="GitLab" />
     <div class="text-container">
       <span class="title">GitLab</span>
     </div>
-  </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'gitlab-self-hosted', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'gitlab-self-hosted', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="GitLab" />
+    <div class="text-container">
+      <span class="title">GitLab Self Hosted</span>
+    </div>
+  </a>
 
   <a
     class="item card"

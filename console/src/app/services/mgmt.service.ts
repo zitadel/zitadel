@@ -39,6 +39,10 @@ import {
   AddGitHubEnterpriseServerProviderResponse,
   AddGitHubProviderRequest,
   AddGitHubProviderResponse,
+  AddGitLabProviderRequest,
+  AddGitLabProviderResponse,
+  AddGitLabSelfHostedProviderRequest,
+  AddGitLabSelfHostedProviderResponse,
   AddGoogleProviderRequest,
   AddGoogleProviderResponse,
   AddHumanUserRequest,
@@ -445,6 +449,10 @@ import {
   UpdateGitHubEnterpriseServerProviderResponse,
   UpdateGitHubProviderRequest,
   UpdateGitHubProviderResponse,
+  UpdateGitLabProviderRequest,
+  UpdateGitLabProviderResponse,
+  UpdateGitLabSelfHostedProviderRequest,
+  UpdateGitLabSelfHostedProviderResponse,
   UpdateGoogleProviderRequest,
   UpdateGoogleProviderResponse,
   UpdateHumanEmailRequest,
@@ -883,6 +891,26 @@ export class ManagementService {
 
   public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitLabProvider(req: AddGitLabProviderRequest): Promise<AddGitLabProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGitLabProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitLabProvider(req: UpdateGitLabProviderRequest): Promise<UpdateGitLabProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGitLabProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitLabSelfHostedProvider(
+    req: AddGitLabSelfHostedProviderRequest,
+  ): Promise<AddGitLabSelfHostedProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGitLabSelfHostedProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitLabSelfHostedProvider(
+    req: UpdateGitLabSelfHostedProviderRequest,
+  ): Promise<UpdateGitLabSelfHostedProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGitLabSelfHostedProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGitHubProvider(req: AddGitHubProviderRequest): Promise<AddGitHubProviderResponse.AsObject> {
