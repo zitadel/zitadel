@@ -1,11 +1,9 @@
-import { KeyValuePipe } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import {
   MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
-import { TranslateService } from '@ngx-translate/core';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
@@ -33,8 +31,6 @@ export class EditDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<EditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private countryCallingCodesService: CountryCallingCodesService,
-    private translateSvc: TranslateService,
-    private kvPipe: KeyValuePipe,
   ) {
     if (data.type === EditDialogType.PHONE) {
       this.isPhone = true;
