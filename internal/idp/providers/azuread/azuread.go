@@ -168,6 +168,11 @@ func (u *User) GetPreferredUsername() string {
 
 // GetEmail is an implementation of the [idp.User] interface.
 func (u *User) GetEmail() domain.EmailAddress {
+	if u.Email == "" {
+		// if the user used a social login on Azure as well, the email will be empty
+		// but is used as username
+		return domain.EmailAddress(u.UserPrincipalName)
+	}
 	return u.Email
 }
 

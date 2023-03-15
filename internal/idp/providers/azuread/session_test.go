@@ -147,7 +147,7 @@ func TestSession_FetchUser(t *testing.T) {
 			want: want{
 				user: &User{
 					ID:                "id",
-					BusinessPhones:    []string{"phone1", "phone2"},
+					BusinessPhones:    []domain.PhoneNumber{"phone1", "phone2"},
 					DisplayName:       "firstname lastname",
 					FirstName:         "firstname",
 					JobTitle:          "title",
@@ -211,7 +211,7 @@ func TestSession_FetchUser(t *testing.T) {
 			want: want{
 				user: &User{
 					ID:                "id",
-					BusinessPhones:    []string{"phone1", "phone2"},
+					BusinessPhones:    []domain.PhoneNumber{"phone1", "phone2"},
 					DisplayName:       "firstname lastname",
 					FirstName:         "firstname",
 					JobTitle:          "title",
@@ -282,7 +282,7 @@ func TestSession_FetchUser(t *testing.T) {
 func userinfo() *User {
 	return &User{
 		ID:                "id",
-		BusinessPhones:    []string{"phone1", "phone2"},
+		BusinessPhones:    []domain.PhoneNumber{"phone1", "phone2"},
 		DisplayName:       "firstname lastname",
 		FirstName:         "firstname",
 		JobTitle:          "title",
