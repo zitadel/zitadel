@@ -1646,6 +1646,10 @@
       "GITHUB": {
         "TITLE": "Fournisseur Github",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Fournisseur Microsoft",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Microsoft"
       }
     },
     "DETAIL": {
@@ -1678,6 +1682,14 @@
       "1": "actif",
       "2": "inactif"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Type de locataire",
+    "AZUREADTENANTID": "ID du locataire",
+    "EMAILVERIFIED": "Courriel vérifié",
     "NAMEHINT": "Si elle est spécifiée, elle sera affichée dans l'interface de connexion.",
     "OPTIONAL": "optionnel",
     "UPDATECLIENTSECRET": "mise à jour du secret client",
