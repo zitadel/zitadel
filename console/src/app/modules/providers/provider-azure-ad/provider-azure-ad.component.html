@@ -2,39 +2,24 @@
   title="{{ id ? ('IDP.DETAIL.TITLE' | translate) : ('IDP.CREATE.TITLE' | translate) }}"
   (closed)="close()"
 >
-  <div class="github-es-create-content">
+  <div class="azure-ad-create-content">
     <div class="title-row">
-      <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
-      <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
-
-      <h1>{{ 'IDP.CREATE.GITHUBES.TITLE' | translate }}</h1>
+      <img class="idp-logo" src="./assets/images/idp/ms.svg" alt="microsoft" />
+      <h1>{{ 'IDP.CREATE.AZUREAD.TITLE' | translate }}</h1>
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-    <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.GITHUBES.DESCRIPTION' | translate }}</p>
+    <p class="desc cnsl-secondary-text">
+      {{ !provider ? ('IDP.CREATE.AZUREAD.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}
+    </p>
 
     <form [formGroup]="form" (ngSubmit)="submitForm()">
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
-        <input cnslInput formControlName="name" />
-      </cnsl-form-field>
+      <div class="azure-ad-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="name" />
+        </cnsl-form-field>
 
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'IDP.AUTHORIZATIONENDPOINT' | translate }}</cnsl-label>
-        <input cnslInput formControlName="authorizationEndpoint" />
-      </cnsl-form-field>
-
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'IDP.TOKENENDPOINT' | translate }}</cnsl-label>
-        <input cnslInput formControlName="tokenEndpoint" />
-      </cnsl-form-field>
-
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'IDP.USERENDPOINT' | translate }}</cnsl-label>
-        <input cnslInput formControlName="userEndpoint" />
-      </cnsl-form-field>
-
-      <div class="github-es-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientId" />
@@ -89,6 +74,22 @@
             </cnsl-form-field>
           </div>
 
+          <mat-checkbox formControlName="emailVerified">{{ 'IDP.EMAILVERIFIED' | translate }}</mat-checkbox>
+
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.AZUREADTENANTTYPE' | translate }}</cnsl-label>
+            <mat-select formControlName="tenantType">
+              <mat-option *ngFor="let type of tenantTypes" [value]="type">
+                {{ 'IDP.AZUREADTENANTTYPES.' + type | translate }}
+              </mat-option>
+            </mat-select>
+          </cnsl-form-field>
+
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.AZUREADTENANTID' | translate }}</cnsl-label>
+            <input cnslInput formControlName="tenantId" />
+          </cnsl-form-field>
+
           <cnsl-provider-options
             [initialOptions]="provider?.config?.options"
             (optionsChanged)="options = $event"
@@ -96,7 +97,7 @@
         </div>
       </div>
 
-      <div class="github-es-create-actions">
+      <div class="azure-ad-create-actions">
         <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
           <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
