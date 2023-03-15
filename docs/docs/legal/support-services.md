@@ -7,9 +7,10 @@ custom_edit_url: null
 
 This annex of the [Framework Agreement](terms-of-service) and the [Support Service Terms and Conditions](terms-support-service) describes the support services offered by us for our Services.
 
-Support Services for products and services provided by CAOS is offered to customers according to the terms and conditions outlined in this document. The customer may purchase support services from CAOS Ltd. directly.
+Support Services for products and services provided by ZITADEL is offered to customers according to the terms and conditions outlined in this document.
+The customer may purchase support services from ZITADEL (CAOS Ltd.) directly.
 
-Last revised: June 14, 2022
+Last revised: March 15, 2023
 
 ## Support Services
 
@@ -25,32 +26,37 @@ Last revised: June 14, 2022
 
 Support features for cloud subscriptions are as follows:
 
-Subscription Plans | Default | Extended SLA  | Self-hosted or dedicated
+Subscription Plans | Default | Extended SLA  | Custom
 --- | --- | --- | ---
-Support hours | Business hours | Business hours | Business hours
+Support hours | Business hours | Business hours | up to 24x7
 Response Time (Severity 1) | Best effort | 1 business hour | bespoke
 eMail Support | yes | yes | yes
-Phone Support | no | no | yes
+Phone Support | no | no | optional
 Chat Support |  no | no | optional
 
-If you want to add a [Technical Account Manager] or need assistance during onboarding, please [get in touch](https://zitadel.com/contact).
+If you want to add a [Technical Account Manager](#technical-account-manager) or need assistance during onboarding, please [get in touch](https://zitadel.com/contact).
 
-### Self-hosting and dedicated instances
+### Self-hosting
 
-Support plans for self-hosting and dedicated instances according to your purchase order.
+Support plans for self-hosting according to your purchase order.
 
-Customers can choose support hours (business, extended, 24x7), initial response time, Technical account manager, and communication channels.
+Customers can define the SLA and additional support options, such as
+
+- Support Hours (business, extended, 24x7) along different severities
+- SLO [Initial response time](#slo---initial-response-time)
+- [Technical account manager](#technical-account-manager)
+- Communication channels
 
 ### SLO - Initial response time
 
 CAOS service level objective (SLO) for Support Services  is defined in terms of initial response time to a support request, as outlined in the table below per plan. CAOS will use reasonable efforts to resolve support requests, but does not guarantee a work-around, resolution or resolution time.
 
-Subscription Plans | Default | Extended SLA
---- | --- | --- 
-Severity 1| Best effort | 1 business hour
-Severity 2| Best effort | 2 business hour
-Severity 3| Best effort | 12 business hour
-Severity 4| Best effort | 24 business hour
+Subscription Plans | Default | Extended SLA | Custom
+--- | --- | --- | ---
+Severity 1| Best effort | 1 business hour | up to 30min
+Severity 2| Best effort | 2 business hour | 2 business hours
+Severity 3| Best effort | 12 business hour | 12 business hours 
+Severity 4| Best effort | 24 business hour | 24 business hours
 
 If we fail to provide the initial response time objective, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
 
@@ -77,7 +83,8 @@ CAOS will enhance its support offering by providing eligible clients with a Tech
 - Provide support and advice regarding best practices on platform, product and configuration covered by the applicable Support Services;
 - Participate in review calls every other week at mutually agreed times addressing customer’s operational issues.
 
-We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans. If you require consulting for your projects, please request a quote via our [website](https://zitadel.com/contact).
+We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans.
+If you require consulting for your projects, please request a quote via our [website](https://zitadel.com/contact).
 
 ## Support
 
