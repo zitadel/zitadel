@@ -78,7 +78,7 @@
   </a>
 
   <a
-    class="item card coming-soon"
+    class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'gitlab', 'create']
@@ -87,7 +87,6 @@
         : []
     "
   >
-    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
     <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="GitLab" />
     <div class="text-container">
       <span class="title">GitLab</span>
