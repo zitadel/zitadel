@@ -273,6 +273,30 @@ func updateJWTProviderToCommand(req *admin_pb.UpdateJWTProviderRequest) command.
 	}
 }
 
+func addAzureADProviderToCommand(req *admin_pb.AddAzureADProviderRequest) command.AzureADProvider {
+	return command.AzureADProvider{
+		Name:          req.Name,
+		ClientID:      req.ClientId,
+		ClientSecret:  req.ClientSecret,
+		Scopes:        req.Scopes,
+		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
+		EmailVerified: req.EmailVerified,
+		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateAzureADProviderToCommand(req *admin_pb.UpdateAzureADProviderRequest) command.AzureADProvider {
+	return command.AzureADProvider{
+		Name:          req.Name,
+		ClientID:      req.ClientId,
+		ClientSecret:  req.ClientSecret,
+		Scopes:        req.Scopes,
+		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
+		EmailVerified: req.EmailVerified,
+		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
 func addGitHubProviderToCommand(req *admin_pb.AddGitHubProviderRequest) command.GitHubProvider {
 	return command.GitHubProvider{
 		Name:         req.Name,

@@ -43,5 +43,5 @@ type User struct {
 // GetPreferredUsername implements the [idp.User] interface.
 // It returns the email, because Google does not return a username.
 func (u *User) GetPreferredUsername() string {
-	return u.GetEmail()
+	return string(u.GetEmail())
 }

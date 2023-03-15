@@ -1,12 +1,14 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
+import { Validators } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
 import { Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
@@ -304,6 +306,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user?.human?.phone?.phone,
             type: type,
+            validator: Validators.compose([phoneValidator, requiredValidator]),
           },
           width: '400px',
         });

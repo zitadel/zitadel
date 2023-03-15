@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { take } from 'rxjs';
 import {
@@ -15,6 +15,7 @@ import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from '
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
@@ -55,11 +56,11 @@ export class NotificationSettingsComponent implements OnInit {
     private authService: GrpcAuthService,
   ) {
     this.form = this.fb.group({
-      senderAddress: [{ disabled: true, value: '' }, [Validators.required]],
-      senderName: [{ disabled: true, value: '' }, [Validators.required]],
-      tls: [{ disabled: true, value: true }, [Validators.required]],
-      hostAndPort: [{ disabled: true, value: '' }, [Validators.required]],
-      user: [{ disabled: true, value: '' }, [Validators.required]],
+      senderAddress: [{ disabled: true, value: '' }, [requiredValidator]],
+      senderName: [{ disabled: true, value: '' }, [requiredValidator]],
+      tls: [{ disabled: true, value: true }, [requiredValidator]],
+      hostAndPort: [{ disabled: true, value: '' }, [requiredValidator]],
+      user: [{ disabled: true, value: '' }, [requiredValidator]],
     });
   }
 

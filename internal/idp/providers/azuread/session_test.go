@@ -14,6 +14,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 )
@@ -24,6 +25,7 @@ func TestSession_FetchUser(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		httpMock     func()
 		options      []ProviderOptions
 		authURL      string
@@ -60,7 +62,7 @@ func TestSession_FetchUser(t *testing.T) {
 				redirectURI:  "redirectURI",
 				httpMock: func() {
 					gock.New("https://graph.microsoft.com").
-						Get("/oidc/userinfo").
+						Get("/v1.0/me").
 						Reply(200).
 						JSON(userinfo())
 				},
@@ -81,7 +83,7 @@ func TestSession_FetchUser(t *testing.T) {
 				redirectURI:  "redirectURI",
 				httpMock: func() {
 					gock.New("https://graph.microsoft.com").
-						Get("/oidc/userinfo").
+						Get("/v1.0/me").
 						Reply(http.StatusInternalServerError)
 				},
 				authURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
@@ -118,7 +120,7 @@ func TestSession_FetchUser(t *testing.T) {
 				redirectURI:  "redirectURI",
 				httpMock: func() {
 					gock.New("https://graph.microsoft.com").
-						Get("/oidc/userinfo").
+						Get("/v1.0/me").
 						Reply(200).
 						JSON(userinfo())
 				},
@@ -144,16 +146,20 @@ func TestSession_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &User{
-					Sub:               "sub",
-					FamilyName:        "lastname",
-					GivenName:         "firstname",
-					Name:              "firstname lastname",
-					PreferredUsername: "username",
+					ID:                "id",
+					BusinessPhones:    []domain.PhoneNumber{"phone1", "phone2"},
+					DisplayName:       "firstname lastname",
+					FirstName:         "firstname",
+					JobTitle:          "title",
 					Email:             "email",
-					Picture:           "picture",
+					MobilePhone:       "mobile",
+					OfficeLocation:    "office",
+					PreferredLanguage: "en",
+					LastName:          "lastname",
+					UserPrincipalName: "username",
 					isEmailVerified:   false,
 				},
-				id:                "sub",
+				id:                "id",
 				firstName:         "firstname",
 				lastName:          "lastname",
 				displayName:       "firstname lastname",
@@ -163,8 +169,7 @@ func TestSession_FetchUser(t *testing.T) {
 				isEmailVerified:   false,
 				phone:             "",
 				isPhoneVerified:   false,
-				preferredLanguage: language.Und,
-				avatarURL:         "picture",
+				preferredLanguage: language.English,
 				profile:           "",
 			},
 		},
@@ -179,7 +184,7 @@ func TestSession_FetchUser(t *testing.T) {
 				},
 				httpMock: func() {
 					gock.New("https://graph.microsoft.com").
-						Get("/oidc/userinfo").
+						Get("/v1.0/me").
 						Reply(200).
 						JSON(userinfo())
 				},
@@ -205,16 +210,20 @@ func TestSession_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &User{
-					Sub:               "sub",
-					FamilyName:        "lastname",
-					GivenName:         "firstname",
-					Name:              "firstname lastname",
-					PreferredUsername: "username",
+					ID:                "id",
+					BusinessPhones:    []domain.PhoneNumber{"phone1", "phone2"},
+					DisplayName:       "firstname lastname",
+					FirstName:         "firstname",
+					JobTitle:          "title",
 					Email:             "email",
-					Picture:           "picture",
+					MobilePhone:       "mobile",
+					OfficeLocation:    "office",
+					PreferredLanguage: "en",
+					LastName:          "lastname",
+					UserPrincipalName: "username",
 					isEmailVerified:   true,
 				},
-				id:                "sub",
+				id:                "id",
 				firstName:         "firstname",
 				lastName:          "lastname",
 				displayName:       "firstname lastname",
@@ -224,8 +233,7 @@ func TestSession_FetchUser(t *testing.T) {
 				isEmailVerified:   true,
 				phone:             "",
 				isPhoneVerified:   false,
-				preferredLanguage: language.Und,
-				avatarURL:         "picture",
+				preferredLanguage: language.English,
 				profile:           "",
 			},
 		},
@@ -236,7 +244,7 @@ func TestSession_FetchUser(t *testing.T) {
 			tt.fields.httpMock()
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.options...)
+			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
 			require.NoError(t, err)
 
 			session := &oauth.Session{
@@ -259,9 +267,9 @@ func TestSession_FetchUser(t *testing.T) {
 				a.Equal(tt.want.displayName, user.GetDisplayName())
 				a.Equal(tt.want.nickName, user.GetNickname())
 				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
-				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(domain.EmailAddress(tt.want.email), user.GetEmail())
 				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
-				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(domain.PhoneNumber(tt.want.phone), user.GetPhone())
 				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
 				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
 				a.Equal(tt.want.avatarURL, user.GetAvatarURL())
@@ -271,15 +279,18 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 }
 
-func userinfo() oidc.UserInfoSetter {
-	userinfo := oidc.NewUserInfo()
-	userinfo.SetSubject("sub")
-	userinfo.SetName("firstname lastname")
-	userinfo.SetPreferredUsername("username")
-	userinfo.SetNickname("nickname")
-	userinfo.SetEmail("email", false) // azure add does not send the email_verified claim
-	userinfo.SetPicture("picture")
-	userinfo.SetGivenName("firstname")
-	userinfo.SetFamilyName("lastname")
-	return userinfo
+func userinfo() *User {
+	return &User{
+		ID:                "id",
+		BusinessPhones:    []domain.PhoneNumber{"phone1", "phone2"},
+		DisplayName:       "firstname lastname",
+		FirstName:         "firstname",
+		JobTitle:          "title",
+		Email:             "email",
+		MobilePhone:       "mobile",
+		OfficeLocation:    "office",
+		PreferredLanguage: "en",
+		LastName:          "lastname",
+		UserPrincipalName: "username",
+	}
 }

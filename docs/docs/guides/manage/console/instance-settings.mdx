@@ -87,11 +87,14 @@ The Login Policy defines how the login process should look like and which authen
 
 | Setting                   | Description                                                                                                                                                         |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Register allowed          | Enable self register possibility in the login ui, this enables username password registration as well as registration with configured external identity providers   |
 | Username Password allowed | Possibility to login with username and password. If this is disabled only login with external identity providers will be allowed                                    |
+| Register allowed          | Enable self register possibility in the login ui, this enables username password registration as well as registration with configured external identity providers   |
 | External IDP allowed      | Possibility to login with an external identity (e.g Google, Microsoft, Apple, etc), If you like to allow external Identity providers add them to the providers list |
-| Force MFA                 | Force a user to register and use a multifactor authentication, Ensure that you have added the MFA methods you want to allow.                                        |
-| Passwordless              | Choose if passwordless login is allowed or not                                                                                                                      |
+| Hide password reset | Disable the self-service option for users to reset their password. |
+| Domain discovery allowed | If this setting is enabled, the user does't not mandatory have to exist when entering the username. It is required to have verified domains on the organization. Example: ZITADEL is registered as organization with the domain zitadel.com and AzureAD as identity provider. A user enters john@zitadel.com in the login but the user doesn't exist. The domain can be mapped to the organization and therefore the user can be redirected to the AzureAD.
+| Ignore unknown usernames | This setting can be enabled, if no error message should be shown if the user doesn't exist. Example: A user enters the login name john@zitadel.com, the user doesn't exist, but will be redirected to the password screen. After entering a password, the user will get an error that either username or password are wrong. |
+| Disable login with email address | By default users can additionally [login with the email attribute](/docs/guides/solution-scenarios/configurations#use-an-email-address-as-username) of their user. Check this option to disable. |
+| Disable login with phone number | By default users can additionally [login with the phonenumber attribute](/docs/guides/solution-scenarios/configurations#use-a-phone-number-as-username) of their user. Check this option to disable. |
 
 <img
   src="/docs/img/guides/console/loginpolicy.png"
@@ -115,6 +118,9 @@ Secondfactors (2FA):
 
 - OTP (One Time Password), Authenticator Apps like Google/Microsoft Authenticator, Authy, etc.
 - U2F (Universal Second Factor), e.g FaceID, WindowsHello, Fingerprint, Hardwaretokens like Yubikey
+
+Force a user to register and use a multifactor authentication, by checking the option "Force MFA".
+Ensure that you have added the MFA methods you want to allow.
 
 ### Login Lifetimes
 

@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
+	openid "github.com/zitadel/oidc/v2/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -19,6 +20,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		options      []ProviderOptions
 	}
 	tests := []struct {
@@ -34,7 +36,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				redirectURI:  "redirectURI",
 			},
 			want: &oidc.Session{
-				AuthURL: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
+				AuthURL: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
 			},
 		},
 		{
@@ -48,7 +50,22 @@ func TestProvider_BeginAuth(t *testing.T) {
 				},
 			},
 			want: &oidc.Session{
-				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
+				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+			},
+		},
+		{
+			name: "custom scopes",
+			fields: fields{
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{openid.ScopeOpenID, openid.ScopeProfile, "user"},
+				options: []ProviderOptions{
+					WithTenant(ConsumersTenant),
+				},
+			},
+			want: &oidc.Session{
+				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid+profile+user&state=testState",
 			},
 		},
 	}
@@ -57,7 +74,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.options...)
+			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
 			r.NoError(err)
 
 			session, err := provider.BeginAuth(context.Background(), "testState")
@@ -74,6 +91,7 @@ func TestProvider_Options(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		options      []ProviderOptions
 	}
 	type want struct {
@@ -98,6 +116,7 @@ func TestProvider_Options(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       nil,
 				options:      nil,
 			},
 			want: want{
@@ -146,7 +165,7 @@ func TestProvider_Options(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.options...)
+			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
 			require.NoError(t, err)
 
 			a.Equal(tt.want.name, provider.Name())

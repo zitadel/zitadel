@@ -1,10 +1,11 @@
 import { Component, Inject } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import {
   MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { UpdateSecretGeneratorRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { SecretGeneratorType } from 'src/app/proto/generated/zitadel/settings_pb';
 
@@ -33,13 +34,13 @@ export class DialogAddSecretGeneratorComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
     this.specsForm = this.fb.group({
-      generatorType: [SecretGeneratorType.SECRET_GENERATOR_TYPE_APP_SECRET, [Validators.required]],
-      expiry: [1, [Validators.required]],
-      includeDigits: [true, [Validators.required]],
-      includeLowerLetters: [true, [Validators.required]],
-      includeSymbols: [true, [Validators.required]],
-      includeUpperLetters: [true, [Validators.required]],
-      length: [6, [Validators.required]],
+      generatorType: [SecretGeneratorType.SECRET_GENERATOR_TYPE_APP_SECRET, [requiredValidator]],
+      expiry: [1, [requiredValidator]],
+      includeDigits: [true, [requiredValidator]],
+      includeLowerLetters: [true, [requiredValidator]],
+      includeSymbols: [true, [requiredValidator]],
+      includeUpperLetters: [true, [requiredValidator]],
+      length: [6, [requiredValidator]],
     });
 
     this.generatorType?.setValue(data.type);
