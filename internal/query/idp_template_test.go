@@ -49,6 +49,13 @@ var (
 		` projections.idp_templates3_jwt.jwt_endpoint,` +
 		` projections.idp_templates3_jwt.keys_endpoint,` +
 		` projections.idp_templates3_jwt.header_name,` +
+		// azure
+		` projections.idp_templates3_azure.idp_id,` +
+		` projections.idp_templates3_azure.client_id,` +
+		` projections.idp_templates3_azure.client_secret,` +
+		` projections.idp_templates3_azure.scopes,` +
+		` projections.idp_templates3_azure.tenant,` +
+		` projections.idp_templates3_azure.is_email_verified,` +
 		// github
 		` projections.idp_templates3_github.idp_id,` +
 		` projections.idp_templates3_github.client_id,` +
@@ -105,6 +112,7 @@ var (
 		` LEFT JOIN projections.idp_templates3_oauth2 ON projections.idp_templates3.id = projections.idp_templates3_oauth2.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_oauth2.instance_id` +
 		` LEFT JOIN projections.idp_templates3_oidc ON projections.idp_templates3.id = projections.idp_templates3_oidc.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_oidc.instance_id` +
 		` LEFT JOIN projections.idp_templates3_jwt ON projections.idp_templates3.id = projections.idp_templates3_jwt.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_jwt.instance_id` +
+		` LEFT JOIN projections.idp_templates3_azure ON projections.idp_templates3.id = projections.idp_templates3_azure.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_azure.instance_id` +
 		` LEFT JOIN projections.idp_templates3_github ON projections.idp_templates3.id = projections.idp_templates3_github.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github.instance_id` +
 		` LEFT JOIN projections.idp_templates3_github_enterprise ON projections.idp_templates3.id = projections.idp_templates3_github_enterprise.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github_enterprise.instance_id` +
 		` LEFT JOIN projections.idp_templates3_gitlab ON projections.idp_templates3.id = projections.idp_templates3_gitlab.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_gitlab.instance_id` +
@@ -147,6 +155,13 @@ var (
 		"jwt_endpoint",
 		"keys_endpoint",
 		"header_name",
+		// azure
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"tenant",
+		"is_email_verified",
 		// github config
 		"idp_id",
 		"client_id",
@@ -234,6 +249,13 @@ var (
 		` projections.idp_templates3_jwt.jwt_endpoint,` +
 		` projections.idp_templates3_jwt.keys_endpoint,` +
 		` projections.idp_templates3_jwt.header_name,` +
+		// azure
+		` projections.idp_templates3_azure.idp_id,` +
+		` projections.idp_templates3_azure.client_id,` +
+		` projections.idp_templates3_azure.client_secret,` +
+		` projections.idp_templates3_azure.scopes,` +
+		` projections.idp_templates3_azure.tenant,` +
+		` projections.idp_templates3_azure.is_email_verified,` +
 		// github
 		` projections.idp_templates3_github.idp_id,` +
 		` projections.idp_templates3_github.client_id,` +
@@ -291,6 +313,7 @@ var (
 		` LEFT JOIN projections.idp_templates3_oauth2 ON projections.idp_templates3.id = projections.idp_templates3_oauth2.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_oauth2.instance_id` +
 		` LEFT JOIN projections.idp_templates3_oidc ON projections.idp_templates3.id = projections.idp_templates3_oidc.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_oidc.instance_id` +
 		` LEFT JOIN projections.idp_templates3_jwt ON projections.idp_templates3.id = projections.idp_templates3_jwt.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_jwt.instance_id` +
+		` LEFT JOIN projections.idp_templates3_azure ON projections.idp_templates3.id = projections.idp_templates3_azure.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_azure.instance_id` +
 		` LEFT JOIN projections.idp_templates3_github ON projections.idp_templates3.id = projections.idp_templates3_github.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github.instance_id` +
 		` LEFT JOIN projections.idp_templates3_github_enterprise ON projections.idp_templates3.id = projections.idp_templates3_github_enterprise.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github_enterprise.instance_id` +
 		` LEFT JOIN projections.idp_templates3_gitlab ON projections.idp_templates3.id = projections.idp_templates3_gitlab.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_gitlab.instance_id` +
@@ -333,6 +356,13 @@ var (
 		"jwt_endpoint",
 		"keys_endpoint",
 		"header_name",
+		// azure
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"tenant",
+		"is_email_verified",
 		// github config
 		"idp_id",
 		"client_id",
@@ -455,6 +485,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -583,6 +620,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// github
 						nil,
 						nil,
@@ -703,6 +747,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"jwt",
 						"keys",
 						"header",
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// github
 						nil,
 						nil,
@@ -818,6 +869,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -942,6 +1000,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// github
 						nil,
 						nil,
@@ -1056,6 +1121,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1181,6 +1253,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// github
 						nil,
 						nil,
@@ -1295,6 +1374,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1433,6 +1519,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1587,6 +1680,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// azure
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// github
 							nil,
 							nil,
@@ -1734,6 +1834,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// azure
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// github
 							nil,
 							nil,
@@ -1856,6 +1963,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// azure
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// github
 							nil,
 							nil,
@@ -1939,6 +2053,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2032,6 +2153,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// azure
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// github
 							nil,
 							nil,
@@ -2115,6 +2243,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							database.StringArray{"profile"},
 							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2208,6 +2343,13 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"jwt",
 							"keys",
 							"header",
+							// azure
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// github
 							nil,
 							nil,

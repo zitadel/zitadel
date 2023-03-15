@@ -233,6 +233,27 @@ func (s *Server) UpdateJWTProvider(ctx context.Context, req *mgmt_pb.UpdateJWTPr
 	}, nil
 }
 
+func (s *Server) AddAzureADProvider(ctx context.Context, req *mgmt_pb.AddAzureADProviderRequest) (*mgmt_pb.AddAzureADProviderResponse, error) {
+	id, details, err := s.command.AddOrgAzureADProvider(ctx, authz.GetCtxData(ctx).OrgID, addAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddAzureADProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateAzureADProvider(ctx context.Context, req *mgmt_pb.UpdateAzureADProviderRequest) (*mgmt_pb.UpdateAzureADProviderResponse, error) {
+	details, err := s.command.UpdateOrgAzureADProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateAzureADProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddGitHubProvider(ctx context.Context, req *mgmt_pb.AddGitHubProviderRequest) (*mgmt_pb.AddGitHubProviderResponse, error) {
 	id, details, err := s.command.AddOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitHubProviderToCommand(req))
 	if err != nil {

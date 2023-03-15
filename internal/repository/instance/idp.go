@@ -16,6 +16,8 @@ const (
 	OIDCIDPChangedEventType             eventstore.EventType = "instance.idp.oidc.changed"
 	JWTIDPAddedEventType                eventstore.EventType = "instance.idp.jwt.added"
 	JWTIDPChangedEventType              eventstore.EventType = "instance.idp.jwt.changed"
+	AzureADIDPAddedEventType            eventstore.EventType = "instance.idp.azure.added"
+	AzureADIDPChangedEventType          eventstore.EventType = "instance.idp.azure.changed"
 	GitHubIDPAddedEventType             eventstore.EventType = "instance.idp.github.added"
 	GitHubIDPChangedEventType           eventstore.EventType = "instance.idp.github.changed"
 	GitHubEnterpriseIDPAddedEventType   eventstore.EventType = "instance.idp.github_enterprise.added"
@@ -269,6 +271,86 @@ func JWTIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error)
 	}
 
 	return &JWTIDPChangedEvent{JWTIDPChangedEvent: *e.(*idp.JWTIDPChangedEvent)}, nil
+}
+
+type AzureADIDPAddedEvent struct {
+	idp.AzureADIDPAddedEvent
+}
+
+func NewAzureADIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	tenant string,
+	isEmailVerified bool,
+	options idp.Options,
+) *AzureADIDPAddedEvent {
+
+	return &AzureADIDPAddedEvent{
+		AzureADIDPAddedEvent: *idp.NewAzureADIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				AzureADIDPAddedEventType,
+			),
+			id,
+			name,
+			clientID,
+			clientSecret,
+			scopes,
+			tenant,
+			isEmailVerified,
+			options,
+		),
+	}
+}
+
+func AzureADIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.AzureADIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AzureADIDPAddedEvent{AzureADIDPAddedEvent: *e.(*idp.AzureADIDPAddedEvent)}, nil
+}
+
+type AzureADIDPChangedEvent struct {
+	idp.AzureADIDPChangedEvent
+}
+
+func NewAzureADIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.AzureADIDPChanges,
+) (*AzureADIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewAzureADIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			AzureADIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &AzureADIDPChangedEvent{AzureADIDPChangedEvent: *changedEvent}, nil
+}
+
+func AzureADIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.AzureADIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AzureADIDPChangedEvent{AzureADIDPChangedEvent: *e.(*idp.AzureADIDPChangedEvent)}, nil
 }
 
 type GitHubIDPAddedEvent struct {
