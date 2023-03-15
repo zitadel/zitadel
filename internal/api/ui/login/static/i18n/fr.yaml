@@ -320,6 +320,7 @@ Errors:
     MissingParameters: Paramètres requis manquants
   User:
     NotFound: L'utilisateur n'a pas pu être trouvé
+    AlreadyExists: L'utilisateur existe déjà
     Inactive: L'utilisateur est inactif
     NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
     NotAllowedOrg: L'utilisateur n'est pas membre de l'organisation requise

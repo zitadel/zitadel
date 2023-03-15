@@ -320,6 +320,7 @@ Errors:
     MissingParameters: 缺少必需的参数
   User:
     NotFound: 找不到用户
+    AlreadyExists: 用户已存在
     Inactive: 用户处于停用状态
     NotFoundOnOrg: 在所选组织中找不到用户
     NotAllowedOrg: 用户不是所需组织的成员
