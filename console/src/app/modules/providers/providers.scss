@@ -1,11 +1,11 @@
-.desc {
-  font-size: 14px;
-}
-
-@mixin provider-github-theme($theme) {
+@mixin identity-provider-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
 
-  .github-create-content {
+  .identity-provider-desc {
+    font-size: 14px;
+  }
+
+  .identity-provider-create-content {
     .title-row {
       display: flex;
       align-items: center;
@@ -53,7 +53,7 @@
       }
     }
 
-    .github-content {
+    .identity-provider-content {
       .desc {
         margin-bottom: 1rem;
       }
@@ -77,23 +77,23 @@
       }
     }
   }
-}
 
-.github-create-actions {
-  display: flex;
-  margin-top: 1rem;
+  .identity-provider-create-actions {
+    display: flex;
+    margin-top: 1rem;
 
-  button[mat-raised-button] {
-    border-radius: 0.5rem;
-    padding: 0.5rem 4rem;
+    button[mat-raised-button] {
+      border-radius: 0.5rem;
+      padding: 0.5rem 4rem;
+    }
   }
-}
 
-.optional-h-wrapper {
-  display: flex;
-  align-items: center;
+  .identity-provider-optional-h-wrapper {
+    display: flex;
+    align-items: center;
 
-  h2 {
-    margin-right: 0.25rem;
+    h2 {
+      margin-right: 0.25rem;
+    }
   }
 }

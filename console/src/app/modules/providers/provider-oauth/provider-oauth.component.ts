@@ -27,7 +27,6 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-oauth',
   templateUrl: './provider-oauth.component.html',
-  styleUrls: ['./provider-oauth.component.scss'],
 })
 export class ProviderOAuthComponent {
   public showOptional: boolean = false;

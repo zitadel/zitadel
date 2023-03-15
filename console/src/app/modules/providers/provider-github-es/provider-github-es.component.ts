@@ -27,7 +27,6 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-github-es',
   templateUrl: './provider-github-es.component.html',
-  styleUrls: ['./provider-github-es.component.scss'],
 })
 export class ProviderGithubESComponent {
   public showOptional: boolean = false;

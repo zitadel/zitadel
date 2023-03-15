@@ -26,7 +26,6 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-jwt',
   templateUrl: './provider-jwt.component.html',
-  styleUrls: ['./provider-jwt.component.scss'],
 })
 export class ProviderJWTComponent {
   public showOptional: boolean = false;
