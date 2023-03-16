@@ -6,6 +6,9 @@ on:
       go_version:
         required: true
         type: string
+      buf_version:
+        required: true
+        type: string
 
 jobs:
 
@@ -17,6 +20,9 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf_version }}
     - run: make grpc
     - run: make grpc_copy
     - run: make tidy
@@ -29,6 +35,9 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf_version }}
     - run: make test
 
   lint:
@@ -39,6 +48,9 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf_version }}
     - run: make generate
     - name: linting
       uses: golangci/golangci-lint-action@v3
@@ -60,6 +72,9 @@ jobs:
             goos: windows
     steps:
     - uses: actions/checkout@v3
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf_version }}
     ## Check if caching is needed
     - uses: wangyoucao577/go-release-action@v1
       with:

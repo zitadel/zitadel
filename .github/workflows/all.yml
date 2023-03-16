@@ -21,6 +21,7 @@ jobs:
     uses: ./.github/workflows/core.yml
     with:
       go_version: 1.19
+      buf_version: v1.15.1
 
   docs:
     uses: ./.github/workflows/docs.yml
