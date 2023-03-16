@@ -1,13 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ProviderAzureADComponent } from './provider-azure-ad.component';
+import { ProvidersComponent } from './providers.component';
 
 const routes: Routes = [
   {
-    path: '',
-    component: ProviderAzureADComponent,
-    data: { animation: 'DetailPage' },
+    path: 'create',
+    component: ProvidersComponent,
+  },
+  {
+    path: ':id',
+    component: ProvidersComponent,
   },
 ];
 
@@ -15,4 +18,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class ProviderAzureADRoutingModule {}
+export class ProvidersRoutingModule {}
