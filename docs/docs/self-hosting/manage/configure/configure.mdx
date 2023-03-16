@@ -10,40 +10,45 @@ import Helm from './_helm.mdx'
 
 # Configure ZITADEL
 
-This guide assumes you are already familiar with [running ZITADEL with the most minimal configuration possible](/docs/self-hosting/deploy/overview).
+This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/docs/self-hosting/deploy/overview).
 
 ## Configuration Files
 
-### Runtime Configuration
-See a description of all possible _runtime configuration_ options with their defaults [in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
-The `zitadel` binary expects the `--config` flag for this configuration.
+### Runtime Configuration File
 
-### Database Initialization
-Apart from these options, ZITADEL uses a [different configuration](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
-The `zitadel` binary expects the `--steps` flag for this configuration.
+You can configure the runtime using the `--config` flag of the `zitadel` binary.
+For a description of all _runtime configuration options_ and their defaults, read the [ZITADEL source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
 
-### Split Configuration
-ZITADEL merges multiple configurations passed via multiple `--config` and/or multiple `--steps` flags.
-This is especially useful, if you want to treat secret configuration files differently from standard configuration.
-For example, you can check configuration with information like the database hostname in to git.
-Other configration that contains information like your databases admin username and password, you can hand to a secret manager.
+### Database Initialization File
 
-## Environment variables
+ZITADEL uses a [different configuration file](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
+Use the `--steps` flag of the `zitadel` binary to provide this configuration file.
 
-All configuration properties are also configurable via environemnt variables.
-Prefix the key with *ZITADEL\_*, uppercase the propery and join sections by an underscore _.
-For example, if you want to configure the default ZITADEL IAM admin username and password, make sure the ZITADEL binary runtime has the variables *ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME* and *ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD* set.
+### Multiple Configuration Files
 
-### Proxy configuration
+ZITADEL merges configuration files when multiple `--config` and `--steps` flags are provided.
+You can use these flags to handle standard configuration files differently from secret configuration files.
+For example, standard configuration files stored in git may contain public information such as a database hostname.
+To use private information — such as a database admin credential — without storing it in git, use an extra `--config` or `--steps` flag that requests the private information from a secret manager.
 
-If your organisation uses a proxy for outgoing connections, it can be configured using the environemnt variables `HTTP_PROXY` for outgoint HTTP requests and `HTTPS_PROXY` for outgoint HTTPS requests. The variables are used as proxy url. 
-If specific hosts should be excluded from proxying, the `NO_PROXY` environment variable ca be used. The value is interpreted as comma separated string. More details about the variable can be found [here](https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config).
+## Environment Variables
+
+All configuration properties are configurable using environment variables.
+ZITADEL environment variable keys are prefixed with `ZITADEL_`.
+For example, to configure the default ZITADEL IAM admin username and password, set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
+
+### Proxy Configuration
+
+A proxy for outgoing connections can be configured using the environment variables: Use `HTTP_PROXY` for outgoing HTTP requests, and `HTTPS_PROXY` for outgoing HTTPS requests.
+These environment variables are used as a proxy URL.
+To exclude specific hosts from proxying, set the `NO_PROXY` environment variable: The value is interpreted as a comma separated string.
+For more information on the `NO_PROXY` environment variable, read the [`httpproxy` Go doc](https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config).
 
 ## Masterkey
 
 The masterkey is used to AES256-encrypt other generated encryption keys.
-It needs to have 32 bytes.
-You can pass the masterkey in either of three possible ways to the zitadel binary:
+It must be 32 bytes.
+There are three ways to pass the masterkey to the `zitadel` binary:
 - By value: Use the flag `--masterkey My_Master_Key_Which_Has_32_Bytes`
 - By environment variable `ZITADEL_MASTERKEY`: Use the flag `--masterkeyFromEnv`
 - By file: Use the flag `--masterkeyFile /path/to/file`
@@ -78,7 +83,7 @@ This is the IAM admin users login according to your configuration in the [exampl
 ## What's next
 
 - Read more about [the login process](/guides/integrate/login-users).
-- If you want to run ZITADEL in production, you most certainly need to [customize your own domain](./custom-domain).
+- If you are running ZITADEL in production, you need to [customize your own domain](./custom-domain).
 - Check out all possible [runtime configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml)
 - Check out all possible [setup step configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml)
 
