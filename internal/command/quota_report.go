@@ -3,18 +3,18 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
 // ReportUsage calls notification hooks and emits the notified events
 func (c *Commands) ReportUsage(ctx context.Context, dueNotifications []*quota.NotificationDueEvent) error {
-	for _, notification := range dueNotifications {
-		if _, err := c.eventstore.Push(ctx, notification); err != nil {
-			return err
-		}
+	cmds := make([]eventstore.Command, len(dueNotifications))
+	for idx, notification := range dueNotifications {
+		cmds[idx] = notification
 	}
-
-	return nil
+	_, err := c.eventstore.Push(ctx, cmds...)
+	return err
 }
 
 func (c *Commands) UsageNotificationSent(ctx context.Context, dueEvent *quota.NotificationDueEvent) error {

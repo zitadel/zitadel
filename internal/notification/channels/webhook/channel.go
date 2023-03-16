@@ -47,7 +47,6 @@ func InitWebhookChannel(ctx context.Context, cfg Config) (channels.NotificationC
 		}
 
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-			// TODO: Translate
 			return caos_errs.ThrowUnknown(fmt.Errorf("calling url %s returned %s", cfg.CallURL, resp.Status), "WEBH-LBxU0", "webhook didn't return a success status")
 		}
 

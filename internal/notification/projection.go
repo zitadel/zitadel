@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/quota"
-
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
 
@@ -29,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 

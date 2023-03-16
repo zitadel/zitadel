@@ -158,7 +158,7 @@ func NotificationDueEventMapper(event *repository.Event) (eventstore.Event, erro
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUOTA-4bReE", "unable to unmarshal notification due")
+		return nil, errors.ThrowInternal(err, "QUOTA-k56rT", "unable to unmarshal notification due")
 	}
 
 	return e, nil
