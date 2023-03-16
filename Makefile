@@ -1,11 +1,4 @@
 grpc:
-	go get github.com/go-bindata/go-bindata
-	go install github.com/go-bindata/go-bindata
-	$$(go env GOPATH)/bin/go-bindata \
-	-pkg main \
-	-prefix internal/protoc/protoc-gen-authoption \
-	-o internal/protoc/protoc-gen-authoption/templates.gen.go \
-	internal/protoc/protoc-gen-authoption/templates
 	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption
 	rm -rf .artifacts/grpc
 	# This foreach is a workaround from a limitation of the authoption generator and only affects zitadel.
