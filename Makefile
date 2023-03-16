@@ -1,4 +1,5 @@
 grpc:
+	go get github.com/go-bindata/go-bindata
 	go install github.com/go-bindata/go-bindata
 	$$(go env GOPATH)/bin/go-bindata \
 	-pkg main \
