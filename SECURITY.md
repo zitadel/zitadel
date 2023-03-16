@@ -26,7 +26,7 @@ To file an incident, please disclose it by e-mail to [security@zitadel.com](mail
 - Target: ZITADEL, Website (zitadel.com), ZITADEL Cloud (zitadel.cloud), Other (please describe)
 - Type: For example DoS, authentication bypass, information disclosure, broken authorization, ...
 - Description: Provide a detailed explanation of the issue, steps to reproduce, and assumptions you have made
-- Url / Location (optional): The url of the vulnerability
+- URL / Location (optional): The URL of the vulnerability
 - Contact details (optional): In case we should contact you on a different channel
 
 At the moment GPG encryption is no yet supported, however you may sign your message at will.
