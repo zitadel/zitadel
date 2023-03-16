@@ -110,6 +110,24 @@ jobs:
         push: false
         tags: zitadel/core-alpine:${{ github.sha }}
 
+  debug:
+    name: debug
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        exclude:
+          - goarch: arm64
+            goos: windows
+    steps:
+    - uses: actions/checkout@v3
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf_version }}
+    - run: make generate
+    - run: make build
+
   success:
     name: success
     runs-on: ubuntu-latest
