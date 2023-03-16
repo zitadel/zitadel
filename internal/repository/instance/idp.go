@@ -120,6 +120,7 @@ func NewOIDCIDPAddedEvent(
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
+	isIDTokenMapping bool,
 	options idp.Options,
 ) *OIDCIDPAddedEvent {
 
@@ -136,6 +137,7 @@ func NewOIDCIDPAddedEvent(
 			clientID,
 			clientSecret,
 			scopes,
+			isIDTokenMapping,
 			options,
 		),
 	}

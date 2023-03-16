@@ -30,17 +30,19 @@ func NewOIDCIDPAddedEvent(
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
+	isIDTokenMapping bool,
 	options Options,
 ) *OIDCIDPAddedEvent {
 	return &OIDCIDPAddedEvent{
-		BaseEvent:    *base,
-		ID:           id,
-		Name:         name,
-		Issuer:       issuer,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		Scopes:       scopes,
-		Options:      options,
+		BaseEvent:        *base,
+		ID:               id,
+		Name:             name,
+		Issuer:           issuer,
+		ClientID:         clientID,
+		ClientSecret:     clientSecret,
+		Scopes:           scopes,
+		IsIDTokenMapping: isIDTokenMapping,
+		Options:          options,
 	}
 }
 

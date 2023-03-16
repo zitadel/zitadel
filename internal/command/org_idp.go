@@ -393,6 +393,7 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, writeModel *OrgOI
 					provider.ClientID,
 					secret,
 					provider.Scopes,
+					provider.IsIDTokenMapping,
 					provider.IDPOptions,
 				),
 			}, nil
