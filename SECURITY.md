@@ -34,7 +34,7 @@ At the moment GPG encryption is no yet supported, however you may sign your mess
 Your email will be acknowledged within 48 hours.
 We will follow-up within the next 3 business days indicating next steps in handling your report.
 
-If you haven't received a response within 48 hours, or you didn't get a reply from our security team within the last 5 days, please contact [hi@zitadel.com](mailto:hi@zitadel.com).
+If you haven't received a response within 48 hours, or you didn't get a reply from our security team within the last 5 days, please contact [support@zitadel.com](mailto:support@zitadel.com).
 
 Please inform us in your report whether we should mention your contribution.
 We will not publish this information by default to protect your privacy.
