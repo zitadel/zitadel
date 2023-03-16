@@ -89,18 +89,11 @@ Requirements:
 func startZitadel(config *Config, masterKey string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM, os.Kill)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		sig := <-shutdown
-		switch sig {
-		case os.Interrupt, syscall.SIGTERM:
-			close(shutdown)
-			time.AfterFunc(10*time.Second, cancel)
-		case os.Kill:
-			cancel()
-		default:
-			cancel()
-		}
+		<-shutdown
+		close(shutdown)
+		time.AfterFunc(10*time.Second, cancel)
 	}()
 
 	dbClient, err := database.Connect(config.Database, false)
