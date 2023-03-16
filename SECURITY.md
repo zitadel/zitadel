@@ -17,7 +17,7 @@ Please refer to the separate [vulnerability disclosure policy](https://zitadel.c
 ### Supported Versions
 
 Supported are releases that are newer and not older than 6 months from our stable release
-https://github.com/zitadel/zitadel/blob/bc116247ea4f4c52261be8209e6b7f5b19971127/release-channels.yaml#L1
+https://github.com/zitadel/zitadel/blob/main/release-channels.yaml#L1
 
 ## Reporting a vulnerability
 
