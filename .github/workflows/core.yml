@@ -122,6 +122,9 @@ jobs:
             goos: windows
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ inputs.go_version }}
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
