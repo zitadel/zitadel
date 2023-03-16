@@ -627,6 +627,11 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
+	opts := make([]openid.ProviderOpts, 1, 2)
+	opts[0] = openid.WithSelectAccount()
+	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
+		opts = append(opts, openid.WithIDTokenMapping())
+	}
 	return openid.New(identityProvider.Name,
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
@@ -634,7 +639,7 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.OIDCIDPTemplate.Scopes,
 		openid.DefaultMapper,
-		openid.WithSelectAccount(),
+		opts...,
 	)
 }
 
