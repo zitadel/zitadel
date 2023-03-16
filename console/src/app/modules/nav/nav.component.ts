@@ -1,12 +1,11 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, Observable, Subject, take } from 'rxjs';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { BehaviorSubject, combineLatest, map, Observable, Subject } from 'rxjs';
+import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
@@ -90,7 +89,6 @@ export class NavComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
 
   public BreadcrumbType: any = BreadcrumbType;
-  public customerPortalLink: string = '';
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
@@ -105,23 +103,9 @@ export class NavComponent implements OnDestroy {
     public mgmtService: ManagementService,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
-    private http: HttpClient,
     private shortcutService: KeyboardShortcutsService,
     private storageService: StorageService,
-  ) {
-    this.loadEnvironment();
-  }
-
-  public loadEnvironment(): void {
-    this.http
-      .get('./assets/environment.json')
-      .pipe(take(1))
-      .subscribe((data: any) => {
-        if (data && data.customer_portal) {
-          this.customerPortalLink = data.customer_portal;
-        }
-      });
-  }
+  ) {}
 
   public ngOnDestroy() {
     this.destroy$.next();
@@ -151,6 +135,14 @@ export class NavComponent implements OnDestroy {
     }).pipe(
       map(({ owned, granted }) => {
         return (owned ?? 0) + (granted ?? 0);
+      }),
+    );
+  }
+
+  public get orgLength(): Observable<Org.AsObject[]> {
+    return this.authService.cachedOrgs.pipe(
+      map((orgs) => {
+        return orgs.filter((org) => org.state === OrgState.ORG_STATE_ACTIVE);
       }),
     );
   }

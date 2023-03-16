@@ -78,15 +78,12 @@
     }
   },
   "MENU": {
-    "INSTANCE": "实例",
+    "INSTANCE": "设置",
     "DASHBOARD": "首页",
     "PERSONAL_INFO": "个人信息",
     "DOCUMENTATION": "文档",
     "INSTANCEOVERVIEW": "实例",
     "ORGS": "组织",
-    "VIEWS": "数据表",
-    "EVENTS": "活动",
-    "FAILEDEVENTS": "失败事件",
     "ORGANIZATION": "组织",
     "DOMAINS": "域名",
     "PROJECT": "项目",
@@ -974,7 +971,7 @@
   },
   "SETTINGS": {
     "INSTANCE": {
-      "TITLE": "实例设置",
+      "TITLE": "设置",
       "DESCRIPTION": "这些设置将应用于您的所有组织，除非它们已被覆盖。"
     },
     "ORG": {
@@ -996,7 +993,9 @@
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
       "SECRETS": "验证码外观",
-      "SECURITY": "安全设置"
+      "SECURITY": "安全设置",
+      "VIEWS": "数据表",
+      "FAILEDEVENTS": "失败事件"
     },
     "GROUPS": {
       "NOTIFICATIONS": "通知",
@@ -1004,7 +1003,8 @@
       "DOMAIN": "域名",
       "TEXTS": "文本和语言",
       "APPEARANCE": "外观",
-      "OTHER": "其他"
+      "OTHER": "其他",
+      "STORAGE": "记忆"
     }
   },
   "SETTING": {

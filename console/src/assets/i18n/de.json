@@ -78,15 +78,12 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "Einstellungen",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",
     "INSTANCEOVERVIEW": "Instanz",
     "ORGS": "Organisationen",
-    "VIEWS": "Views",
-    "EVENTS": "Events",
-    "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organisation",
     "DOMAINS": "Domains",
     "PROJECT": "Projekte",
@@ -974,7 +971,7 @@
   },
   "SETTINGS": {
     "INSTANCE": {
-      "TITLE": "Instanz Einstellungen",
+      "TITLE": "Einstellungen",
       "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewandt sofern die Einstellung nicht überschrieben wurde."
     },
     "ORG": {
@@ -996,7 +993,9 @@
       "PRIVACYPOLICY": "Datenschutzrichtlinie",
       "OIDC": "OIDC Token Lifetime und Expiration",
       "SECRETS": "Secret Erscheinungsbild",
-      "SECURITY": "Sicherheitseinstellungen"
+      "SECURITY": "Sicherheitseinstellungen",
+      "VIEWS": "Views",
+      "FAILEDEVENTS": "Failed Events"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Benachrichtigungen",
@@ -1004,7 +1003,8 @@
       "DOMAIN": "Domain",
       "TEXTS": "Texte und Sprachen",
       "APPEARANCE": "Erscheinungsbild",
-      "OTHER": "Anderes"
+      "OTHER": "Anderes",
+      "STORAGE": "Speicher"
     }
   },
   "SETTING": {

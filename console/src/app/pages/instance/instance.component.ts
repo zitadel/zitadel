@@ -1,10 +1,30 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, take } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
+import {
+  BRANDING,
+  COMPLEXITY,
+  DOMAIN,
+  GENERAL,
+  IDP,
+  LOCKOUT,
+  LOGIN,
+  LOGINTEXTS,
+  MESSAGETEXTS,
+  NOTIFICATIONS,
+  PRIVACYPOLICY,
+  SECRETS,
+  SECURITY,
+  OIDC,
+  INSTANCEVIEWS,
+  FAILEDEVENTS,
+} from 'src/app/modules/settings-list/settings';
+import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { InstanceDetail, State } from 'src/app/proto/generated/zitadel/instance_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -25,19 +45,53 @@ export class InstanceComponent {
   public totalMemberResult: number = 0;
   public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
   public State: any = State;
+
+  public id: string = '';
+  public settingsList: SidenavSetting[] = [
+    GENERAL,
+    // notifications
+    // { showWarn: true, ...NOTIFICATIONS },
+    NOTIFICATIONS,
+    // login
+    LOGIN,
+    IDP,
+    COMPLEXITY,
+    LOCKOUT,
+
+    DOMAIN,
+    // appearance
+    BRANDING,
+    MESSAGETEXTS,
+    LOGINTEXTS,
+    // others
+    PRIVACYPOLICY,
+    OIDC,
+    SECRETS,
+    SECURITY,
+    // storage
+    INSTANCEVIEWS,
+    FAILEDEVENTS,
+  ];
+
+  public customerPortalLink: string = '';
+
   constructor(
     public adminService: AdminService,
     private dialog: MatDialog,
     private toast: ToastService,
     breadcrumbService: BreadcrumbService,
     private router: Router,
+    activatedRoute: ActivatedRoute,
+    private http: HttpClient,
   ) {
     this.loadMembers();
+    this.loadEnvironment();
 
     const instanceBread = new Breadcrumb({
       type: BreadcrumbType.INSTANCE,
       name: 'Instance',
       routerLink: ['/instance'],
+      hideNav: true,
     });
 
     breadcrumbService.setBreadcrumb([instanceBread]);
@@ -51,6 +105,34 @@ export class InstanceComponent {
       })
       .catch((error) => {
         this.toast.showError(error);
+      });
+
+    const breadcrumbs = [
+      new Breadcrumb({
+        type: BreadcrumbType.INSTANCE,
+        name: 'Instance',
+        routerLink: ['/instance'],
+      }),
+    ];
+    breadcrumbService.setBreadcrumb(breadcrumbs);
+
+    activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
+      const { id } = params;
+      if (id) {
+        this.id = id;
+      }
+    });
+  }
+
+  public loadEnvironment(): void {
+    this.http
+      .get('./assets/environment.json')
+      .pipe(take(1))
+      .subscribe((data: any) => {
+        if (data && data.customer_portal) {
+          this.customerPortalLink = data.customer_portal;
+          console.log(this.customerPortalLink);
+        }
       });
   }
 
