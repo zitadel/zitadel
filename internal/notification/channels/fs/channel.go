@@ -1,8 +1,8 @@
 package fs
 
 import (
+	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -26,7 +26,7 @@ func InitFSChannel(config FSConfig) (channels.NotificationChannel, error) {
 
 	logging.Debug("successfully initialized filesystem email and sms channel")
 
-	return channels.HandleMessageFunc(func(message channels.Message) error {
+	return channels.HandleMessageFunc(func(_ context.Context, message channels.Message) error {
 
 		fileName := fmt.Sprintf("%d_", time.Now().Unix())
 		content := message.GetContent()
@@ -45,6 +45,6 @@ func InitFSChannel(config FSConfig) (channels.NotificationChannel, error) {
 			return caos_errors.ThrowUnimplementedf(nil, "NOTIF-6f9a1", "filesystem provider doesn't support message type %T", message)
 		}
 
-		return ioutil.WriteFile(filepath.Join(config.Path, fileName), []byte(content), 0666)
+		return os.WriteFile(filepath.Join(config.Path, fileName), []byte(content), 0666)
 	}), nil
 }

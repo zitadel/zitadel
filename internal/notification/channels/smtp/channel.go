@@ -42,7 +42,7 @@ func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context
 	}, nil
 }
 
-func (email *Email) HandleMessage(message channels.Message) error {
+func (email *Email) HandleMessage(_ context.Context, message channels.Message) error {
 	defer email.smtpClient.Close()
 	emailMsg, ok := message.(*messages.Email)
 	if !ok {

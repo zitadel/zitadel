@@ -32,7 +32,7 @@ func generateEmail(ctx context.Context, user *query.NotifyUser, subject, content
 	if channelChain.Len() == 0 {
 		return caos_errors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
 	}
-	return channelChain.HandleMessage(message)
+	return channelChain.HandleMessage(ctx, message)
 }
 
 func mapNotifyUserToArgs(user *query.NotifyUser, args map[string]interface{}) map[string]interface{} {

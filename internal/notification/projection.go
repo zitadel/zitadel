@@ -42,6 +42,7 @@ func Start(ctx context.Context, customConfig projection.CustomConfig, externalPo
 }
 
 type notificationsProjection struct {
+	ctx func(event eventstore.Aggregate) context.Context
 	crdb.StatementHandler
 	commands           *command.Commands
 	queries            *query.Queries
@@ -72,6 +73,11 @@ func newNotificationsProjection(
 	statikDir http.FileSystem,
 ) *notificationsProjection {
 	p := new(notificationsProjection)
+	p.ctx = func(event eventstore.Aggregate) context.Context {
+		notificationCtx := authz.WithInstanceID(ctx, event.InstanceID)
+		notificationCtx = authz.SetCtxData(notificationCtx, authz.CtxData{UserID: NotifyUserID, OrgID: event.ResourceOwner})
+		return notificationCtx
+	}
 	config.ProjectionName = NotificationsProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -151,7 +157,7 @@ func (p *notificationsProjection) reduceInitCodeAdded(event eventstore.Event) (*
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-EFe2f", "reduce.wrong.event.type %s", user.HumanInitialCodeAddedType)
 	}
-	ctx := setNotificationContext(event.Aggregate())
+	ctx := p.ctx(event.Aggregate())
 	alreadyHandled, err := p.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1InitialCodeAddedType, user.UserV1InitialCodeSentType,
 		user.HumanInitialCodeAddedType, user.HumanInitialCodeSentType)
@@ -214,7 +220,7 @@ func (p *notificationsProjection) reduceEmailCodeAdded(event eventstore.Event) (
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SWf3g", "reduce.wrong.event.type %s", user.HumanEmailCodeAddedType)
 	}
-	ctx := setNotificationContext(event.Aggregate())
+	ctx := p.ctx(event.Aggregate())
 	alreadyHandled, err := p.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1EmailCodeAddedType, user.UserV1EmailCodeSentType,
 		user.HumanEmailCodeAddedType, user.HumanEmailCodeSentType)
@@ -277,7 +283,7 @@ func (p *notificationsProjection) reducePasswordCodeAdded(event eventstore.Event
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Eeg3s", "reduce.wrong.event.type %s", user.HumanPasswordCodeAddedType)
 	}
-	ctx := setNotificationContext(event.Aggregate())
+	ctx := p.ctx(event.Aggregate())
 	alreadyHandled, err := p.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1PasswordCodeAddedType, user.UserV1PasswordCodeSentType,
 		user.HumanPasswordCodeAddedType, user.HumanPasswordCodeSentType)
@@ -353,7 +359,7 @@ func (p *notificationsProjection) reduceDomainClaimed(event eventstore.Event) (*
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Drh5w", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
-	ctx := setNotificationContext(event.Aggregate())
+	ctx := p.ctx(event.Aggregate())
 	alreadyHandled, err := p.checkIfAlreadyHandled(ctx, event, nil,
 		user.UserDomainClaimedType, user.UserDomainClaimedSentType)
 	if err != nil {
@@ -411,7 +417,7 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-EDtjd", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeAddedType)
 	}
-	ctx := setNotificationContext(event.Aggregate())
+	ctx := p.ctx(event.Aggregate())
 	alreadyHandled, err := p.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, map[string]interface{}{"id": e.ID}, user.HumanPasswordlessInitCodeSentType)
 	if err != nil {
 		return nil, err
@@ -472,7 +478,7 @@ func (p *notificationsProjection) reducePasswordChanged(event eventstore.Event) 
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Yko2z8", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
-	ctx := setNotificationContext(event.Aggregate())
+	ctx := p.ctx(event.Aggregate())
 	alreadyHandled, err := p.checkIfAlreadyHandled(ctx, event, nil, user.HumanPasswordChangeSentType)
 	if err != nil {
 		return nil, err
@@ -540,7 +546,7 @@ func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-He83g", "reduce.wrong.event.type %s", user.HumanPhoneCodeAddedType)
 	}
-	ctx := setNotificationContext(event.Aggregate())
+	ctx := p.ctx(event.Aggregate())
 	alreadyHandled, err := p.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1PhoneCodeAddedType, user.UserV1PhoneCodeSentType,
 		user.HumanPhoneCodeAddedType, user.HumanPhoneCodeSentType)
@@ -730,9 +736,4 @@ func (p *notificationsProjection) origin(ctx context.Context) (context.Context, 
 	}
 	ctx = authz.WithRequestedDomain(ctx, domains.Domains[0].Domain)
 	return ctx, http_utils.BuildHTTP(domains.Domains[0].Domain, p.externalPort, p.externalSecure), nil
-}
-
-func setNotificationContext(event eventstore.Aggregate) context.Context {
-	ctx := authz.WithInstanceID(context.Background(), event.InstanceID)
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: NotifyUserID, OrgID: event.ResourceOwner})
 }

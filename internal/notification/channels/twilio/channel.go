@@ -1,6 +1,9 @@
 package twilio
 
 import (
+	"context"
+	"net/url"
+
 	"github.com/kevinburke/twilio-go"
 	"github.com/zitadel/logging"
 
@@ -14,12 +17,16 @@ func InitTwilioChannel(config TwilioConfig) channels.NotificationChannel {
 
 	logging.Debug("successfully initialized twilio sms channel")
 
-	return channels.HandleMessageFunc(func(message channels.Message) error {
+	return channels.HandleMessageFunc(func(ctx context.Context, message channels.Message) error {
 		twilioMsg, ok := message.(*messages.SMS)
 		if !ok {
 			return caos_errs.ThrowInternal(nil, "TWILI-s0pLc", "message is not SMS")
 		}
-		m, err := client.Messages.SendMessage(twilioMsg.SenderPhoneNumber, twilioMsg.RecipientPhoneNumber, twilioMsg.GetContent(), nil)
+		v := url.Values{}
+		v.Set("Body", twilioMsg.GetContent())
+		v.Set("From", twilioMsg.SenderPhoneNumber)
+		v.Set("To", twilioMsg.RecipientPhoneNumber)
+		m, err := client.Messages.Create(ctx, v)
 		if err != nil {
 			return caos_errs.ThrowInternal(err, "TWILI-osk3S", "could not send message")
 		}

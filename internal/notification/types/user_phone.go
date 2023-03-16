@@ -35,5 +35,5 @@ func generateSms(ctx context.Context, user *query.NotifyUser, content string, ge
 	if channelChain.Len() == 0 {
 		return caos_errors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
 	}
-	return channelChain.HandleMessage(message)
+	return channelChain.HandleMessage(ctx, message)
 }
