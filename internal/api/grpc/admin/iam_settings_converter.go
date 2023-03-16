@@ -113,8 +113,8 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 	}
 }
 
-func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.EmailConfig {
-	return &smtp.EmailConfig{
+func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.Config {
+	return &smtp.Config{
 		Tls:      req.Tls,
 		From:     req.SenderAddress,
 		FromName: req.SenderName,
@@ -126,8 +126,8 @@ func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.EmailConfig {
 	}
 }
 
-func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.EmailConfig {
-	return &smtp.EmailConfig{
+func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.Config {
+	return &smtp.Config{
 		Tls:      req.Tls,
 		From:     req.SenderAddress,
 		FromName: req.SenderName,

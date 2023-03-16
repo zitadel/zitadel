@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
-func InitTwilioChannel(config TwilioConfig) channels.NotificationChannel {
+func InitTwilioChannel(config Config) channels.NotificationChannel {
 	client := twilio.NewClient(config.SID, config.Token, nil)
 
 	logging.Debug("successfully initialized twilio sms channel")

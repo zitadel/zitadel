@@ -27,7 +27,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		instanceID string
-		sms        *twilio.TwilioConfig
+		sms        *twilio.Config
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -70,7 +70,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 			args: args{
 				ctx:        context.Background(),
 				instanceID: "INSTANCE",
-				sms: &twilio.TwilioConfig{
+				sms: &twilio.Config{
 					SID:          "sid",
 					Token:        "token",
 					SenderNumber: "senderName",
@@ -112,7 +112,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 		ctx        context.Context
 		instanceID string
 		id         string
-		sms        *twilio.TwilioConfig
+		sms        *twilio.Config
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -133,7 +133,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				sms: &twilio.TwilioConfig{},
+				sms: &twilio.Config{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -149,7 +149,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			},
 			args: args{
 				ctx:        context.Background(),
-				sms:        &twilio.TwilioConfig{},
+				sms:        &twilio.Config{},
 				instanceID: "INSTANCE",
 				id:         "id",
 			},
@@ -183,7 +183,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				sms: &twilio.TwilioConfig{
+				sms: &twilio.Config{
 					SID:          "sid",
 					Token:        "token",
 					SenderNumber: "senderName",
@@ -233,7 +233,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				sms: &twilio.TwilioConfig{
+				sms: &twilio.Config{
 					SID:          "sid2",
 					Token:        "token2",
 					SenderNumber: "senderName2",
