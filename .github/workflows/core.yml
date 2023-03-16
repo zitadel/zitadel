@@ -69,7 +69,11 @@ jobs:
           - goarch: arm64
             goos: windows
     steps:
+    steps:
     - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ inputs.go_version }}
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
@@ -109,27 +113,6 @@ jobs:
         platforms: ${{ matrix.goos }}/${{ matrix.goarch }}
         push: false
         tags: zitadel/core-alpine:${{ github.sha }}
-
-  debug:
-    name: debug
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        goos: [linux, windows, darwin]
-        goarch: [amd64, arm64]
-        exclude:
-          - goarch: arm64
-            goos: windows
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
-      with:
-        go-version: ${{ inputs.go_version }}
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-    - run: make generate
-    - run: make build
 
   success:
     name: success
