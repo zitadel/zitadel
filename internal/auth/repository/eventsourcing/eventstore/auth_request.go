@@ -858,7 +858,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 		idQuery, externalIDQuery,
 	}
 	if request.RequestedOrgID != "" {
-		orgIDQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(idpConfigID)
+		orgIDQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(request.RequestedOrgID)
 		if err != nil {
 			return err
 		}
