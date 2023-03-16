@@ -16,18 +16,6 @@
     &:not([disabled]):active {
       border-color: var(--zitadel-color-input-border-active);
     }
-
-    // &.google {
-    //   color: var(--zitadel-color-google-text);
-    // }
-
-    // &.github {
-    //   color: var(--zitadel-color-github-text);
-    // }
-
-    // &.gitlab {
-    //   color: var(--zitadel-color-gitlab-text);
-    // }
   }
 
   .lgn-idp-providers {
