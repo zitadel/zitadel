@@ -27,7 +27,6 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-google',
   templateUrl: './provider-google.component.html',
-  styleUrls: ['./provider-google.component.scss'],
 })
 export class ProviderGoogleComponent {
   public showOptional: boolean = false;
