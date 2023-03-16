@@ -12,16 +12,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/zitadel/saml/pkg/provider"
-
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/op"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+
+	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/op"
+	"github.com/zitadel/saml/pkg/provider"
 
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
@@ -87,7 +87,21 @@ Requirements:
 }
 
 func startZitadel(config *Config, masterKey string) error {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM, os.Kill)
+	go func() {
+		sig := <-shutdown
+		switch sig {
+		case os.Interrupt, syscall.SIGTERM:
+			close(shutdown)
+			time.AfterFunc(10*time.Second, cancel)
+		case os.Kill:
+			cancel()
+		default:
+			cancel()
+		}
+	}()
 
 	dbClient, err := database.Connect(config.Database, false)
 	if err != nil {
@@ -167,7 +181,7 @@ func startZitadel(config *Config, masterKey string) error {
 	}
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(ctx, shutdown, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
@@ -178,7 +192,7 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	return listen(ctx, router, config.Port, tlsConfig)
+	return listen(ctx, router, config.Port, tlsConfig, shutdown)
 }
 
 func startAPIs(
@@ -292,7 +306,7 @@ func startAPIs(
 	return nil
 }
 
-func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config) error {
+func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, shutdown chan os.Signal) error {
 	http2Server := &http2.Server{}
 	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig}
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
@@ -311,9 +325,6 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 			errCh <- http1Server.Serve(lis)
 		}
 	}()
-
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
 	select {
 	case err := <-errCh:

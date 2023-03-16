@@ -3,6 +3,7 @@ package notification
 import (
 	"context"
 	"net/http"
+	"os"
 	"time"
 
 	statik_fs "github.com/rakyll/statik/fs"
@@ -34,11 +35,11 @@ const (
 	NotifyUserID                 = "NOTIFICATION" //TODO: system?
 )
 
-func Start(ctx context.Context, customConfig projection.CustomConfig, externalPort uint16, externalSecure bool, commands *command.Commands, queries *query.Queries, es *eventstore.Eventstore, assetsPrefix func(context.Context) string, fileSystemPath string, userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm) {
+func Start(ctx context.Context, shutdown <-chan os.Signal, customConfig projection.CustomConfig, externalPort uint16, externalSecure bool, commands *command.Commands, queries *query.Queries, es *eventstore.Eventstore, assetsPrefix func(context.Context) string, fileSystemPath string, userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm) {
 	statikFS, err := statik_fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
 
-	projection.NotificationsProjection = newNotificationsProjection(ctx, projection.ApplyCustomConfig(customConfig), commands, queries, es, userEncryption, smtpEncryption, smsEncryption, externalSecure, externalPort, fileSystemPath, assetsPrefix, statikFS)
+	projection.NotificationsProjection = newNotificationsProjection(ctx, shutdown, projection.ApplyCustomConfig(customConfig), commands, queries, es, userEncryption, smtpEncryption, smsEncryption, externalSecure, externalPort, fileSystemPath, assetsPrefix, statikFS)
 }
 
 type notificationsProjection struct {
@@ -55,10 +56,12 @@ type notificationsProjection struct {
 	externalPort       uint16
 	externalSecure     bool
 	statikDir          http.FileSystem
+	shutdown           <-chan os.Signal
 }
 
 func newNotificationsProjection(
 	ctx context.Context,
+	shutdown <-chan os.Signal,
 	config crdb.StatementHandlerConfig,
 	commands *command.Commands,
 	queries *query.Queries,
@@ -92,6 +95,7 @@ func newNotificationsProjection(
 	p.externalSecure = externalSecure
 	p.fileSystemPath = fileSystemPath
 	p.statikDir = statikDir
+	p.shutdown = shutdown
 
 	// needs to be started here as it is not part of the projection.projections / projection.newProjectionsList()
 	p.Start()
@@ -105,50 +109,62 @@ func (p *notificationsProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  user.UserV1InitialCodeAddedType,
-					Reduce: p.reduceInitCodeAdded,
+					Reduce: p.stopHandlingOnShutdown(p.reduceInitCodeAdded),
 				},
 				{
 					Event:  user.HumanInitialCodeAddedType,
-					Reduce: p.reduceInitCodeAdded,
+					Reduce: p.stopHandlingOnShutdown(p.reduceInitCodeAdded),
 				},
 				{
 					Event:  user.UserV1EmailCodeAddedType,
-					Reduce: p.reduceEmailCodeAdded,
+					Reduce: p.stopHandlingOnShutdown(p.reduceEmailCodeAdded),
 				},
 				{
 					Event:  user.HumanEmailCodeAddedType,
-					Reduce: p.reduceEmailCodeAdded,
+					Reduce: p.stopHandlingOnShutdown(p.reduceEmailCodeAdded),
 				},
 				{
 					Event:  user.UserV1PasswordCodeAddedType,
-					Reduce: p.reducePasswordCodeAdded,
+					Reduce: p.stopHandlingOnShutdown(p.reducePasswordCodeAdded),
 				},
 				{
 					Event:  user.HumanPasswordCodeAddedType,
-					Reduce: p.reducePasswordCodeAdded,
+					Reduce: p.stopHandlingOnShutdown(p.reducePasswordCodeAdded),
 				},
 				{
 					Event:  user.UserDomainClaimedType,
-					Reduce: p.reduceDomainClaimed,
+					Reduce: p.stopHandlingOnShutdown(p.reduceDomainClaimed),
 				},
 				{
 					Event:  user.HumanPasswordlessInitCodeRequestedType,
-					Reduce: p.reducePasswordlessCodeRequested,
+					Reduce: p.stopHandlingOnShutdown(p.reducePasswordlessCodeRequested),
 				},
 				{
 					Event:  user.UserV1PhoneCodeAddedType,
-					Reduce: p.reducePhoneCodeAdded,
+					Reduce: p.stopHandlingOnShutdown(p.reducePhoneCodeAdded),
 				},
 				{
 					Event:  user.HumanPhoneCodeAddedType,
-					Reduce: p.reducePhoneCodeAdded,
+					Reduce: p.stopHandlingOnShutdown(p.reducePhoneCodeAdded),
 				},
 				{
 					Event:  user.HumanPasswordChangedType,
-					Reduce: p.reducePasswordChanged,
+					Reduce: p.stopHandlingOnShutdown(p.reducePasswordChanged),
 				},
 			},
 		},
+	}
+}
+
+func (p *notificationsProjection) stopHandlingOnShutdown(reduce handler.Reduce) handler.Reduce {
+	select {
+	case <-p.shutdown:
+		return func(e eventstore.Event) (*handler.Statement, error) {
+			logging.WithFields("event", e).Info("not handling event because shutting down")
+			return crdb.NewNoOpStatement(e), nil
+		}
+	default:
+		return reduce
 	}
 }
 
