@@ -69,7 +69,6 @@ jobs:
           - goarch: arm64
             goos: windows
     steps:
-    steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
       with:
