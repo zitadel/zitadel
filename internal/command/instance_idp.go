@@ -614,6 +614,7 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 					provider.ClientID,
 					secret,
 					provider.Scopes,
+					provider.IsIDTokenMapping,
 					provider.IDPOptions,
 				),
 			}, nil
