@@ -52,6 +52,7 @@ jobs:
       with:
         version: ${{ inputs.buf_version }}
     - run: make generate
+    - uses: docker/setup-buildx-action@v2
     - name: linting
       uses: golangci/golangci-lint-action@v3
       with:
