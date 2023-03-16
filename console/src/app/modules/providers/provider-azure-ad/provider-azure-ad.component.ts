@@ -27,7 +27,6 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-azure-ad',
   templateUrl: './provider-azure-ad.component.html',
-  styleUrls: ['./provider-azure-ad.component.scss'],
 })
 export class ProviderAzureADComponent {
   public showOptional: boolean = false;
