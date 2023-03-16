@@ -20,6 +20,7 @@ type Provider struct {
 	isCreationAllowed bool
 	isAutoCreation    bool
 	isAutoUpdate      bool
+	useIDToken        bool
 	userInfoMapper    func(info oidc.UserInfo) idp.User
 }
 
@@ -51,6 +52,13 @@ func WithAutoCreation() ProviderOpts {
 func WithAutoUpdate() ProviderOpts {
 	return func(p *Provider) {
 		p.isAutoUpdate = true
+	}
+}
+
+// WithIDTokenMapping enables that information to map the user is retrieved from the id_token and not the userinfo endpoint.
+func WithIDTokenMapping() ProviderOpts {
+	return func(p *Provider) {
+		p.useIDToken = true
 	}
 }
 

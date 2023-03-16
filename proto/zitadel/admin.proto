@@ -4379,6 +4379,7 @@ message AddGenericOIDCProviderRequest {
     string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
     zitadel.idp.v1.Options provider_options = 6;
+    bool is_id_token_mapping = 7;
 }
 
 message AddGenericOIDCProviderResponse {
@@ -4395,6 +4396,7 @@ message UpdateGenericOIDCProviderRequest {
     string client_secret = 5 [(validate.rules).string = {max_len: 200}];
     repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
     zitadel.idp.v1.Options provider_options = 7;
+    bool is_id_token_mapping = 8;
 }
 
 message UpdateGenericOIDCProviderResponse {

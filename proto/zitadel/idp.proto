@@ -282,6 +282,7 @@ message GenericOIDCConfig {
     string issuer = 1;
     string client_id = 2;
     repeated string scopes = 3;
+    bool is_id_token_mapping = 4;
 }
 
 message GoogleConfig {

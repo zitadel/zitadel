@@ -401,6 +401,7 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 					provider.ClientID,
 					secret,
 					provider.Scopes,
+					provider.IsIDTokenMapping,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -444,6 +445,7 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 				provider.ClientSecret,
 				c.idpConfigEncryption,
 				provider.Scopes,
+				provider.IsIDTokenMapping,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

@@ -58,11 +58,12 @@ type OAuthIDPTemplate struct {
 }
 
 type OIDCIDPTemplate struct {
-	IDPID        string
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
-	Issuer       string
-	Scopes       database.StringArray
+	IDPID            string
+	ClientID         string
+	ClientSecret     *crypto.CryptoValue
+	Issuer           string
+	Scopes           database.StringArray
+	IsIDTokenMapping bool
 }
 
 type JWTIDPTemplate struct {
@@ -230,6 +231,10 @@ var (
 	}
 	OIDCScopesCol = Column{
 		name:  projection.OIDCScopesCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCIDTokenMappingCol = Column{
+		name:  projection.OIDCIDTokenMappingCol,
 		table: oidcIdpTemplateTable,
 	}
 )
@@ -517,6 +522,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OIDCClientIDCol.identifier(),
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
+			OIDCIDTokenMappingCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -577,6 +583,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcScopes := database.StringArray{}
+			oidcIDTokenMapping := sql.NullBool{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
@@ -641,6 +648,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oidcClientID,
 				&oidcClientSecret,
 				&oidcScopes,
+				&oidcIDTokenMapping,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
@@ -699,11 +707,12 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			}
 			if oidcID.Valid {
 				idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-					IDPID:        oidcID.String,
-					ClientID:     oidcClientID.String,
-					ClientSecret: oidcClientSecret,
-					Issuer:       oidcIssuer.String,
-					Scopes:       oidcScopes,
+					IDPID:            oidcID.String,
+					ClientID:         oidcClientID.String,
+					ClientSecret:     oidcClientSecret,
+					Issuer:           oidcIssuer.String,
+					Scopes:           oidcScopes,
+					IsIDTokenMapping: oidcIDTokenMapping.Bool,
 				}
 			}
 			if jwtID.Valid {
@@ -786,6 +795,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OIDCClientIDCol.identifier(),
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
+			OIDCIDTokenMappingCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -850,6 +860,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcScopes := database.StringArray{}
+				oidcIDTokenMapping := sql.NullBool{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
@@ -914,6 +925,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oidcClientID,
 					&oidcClientSecret,
 					&oidcScopes,
+					&oidcIDTokenMapping,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
@@ -971,11 +983,12 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				}
 				if oidcID.Valid {
 					idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-						IDPID:        oidcID.String,
-						ClientID:     oidcClientID.String,
-						ClientSecret: oidcClientSecret,
-						Issuer:       oidcIssuer.String,
-						Scopes:       oidcScopes,
+						IDPID:            oidcID.String,
+						ClientID:         oidcClientID.String,
+						ClientSecret:     oidcClientSecret,
+						Issuer:           oidcIssuer.String,
+						Scopes:           oidcScopes,
+						IsIDTokenMapping: oidcIDTokenMapping.Bool,
 					}
 				}
 				if jwtID.Valid {
