@@ -23,8 +23,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
-    - run: make grpc
-    - run: make grpc_copy
+    - run: make generate
     - run: make tidy
 
   test:
@@ -38,6 +37,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+    - run: make generate
     - run: make test
 
   lint:
