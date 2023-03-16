@@ -13,15 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
-var (
-	idpTemplateInsertStmt = `INSERT INTO projections.idp_templates4` +
-		` (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update)` +
-		` VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`
-	idpTemplateUpdateMinimalStmt = `UPDATE projections.idp_templates4 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)`
-	idpTemplateUpdateStmt        = `UPDATE projections.idp_templates4 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence)` +
-		` = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)`
-)
-
 func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
