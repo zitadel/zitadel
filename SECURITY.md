@@ -54,6 +54,6 @@ Our security team will follow the disclosure process:
 3. A member of our team will respond to either confirm or reject your report, including an explanation
 4. Code will be audited to assess if the report uncovers similar issues
 5. Fixes are prepared for the latest release
-6. On the date that the fixes are applied, we will publish a [security advisory](https://github.com/zitadel/zitadel/security/advisories). Affected users of our Product, Services, or Website will be informed of the fix and required actions.
+6. On the date that the fixes are applied, we will create a CVE and publish a [security advisory](https://github.com/zitadel/zitadel/security/advisories). Affected users of our Product, Services, or Website will be informed of the fix and required actions.
 
 We think it is crucial to publish advisories `ASAP` as mitigations are ready. But due to the unknown nature of the disclosures the time frame can range from 7 to 90 days.
