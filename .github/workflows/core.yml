@@ -56,7 +56,8 @@ jobs:
       uses: golangci/golangci-lint-action@v3
       with:
         version: v1.50.1
-        only-new-issues: true    
+        only-new-issues: true
+        skip-pkg-cache: true   
 
   build:
     name: build
@@ -78,7 +79,6 @@ jobs:
         version: ${{ inputs.buf_version }}
     - run: make generate
     - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
-    - run: ls -latr
     - uses: docker/setup-qemu-action@v2
     - uses: docker/setup-buildx-action@v2
       # uses: docker/login-action@v2
