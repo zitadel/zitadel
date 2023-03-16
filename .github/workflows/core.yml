@@ -23,7 +23,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }} }}
+        github_token: ${{ github.token }}
     - run: make generate
     - run: make tidy
 
@@ -47,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
@@ -55,7 +57,6 @@ jobs:
         version: ${{ inputs.buf_version }}
         github_token: ${{ github.token }}
     - run: make generate
-    - uses: docker/setup-buildx-action@v2
     - name: linting
       uses: golangci/golangci-lint-action@v3
       with:
