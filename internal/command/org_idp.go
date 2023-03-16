@@ -436,6 +436,7 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, writeModel *Or
 				provider.ClientSecret,
 				c.idpConfigEncryption,
 				provider.Scopes,
+				provider.IsIDTokenMapping,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

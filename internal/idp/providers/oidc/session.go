@@ -46,6 +46,9 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if err != nil {
 		return nil, err
 	}
+	if s.Provider.useIDToken {
+		info = s.Tokens.IDTokenClaims
+	}
 	u := s.Provider.userInfoMapper(info)
 	return u, nil
 }

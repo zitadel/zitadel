@@ -174,6 +174,7 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
 	scopes []string,
+	idTokenMapping bool,
 	options idp.Options,
 ) (*instance.OIDCIDPChangedEvent, error) {
 
@@ -184,6 +185,7 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 		clientSecretString,
 		secretCrypto,
 		scopes,
+		idTokenMapping,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
