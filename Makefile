@@ -10,7 +10,7 @@ grpc:
 	mv .artifacts/grpc/zitadel/system.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/system
 	cp -rT .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/ pkg/grpc/
 	mkdir -p openapi/v2/zitadel
-	cp -rT .artifacts/grpc/zitadel openapi/v2/zitadel
+	cp .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel
 
 static:
 	go install github.com/rakyll/statik@v0.1.7
@@ -24,13 +24,13 @@ assets:
     mkdir -p docs/apis/assets/ && \
     go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
-test: grpc static assets
+generate: grpc static assets
+
+test:
 	go test -race -v -coverprofile=profile.cov ./...
 
-lint: grpc static assets
+lint:
 	golangci-lint run
-
-generate: grpc static assets
 
 tidy:
 	go mod tidy
@@ -38,5 +38,5 @@ tidy:
 install:
 	go mod download
 
-build: grpc static assets
+build:
 	go build

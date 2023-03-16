@@ -57,7 +57,7 @@ jobs:
       with:
         version: v1.50.1
         only-new-issues: true
-        skip-pkg-cache: false
+        skip-pkg-cache: true
     
 
   build:
