@@ -29,8 +29,6 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
-    - run: make grpc
-    - run: make grpc_copy
     - run: make test
 
   lint:
@@ -46,9 +44,7 @@ jobs:
       with:
         version: v1.50.1
         only-new-issues: true
-        skip-pkg-cache: true
-    - run: make grpc
-    - run: make grpc_copy
+        skip-pkg-cache: false
     - run: make lint
 
   build:
