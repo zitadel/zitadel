@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTemplateTable                 = "projections.idp_templates3"
+	IDPTemplateTable                 = "projections.idp_templates4"
 	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
@@ -66,12 +66,13 @@ const (
 	OAuthScopesCol                = "scopes"
 	OAuthIDAttributeCol           = "id_attribute"
 
-	OIDCIDCol           = "idp_id"
-	OIDCInstanceIDCol   = "instance_id"
-	OIDCIssuerCol       = "issuer"
-	OIDCClientIDCol     = "client_id"
-	OIDCClientSecretCol = "client_secret"
-	OIDCScopesCol       = "scopes"
+	OIDCIDCol             = "idp_id"
+	OIDCInstanceIDCol     = "instance_id"
+	OIDCIssuerCol         = "issuer"
+	OIDCClientIDCol       = "client_id"
+	OIDCClientSecretCol   = "client_secret"
+	OIDCScopesCol         = "scopes"
+	OIDCIDTokenMappingCol = "id_token_mapping"
 
 	JWTIDCol           = "idp_id"
 	JWTInstanceIDCol   = "instance_id"
@@ -199,6 +200,7 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(OIDCClientIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(OIDCClientSecretCol, crdb.ColumnTypeJSONB),
 			crdb.NewColumn(OIDCScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(OIDCIDTokenMappingCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(OIDCInstanceIDCol, OIDCIDCol),
 			IDPTemplateOIDCSuffix,
@@ -695,6 +697,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCIDTokenMappingCol, idpEvent.IsIDTokenMapping),
 			},
 			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
@@ -931,6 +934,7 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event)
 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCIDTokenMappingCol, true),
 			},
 			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
@@ -1830,6 +1834,9 @@ func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Col
 	}
 	if idpEvent.Scopes != nil {
 		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	if idpEvent.IsIDTokenMapping != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCIDTokenMappingCol, *idpEvent.IsIDTokenMapping))
 	}
 	return oidcCols
 }

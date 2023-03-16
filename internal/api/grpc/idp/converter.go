@@ -487,9 +487,10 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCIDPTemplate) {
 	providerConfig.Config = &idp_pb.ProviderConfig_Oidc{
 		Oidc: &idp_pb.GenericOIDCConfig{
-			ClientId: template.ClientID,
-			Issuer:   template.Issuer,
-			Scopes:   template.Scopes,
+			ClientId:         template.ClientID,
+			Issuer:           template.Issuer,
+			Scopes:           template.Scopes,
+			IsIdTokenMapping: template.IsIDTokenMapping,
 		},
 	}
 }

@@ -27,7 +27,6 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-gitlab',
   templateUrl: './provider-gitlab.component.html',
-  styleUrls: ['./provider-gitlab.component.scss'],
 })
 export class ProviderGitlabComponent {
   public showOptional: boolean = false;

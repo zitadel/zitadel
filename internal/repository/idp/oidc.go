@@ -12,12 +12,13 @@ import (
 type OIDCIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID           string              `json:"id"`
-	Name         string              `json:"name"`
-	Issuer       string              `json:"issuer"`
-	ClientID     string              `json:"clientId"`
-	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
-	Scopes       []string            `json:"scopes,omitempty"`
+	ID               string              `json:"id"`
+	Name             string              `json:"name"`
+	Issuer           string              `json:"issuer"`
+	ClientID         string              `json:"clientId"`
+	ClientSecret     *crypto.CryptoValue `json:"clientSecret"`
+	Scopes           []string            `json:"scopes,omitempty"`
+	IsIDTokenMapping bool                `json:"idTokenMapping,omitempty"`
 	Options
 }
 
@@ -29,17 +30,19 @@ func NewOIDCIDPAddedEvent(
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
+	isIDTokenMapping bool,
 	options Options,
 ) *OIDCIDPAddedEvent {
 	return &OIDCIDPAddedEvent{
-		BaseEvent:    *base,
-		ID:           id,
-		Name:         name,
-		Issuer:       issuer,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		Scopes:       scopes,
-		Options:      options,
+		BaseEvent:        *base,
+		ID:               id,
+		Name:             name,
+		Issuer:           issuer,
+		ClientID:         clientID,
+		ClientSecret:     clientSecret,
+		Scopes:           scopes,
+		IsIDTokenMapping: isIDTokenMapping,
+		Options:          options,
 	}
 }
 
@@ -67,12 +70,13 @@ func OIDCIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) 
 type OIDCIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID           string              `json:"id"`
-	Name         *string             `json:"name,omitempty"`
-	Issuer       *string             `json:"issuer,omitempty"`
-	ClientID     *string             `json:"clientId,omitempty"`
-	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Scopes       []string            `json:"scopes,omitempty"`
+	ID               string              `json:"id"`
+	Name             *string             `json:"name,omitempty"`
+	Issuer           *string             `json:"issuer,omitempty"`
+	ClientID         *string             `json:"clientId,omitempty"`
+	ClientSecret     *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Scopes           []string            `json:"scopes,omitempty"`
+	IsIDTokenMapping *bool               `json:"idTokenMapping,omitempty"`
 	OptionChanges
 }
 
@@ -129,6 +133,12 @@ func ChangeOIDCOptions(options OptionChanges) func(*OIDCIDPChangedEvent) {
 func ChangeOIDCScopes(scopes []string) func(*OIDCIDPChangedEvent) {
 	return func(e *OIDCIDPChangedEvent) {
 		e.Scopes = scopes
+	}
+}
+
+func ChangeOIDCIsIDTokenMapping(idTokenMapping bool) func(*OIDCIDPChangedEvent) {
+	return func(e *OIDCIDPChangedEvent) {
+		e.IsIDTokenMapping = &idTokenMapping
 	}
 }
 
