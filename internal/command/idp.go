@@ -21,12 +21,13 @@ type GenericOAuthProvider struct {
 }
 
 type GenericOIDCProvider struct {
-	Name         string
-	Issuer       string
-	ClientID     string
-	ClientSecret string
-	Scopes       []string
-	IDPOptions   idp.Options
+	Name             string
+	Issuer           string
+	ClientID         string
+	ClientSecret     string
+	Scopes           []string
+	IsIDTokenMapping bool
+	IDPOptions       idp.Options
 }
 
 type JWTProvider struct {
