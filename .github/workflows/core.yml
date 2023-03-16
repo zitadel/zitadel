@@ -75,6 +75,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+    - run: make generate
     ## Check if caching is needed
     - uses: wangyoucao577/go-release-action@v1
       with:
@@ -86,7 +87,6 @@ jobs:
         extra_files: LICENSE README.md
         md5sum: false
         sha256sum: true
-        build_command: make build
         asset_name: zitadel-core-${{ matrix.goos }}/${{ matrix.goarch }}
     - uses: docker/setup-qemu-action@v2
     - uses: docker/setup-buildx-action@v2
