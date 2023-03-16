@@ -21,6 +21,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+        github_token: ${{ github.token }}
     - uses: bufbuild/buf-lint-action@v1
     ## TODO add comment action with report
 
@@ -32,6 +33,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+        github_token: ${{ github.token }}
     - uses: bufbuild/buf-breaking-action@v1
       with:
         against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
@@ -45,6 +47,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+        github_token: ${{ github.token }}
     - uses: bufbuild/buf-push-action@v1
       with:
         buf_token: ${{ secrets.buf_token }}

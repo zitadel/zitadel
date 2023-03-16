@@ -23,6 +23,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+        github_token: ${{ github.token }} }}
     - run: make generate
     - run: make tidy
 
@@ -37,6 +38,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+        github_token: ${{ github.token }}
     - run: make generate
     - run: make test
 
@@ -51,6 +53,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+        github_token: ${{ github.token }}
     - run: make generate
     - uses: docker/setup-buildx-action@v2
     - name: linting
@@ -58,7 +61,8 @@ jobs:
       with:
         version: v1.50.1
         only-new-issues: true
-        skip-pkg-cache: true   
+        skip-pkg-cache: true
+        args: -v
 
   build:
     name: build
@@ -78,6 +82,7 @@ jobs:
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+        github_token: ${{ github.token }}
     - run: make generate
     - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
     - uses: docker/setup-qemu-action@v2
