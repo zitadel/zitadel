@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
@@ -106,8 +107,8 @@ func (u *User) GetNickname() string {
 	return u.IDTokenClaims.GetNickname()
 }
 
-func (u *User) GetPhone() string {
-	return u.IDTokenClaims.GetPhoneNumber()
+func (u *User) GetPhone() domain.PhoneNumber {
+	return domain.PhoneNumber(u.IDTokenClaims.GetPhoneNumber())
 }
 
 func (u *User) IsPhoneVerified() bool {
@@ -120,4 +121,8 @@ func (u *User) GetPreferredLanguage() language.Tag {
 
 func (u *User) GetAvatarURL() string {
 	return u.IDTokenClaims.GetPicture()
+}
+
+func (u *User) GetEmail() domain.EmailAddress {
+	return domain.EmailAddress(u.IDTokenClaims.GetEmail())
 }

@@ -15,6 +15,8 @@ import {
   AddAPIAppResponse,
   AddAppKeyRequest,
   AddAppKeyResponse,
+  AddAzureADProviderRequest,
+  AddAzureADProviderResponse,
   AddCustomLabelPolicyRequest,
   AddCustomLabelPolicyResponse,
   AddCustomLockoutPolicyRequest,
@@ -37,6 +39,10 @@ import {
   AddGitHubEnterpriseServerProviderResponse,
   AddGitHubProviderRequest,
   AddGitHubProviderResponse,
+  AddGitLabProviderRequest,
+  AddGitLabProviderResponse,
+  AddGitLabSelfHostedProviderRequest,
+  AddGitLabSelfHostedProviderResponse,
   AddGoogleProviderRequest,
   AddGoogleProviderResponse,
   AddHumanUserRequest,
@@ -419,6 +425,8 @@ import {
   UpdateAPIAppConfigResponse,
   UpdateAppRequest,
   UpdateAppResponse,
+  UpdateAzureADProviderRequest,
+  UpdateAzureADProviderResponse,
   UpdateCustomLabelPolicyRequest,
   UpdateCustomLabelPolicyResponse,
   UpdateCustomLockoutPolicyRequest,
@@ -441,6 +449,10 @@ import {
   UpdateGitHubEnterpriseServerProviderResponse,
   UpdateGitHubProviderRequest,
   UpdateGitHubProviderResponse,
+  UpdateGitLabProviderRequest,
+  UpdateGitLabProviderResponse,
+  UpdateGitLabSelfHostedProviderRequest,
+  UpdateGitLabSelfHostedProviderResponse,
   UpdateGoogleProviderRequest,
   UpdateGoogleProviderResponse,
   UpdateHumanEmailRequest,
@@ -865,12 +877,40 @@ export class ManagementService {
 
   //   idp templates
 
+  public addAzureADProvider(req: AddAzureADProviderRequest): Promise<AddAzureADProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addAzureADProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateAzureADProvider(req: UpdateAzureADProviderRequest): Promise<UpdateAzureADProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateAzureADProvider(req, null).then((resp) => resp.toObject());
+  }
+
   public addGoogleProvider(req: AddGoogleProviderRequest): Promise<AddGoogleProviderResponse.AsObject> {
     return this.grpcService.mgmt.addGoogleProvider(req, null).then((resp) => resp.toObject());
   }
 
   public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitLabProvider(req: AddGitLabProviderRequest): Promise<AddGitLabProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGitLabProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitLabProvider(req: UpdateGitLabProviderRequest): Promise<UpdateGitLabProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGitLabProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitLabSelfHostedProvider(
+    req: AddGitLabSelfHostedProviderRequest,
+  ): Promise<AddGitLabSelfHostedProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addGitLabSelfHostedProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitLabSelfHostedProvider(
+    req: UpdateGitLabSelfHostedProviderRequest,
+  ): Promise<UpdateGitLabSelfHostedProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateGitLabSelfHostedProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGitHubProvider(req: AddGitHubProviderRequest): Promise<AddGitHubProviderResponse.AsObject> {

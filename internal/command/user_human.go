@@ -104,29 +104,31 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 
 type humanCreationCommand interface {
 	eventstore.Command
-	AddPhoneData(phoneNumber string)
+	AddPhoneData(phoneNumber domain.PhoneNumber)
 	AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
 }
 
 func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if !human.Email.Valid() {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument")
+		if err := human.Email.Validate(); err != nil {
+			return nil, err
 		}
 		if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument")
 		}
 
 		if human.FirstName = strings.TrimSpace(human.FirstName); human.FirstName == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.Invalid.Argument")
+			return nil, errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty")
 		}
 		if human.LastName = strings.TrimSpace(human.LastName); human.LastName == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-DiAq8", "Errors.Invalid.Argument")
+			return nil, errors.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty")
 		}
 		human.ensureDisplayName()
 
-		if human.Phone.Number, err = FormatPhoneNumber(human.Phone.Number); err != nil {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-tD6ax", "Errors.Invalid.Argument")
+		if human.Phone.Number != "" {
+			if human.Phone.Number, err = human.Phone.Number.Normalize(); err != nil {
+				return nil, err
+			}
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -387,19 +389,12 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 	return writeModelToHuman(registeredHuman), nil
 }
 
-func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
-	if orgID == "" || !human.IsValid() {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-67Ms8", "Errors.User.Invalid")
-	}
-	if human.Password != nil && human.Password.SecretString != "" {
-		human.Password.ChangeRequired = true
-	}
-	return c.createHuman(ctx, orgID, human, nil, false, false, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
-}
-
 func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (events []eventstore.Command, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
-	if orgID == "" || !human.IsValid() {
-		return nil, nil, nil, "", errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Invalid")
+	if orgID == "" {
+		return nil, nil, nil, "", errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
+	}
+	if err := human.Normalize(); err != nil {
+		return nil, nil, nil, "", err
 	}
 	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, links, false, passwordless, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
@@ -421,10 +416,16 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-JKefw", "Errors.User.Invalid")
 	}
 	if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
-		human.Username = human.EmailAddress
+		human.Username = string(human.EmailAddress)
 	}
-	if orgID == "" || !human.IsValid() || link == nil && (human.Password == nil || human.Password.SecretString == "") {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-9dk45", "Errors.User.Invalid")
+	if orgID == "" {
+		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-hYsVH", "Errors.Org.Empty")
+	}
+	if err := human.Normalize(); err != nil {
+		return nil, nil, err
+	}
+	if link == nil && (human.Password == nil || human.Password.SecretString == "") {
+		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-X23na", "Errors.User.Password.Empty")
 	}
 	if human.Password != nil && human.Password.SecretString != "" {
 		human.Password.ChangeRequired = false
@@ -441,7 +442,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 		return nil, nil, err
 	}
 	human.Username = strings.TrimSpace(human.Username)
-	human.EmailAddress = strings.TrimSpace(human.EmailAddress)
+	human.EmailAddress = human.EmailAddress.Normalize()
 	if !domainPolicy.UserLoginMustBeDomain {
 		index := strings.LastIndex(human.Username, "@")
 		if index > 1 {

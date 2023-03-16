@@ -2,16 +2,16 @@
   title="{{ id ? ('IDP.DETAIL.TITLE' | translate) : ('IDP.CREATE.TITLE' | translate) }}"
   (closed)="close()"
 >
-  <div class="github-es-create-content">
+  <div class="identity-provider-create-content">
     <div class="title-row">
-      <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="github" />
-      <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="github" />
+      <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
+      <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
 
       <h1>{{ 'IDP.CREATE.GITHUBES.TITLE' | translate }}</h1>
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-    <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.GITHUBES.DESCRIPTION' | translate }}</p>
+    <p class="identity-provider-desc cnsl-secondary-text">{{ 'IDP.CREATE.GITHUBES.DESCRIPTION' | translate }}</p>
 
     <form [formGroup]="form" (ngSubmit)="submitForm()">
       <cnsl-form-field class="formfield">
@@ -34,7 +34,7 @@
         <input cnslInput formControlName="userEndpoint" />
       </cnsl-form-field>
 
-      <div class="github-es-content">
+      <div class="identity-provider-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientId" />
@@ -48,7 +48,7 @@
           <input cnslInput formControlName="clientSecret" />
         </cnsl-form-field>
 
-        <div class="optional-h-wrapper">
+        <div class="identity-provider-optional-h-wrapper">
           <h2>{{ 'IDP.OPTIONAL' | translate }}</h2>
           <button (click)="showOptional = !showOptional" type="button" mat-icon-button>
             <mat-icon *ngIf="showOptional">keyboard_arrow_up</mat-icon
@@ -96,7 +96,7 @@
         </div>
       </div>
 
-      <div class="github-es-create-actions">
+      <div class="identity-provider-create-actions">
         <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
           <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>

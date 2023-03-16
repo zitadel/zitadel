@@ -320,6 +320,7 @@ Errors:
     MissingParameters: Paramètres requis manquants
   User:
     NotFound: L'utilisateur n'a pas pu être trouvé
+    AlreadyExists: L'utilisateur existe déjà
     Inactive: L'utilisateur est inactif
     NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
     NotAllowedOrg: L'utilisateur n'est pas membre de l'organisation requise
@@ -328,6 +329,33 @@ Errors:
     Invalid: Données utilisateur non valides
     DomainNotAllowedAsUsername: Le domaine est déjà réservé et ne peut pas être utilisé.
     NotAllowedToLink: L'utilisateur n'est pas autorisé à établir un lien avec un fournisseur de connexion externe
+    Profile:
+      NotFound: Profil non trouvé
+      NotChanged: Le profil n'a pas changé
+      Empty: Profil est vide
+      FirstNameEmpty: Le prénom dans le profil est vide
+      LastNameEmpty: Le nom de famille dans le profil est vide
+      IDMissing: Profil ID manquant
+    Email:
+      NotFound: Email non trouvé
+      Invalid: L'email n'est pas valide
+      AlreadyVerified: L'adresse électronique est déjà vérifiée
+      NotChanged: L'adresse électronique n'a pas changé
+      Empty: Email est vide
+      IDMissing: Email ID manquant
+    Phone:
+      Notfound: Téléphone non trouvé
+      Invalid: Le téléphone n'est pas valide
+      AlreadyVerified: Téléphone déjà vérifié
+      Empty: Téléphone est vide
+      NotChanged: Téléphone n'a pas changé
+    Address:
+      NotFound: Adresse non trouvée
+      NotChanged: L'adresse n'a pas changé
+    Username:
+      AlreadyExists: Nom d'utilisateur déjà pris
+      Reserved: Le nom d'utilisateur est déjà pris
+      Empty: Le nom d'utilisateur est vide
     Password:
       ConfirmationWrong: La confirmation du mot de passe est erronée
       Empty: Le mot de passe est vide

@@ -13,27 +13,17 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../validators';
-
-function passwordConfirmValidator(c: AbstractControl): any {
-  if (!c.parent || !c) {
-    return;
-  }
-  const pwd = c.parent.get('password');
-  const cpwd = c.parent.get('confirmPassword');
-
-  if (!pwd || !cpwd) {
-    return;
-  }
-  if (pwd.value !== cpwd.value) {
-    return {
-      invalid: true,
-      notequal: {
-        valid: false,
-      },
-    };
-  }
-}
+import {
+  containsLowerCaseValidator,
+  containsNumberValidator,
+  containsSymbolValidator,
+  containsUpperCaseValidator,
+  emailValidator,
+  minLengthValidator,
+  passwordConfirmValidator,
+  phoneValidator,
+  requiredValidator,
+} from '../../../modules/form-field/validators/validators';
 
 @Component({
   selector: 'cnsl-user-create',
@@ -113,40 +103,40 @@ export class UserCreateComponent implements OnInit, OnDestroy {
 
   private initForm(): void {
     this.userForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      userName: ['', [Validators.required, Validators.minLength(2)]],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      email: ['', [requiredValidator, emailValidator]],
+      userName: ['', [requiredValidator, minLengthValidator(2)]],
+      firstName: ['', requiredValidator],
+      lastName: ['', requiredValidator],
       nickName: [''],
       gender: [],
       preferredLanguage: [''],
-      phone: [''],
+      phone: ['', phoneValidator],
       isVerified: [false, []],
     });
 
-    const validators: Validators[] = [Validators.required];
+    const validators: Validators[] = [requiredValidator];
 
     this.mgmtService.getPasswordComplexityPolicy().then((data) => {
       if (data.policy) {
         this.policy = data.policy;
 
         if (this.policy.minLength) {
-          validators.push(Validators.minLength(this.policy.minLength));
+          validators.push(minLengthValidator(this.policy.minLength));
         }
         if (this.policy.hasLowercase) {
-          validators.push(lowerCaseValidator);
+          validators.push(containsLowerCaseValidator);
         }
         if (this.policy.hasUppercase) {
-          validators.push(upperCaseValidator);
+          validators.push(containsUpperCaseValidator);
         }
         if (this.policy.hasNumber) {
-          validators.push(numberValidator);
+          validators.push(containsNumberValidator);
         }
         if (this.policy.hasSymbol) {
-          validators.push(symbolValidator);
+          validators.push(containsSymbolValidator);
         }
         const pwdValidators = [...validators] as ValidatorFn[];
-        const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+        const confirmPwdValidators = [requiredValidator, passwordConfirmValidator()] as ValidatorFn[];
 
         this.pwdForm = this.fb.group({
           password: ['', pwdValidators],
@@ -203,14 +193,13 @@ export class UserCreateComponent implements OnInit, OnDestroy {
 
   public setCountryCallingCode(): void {
     let value = (this.phone?.value as string) || '';
-    this.phone?.setValue('+' + this.selected?.countryCallingCode + ' ' + value.replace(/\+[0-9]*\s/, ''));
+    this.countryPhoneCodes.forEach((code) => (value = value.replace(`+${code.countryCallingCode}`, '')));
+    value = value.trim();
+    this.phone?.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
   }
 
   ngOnInit(): void {
-    // Set default selected country for phone numbers
-    const defaultCountryCallingCode = 'CH';
     this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
-    this.selected = this.countryPhoneCodes.find((code) => code.countryCode === defaultCountryCallingCode);
   }
 
   ngOnDestroy(): void {

@@ -320,6 +320,7 @@ Errors:
     MissingParameters: 缺少必需的参数
   User:
     NotFound: 找不到用户
+    AlreadyExists: 用户已存在
     Inactive: 用户处于停用状态
     NotFoundOnOrg: 在所选组织中找不到用户
     NotAllowedOrg: 用户不是所需组织的成员
@@ -328,6 +329,33 @@ Errors:
     Invalid: 无效的用户数据
     DomainNotAllowedAsUsername: 域名已存在，但无法使用
     NotAllowedToLink: 不允许用户使用外部身份提供者注册
+    Profile:
+      NotFound: 未找到个人资料
+      NotChanged: 个人资料未更改
+      Empty: 简介是空的
+      FirstNameEmpty: 简介中的名字是空的
+      LastNameEmpty: 简介中的姓氏是空的
+      IDMissing: 简介ID丢失
+    Email:
+      NotFound: 电子邮件没有找到
+      Invalid: 电子邮件无效
+      AlreadyVerified: 电子邮件已经过验证
+      NotChanged: 电子邮件未更改
+      Empty: 电子邮件是空的
+      IDMissing: 电子邮件ID丢失
+    Phone:
+      NotFound: 手机号码未找到
+      Invalid: 手机号码无效
+      AlreadyVerified: 手机号码已经验证
+      Empty: 电话号码是空的
+      NotChanged: 电话号码没有改变
+    Address:
+      NotFound: 找不到地址
+      NotChanged: 地址没有改变
+    Username:
+      AlreadyExists: 用户名已被使用
+      Reserved: 用户名已被使用
+      Empty: 用户名是空的
     Password:
       ConfirmationWrong: 密码不一致
       Empty: 密码为空

@@ -1,9 +1,10 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { BulkAddProjectRolesRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -32,7 +33,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
 
   public formArray!: UntypedFormArray;
   public formGroup: UntypedFormGroup = this.fb.group({
-    key: new UntypedFormControl('', [Validators.required]),
+    key: new UntypedFormControl('', [requiredValidator]),
     displayName: new UntypedFormControl(''),
     group: new UntypedFormControl(''),
   });
@@ -50,7 +51,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
 
   public addEntry(): void {
     const newGroup = this.fb.group({
-      key: new UntypedFormControl('', [Validators.required]),
+      key: new UntypedFormControl('', [requiredValidator]),
       displayName: new UntypedFormControl(''),
       group: new UntypedFormControl(''),
     });
