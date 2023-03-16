@@ -1,4 +1,3 @@
-import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
@@ -10,7 +9,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGenericOAuthProviderRequest as AdminUpdateGenericOAuthProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGenericOAuthProviderRequest as MgmtAddGenericOAuthProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -23,24 +22,21 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { AbstractProvider } from '../abstract-provider';
+import { ProviderService } from '../provider.service';
 
 @Component({
   selector: 'cnsl-provider-oauth',
   templateUrl: './provider-oauth.component.html',
+  providers: [
+    {
+      provide: AbstractProvider,
+      useClass: ProviderService,
+    },
+  ],
 })
 export class ProviderOAuthComponent {
-  public showOptional: boolean = false;
-  public options: Options = new Options();
-
-  public id: string | null = '';
   public updateClientSecret: boolean = false;
-  public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-  private service!: ManagementService | AdminService;
-  public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  public form!: UntypedFormGroup;
-
-  public loading: boolean = false;
-
   public provider?: Provider.AsObject;
 
   constructor(
