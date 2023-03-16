@@ -16,3 +16,4 @@ plugins:
     out: .artifacts/grpc
   - plugin: authoption
     out: .artifacts/grpc
+    #path: $(go env GOPATH)/bin/protoc-gen-authoption

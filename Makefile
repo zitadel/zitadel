@@ -1,5 +1,6 @@
 grpc:
-	go-bindata \
+	go install github.com/go-bindata/go-bindata
+	$$(go env GOPATH)/bin/go-bindata \
 	-pkg main \
 	-prefix internal/protoc/protoc-gen-authoption \
 	-o internal/protoc/protoc-gen-authoption/templates.gen.go \
@@ -34,6 +35,8 @@ test: grpc static assets
 
 lint: grpc static assets
 	golangci-lint run
+
+generate: grpc static assets
 
 tidy:
 	go mod tidy

@@ -39,13 +39,14 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
+    - run: make generate
     - name: linting
       uses: golangci/golangci-lint-action@v3
       with:
         version: v1.50.1
         only-new-issues: true
         skip-pkg-cache: false
-    - run: make lint
+    
 
   build:
     name: build
