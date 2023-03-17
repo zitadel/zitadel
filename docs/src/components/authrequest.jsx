@@ -114,6 +114,10 @@ export function SetAuthRequest() {
     }
   }, [scope]);
 
+  function copyToClipboard() {
+    navigator.clipboard.writeText("Hello");
+  }
+
   return (
     <div className="bg-white/5 rounded-md p-6 shadow">
       <h5 className="text-lg mt-0 mb-4 font-semibold">Your Domain</h5>
@@ -557,6 +561,7 @@ export function SetAuthRequest() {
 
         <a
           onClick={() => {
+            copyToClipboard();
             window.plausible("OIDC Playground", {
               props: { method: "Try it out", pageloc: "Authorize" },
             });
@@ -586,6 +591,43 @@ export function SetAuthRequest() {
           }`}
         >
           <span>Try it out</span>
+          <i className="text-white text-md ml-2 las la-external-link-alt"></i>
+        </a>
+
+        <a
+          onClick={() => {
+            window.plausible("OIDC Playground", {
+              props: { method: "Save", pageloc: "Authorize" },
+            });
+          }}
+          target="_blank"
+          className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-gray-500 dark:bg-gray-600 hover:dark:bg-gray-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
+          href={`${window.location.href}/docs/apis/openidoauth/authrequest?instance=${encodeURIComponent(
+            instance
+          )}&client_id=${encodeURIComponent(
+            clientId
+          )}&redirect_uri=${encodeURIComponent(
+            redirectUri
+          )}&response_type=${encodeURIComponent(
+            responseType
+          )}&scope=${encodeURIComponent(
+            scope
+          )}&prompt=${encodeURIComponent(
+            prompt
+          )}&auth_method=${encodeURIComponent(
+            authMethod
+          )}&code_verifier=${encodeURIComponent(
+            codeVerifier
+          )}&login_hint=${encodeURIComponent(
+            loginHint
+          )}&id_token_hint=${encodeURIComponent(
+            idTokenHint
+          )}&organization_id=${encodeURIComponent(
+            organizationId
+          )}
+          `}
+        >
+          <span>Permanent Link</span>
           <i className="text-white text-md ml-2 las la-external-link-alt"></i>
         </a>
       </div>
