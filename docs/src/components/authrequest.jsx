@@ -603,7 +603,7 @@ export function SetAuthRequest() {
           }}
           target="_blank"
           className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-gray-500 dark:bg-gray-600 hover:dark:bg-gray-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
-          href={`${window.location.href}/docs/apis/openidoauth/authrequest?instance=${encodeURIComponent(
+          href={`/docs/apis/openidoauth/authrequest?instance=${encodeURIComponent(
             instance
           )}&client_id=${encodeURIComponent(
             clientId
