@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -17,6 +18,9 @@ const (
 func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	// clear the call timestamp for all auth check calls
+	ctx = call.ClearTimestamp(ctx)
 
 	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, verifier, method)
 	if err != nil {

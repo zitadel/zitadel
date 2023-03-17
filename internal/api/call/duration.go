@@ -28,6 +28,11 @@ func FromContext(ctx context.Context) (t time.Time) {
 	return t
 }
 
+// ClearTimestamp clears the call timestamp on the context
+func ClearTimestamp(parent context.Context) context.Context {
+	return context.WithValue(parent, key, nil)
+}
+
 // Took returns the time the call took so far
 func Took(ctx context.Context) time.Duration {
 	start := FromContext(ctx)
