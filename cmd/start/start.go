@@ -12,6 +12,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/runtime"
+
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -87,12 +89,17 @@ Requirements:
 
 func startZitadel(config *Config, masterKey string) error {
 	ctx, cancel := context.WithCancel(context.Background())
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+	sigChan := make(chan os.Signal, 1)
+	phase := runtime.StartTracking(sigChan)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		<-shutdown
-		close(shutdown)
-		time.AfterFunc(10*time.Second, cancel)
+		sig := <-phase.ForkShutdown()
+		fmt.Println("closing shutdown", sig.String())
+		time.AfterFunc(10*time.Second, func() {
+			fmt.Println("cancelling app context")
+			cancel()
+			os.Exit(1)
+		})
 	}()
 
 	dbClient, err := database.Connect(config.Database, false)
@@ -173,7 +180,7 @@ func startZitadel(config *Config, masterKey string) error {
 	}
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(ctx, shutdown, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(ctx, phase, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
@@ -184,7 +191,7 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	return listen(ctx, router, config.Port, tlsConfig, shutdown)
+	return listen(ctx, router, config.Port, tlsConfig, phase)
 }
 
 func startAPIs(
@@ -298,7 +305,7 @@ func startAPIs(
 	return nil
 }
 
-func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, shutdown chan os.Signal) error {
+func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, phase *runtime.Phase) error {
 	http2Server := &http2.Server{}
 	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig}
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
@@ -321,11 +328,14 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 	select {
 	case err := <-errCh:
 		return fmt.Errorf("error starting server: %w", err)
-	case <-shutdown:
-		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	case <-phase.ForkShutdown():
+		shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
-		return shutdownServer(ctx, http1Server)
+		fmt.Println("shutting down server")
+		//		defer cancel()
+		return shutdownServer(shutdownCtx, http1Server)
 	case <-ctx.Done():
+		fmt.Println("app context closed, shutting down server")
 		return shutdownServer(ctx, http1Server)
 	}
 }
