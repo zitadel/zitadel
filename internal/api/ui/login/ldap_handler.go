@@ -50,7 +50,7 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err := l.authRepo.ResetSelectedIDP(r.Context(), authReq.ID, userAgentID)
 		if err != nil {
-			l.renderError(w, r, authReq, err)
+			l.renderLDAPLogin(w, r, authReq, err)
 		}
 
 		l.handleLoginName(w, r)
@@ -59,13 +59,13 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 
 	identityProvider, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
 	if err != nil {
-		l.renderError(w, r, authReq, err)
+		l.renderLDAPLogin(w, r, authReq, err)
 		return
 	}
 
 	provider, err := l.ldapProvider(r.Context(), identityProvider)
 	if err != nil {
-		l.renderError(w, r, authReq, err)
+		l.renderLDAPLogin(w, r, authReq, err)
 		return
 	}
 	session := &ldap.Session{Provider: provider, User: data.Username, Password: data.Password}

@@ -31,8 +31,9 @@ func (s *Session) GetAuthURL() string {
 }
 func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 	var user *ldap.Entry
+	var err error
 	for _, server := range s.Provider.servers {
-		userT, err := tryLogin(
+		user, err = tryLogin(
 			server,
 			s.Provider.startTLS,
 			s.Provider.bindDN,
@@ -45,14 +46,14 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 			s.Password,
 			s.Provider.timeout,
 		)
-		if err != nil {
-			return nil, err
+		if err == nil && user != nil {
+			break
 		}
-		user = userT
-		break
+	}
+	if err != nil {
+		return nil, err
 	}
 
-	var err error
 	var emailVerified bool
 	if v := user.GetAttributeValue(s.Provider.emailVerifiedAttribute); v != "" {
 		emailVerified, err = strconv.ParseBool(user.GetAttributeValue(s.Provider.emailVerifiedAttribute))

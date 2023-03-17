@@ -315,7 +315,6 @@ message LDAPConfig {
     repeated string user_filters = 7;
     google.protobuf.Duration timeout = 8;
     LDAPAttributes attributes = 9;
-    Options provider_options = 10;
 }
 
 message Options {

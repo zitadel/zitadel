@@ -913,6 +913,15 @@ func (c *Commands) prepareAddInstanceLDAPProvider(a *instance.Aggregate, writeMo
 		if provider.UserBase = strings.TrimSpace(provider.UserBase); provider.UserBase == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SAD5n", "Errors.Invalid.Argument")
 		}
+		if len(provider.Servers) == 0 {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SAx905n", "Errors.Invalid.Argument")
+		}
+		if len(provider.UserObjectClasses) == 0 {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-S1x905n", "Errors.Invalid.Argument")
+		}
+		if len(provider.UserFilters) == 0 {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-aAx905n", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -965,6 +974,15 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 		}
 		if provider.UserBase = strings.TrimSpace(provider.UserBase); provider.UserBase == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-DG45z", "Errors.Invalid.Argument")
+		}
+		if len(provider.Servers) == 0 {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SAx945n", "Errors.Invalid.Argument")
+		}
+		if len(provider.UserObjectClasses) == 0 {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-S1x605n", "Errors.Invalid.Argument")
+		}
+		if len(provider.UserFilters) == 0 {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-aAx901n", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

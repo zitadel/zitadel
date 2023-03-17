@@ -717,7 +717,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			ldapUserBase := sql.NullString{}
 			ldapUserObjectClasses := database.StringArray{}
 			ldapUserFilters := database.StringArray{}
-			ldapTimeout := new(time.Duration)
+			ldapTimeout := sql.NullInt64{}
 			ldapIDAttribute := sql.NullString{}
 			ldapFirstNameAttribute := sql.NullString{}
 			ldapLastNameAttribute := sql.NullString{}
@@ -887,7 +887,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					UserBase:          ldapUserBase.String,
 					UserObjectClasses: ldapUserObjectClasses,
 					UserFilters:       ldapUserFilters,
-					Timeout:           ldapTimeout.Abs(),
+					Timeout:           time.Duration(ldapTimeout.Int64),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                ldapIDAttribute.String,
 						FirstNameAttribute:         ldapFirstNameAttribute.String,
@@ -1054,7 +1054,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				ldapUserBase := sql.NullString{}
 				ldapUserObjectClasses := database.StringArray{}
 				ldapUserFilters := database.StringArray{}
-				ldapTimeout := new(time.Duration)
+				ldapTimeout := sql.NullInt64{}
 				ldapIDAttribute := sql.NullString{}
 				ldapFirstNameAttribute := sql.NullString{}
 				ldapLastNameAttribute := sql.NullString{}
@@ -1223,7 +1223,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						UserBase:          ldapUserBase.String,
 						UserObjectClasses: ldapUserObjectClasses,
 						UserFilters:       ldapUserFilters,
-						Timeout:           ldapTimeout.Abs(),
+						Timeout:           time.Duration(ldapTimeout.Int64),
 						LDAPAttributes: idp.LDAPAttributes{
 							IDAttribute:                ldapIDAttribute.String,
 							FirstNameAttribute:         ldapFirstNameAttribute.String,

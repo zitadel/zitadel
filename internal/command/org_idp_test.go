@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -1919,7 +1920,9 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 				provider:      LDAPProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAfdd", ""))
+				},
 			},
 		},
 		{
@@ -1936,7 +1939,9 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sv31s", ""))
+				},
 			},
 		},
 		{
@@ -1954,7 +1959,9 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sdgf4", ""))
+				},
 			},
 		},
 		{
@@ -1973,7 +1980,103 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-AEG2w", ""))
+				},
+			},
+		},
+		{
+			"invalid userbase",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: LDAPProvider{
+					Name:         "name",
+					BindDN:       "binddn",
+					BaseDN:       "baseDN",
+					BindPassword: "password",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAD5n", ""))
+				},
+			},
+		},
+		{
+			"invalid servers",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: LDAPProvider{
+					Name:         "name",
+					BindDN:       "binddn",
+					BaseDN:       "baseDN",
+					BindPassword: "password",
+					UserBase:     "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAy945n", ""))
+				},
+			},
+		},
+		{
+			"invalid userObjectClasses",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: LDAPProvider{
+					Name:         "name",
+					Servers:      []string{"server"},
+					BindDN:       "binddn",
+					BaseDN:       "baseDN",
+					BindPassword: "password",
+					UserBase:     "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-S1x705n", ""))
+				},
+			},
+		},
+		{
+			"invalid userFilters",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BindDN:            "binddn",
+					BaseDN:            "baseDN",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-aAx9x1n", ""))
+				},
 			},
 		},
 		{
@@ -2179,7 +2282,9 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 				provider:      LDAPProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dgdbs", ""))
+				},
 			},
 		},
 		{
@@ -2194,7 +2299,9 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 				provider:      LDAPProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Sffgd", ""))
+				},
 			},
 		},
 		{
@@ -2211,7 +2318,9 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-vb3ss", ""))
+				},
 			},
 		},
 		{
@@ -2229,7 +2338,99 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-hbere", ""))
+				},
+			},
+		},
+		{
+			"invalid userbase",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: LDAPProvider{
+					Name:   "name",
+					BaseDN: "baseDN",
+					BindDN: "bindDN",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-DG45z", ""))
+				},
+			},
+		},
+		{
+			"invalid servers",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: LDAPProvider{
+					Name:     "name",
+					BaseDN:   "baseDN",
+					BindDN:   "bindDN",
+					UserBase: "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Sxx945n", ""))
+				},
+			},
+		},
+		{
+			"invalid userObjectClasses",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: LDAPProvider{
+					Name:     "name",
+					Servers:  []string{"server"},
+					BaseDN:   "baseDN",
+					BindDN:   "bindDN",
+					UserBase: "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-S1p605n", ""))
+				},
+			},
+		},
+		{
+			"invalid userFilters",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "bindDN",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-aBx901n", ""))
+				},
 			},
 		},
 		{
@@ -2244,15 +2445,20 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 				resourceOwner: "org1",
 				id:            "id1",
 				provider: LDAPProvider{
-					Name:         "name",
-					BaseDN:       "baseDN",
-					BindDN:       "binddn",
-					BindPassword: "password",
-					UserBase:     "user",
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "binddn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowNotFound(nil, "ORG-ASF3F", ""))
+				},
 			},
 		},
 		{

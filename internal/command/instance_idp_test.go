@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -1893,7 +1894,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				provider: LDAPProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAfdd", ""))
+				},
 			},
 		},
 		{
@@ -1909,7 +1912,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sv31s", ""))
+				},
 			},
 		},
 		{
@@ -1926,7 +1931,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdgf4", ""))
+				},
 			},
 		},
 		{
@@ -1944,7 +1951,99 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-AEG2w", ""))
+				},
+			},
+		},
+		{
+			"invalid userBase",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: LDAPProvider{
+					Name:         "name",
+					BindDN:       "binddn",
+					BaseDN:       "baseDN",
+					BindPassword: "password",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAD5n", ""))
+				},
+			},
+		},
+		{
+			"invalid servers",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: LDAPProvider{
+					Name:         "name",
+					BindDN:       "binddn",
+					BaseDN:       "baseDN",
+					BindPassword: "password",
+					UserBase:     "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAx905n", ""))
+				},
+			},
+		},
+		{
+			"invalid userObjectClasses",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: LDAPProvider{
+					Name:         "name",
+					Servers:      []string{"server"},
+					BindDN:       "binddn",
+					BaseDN:       "baseDN",
+					BindPassword: "password",
+					UserBase:     "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S1x905n", ""))
+				},
+			},
+		},
+		{
+			"invalid userFilters",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BindDN:            "binddn",
+					BaseDN:            "baseDN",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-aAx905n", ""))
+				},
 			},
 		},
 		{
@@ -2152,7 +2251,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				provider: LDAPProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dgdbs", ""))
+				},
 			},
 		},
 		{
@@ -2166,7 +2267,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				provider: LDAPProvider{},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sffgd", ""))
+				},
 			},
 		},
 		{
@@ -2182,7 +2285,9 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-vb3ss", ""))
+				},
 			},
 		},
 		{
@@ -2199,7 +2304,95 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsErrorInvalidArgument,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-hbere", ""))
+				},
+			},
+		},
+		{
+			"invalid userbase",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:   "name",
+					BaseDN: "baseDN",
+					BindDN: "bindDN",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DG45z", ""))
+				},
+			},
+		},
+		{
+			"invalid servers",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:     "name",
+					BaseDN:   "baseDN",
+					BindDN:   "bindDN",
+					UserBase: "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAx945n", ""))
+				},
+			},
+		},
+		{
+			"invalid userObjectClasses",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:     "name",
+					Servers:  []string{"server"},
+					BaseDN:   "baseDN",
+					BindDN:   "bindDN",
+					UserBase: "user",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S1x605n", ""))
+				},
+			},
+		},
+		{
+			"invalid userFilters",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "bindDN",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-aAx901n", ""))
+				},
 			},
 		},
 		{
@@ -2213,15 +2406,20 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
 				provider: LDAPProvider{
-					Name:         "name",
-					BaseDN:       "baseDN",
-					BindDN:       "binddn",
-					BindPassword: "password",
-					UserBase:     "user",
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "binddn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: func(err error) bool {
+					return errors.Is(err, caos_errors.ThrowNotFound(nil, "INST-ASF3F", ""))
+				},
 			},
 		},
 		{
