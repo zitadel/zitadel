@@ -239,11 +239,20 @@
     "NOROWS": "Pas de données"
   },
   "ERRORS": {
-    "REQUIRED": "Certains champs obligatoires sont manquants.",
+    "REQUIRED": "Remplis ce champ s'il te plaît.",
     "TOKENINVALID": {
       "TITLE": "Votre jeton d'autorisation a expiré.",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
-    }
+    },
+    "INVALID_FORMAT": "Le format n'est pas valide",
+    "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",
+    "MINLENGTH": "Doit comporter au moins {{length}} caractères.",
+    "UPPERCASEMISSING": "Doit inclure un caractère majuscule.",
+    "LOWERCASEMISSING": "Doit inclure un caractère minuscule.",
+    "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
+    "NUMBERERROR": "Doit inclure un chiffre.",
+    "PWNOTEQUAL": "Les mots de passe fournis ne correspondent pas.",
+    "PHONE": "Le numéro de téléphone doit commencer par 00 ou +."
   },
   "USER": {
     "SETTINGS": {
@@ -524,8 +533,7 @@
       "SET": "Définir un nouveau mot de passe",
       "RESENDNOTIFICATION": "Envoyer le lien de réinitialisation du mot de passe",
       "REQUIRED": "Certains champs obligatoires sont manquants.",
-      "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères.",
-      "NOTEQUAL": "Les mots de passe fournis ne correspondent pas."
+      "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -578,17 +586,6 @@
         "2": "filtre pour le nom du projet",
         "3": "filtre pour nom de rôle"
       }
-    },
-    "VALIDATION": {
-      "INVALIDPATTERN": "Le mot de passe ne répond pas aux règles définies.",
-      "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",
-      "REQUIRED": "Le champ de saisie est vide.",
-      "MINLENGTH": "Le mot de passe doit comporter au moins{{length}} caractères.",
-      "NOEMAIL": "Le nom d'utilisateur ne peut pas être une adresse électronique.",
-      "UPPERCASEMISSING": "Doit inclure un caractère majuscule.",
-      "LOWERCASEMISSING": "Doit inclure un caractère minuscule.",
-      "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
-      "NUMBERERROR": "Doit inclure un chiffre."
     },
     "STATE": {
       "0": "Inconnu",
@@ -1633,6 +1630,26 @@
       "GOOGLE": {
         "TITLE": "Fournisseur Google",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Google"
+      },
+      "GITLAB": {
+        "TITLE": "Fournisseur Gitlab",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Fournisseur Gitlab Self Hosted",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Gitlab Self Hosted"
+      },
+      "GITHUBES": {
+        "TITLE": "Fournisseur GitHub Enterprise Server",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Fournisseur Github",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Fournisseur Microsoft",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Microsoft"
       }
     },
     "DETAIL": {
@@ -1665,6 +1682,14 @@
       "1": "actif",
       "2": "inactif"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Type de locataire",
+    "AZUREADTENANTID": "ID du locataire",
+    "EMAILVERIFIED": "Courriel vérifié",
     "NAMEHINT": "Si elle est spécifiée, elle sera affichée dans l'interface de connexion.",
     "OPTIONAL": "optionnel",
     "UPDATECLIENTSECRET": "mise à jour du secret client",

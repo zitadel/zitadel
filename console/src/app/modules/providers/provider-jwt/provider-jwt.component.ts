@@ -1,8 +1,8 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
 import {
   AddJWTProviderRequest as AdminAddJWTProviderRequest,
@@ -19,13 +19,13 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
   selector: 'cnsl-provider-jwt',
   templateUrl: './provider-jwt.component.html',
-  styleUrls: ['./provider-jwt.component.scss'],
 })
 export class ProviderJWTComponent {
   public showOptional: boolean = false;
@@ -42,7 +42,6 @@ export class ProviderJWTComponent {
   public provider?: Provider.AsObject;
 
   constructor(
-    private router: Router,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -83,11 +82,11 @@ export class ProviderJWTComponent {
     });
 
     this.form = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      headerName: new UntypedFormControl('', [Validators.required]),
-      issuer: new UntypedFormControl('', [Validators.required]),
-      jwtEndpoint: new UntypedFormControl('', [Validators.required]),
-      keysEndpoint: new UntypedFormControl('', [Validators.required]),
+      name: new UntypedFormControl('', [requiredValidator]),
+      headerName: new UntypedFormControl('', [requiredValidator]),
+      issuer: new UntypedFormControl('', [requiredValidator]),
+      jwtEndpoint: new UntypedFormControl('', [requiredValidator]),
+      keysEndpoint: new UntypedFormControl('', [requiredValidator]),
     });
   }
 
@@ -134,7 +133,7 @@ export class ProviderJWTComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -157,7 +156,7 @@ export class ProviderJWTComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -185,7 +184,7 @@ export class ProviderJWTComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {
@@ -208,7 +207,7 @@ export class ProviderJWTComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {

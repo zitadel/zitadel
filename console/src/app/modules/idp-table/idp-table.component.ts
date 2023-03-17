@@ -226,14 +226,29 @@ export class IdpTableComponent implements OnInit {
   public routerLinkForRow(row: Provider.AsObject): any {
     if (row.id) {
       switch (row.type) {
+        case ProviderType.PROVIDER_TYPE_AZURE_AD:
+          return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'azure-ad', row.id];
         case ProviderType.PROVIDER_TYPE_OIDC:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'oidc', row.id];
+        case ProviderType.PROVIDER_TYPE_GITHUB_ES:
+          return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'github-es', row.id];
         case ProviderType.PROVIDER_TYPE_OAUTH:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'oauth', row.id];
         case ProviderType.PROVIDER_TYPE_JWT:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'jwt', row.id];
         case ProviderType.PROVIDER_TYPE_GOOGLE:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'google', row.id];
+        case ProviderType.PROVIDER_TYPE_GITLAB:
+          return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'gitlab', row.id];
+        case ProviderType.PROVIDER_TYPE_GITLAB_SELF_HOSTED:
+          return [
+            row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org',
+            'provider',
+            'gitlab-self-hosted',
+            row.id,
+          ];
+        case ProviderType.PROVIDER_TYPE_GITHUB:
+          return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'github', row.id];
       }
     }
   }

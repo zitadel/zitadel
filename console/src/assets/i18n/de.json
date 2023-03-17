@@ -239,11 +239,20 @@
     "NOROWS": "Keine Daten"
   },
   "ERRORS": {
-    "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
+    "REQUIRED": "Bitte fülle dieses Feld aus.",
     "TOKENINVALID": {
       "TITLE": "Du bist abgemeldet",
       "DESCRIPTION": "Klicke auf \"Einloggen\", um Dich erneut anzumelden."
-    }
+    },
+    "INVALID_FORMAT": "Das Format is ungültig.",
+    "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
+    "MINLENGTH": "Muss mindestens {{requiredLength}} Zeichen lang sein.",
+    "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
+    "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
+    "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
+    "NUMBERERROR": "Muss eine Ziffer beinhalten.",
+    "PWNOTEQUAL": "Die Passwörter stimmen nicht überein.",
+    "PHONE": "Die Telefonnummer muss mit 00 oder + starten."
   },
   "USER": {
     "SETTINGS": {
@@ -524,8 +533,7 @@
       "SET": "Passwort neu setzen",
       "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
-      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
-      "NOTEQUAL": "Die Passwörter stimmen nicht überein."
+      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein."
     },
     "ID": "ID",
     "EMAIL": "E-Mail",
@@ -578,17 +586,6 @@
         "2": "Nach Projektnamen filtern",
         "3": "Nach Rolle filtern"
       }
-    },
-    "VALIDATION": {
-      "INVALIDPATTERN": "Das Passwort erfüllt nicht die vorgegebenen Regeln.",
-      "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
-      "REQUIRED": "Das Eingabefeld ist leer.",
-      "MINLENGTH": "Das Passwort muss mindestens {{requiredLength}} Zeichen lang sein.",
-      "NOEMAIL": "Benutzername darf keine E-Mail-Adresse sein.",
-      "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
-      "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
-      "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Muss eine Ziffer beinhalten."
     },
     "STATE": {
       "0": "Unbekannt",
@@ -1629,6 +1626,26 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Google-Identitätsprovider ein."
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Gitlab Self Hosted Identitätsprovider ein."
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self hosted Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Gitlab Self Hosted Identitätsprovider ein."
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren GitHub Enterprise Server ein."
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Github-Identitätsprovider ein."
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Microsoft-Identitätsprovider ein."
       }
     },
     "DETAIL": {
@@ -1661,6 +1678,14 @@
       "1": "aktiv",
       "2": "inaktiv"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Tenant Typ",
+    "AZUREADTENANTID": "Tenant ID",
+    "EMAILVERIFIED": "Email verifiziert",
     "NAMEHINT": "Wenn angegeben, wir er im Login interface angezeigt.",
     "OPTIONAL": "optional",
     "UPDATECLIENTSECRET": "Client Secret updaten",
@@ -1674,9 +1699,9 @@
     "SETAVAILABLE": "verfügbar setzen",
     "SETUNAVAILABLE": "auf nicht verfügbar setzen",
     "NAME": "Name",
-    "AUTHORIZATIONENDPOINT": "Authorization Endpunkt",
-    "TOKENENDPOINT": "Token Endpunkt",
-    "USERENDPOINT": "User Endpunkt",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
     "IDATTRIBUTE": "ID Attribut",
     "CONFIG": "Konfiguration",
     "STATE": "Status",

@@ -59,7 +59,7 @@ func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defau
 func createInstancePbToAddHuman(req *system_pb.CreateInstanceRequest_Human, defaultHuman command.AddHuman, userLoginMustBeDomain bool, org, externalDomain string) *command.AddHuman {
 	user := defaultHuman
 	if req.Email != nil {
-		user.Email.Address = req.Email.Email
+		user.Email.Address = domain.EmailAddress(req.Email.Email)
 		user.Email.Verified = req.Email.IsEmailVerified
 	}
 	if req.Profile != nil {
@@ -164,7 +164,7 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 		instance.Org.Human = new(command.AddHuman)
 	}
 	if req.OwnerEmail.Email != "" {
-		instance.Org.Human.Email.Address = req.OwnerEmail.Email
+		instance.Org.Human.Email.Address = domain.EmailAddress(req.OwnerEmail.Email)
 		instance.Org.Human.Email.Verified = req.OwnerEmail.IsEmailVerified
 	}
 	if req.OwnerProfile != nil {

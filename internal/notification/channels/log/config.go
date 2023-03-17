@@ -1,6 +1,6 @@
 package log
 
-type LogConfig struct {
+type Config struct {
 	Enabled bool
 	Compact bool
 }

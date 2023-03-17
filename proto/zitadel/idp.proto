@@ -270,8 +270,12 @@ message ProviderConfig {
         JWTConfig jwt = 6;
         GitHubConfig github = 7;
         GitHubEnterpriseServerConfig github_es = 8;
+        GitLabConfig gitlab = 9;
+        GitLabSelfHostedConfig gitlab_self_hosted = 10;
+        AzureADConfig azure_ad = 11;
     }
 }
+
 message OAuthConfig {
     string client_id = 1;
     string authorization_endpoint = 2;
@@ -285,6 +289,7 @@ message GenericOIDCConfig {
     string issuer = 1;
     string client_id = 2;
     repeated string scopes = 3;
+    bool is_id_token_mapping = 4;
 }
 
 message GitHubConfig {
@@ -305,6 +310,17 @@ message GoogleConfig {
     repeated string scopes = 2;
 }
 
+message GitLabConfig {
+    string client_id = 1;
+    repeated string scopes = 2;
+}
+
+message GitLabSelfHostedConfig {
+    string issuer = 1;
+    string client_id = 2;
+    repeated string scopes = 3;
+}
+
 message LDAPConfig {
     repeated string servers = 1;
     bool start_tls = 2;
@@ -315,6 +331,13 @@ message LDAPConfig {
     repeated string user_filters = 7;
     google.protobuf.Duration timeout = 8;
     LDAPAttributes attributes = 9;
+}
+
+message AzureADConfig {
+    string client_id = 1;
+    AzureADTenant tenant = 2;
+    bool email_verified = 3;
+    repeated string scopes = 4;
 }
 
 message Options {
@@ -340,3 +363,15 @@ message LDAPAttributes {
     string profile_attribute = 13 [(validate.rules).string = {max_len: 200}];
 }
 
+enum AzureADTenantType {
+    AZURE_AD_TENANT_TYPE_COMMON = 0;
+    AZURE_AD_TENANT_TYPE_ORGANISATIONS = 1;
+    AZURE_AD_TENANT_TYPE_CONSUMERS = 2;
+}
+
+message AzureADTenant {
+    oneof type {
+        AzureADTenantType tenant_type = 1;
+        string tenant_id = 2;
+    }
+}

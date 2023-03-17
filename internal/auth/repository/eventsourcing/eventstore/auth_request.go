@@ -867,7 +867,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 		idQuery, externalIDQuery,
 	}
 	if request.RequestedOrgID != "" {
-		orgIDQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(idpConfigID)
+		orgIDQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(request.RequestedOrgID)
 		if err != nil {
 			return err
 		}
@@ -1480,10 +1480,8 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	}
 	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, project.ID, request.InstanceID)
 	if errors.IsNotFound(err) {
+		// if not found there is no error returned
 		return true, nil
 	}
-	if err != nil {
-		return false, err
-	}
-	return false, nil
+	return false, err
 }

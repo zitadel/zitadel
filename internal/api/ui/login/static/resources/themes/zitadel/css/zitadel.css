@@ -100,6 +100,8 @@
   --zitadel-color-google-background: #ffffff;
   --zitadel-color-github-text: #8b8d8d;
   --zitadel-color-github-background: #ffffff;
+  --zitadel-color-gitlab-text: #8b8d8d;
+  --zitadel-color-gitlab-background: #ffffff;
   --zitadel-color-qr: var(--zitadel-color-black);
   --zitadel-color-qr-background: var(--zitadel-color-white);
 }
@@ -188,6 +190,8 @@
   --zitadel-color-google-background: #ffffff;
   --zitadel-color-github-text: #8b8d8d;
   --zitadel-color-github-background: #ffffff;
+  --zitadel-color-gitlab-text: #8b8d8d;
+  --zitadel-color-gitlab-background: #ffffff;
 }
 
 body {
@@ -568,6 +572,15 @@ a.sub-formfield-link {
   width: 46px;
   background-image: url("../../../images/idp/github.png");
   background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.gitlab span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/gitlab.png");
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
@@ -1552,6 +1565,15 @@ a.sub-formfield-link {
   width: 46px;
   background-image: url("../../../images/idp/github.png");
   background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.gitlab span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/gitlab.png");
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
@@ -3072,6 +3094,10 @@ ul li i.lgn-valid {
 .lgn-idp.github {
   color: var(--zitadel-color-github-text);
   background-color: var(--zitadel-color-github-background);
+}
+.lgn-idp.gitlab {
+  color: var(--zitadel-color-gitlab-text);
+  background-color: var(--zitadel-color-gitlab-background);
 }
 
 .lgn-idp-providers .lgn-idp-desc {

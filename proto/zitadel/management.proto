@@ -6536,6 +6536,30 @@ service ManagementService {
         };
     }
 
+    // Add a new Azure AD identity provider in the organisation
+    rpc AddAzureADProvider(AddAzureADProviderRequest) returns (AddAzureADProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/azure"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Change an existing Azure AD identity provider in the organisation
+    rpc UpdateAzureADProvider(UpdateAzureADProviderRequest) returns (UpdateAzureADProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/azure/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
     // Add a new GitHub identity provider in the organization
     rpc AddGitHubProvider(AddGitHubProviderRequest) returns (AddGitHubProviderResponse) {
         option (google.api.http) = {
@@ -6576,6 +6600,54 @@ service ManagementService {
     rpc UpdateGitHubEnterpriseServerProvider(UpdateGitHubEnterpriseServerProviderRequest) returns (UpdateGitHubEnterpriseServerProviderResponse) {
         option (google.api.http) = {
             put: "/idps/github_es/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Add a new GitLab identity provider in the organization
+    rpc AddGitLabProvider(AddGitLabProviderRequest) returns (AddGitLabProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/gitlab"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Change an existing GitLab identity provider in the organization
+    rpc UpdateGitLabProvider(UpdateGitLabProviderRequest) returns (UpdateGitLabProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/gitlab/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Add a new self hosted GitLab identity provider in the organization
+    rpc AddGitLabSelfHostedProvider(AddGitLabSelfHostedProviderRequest) returns (AddGitLabSelfHostedProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/gitlab_self_hosted"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Change an existing self hosted GitLab identity provider in the organization
+    rpc UpdateGitLabSelfHostedProvider(UpdateGitLabSelfHostedProviderRequest) returns (UpdateGitLabSelfHostedProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/gitlab_self_hosted/{id}"
             body: "*"
         };
 
@@ -11101,6 +11173,7 @@ message AddGenericOIDCProviderRequest {
     string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
     zitadel.idp.v1.Options provider_options = 6;
+    bool is_id_token_mapping = 7;
 }
 
 message AddGenericOIDCProviderResponse {
@@ -11117,6 +11190,7 @@ message UpdateGenericOIDCProviderRequest {
     string client_secret = 5 [(validate.rules).string = {max_len: 200}];
     repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
     zitadel.idp.v1.Options provider_options = 7;
+    bool is_id_token_mapping = 8;
 }
 
 message UpdateGenericOIDCProviderResponse {
@@ -11148,6 +11222,39 @@ message UpdateJWTProviderRequest {
 }
 
 message UpdateJWTProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddAzureADProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // if not provided the `common` tenant will be used
+    zitadel.idp.v1.AzureADTenant tenant = 4;
+    bool email_verified = 5;
+    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 7;
+}
+
+message AddAzureADProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateAzureADProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // client_secret will only be updated if provided
+    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    // if not provided the `common` tenant will be used
+    zitadel.idp.v1.AzureADTenant tenant = 5;
+    bool email_verified = 6;
+    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 8;
+}
+
+message UpdateAzureADProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -11209,6 +11316,63 @@ message UpdateGitHubEnterpriseServerProviderRequest {
 }
 
 message UpdateGitHubEnterpriseServerProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddGitLabProviderRequest {
+    // GitLab will be used as default, if no name is provided
+    string name = 1 [(validate.rules).string = {max_len: 200}];
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 5;
+}
+
+message AddGitLabProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGitLabProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // client_secret will only be updated if provided
+    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 6;
+}
+
+message UpdateGitLabProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddGitLabSelfHostedProviderRequest {
+    string issuer = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 6;
+}
+
+message AddGitLabSelfHostedProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGitLabSelfHostedProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // client_secret will only be updated if provided
+    string client_secret = 5 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 7;
+}
+
+message UpdateGitLabSelfHostedProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

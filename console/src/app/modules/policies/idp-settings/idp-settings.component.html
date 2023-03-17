@@ -18,37 +18,96 @@
         : []
     "
   >
-    <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
+    <img class="idp-logo" src="./assets/images/idp/google.png" alt="google" />
     <div class="text-container">
       <span class="title">Google</span>
     </div>
   </a>
 
-  <div class="item card coming-soon" matRipple>
-    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
-    <img class="idp-logo" src="../../../assets/images/idp/ms.svg" alt="microsoft" />
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'azure-ad', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'azure-ad', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo" src="./assets/images/idp/ms.svg" alt="microsoft" />
     <div class="text-container">
       <span class="title">Microsoft</span>
     </div>
-  </div>
+  </a>
 
-  <div class="item card coming-soon" matRipple>
-    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
-    <img class="idp-logo dark" src="../../../assets/images/idp/github-dark.svg" alt="GitHub" />
-    <img class="idp-logo light" src="../../../assets/images/idp/github.svg" alt="GitHub" />
+  <a
+    class="item card"
+    matRipple
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'github', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'github', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="GitHub" />
+    <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="GitHub" />
 
     <div class="text-container">
       <span class="title">GitHub</span>
     </div>
-  </div>
+  </a>
 
-  <div class="item card coming-soon" matRipple>
-    <span class="state coming-soon-label">{{ 'ACTIONS.COMINGSOON' | translate }}</span>
-    <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="GitLab" />
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'github-es', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'github-es', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="GitHub" />
+    <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="GitHub" />
+
+    <div class="text-container">
+      <span class="title">GitHub Enterprise Server</span>
+    </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'gitlab', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'gitlab', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="GitLab" />
     <div class="text-container">
       <span class="title">GitLab</span>
     </div>
-  </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'gitlab-self-hosted', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'gitlab-self-hosted', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="GitLab" />
+    <div class="text-container">
+      <span class="title">GitLab Self Hosted</span>
+    </div>
+  </a>
 
   <a
     class="item card"
@@ -78,7 +137,7 @@
         : []
     "
   >
-    <img class="idp-logo" src="../../../assets/images/idp/oauth.svg" alt="oauth" />
+    <img class="idp-logo" src="./assets/images/idp/oauth.svg" alt="oauth" />
 
     <div class="text-container">
       <span class="title">Generic OAuth</span>

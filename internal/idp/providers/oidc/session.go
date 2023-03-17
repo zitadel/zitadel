@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
@@ -46,6 +47,9 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if err != nil {
 		return nil, err
 	}
+	if s.Provider.useIDToken {
+		info = s.Tokens.IDTokenClaims
+	}
 	u := s.Provider.userInfoMapper(info)
 	return u, nil
 }
@@ -82,8 +86,8 @@ func (u *User) GetDisplayName() string {
 	return u.GetName()
 }
 
-func (u *User) GetPhone() string {
-	return u.GetPhoneNumber()
+func (u *User) GetPhone() domain.PhoneNumber {
+	return domain.PhoneNumber(u.GetPhoneNumber())
 }
 
 func (u *User) IsPhoneVerified() bool {
@@ -96,4 +100,8 @@ func (u *User) GetPreferredLanguage() language.Tag {
 
 func (u *User) GetAvatarURL() string {
 	return u.GetPicture()
+}
+
+func (u *User) GetEmail() domain.EmailAddress {
+	return domain.EmailAddress(u.UserInfo.GetEmail())
 }

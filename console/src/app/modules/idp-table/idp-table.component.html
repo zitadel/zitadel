@@ -38,21 +38,43 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.TYPE' | translate }}</th>
         <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
           <div [ngSwitch]="idp.type">
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_AZURE_AD">
+              <img class="idp-logo" src="./assets/images/idp/ms.svg" alt="azure ad" />
+              Microsoft
+            </div>
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GOOGLE">
-              <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
+              <img class="idp-logo" src="./assets/images/idp/google.png" alt="google" />
               Google
+            </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB">
+              <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
+              <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
+              GitHub
             </div>
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OIDC">
               <mat-icon class="idp-icon" svgIcon="mdi_openid" alt="oidc" />
               Generic OIDC
             </div>
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_OAUTH">
-              <img class="idp-logo" src="../../../assets/images/idp/oauth.svg" alt="oauth" />
+              <img class="idp-logo" src="./assets/images/idp/oauth.svg" alt="oauth" />
               Generic OAuth
             </div>
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_JWT">
               <mat-icon class="idp-icon" svgIcon="mdi_jwt" alt="jwt" />
               Generic JWT
+            </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITLAB">
+              <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="gitlab" />
+              Gitlab
+            </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITLAB_SELF_HOSTED">
+              <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="gitlab self hosted" />
+              Gitlab Self Hosted
+            </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_GITHUB_ES">
+              <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="github" />
+              <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
+              GitHub Enterprise Server
             </div>
             <div class="idp-table-provider-type" *ngSwitchDefault>coming soon</div>
           </div>

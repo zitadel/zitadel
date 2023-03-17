@@ -233,6 +233,27 @@ func (s *Server) UpdateJWTProvider(ctx context.Context, req *mgmt_pb.UpdateJWTPr
 	}, nil
 }
 
+func (s *Server) AddAzureADProvider(ctx context.Context, req *mgmt_pb.AddAzureADProviderRequest) (*mgmt_pb.AddAzureADProviderResponse, error) {
+	id, details, err := s.command.AddOrgAzureADProvider(ctx, authz.GetCtxData(ctx).OrgID, addAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddAzureADProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateAzureADProvider(ctx context.Context, req *mgmt_pb.UpdateAzureADProviderRequest) (*mgmt_pb.UpdateAzureADProviderResponse, error) {
+	details, err := s.command.UpdateOrgAzureADProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateAzureADProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddGitHubProvider(ctx context.Context, req *mgmt_pb.AddGitHubProviderRequest) (*mgmt_pb.AddGitHubProviderResponse, error) {
 	id, details, err := s.command.AddOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitHubProviderToCommand(req))
 	if err != nil {
@@ -271,6 +292,48 @@ func (s *Server) UpdateGitHubEnterpriseServerProvider(ctx context.Context, req *
 		return nil, err
 	}
 	return &mgmt_pb.UpdateGitHubEnterpriseServerProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitLabProvider(ctx context.Context, req *mgmt_pb.AddGitLabProviderRequest) (*mgmt_pb.AddGitLabProviderResponse, error) {
+	id, details, err := s.command.AddOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitLabProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddGitLabProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitLabProvider(ctx context.Context, req *mgmt_pb.UpdateGitLabProviderRequest) (*mgmt_pb.UpdateGitLabProviderResponse, error) {
+	details, err := s.command.UpdateOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitLabProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateGitLabProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitLabSelfHostedProvider(ctx context.Context, req *mgmt_pb.AddGitLabSelfHostedProviderRequest) (*mgmt_pb.AddGitLabSelfHostedProviderResponse, error) {
+	id, details, err := s.command.AddOrgGitLabSelfHostedProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitLabSelfHostedProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddGitLabSelfHostedProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitLabSelfHostedProvider(ctx context.Context, req *mgmt_pb.UpdateGitLabSelfHostedProviderRequest) (*mgmt_pb.UpdateGitLabSelfHostedProviderResponse, error) {
+	details, err := s.command.UpdateOrgGitLabSelfHostedProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitLabSelfHostedProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateGitLabSelfHostedProviderResponse{
 		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }
