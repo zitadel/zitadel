@@ -17,7 +17,7 @@ func (s *Server) ListEvents(ctx context.Context, in *admin_pb.ListEventsRequest)
 	if err != nil {
 		return nil, err
 	}
-	events, err := s.query.SearchEvents(ctx, filter)
+	events, err := s.query.SearchEvents(ctx, filter, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
