@@ -115,10 +115,6 @@ export function SetAuthRequest() {
     }
   }, [scope]);
 
-  function copyToClipboard() {
-    navigator.clipboard.writeText("Hello");
-  }
-
   return (
     <div className="bg-white/5 rounded-md p-6 shadow">
       <h5 className="text-lg mt-0 mb-4 font-semibold">Your Domain</h5>
@@ -562,7 +558,6 @@ export function SetAuthRequest() {
 
         <a
           onClick={() => {
-            copyToClipboard();
             window.plausible("OIDC Playground", {
               props: { method: "Try it out", pageloc: "Authorize" },
             });
