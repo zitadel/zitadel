@@ -2,21 +2,10 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Component } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import {
-  AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
-  UpdateGenericOIDCProviderRequest as AdminUpdateGenericOIDCProviderRequest,
-} from 'src/app/proto/generated/zitadel/admin_pb';
-import { Provider } from 'src/app/proto/generated/zitadel/idp_pb';
-import {
-  AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest,
-  UpdateGenericOIDCProviderRequest as MgmtUpdateGenericOIDCProviderRequest,
-} from 'src/app/proto/generated/zitadel/management_pb';
-import { AdminService } from 'src/app/services/admin.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
+import { Provider, ProviderType } from 'src/app/proto/generated/zitadel/idp_pb';
 import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
-import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { ProviderService } from '../provider.service';
 
 @Component({
@@ -44,50 +33,16 @@ export class ProviderOIDCComponent {
   }
 
   public addGenericOIDCProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGenericOIDCProviderRequest();
-
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setIssuer(this.issuer?.value);
-      req.setScopesList(this.scopesList?.value);
-
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGenericOIDCProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-          this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGenericOIDCProviderRequest();
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setIssuer(this.issuer?.value);
-      req.setScopesList(this.scopesList?.value);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGenericOIDCProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-          this.loading = false;
-        });
-    }
+    this.providerService
+      .addProvider(this.form, ProviderType.PROVIDER_TYPE_OIDC)
+      .then((idp) => {
+        setTimeout(() => {
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public updateGenericOIDCProvider(): void {
@@ -101,51 +56,16 @@ export class ProviderOIDCComponent {
       });
 
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGenericOIDCProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setScopesList(this.scopesList?.value);
-
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateGenericOIDCProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGenericOIDCProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setScopesList(this.scopesList?.value);
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateGenericOIDCProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      }
+      this.providerService
+        .updateProvider('a', this.form)
+        .then((idp) => {
+          setTimeout(() => {
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
