@@ -24,7 +24,7 @@ const routes: Routes = [
     },
   },
   {
-    path: 'provider/:providertype',
+    path: 'provider',
     canActivate: [AuthGuard, RoleGuard],
     loadChildren: () => import('src/app/modules/providers/providers.module'),
     data: {

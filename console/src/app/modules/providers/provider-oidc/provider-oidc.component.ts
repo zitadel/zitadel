@@ -47,7 +47,7 @@ export class ProviderOIDCComponent {
 
   public updateGenericOIDCProvider(): void {
     this.providerService
-      .updateProvider('asd', this.form)
+      .updateProvider('asd', this.form, ProviderType.PROVIDER_TYPE_OIDC)
       .then(() => {
         this.providerService.navigateBack();
       })
@@ -57,7 +57,7 @@ export class ProviderOIDCComponent {
 
     if (this.provider) {
       this.providerService
-        .updateProvider('a', this.form)
+        .updateProvider('a', this.form, ProviderType.PROVIDER_TYPE_OIDC)
         .then((idp) => {
           setTimeout(() => {
             this.close();

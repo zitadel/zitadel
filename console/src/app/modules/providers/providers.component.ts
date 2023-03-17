@@ -2,7 +2,6 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
@@ -104,132 +103,7 @@ export class ProvidersComponent {
   //       });
   //   }
 
-  public submitForm(): void {
-    this.provider ? updateProvider() : addProvider();
-  }
-
-  //   public addGenericOIDCProvider(): void {
-  //     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-  //       const req = new MgmtAddGenericOIDCProviderRequest();
-
-  //       req.setName(this.name?.value);
-  //       req.setClientId(this.clientId?.value);
-  //       req.setClientSecret(this.clientSecret?.value);
-  //       req.setIssuer(this.issuer?.value);
-  //       req.setScopesList(this.scopesList?.value);
-
-  //       this.loading = true;
-  //       (this.service as ManagementService)
-  //         .addGenericOIDCProvider(req)
-  //         .then((idp) => {
-  //           setTimeout(() => {
-  //             this.loading = false;
-  //             this.close();
-  //           }, 2000);
-  //         })
-  //         .catch((error) => {
-  //           this.toast.showError(error);
-  //           this.loading = false;
-  //         });
-  //     } else if (PolicyComponentServiceType.ADMIN) {
-  //       const req = new AdminAddGenericOIDCProviderRequest();
-  //       req.setName(this.name?.value);
-  //       req.setClientId(this.clientId?.value);
-  //       req.setClientSecret(this.clientSecret?.value);
-  //       req.setIssuer(this.issuer?.value);
-  //       req.setScopesList(this.scopesList?.value);
-
-  //       this.loading = true;
-  //       (this.service as AdminService)
-  //         .addGenericOIDCProvider(req)
-  //         .then((idp) => {
-  //           setTimeout(() => {
-  //             this.loading = false;
-  //             this.close();
-  //           }, 2000);
-  //         })
-  //         .catch((error) => {
-  //           this.toast.showError(error);
-  //           this.loading = false;
-  //         });
-  //     }
-  //   }
-
-  //   public updateGenericOIDCProvider(): void {
-  //     if (this.provider) {
-  //       if (this.serviceType === PolicyComponentServiceType.MGMT) {
-  //         const req = new MgmtUpdateGenericOIDCProviderRequest();
-  //         req.setId(this.provider.id);
-  //         req.setName(this.name?.value);
-  //         req.setClientId(this.clientId?.value);
-  //         req.setClientSecret(this.clientSecret?.value);
-  //         req.setIssuer(this.issuer?.value);
-  //         req.setScopesList(this.scopesList?.value);
-
-  //         this.loading = true;
-  //         (this.service as ManagementService)
-  //           .updateGenericOIDCProvider(req)
-  //           .then((idp) => {
-  //             setTimeout(() => {
-  //               this.loading = false;
-  //               this.close();
-  //             }, 2000);
-  //           })
-  //           .catch((error) => {
-  //             this.toast.showError(error);
-  //             this.loading = false;
-  //           });
-  //       } else if (PolicyComponentServiceType.ADMIN) {
-  //         const req = new AdminUpdateGenericOIDCProviderRequest();
-  //         req.setId(this.provider.id);
-  //         req.setName(this.name?.value);
-  //         req.setClientId(this.clientId?.value);
-  //         req.setClientSecret(this.clientSecret?.value);
-  //         req.setIssuer(this.issuer?.value);
-  //         req.setScopesList(this.scopesList?.value);
-
-  //         this.loading = true;
-  //         (this.service as AdminService)
-  //           .updateGenericOIDCProvider(req)
-  //           .then((idp) => {
-  //             setTimeout(() => {
-  //               this.loading = false;
-  //               this.close();
-  //             }, 2000);
-  //           })
-  //           .catch((error) => {
-  //             this.toast.showError(error);
-  //             this.loading = false;
-  //           });
-  //       }
-  //     }
-  //   }
-
   public close(): void {
     this._location.back();
-  }
-
-  public addScope(event: MatChipInputEvent): void {
-    const input = event.chipInput?.inputElement;
-    const value = event.value.trim();
-
-    if (value !== '') {
-      if (this.scopesList?.value) {
-        this.scopesList.value.push(value);
-        if (input) {
-          input.value = '';
-        }
-      }
-    }
-  }
-
-  public removeScope(uri: string): void {
-    if (this.scopesList?.value) {
-      const index = this.scopesList.value.indexOf(uri);
-
-      if (index !== undefined && index >= 0) {
-        this.scopesList.value.splice(index, 1);
-      }
-    }
   }
 }

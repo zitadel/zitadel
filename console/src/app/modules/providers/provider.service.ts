@@ -1,8 +1,8 @@
 import { Location } from '@angular/common';
-import { Injectable, Injector } from '@angular/core';
+import { Injectable, Injector, Type } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { BehaviorSubject, take } from 'rxjs';
-import { Options, Provider, ProviderType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { AzureADTenant, Options, Provider, ProviderType } from 'src/app/proto/generated/zitadel/idp_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
@@ -10,6 +10,7 @@ import { AbstractProvider } from './abstract-provider';
 
 import { ActivatedRoute } from '@angular/router';
 import {
+  AddAzureADProviderRequest as AdminAddAzureADProviderRequest,
   AddGenericOAuthProviderRequest as AdminAddGenericOAuthProviderRequest,
   AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
   AddGitHubEnterpriseServerProviderRequest as AdminGitHubEnterpriseServerProviderRequest,
@@ -17,6 +18,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
+  AddAzureADProviderRequest as MgmtAddAzureADProviderRequest,
   AddGenericOAuthProviderRequest as MgmtAddGenericOAuthProviderRequest,
   AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest,
   AddGitHubEnterpriseServerProviderRequest as MgmtGitHubEnterpriseServerProviderRequest,
@@ -72,13 +74,12 @@ export class ProviderService implements AbstractProvider {
       this.id = this.route.snapshot.paramMap.get('id');
 
       if (this.id) {
-        this.clientSecret?.setValidators([]);
-        this.getData(this.id);
+        this.form.get('clientSecret')?.setValidators([]);
       }
     });
   }
 
-  public getData(id: string, providerType: string): Promise<Provider.AsObject | undefined> {
+  public getData(id: string, providerType: ProviderType): Promise<Provider.AsObject | undefined> {
     this.loading$.next(true);
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
@@ -146,9 +147,36 @@ export class ProviderService implements AbstractProvider {
         reqGSH.setScopesList(this.form.get('scopesList')?.value);
         return this.service.addGitLabSelfHostedProvider(reqGSH);
       case ProviderType.PROVIDER_TYPE_AZURE_AD:
-        break;
+        const reqAZURE =
+          this.serviceType === PolicyComponentServiceType.MGMT
+            ? new MgmtAddAzureADProviderRequest()
+            : new AdminAddAzureADProviderRequest();
+
+        reqAZURE.setName(this.form.get('name')?.value);
+        reqAZURE.setClientId(this.form.get('clientId')?.value);
+        reqAZURE.setClientSecret(this.form.get('clientSecret')?.value);
+        reqAZURE.setEmailVerified(this.form.get('emailVerified')?.value);
+
+        const tenant = new AzureADTenant();
+        tenant.setTenantId(this.form.get('tenantId')?.value);
+        tenant.setTenantType(this.form.get('tenantType')?.value);
+        reqAZURE.setTenant(tenant);
+
+        reqAZURE.setScopesList(this.form.get('scopesList')?.value);
+        reqAZURE.setProviderOptions(this.options);
+        return this.service.addAzureADProvider(reqAZURE);
       case ProviderType.PROVIDER_TYPE_GOOGLE:
-        break;
+        const reqGOOGLE =
+          this.serviceType === PolicyComponentServiceType.MGMT
+            ? new MgmtAddAzureADProviderRequest()
+            : new AdminAddAzureADProviderRequest();
+
+        reqGOOGLE.setName(this.form.get('name')?.value);
+        reqGOOGLE.setClientId(this.form.get('clientId')?.value);
+        reqGOOGLE.setClientSecret(this.form.get('clientSecret')?.value);
+        reqGOOGLE.setScopesList(this.form.get('scopesLiast')?.value);
+        reqGOOGLE.setProviderOptions(this.options);
+        return this.service.addGoogleProvider(reqGOOGLE);
       case ProviderType.PROVIDER_TYPE_JWT:
         const reqJWT =
           this.serviceType === PolicyComponentServiceType.MGMT
@@ -160,7 +188,7 @@ export class ProviderService implements AbstractProvider {
         reqJWT.setJwtEndpoint(this.form.get('jwtEndpoint')?.value);
         reqJWT.setKeysEndpoint(this.form.get('keysEndpoint')?.value);
         reqJWT.setProviderOptions(this.options);
-        break;
+        return this.service.addJWTProvider(reqJWT);
       case ProviderType.PROVIDER_TYPE_OAUTH:
         const reqOAUTH =
           this.serviceType === PolicyComponentServiceType.MGMT
@@ -174,13 +202,23 @@ export class ProviderService implements AbstractProvider {
         reqOAUTH.setClientId(this.form.get('clientId')?.value);
         reqOAUTH.setClientSecret(this.form.get('clientSecret')?.value);
         reqOAUTH.setScopesList(this.form.get('scopesList')?.value);
-        break;
+        return this.service.addGenericOAuthProvider(reqOAUTH);
       case ProviderType.PROVIDER_TYPE_OIDC:
-        break;
+        const reqOIDC =
+          this.serviceType === PolicyComponentServiceType.MGMT
+            ? new MgmtAddGenericOIDCProviderRequest()
+            : new AdminAddGenericOIDCProviderRequest();
+        reqOIDC.setName(this.form.get('name')?.value);
+        reqOIDC.setClientId(this.form.get('clientId')?.value);
+        reqOIDC.setClientSecret(this.form.get('clientSecret')?.value);
+        reqOIDC.setScopesList(this.form.get('scopesList')?.value);
+        return this.service.addGenericOIDCProvider(reqOIDC);
+      default:
+        return Promise.reject();
     }
   }
 
-  public updateProvider(id: string, form: FormGroup<any>): Promise<Provider.AsObject> {
+  public updateProvider(id: string, form: FormGroup<any>, providerType: ProviderType): Promise<any> {
     throw new Error('Method not implemented.');
   }
 

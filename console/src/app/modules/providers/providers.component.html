@@ -11,15 +11,6 @@
 
     <p class="identity-provider-desc cnsl-secondary-text">{{ 'IDP.CREATE.OIDC.DESCRIPTION' | translate }}</p>
 
-    <form [formGroup]="form" (ngSubmit)="submitForm()">
-      <!-- identity-provider-content-here -->
-
-      <div class="identity-provider-create-actions">
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
-          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
-          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
-        </button>
-      </div>
-    </form>
+    <!-- identity-provider-content-here -->
   </div>
 </cnsl-create-layout>
