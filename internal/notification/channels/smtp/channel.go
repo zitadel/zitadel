@@ -85,7 +85,6 @@ func (email *Email) HandleMessage(message channels.Message) error {
 		return err
 	}
 
-	defer logging.LogWithFields("EMAI-a1c87ec8").Debug("email sent")
 	return email.smtpClient.Quit()
 }
 
@@ -159,6 +158,8 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 	// Auth
 	auth := smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host)
 	err := client.Auth(auth)
-	logging.Log("EMAIL-s9kfs").WithField("smtp user", smtpConfig.User).OnError(err).Debug("could not add smtp auth")
-	return err
+	if err != nil {
+		return caos_errs.ThrowInternalf(err, "EMAIL-s9kfs", "could not add smtp auth for user %s", smtpConfig.User)
+	}
+	return nil
 }

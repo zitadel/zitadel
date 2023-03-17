@@ -1,6 +1,9 @@
 package channels
 
+import "github.com/zitadel/zitadel/internal/eventstore"
+
 type Message interface {
+	GetTriggeringEvent() eventstore.Event
 	GetContent() (string, error)
 }
 

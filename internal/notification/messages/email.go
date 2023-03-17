@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/eventstore"
+
 	"github.com/zitadel/zitadel/internal/notification/channels"
 )
 
@@ -16,13 +18,14 @@ var (
 var _ channels.Message = (*Email)(nil)
 
 type Email struct {
-	Recipients  []string
-	BCC         []string
-	CC          []string
-	SenderEmail string
-	SenderName  string
-	Subject     string
-	Content     string
+	Recipients      []string
+	BCC             []string
+	CC              []string
+	SenderEmail     string
+	SenderName      string
+	Subject         string
+	Content         string
+	TriggeringEvent eventstore.Event
 }
 
 func (msg *Email) GetContent() (string, error) {
@@ -50,6 +53,10 @@ func (msg *Email) GetContent() (string, error) {
 	message += subject + mime + lineBreak + msg.Content
 
 	return message, nil
+}
+
+func (msg *Email) GetTriggeringEvent() eventstore.Event {
+	return msg.TriggeringEvent
 }
 
 func isHTML(input string) bool {

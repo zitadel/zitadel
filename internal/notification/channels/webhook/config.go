@@ -9,7 +9,7 @@ type Config struct {
 	Method  string
 }
 
-func (w *Config) IsValid() error {
+func (w *Config) Validate() error {
 	_, err := url.Parse(w.CallURL)
 	return err
 }

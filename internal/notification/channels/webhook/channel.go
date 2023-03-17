@@ -14,7 +14,7 @@ import (
 )
 
 func InitWebhookChannel(ctx context.Context, cfg Config) (channels.NotificationChannel, error) {
-	if err := cfg.IsValid(); err != nil {
+	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
 

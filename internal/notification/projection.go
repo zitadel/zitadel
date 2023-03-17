@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
 
@@ -32,13 +34,31 @@ import (
 )
 
 const (
-	NotificationsProjectionTable = "projections.notifications"
-	NotifyUserID                 = "NOTIFICATION" //TODO: system?
+	NotificationsProjectionTable    = "projections.notifications"
+	NotifyUserID                    = "NOTIFICATION" //TODO: system?
+	metricSuccessfulDeliveriesEmail = "successful_deliveries_email"
+	metricFailedDeliveriesEmail     = "failed_deliveries_email"
+	metricSuccessfulDeliveriesSMS   = "successful_deliveries_sms"
+	metricFailedDeliveriesSMS       = "failed_deliveries_sms"
+	metricSuccessfulDeliveriesJSON  = "successful_deliveries_json"
+	metricFailedDeliveriesJSON      = "failed_deliveries_json"
 )
 
 func Start(ctx context.Context, customConfig projection.CustomConfig, externalPort uint16, externalSecure bool, commands *command.Commands, queries *query.Queries, es *eventstore.Eventstore, assetsPrefix func(context.Context) string, fileSystemPath string, userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm) {
 	statikFS, err := statik_fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
+	err = metrics.RegisterCounter(metricSuccessfulDeliveriesEmail, "Successfully delivered emails")
+	logging.WithFields("metric", metricSuccessfulDeliveriesEmail).OnError(err).Panic("unable to register counter")
+	err = metrics.RegisterCounter(metricFailedDeliveriesEmail, "Failed email deliveries")
+	logging.WithFields("metric", metricFailedDeliveriesEmail).OnError(err).Panic("unable to register counter")
+	err = metrics.RegisterCounter(metricSuccessfulDeliveriesSMS, "Successfully delivered SMS")
+	logging.WithFields("metric", metricSuccessfulDeliveriesSMS).OnError(err).Panic("unable to register counter")
+	err = metrics.RegisterCounter(metricFailedDeliveriesSMS, "Failed SMS deliveries")
+	logging.WithFields("metric", metricFailedDeliveriesSMS).OnError(err).Panic("unable to register counter")
+	err = metrics.RegisterCounter(metricSuccessfulDeliveriesJSON, "Successfully delivered JSON messages")
+	logging.WithFields("metric", metricSuccessfulDeliveriesJSON).OnError(err).Panic("unable to register counter")
+	err = metrics.RegisterCounter(metricFailedDeliveriesJSON, "Failed JSON message deliveries")
+	logging.WithFields("metric", metricFailedDeliveriesJSON).OnError(err).Panic("unable to register counter")
 
 	projection.NotificationsProjection = newNotificationsProjection(ctx, projection.ApplyCustomConfig(customConfig), commands, queries, es, userEncryption, smtpEncryption, smsEncryption, externalSecure, externalPort, fileSystemPath, assetsPrefix, statikFS)
 }
@@ -204,6 +224,9 @@ func (p *notificationsProjection) reduceInitCodeAdded(event eventstore.Event) (*
 		p.getLogProvider,
 		colors,
 		p.assetsPrefix(ctx),
+		e,
+		metricSuccessfulDeliveriesEmail,
+		metricFailedDeliveriesEmail,
 	).SendUserInitCode(notifyUser, origin, code)
 	if err != nil {
 		return nil, err
@@ -267,6 +290,9 @@ func (p *notificationsProjection) reduceEmailCodeAdded(event eventstore.Event) (
 		p.getLogProvider,
 		colors,
 		p.assetsPrefix(ctx),
+		e,
+		metricSuccessfulDeliveriesEmail,
+		metricFailedDeliveriesEmail,
 	).SendEmailVerificationCode(notifyUser, origin, code)
 	if err != nil {
 		return nil, err
@@ -330,6 +356,9 @@ func (p *notificationsProjection) reducePasswordCodeAdded(event eventstore.Event
 		p.getLogProvider,
 		colors,
 		p.assetsPrefix(ctx),
+		e,
+		metricSuccessfulDeliveriesEmail,
+		metricFailedDeliveriesEmail,
 	)
 	if e.NotificationType == domain.NotificationTypeSms {
 		notify = types.SendSMSTwilio(
@@ -341,6 +370,9 @@ func (p *notificationsProjection) reducePasswordCodeAdded(event eventstore.Event
 			p.getLogProvider,
 			colors,
 			p.assetsPrefix(ctx),
+			e,
+			metricSuccessfulDeliveriesSMS,
+			metricFailedDeliveriesSMS,
 		)
 	}
 	err = notify.SendPasswordCode(notifyUser, origin, code)
@@ -401,6 +433,9 @@ func (p *notificationsProjection) reduceDomainClaimed(event eventstore.Event) (*
 		p.getLogProvider,
 		colors,
 		p.assetsPrefix(ctx),
+		e,
+		metricSuccessfulDeliveriesEmail,
+		metricFailedDeliveriesEmail,
 	).SendDomainClaimed(notifyUser, origin, e.UserName)
 	if err != nil {
 		return nil, err
@@ -462,6 +497,9 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 		p.getLogProvider,
 		colors,
 		p.assetsPrefix(ctx),
+		e,
+		metricSuccessfulDeliveriesEmail,
+		metricFailedDeliveriesEmail,
 	).SendPasswordlessRegistrationLink(notifyUser, origin, code, e.ID)
 	if err != nil {
 		return nil, err
@@ -529,6 +567,9 @@ func (p *notificationsProjection) reducePasswordChanged(event eventstore.Event) 
 			p.getLogProvider,
 			colors,
 			p.assetsPrefix(ctx),
+			e,
+			metricSuccessfulDeliveriesEmail,
+			metricFailedDeliveriesEmail,
 		).SendPasswordChange(notifyUser, origin)
 		if err != nil {
 			return nil, err
@@ -563,6 +604,9 @@ func (p *notificationsProjection) reduceNotificationDue(event eventstore.Event) 
 		p.getFileSystemProvider,
 		p.getLogProvider,
 		e,
+		e,
+		metricSuccessfulDeliveriesJSON,
+		metricFailedDeliveriesJSON,
 	).Naked()
 	if err != nil {
 		return nil, err
@@ -620,6 +664,9 @@ func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (
 		p.getLogProvider,
 		colors,
 		p.assetsPrefix(ctx),
+		e,
+		metricSuccessfulDeliveriesSMS,
+		metricFailedDeliveriesSMS,
 	).SendPhoneVerificationCode(notifyUser, origin, code)
 	if err != nil {
 		return nil, err

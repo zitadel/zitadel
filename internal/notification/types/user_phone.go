@@ -3,6 +3,8 @@ package types
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/eventstore"
+
 	"github.com/zitadel/logging"
 
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
@@ -22,6 +24,9 @@ func generateSms(
 	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
 	getLogProvider func(ctx context.Context) (*log.Config, error),
 	lastPhone bool,
+	triggeringEvent eventstore.Event,
+	successMetricName,
+	failureMetricName string,
 ) error {
 	number := ""
 	twilioConfig, err := getTwilioProvider(ctx)
@@ -32,12 +37,20 @@ func generateSms(
 		SenderPhoneNumber:    number,
 		RecipientPhoneNumber: user.VerifiedPhone,
 		Content:              content,
+		TriggeringEvent:      triggeringEvent,
 	}
 	if lastPhone {
 		message.RecipientPhoneNumber = user.LastPhone
 	}
 
-	channelChain, err := senders.SMSChannels(ctx, twilioConfig, getFileSystemProvider, getLogProvider)
+	channelChain, err := senders.SMSChannels(
+		ctx,
+		twilioConfig,
+		getFileSystemProvider,
+		getLogProvider,
+		successMetricName,
+		failureMetricName,
+	)
 	logging.OnError(err).Error("could not create sms channel")
 
 	if channelChain.Len() == 0 {

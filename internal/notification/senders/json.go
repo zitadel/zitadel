@@ -14,15 +14,26 @@ func JSONChannels(
 	webhookConfig webhook.Config,
 	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
 	getLogProvider func(ctx context.Context) (*log.Config, error),
+	successMetricName,
+	failureMetricName string,
 ) (*Chain, error) {
-	if err := webhookConfig.IsValid(); err != nil {
+	if err := webhookConfig.Validate(); err != nil {
 		return nil, err
 	}
+	channels := make([]channels.NotificationChannel, 0, 3)
 	webhookChannel, err := webhook.InitWebhookChannel(ctx, webhookConfig)
-	if err != nil {
-		return nil, err
+	// TODO: Handle this error?
+	if err == nil {
+		channels = append(
+			channels,
+			instrument(
+				ctx,
+				webhookChannel,
+				successMetricName,
+				failureMetricName,
+			),
+		)
 	}
-	channels := []channels.NotificationChannel{webhookChannel}
 	channels = append(channels, debugChannels(ctx, getFileSystemProvider, getLogProvider)...)
 	return chainChannels(channels...), nil
 }
