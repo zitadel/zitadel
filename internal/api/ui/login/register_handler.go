@@ -16,14 +16,14 @@ const (
 )
 
 type registerFormData struct {
-	Email        string `schema:"email"`
-	Username     string `schema:"username"`
-	Firstname    string `schema:"firstname"`
-	Lastname     string `schema:"lastname"`
-	Language     string `schema:"language"`
-	Password     string `schema:"register-password"`
-	Password2    string `schema:"register-password-confirmation"`
-	TermsConfirm bool   `schema:"terms-confirm"`
+	Email        domain.EmailAddress `schema:"email"`
+	Username     string              `schema:"username"`
+	Firstname    string              `schema:"firstname"`
+	Lastname     string              `schema:"lastname"`
+	Language     string              `schema:"language"`
+	Password     string              `schema:"register-password"`
+	Password2    string              `schema:"register-password-confirmation"`
+	TermsConfirm bool                `schema:"terms-confirm"`
 }
 
 type registerData struct {

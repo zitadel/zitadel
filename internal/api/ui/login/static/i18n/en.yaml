@@ -320,6 +320,7 @@ Errors:
     MissingParameters: Required parameters missing
   User:
     NotFound: User could not be found
+    AlreadyExists: User already exists
     Inactive: User is inactive
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
@@ -328,6 +329,33 @@ Errors:
     Invalid: Invalid userdata
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
     NotAllowedToLink: User is not allowed to link with external login provider
+    Profile:
+      NotFound: Profile not found
+      NotChanged: Profile not changed
+      Empty: Profile is empty
+      FirstNameEmpty: First name in profile is empty
+      LastNameEmpty: Last name in profile is empty
+      IDMissing: Profile ID is missing
+    Email:
+      NotFound: Email not found
+      Invalid: Email is invalid
+      AlreadyVerified: Email is already verified
+      NotChanged: Email not changed
+      Empty: Email is empty
+      IDMissing: Email ID is missing
+    Phone:
+      NotFound: Phone not found
+      Invalid: Phone is invalid
+      AlreadyVerified: Phone already verified
+      Empty: Phone is empty
+      NotChanged: Phone not changed
+    Address:
+      NotFound: Address not found
+      NotChanged: Address not changed
+    Username:
+      AlreadyExists:  Username already taken
+      Reserved: Username is already taken
+      Empty: Username is empty
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty

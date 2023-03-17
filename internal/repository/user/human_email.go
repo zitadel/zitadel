@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -24,7 +24,7 @@ const (
 type HumanEmailChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	EmailAddress string `json:"email,omitempty"`
+	EmailAddress domain.EmailAddress `json:"email,omitempty"`
 }
 
 func (e *HumanEmailChangedEvent) Data() interface{} {
@@ -35,7 +35,7 @@ func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress string) *HumanEmailChangedEvent {
+func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress domain.EmailAddress) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

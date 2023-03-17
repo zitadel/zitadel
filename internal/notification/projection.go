@@ -617,7 +617,7 @@ func (p *notificationsProjection) checkIfAlreadyHandled(ctx context.Context, eve
 	}
 	return len(events) > 0, nil
 }
-func (p *notificationsProjection) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, error) {
+func (p *notificationsProjection) getSMTPConfig(ctx context.Context) (*smtp.Config, error) {
 	config, err := p.queries.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
@@ -626,7 +626,7 @@ func (p *notificationsProjection) getSMTPConfig(ctx context.Context) (*smtp.Emai
 	if err != nil {
 		return nil, err
 	}
-	return &smtp.EmailConfig{
+	return &smtp.Config{
 		From:     config.SenderAddress,
 		FromName: config.SenderName,
 		Tls:      config.TLS,
@@ -639,7 +639,7 @@ func (p *notificationsProjection) getSMTPConfig(ctx context.Context) (*smtp.Emai
 }
 
 // Read iam twilio config
-func (p *notificationsProjection) getTwilioConfig(ctx context.Context) (*twilio.TwilioConfig, error) {
+func (p *notificationsProjection) getTwilioConfig(ctx context.Context) (*twilio.Config, error) {
 	active, err := query.NewSMSProviderStateQuery(domain.SMSConfigStateActive)
 	if err != nil {
 		return nil, err
@@ -655,7 +655,7 @@ func (p *notificationsProjection) getTwilioConfig(ctx context.Context) (*twilio.
 	if err != nil {
 		return nil, err
 	}
-	return &twilio.TwilioConfig{
+	return &twilio.Config{
 		SID:          config.TwilioConfig.SID,
 		Token:        token,
 		SenderNumber: config.TwilioConfig.SenderNumber,
@@ -663,24 +663,24 @@ func (p *notificationsProjection) getTwilioConfig(ctx context.Context) (*twilio.
 }
 
 // Read iam filesystem provider config
-func (p *notificationsProjection) getFileSystemProvider(ctx context.Context) (*fs.FSConfig, error) {
+func (p *notificationsProjection) getFileSystemProvider(ctx context.Context) (*fs.Config, error) {
 	config, err := p.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeFile)
 	if err != nil {
 		return nil, err
 	}
-	return &fs.FSConfig{
+	return &fs.Config{
 		Compact: config.Compact,
 		Path:    p.fileSystemPath,
 	}, nil
 }
 
 // Read iam log provider config
-func (p *notificationsProjection) getLogProvider(ctx context.Context) (*log.LogConfig, error) {
+func (p *notificationsProjection) getLogProvider(ctx context.Context) (*log.Config, error) {
 	config, err := p.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeLog)
 	if err != nil {
 		return nil, err
 	}
-	return &log.LogConfig{
+	return &log.Config{
 		Compact: config.Compact,
 	}, nil
 }

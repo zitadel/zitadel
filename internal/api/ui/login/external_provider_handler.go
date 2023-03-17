@@ -18,7 +18,9 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
+	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -59,28 +61,28 @@ type externalNotFoundOptionData struct {
 	ShowUsername               bool
 	ShowUsernameSuffix         bool
 	OrgRegister                bool
-	ExternalEmail              string
+	ExternalEmail              domain.EmailAddress
 	ExternalEmailVerified      bool
-	ExternalPhone              string
+	ExternalPhone              domain.PhoneNumber
 	ExternalPhoneVerified      bool
 }
 
 type externalRegisterFormData struct {
-	ExternalIDPConfigID    string `schema:"external-idp-config-id"`
-	ExternalIDPExtUserID   string `schema:"external-idp-ext-user-id"`
-	ExternalIDPDisplayName string `schema:"external-idp-display-name"`
-	ExternalEmail          string `schema:"external-email"`
-	ExternalEmailVerified  bool   `schema:"external-email-verified"`
-	Email                  string `schema:"email"`
-	Username               string `schema:"username"`
-	Firstname              string `schema:"firstname"`
-	Lastname               string `schema:"lastname"`
-	Nickname               string `schema:"nickname"`
-	ExternalPhone          string `schema:"external-phone"`
-	ExternalPhoneVerified  bool   `schema:"external-phone-verified"`
-	Phone                  string `schema:"phone"`
-	Language               string `schema:"language"`
-	TermsConfirm           bool   `schema:"terms-confirm"`
+	ExternalIDPConfigID    string              `schema:"external-idp-config-id"`
+	ExternalIDPExtUserID   string              `schema:"external-idp-ext-user-id"`
+	ExternalIDPDisplayName string              `schema:"external-idp-display-name"`
+	ExternalEmail          domain.EmailAddress `schema:"external-email"`
+	ExternalEmailVerified  bool                `schema:"external-email-verified"`
+	Email                  domain.EmailAddress `schema:"email"`
+	Username               string              `schema:"username"`
+	Firstname              string              `schema:"firstname"`
+	Lastname               string              `schema:"lastname"`
+	Nickname               string              `schema:"nickname"`
+	ExternalPhone          domain.PhoneNumber  `schema:"external-phone"`
+	ExternalPhoneVerified  bool                `schema:"external-phone-verified"`
+	Phone                  domain.PhoneNumber  `schema:"phone"`
+	Language               string              `schema:"language"`
+	TermsConfirm           bool                `schema:"terms-confirm"`
 }
 
 // handleExternalLoginStep is called as nextStep
@@ -135,6 +137,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 	var provider idp.Provider
+
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
@@ -142,16 +145,19 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.oidcProvider(r.Context(), identityProvider)
 	case domain.IDPTypeJWT:
 		provider, err = l.jwtProvider(identityProvider)
+	case domain.IDPTypeAzureAD:
+		provider, err = l.azureProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGitHubEnterprise:
 		provider, err = l.githubEnterpriseProvider(r.Context(), identityProvider)
+	case domain.IDPTypeGitLab:
+		provider, err = l.gitlabProvider(r.Context(), identityProvider)
+	case domain.IDPTypeGitLabSelfHosted:
+		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 	case domain.IDPTypeLDAP,
-		domain.IDPTypeAzureAD,
-		domain.IDPTypeGitLab,
-		domain.IDPTypeGitLabSelfHosted,
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
@@ -162,7 +168,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	session, err := provider.BeginAuth(r.Context(), authReq.ID, authReq.AgentID)
+	params := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
+	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -207,6 +214,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
+	case domain.IDPTypeAzureAD:
+		provider, err = l.azureProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &oauth.Session{Provider: provider.(*azuread.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -221,6 +235,20 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+	case domain.IDPTypeGitLab:
+		provider, err = l.gitlabProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+	case domain.IDPTypeGitLabSelfHosted:
+		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -230,9 +258,6 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
-		domain.IDPTypeAzureAD,
-		domain.IDPTypeGitLab,
-		domain.IDPTypeGitLabSelfHosted,
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
@@ -602,6 +627,11 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
+	opts := make([]openid.ProviderOpts, 1, 2)
+	opts[0] = openid.WithSelectAccount()
+	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
+		opts = append(opts, openid.WithIDTokenMapping())
+	}
 	return openid.New(identityProvider.Name,
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
@@ -609,6 +639,7 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.OIDCIDPTemplate.Scopes,
 		openid.DefaultMapper,
+		opts...,
 	)
 }
 
@@ -648,6 +679,28 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 	)
 }
 
+func (l *Login) azureProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*azuread.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.AzureADIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]azuread.ProviderOptions, 0, 2)
+	if identityProvider.AzureADIDPTemplate.IsEmailVerified {
+		opts = append(opts, azuread.WithEmailVerified())
+	}
+	if identityProvider.AzureADIDPTemplate.Tenant != "" {
+		opts = append(opts, azuread.WithTenant(azuread.TenantType(identityProvider.AzureADIDPTemplate.Tenant)))
+	}
+	return azuread.New(
+		identityProvider.Name,
+		identityProvider.AzureADIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.AzureADIDPTemplate.Scopes,
+		opts...,
+	)
+}
+
 func (l *Login) githubProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*github.Provider, error) {
 	secret, err := crypto.DecryptString(identityProvider.GitHubIDPTemplate.ClientSecret, l.idpConfigAlg)
 	if err != nil {
@@ -675,6 +728,34 @@ func (l *Login) githubEnterpriseProvider(ctx context.Context, identityProvider *
 		identityProvider.GitHubEnterpriseIDPTemplate.TokenEndpoint,
 		identityProvider.GitHubEnterpriseIDPTemplate.UserEndpoint,
 		identityProvider.GitHubIDPTemplate.Scopes,
+	)
+}
+
+func (l *Login) gitlabProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*gitlab.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.GitLabIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return gitlab.New(
+		identityProvider.GitLabIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.GitLabIDPTemplate.Scopes,
+	)
+}
+
+func (l *Login) gitlabSelfHostedProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*gitlab.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.GitLabSelfHostedIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return gitlab.NewCustomIssuer(
+		identityProvider.Name,
+		identityProvider.GitLabSelfHostedIDPTemplate.Issuer,
+		identityProvider.GitLabSelfHostedIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.GitLabSelfHostedIDPTemplate.Scopes,
 	)
 }
 
@@ -757,7 +838,7 @@ func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain 
 	externalIDP := &domain.UserIDPLink{
 		IDPConfigID:    externalUser.IDPConfigID,
 		ExternalUserID: externalUser.ExternalUserID,
-		DisplayName:    externalUser.DisplayName,
+		DisplayName:    externalUser.PreferredUsername,
 	}
 	return human, externalIDP, externalUser.Metadatas
 }
@@ -769,7 +850,7 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 		IDPConfigID:       formData.ExternalIDPConfigID,
 		ExternalUserID:    formData.ExternalIDPExtUserID,
 		PreferredUsername: formData.Username,
-		DisplayName:       formData.Email,
+		DisplayName:       string(formData.Email),
 		FirstName:         formData.Firstname,
 		LastName:          formData.Lastname,
 		NickName:          formData.Nickname,
@@ -779,4 +860,54 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 		IsPhoneVerified:   isPhoneVerified,
 		PreferredLanguage: language.Make(formData.Language),
 	}
+}
+
+func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []any {
+	params := []any{authReq.AgentID}
+
+	if authReq.UserID != "" && identityProviderID != "" {
+		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
+		if err != nil {
+			logging.WithFields("authReqID", authReq.ID, "userID", authReq.UserID, "providerID", identityProviderID).WithError(err).Warn("failed to get user links for")
+			return params
+		}
+		if len(links.Links) == 1 {
+			return append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername))
+		}
+	}
+	if authReq.UserName != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName))
+	}
+	if authReq.LoginName != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName))
+	}
+	if authReq.LoginHint != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint))
+	}
+	return params
+}
+
+func keyAndValueToAuthURLOpt(key, value string) rp.AuthURLOpt {
+	return func() []oauth2.AuthCodeOption {
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
+	}
+}
+
+func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.IDPUserLinks, error) {
+	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpID)
+	if err != nil {
+		return nil, err
+	}
+	return l.query.IDPUserLinks(ctx,
+		&query.IDPUserLinksSearchQuery{
+			Queries: []query.SearchQuery{
+				userIDQuery,
+				idpIDQuery,
+			},
+		}, false,
+	)
 }

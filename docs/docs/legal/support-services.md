@@ -7,9 +7,10 @@ custom_edit_url: null
 
 This annex of the [Framework Agreement](terms-of-service) and the [Support Service Terms and Conditions](terms-support-service) describes the support services offered by us for our Services.
 
-Support Services for products and services provided by CAOS is offered to customers according to the terms and conditions outlined in this document. The customer may purchase support services from CAOS Ltd. directly.
+Support Services for products and services provided by ZITADEL is offered to customers according to the terms and conditions outlined in this document.
+The customer may purchase support services from ZITADEL (CAOS Ltd.) directly.
 
-Last revised: June 14, 2022
+Last revised: March 15, 2023
 
 ## Support Services
 
@@ -25,32 +26,38 @@ Last revised: June 14, 2022
 
 Support features for cloud subscriptions are as follows:
 
-Subscription Plans | Default | Extended SLA  | Self-hosted or dedicated
+Subscription Plans | Default | Extended SLA  | Custom
 --- | --- | --- | ---
-Support hours | Business hours | Business hours | Business hours
+Support hours | Business hours | Business hours | up to 24x7
 Response Time (Severity 1) | Best effort | 1 business hour | bespoke
 eMail Support | yes | yes | yes
-Phone Support | no | no | yes
+Phone Support | no | no | optional
 Chat Support |  no | no | optional
 
-If you want to add a [Technical Account Manager] or need assistance during onboarding, please [get in touch](https://zitadel.com/contact).
+If you want to add a [Technical Account Manager](#technical-account-manager) or need assistance during onboarding, please [get in touch](https://zitadel.com/contact).
 
-### Self-hosting and dedicated instances
+### Self-hosting
 
-Support plans for self-hosting and dedicated instances according to your purchase order.
+Support plans for self-hosting according to your purchase order.
 
-Customers can choose support hours (business, extended, 24x7), initial response time, Technical account manager, and communication channels.
+Customers can define the SLA and additional support options, such as
+
+- Support Hours (business, extended, 24x7) along different severities
+- SLO [Initial response time](#slo---initial-response-time)
+- [Technical account manager](#technical-account-manager)
+- Communication channels
 
 ### SLO - Initial response time
 
-CAOS service level objective (SLO) for Support Services  is defined in terms of initial response time to a support request, as outlined in the table below per plan. CAOS will use reasonable efforts to resolve support requests, but does not guarantee a work-around, resolution or resolution time.
+ZITADEL service level objective (SLO) for Support Services is defined in terms of initial response time to a support request, as outlined in the table below per plan.
+ZITADEL will use reasonable efforts to resolve support requests, but does not guarantee a work-around, resolution or resolution time.
 
-Subscription Plans | Default | Extended SLA
---- | --- | --- 
-Severity 1| Best effort | 1 business hour
-Severity 2| Best effort | 2 business hour
-Severity 3| Best effort | 12 business hour
-Severity 4| Best effort | 24 business hour
+Subscription Plans | Default | Extended SLA | Custom
+--- | --- | --- | ---
+Severity 1| Best effort | 1 business hour | up to 30min
+Severity 2| Best effort | 2 business hour | 2 business hours
+Severity 3| Best effort | 12 business hour | 12 business hours 
+Severity 4| Best effort | 24 business hour | 24 business hours
 
 If we fail to provide the initial response time objective, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
 
@@ -58,12 +65,12 @@ If we fail to provide the initial response time objective, you will be entitled 
 
 - Support is available in Swiss-German, German, and English
 - Default contact: Whenever customers require support, Customers should consult the documentation of the service or product or post a question to our community.
-- When Customer is eligible for support services through a Subscription Plan, Customer may contact CAOS support via the following channels
+- When Customer is eligible for support services through a Subscription Plan, Customer may contact ZITADEL support via the following channels
 
 Support Feature | Contact information
 --- | ---
 eMail Support | support@zitadel.com
-Chat Support | Private chat channel between CAOS and Customer that is opened when Subscription becomes active
+Chat Support | Private chat channel between ZITADEL and Customer that is opened when Subscription becomes active
 Phone Support | +41 43 215 27 34
 
 - ZITADEL Cloud system status, incidents and maintenance windows will be communicated via [our status page](https://status.zitadel.com).
@@ -72,20 +79,21 @@ Phone Support | +41 43 215 27 34
 
 ### Technical account manager
 
-CAOS will enhance its support offering by providing eligible clients with a Technical Account Manager (TAM), who will perform the following tasks for up to the specified amount of time per week during the term of service:
+ZITADEL will enhance its support offering by providing eligible clients with a Technical Account Manager (TAM), who will perform the following tasks for up to the specified amount of time per week during the term of service:
 
 - Provide support and advice regarding best practices on platform, product and configuration covered by the applicable Support Services;
 - Participate in review calls every other week at mutually agreed times addressing customer’s operational issues.
 
-We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans. If you require consulting for your projects, please request a quote via our [website](https://zitadel.com/contact).
+We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans.
+If you require consulting for your projects, please request a quote via our [website](https://zitadel.com/contact).
 
 ## Support
 
 ### Support request
 
-CAOS agrees to handle support incidents in the following scenarios:
+ZITADEL agrees to handle support incidents in the following scenarios:
 
-1. Service, product or configuration as provided by CAOS contains errors or critical security-related issues
+1. Service, product or configuration as provided by ZITADEL contains errors or critical security-related issues
 2. Service or product requires upgrades or changes through the customer
 3. Service or product has incorrect or missing documentation
 
@@ -105,19 +113,19 @@ The customer may submit support requests (“ticket”) through any means of eli
 - Single discrete problem, issue, or request
 - Initial severity level and impact statement for assessment
 - Description of the issue and if possible a description of the observed and expected behavior,  steps to reproduce the issue, evidence that issue is not caused by connectivity / compute, relevant anonymized log-files etc.
-- All information requested by CAOS as we resolve the ticket (e.g. system logs)
+- All information requested by ZITADEL as we resolve the ticket (e.g. system logs)
 
-CAOS will review the case information and determine the severity level (see below), working with the customer to assess the urgency of the request and use reasonable efforts to respond to support requests within the initial response time.
+ZITADEL will review the case information and determine the severity level (see below), working with the customer to assess the urgency of the request and use reasonable efforts to respond to support requests within the initial response time.
 
-CAOS will use reasonable efforts to resolve support request as defined below, but does not guarantee a workaround, resolution or resolution time.
+ZITADEL will use reasonable efforts to resolve support request as defined below, but does not guarantee a workaround, resolution or resolution time.
 
 Severity Level | Description
 --- | --- 
-**Severity 1**<br/> Critical / Service down| <p>Widespread failure or complete unavailability of CAOS Core Services. </p><p> CAOS will use continuous effort to provide a workaround or permanent solution. When Core Services are available, the severity will be lowered to the new appropriate level.</p>
-**Severity 2**<br/> Core functionality unavailable or severely degraded| <p>Core Services of CAOS software continue to operate in severely restricted fashion, yet long-term productivity may be impacted.</p><p> When Core Services are no longer severely degraded (eg, through a viable workaround or release), the severity level will be lowered to Severity 3.</p>
-**Severity 3**<br/>Standard support request| <p>Partial and non-critical loss of CAOS software functionality or major software defect, yet a workaround exists for viable long-term operation.</p><p>CAOS will continue to work on developing permanent resolution.</p>
+**Severity 1**<br/> Critical / Service down| <p>Widespread failure or complete unavailability of ZITADEL Core Services. </p><p> ZITADEL will use continuous effort to provide a workaround or permanent solution. When Core Services are available, the severity will be lowered to the new appropriate level.</p>
+**Severity 2**<br/> Core functionality unavailable or severely degraded| <p>Core Services of ZITADEL software continue to operate in severely restricted fashion, yet long-term productivity may be impacted.</p><p> When Core Services are no longer severely degraded (eg, through a viable workaround or release), the severity level will be lowered to Severity 3.</p>
+**Severity 3**<br/>Standard support request| <p>Partial and non-critical loss of ZITADEL software functionality or major software defect, yet a workaround exists for viable long-term operation.</p><p>ZITADEL will continue to work on developing permanent resolution.</p>
 **Severity 4**<br/>Non-urgent request| <p>Defined as follows: <ul><li>Request for information or general query</li><li>Feature request</li><li>Performance issues and little to none functional impact</li><li>Defects with workarounds and little to low functional impact</li></ul></p>
-<p>CAOS will continue to work on developing permanent resolution and response to general requests. CAOS does not provide a timeline or guarantee to include any feature requests.</p>
+<p>ZITADEL will continue to work on developing permanent resolution and response to general requests. ZITADEL does not provide a timeline or guarantee to include any feature requests.</p>
 
 ### Escalation
 

@@ -1,9 +1,9 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import {
   AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
@@ -20,13 +20,13 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
   selector: 'cnsl-provider-oidc',
   templateUrl: './provider-oidc.component.html',
-  styleUrls: ['./provider-oidc.component.scss'],
 })
 export class ProviderOIDCComponent {
   public showOptional: boolean = false;
@@ -44,7 +44,6 @@ export class ProviderOIDCComponent {
   public provider?: Provider.AsObject;
 
   constructor(
-    private router: Router,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -52,10 +51,10 @@ export class ProviderOIDCComponent {
     breadcrumbService: BreadcrumbService,
   ) {
     this.oidcFormGroup = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      clientId: new UntypedFormControl('', [Validators.required]),
-      clientSecret: new UntypedFormControl('', [Validators.required]),
-      issuer: new UntypedFormControl('', [Validators.required]),
+      name: new UntypedFormControl('', [requiredValidator]),
+      clientId: new UntypedFormControl('', [requiredValidator]),
+      clientSecret: new UntypedFormControl('', [requiredValidator]),
+      issuer: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
 
@@ -136,7 +135,7 @@ export class ProviderOIDCComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -157,7 +156,7 @@ export class ProviderOIDCComponent {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+            this.close();
           }, 2000);
         })
         .catch((error) => {
@@ -184,7 +183,7 @@ export class ProviderOIDCComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {
@@ -206,7 +205,7 @@ export class ProviderOIDCComponent {
           .then((idp) => {
             setTimeout(() => {
               this.loading = false;
-              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
+              this.close();
             }, 2000);
           })
           .catch((error) => {

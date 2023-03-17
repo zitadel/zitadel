@@ -17,22 +17,28 @@ import (
 )
 
 const (
-	IDPTemplateTable       = "projections.idp_templates3"
-	IDPTemplateOAuthTable  = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
-	IDPTemplateOIDCTable   = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
-	IDPTemplateJWTTable    = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
+	IDPTemplateTable                 = "projections.idp_templates4"
+	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
+	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
+	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
+	IDPTemplateAzureADTable          = IDPTemplateTable + "_" + IDPTemplateAzureADSuffix
 	IDPTemplateGitHubTable           = IDPTemplateTable + "_" + IDPTemplateGitHubSuffix
 	IDPTemplateGitHubEnterpriseTable = IDPTemplateTable + "_" + IDPTemplateGitHubEnterpriseSuffix
-	IDPTemplateGoogleTable = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
-	IDPTemplateLDAPTable   = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
+	IDPTemplateGitLabTable           = IDPTemplateTable + "_" + IDPTemplateGitLabSuffix
+	IDPTemplateGitLabSelfHostedTable = IDPTemplateTable + "_" + IDPTemplateGitLabSelfHostedSuffix
+	IDPTemplateGoogleTable           = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
+	IDPTemplateLDAPTable             = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 
-	IDPTemplateOAuthSuffix  = "oauth2"
-	IDPTemplateOIDCSuffix   = "oidc"
-	IDPTemplateJWTSuffix    = "jwt"
+	IDPTemplateOAuthSuffix            = "oauth2"
+	IDPTemplateOIDCSuffix             = "oidc"
+	IDPTemplateJWTSuffix              = "jwt"
+	IDPTemplateAzureADSuffix          = "azure"
 	IDPTemplateGitHubSuffix           = "github"
 	IDPTemplateGitHubEnterpriseSuffix = "github_enterprise"
-	IDPTemplateGoogleSuffix = "google"
-	IDPTemplateLDAPSuffix   = "ldap"
+	IDPTemplateGitLabSuffix           = "gitlab"
+	IDPTemplateGitLabSelfHostedSuffix = "gitlab_self_hosted"
+	IDPTemplateGoogleSuffix           = "google"
+	IDPTemplateLDAPSuffix             = "ldap"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -60,12 +66,13 @@ const (
 	OAuthScopesCol                = "scopes"
 	OAuthIDAttributeCol           = "id_attribute"
 
-	OIDCIDCol           = "idp_id"
-	OIDCInstanceIDCol   = "instance_id"
-	OIDCIssuerCol       = "issuer"
-	OIDCClientIDCol     = "client_id"
-	OIDCClientSecretCol = "client_secret"
-	OIDCScopesCol       = "scopes"
+	OIDCIDCol             = "idp_id"
+	OIDCInstanceIDCol     = "instance_id"
+	OIDCIssuerCol         = "issuer"
+	OIDCClientIDCol       = "client_id"
+	OIDCClientSecretCol   = "client_secret"
+	OIDCScopesCol         = "scopes"
+	OIDCIDTokenMappingCol = "id_token_mapping"
 
 	JWTIDCol           = "idp_id"
 	JWTInstanceIDCol   = "instance_id"
@@ -73,6 +80,14 @@ const (
 	JWTEndpointCol     = "jwt_endpoint"
 	JWTKeysEndpointCol = "keys_endpoint"
 	JWTHeaderNameCol   = "header_name"
+
+	AzureADIDCol           = "idp_id"
+	AzureADInstanceIDCol   = "instance_id"
+	AzureADClientIDCol     = "client_id"
+	AzureADClientSecretCol = "client_secret"
+	AzureADScopesCol       = "scopes"
+	AzureADTenantCol       = "tenant"
+	AzureADIsEmailVerified = "is_email_verified"
 
 	GitHubIDCol           = "idp_id"
 	GitHubInstanceIDCol   = "instance_id"
@@ -88,6 +103,19 @@ const (
 	GitHubEnterpriseTokenEndpointCol         = "token_endpoint"
 	GitHubEnterpriseUserEndpointCol          = "user_endpoint"
 	GitHubEnterpriseScopesCol                = "scopes"
+
+	GitLabIDCol           = "idp_id"
+	GitLabInstanceIDCol   = "instance_id"
+	GitLabClientIDCol     = "client_id"
+	GitLabClientSecretCol = "client_secret"
+	GitLabScopesCol       = "scopes"
+
+	GitLabSelfHostedIDCol           = "idp_id"
+	GitLabSelfHostedInstanceIDCol   = "instance_id"
+	GitLabSelfHostedIssuerCol       = "issuer"
+	GitLabSelfHostedClientIDCol     = "client_id"
+	GitLabSelfHostedClientSecretCol = "client_secret"
+	GitLabSelfHostedScopesCol       = "scopes"
 
 	GoogleIDCol           = "idp_id"
 	GoogleInstanceIDCol   = "instance_id"
@@ -172,6 +200,7 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(OIDCClientIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(OIDCClientSecretCol, crdb.ColumnTypeJSONB),
 			crdb.NewColumn(OIDCScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(OIDCIDTokenMappingCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(OIDCInstanceIDCol, OIDCIDCol),
 			IDPTemplateOIDCSuffix,
@@ -187,6 +216,19 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 		},
 			crdb.NewPrimaryKey(JWTInstanceIDCol, JWTIDCol),
 			IDPTemplateJWTSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AzureADIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AzureADInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AzureADClientIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AzureADClientSecretCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(AzureADScopesCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(AzureADTenantCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(AzureADIsEmailVerified, crdb.ColumnTypeBool, crdb.Default(false)),
+		},
+			crdb.NewPrimaryKey(AzureADInstanceIDCol, AzureADIDCol),
+			IDPTemplateAzureADSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
@@ -212,6 +254,29 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 		},
 			crdb.NewPrimaryKey(GitHubEnterpriseInstanceIDCol, GitHubEnterpriseIDCol),
 			IDPTemplateGitHubEnterpriseSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(GitLabIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GitLabInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GitLabClientIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GitLabClientSecretCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(GitLabScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(GitLabInstanceIDCol, GitLabIDCol),
+			IDPTemplateGitLabSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(GitLabSelfHostedIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GitLabSelfHostedInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GitLabSelfHostedIssuerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GitLabSelfHostedClientIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GitLabSelfHostedClientSecretCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(GitLabSelfHostedScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(GitLabSelfHostedInstanceIDCol, GitLabSelfHostedIDCol),
+			IDPTemplateGitLabSelfHostedSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
@@ -313,6 +378,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOldJWTConfigChanged,
 				},
 				{
+					Event:  instance.AzureADIDPAddedEventType,
+					Reduce: p.reduceAzureADIDPAdded,
+				},
+				{
+					Event:  instance.AzureADIDPChangedEventType,
+					Reduce: p.reduceAzureADIDPChanged,
+				},
+				{
 					Event:  instance.GitHubIDPAddedEventType,
 					Reduce: p.reduceGitHubIDPAdded,
 				},
@@ -327,6 +400,22 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.GitHubEnterpriseIDPChangedEventType,
 					Reduce: p.reduceGitHubEnterpriseIDPChanged,
+				},
+				{
+					Event:  instance.GitLabIDPAddedEventType,
+					Reduce: p.reduceGitLabIDPAdded,
+				},
+				{
+					Event:  instance.GitLabIDPChangedEventType,
+					Reduce: p.reduceGitLabIDPChanged,
+				},
+				{
+					Event:  instance.GitLabSelfHostedIDPAddedEventType,
+					Reduce: p.reduceGitLabSelfHostedIDPAdded,
+				},
+				{
+					Event:  instance.GitLabSelfHostedIDPChangedEventType,
+					Reduce: p.reduceGitLabSelfHostedIDPChanged,
 				},
 				{
 					Event:  instance.GoogleIDPAddedEventType,
@@ -373,7 +462,6 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Event:  org.OIDCIDPChangedEventType,
 					Reduce: p.reduceOIDCIDPChanged,
 				},
-
 				{
 					Event:  org.JWTIDPAddedEventType,
 					Reduce: p.reduceJWTIDPAdded,
@@ -407,6 +495,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOldJWTConfigChanged,
 				},
 				{
+					Event:  org.AzureADIDPAddedEventType,
+					Reduce: p.reduceAzureADIDPAdded,
+				},
+				{
+					Event:  org.AzureADIDPChangedEventType,
+					Reduce: p.reduceAzureADIDPChanged,
+				},
+				{
 					Event:  org.GitHubIDPAddedEventType,
 					Reduce: p.reduceGitHubIDPAdded,
 				},
@@ -421,6 +517,22 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.GitHubEnterpriseIDPChangedEventType,
 					Reduce: p.reduceGitHubEnterpriseIDPChanged,
+				},
+				{
+					Event:  org.GitLabIDPAddedEventType,
+					Reduce: p.reduceGitLabIDPAdded,
+				},
+				{
+					Event:  org.GitLabIDPChangedEventType,
+					Reduce: p.reduceGitLabIDPChanged,
+				},
+				{
+					Event:  org.GitLabSelfHostedIDPAddedEventType,
+					Reduce: p.reduceGitLabSelfHostedIDPAdded,
+				},
+				{
+					Event:  org.GitLabSelfHostedIDPChangedEventType,
+					Reduce: p.reduceGitLabSelfHostedIDPChanged,
 				},
 				{
 					Event:  org.GoogleIDPAddedEventType,
@@ -585,6 +697,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCIDTokenMappingCol, idpEvent.IsIDTokenMapping),
 			},
 			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
@@ -821,6 +934,7 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event)
 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCIDTokenMappingCol, true),
 			},
 			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
@@ -967,6 +1081,96 @@ func (p *idpTemplateProjection) reduceOldJWTConfigChanged(event eventstore.Event
 					handler.NewCond(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 				crdb.WithTableSuffix(IDPTemplateJWTSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.AzureADIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.AzureADIDPAddedEvent:
+		idpEvent = e.AzureADIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.AzureADIDPAddedEvent:
+		idpEvent = e.AzureADIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzureAD),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(AzureADIDCol, idpEvent.ID),
+				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
+				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
+				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
+			},
+			crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceAzureADIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.AzureADIDPChangedEvent
+	switch e := event.(type) {
+	case *org.AzureADIDPChangedEvent:
+		idpEvent = e.AzureADIDPChangedEvent
+	case *instance.AzureADIDPChangedEvent:
+		idpEvent = e.AzureADIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	githubCols := reduceAzureADIDPChangedColumns(idpEvent)
+	if len(githubCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				githubCols,
+				[]handler.Condition{
+					handler.NewCond(AzureADIDCol, idpEvent.ID),
+					handler.NewCond(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
 			),
 		)
 	}
@@ -1146,6 +1350,183 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPChanged(event eventstor
 					handler.NewCond(GitHubEnterpriseInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 				crdb.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceGitLabIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.GitLabIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.GitLabIDPAddedEvent:
+		idpEvent = e.GitLabIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.GitLabIDPAddedEvent:
+		idpEvent = e.GitLabIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLab),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(GitLabIDCol, idpEvent.ID),
+				handler.NewCol(GitLabInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(GitLabClientIDCol, idpEvent.ClientID),
+				handler.NewCol(GitLabClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(GitLabScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateGitLabSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceGitLabIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.GitLabIDPChangedEvent
+	switch e := event.(type) {
+	case *org.GitLabIDPChangedEvent:
+		idpEvent = e.GitLabIDPChangedEvent
+	case *instance.GitLabIDPChangedEvent:
+		idpEvent = e.GitLabIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	gitlabCols := reduceGitLabIDPChangedColumns(idpEvent)
+	if len(gitlabCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				gitlabCols,
+				[]handler.Condition{
+					handler.NewCond(GitLabIDCol, idpEvent.ID),
+					handler.NewCond(GitLabInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateGitLabSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.GitLabSelfHostedIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.GitLabSelfHostedIDPAddedEvent:
+		idpEvent = e.GitLabSelfHostedIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.GitLabSelfHostedIDPAddedEvent:
+		idpEvent = e.GitLabSelfHostedIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAF3gw", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPAddedEventType, instance.GitLabSelfHostedIDPAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLabSelfHosted),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(GitLabSelfHostedIDCol, idpEvent.ID),
+				handler.NewCol(GitLabSelfHostedInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(GitLabSelfHostedIssuerCol, idpEvent.Issuer),
+				handler.NewCol(GitLabSelfHostedClientIDCol, idpEvent.ClientID),
+				handler.NewCol(GitLabSelfHostedClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(GitLabSelfHostedScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateGitLabSelfHostedSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.GitLabSelfHostedIDPChangedEvent
+	switch e := event.(type) {
+	case *org.GitLabSelfHostedIDPChangedEvent:
+		idpEvent = e.GitLabSelfHostedIDPChangedEvent
+	case *instance.GitLabSelfHostedIDPChangedEvent:
+		idpEvent = e.GitLabSelfHostedIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	gitlabCols := reduceGitLabSelfHostedIDPChangedColumns(idpEvent)
+	if len(gitlabCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				gitlabCols,
+				[]handler.Condition{
+					handler.NewCond(GitLabSelfHostedIDCol, idpEvent.ID),
+					handler.NewCond(GitLabSelfHostedInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateGitLabSelfHostedSuffix),
 			),
 		)
 	}
@@ -1454,6 +1835,9 @@ func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Col
 	if idpEvent.Scopes != nil {
 		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)))
 	}
+	if idpEvent.IsIDTokenMapping != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCIDTokenMappingCol, *idpEvent.IsIDTokenMapping))
+	}
 	return oidcCols
 }
 
@@ -1472,6 +1856,26 @@ func reduceJWTIDPChangedColumns(idpEvent idp.JWTIDPChangedEvent) []handler.Colum
 		jwtCols = append(jwtCols, handler.NewCol(JWTIssuerCol, *idpEvent.Issuer))
 	}
 	return jwtCols
+}
+
+func reduceAzureADIDPChangedColumns(idpEvent idp.AzureADIDPChangedEvent) []handler.Column {
+	azureADCols := make([]handler.Column, 0, 5)
+	if idpEvent.ClientID != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Scopes != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	if idpEvent.Tenant != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADTenantCol, *idpEvent.Tenant))
+	}
+	if idpEvent.IsEmailVerified != nil {
+		azureADCols = append(azureADCols, handler.NewCol(AzureADIsEmailVerified, *idpEvent.IsEmailVerified))
+	}
+	return azureADCols
 }
 
 func reduceGitHubIDPChangedColumns(idpEvent idp.GitHubIDPChangedEvent) []handler.Column {
@@ -1509,6 +1913,37 @@ func reduceGitHubEnterpriseIDPChangedColumns(idpEvent idp.GitHubEnterpriseIDPCha
 		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseScopesCol, database.StringArray(idpEvent.Scopes)))
 	}
 	return oauthCols
+}
+
+func reduceGitLabIDPChangedColumns(idpEvent idp.GitLabIDPChangedEvent) []handler.Column {
+	gitlabCols := make([]handler.Column, 0, 3)
+	if idpEvent.ClientID != nil {
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Scopes != nil {
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	return gitlabCols
+}
+
+func reduceGitLabSelfHostedIDPChangedColumns(idpEvent idp.GitLabSelfHostedIDPChangedEvent) []handler.Column {
+	gitlabCols := make([]handler.Column, 0, 4)
+	if idpEvent.Issuer != nil {
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedIssuerCol, *idpEvent.Issuer))
+	}
+	if idpEvent.ClientID != nil {
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Scopes != nil {
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	return gitlabCols
 }
 
 func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler.Column {

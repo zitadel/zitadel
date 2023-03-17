@@ -26,6 +26,11 @@
       color: var(--zitadel-color-github-text);
       background-color: var(--zitadel-color-github-background);
     }
+
+    &.gitlab {
+      color: var(--zitadel-color-gitlab-text);
+      background-color: var(--zitadel-color-gitlab-background);
+    }
   }
 
   .lgn-idp-providers {

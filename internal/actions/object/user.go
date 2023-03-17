@@ -156,9 +156,9 @@ type human struct {
 	AvatarKey         string
 	PreferredLanguage string
 	Gender            domain.Gender
-	Email             string
+	Email             domain.EmailAddress
 	IsEmailVerified   bool
-	Phone             string
+	Phone             domain.PhoneNumber
 	IsPhoneVerified   bool
 }
 
