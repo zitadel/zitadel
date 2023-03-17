@@ -21,6 +21,8 @@ func (p *Phase) ShuttingDown() bool {
 	return p.latestSig != nil
 }
 
+// ForkShutdown returns a new channel on each call
+// It enables multiple os.Signal receivers
 func (p *Phase) ForkShutdown() chan os.Signal {
 	fork := make(chan os.Signal)
 	go func() {

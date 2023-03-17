@@ -98,9 +98,9 @@ func startZitadel(config *Config, masterKey string) error {
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		sig := <-phase.ForkShutdown()
-		fmt.Println("closing shutdown", sig.String())
+		logging.WithFields("signal", sig.String()).Info("shutting down in 10 seconds")
 		<-time.After(10 * time.Second)
-		fmt.Println("cancelling app context")
+		logging.Info("cancelling app context")
 		cancel()
 	}()
 
@@ -333,11 +333,10 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 	case <-phase.ForkShutdown():
 		shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
-		fmt.Println("shutting down server")
-		//		defer cancel()
+		logging.New().Info("shutdown phase started, stopping to handle new requests")
 		return shutdownServer(shutdownCtx, http1Server)
 	case <-ctx.Done():
-		fmt.Println("app context closed, shutting down server")
+		logging.New().Info("app context closed, shutting down server")
 		return shutdownServer(ctx, http1Server)
 	}
 }
@@ -347,6 +346,6 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 	if err != nil {
 		return fmt.Errorf("could not shutdown gracefully: %w", err)
 	}
-	logging.New().Info("server shutdown gracefully")
+	logging.New().Info("stopped listening for new requests")
 	return nil
 }
