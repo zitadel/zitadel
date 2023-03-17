@@ -172,13 +172,18 @@ func (p *notificationsProjection) stopHandlingOnShutdown(reduce handler.Reduce) 
 func mockLongRunningCall(ctx context.Context) {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
+	seconds := 0
 
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println("stopping long running call because context is cancelledd", ctx.Err())
+			fmt.Println("stopping long running call because context is cancelled", ctx.Err())
 			break
 		case <-ticker.C:
+			seconds++
+			if seconds >= 5 {
+				return
+			}
 			fmt.Println("tick")
 		}
 	}

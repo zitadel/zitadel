@@ -91,6 +91,7 @@ func startZitadel(config *Config, masterKey string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	sigChan := make(chan os.Signal, 1)
 	defer func() {
+		// Don't return before the context is cancelled
 		<-ctx.Done()
 	}()
 	phase := runtime.StartTracking(sigChan)
