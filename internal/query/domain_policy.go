@@ -9,10 +9,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type DomainPolicy struct {
@@ -79,29 +80,41 @@ var (
 		name:  projection.DomainPolicyStateCol,
 		table: domainPolicyTable,
 	}
+	DomainPolicyColOwnerRemoved = Column{
+		name:  projection.DomainPolicyOwnerRemovedCol,
+		table: domainPolicyTable,
+	}
 )
 
-func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*DomainPolicy, error) {
+func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (_ *DomainPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.DomainPolicyProjection.Trigger(ctx)
 	}
-
-	stmt, scan := prepareDomainPolicyQuery()
-	query, args, err := stmt.Where(
-		sq.And{
+	eq := sq.And{
+		sq.Eq{DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+		sq.Or{
+			sq.Eq{DomainPolicyColID.identifier(): orgID},
+			sq.Eq{DomainPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID()},
+		},
+	}
+	if !withOwnerRemoved {
+		eq = sq.And{
 			sq.Eq{
-				DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+				DomainPolicyColInstanceID.identifier():   authz.GetInstance(ctx).InstanceID(),
+				DomainPolicyColOwnerRemoved.identifier(): false,
 			},
 			sq.Or{
-				sq.Eq{
-					DomainPolicyColID.identifier(): orgID,
-				},
-				sq.Eq{
-					DomainPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{DomainPolicyColID.identifier(): orgID},
+				sq.Eq{DomainPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
-		}).
-		OrderBy(DomainPolicyColIsDefault.identifier()).
+		}
+	}
+
+	stmt, scan := prepareDomainPolicyQuery(ctx, q.client)
+	query, args, err := stmt.Where(eq).OrderBy(DomainPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-D3CqT", "Errors.Query.SQLStatement")
@@ -111,8 +124,11 @@ func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool,
 	return scan(row)
 }
 
-func (q *Queries) DefaultDomainPolicy(ctx context.Context) (*DomainPolicy, error) {
-	stmt, scan := prepareDomainPolicyQuery()
+func (q *Queries) DefaultDomainPolicy(ctx context.Context) (_ *DomainPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareDomainPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		DomainPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -127,7 +143,7 @@ func (q *Queries) DefaultDomainPolicy(ctx context.Context) (*DomainPolicy, error
 	return scan(row)
 }
 
-func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy, error)) {
+func prepareDomainPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy, error)) {
 	return sq.Select(
 			DomainPolicyColID.identifier(),
 			DomainPolicyColSequence.identifier(),
@@ -140,7 +156,8 @@ func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy
 			DomainPolicyColIsDefault.identifier(),
 			DomainPolicyColState.identifier(),
 		).
-			From(domainPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(domainPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*DomainPolicy, error) {
 			policy := new(DomainPolicy)
 			err := row.Scan(

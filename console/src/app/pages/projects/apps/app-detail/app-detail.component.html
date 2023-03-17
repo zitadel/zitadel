@@ -1,7 +1,7 @@
 <cnsl-top-view
   title="{{ app?.name }}"
   [hasActions]="isZitadel === false && (['project.app.write:' + projectId, 'project.app.write'] | hasRole | async)"
-  docLink="https://docs.zitadel.com/docs/guides/manage/console/projects"
+  docLink="https://zitadel.com/docs/guides/manage/console/projects"
   [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate) : app?.apiConfig ? 'API' : 'SAML'"
   [isActive]="app?.state === AppState.APP_STATE_ACTIVE"
   [isInactive]="app?.state === AppState.APP_STATE_INACTIVE"
@@ -389,6 +389,14 @@
 
         <ng-container *ngIf="currentSetting === 'urls'">
           <cnsl-card title=" {{ 'APP.URLS' | translate }}">
+            <cnsl-info-section *ngIf="environmentMap?.issuer">
+              <div
+                [innerHtml]="
+                  'APP.OIDC.WELLKNOWN' | translate : { url: environmentMap.issuer + '/.well-known/openid-configuration' }
+                "
+              ></div>
+            </cnsl-info-section>
+
             <div class="app-info-row">
               <div class="app-info-wrapper" *ngFor="let environmentV of environmentMap | keyvalue">
                 <p class="app-info-row-title cnsl-secondary-text">{{ environmentV.key }}</p>
@@ -402,6 +410,25 @@
                       (copiedValue)="copied = environmentV.key"
                     >
                       {{ environmentV.value }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="app-info-row">
+              <div class="app-info-wrapper" *ngFor="let wellKnownV of wellKnownMap | keyvalue">
+                <p class="app-info-row-title cnsl-secondary-text">{{ wellKnownV.key }}</p>
+                <div class="app-copy-row">
+                  <div *ngIf="wellKnownV.value" class="environment">
+                    <button
+                      [disabled]="copied === wellKnownV.value"
+                      [matTooltip]="(copied !== wellKnownV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+                      cnslCopyToClipboard
+                      [valueToCopy]="wellKnownV.value"
+                      (copiedValue)="copied = wellKnownV.key"
+                    >
+                      {{ wellKnownV.value }}
                     </button>
                   </div>
                 </div>

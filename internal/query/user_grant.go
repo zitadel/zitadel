@@ -8,21 +8,27 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type UserGrant struct {
+	// ID represents the aggregate id (id of the user grant)
 	ID           string
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
 	Roles        database.StringArray
-	GrantID      string
-	State        domain.UserGrantState
+	// GrantID represents the project grant id
+	GrantID string
+	State   domain.UserGrantState
 
 	UserID             string
 	Username           string
@@ -190,21 +196,49 @@ var (
 		name:  projection.UserGrantState,
 		table: userGrantTable,
 	}
+	UserGrantOwnerRemoved = Column{
+		name:  projection.UserGrantOwnerRemoved,
+		table: userGrantTable,
+	}
+	UserGrantUserOwnerRemoved = Column{
+		name:  projection.UserGrantUserOwnerRemoved,
+		table: userGrantTable,
+	}
+	UserGrantProjectOwnerRemoved = Column{
+		name:  projection.UserGrantProjectOwnerRemoved,
+		table: userGrantTable,
+	}
+	UserGrantGrantGrantedOrgRemoved = Column{
+		name:  projection.UserGrantGrantedOrgRemoved,
+		table: userGrantTable,
+	}
 )
 
-func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (*UserGrant, error) {
+func addUserGrantWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[UserGrantOwnerRemoved.identifier()] = false
+	eq[UserGrantUserOwnerRemoved.identifier()] = false
+	eq[UserGrantProjectOwnerRemoved.identifier()] = false
+	eq[UserGrantGrantGrantedOrgRemoved.identifier()] = false
+	addLoginNameWithoutOwnerRemoved(eq)
+}
+
+func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (_ *UserGrant, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.UserGrantProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareUserGrantQuery()
+	query, scan := prepareUserGrantQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.
-		Where(sq.Eq{
-			UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		addUserGrantWithoutOwnerRemoved(eq)
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Fa1KW", "Errors.Query.SQLStatement")
 	}
@@ -213,12 +247,22 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries
 	return scan(row)
 }
 
-func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries) (*UserGrants, error) {
-	query, scan := prepareUserGrantsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk, withOwnerRemoved bool) (_ *UserGrants, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		logging.OnError(
+			projection.UserGrantProjection.Trigger(ctx),
+		).Debug("unable to trigger")
+	}
+
+	query, scan := prepareUserGrantsQuery(ctx, q.client)
+	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		addUserGrantWithoutOwnerRemoved(eq)
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")
 	}
@@ -241,7 +285,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries) (*
 	return grants, nil
 }
 
-func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, error)) {
+func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserGrant, error)) {
 	return sq.Select(
 			UserGrantID.identifier(),
 			UserGrantCreationDate.identifier(),
@@ -274,7 +318,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
@@ -349,7 +393,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 		}
 }
 
-func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, error)) {
+func prepareUserGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, error)) {
 	return sq.Select(
 			UserGrantID.identifier(),
 			UserGrantCreationDate.identifier(),
@@ -384,7 +428,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

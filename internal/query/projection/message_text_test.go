@@ -23,7 +23,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.reduceAdded.Title",
+			name: "org reduceAdded Title",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextSetEventType),
@@ -44,7 +44,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, title) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.title)",
+							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, title) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.title)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -62,7 +62,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceAdded.PreHeader",
+			name: "org reduceAdded PreHeader",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextSetEventType),
@@ -83,7 +83,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, pre_header) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, pre_header) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.pre_header)",
+							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, pre_header) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, pre_header) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.pre_header)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -101,7 +101,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceAdded.Subject",
+			name: "org reduceAdded Subject",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextSetEventType),
@@ -122,7 +122,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, subject) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, subject) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.subject)",
+							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, subject) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, subject) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.subject)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -140,7 +140,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceAdded.Greeting",
+			name: "org reduceAdded Greeting",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextSetEventType),
@@ -161,7 +161,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, greeting) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, greeting) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.greeting)",
+							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, greeting) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, greeting) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.greeting)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -179,7 +179,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceAdded.Text",
+			name: "org reduceAdded Text",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextSetEventType),
@@ -200,7 +200,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.text)",
+							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -218,7 +218,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceAdded.ButtonText",
+			name: "org reduceAdded ButtonText",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextSetEventType),
@@ -239,7 +239,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, button_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, button_text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.button_text)",
+							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, button_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, button_text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.button_text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -257,7 +257,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceAdded.Footer",
+			name: "org reduceAdded Footer",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextSetEventType),
@@ -278,7 +278,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, footer_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, footer_text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.footer_text)",
+							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, footer_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, footer_text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.footer_text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -296,7 +296,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceRemoved.Title",
+			name: "org reduceRemoved Title",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextRemovedEventType),
@@ -316,7 +316,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, title) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, title) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -324,6 +324,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -331,7 +332,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -347,7 +348,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.message_texts WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.message_texts2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -357,7 +358,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceRemoved.PreHeader",
+			name: "org reduceRemoved PreHeader",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextRemovedEventType),
@@ -377,7 +378,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, pre_header) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, pre_header) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -385,6 +386,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -392,7 +394,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceRemoved.Subject",
+			name: "org reduceRemoved Subject",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextRemovedEventType),
@@ -412,7 +414,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, subject) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, subject) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -420,6 +422,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -427,7 +430,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceRemoved.Greeting",
+			name: "org reduceRemoved Greeting",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextRemovedEventType),
@@ -447,7 +450,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, greeting) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, greeting) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -455,6 +458,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -462,7 +466,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceRemoved.Text",
+			name: "org reduceRemoved Text",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextRemovedEventType),
@@ -482,7 +486,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -490,6 +494,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -497,7 +502,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceRemoved.ButtonText",
+			name: "org reduceRemoved ButtonText",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextRemovedEventType),
@@ -517,7 +522,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, button_text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, button_text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -525,6 +530,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -532,7 +538,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceRemoved.Footer",
+			name: "org reduceRemoved Footer",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextRemovedEventType),
@@ -552,7 +558,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, footer_text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, footer_text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -560,6 +566,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -567,7 +574,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceRemoved",
+			name:   "org reduceRemoved",
 			reduce: (&messageTextProjection{}).reduceTemplateRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -587,11 +594,12 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.message_texts WHERE (aggregate_id = $1) AND (type = $2) AND (language = $3)",
+							expectedStmt: "DELETE FROM projections.message_texts2 WHERE (aggregate_id = $1) AND (type = $2) AND (language = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -599,7 +607,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceAdded",
+			name:   "instance reduceAdded",
 			reduce: (&messageTextProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -620,7 +628,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, title) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.title)",
+							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, title) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.title)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -638,7 +646,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceRemoved.Title",
+			name: "instance reduceRemoved Title",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.CustomTextRemovedEventType),
@@ -658,7 +666,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, title) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, title) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -666,6 +674,37 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&messageTextProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (aggregate_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
 							},
 						},
 					},

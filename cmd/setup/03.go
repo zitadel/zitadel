@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"strings"
 
 	"golang.org/x/text/language"
@@ -21,6 +22,7 @@ type FirstInstance struct {
 	InstanceName    string
 	DefaultLanguage language.Tag
 	Org             command.OrgSetup
+	MachineKeyPath  string
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
@@ -89,15 +91,33 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 	if !mig.instanceSetup.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(mig.instanceSetup.Org.Human.Username, "@") {
 		mig.instanceSetup.Org.Human.Username = mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
 	}
-	mig.instanceSetup.Org.Human.Email.Address = strings.TrimSpace(mig.instanceSetup.Org.Human.Email.Address)
+	mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Email.Address.Normalize()
 	if mig.instanceSetup.Org.Human.Email.Address == "" {
-		mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Username
-		if !strings.Contains(mig.instanceSetup.Org.Human.Email.Address, "@") {
-			mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+		mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username)
+		if !strings.Contains(string(mig.instanceSetup.Org.Human.Email.Address), "@") {
+			mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain))
 		}
 	}
 
-	_, _, err = cmd.SetUpInstance(ctx, &mig.instanceSetup)
+	_, _, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
+	if key == nil {
+		return err
+	}
+
+	f := os.Stdout
+	if mig.MachineKeyPath != "" {
+		f, err = os.OpenFile(mig.MachineKeyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+	}
+
+	keyDetails, err := key.Detail()
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintln(f, string(keyDetails))
 	return err
 }
 

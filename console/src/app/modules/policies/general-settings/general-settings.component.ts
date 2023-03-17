@@ -34,16 +34,18 @@ export class GeneralSettingsComponent implements OnInit {
 
   public savePolicy(): void {
     const prom = this.updateData();
+    this.loading = true;
     if (prom) {
       prom
         .then(() => {
           this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
-          this.loading = true;
+          this.loading = false;
           setTimeout(() => {
             this.fetchData();
           }, 2000);
         })
         .catch((error) => {
+          this.loading = false;
           this.toast.showError(error);
         });
     }

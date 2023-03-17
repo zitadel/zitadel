@@ -41,7 +41,7 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	data := loginSuccessData{
-		userData: l.getUserData(r, authReq, "Login Successful", errID, errMessage),
+		userData: l.getUserData(r, authReq, "LoginSuccess.Title", "", errID, errMessage),
 	}
 	if authReq != nil {
 		//the id will be set via the html (maybe change this with the login refactoring)

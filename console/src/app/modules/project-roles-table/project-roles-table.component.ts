@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatTable } from '@angular/material/table';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatLegacyTable as MatTable } from '@angular/material/legacy-table';
 import { Router } from '@angular/router';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -27,8 +27,8 @@ export class ProjectRolesTableComponent implements OnInit {
   @ViewChild(PaginatorComponent) public paginator?: PaginatorComponent;
   @ViewChild(MatTable) public table?: MatTable<Role.AsObject>;
   public dataSource: ProjectRolesDataSource = new ProjectRolesDataSource(this.mgmtService);
-  public selection: SelectionModel<Role.AsObject> = new SelectionModel<Role.AsObject>(true, []);
-  @Output() public changedSelection: EventEmitter<Array<Role.AsObject>> = new EventEmitter();
+  public selection: SelectionModel<string> = new SelectionModel<string>(true, []);
+  @Output() public changedSelection: EventEmitter<Array<string>> = new EventEmitter();
   @Input() public displayedColumns: string[] = ['key', 'displayname', 'group', 'creationDate', 'changeDate', 'actions'];
 
   constructor(
@@ -47,7 +47,7 @@ export class ProjectRolesTableComponent implements OnInit {
 
     this.dataSource.rolesSubject.subscribe((roles) => {
       const selectedRoles: Role.AsObject[] = roles.filter((role) => this.selectedKeys.includes(role.key));
-      this.selection.select(...selectedRoles);
+      this.selection.select(...selectedRoles.map((r) => r.key));
     });
 
     this.selection.changed.subscribe(() => {
@@ -57,7 +57,7 @@ export class ProjectRolesTableComponent implements OnInit {
 
   public selectAllOfGroup(group: string): void {
     const groupRoles: Role.AsObject[] = this.dataSource.rolesSubject.getValue().filter((role) => role.group === group);
-    this.selection.select(...groupRoles);
+    this.selection.select(...groupRoles.map((r) => r.key));
   }
 
   private loadRolesPage(): void {
@@ -65,20 +65,19 @@ export class ProjectRolesTableComponent implements OnInit {
   }
 
   public changePage(): void {
-    this.selection.clear();
     this.loadRolesPage();
   }
 
   public isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.rolesSubject.value.length;
+    const numRows = this.dataSource.totalResult;
     return numSelected === numRows;
   }
 
   public masterToggle(): void {
     this.isAllSelected()
       ? this.selection.clear()
-      : this.dataSource.rolesSubject.value.forEach((row: Role.AsObject) => this.selection.select(row));
+      : this.dataSource.rolesSubject.value.forEach((row: Role.AsObject) => this.selection.select(row.key));
   }
 
   public deleteRole(role: Role.AsObject): void {

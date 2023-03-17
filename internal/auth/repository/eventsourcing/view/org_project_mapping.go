@@ -9,15 +9,15 @@ import (
 )
 
 const (
-	orgPrgojectMappingTable = "auth.org_project_mapping"
+	orgProjectMappingTable = "auth.org_project_mapping2"
 )
 
 func (v *View) OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*model.OrgProjectMapping, error) {
-	return view.OrgProjectMappingByIDs(v.Db, orgPrgojectMappingTable, orgID, projectID, instanceID)
+	return view.OrgProjectMappingByIDs(v.Db, orgProjectMappingTable, orgID, projectID, instanceID)
 }
 
 func (v *View) PutOrgProjectMapping(mapping *model.OrgProjectMapping, event *models.Event) error {
-	err := view.PutOrgProjectMapping(v.Db, orgPrgojectMappingTable, mapping)
+	err := view.PutOrgProjectMapping(v.Db, orgProjectMappingTable, mapping)
 	if err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func (v *View) PutOrgProjectMapping(mapping *model.OrgProjectMapping, event *mod
 }
 
 func (v *View) DeleteOrgProjectMapping(orgID, projectID, instanceID string, event *models.Event) error {
-	err := view.DeleteOrgProjectMapping(v.Db, orgPrgojectMappingTable, orgID, projectID, instanceID)
+	err := view.DeleteOrgProjectMapping(v.Db, orgProjectMappingTable, orgID, projectID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
@@ -33,7 +33,15 @@ func (v *View) DeleteOrgProjectMapping(orgID, projectID, instanceID string, even
 }
 
 func (v *View) DeleteInstanceOrgProjectMappings(event *models.Event) error {
-	err := view.DeleteInstanceOrgProjectMappings(v.Db, orgPrgojectMappingTable, event.InstanceID)
+	err := view.DeleteInstanceOrgProjectMappings(v.Db, orgProjectMappingTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedOrgProjectMappingSequence(event)
+}
+
+func (v *View) UpdateOwnerRemovedOrgProjectMappings(event *models.Event) error {
+	err := view.UpdateOwnerRemovedOrgProjectMappings(v.Db, orgProjectMappingTable, event.InstanceID, event.AggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
@@ -41,31 +49,31 @@ func (v *View) DeleteInstanceOrgProjectMappings(event *models.Event) error {
 }
 
 func (v *View) DeleteOrgProjectMappingsByProjectID(projectID, instanceID string) error {
-	return view.DeleteOrgProjectMappingsByProjectID(v.Db, orgPrgojectMappingTable, projectID, instanceID)
+	return view.DeleteOrgProjectMappingsByProjectID(v.Db, orgProjectMappingTable, projectID, instanceID)
 }
 
 func (v *View) DeleteOrgProjectMappingsByProjectGrantID(projectGrantID, instanceID string) error {
-	return view.DeleteOrgProjectMappingsByProjectGrantID(v.Db, orgPrgojectMappingTable, projectGrantID, instanceID)
+	return view.DeleteOrgProjectMappingsByProjectGrantID(v.Db, orgProjectMappingTable, projectGrantID, instanceID)
 }
 
 func (v *View) GetLatestOrgProjectMappingSequence(instanceID string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(orgPrgojectMappingTable, instanceID)
+	return v.latestSequence(orgProjectMappingTable, instanceID)
 }
 
-func (v *View) GetLatestOrgProjectMappingSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(orgPrgojectMappingTable, instanceIDs...)
+func (v *View) GetLatestOrgProjectMappingSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(orgProjectMappingTable, instanceIDs)
 }
 
 func (v *View) ProcessedOrgProjectMappingSequence(event *models.Event) error {
-	return v.saveCurrentSequence(orgPrgojectMappingTable, event)
+	return v.saveCurrentSequence(orgProjectMappingTable, event)
 }
 
-func (v *View) UpdateOrgProjectMappingSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(orgPrgojectMappingTable)
+func (v *View) UpdateOrgProjectMappingSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(orgProjectMappingTable, instanceIDs)
 }
 
 func (v *View) GetLatestOrgProjectMappingFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(orgPrgojectMappingTable, instanceID, sequence)
+	return v.latestFailedEvent(orgProjectMappingTable, instanceID, sequence)
 }
 
 func (v *View) ProcessedOrgProjectMappingFailedEvent(failedEvent *repository.FailedEvent) error {

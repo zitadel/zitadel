@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	LabelPolicyKeyAggregateID = "aggregate_id"
-	LabelPolicyKeyState       = "label_policy_state"
-	LabelPolicyKeyInstanceID  = "instance_id"
+	LabelPolicyKeyAggregateID  = "aggregate_id"
+	LabelPolicyKeyState        = "label_policy_state"
+	LabelPolicyKeyInstanceID   = "instance_id"
+	LabelPolicyKeyOwnerRemoved = "owner_removed"
 )
 
 type LabelPolicyView struct {

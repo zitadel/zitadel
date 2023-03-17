@@ -9,9 +9,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type PasswordAgePolicy struct {
@@ -73,26 +75,30 @@ var (
 		name:  projection.AgePolicyStateCol,
 		table: passwordAgeTable,
 	}
+	PasswordAgeColOwnerRemoved = Column{
+		name:  projection.AgePolicyOwnerRemovedCol,
+		table: passwordAgeTable,
+	}
 )
 
-func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*PasswordAgePolicy, error) {
+func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (_ *PasswordAgePolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.PasswordAgeProjection.Trigger(ctx)
 	}
-
-	stmt, scan := preparePasswordAgePolicyQuery()
+	eq := sq.Eq{PasswordAgeColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[PasswordAgeColOwnerRemoved.identifier()] = false
+	}
+	stmt, scan := preparePasswordAgePolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{
-				PasswordAgeColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 			sq.Or{
-				sq.Eq{
-					PasswordAgeColID.identifier(): orgID,
-				},
-				sq.Eq{
-					PasswordAgeColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{PasswordAgeColID.identifier(): orgID},
+				sq.Eq{PasswordAgeColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
 		}).
 		OrderBy(PasswordAgeColIsDefault.identifier()).
@@ -105,12 +111,15 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldTriggerBulk 
 	return scan(row)
 }
 
-func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBulk bool) (*PasswordAgePolicy, error) {
+func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBulk bool) (_ *PasswordAgePolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.PasswordAgeProjection.Trigger(ctx)
 	}
 
-	stmt, scan := preparePasswordAgePolicyQuery()
+	stmt, scan := preparePasswordAgePolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		PasswordAgeColID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).
@@ -124,7 +133,7 @@ func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBul
 	return scan(row)
 }
 
-func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PasswordAgePolicy, error)) {
+func preparePasswordAgePolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*PasswordAgePolicy, error)) {
 	return sq.Select(
 			PasswordAgeColID.identifier(),
 			PasswordAgeColSequence.identifier(),
@@ -136,7 +145,8 @@ func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Passwor
 			PasswordAgeColIsDefault.identifier(),
 			PasswordAgeColState.identifier(),
 		).
-			From(passwordAgeTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(passwordAgeTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PasswordAgePolicy, error) {
 			policy := new(PasswordAgePolicy)
 			err := row.Scan(

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
@@ -20,7 +20,15 @@ import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
-import { ThemeService } from 'src/app/services/theme.service';
+import {
+  BACKGROUND,
+  DARK_BACKGROUND,
+  DARK_PRIMARY,
+  DARK_WARN,
+  PRIMARY,
+  ThemeService,
+  WARN,
+} from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -176,7 +184,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           case PolicyComponentServiceType.MGMT:
             return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
           case PolicyComponentServiceType.ADMIN:
-            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData, this.org.id));
+            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData));
         }
       }
     }
@@ -637,14 +645,14 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   }
 
   private applyToConsole(labelpolicy: LabelPolicy.AsObject): void {
-    const darkPrimary = labelpolicy?.primaryColorDark || '#bbbafa';
-    const lightPrimary = labelpolicy?.primaryColor || '#5469d4';
+    const darkPrimary = labelpolicy?.primaryColorDark || DARK_PRIMARY;
+    const lightPrimary = labelpolicy?.primaryColor || PRIMARY;
 
-    const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
-    const lightWarn = labelpolicy?.warnColor || '#cd3d56';
+    const darkWarn = labelpolicy?.warnColorDark || DARK_WARN;
+    const lightWarn = labelpolicy?.warnColor || WARN;
 
-    const darkBackground = labelpolicy?.backgroundColorDark || '#111827';
-    const lightBackground = labelpolicy?.backgroundColor || '#fafafa';
+    const darkBackground = labelpolicy?.backgroundColorDark || DARK_BACKGROUND;
+    const lightBackground = labelpolicy?.backgroundColor || BACKGROUND;
 
     this.themeService.savePrimaryColor(darkPrimary, true);
     this.themeService.savePrimaryColor(lightPrimary, false);

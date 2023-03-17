@@ -7,9 +7,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -50,6 +51,14 @@ var (
 		name:  projection.ProjectMemberProjectIDCol,
 		table: projectMemberTable,
 	}
+	ProjectMemberOwnerRemoved = Column{
+		name:  projection.MemberOwnerRemoved,
+		table: orgMemberTable,
+	}
+	ProjectMemberOwnerRemovedUser = Column{
+		name:  projection.MemberUserOwnerRemoved,
+		table: orgMemberTable,
+	}
 )
 
 type ProjectMembersQuery struct {
@@ -63,12 +72,22 @@ func (q *ProjectMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		Where(sq.Eq{ProjectMemberProjectID.identifier(): q.ProjectID})
 }
 
-func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery) (*Members, error) {
-	query, scan := prepareProjectMembersQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+func addProjectMemberWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[ProjectMemberOwnerRemoved.identifier()] = false
+	eq[ProjectMemberOwnerRemovedUser.identifier()] = false
+}
+
+func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery, withOwnerRemoved bool) (_ *Members, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareProjectMembersQuery(ctx, q.client)
+	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		addProjectMemberWithoutOwnerRemoved(eq)
+		addLoginNameWithoutOwnerRemoved(eq)
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T8CuT", "Errors.Query.InvalidRequest")
 	}
@@ -90,7 +109,7 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	return members, err
 }
 
-func prepareProjectMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
+func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
 			ProjectMemberCreationDate.identifier(),
 			ProjectMemberChangeDate.identifier(),
@@ -109,7 +128,7 @@ func prepareProjectMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, 
 		).From(projectMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, ProjectMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, ProjectMemberUserID)).
+			LeftJoin(join(LoginNameUserIDCol, ProjectMemberUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

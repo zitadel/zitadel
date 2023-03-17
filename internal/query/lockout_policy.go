@@ -9,10 +9,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type LockoutPolicy struct {
@@ -74,26 +75,33 @@ var (
 		name:  projection.LockoutPolicyStateCol,
 		table: lockoutTable,
 	}
+	LockoutPolicyOwnerRemoved = Column{
+		name:  projection.LockoutPolicyOwnerRemovedCol,
+		table: lockoutTable,
+	}
 )
 
-func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*LockoutPolicy, error) {
+func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (_ *LockoutPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.LockoutPolicyProjection.Trigger(ctx)
 	}
+	eq := sq.Eq{
+		LockoutColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[LockoutPolicyOwnerRemoved.identifier()] = false
+	}
 
-	stmt, scan := prepareLockoutPolicyQuery()
+	stmt, scan := prepareLockoutPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{
-				LockoutColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 			sq.Or{
-				sq.Eq{
-					LockoutColID.identifier(): orgID,
-				},
-				sq.Eq{
-					LockoutColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{LockoutColID.identifier(): orgID},
+				sq.Eq{LockoutColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
 		}).
 		OrderBy(LockoutColIsDefault.identifier()).
@@ -106,8 +114,11 @@ func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 	return scan(row)
 }
 
-func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (*LockoutPolicy, error) {
-	stmt, scan := prepareLockoutPolicyQuery()
+func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (_ *LockoutPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareLockoutPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		LockoutColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		LockoutColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -122,7 +133,7 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (*LockoutPolicy, err
 	return scan(row)
 }
 
-func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPolicy, error)) {
+func prepareLockoutPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LockoutPolicy, error)) {
 	return sq.Select(
 			LockoutColID.identifier(),
 			LockoutColSequence.identifier(),
@@ -134,7 +145,8 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 			LockoutColIsDefault.identifier(),
 			LockoutColState.identifier(),
 		).
-			From(lockoutTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(lockoutTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LockoutPolicy, error) {
 			policy := new(LockoutPolicy)
 			err := row.Scan(

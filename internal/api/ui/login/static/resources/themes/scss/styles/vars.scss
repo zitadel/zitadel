@@ -44,6 +44,8 @@
 
   --zitadel-color-footer-line: rgba(0, 0, 0, 0.12);
 
+  --zitadel-color-card-hover: #ffffff;
+
   --zitadel-color-input-background: #00000003;
   --zitadel-color-input-border: #1a191938;
   --zitadel-color-input-border-hover: #1a1b1b;
@@ -111,22 +113,26 @@
 
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
+  --zitadel-color-github-text: #8b8d8d;
+  --zitadel-color-github-background: #ffffff;
+  --zitadel-color-gitlab-text: #8b8d8d;
+  --zitadel-color-gitlab-background: #ffffff;
 
   --zitadel-color-qr: var(--zitadel-color-black);
   --zitadel-color-qr-background: var(--zitadel-color-white);
 }
 
 .lgn-dark-theme {
-  --zitadel-color-primary-50: #ffffff;
-  --zitadel-color-primary-100: #dde6f3;
-  --zitadel-color-primary-200: #b4c9e4;
-  --zitadel-color-primary-300: #7fa3d1;
-  --zitadel-color-primary-400: #6992c9;
-  --zitadel-color-primary-500: #5282c1;
-  --zitadel-color-primary-600: #4072b4;
-  --zitadel-color-primary-700: #38649d;
-  --zitadel-color-primary-800: #305687;
-  --zitadel-color-primary-900: #284770;
+  --zitadel-color-primary-50: #f1f7fd;
+  --zitadel-color-primary-100: #afd1f2;
+  --zitadel-color-primary-200: #7fb5ea;
+  --zitadel-color-primary-300: #4192e0;
+  --zitadel-color-primary-400: #2782dc;
+  --zitadel-color-primary-500: #2073c4;
+  --zitadel-color-primary-600: #1c64aa;
+  --zitadel-color-primary-700: #17548f;
+  --zitadel-color-primary-800: #134575;
+  --zitadel-color-primary-900: #0f355b;
 
   --zitadel-color-warn-50: #ffe7eb;
   --zitadel-color-warn-100: #ffc4ce;
@@ -155,9 +161,11 @@
 
   --zitadel-color-footer-line: rgba(255, 255, 255, 0.12);
 
+  --zitadel-color-card-hover: #ffffff20;
+
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
   --zitadel-color-input-border: #f9f7f725;
-  --zitadel-color-input-border-hover: #aeafb1;
+  --zitadel-color-input-border-hover: #ffffff;
   --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
 
@@ -210,4 +218,8 @@
 
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
+  --zitadel-color-github-text: #8b8d8d;
+  --zitadel-color-github-background: #ffffff;
+  --zitadel-color-gitlab-text: #8b8d8d;
+  --zitadel-color-gitlab-background: #ffffff;
 }

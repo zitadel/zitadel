@@ -86,14 +86,15 @@ COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/api/assets/route
 #######################
 FROM go-base as go-test
 
-ARG COCKROACH_BINARY=cockroach
+ARG COCKROACH_BINARY=/usr/local/bin/cockroach
+ARG COCKROACH_VERSION=v22.2.2
 RUN apt install openssl tzdata tar
 
 # cockroach binary used to backup database
 RUN mkdir /usr/local/lib/cockroach
-RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v22.1.0.linux-amd64.tgz \
-    | tar  xvz && cp -i cockroach-v22.1.0.linux-amd64/cockroach /usr/local/bin/
-RUN rm -r cockroach-v22.1.0.linux-amd64
+RUN wget -qO- https://binaries.cockroachdb.com/cockroach-${COCKROACH_VERSION}.linux-amd64.tgz \
+    | tar  xvz && cp -i cockroach-${COCKROACH_VERSION}.linux-amd64/cockroach /usr/local/bin/
+RUN rm -r cockroach-${COCKROACH_VERSION}.linux-amd64
 
 # Migrations for cockroach-secure
 RUN go install github.com/rakyll/statik \
@@ -104,3 +105,4 @@ RUN go install github.com/rakyll/statik \
 #######################
 FROM scratch as go-codecov
 COPY --from=go-test /go/src/github.com/zitadel/zitadel/profile.cov profile.cov
+

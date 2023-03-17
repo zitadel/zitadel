@@ -47,8 +47,8 @@ func newOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(OrgColumnDomain, crdb.ColumnTypeText, crdb.Default("")),
 		},
 			crdb.NewPrimaryKey(OrgColumnInstanceID, OrgColumnID),
-			crdb.WithIndex(crdb.NewIndex("domain_idx", []string{OrgColumnDomain})),
-			crdb.WithIndex(crdb.NewIndex("name_idx", []string{OrgColumnName})),
+			crdb.WithIndex(crdb.NewIndex("domain", []string{OrgColumnDomain})),
+			crdb.WithIndex(crdb.NewIndex("name", []string{OrgColumnName})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -75,6 +75,10 @@ func (p *orgProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.OrgReactivatedEventType,
 					Reduce: p.reduceOrgReactivated,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
 				},
 				{
 					Event:  org.OrgDomainPrimarySetEventType,
@@ -131,6 +135,7 @@ func (p *orgProjection) reduceOrgChanged(event eventstore.Event) (*handler.State
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -149,6 +154,7 @@ func (p *orgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -167,6 +173,7 @@ func (p *orgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -185,6 +192,26 @@ func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *orgProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DgMSg", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
+			handler.NewCol(OrgColumnSequence, e.Sequence()),
+			handler.NewCol(OrgColumnState, domain.OrgStateRemoved),
+		},
+		[]handler.Condition{
+			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	userTable = "auth.users"
+	userTable = "auth.users2"
 )
 
 type User struct {
@@ -34,6 +34,7 @@ type User struct {
 }
 
 func newUser(
+	ctx context.Context,
 	handler handler,
 	queries *query2.Queries,
 ) *User {
@@ -42,16 +43,16 @@ func newUser(
 		queries: queries,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (k *User) subscribe() {
-	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+func (u *User) subscribe(ctx context.Context) {
+	u.subscription = u.es.Subscribe(u.AggregateTypes()...)
 	go func() {
-		for event := range k.subscription.Events {
-			query.ReduceEvent(k, event)
+		for event := range u.subscription.Events {
+			query.ReduceEvent(ctx, u, event)
 		}
 	}()
 }
@@ -75,8 +76,8 @@ func (u *User) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (u *User) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
-	sequences, err := u.view.GetLatestUserSequences(instanceIDs...)
+func (u *User) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := u.view.GetLatestUserSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -146,6 +147,10 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		user_repo.HumanMFAInitSkippedType,
 		user_repo.MachineChangedEventType,
 		user_repo.HumanPasswordChangedType,
+		user_repo.HumanInitialCodeAddedType,
+		user_repo.UserV1InitialCodeAddedType,
+		user_repo.UserV1InitializedCheckSucceededType,
+		user_repo.HumanInitializedCheckSucceededType,
 		user_repo.HumanPasswordlessInitCodeAddedType,
 		user_repo.HumanPasswordlessInitCodeRequestedType:
 		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
@@ -227,6 +232,8 @@ func (u *User) ProcessOrg(event *es_models.Event) (err error) {
 		return u.fillLoginNamesOnOrgUsers(event)
 	case org.OrgDomainPrimarySetEventType:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
+	case org.OrgRemovedEventType:
+		return u.view.UpdateOrgOwnerRemovedUsers(event)
 	default:
 		return u.view.ProcessedUserSequence(event)
 	}
@@ -275,12 +282,12 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
 }
 
 func (u *User) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-is8aAWima", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
 }
 
-func (u *User) OnSuccess() error {
-	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp)
+func (u *User) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp, instanceIDs)
 }
 
 func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
@@ -310,12 +317,12 @@ func (u *User) loginNameInformation(ctx context.Context, orgID string, instanceI
 	if err != nil {
 		return false, "", nil, err
 	}
-	if org.DomainPolicy == nil {
-		policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
-		if err != nil {
-			return false, "", nil, err
-		}
-		userLoginMustBeDomain = policy.UserLoginMustBeDomain
+	if org.DomainPolicy != nil {
+		return org.DomainPolicy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 	}
-	return userLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
+	policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
+	if err != nil {
+		return false, "", nil, err
+	}
+	return policy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 }

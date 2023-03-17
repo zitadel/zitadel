@@ -6,13 +6,13 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/api/saml"
 
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
@@ -22,7 +22,9 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
@@ -60,6 +62,13 @@ type Config struct {
 	CustomerPortal    string
 	Machine           *id.Config
 	Actions           *actions.Config
+	Eventstore        *eventstore.Config
+	LogStore          *logstore.Configs
+	Quotas            *QuotasConfig
+}
+
+type QuotasConfig struct {
+	Access *middleware.AccessConfig
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -70,6 +79,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,

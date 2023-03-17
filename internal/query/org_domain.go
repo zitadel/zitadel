@@ -8,9 +8,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Domain struct {
@@ -54,12 +56,16 @@ func NewOrgDomainVerifiedSearchQuery(verified bool) (SearchQuery, error) {
 	return NewBoolQuery(OrgDomainIsVerifiedCol, verified)
 }
 
-func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries) (domains *Domains, err error) {
-	query, scan := prepareDomainsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			OrgDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries, withOwnerRemoved bool) (domains *Domains, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareDomainsQuery(ctx, q.client)
+	eq := sq.Eq{OrgDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[OrgDomainOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")
 	}
@@ -76,7 +82,7 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 	return domains, err
 }
 
-func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error)) {
+func prepareDomainsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Domains, error)) {
 	return sq.Select(
 			OrgDomainCreationDateCol.identifier(),
 			OrgDomainChangeDateCol.identifier(),
@@ -87,7 +93,8 @@ func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error))
 			OrgDomainIsPrimaryCol.identifier(),
 			OrgDomainValidationTypeCol.identifier(),
 			countColumn.identifier(),
-		).From(orgDomainsTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(orgDomainsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Domains, error) {
 			domains := make([]*Domain, 0)
 			var count uint64
@@ -163,6 +170,10 @@ var (
 	}
 	OrgDomainValidationTypeCol = Column{
 		name:  projection.OrgDomainValidationTypeCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainOwnerRemovedCol = Column{
+		name:  projection.OrgDomainOwnerRemovedCol,
 		table: orgDomainsTable,
 	}
 )

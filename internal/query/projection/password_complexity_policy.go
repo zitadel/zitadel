@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	PasswordComplexityTable = "projections.password_complexity_policies"
+	PasswordComplexityTable = "projections.password_complexity_policies2"
 
 	ComplexityPolicyIDCol            = "id"
 	ComplexityPolicyCreationDateCol  = "creation_date"
@@ -29,6 +29,7 @@ const (
 	ComplexityPolicyHasUppercaseCol  = "has_uppercase"
 	ComplexityPolicyHasSymbolCol     = "has_symbol"
 	ComplexityPolicyHasNumberCol     = "has_number"
+	ComplexityPolicyOwnerRemovedCol  = "owner_removed"
 )
 
 type passwordComplexityProjection struct {
@@ -54,8 +55,10 @@ func newPasswordComplexityProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(ComplexityPolicyHasUppercaseCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(ComplexityPolicyHasSymbolCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(ComplexityPolicyHasNumberCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(ComplexityPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(ComplexityPolicyInstanceIDCol, ComplexityPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{ComplexityPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -78,6 +81,10 @@ func (p *passwordComplexityProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.PasswordComplexityPolicyRemovedEventType,
 					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -167,6 +174,7 @@ func (p *passwordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 		cols,
 		[]handler.Condition{
 			handler.NewCond(ComplexityPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(ComplexityPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -179,5 +187,26 @@ func (p *passwordComplexityProjection) reduceRemoved(event eventstore.Event) (*h
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(ComplexityPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(ComplexityPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
+}
+
+func (p *passwordComplexityProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-pGTz9", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(ComplexityPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(ComplexityPolicySequenceCol, e.Sequence()),
+			handler.NewCol(ComplexityPolicyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(ComplexityPolicyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(ComplexityPolicyResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
 }

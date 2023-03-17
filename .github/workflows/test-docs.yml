@@ -12,9 +12,10 @@ on:
       - 'docs/**'
       - 'guides/**'
       - '**.md'
+      - 'release-channels.yaml'
 
 jobs:
-  Test:
+  Build-ZITADEL:
     runs-on: ubuntu-20.04
     steps:
       - run: 'echo "No tests for docs are implemented, yet"'

@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -19,7 +20,7 @@ var (
 type StatementHandlerConfig struct {
 	handler.ProjectionHandlerConfig
 
-	Client            *sql.DB
+	Client            *database.DB
 	SequenceTable     string
 	LockTable         string
 	FailedEventsTable string
@@ -34,7 +35,7 @@ type StatementHandler struct {
 	*handler.ProjectionHandler
 	Locker
 
-	client                  *sql.DB
+	client                  *database.DB
 	sequenceTable           string
 	currentSequenceStmt     string
 	updateSequencesBaseStmt string
@@ -42,8 +43,10 @@ type StatementHandler struct {
 	failureCountStmt        string
 	setFailureCountStmt     string
 
-	aggregates []eventstore.AggregateType
-	reduces    map[eventstore.EventType]handler.Reduce
+	aggregates  []eventstore.AggregateType
+	reduces     map[eventstore.EventType]handler.Reduce
+	initCheck   *handler.Check
+	initialized chan bool
 
 	bulkLimit uint64
 }
@@ -72,18 +75,20 @@ func NewStatementHandler(
 		aggregates:              aggregateTypes,
 		reduces:                 reduces,
 		bulkLimit:               config.BulkLimit,
-		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionName),
+		Locker:                  NewLocker(config.Client.DB, config.LockTable, config.ProjectionName),
+		initCheck:               config.InitCheck,
+		initialized:             make(chan bool),
 	}
 
-	initialized := make(chan bool)
-	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, initialized)
-
-	err := h.Init(ctx, initialized, config.InitCheck)
-	logging.OnError(err).WithField("projection", config.ProjectionName).Fatal("unable to initialize projections")
-
-	h.Subscribe(h.aggregates...)
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, h.initialized)
 
 	return h
+}
+
+func (h *StatementHandler) Start() {
+	h.initialized <- true
+	close(h.initialized)
+	h.Subscribe(h.aggregates...)
 }
 
 func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
@@ -92,7 +97,7 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 		return nil, 0, err
 	}
 
-	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(h.bulkLimit)
+	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(h.bulkLimit).AllowTimeTravel()
 
 	for _, aggregateType := range h.aggregates {
 		for _, instanceID := range instanceIDs {

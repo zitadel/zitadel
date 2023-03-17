@@ -38,7 +38,7 @@ func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Re
 	}
 	data := &passwordlessData{
 		webAuthNData{
-			userData:               l.getUserData(r, authReq, "Login Passwordless", errID, errMessage),
+			userData:               l.getUserData(r, authReq, "Passwordless.Title", "Passwordless.Description", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		passwordSet,
@@ -63,6 +63,14 @@ func (l *Login) handlePasswordlessVerification(w http.ResponseWriter, r *http.Re
 		return
 	}
 	err = l.authRepo.VerifyPasswordless(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID, credData, domain.BrowserInfoFromRequest(r))
+
+	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodPasswordless, err)
+	if err == nil && actionErr == nil && len(metadata) > 0 {
+		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+	} else if actionErr != nil && err == nil {
+		err = actionErr
+	}
+
 	if err != nil {
 		l.renderPasswordlessVerification(w, r, authReq, formData.PasswordLogin, err)
 		return

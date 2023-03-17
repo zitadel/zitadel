@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
+import { Domain, DomainValidationType } from 'src/app/proto/generated/zitadel/org_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -62,13 +62,16 @@ export class DomainsComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
+    dialogRef.afterClosed().subscribe((domainName) => {
+      if (domainName) {
         this.mgmtService
-          .addOrgDomain(resp)
+          .addOrgDomain(domainName)
           .then(() => {
             this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
-
+            this.verifyDomain({
+              domainName: domainName,
+              validationType: DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED,
+            });
             setTimeout(() => {
               this.loadDomains();
             }, 1000);
@@ -91,8 +94,8 @@ export class DomainsComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
+    dialogRef.afterClosed().subscribe((del) => {
+      if (del) {
         this.mgmtService
           .removeOrgDomain(domain)
           .then(() => {
@@ -109,7 +112,7 @@ export class DomainsComponent implements OnInit {
     });
   }
 
-  public verifyDomain(domain: Domain.AsObject): void {
+  public verifyDomain(domain: Partial<Domain.AsObject>): void {
     const dialogRef = this.dialog.open(DomainVerificationComponent, {
       data: {
         domain: domain,

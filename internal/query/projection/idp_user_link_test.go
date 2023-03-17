@@ -43,7 +43,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_user_links2 (idp_id, user_id, external_user_id, creation_date, change_date, sequence, resource_owner, instance_id, display_name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idp_user_links3 (idp_id, user_id, external_user_id, creation_date, change_date, sequence, resource_owner, instance_id, display_name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -80,11 +80,12 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links2 WHERE (idp_id = $1) AND (user_id = $2) AND (external_user_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (user_id = $2) AND (external_user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
 								"external-user-id",
+								"instance-id",
 							},
 						},
 					},
@@ -111,11 +112,12 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links2 WHERE (idp_id = $1) AND (user_id = $2) AND (external_user_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (user_id = $2) AND (external_user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
 								"external-user-id",
+								"instance-id",
 							},
 						},
 					},
@@ -123,7 +125,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceOrgRemoved",
+			name: "reduceOwnerRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgRemovedEventType),
@@ -131,7 +133,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.OrgRemovedEventMapper),
 			},
-			reduce: (&idpUserLinkProjection{}).reduceOrgRemoved,
+			reduce: (&idpUserLinkProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -139,9 +141,13 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links2 WHERE (resource_owner = $1)",
+							expectedStmt: "UPDATE projections.idp_user_links3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (resource_owner = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -149,7 +155,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -165,7 +171,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -191,9 +197,10 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -201,7 +208,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.IDPConfigRemovedEvent",
+			name: "org IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPConfigRemovedEventType),
@@ -219,10 +226,11 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links2 WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -230,7 +238,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.IDPConfigRemovedEvent",
+			name: "iam IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigRemovedEventType),
@@ -248,10 +256,11 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links2 WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},

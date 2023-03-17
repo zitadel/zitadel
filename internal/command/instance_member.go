@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -20,7 +19,7 @@ func (c *Commands) AddInstanceMemberCommand(a *instance.Aggregate, userID string
 			return nil, errors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument")
 		}
 		if len(domain.CheckForInvalidRoles(roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-4m0fS", "Errors.IAM.MemberInvalid")
+			return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-4m0fS", "Errors.IAM.MemberInvalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 				if exists, err := ExistsUser(ctx, filter, userID, ""); err != nil || !exists {
@@ -88,13 +87,13 @@ func (c *Commands) AddInstanceMember(ctx context.Context, userID string, roles .
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
-//ChangeInstanceMember updates an existing member
+// ChangeInstanceMember updates an existing member
 func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	if !member.IsIAMValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IAM.MemberInvalid")
+		return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IAM.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-3m9fs", "Errors.IAM.MemberInvalid")
+		return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-3m9fs", "Errors.IAM.MemberInvalid")
 	}
 
 	existingMember, err := c.instanceMemberWriteModelByID(ctx, member.UserID)
@@ -103,7 +102,7 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Memb
 	}
 
 	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-LiaZi", "Errors.IAM.Member.RolesNotChanged")
+		return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-LiaZi", "Errors.IAM.Member.RolesNotChanged")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewMemberChangedEvent(ctx, instanceAgg, member.UserID, member.Roles...))
@@ -120,14 +119,15 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Memb
 
 func (c *Commands) RemoveInstanceMember(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IDMissing")
+		return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IDMissing")
 	}
 	memberWriteModel, err := c.instanceMemberWriteModelByID(ctx, userID)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
 	if errors.IsNotFound(err) {
-		return nil, nil
+		// empty response because we have no data that match the request
+		return &domain.ObjectDetails{}, nil
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&memberWriteModel.MemberWriteModel.WriteModel)

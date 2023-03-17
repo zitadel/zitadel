@@ -1,0 +1,45 @@
+.title {
+  margin-bottom: 2rem;
+  display: block;
+}
+
+.event-data-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 2rem;
+  grid-row-gap: 1rem;
+  margin-bottom: 2rem;
+
+  .data-row {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .label {
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .aggregate-type {
+      align-self: flex-start;
+    }
+
+    span {
+      text-overflow: ellipsis;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.code {
+  width: 100%;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+}

@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 )
 
-func debugChannels(ctx context.Context, getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error)) []channels.NotificationChannel {
+func debugChannels(ctx context.Context, getFileSystemProvider func(ctx context.Context) (*fs.Config, error), getLogProvider func(ctx context.Context) (*log.Config, error)) []channels.NotificationChannel {
 	var (
 		providers []channels.NotificationChannel
 	)

@@ -47,7 +47,7 @@
 
         <div class="lgn-field double">
             <label class="lgn-label" for="email">{{t "ExternalRegistrationUserOverview.EmailLabel"}}</label>
-            <input class="lgn-input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" required>
+            <input class="lgn-input" type="email" id="email" name="email" autocomplete="email" value="{{ .Email }}" required>
         </div>
 
         <div class="lgn-field double">
@@ -70,6 +70,8 @@
                     </option>
                     <option value="zh" id="zh" {{if (selectedLanguage "zh")}} selected {{end}}>{{t "ExternalNotFound.Chinese"}}
                     </option>
+                    <option value="pl" id="pl" {{if (selectedLanguage "pl")}} selected {{end}}>{{t "ExternalNotFound.Polish"}}
+                    </option>
                 </select>
             </div>
         </div>
@@ -77,26 +79,33 @@
         {{ if or .TOSLink .PrivacyLink }}
         <div class="lgn-field">
             <label class="lgn-label">{{t "ExternalNotFound.TosAndPrivacyLabel"}}</label>
+            {{ if .TOSLink }}
             <div class="lgn-checkbox">
                 <input type="checkbox" id="terms-confirm"
                        name="terms-confirm" required>
                 <label for="terms-confirm">
                     {{t "ExternalNotFound.TosConfirm"}}
-                    {{ if .TOSLink }}
                     <a class="tos-link" target="_blank" href="{{ .TOSLink }}" rel="noopener noreferrer">
                         {{t "ExternalNotFound.TosLinkText"}}
                     </a>
-                    {{end}}
-                    {{ if and .TOSLink .PrivacyLink }}
-                    {{t "ExternalNotFound.TosConfirmAnd"}}
-                    {{ end }}
-                    {{ if .PrivacyLink }}
+                </label>
+            </div>
+            {{end}}
+            {{ if and .TOSLink .PrivacyLink }}
+            <br />
+            {{end}}
+            {{ if .PrivacyLink }}
+            <div class="lgn-checkbox">
+                <input type="checkbox" id="terms-confirm-privacy"
+                       name="terms-confirm-privacy" required>
+                <label for="terms-confirm-privacy">
+                    {{t "ExternalNotFound.PrivacyConfirm"}}
                     <a class="tos-link" target="_blank" href="{{ .PrivacyLink}}" rel="noopener noreferrer">
                         {{t "ExternalNotFound.PrivacyLinkText"}}
                     </a>
-                    {{end}}
                 </label>
             </div>
+            {{end}}
         </div>
         {{ end }}
     </div>
@@ -109,13 +118,17 @@
             <i class="lgn-icon-arrow-left-solid"></i>
         </button>
 
+        {{ if .IsLinkingAllowed }}
         <button type="submit" formaction="{{ externalNotFoundOptionUrl "linkbutton"}}" class="lgn-raised-button lgn-primary" name="linkbutton" value="true">
             {{t "ExternalNotFound.LinkButtonText"}}
         </button>
-            <span class="fill-space"></span>
+        {{ end }}
+        <span class="fill-space"></span>
+        {{ if .IsCreationAllowed }}
         <button type="submit" formaction="{{ externalNotFoundOptionUrl "autoregisterbutton"}}" class="lgn-raised-button lgn-primary" name="autoregisterbutton" value="true">
             {{t "ExternalNotFound.AutoRegisterButtonText"}}
         </button>
+        {{ end }}
     </div>
 </form>
 

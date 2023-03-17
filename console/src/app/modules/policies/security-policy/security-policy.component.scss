@@ -1,0 +1,97 @@
+@use '@angular/material' as mat;
+
+@mixin security-policy-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, 500);
+  $button-text-color: map-get($foreground, text);
+  $button-disabled-text-color: map-get($foreground, disabled-button);
+  $divider-color: map-get($foreground, dividers);
+  $secondary-text: map-get($foreground, secondary-text);
+
+  .security-wrapper {
+    max-width: 500px;
+
+    .security-policy-toggle {
+      margin-top: 0.5rem;
+    }
+
+    .security-allowed-uris-list {
+      width: 100%;
+
+      .uri-line {
+        display: flex;
+        align-items: center;
+        margin: 0.5rem 0;
+        padding: 0 0 0 0.75rem;
+        border-radius: 4px;
+        background: map-get($background, infosection);
+        height: 30px;
+        box-sizing: border-box;
+
+        .uri {
+          font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+          font-size: 14px;
+          overflow-x: auto;
+        }
+
+        .fill-space {
+          flex: 1;
+        }
+
+        .icon-button {
+          height: 30px;
+          line-height: 30px;
+
+          .icon {
+            font-size: 1rem;
+            margin-bottom: 3px;
+          }
+
+          &:not(:hover) {
+            color: $secondary-text;
+          }
+        }
+
+        &.disabled {
+          opacity: 0.5;
+
+          .icon-button {
+            display: none;
+          }
+        }
+      }
+    }
+
+    .security-allowed-originsform {
+      display: flex;
+      align-items: flex-end;
+      min-width: 320px;
+
+      .formfield {
+        width: 500px;
+      }
+
+      button {
+        margin-bottom: 14px;
+        margin-right: -0.5rem;
+      }
+    }
+  }
+}
+
+.spinner-wr {
+  margin: 0.5rem 0;
+}
+
+.general-btn-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+
+  .save-button {
+    display: block;
+  }
+}

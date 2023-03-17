@@ -57,6 +57,8 @@ func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 		return query.UserTypeCol
 	case user.UserFieldName_USER_FIELD_NAME_NICK_NAME:
 		return query.HumanNickNameCol
+	case user.UserFieldName_USER_FIELD_NAME_CREATION_DATE:
+		return query.UserCreationDateCol
 	default:
 		return query.UserIDCol
 	}
@@ -89,38 +91,7 @@ func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) (*query.User
 	}, nil
 }
 
-func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human {
-	h := &domain.Human{
-		Username: req.UserName,
-	}
-	preferredLanguage, err := language.Parse(req.Profile.PreferredLanguage)
-	logging.Log("MANAG-M029f").OnError(err).Debug("language malformed")
-	h.Profile = &domain.Profile{
-		FirstName:         req.Profile.FirstName,
-		LastName:          req.Profile.LastName,
-		NickName:          req.Profile.NickName,
-		DisplayName:       req.Profile.DisplayName,
-		PreferredLanguage: preferredLanguage,
-		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
-	}
-	h.Email = &domain.Email{
-		EmailAddress:    req.Email.Email,
-		IsEmailVerified: req.Email.IsEmailVerified,
-	}
-	if req.Phone != nil {
-		h.Phone = &domain.Phone{
-			PhoneNumber:     req.Phone.Phone,
-			IsPhoneVerified: req.Phone.IsPhoneVerified,
-		}
-	}
-	if req.InitialPassword != "" {
-		h.Password = &domain.Password{SecretString: req.InitialPassword, ChangeRequired: true}
-	}
-
-	return h
-}
-
-func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool) {
+func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool, links []*domain.UserIDPLink) {
 	human = &domain.Human{
 		Username: req.UserName,
 	}
@@ -135,12 +106,12 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
 	}
 	human.Email = &domain.Email{
-		EmailAddress:    req.Email.Email,
+		EmailAddress:    domain.EmailAddress(req.Email.Email),
 		IsEmailVerified: req.Email.IsEmailVerified,
 	}
 	if req.Phone != nil {
 		human.Phone = &domain.Phone{
-			PhoneNumber:     req.Phone.Phone,
+			PhoneNumber:     domain.PhoneNumber(req.Phone.Phone),
 			IsPhoneVerified: req.Phone.IsPhoneVerified,
 		}
 	}
@@ -153,8 +124,16 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 	if req.HashedPassword != nil && req.HashedPassword.Value != "" && req.HashedPassword.Algorithm != "" {
 		human.HashedPassword = domain.NewHashedPassword(req.HashedPassword.Value, req.HashedPassword.Algorithm)
 	}
+	links = make([]*domain.UserIDPLink, len(req.Idps))
+	for i, idp := range req.Idps {
+		links[i] = &domain.UserIDPLink{
+			IDPConfigID:    idp.ConfigId,
+			ExternalUserID: idp.ExternalUserId,
+			DisplayName:    idp.DisplayName,
+		}
+	}
 
-	return human, req.RequestPasswordlessRegistration
+	return human, req.RequestPasswordlessRegistration, links
 }
 
 func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resourceowner string) *command.Machine {
@@ -162,9 +141,10 @@ func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resource
 		ObjectRoot: models.ObjectRoot{
 			ResourceOwner: resourceowner,
 		},
-		Username:    req.UserName,
-		Name:        req.Name,
-		Description: req.Description,
+		Username:        req.UserName,
+		Name:            req.Name,
+		Description:     req.Description,
+		AccessTokenType: user_grpc.AccessTokenTypeToDomain(req.AccessTokenType),
 	}
 }
 
@@ -188,7 +168,7 @@ func UpdateHumanEmailRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateHum
 			AggregateID:   req.UserId,
 			ResourceOwner: authz.GetCtxData(ctx).OrgID,
 		},
-		EmailAddress:    req.Email,
+		EmailAddress:    domain.EmailAddress(req.Email),
 		IsEmailVerified: req.IsEmailVerified,
 	}
 }
@@ -196,7 +176,7 @@ func UpdateHumanEmailRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateHum
 func UpdateHumanPhoneRequestToDomain(req *mgmt_pb.UpdateHumanPhoneRequest) *domain.Phone {
 	return &domain.Phone{
 		ObjectRoot:      models.ObjectRoot{AggregateID: req.UserId},
-		PhoneNumber:     req.Phone,
+		PhoneNumber:     domain.PhoneNumber(req.Phone),
 		IsPhoneVerified: req.IsPhoneVerified,
 	}
 }
@@ -218,8 +198,9 @@ func UpdateMachineRequestToCommand(req *mgmt_pb.UpdateMachineRequest, orgID stri
 			AggregateID:   req.UserId,
 			ResourceOwner: orgID,
 		},
-		Name:        req.Name,
-		Description: req.Description,
+		Name:            req.Name,
+		Description:     req.Description,
+		AccessTokenType: user_grpc.AccessTokenTypeToDomain(req.AccessTokenType),
 	}
 }
 
@@ -247,18 +228,56 @@ func ListMachineKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListMachine
 
 }
 
-func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.MachineKey {
+func AddMachineKeyRequestToCommand(req *mgmt_pb.AddMachineKeyRequest, resourceOwner string) *command.MachineKey {
 	expDate := time.Time{}
 	if req.ExpirationDate != nil {
 		expDate = req.ExpirationDate.AsTime()
 	}
 
-	return &domain.MachineKey{
+	return &command.MachineKey{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.UserId,
+			AggregateID:   req.UserId,
+			ResourceOwner: resourceOwner,
 		},
 		ExpirationDate: expDate,
 		Type:           authn.KeyTypeToDomain(req.Type),
+	}
+}
+
+func RemoveMachineKeyRequestToCommand(req *mgmt_pb.RemoveMachineKeyRequest, resourceOwner string) *command.MachineKey {
+	return &command.MachineKey{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: resourceOwner,
+		},
+		KeyID: req.KeyId,
+	}
+}
+
+func AddPersonalAccessTokenRequestToCommand(req *mgmt_pb.AddPersonalAccessTokenRequest, resourceOwner string, scopes []string, allowedUserType domain.UserType) *command.PersonalAccessToken {
+	expDate := time.Time{}
+	if req.ExpirationDate != nil {
+		expDate = req.ExpirationDate.AsTime()
+	}
+
+	return &command.PersonalAccessToken{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: resourceOwner,
+		},
+		ExpirationDate:  expDate,
+		Scopes:          scopes,
+		AllowedUserType: allowedUserType,
+	}
+}
+
+func RemovePersonalAccessTokenRequestToCommand(req *mgmt_pb.RemovePersonalAccessTokenRequest, resourceOwner string) *command.PersonalAccessToken {
+	return &command.PersonalAccessToken{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: resourceOwner,
+		},
+		TokenID: req.TokenId,
 	}
 }
 
@@ -327,7 +346,7 @@ func ListUserMembershipsRequestToModel(ctx context.Context, req *mgmt_pb.ListUse
 	if err != nil {
 		return nil, err
 	}
-	ownerQuery, err := query.NewMembershipResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	ownerQuery, err := query.NewMembershipResourceOwnersSearchQuery(authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

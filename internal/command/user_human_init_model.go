@@ -14,7 +14,7 @@ import (
 type HumanInitCodeWriteModel struct {
 	eventstore.WriteModel
 
-	Email           string
+	Email           domain.EmailAddress
 	IsEmailVerified bool
 
 	Code             *crypto.CryptoValue
@@ -92,7 +92,7 @@ func (wm *HumanInitCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *HumanInitCodeWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	email string,
+	email domain.EmailAddress,
 ) (*user.HumanEmailChangedEvent, bool) {
 	changedEvent := user.NewHumanEmailChangedEvent(ctx, aggregate, email)
 	return changedEvent, wm.Email != email

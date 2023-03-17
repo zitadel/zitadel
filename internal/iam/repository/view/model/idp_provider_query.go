@@ -59,6 +59,8 @@ func (key IDPProviderSearchKey) ToColumnName() string {
 		return IDPProviderKeyState
 	case iam_model.IDPProviderSearchKeyInstanceID:
 		return IDPProviderKeyInstanceID
+	case iam_model.IDPProviderSearchKeyOwnerRemoved:
+		return IDPProviderKeyOwnerRemoved
 	default:
 		return ""
 	}

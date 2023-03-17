@@ -39,12 +39,13 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, primary_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, primary_domain) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"domain.new",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -68,12 +69,13 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.OrgStateActive,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -97,12 +99,13 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.OrgStateInactive,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -126,12 +129,13 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, name) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, name) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"new name",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -189,7 +193,37 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "reduceOrgRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&orgProjection{}).reduceOrgRemoved,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.OrgStateRemoved,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),

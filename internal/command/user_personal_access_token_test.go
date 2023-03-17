@@ -32,15 +32,11 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 		keyAlgorithm crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx             context.Context
-		userID          string
-		resourceOwner   string
-		expirationDate  time.Time
-		scopes          []string
-		allowedUserType domain.UserType
+		ctx context.Context
+		pat *PersonalAccessToken
 	}
 	type res struct {
-		want  *domain.Token
+		want  *domain.ObjectDetails
 		token string
 		err   func(error) bool
 	}
@@ -56,13 +52,18 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "token1"),
 			},
 			args{
-				ctx:            context.Background(),
-				userID:         "user1",
-				resourceOwner:  "org1",
-				scopes:         []string{"openid"},
-				expirationDate: time.Time{},
+				ctx: context.Background(),
+				pat: &PersonalAccessToken{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Scopes:         []string{"openid"},
+					ExpirationDate: time.Time{},
+				},
 			},
 			res{
 				err: caos_errs.IsPreconditionFailed,
@@ -80,18 +81,24 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 								"Machine",
 								"",
 								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),
 				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "token1"),
 			},
 			args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				resourceOwner:   "org1",
-				expirationDate:  time.Time{},
-				scopes:          []string{"openid"},
-				allowedUserType: domain.UserTypeHuman,
+				ctx: context.Background(),
+				pat: &PersonalAccessToken{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Scopes:          []string{"openid"},
+					ExpirationDate:  time.Time{},
+					AllowedUserType: domain.UserTypeHuman,
+				},
 			},
 			res{
 				err: caos_errs.IsPreconditionFailed,
@@ -100,28 +107,58 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 		{
 			"invalid expiration date, error",
 			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"machine",
-								"Machine",
-								"",
-								true,
-							),
-						),
-					),
-					expectFilter(),
-				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "token1"),
 			},
 			args{
-				ctx:            context.Background(),
-				userID:         "user1",
-				resourceOwner:  "org1",
-				expirationDate: time.Now().Add(-24 * time.Hour),
-				scopes:         []string{"openid"},
+				ctx: context.Background(),
+				pat: &PersonalAccessToken{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Scopes:         []string{"openid"},
+					ExpirationDate: time.Now().Add(-24 * time.Hour),
+				},
+			},
+			res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no userID, error",
+			fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "token1"),
+			},
+			args{
+				ctx: context.Background(),
+				pat: &PersonalAccessToken{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "",
+						ResourceOwner: "org1",
+					},
+					Scopes:         []string{"openid"},
+					ExpirationDate: time.Time{},
+				},
+			},
+			res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no resourceowner, error",
+			fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "token1"),
+			},
+			args{
+				ctx: context.Background(),
+				pat: &PersonalAccessToken{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "",
+					},
+					Scopes:         []string{"openid"},
+					ExpirationDate: time.Time{},
+				},
 			},
 			res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -139,6 +176,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 								"Machine",
 								"",
 								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),
@@ -160,20 +198,72 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
-				ctx:            context.Background(),
-				userID:         "user1",
-				resourceOwner:  "org1",
-				expirationDate: time.Time{},
-				scopes:         []string{"openid"},
-			},
-			res{
-				want: &domain.Token{
+				ctx: context.Background(),
+				pat: &PersonalAccessToken{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "user1",
 						ResourceOwner: "org1",
 					},
-					TokenID:    "token1",
-					Expiration: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
+					Scopes:          []string{"openid"},
+					ExpirationDate:  time.Time{},
+					AllowedUserType: domain.UserTypeMachine,
+				},
+			},
+			res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				token: base64.RawURLEncoding.EncodeToString([]byte("token1:user1")),
+			},
+		},
+		{
+			"token added with ID",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"machine",
+								"Machine",
+								"",
+								true,
+								domain.OIDCTokenTypeBearer,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewPersonalAccessTokenAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"token1",
+									time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
+									[]string{"openid"},
+								),
+							),
+						},
+					),
+				),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx: context.Background(),
+				pat: &PersonalAccessToken{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					TokenID:         "token1",
+					Scopes:          []string{"openid"},
+					ExpirationDate:  time.Time{},
+					AllowedUserType: domain.UserTypeMachine,
+				},
+			},
+			res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 				token: base64.RawURLEncoding.EncodeToString([]byte("token1:user1")),
 			},
@@ -186,7 +276,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			got, token, err := c.AddPersonalAccessToken(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.expirationDate, tt.args.scopes, tt.args.allowedUserType)
+			got, err := c.AddPersonalAccessToken(tt.args.ctx, tt.args.pat)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -195,7 +285,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
-				assert.Equal(t, tt.res.token, token)
+				assert.Equal(t, tt.res.token, tt.args.pat.Token)
 			}
 		})
 	}
@@ -206,10 +296,8 @@ func TestCommands_RemovePersonalAccessToken(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		tokenID       string
-		resourceOwner string
+		ctx context.Context
+		pat *PersonalAccessToken
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -229,10 +317,14 @@ func TestCommands_RemovePersonalAccessToken(t *testing.T) {
 				),
 			},
 			args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				tokenID:       "token1",
-				resourceOwner: "org1",
+				ctx: context.Background(),
+				pat: &PersonalAccessToken{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					TokenID: "token1",
+				},
 			},
 			res{
 				err: caos_errs.IsNotFound,
@@ -265,10 +357,14 @@ func TestCommands_RemovePersonalAccessToken(t *testing.T) {
 				),
 			},
 			args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				tokenID:       "token1",
-				resourceOwner: "org1",
+				ctx: context.Background(),
+				pat: &PersonalAccessToken{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					TokenID: "token1",
+				},
 			},
 			res{
 				want: &domain.ObjectDetails{
@@ -282,7 +378,7 @@ func TestCommands_RemovePersonalAccessToken(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := c.RemovePersonalAccessToken(tt.args.ctx, tt.args.userID, tt.args.tokenID, tt.args.resourceOwner)
+			got, err := c.RemovePersonalAccessToken(tt.args.ctx, tt.args.pat)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

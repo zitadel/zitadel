@@ -1,5 +1,6 @@
 ---
 title: SaaS Product with Authentication and Authorization
+sidebar_label: Software-as-a-Service
 ---
 
 This is an example architecture for a typical SaaS product. 
@@ -52,11 +53,11 @@ There are some different use cases how the login should behave and look like:
 
 1. Restrict Organization
 
-With the primary domain scope the organization will be restricted to the requested domain, this means only users of the requestd organization will be able to login.
+With the primary domain scope the organization will be restricted to the requested domain, this means only users of the requested organization will be able to login.
 The private labeling (branding) and the login policy of the requested organization will be set automatically.
 
 :::note
-More about the [Scopes](../../apis/openidoauth/scopes)
+More about the [Scopes](/apis/openidoauth/scopes)
 :::
 
 2. Show private labeling (branding) of the project organization
@@ -64,8 +65,8 @@ More about the [Scopes](../../apis/openidoauth/scopes)
 You can configure on project-level which branding should be shown to users.
 In the default the design of the instance will be shown, but as soon as the user is identified, the policy of the users organization (if specified) will be triggered.
 If the setting is set to `Ensure Project Resource Owner Setting`, the private labeling of the project organization will always be triggered.
-The last possibility is to show the private labeling of the project organization and as soon as the user is identitfied the user organization settings will be triggered.
+The last possibility is to show the private labeling of the project organization and as soon as the user is identified the user organization settings will be triggered.
 For this the Allow User Resource Owner Setting should be set.
 :::note
-More about [Private Labeling](../../guides/manage/customize/branding)
+More about [Private Labeling](/guides/manage/customize/branding)
 :::

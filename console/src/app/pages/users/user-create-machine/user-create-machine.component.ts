@@ -1,9 +1,11 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { minLengthValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { AddMachineUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { AccessTokenType } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -19,6 +21,11 @@ export class UserCreateMachineComponent implements OnDestroy {
 
   private sub: Subscription = new Subscription();
   public loading: boolean = false;
+
+  public accessTokenTypes: AccessTokenType[] = [
+    AccessTokenType.ACCESS_TOKEN_TYPE_BEARER,
+    AccessTokenType.ACCESS_TOKEN_TYPE_JWT,
+  ];
 
   constructor(
     private router: Router,
@@ -39,9 +46,10 @@ export class UserCreateMachineComponent implements OnDestroy {
 
   private initForm(): void {
     this.userForm = this.fb.group({
-      userName: ['', [Validators.required, Validators.minLength(2)]],
-      name: ['', [Validators.required]],
+      userName: ['', [requiredValidator, minLengthValidator(2)]],
+      name: ['', [requiredValidator]],
       description: ['', []],
+      accessTokenType: [AccessTokenType.ACCESS_TOKEN_TYPE_BEARER, []],
     });
   }
 
@@ -54,6 +62,7 @@ export class UserCreateMachineComponent implements OnDestroy {
     machineReq.setDescription(this.description?.value);
     machineReq.setName(this.name?.value);
     machineReq.setUserName(this.userName?.value);
+    machineReq.setAccessTokenType(this.accessTokenType?.value);
 
     this.userService
       .addMachineUser(machineReq)
@@ -87,5 +96,8 @@ export class UserCreateMachineComponent implements OnDestroy {
   }
   public get userName(): AbstractControl | null {
     return this.userForm.get('userName');
+  }
+  public get accessTokenType(): AbstractControl | null {
+    return this.userForm.get('accessTokenType');
   }
 }

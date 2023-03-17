@@ -12,13 +12,14 @@ import (
 )
 
 var (
-	orgMetadataQuery = `SELECT projections.org_metadata.creation_date,` +
-		` projections.org_metadata.change_date,` +
-		` projections.org_metadata.resource_owner,` +
-		` projections.org_metadata.sequence,` +
-		` projections.org_metadata.key,` +
-		` projections.org_metadata.value` +
-		` FROM projections.org_metadata`
+	orgMetadataQuery = `SELECT projections.org_metadata2.creation_date,` +
+		` projections.org_metadata2.change_date,` +
+		` projections.org_metadata2.resource_owner,` +
+		` projections.org_metadata2.sequence,` +
+		` projections.org_metadata2.key,` +
+		` projections.org_metadata2.value` +
+		` FROM projections.org_metadata2` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	orgMetadataCols = []string{
 		"creation_date",
 		"change_date",
@@ -27,14 +28,15 @@ var (
 		"key",
 		"value",
 	}
-	orgMetadataListQuery = `SELECT projections.org_metadata.creation_date,` +
-		` projections.org_metadata.change_date,` +
-		` projections.org_metadata.resource_owner,` +
-		` projections.org_metadata.sequence,` +
-		` projections.org_metadata.key,` +
-		` projections.org_metadata.value,` +
+	orgMetadataListQuery = `SELECT projections.org_metadata2.creation_date,` +
+		` projections.org_metadata2.change_date,` +
+		` projections.org_metadata2.resource_owner,` +
+		` projections.org_metadata2.sequence,` +
+		` projections.org_metadata2.key,` +
+		` projections.org_metadata2.value,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.org_metadata`
+		` FROM projections.org_metadata2` +
+		` AS OF SYSTEM TIME '-1 ms'`
 	orgMetadataListCols = []string{
 		"creation_date",
 		"change_date",
@@ -242,7 +244,7 @@ func Test_OrgMetadataPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

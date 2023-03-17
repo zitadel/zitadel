@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "上一页",
     "NEXT": "下一页",
-    "COUNT": "总数"
+    "COUNT": "总数",
+    "MORE": "显示更多"
   },
   "FOOTER": {
     "LINKS": {
@@ -41,6 +42,41 @@
       "ADD": "按住并拖动来添加"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "你的入职过程",
+    "COMPLETED": "已完成",
+    "DISMISS": "隐藏",
+    "CARD": {
+      "TITLE": "让你的ZITADEL运转起来",
+      "DESCRIPTION": "这份清单有助于设置你的实例，并指导你完成最重要的步骤"
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "设置你的品牌",
+        "description": "定义你的登录的颜色和形状，上传你的标志和图标。"
+      },
+      "instance.smtp.config.added": {
+        "title": "SMTP设置",
+        "description": "设置你自己的邮件服务器设置"
+      },
+      "project.added": {
+        "title": "创建你的第一个项目",
+        "description": "添加你的第一个项目并定义其角色和授权。"
+      },
+      "project.application.added": {
+        "title": "创建你的第一个应用程序",
+        "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。"
+      },
+      "user.human.added": {
+        "title": "添加用户",
+        "description": "添加你的应用程序用户"
+      },
+      "user.grant.added": {
+        "title": "授予用户",
+        "description": "允许用户访问你的应用程序并设置他们的角色。"
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "实例",
     "DASHBOARD": "首页",
@@ -49,6 +85,7 @@
     "INSTANCEOVERVIEW": "实例",
     "ORGS": "组织",
     "VIEWS": "数据表",
+    "EVENTS": "活动",
     "FAILEDEVENTS": "失败事件",
     "ORGANIZATION": "组织",
     "DOMAINS": "域名",
@@ -122,6 +159,7 @@
     "NEXT": "下一页",
     "MORE": "更多",
     "STEP": "Step",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -201,11 +239,20 @@
     "NOROWS": "没有数据"
   },
   "ERRORS": {
-    "REQUIRED": "缺少一些必填字段。",
+    "REQUIRED": "请填写此栏",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
-    }
+    },
+    "INVALID_FORMAT": "格式是无效的。",
+    "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
+    "MINLENGTH": "长度必须至少是{{requiredLength}}字符。",
+    "UPPERCASEMISSING": "密码必须包含大写字符。",
+    "LOWERCASEMISSING": "密码必须包含小写字符。",
+    "SYMBOLERROR": "密码必须包含符号或标点符号。",
+    "NUMBERERROR": "密码必须包含数字。",
+    "PWNOTEQUAL": "提供的密码不匹配。",
+    "PHONE": "电话号码必须以00或+开头。"
   },
   "USER": {
     "SETTINGS": {
@@ -231,6 +278,7 @@
       "CREATE": "创建",
       "MY": "我的信息",
       "LOGINNAMES": "登录名称",
+      "LOGINMETHODS": "登录方式",
       "LOGINNAMESDESC": "这些是您的登录名:",
       "NOUSER": "没有关联的用户。",
       "REACTIVATE": "重新启用",
@@ -239,6 +287,8 @@
       "STATE": "状态",
       "DELETE": "删除用户",
       "UNLOCK": "解锁用户",
+      "GENERATESECRET": "生成客户密匙",
+      "REMOVESECRET": "删除客户密匙",
       "LOCKEDDESCRIPTION": "此用户因超过最大登录尝试次数而被锁定，必须解锁才能再次使用。",
       "DELETEACCOUNT": "删除账户",
       "DELETEACCOUNT_DESC": "如果您执行此操作，您将被注销并且无法再访问您的帐户。此操作不可逆，因此请谨慎操作。",
@@ -256,12 +306,17 @@
       "DELETE_SELF_DESCRIPTION": "您即将永久删除您的个人帐户。这将使您注销并删除您的用户。此操作无法撤消！",
       "DELETE_AUTH_DESCRIPTION": "您即将永久删除您的个人帐户。你确定吗？",
       "TYPEUSERNAME": "输入 '{{value}}'，确认并删除该用户。",
+      "USERNAME": "登录名",
       "DELETE_BTN": "永久删除"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "发送电子邮件通知",
       "DESCRIPTION": "单击下面的按钮可向当前电子邮件地址发送通知或更改电子邮件地址。",
       "NEWEMAIL": "新的电子邮件地址"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "客户端秘钥",
+      "CLIENTSECRET_DESCRIPTION": "将您的客户保密在一个安全的地方，因为一旦对话框关闭，便无法再次查看。"
     },
     "TABLE": {
       "DEACTIVATE": "停用",
@@ -403,6 +458,7 @@
       "TITLE": "信息",
       "EMAIL": "电子邮件",
       "PHONE": "手机号码",
+      "PHONE_HINT": "使用 00 或 + 符号后跟呼叫者的国家代码，或从下拉列表中选择国家，最后输入电话号码",
       "USERNAME": "用户名",
       "CHANGEUSERNAME": "修改",
       "CHANGEUSERNAME_TITLE": "修改用户名称",
@@ -422,7 +478,8 @@
         "PREVIEW": "预览",
         "DELETESUCCESS": "删除成功！",
         "CROPPERERROR": "上传文件时出错。如有必要，请尝试不同的格式和大小。"
-      }
+      },
+      "COUNTRY": "国家"
     },
     "MACHINE": {
       "TITLE": "服务用户详情",
@@ -440,6 +497,11 @@
       "CHOOSEEXPIRY": "选择过期时间",
       "CREATIONDATE": "创建于",
       "KEYDETAILS": "秘钥详情",
+      "ACCESSTOKENTYPE": "访问令牌类型 ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "添加秘钥",
         "DESCRIPTION": "选择您的密钥类型并选择一个可选的到期日期。"
@@ -471,8 +533,7 @@
       "SET": "设置新密码",
       "RESENDNOTIFICATION": "发送重置密码链接",
       "REQUIRED": "缺少必填字段。",
-      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
-      "NOTEQUAL": "提供的密码不匹配。"
+      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。"
     },
     "ID": "ID",
     "EMAIL": "电子邮件",
@@ -482,7 +543,7 @@
     "EMAILVERIFIED": "电子邮件已验证",
     "NOTVERIFIED": "未验证",
     "PREFERRED_LOGINNAME": "首选登录名",
-    "ISINITIAL": "此用户电子邮件尚未验证。",
+    "ISINITIAL": "用户尚未激活。",
     "LOGINMETHODS": {
       "TITLE": "联系信息",
       "DESCRIPTION": "提供的信息用于向您发送重要信息，例如密码重置电子邮件。",
@@ -526,17 +587,6 @@
         "3": "过滤角色名称"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "密码不符合定义的规则。",
-      "NOTANEMAIL": "给定的值不是合法电子邮件地址",
-      "REQUIRED": "输入字段为空。",
-      "MINLENGTH": "密码长度必须至少为 {{requiredLength}} 个字符。",
-      "NOEMAIL": "用户名不能是电子邮件地址。",
-      "UPPERCASEMISSING": "密码必须包含大写字符。",
-      "LOWERCASEMISSING": "密码必须包含小写字符。",
-      "SYMBOLERROR": "密码必须包含符号或标点符号。",
-      "NUMBERERROR": "密码必须包含数字。"
-    },
     "STATE": {
       "0": "未知",
       "1": "启用",
@@ -559,7 +609,7 @@
     "SIGNEDOUT_BTN": "登录",
     "EDITACCOUNT": "编辑账户",
     "ADDACCOUNT": "登录其他账户",
-    "RESENDINITIALEMAIL": "发送新的初始化邮件",
+    "RESENDINITIALEMAIL": "重新发送激活邮件",
     "RESENDEMAILNOTIFICATION": "重新发送电子邮件通知",
     "TOAST": {
       "CREATED": "用户创建成功。",
@@ -587,7 +637,9 @@
       "MACHINEADDED": "服务用户已创建成功!",
       "DELETED": "用户删除成功!",
       "UNLOCKED": "用户解锁成功!",
-      "PASSWORDLESSREGISTRATIONSENT": "注册链接发送成功。"
+      "PASSWORDLESSREGISTRATIONSENT": "注册链接发送成功。",
+      "SECRETGENERATED": "秘密成功生成!",
+      "SECRETREMOVED": "秘密被成功删除!"
     },
     "MEMBERSHIPS": {
       "TITLE": "CITADEL 管理角色",
@@ -742,10 +794,61 @@
       "DATABASE": "数据库",
       "FAILEDSEQUENCE": "失败的序列",
       "FAILURECOUNT": "失败计数",
+      "LASTFAILED": "最后一次失败是在",
       "ERRORMESSAGE": "错误消息",
       "ACTIONS": "操作",
       "DELETE": "删除",
       "DELETESUCCESS": "失败的事件被移除。"
+    },
+    "EVENTS": {
+      "TITLE": "活动",
+      "DESCRIPTION": "该视图显示所有传入的事件",
+      "EDITOR": "编辑",
+      "EDITORID": "编者号",
+      "AGGREGATE": "总数",
+      "AGGREGATEID": "汇总的ID",
+      "AGGREGATETYPE": "骨料类型",
+      "RESOURCEOWNER": "所有者",
+      "SEQUENCE": "序列",
+      "CREATIONDATE": "创建日期",
+      "TYPE": "类型",
+      "PAYLOAD": "有效载荷",
+      "FILTERS": {
+        "BTN": "过滤器",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "按用户过滤"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "骨料类型",
+          "IDLABEL": "ID",
+          "CHECKBOX": "按总量过滤"
+        },
+        "TYPE": {
+          "TYPELABEL": "类型",
+          "CHECKBOX": "按类型过滤"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "按资源所有者过滤"
+        },
+        "SEQUENCE": {
+          "LABEL": "序列",
+          "CHECKBOX": "按顺序过滤",
+          "SORT": "分拣",
+          "ASC": "上升中",
+          "DESC": "下降"
+        },
+        "CREATIONDATE": {
+          "LABEL": "创建日期",
+          "CHECKBOX": "按创建日期过滤"
+        },
+        "OTHER": "其他",
+        "OTHERS": "其他"
+      },
+      "DIALOG": {
+        "TITLE": "事件的细节"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "管理者已删除。",
@@ -777,6 +880,10 @@
       "ORGDETAIL_TITLE": "输入新组织的名称和域名。",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
       "ORGDETAILUSER_TITLE": "配置组织所有者",
+      "DELETE": "删除组织",
+      "DEFAULTLABEL": "默认情况下",
+      "SETASDEFAULT": "设置为默认组织",
+      "DEFAULTORGSET": "默认的组织已经改变",
       "RENAME": {
         "ACTION": "改名",
         "TITLE": "重命名组织",
@@ -827,7 +934,8 @@
     "STATE": {
       "0": "未定义",
       "1": "启用",
-      "2": "停用"
+      "2": "停用",
+      "3": "移除"
     },
     "MEMBER": {
       "TITLE": "组织管理者",
@@ -842,7 +950,9 @@
       "MEMBERADDED": "管理者已添加。",
       "MEMBERREMOVED": "管理者已删除。",
       "MEMBERCHANGED": "管理者以改变。",
-      "SETPRIMARY": "已设为主域名。"
+      "SETPRIMARY": "已设为主域名。",
+      "DELETED": "成功删除的组织",
+      "ORG_WAS_DELETED": "组织被删除"
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -852,6 +962,13 @@
       "REACTIVATE": {
         "TITLE": "重新启用组织",
         "DESCRIPTION": "您即将重新启用您的组织。用户将能够再次登录。你确定要继续吗？"
+      },
+      "DELETE": {
+        "TITLE": "删除组织",
+        "DESCRIPTION": "你即将删除你的组织。这将启动一个过程，所有与组织有关的数据将被删除。你现在还不能恢复这一行动。",
+        "TYPENAME": "键入'{价值}'，以删除您的组织。",
+        "ORGNAME": "组织名称",
+        "BTN": "删除"
       }
     }
   },
@@ -869,7 +986,7 @@
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
       "COMPLEXITY": "密码复杂性",
-      "NOTIFICATIONS": "通知服务商",
+      "NOTIFICATIONS": "通知设置",
       "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
       "MESSAGETEXTS": "消息文本",
       "IDP": "身份提供者",
@@ -878,7 +995,8 @@
       "BRANDING": "品牌标识",
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
-      "SECRETS": "验证码外观"
+      "SECRETS": "验证码外观",
+      "SECURITY": "安全设置"
     },
     "GROUPS": {
       "NOTIFICATIONS": "通知",
@@ -896,13 +1014,14 @@
       "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
       "SENDERADDRESS": "发件人地址",
       "SENDERNAME": "发件人名称",
-      "HOST": "服务器地址",
+      "HOSTANDPORT": "主机和端口",
       "USER": "用户名",
       "PASSWORD": "密码",
       "SETPASSWORD": "设置 SMTP 密码",
@@ -967,6 +1086,11 @@
       "LENGTH": "长度",
       "UPDATED": "设置已更新。"
     },
+    "SECURITY": {
+      "DESCRIPTION": "此设置将CSP设置为允许来自一组允许的域的框架。请注意，通过启用iFrames的使用，你会有允许点击劫持的风险。",
+      "IFRAMEENABLED": "允许 iFrame",
+      "ALLOWEDORIGINS": "允许的来源 URL"
+    },
     "DIALOG": {
       "RESET": {
         "DEFAULTTITLE": "重置设置",
@@ -986,6 +1110,11 @@
       "SYMBOLERROR": "密码必须包含符号/标点符号。",
       "NUMBERERROR": "密码必须包含数字。",
       "PATTERNERROR": "密码不符合要求。"
+    },
+    "NOTIFICATION": {
+      "TITLE": "通知",
+      "DESCRIPTION": "确定将发送哪些更改、通知",
+      "PASSWORDCHANGE": "更改密码"
     },
     "PRIVATELABELING": {
       "TITLE": "品牌标识",
@@ -1072,11 +1201,12 @@
       "UNSAVED_DESCRIPTION": "您在未保存的情况下进行了更改。您现在要保存吗？",
       "LOCALE": "本地化",
       "LOCALES": {
-        "de": "德语",
-        "en": "英语",
-        "it": "意大利语",
-        "fr": "法语",
-        "zh": "简体中文"
+        "de": "Deutsch",
+        "en": "English",
+        "it": "Italiano",
+        "fr": "Français",
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1125,7 +1255,8 @@
         "VP": "验证手机号码",
         "PR": "重置密码",
         "DC": "域名声明",
-        "PL": "无密码身份验证"
+        "PL": "无密码身份验证",
+        "PC": "修改密码"
       },
       "CHIPS": {
         "firstname": "名",
@@ -1163,6 +1294,7 @@
       "EXPIREWARNDAYS": "密码过期警告",
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "用户名必须包含组织域名",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "如果启用此设置，所有登录名都将以组织域为后缀。如果禁用此设置，您必须确保用户名在所有组织中都是唯一的。",
       "VALIDATEORGDOMAINS": "验证组织域名",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP 发件人地址与实例域名匹配",
       "ALLOWUSERNAMEPASSWORD": "允许用户名密码",
@@ -1463,6 +1595,12 @@
       "DELETED": "项目已删除"
     }
   },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "删除角色",
+      "DELETE_DESCRIPTION": "您即将删除一个角色。你确定吗？"
+    }
+  },
   "NEXTSTEPS": {
     "TITLE": "下一步"
   },
@@ -1473,14 +1611,61 @@
       "ACTIVETITLE": "启用的身份提供者"
     },
     "CREATE": {
-      "TITLE": "创建身份提供者",
-      "DESCRIPTION": "选择以下身份提供者类型之一。"
+      "TITLE": "创建供应商",
+      "DESCRIPTION": "选择以下一个或多个供应商。",
+      "STEPPERTITLE": "创建供应商",
+      "OIDC": {
+        "TITLE": "OIDC供应商",
+        "DESCRIPTION": "输入你的OIDC供应商的必要数据。"
+      },
+      "OAUTH": {
+        "TITLE": "OAuth供应商",
+        "DESCRIPTION": "输入你的OAuth供应商的必要数据。"
+      },
+      "JWT": {
+        "TITLE": "JWT供应商",
+        "DESCRIPTION": "输入你的JWT供应商所需的数据。"
+      },
+      "GOOGLE": {
+        "TITLE": "Google 身份提供者",
+        "DESCRIPTION": "输入您的 Google 身份提供商的凭据"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab身份提供商",
+        "DESCRIPTION": "输入您的Gitlab身份提供者的凭据"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab自我托管供应商",
+        "DESCRIPTION": "输入您的Gitlab自我托管身份提供商的凭据"
+      },
+      "GITHUBES": {
+        "TITLE": "Github Enterprise Server 身份提供者",
+        "DESCRIPTION": "输入您的GitHubEnterpriseServer身份提供者的凭据"
+      },
+      "GITHUB": {
+        "TITLE": "Github 身份提供者",
+        "DESCRIPTION": "输入您的 Github 身份提供商的凭据"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft 身份提供者",
+        "DESCRIPTION": "输入您的 Microsoft 身份提供商的凭据"
+      }
     },
     "DETAIL": {
       "TITLE": "身份提供者",
-      "DESCRIPTION": "身份提供者的常规配置。",
+      "DESCRIPTION": "更新你的供应商配置",
       "DATECREATED": "已创建",
       "DATECHANGED": "已更新"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "是自动创建",
+      "ISAUTOCREATION_DESC": "如果选择了，如果账户还不存在，就会创建一个账户。",
+      "ISAUTOUPDATE": "正在自动更新",
+      "ISAUTOUPDATE_DESC": "如果选择，账户将在重新认证时更新。",
+      "ISCREATIONALLOWED": "是否允许创作",
+      "ISCREATIONALLOWED_DESC": "确定是否可以创建账户。",
+      "ISLINKINGALLOWED": "是否允许连接",
+      "ISLINKINGALLOWED_DESC": "确定一个身份是否可以与一个现有的账户相联系。"
     },
     "OWNERTYPES": {
       "0": "未知",
@@ -1496,22 +1681,26 @@
       "1": "启用",
       "2": "停用"
     },
-    "MAPPINGFIELD": {
-      "1": "首选用户名",
-      "2": "电子邮箱"
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
     },
-    "STYLE": "样式",
-    "STYLEFIELD": {
-      "0": "没有样式",
-      "1": "Google"
-    },
+    "AZUREADTENANTTYPE": "租户类型",
+    "AZUREADTENANTID": "租户编号",
+    "EMAILVERIFIED": "电子邮件已验证",
+    "NAMEHINT": "如果指定，它将显示在登录界面。",
+    "OPTIONAL": "可选",
+    "UPDATECLIENTSECRET": "更新客户秘密",
     "ADD": "添加身份提供者",
-    "AUTOREGISTER": "自动注册",
-    "AUTOREGISTER_DESC": "如果勾选，当使用 IDP 登录且用户不存在时，则会创建一个。",
     "TYPE": "类型",
     "OWNER": "所有者",
     "ID": "ID",
     "NAME": "名称",
+    "AUTHORIZATIONENDPOINT": "授权端点",
+    "TOKENENDPOINT": "令牌端点",
+    "USERENDPOINT": "用户端点",
+    "IDATTRIBUTE": "标识属性",
     "AVAILABILITY": "可用性",
     "AVAILABLE": "可用的",
     "AVAILABLEBUTINACTIVE": "可用但已停用",
@@ -1611,20 +1800,22 @@
   "APP": {
     "LIST": "应用",
     "COMPLIANCE": "OIDC 兼容性",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "配置",
     "TOKEN": "令牌设置",
     "PAGES": {
       "TITLE": "应用",
       "ID": "ID",
       "DESCRIPTION": "在这里您可以编辑您的应用程序数据及其配置。",
-      "CREATE_OIDC": "OIDC 应用",
-      "CREATE_OIDC_DESC_TITLE": "逐步输入您的应用详情",
-      "CREATE_OIDC_DESC_SUB": "将自动生成推荐的配置。",
+      "CREATE": "OIDC 应用",
+      "CREATE_SELECT_PROJECT": "首先选择你的项目",
+      "CREATE_NEW_PROJECT": "或创建一个新的<a href='{url}}' title='创建项目'>这里</a>。",
+      "CREATE_DESC_TITLE": "逐步输入您的应用详情",
+      "CREATE_DESC_SUB": "将自动生成推荐的配置。",
       "STATE": "状态",
       "DATECREATED": "创建于",
       "DATECHANGED": "修改于",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "删除应用",
       "DETAIL": {
         "TITLE": "详情",
@@ -1674,6 +1865,7 @@
     "ORIGINS": "其他来源",
     "NOTANORIGIN": "输入的值不是有效来源",
     "OIDC": {
+      "WELLKNOWN": "欲了解更多信息，请看<a href='{url}}' title='发现端点' target='_blank'>发现端点</a>。",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client Id"
@@ -1825,11 +2017,12 @@
     "3": "其他"
   },
   "LANGUAGES": {
-    "de": "德语",
-    "en": "英语",
-    "it": "意大利语",
-    "fr": "法语",
-    "zh": "简体中文"
+    "de": "Deutsch",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français",
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "添加管理者",

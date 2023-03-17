@@ -119,6 +119,7 @@ const (
 	ColumnTypeJSONB
 	ColumnTypeBytes
 	ColumnTypeTimestamp
+	ColumnTypeInterval
 	ColumnTypeEnum
 	ColumnTypeEnumArray
 	ColumnTypeInt64
@@ -173,9 +174,9 @@ func NewForeignKey(name string, columns []string, refColumns []string) *ForeignK
 	return i
 }
 
-func NewForeignKeyOfPublicKeys(name string) *ForeignKey {
+func NewForeignKeyOfPublicKeys() *ForeignKey {
 	return &ForeignKey{
-		Name: name,
+		Name: "",
 	}
 }
 
@@ -186,36 +187,28 @@ type ForeignKey struct {
 }
 
 // Init implements handler.Init
-func (h *StatementHandler) Init(ctx context.Context, initialized chan<- bool, checks ...*handler.Check) error {
-	for _, check := range checks {
-		if check == nil || check.IsNoop() {
-			initialized <- true
-			close(initialized)
-			return nil
-		}
-		tx, err := h.client.BeginTx(ctx, nil)
+func (h *StatementHandler) Init(ctx context.Context) error {
+	check := h.initCheck
+	if check == nil || check.IsNoop() {
+		return nil
+	}
+	tx, err := h.client.BeginTx(ctx, nil)
+	if err != nil {
+		return caos_errs.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
+	}
+	for i, execute := range check.Executes {
+		logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("executing check")
+		next, err := execute(h.client, h.ProjectionName)
 		if err != nil {
-			return caos_errs.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
-		}
-		for i, execute := range check.Executes {
-			logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("executing check")
-			next, err := execute(h.client, h.ProjectionName)
-			if err != nil {
-				tx.Rollback()
-				return err
-			}
-			if !next {
-				logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("skipping next check")
-				break
-			}
-		}
-		if err := tx.Commit(); err != nil {
+			tx.Rollback()
 			return err
 		}
+		if !next {
+			logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("projection set up")
+			break
+		}
 	}
-	initialized <- true
-	close(initialized)
-	return nil
+	return tx.Commit()
 }
 
 func NewTableCheck(table *Table, opts ...execOption) *handler.Check {
@@ -226,7 +219,7 @@ func NewTableCheck(table *Table, opts ...execOption) *handler.Check {
 	executes := make([]func(handler.Executer, string) (bool, error), len(table.indices)+1)
 	executes[0] = execNextIfExists(config, create, opts, true)
 	for i, index := range table.indices {
-		executes[i+1] = execNextIfExists(config, createIndexStatement(index), opts, true)
+		executes[i+1] = execNextIfExists(config, createIndexCheck(index), opts, true)
 	}
 	return &handler.Check{
 		Executes: executes,
@@ -304,16 +297,16 @@ func createTableStatement(table *Table, tableName string, suffix string) string 
 		if len(key.Columns) == 0 {
 			key.Columns = table.primaryKey
 		}
-		stmt += fmt.Sprintf(", CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s ON DELETE CASCADE", key.Name, strings.Join(key.Columns, ","), ref)
+		stmt += fmt.Sprintf(", CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s ON DELETE CASCADE", foreignKeyName(key.Name, tableName, suffix), strings.Join(key.Columns, ","), ref)
 	}
 	for _, constraint := range table.constraints {
-		stmt += fmt.Sprintf(", CONSTRAINT %s UNIQUE (%s)", constraint.Name, strings.Join(constraint.Columns, ","))
+		stmt += fmt.Sprintf(", CONSTRAINT %s UNIQUE (%s)", constraintName(constraint.Name, tableName, suffix), strings.Join(constraint.Columns, ","))
 	}
 
 	stmt += ");"
 
 	for _, index := range table.indices {
-		stmt += fmt.Sprintf("CREATE INDEX IF NOT EXISTS %s ON %s (%s);", index.Name, tableName+suffix, strings.Join(index.Columns, ","))
+		stmt += createIndexStatement(index, tableName+suffix)
 	}
 	return stmt
 }
@@ -325,19 +318,41 @@ func createViewStatement(viewName string, selectStmt string) string {
 	)
 }
 
-func createIndexStatement(index *Index) func(config execConfig) string {
+func createIndexCheck(index *Index) func(config execConfig) string {
 	return func(config execConfig) string {
-		stmt := fmt.Sprintf("CREATE INDEX IF NOT EXISTS %s ON %s (%s)",
-			index.Name,
-			config.tableName,
-			strings.Join(index.Columns, ","),
-		)
-		if index.bucketCount == 0 {
-			return stmt + ";"
-		}
-		return fmt.Sprintf("SET experimental_enable_hash_sharded_indexes=on; %s USING HASH WITH BUCKET_COUNT = %d;",
-			stmt, index.bucketCount)
+		return createIndexStatement(index, config.tableName)
 	}
+}
+
+func createIndexStatement(index *Index, tableName string) string {
+	stmt := fmt.Sprintf("CREATE INDEX IF NOT EXISTS %s ON %s (%s)",
+		indexName(index.Name, tableName),
+		tableName,
+		strings.Join(index.Columns, ","),
+	)
+	if index.bucketCount == 0 {
+		return stmt + ";"
+	}
+	return fmt.Sprintf("SET experimental_enable_hash_sharded_indexes=on; %s USING HASH WITH BUCKET_COUNT = %d;",
+		stmt, index.bucketCount)
+}
+
+func foreignKeyName(name, tableName, suffix string) string {
+	if name == "" {
+		key := "fk" + suffix + "_ref_" + tableNameWithoutSchema(tableName)
+		return key
+	}
+	return "fk_" + tableNameWithoutSchema(tableName+suffix) + "_" + name
+}
+func constraintName(name, tableName, suffix string) string {
+	return tableNameWithoutSchema(tableName+suffix) + "_" + name + "_unique"
+}
+func indexName(name, tableName string) string {
+	return tableNameWithoutSchema(tableName) + "_" + name + "_idx"
+}
+
+func tableNameWithoutSchema(name string) string {
+	return name[strings.LastIndex(name, ".")+1:]
 }
 
 func createColumnsStatement(cols []*Column, tableName string) string {
@@ -375,6 +390,8 @@ func columnType(columnType ColumnType) string {
 		return "TEXT[]"
 	case ColumnTypeTimestamp:
 		return "TIMESTAMPTZ"
+	case ColumnTypeInterval:
+		return "INTERVAL"
 	case ColumnTypeEnum:
 		return "SMALLINT"
 	case ColumnTypeEnumArray:

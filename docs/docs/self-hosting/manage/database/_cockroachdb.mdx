@@ -1,0 +1,33 @@
+## Cockroach
+
+The default database of ZITADEL is [CockroachDB](https://www.cockroachlabs.com). The SQL database provides a bunch of features like horizontal scalability, data regionality and many more.
+
+The default configuration of the database looks like this:
+
+```yaml
+Database:
+  cockroach:
+    Host: localhost
+    Port: 26257
+    Database: zitadel
+    MaxOpenConns: 20
+    MaxConnLifetime: 30m
+    MaxConnIdleTime: 30m
+    Options: ""
+    User:
+      Username: zitadel
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
+    Admin:
+      Username: root
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
+```

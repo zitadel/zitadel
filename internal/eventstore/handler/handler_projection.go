@@ -12,7 +12,11 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-const systemID = "system"
+const (
+	schedulerSucceeded = eventstore.EventType("system.projections.scheduler.succeeded")
+	aggregateType      = eventstore.AggregateType("system")
+	aggregateID        = "SYSTEM"
+)
 
 type ProjectionHandlerConfig struct {
 	HandlerConfig
@@ -188,9 +192,35 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 	}()
 	// flag if projection has been successfully executed at least once since start
 	var succeededOnce bool
+	var err error
 	// get every instance id except empty (system)
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).AddQuery().ExcludedInstanceID("")
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).AllowTimeTravel().AddQuery().ExcludedInstanceID("")
 	for range h.triggerProjection.C {
+		if !succeededOnce {
+			// (re)check if it has succeeded in the meantime
+			succeededOnce, err = h.hasSucceededOnce(ctx)
+			if err != nil {
+				logging.WithFields("projection", h.ProjectionName, "err", err).
+					Error("schedule could not check if projection has already succeeded once")
+				h.triggerProjection.Reset(h.requeueAfter)
+				continue
+			}
+		}
+		lockCtx := ctx
+		var cancelLock context.CancelFunc
+		// if it still has not succeeded, lock the projection for the system
+		// so that only a single scheduler does a first schedule (of every instance)
+		if !succeededOnce {
+			lockCtx, cancelLock = context.WithCancel(ctx)
+			errs := h.lock(lockCtx, h.requeueAfter, "system")
+			if err, ok := <-errs; err != nil || !ok {
+				cancelLock()
+				logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("initial lock failed for first schedule")
+				h.triggerProjection.Reset(h.requeueAfter)
+				continue
+			}
+			go h.cancelOnErr(lockCtx, errs, cancelLock)
+		}
 		if succeededOnce {
 			// since we have at least one successful run, we can restrict it to events not older than
 			// twice the requeue time (just to be sure not to miss an event)
@@ -209,30 +239,78 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 				max = len(ids)
 			}
 			instances := ids[i:max]
-			lockCtx, cancelLock := context.WithCancel(ctx)
-			errs := h.lock(lockCtx, h.requeueAfter, instances...)
+			lockInstanceCtx, cancelInstanceLock := context.WithCancel(lockCtx)
+			errs := h.lock(lockInstanceCtx, h.requeueAfter, instances...)
 			//wait until projection is locked
 			if err, ok := <-errs; err != nil || !ok {
-				cancelLock()
+				cancelInstanceLock()
 				logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("initial lock failed")
 				failed = true
 				continue
 			}
-			go h.cancelOnErr(lockCtx, errs, cancelLock)
-			err = h.Trigger(lockCtx, instances...)
+			go h.cancelOnErr(lockInstanceCtx, errs, cancelInstanceLock)
+			err = h.Trigger(lockInstanceCtx, instances...)
 			if err != nil {
 				logging.WithFields("projection", h.ProjectionName, "instanceIDs", instances).WithError(err).Error("trigger failed")
 				failed = true
 			}
 
-			cancelLock()
+			cancelInstanceLock()
 			unlockErr := h.unlock(instances...)
 			logging.WithFields("projection", h.ProjectionName).OnError(unlockErr).Warn("unable to unlock")
+		}
+		// if the first schedule did not fail, store that in the eventstore, so we can check on later starts
+		if !succeededOnce {
+			if !failed {
+				err = h.setSucceededOnce(ctx)
+				logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("unable to push first schedule succeeded")
+			}
+			cancelLock()
+			unlockErr := h.unlock("system")
+			logging.WithFields("projection", h.ProjectionName).OnError(unlockErr).Warn("unable to unlock first schedule")
 		}
 		// it succeeded at least once if it has succeeded before or if it has succeeded now - not failed ;-)
 		succeededOnce = succeededOnce || !failed
 		h.triggerProjection.Reset(h.requeueAfter)
 	}
+}
+
+func (h *ProjectionHandler) hasSucceededOnce(ctx context.Context) (bool, error) {
+	events, err := h.Eventstore.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(aggregateType).
+		AggregateIDs(aggregateID).
+		EventTypes(schedulerSucceeded).
+		EventData(map[string]interface{}{
+			"name": h.ProjectionName,
+		}).
+		Builder(),
+	)
+	return len(events) > 0 && err == nil, err
+}
+
+func (h *ProjectionHandler) setSucceededOnce(ctx context.Context) error {
+	_, err := h.Eventstore.Push(ctx, &ProjectionSucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(ctx,
+			eventstore.NewAggregate(ctx, aggregateID, aggregateType, "v1"),
+			schedulerSucceeded,
+		),
+		Name: h.ProjectionName,
+	})
+	return err
+}
+
+type ProjectionSucceededEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	Name                 string `json:"name"`
+}
+
+func (p *ProjectionSucceededEvent) Data() interface{} {
+	return p
+}
+
+func (p *ProjectionSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
 }
 
 func (h *ProjectionHandler) cancelOnErr(ctx context.Context, errs <-chan error, cancel func()) {
@@ -248,7 +326,6 @@ func (h *ProjectionHandler) cancelOnErr(ctx context.Context, errs <-chan error, 
 			cancel()
 			return
 		}
-
 	}
 }
 

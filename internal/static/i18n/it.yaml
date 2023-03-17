@@ -70,16 +70,23 @@ Errors:
     Profile:
       NotFound: Profilo non trovato
       NotChanged: Profilo non cambiato
-      Invalid: Dati non sono validi
+      Empty: Profilo è vuoto
+      FirstNameEmpty: Il nome nel profilo è vuoto
+      LastNameEmpty: Il cognome nel profilo è vuoto
+      IDMissing: Profilo ID mancante
     Email:
       NotFound: Email non trovata
       Invalid: L'e-mail non è valida
       AlreadyVerified: L'e-mail è già verificata
       NotChanged: Email non cambiata
+      Empty: Email è vuota
+      IDMissing: Email ID mancante
     Phone:
       NotFound: Telefono non trovato
       Invalid: Il telefono non è valido
       AlreadyVerified: Telefono già verificato
+      Empty: Il telefono è vuoto
+      NotChanged: Telefono non cambiato
     Address:
       NotFound: Indirizzo non trovato
       NotChanged: Indirizzo non cambiato
@@ -87,6 +94,10 @@ Errors:
       Key:
         NotFound: Chiave macchina non trovato
         AlreadyExisting: Chiave macchina già esistente
+      Secret:
+        NotExisting: Secret non esiste
+        Invalid: Secret non è valido
+        CouldNotGenerate: Non è stato possibile generare il Secret
     PAT:
       NotFound: Personal Access Token non trovato
     NotHuman: L'utente deve essere personale
@@ -96,6 +107,7 @@ Errors:
     Username:
       AlreadyExists: Nome utente già preso
       Reserved: Il nome utente è già preso
+      Empty: Il nome utente è vuoto
     Code:
       Empty: Il codice è vuoto
       NotFound: Codice non trovato
@@ -155,6 +167,8 @@ Errors:
     Empty: L'organizzazione è vuota
     NotFound: Organizzazione non trovata
     NotChanged: Organizzazione non cambiata
+    DefaultOrgNotDeletable: L'organizzazione predefinita non deve essere cancellata
+    ZitadelOrgNotDeletable: L'organizzazione con il progetto ZITADEL non deve essere cancellata
     InvalidDomain: Dominio non valido
     DomainMissing: Dominio mancante
     DomainNotOnOrg: Il dominio non esistente nell'organizzazione
@@ -223,6 +237,10 @@ Errors:
       Empty: Mancano le impostazioni Org IAM
       NotExisting: Impostazioni Org IAM non esistenti
       AlreadyExists: Impostazioni Org IAM già esistenti
+    NotificationPolicy:
+      NotFound: Impostazioni di notifica non trovate
+      NotChanged: Impostazioni di notifica non è stato cambiato
+      AlreadyExists: Impostazioni di notifica già esistente
   Project:
     ProjectIDMissing: ID del progetto mancante
     AlreadyExists: Il progetto è già stato creato nell'organizzazione
@@ -349,6 +367,10 @@ Errors:
       NotExisting: Impostazioni Org IAM non esistenti
       AlreadyExists: Impostazioni Org IAM già esistenti
       NotChanged: Impostazioni Org IAM non sono state cambiate
+    NotificationPolicy:
+      NotFound: Impostazioni di notifica predefinite non trovate
+      NotChanged: Impostazioni di notifica predefinite non è stato cambiato
+      AlreadyExists: Impostazioni di notifica predefinite già esistente
   Policy:
     AlreadyExists: Impostazioni già esistenti
     Label:
@@ -423,6 +445,38 @@ Errors:
     CloseRows: Lo statement SQL non può essere terminato
     SQLStatement: Lo statement SQL non può essere creato
     InvalidRequest: La richiesta non è valida
+  Quota:
+    AlreadyExists: La quota esiste già per questa unità
+    NotFound: Quota non trovata per questa unità
+    Invalid:
+      CallURL: L'URL di chiamata per la quota non è valido
+      Percent: La percentuale contingente è inferiore all'1
+      Unimplemented: La quota non è implementata per questa unità
+      Amount: L'importo contingente è inferiore all'1
+      ResetInterval: L'intervallo di reset contingente è inferiore a un minuto
+      Noop: Una quota illimitata senza notifiche non ha alcun effetto
+    Access:
+      Exhausted: La quota per le richieste autenticate è esaurita
+    Execution:
+      Exhausted: La quota per i secondi di azione è esaurita
+  LogStore:
+    Access:
+      StorageFailed: Il salvataggio del registro degli accessi nel database non è riuscito
+      ScanFailed: La query delle richieste autenticate utilizzate non è riuscita
+    Execution:
+      StorageFailed: Il salvataggio del registro delle azioni nel database non è riuscito
+      ScanFailed: La query dei secondi delle azioni utilizzate non è riuscita
+
+AggregateTypes:
+  action: Azione
+  instance: Istanza
+  key_pair: Coppia di chiavi
+  org: Organizzazione
+  project: Progetto
+  user: Utente
+  usergrant: Sovvenzione utente
+  quota: Quota
+
 EventTypes:
   user:
     added: Utente aggiunto
@@ -455,6 +509,12 @@ EventTypes:
       key:
         added: Chiave aggiunta
         removed: Chiave rimossa
+      secret:
+        set: Secret set
+        removed: Secret rimosso
+        check:
+          succeeded: Controllo della Secret riuscito
+          failed: Controllo della Secret fallito
     human:
       added: Persona aggiunta
       selfregistered: Persona registrata
@@ -634,7 +694,7 @@ EventTypes:
       changed: Membro dell'organizzazione cambiato
       removed: Membro dell'organizzazione rimosso
       cascade:
-        removeD: Cascata di membri dell'organizzazione rimossa
+        removed: Cascata di membri dell'organizzazione rimossa
     iam:
       policy:
         added: Impostazioni IAM aggiunti
@@ -713,6 +773,10 @@ EventTypes:
         added: Informativa sulla privacy e termini e condizioni aggiunti
         changed: Informativa sulla privacy e termini e condizioni cambiati
         removed: Informativa sulla privacy e termini e condizioni rimossi
+      notification:
+        added: Impostazione di notifica creata
+        changed: Impostazione di notifica cambiata
+        removed: Impostazione di notifica rimossa
     flow:
       trigger_actions:
         set: azioni salvate
@@ -730,7 +794,7 @@ EventTypes:
       changed: Membro del progetto cambiato
       removed: Membro del progetto rimosso
       cascade:
-        removeD: Cascata di membri del progetto rimossa
+        removed: Cascata di membri del progetto rimossa
     role:
       added: Ruolo del progetto aggiunto
       changed: Il ruolo del progetto è cambiato
@@ -922,6 +986,7 @@ Action:
       Unspecified: Non specificato
       ExternalAuthentication: Autenticazione esterna
       CustomiseToken: Completare Token
+      InternalAuthentication: Autenticazione interna
   TriggerType:
     Unspecified: Non specificato
     PostAuthentication: Post-autenticazione

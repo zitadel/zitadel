@@ -24,7 +24,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "instance.reduceIDPAdded",
+			name: "instance reduceIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigAddedEventType),
@@ -46,7 +46,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idps2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO projections.idps3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
@@ -66,7 +66,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceIDPChanged",
+			name: "instance reduceIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigChangedEventType),
@@ -87,7 +87,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
+							expectedStmt: "UPDATE projections.idps3 SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeGoogle,
@@ -103,7 +103,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceIDPDeactivated",
+			name: "instance reduceIDPDeactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigDeactivatedEventType),
@@ -121,7 +121,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.IDPConfigStateInactive,
 								anyArg{},
@@ -135,7 +135,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceIDPReactivated",
+			name: "instance reduceIDPReactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigReactivatedEventType),
@@ -153,7 +153,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.IDPConfigStateActive,
 								anyArg{},
@@ -167,7 +167,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceIDPRemoved",
+			name: "instance reduceIDPRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigRemovedEventType),
@@ -185,7 +185,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idps2 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.idps3 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -196,7 +196,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -212,7 +212,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idps2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.idps3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -222,7 +222,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceOIDCConfigAdded",
+			name: "instance reduceOIDCConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPOIDCConfigAddedEventType),
@@ -252,7 +252,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -262,7 +262,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idps2_oidc_config (idp_id, instance_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idps3_oidc_config (idp_id, instance_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -281,7 +281,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceOIDCConfigChanged",
+			name: "instance reduceOIDCConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPOIDCConfigChangedEventType),
@@ -311,7 +311,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -320,7 +320,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idps2_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9) AND (instance_id = $10)",
+							expectedStmt: "UPDATE projections.idps3_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9) AND (instance_id = $10)",
 							expectedArgs: []interface{}{
 								"client-id",
 								anyArg{},
@@ -339,7 +339,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceOIDCConfigChanged: no op",
+			name: "instance reduceOIDCConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPOIDCConfigChangedEventType),
@@ -358,7 +358,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceJWTConfigAdded",
+			name: "instance reduceJWTConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPJWTConfigAddedEventType),
@@ -380,7 +380,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -390,7 +390,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idps2_jwt_config (idp_id, instance_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idps3_jwt_config (idp_id, instance_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -405,7 +405,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceJWTConfigChanged",
+			name: "instance reduceJWTConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPJWTConfigChangedEventType),
@@ -427,7 +427,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -436,7 +436,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idps2_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.idps3_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								"https://api.zitadel.ch/jwt",
 								"issuer",
@@ -451,7 +451,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceJWTConfigChanged: no op",
+			name: "instance reduceJWTConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPJWTConfigChangedEventType),
@@ -470,7 +470,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceIDPAdded",
+			name: "org reduceIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPConfigAddedEventType),
@@ -492,7 +492,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idps2 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO projections.idps3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
@@ -512,7 +512,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceIDPChanged",
+			name: "org reduceIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPConfigChangedEventType),
@@ -533,7 +533,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
+							expectedStmt: "UPDATE projections.idps3 SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeGoogle,
@@ -549,7 +549,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceIDPDeactivated",
+			name: "org reduceIDPDeactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPConfigDeactivatedEventType),
@@ -567,7 +567,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.IDPConfigStateInactive,
 								anyArg{},
@@ -581,7 +581,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceIDPReactivated",
+			name: "org reduceIDPReactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPConfigReactivatedEventType),
@@ -599,7 +599,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.IDPConfigStateActive,
 								anyArg{},
@@ -613,7 +613,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceIDPRemoved",
+			name: "org reduceIDPRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPConfigRemovedEventType),
@@ -631,7 +631,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idps2 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.idps3 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -642,7 +642,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceOIDCConfigAdded",
+			name: "org reduceOIDCConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPOIDCConfigAddedEventType),
@@ -672,7 +672,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -682,7 +682,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idps2_oidc_config (idp_id, instance_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idps3_oidc_config (idp_id, instance_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -701,7 +701,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceOIDCConfigChanged",
+			name: "org reduceOIDCConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPOIDCConfigChangedEventType),
@@ -731,7 +731,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -740,7 +740,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idps2_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9) AND (instance_id = $10)",
+							expectedStmt: "UPDATE projections.idps3_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9) AND (instance_id = $10)",
 							expectedArgs: []interface{}{
 								"client-id",
 								anyArg{},
@@ -759,7 +759,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceOIDCConfigChanged: no op",
+			name: "org reduceOIDCConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPOIDCConfigChangedEventType),
@@ -778,7 +778,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceJWTConfigAdded",
+			name: "org reduceJWTConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPJWTConfigAddedEventType),
@@ -800,7 +800,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -810,7 +810,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idps2_jwt_config (idp_id, instance_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idps3_jwt_config (idp_id, instance_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -825,7 +825,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceJWTConfigChanged",
+			name: "org reduceJWTConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPJWTConfigChangedEventType),
@@ -847,7 +847,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -856,7 +856,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idps2_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.idps3_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								"https://api.zitadel.ch/jwt",
 								"issuer",
@@ -871,7 +871,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceJWTConfigChanged: no op",
+			name: "org reduceJWTConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPJWTConfigChangedEventType),
@@ -886,6 +886,36 @@ func TestIDPProjection_reduces(t *testing.T) {
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&idpProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
 				},
 			},
 		},

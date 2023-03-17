@@ -206,6 +206,7 @@ const (
 	LoginKeyRegistrationOptionDescription              = LoginKeyRegistrationOption + "Description"
 	LoginKeyRegistrationOptionUserNameButtonText       = LoginKeyRegistrationOption + "RegisterUsernamePasswordButtonText"
 	LoginKeyRegistrationOptionExternalLoginDescription = LoginKeyRegistrationOption + "ExternalLoginDescription"
+	LoginKeyRegistrationOptionLoginButtonText          = LoginKeyRegistrationOption + "LoginButtonText"
 
 	LoginKeyRegistrationUser                       = "RegistrationUser."
 	LoginKeyRegistrationUserTitle                  = LoginKeyRegistrationUser + "Title"
@@ -222,7 +223,7 @@ const (
 	LoginKeyRegistrationUserTOSAndPrivacyLabel     = LoginKeyRegistrationUser + "TosAndPrivacyLabel"
 	LoginKeyRegistrationUserTOSConfirm             = LoginKeyRegistrationUser + "TosConfirm"
 	LoginKeyRegistrationUserTOSLinkText            = LoginKeyRegistrationUser + "TosLinkText"
-	LoginKeyRegistrationUserTOSConfirmAnd          = LoginKeyRegistrationUser + "TosConfirmAnd"
+	LoginKeyRegistrationUserPrivacyConfirm         = LoginKeyRegistrationUser + "PrivacyConfirm"
 	LoginKeyRegistrationUserPrivacyLinkText        = LoginKeyRegistrationUser + "PrivacyLinkText"
 	LoginKeyRegistrationUserNextButtonText         = LoginKeyRegistrationUser + "NextButtonText"
 	LoginKeyRegistrationUserBackButtonText         = LoginKeyRegistrationUser + "BackButtonText"
@@ -240,7 +241,7 @@ const (
 	LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel = LoginKeyExternalRegistrationUserOverview + "TosAndPrivacyLabel"
 	LoginKeyExternalRegistrationUserOverviewTOSConfirm         = LoginKeyExternalRegistrationUserOverview + "TosConfirm"
 	LoginKeyExternalRegistrationUserOverviewTOSLinkText        = LoginKeyExternalRegistrationUserOverview + "TosLinkText"
-	LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd      = LoginKeyExternalRegistrationUserOverview + "TosConfirmAnd"
+	LoginKeyExternalRegistrationUserOverviewPrivacyConfirm     = LoginKeyExternalRegistrationUserOverview + "PrivacyConfirm"
 	LoginKeyExternalRegistrationUserOverviewPrivacyLinkText    = LoginKeyExternalRegistrationUserOverview + "PrivacyLinkText"
 	LoginKeyExternalRegistrationUserOverviewBackButtonText     = LoginKeyExternalRegistrationUserOverview + "BackButtonText"
 	LoginKeyExternalRegistrationUserOverviewNextButtonText     = LoginKeyExternalRegistrationUserOverview + "NextButtonText"
@@ -258,9 +259,10 @@ const (
 	LoginKeyRegisterOrgTOSAndPrivacyLabel   = LoginKeyRegistrationOrg + "TosAndPrivacyLabel"
 	LoginKeyRegisterOrgTOSConfirm           = LoginKeyRegistrationOrg + "TosConfirm"
 	LoginKeyRegisterOrgTOSLinkText          = LoginKeyRegistrationOrg + "TosLinkText"
-	LoginKeyRegisterOrgTosConfirmAnd        = LoginKeyRegistrationOrg + "TosConfirmAnd"
+	LoginKeyRegisterOrgPrivacyConfirm       = LoginKeyRegistrationOrg + "PrivacyConfirm"
 	LoginKeyRegisterOrgPrivacyLinkText      = LoginKeyRegistrationOrg + "PrivacyLinkText"
 	LoginKeyRegisterOrgSaveButtonText       = LoginKeyRegistrationOrg + "SaveButtonText"
+	LoginKeyRegisterOrgBackButtonText       = LoginKeyRegistrationOrg + "BackButtonText"
 
 	LoginKeyLinkingUserDone                 = "LinkingUsersDone."
 	LoginKeyLinkingUserDoneTitle            = LoginKeyLinkingUserDone + "Title"
@@ -276,7 +278,7 @@ const (
 	LoginKeyExternalNotFoundTOSAndPrivacyLabel     = LoginKeyExternalNotFound + "TosAndPrivacyLabel"
 	LoginKeyExternalNotFoundTOSConfirm             = LoginKeyExternalNotFound + "TosConfirm"
 	LoginKeyExternalNotFoundTOSLinkText            = LoginKeyExternalNotFound + "TosLinkText"
-	LoginKeyExternalNotFoundTOSConfirmAnd          = LoginKeyExternalNotFound + "TosConfirmAnd"
+	LoginKeyExternalNotFoundPrivacyConfirm         = LoginKeyExternalNotFound + "PrivacyConfirm"
 	LoginKeyExternalNotFoundPrivacyLinkText        = LoginKeyExternalNotFound + "PrivacyLinkText"
 
 	LoginKeySuccessLogin                        = "LoginSuccess."
@@ -334,7 +336,7 @@ type CustomLoginText struct {
 	ExternalRegistrationUserOverview ExternalRegistrationUserOverviewScreenText
 	RegistrationOrg                  RegistrationOrgScreenText
 	LinkingUsersDone                 LinkingUserDoneScreenText
-	ExternalNotFoundOption           ExternalUserNotFoundScreenText
+	ExternalNotFound                 ExternalUserNotFoundScreenText
 	LoginSuccess                     SuccessLoginScreenText
 	LogoutDone                       LogoutDoneScreenText
 	Footer                           FooterText
@@ -540,6 +542,7 @@ type RegistrationOptionScreenText struct {
 	Description                        string
 	RegisterUsernamePasswordButtonText string
 	ExternalLoginDescription           string
+	LoginButtonText                    string
 }
 
 type RegistrationUserScreenText struct {
@@ -557,7 +560,7 @@ type RegistrationUserScreenText struct {
 	TOSAndPrivacyLabel     string
 	TOSConfirm             string
 	TOSLinkText            string
-	TOSConfirmAnd          string
+	PrivacyConfirm         string
 	PrivacyLinkText        string
 	NextButtonText         string
 	BackButtonText         string
@@ -576,7 +579,7 @@ type ExternalRegistrationUserOverviewScreenText struct {
 	TOSAndPrivacyLabel string
 	TOSConfirm         string
 	TOSLinkText        string
-	TOSConfirmAnd      string
+	PrivacyConfirm     string
 	PrivacyLinkText    string
 	BackButtonText     string
 	NextButtonText     string
@@ -595,7 +598,7 @@ type RegistrationOrgScreenText struct {
 	TOSAndPrivacyLabel   string
 	TOSConfirm           string
 	TOSLinkText          string
-	TOSConfirmAnd        string
+	PrivacyConfirm       string
 	PrivacyLinkText      string
 	SaveButtonText       string
 }
@@ -615,7 +618,7 @@ type ExternalUserNotFoundScreenText struct {
 	TOSAndPrivacyLabel     string
 	TOSConfirm             string
 	TOSLinkText            string
-	TOSConfirmAnd          string
+	PrivacyConfirm         string
 	PrivacyLinkText        string
 }
 

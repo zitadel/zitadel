@@ -1,6 +1,11 @@
 import { Component, Inject } from '@angular/core';
-import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import {
+  MatLegacyDialog as MatDialog,
+  MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+} from '@angular/material/legacy-dialog';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import {
   AddSMSProviderTwilioRequest,
   UpdateSMSProviderTwilioRequest,
@@ -40,15 +45,15 @@ export class DialogAddSMSProviderComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
     this.twilioForm = this.fb.group({
-      sid: ['', [Validators.required]],
-      senderNumber: ['', [Validators.required]],
+      sid: ['', [requiredValidator]],
+      senderNumber: ['', [requiredValidator]],
     });
 
     this.smsProviders = data.smsProviders;
     if (!!this.twilio) {
       this.twilioForm.patchValue(this.twilio);
     } else {
-      this.twilioForm.addControl('token', new FormControl('', Validators.required));
+      this.twilioForm.addControl('token', new FormControl('', requiredValidator));
     }
   }
 

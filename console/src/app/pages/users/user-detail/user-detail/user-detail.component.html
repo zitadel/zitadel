@@ -1,7 +1,7 @@
 <cnsl-top-view
   *ngIf="user"
   title="{{ user.human ? user.human.profile?.displayName : user.machine?.name }}"
-  docLink="https://docs.zitadel.com/docs/guides/manage/console/projects"
+  docLink="https://zitadel.com/docs/guides/manage/console/users"
   sub="{{ user.preferredLoginName }}"
   [isActive]="user.state === UserState.USER_STATE_ACTIVE"
   [isInactive]="user.state === UserState.USER_STATE_INACTIVE"
@@ -10,6 +10,12 @@
   [hasActions]="['user.write$', 'user.write:' + user.id] | hasRole | async"
 >
   <ng-template topActions cnslHasRole [hasRole]="['user.write$', 'user.write:' + user.id]">
+    <button mat-menu-item color="warn" *ngIf="user?.machine" (click)="generateMachineSecret()">
+      {{ 'USER.PAGES.GENERATESECRET' | translate }}
+    </button>
+    <button mat-menu-item color="warn" *ngIf="user?.machine?.hasSecret" (click)="removeMachineSecret()">
+      {{ 'USER.PAGES.REMOVESECRET' | translate }}
+    </button>
     <button mat-menu-item color="warn" *ngIf="user?.state === UserState.USER_STATE_LOCKED" (click)="unlockUser()">
       {{ 'USER.PAGES.UNLOCK' | translate }}
     </button>
@@ -33,7 +39,7 @@
       </button>
     </ng-template>
   </ng-template>
-  <cnsl-info-row topContent *ngIf="user" [user]="user"></cnsl-info-row>
+  <cnsl-info-row topContent *ngIf="user" [user]="user" [loginPolicy]="loginPolicy"></cnsl-info-row>
 </cnsl-top-view>
 
 <div *ngIf="loading" class="max-width-container">
@@ -107,7 +113,11 @@
                 [canWrite]="['user.write:' + user.id, 'user.write$'] | hasRole | async"
                 *ngIf="user?.human"
                 [human]="user.human"
-                (editType)="openEditDialog($event)"
+                (editType)="
+                  user.state === UserState.USER_STATE_INITIAL && $event === EditDialogType.EMAIL
+                    ? resendInitEmail()
+                    : openEditDialog($event)
+                "
                 (deletedPhone)="deletePhone()"
                 (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()"

@@ -18,6 +18,7 @@ type HumanRefreshTokenWriteModel struct {
 	UserState      domain.UserState
 	IdleExpiration time.Time
 	Expiration     time.Time
+	UserAgentID    string
 }
 
 func NewHumanRefreshTokenWriteModel(userID, resourceOwner, tokenID string) *HumanRefreshTokenWriteModel {
@@ -48,6 +49,8 @@ func (wm *HumanRefreshTokenWriteModel) AppendEvents(events ...eventstore.Event) 
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		default:
+			wm.WriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -61,14 +64,18 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 			wm.IdleExpiration = e.CreationDate().Add(e.IdleExpiration)
 			wm.Expiration = e.CreationDate().Add(e.Expiration)
 			wm.UserState = domain.UserStateActive
+			wm.UserAgentID = e.UserAgentID
 		case *user.HumanRefreshTokenRenewedEvent:
 			if wm.UserState == domain.UserStateActive {
 				wm.RefreshToken = e.RefreshToken
 			}
 			wm.RefreshToken = e.RefreshToken
 			wm.IdleExpiration = e.CreationDate().Add(e.IdleExpiration)
+		case *user.HumanSignedOutEvent:
+			if wm.UserAgentID == e.UserAgentID {
+				wm.UserState = domain.UserStateDeleted
+			}
 		case *user.HumanRefreshTokenRemovedEvent,
-			*user.HumanSignedOutEvent,
 			*user.UserLockedEvent,
 			*user.UserDeactivatedEvent,
 			*user.UserRemovedEvent:

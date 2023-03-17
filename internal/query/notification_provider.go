@@ -9,10 +9,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type DebugNotificationProvider struct {
@@ -69,13 +70,14 @@ var (
 	}
 )
 
-func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*DebugNotificationProvider, error) {
-	query, scan := prepareDebugNotificationProviderQuery()
+func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (_ *DebugNotificationProvider, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareDebugNotificationProviderQuery(ctx, q.client)
 	stmt, args, err := query.Where(
 		sq.And{
-			sq.Eq{
-				NotificationProviderColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			sq.Eq{NotificationProviderColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			sq.Or{
 				sq.Eq{
 					NotificationProviderColumnAggID.identifier(): aggID,
@@ -92,7 +94,7 @@ func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID str
 	return scan(row)
 }
 
-func prepareDebugNotificationProviderQuery() (sq.SelectBuilder, func(*sql.Row) (*DebugNotificationProvider, error)) {
+func prepareDebugNotificationProviderQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*DebugNotificationProvider, error)) {
 	return sq.Select(
 			NotificationProviderColumnAggID.identifier(),
 			NotificationProviderColumnCreationDate.identifier(),
@@ -102,7 +104,8 @@ func prepareDebugNotificationProviderQuery() (sq.SelectBuilder, func(*sql.Row) (
 			NotificationProviderColumnState.identifier(),
 			NotificationProviderColumnType.identifier(),
 			NotificationProviderColumnCompact.identifier(),
-		).From(notificationProviderTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(notificationProviderTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*DebugNotificationProvider, error) {
 			p := new(DebugNotificationProvider)
 			err := row.Scan(

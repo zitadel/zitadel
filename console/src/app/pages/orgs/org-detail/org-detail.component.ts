@@ -1,12 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Router } from '@angular/router';
+import { Buffer } from 'buffer';
 import { BehaviorSubject, from, Observable, of, Subject, takeUntil } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
+import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
@@ -17,8 +19,6 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { Buffer } from 'buffer';
-import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 
 @Component({
   selector: 'cnsl-org-detail',
@@ -117,6 +117,44 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             .then(() => {
               this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
               this.org!.state = OrgState.ORG_STATE_INACTIVE;
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
+    }
+  }
+
+  public deleteOrg(): void {
+    const mgmtUserData = {
+      confirmKey: 'ACTIONS.DELETE',
+      cancelKey: 'ACTIONS.CANCEL',
+      titleKey: 'ORG.DIALOG.DELETE.TITLE',
+      warnSectionKey: 'ORG.DIALOG.DELETE.DESCRIPTION',
+      hintKey: 'ORG.DIALOG.DELETE.TYPENAME',
+      hintParam: 'ORG.DIALOG.DELETE.DESCRIPTION',
+      confirmationKey: 'ORG.DIALOG.DELETE.ORGNAME',
+      confirmation: this.org?.name,
+    };
+
+    if (this.org) {
+      let dialogRef;
+
+      dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: mgmtUserData,
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          this.mgmtService
+            .removeOrg()
+            .then(() => {
+              setTimeout(() => {
+                this.router.navigate(['/orgs']);
+              }, 1000);
+              this.toast.showInfo('ORG.TOAST.DELETED', true);
             })
             .catch((error) => {
               this.toast.showError(error);

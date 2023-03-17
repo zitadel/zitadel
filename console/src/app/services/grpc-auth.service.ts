@@ -9,10 +9,8 @@ import {
   finalize,
   map,
   mergeMap,
-  pairwise,
   switchMap,
   take,
-  tap,
   timeout,
   withLatestFrom,
 } from 'rxjs/operators';
@@ -29,7 +27,8 @@ import {
   GetMyEmailRequest,
   GetMyEmailResponse,
   GetMyLabelPolicyRequest,
-  GetMyLabelPolicyResponse,
+  GetMyLoginPolicyRequest,
+  GetMyLoginPolicyResponse,
   GetMyPasswordComplexityPolicyRequest,
   GetMyPasswordComplexityPolicyResponse,
   GetMyPhoneRequest,
@@ -424,11 +423,7 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyUserSessions(req, null).then((resp) => resp.toObject());
   }
 
-  public listMyUserGrants(
-    limit?: number,
-    offset?: number,
-    queryList?: ListQuery[],
-  ): Promise<ListMyUserGrantsResponse.AsObject> {
+  public listMyUserGrants(limit?: number, offset?: number, asc?: boolean): Promise<ListMyUserGrantsResponse.AsObject> {
     const req = new ListMyUserGrantsRequest();
     const query = new ListQuery();
     if (limit) {
@@ -436,6 +431,9 @@ export class GrpcAuthService {
     }
     if (offset) {
       query.setOffset(offset);
+    }
+    if (asc !== undefined) {
+      query.setAsc(asc);
     }
     req.setQuery(query);
     return this.grpcService.auth.listMyUserGrants(req, null).then((resp) => resp.toObject());
@@ -485,6 +483,11 @@ export class GrpcAuthService {
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
     return this.grpcService.auth.getSupportedLanguages(req, null).then((resp) => resp.toObject());
+  }
+
+  public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse.AsObject> {
+    const req = new GetMyLoginPolicyRequest();
+    return this.grpcService.auth.getMyLoginPolicy(req, null).then((resp) => resp.toObject());
   }
 
   public removeMyPhone(): Promise<RemoveMyPhoneResponse.AsObject> {

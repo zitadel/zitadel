@@ -64,10 +64,16 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 			},
 		},
 		{
-			name: "add refresh token, user inactive, error",
+			name: "add refresh token, user deactivated, error",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserDeactivatedEvent(context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+							),
+						),
+					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "refreshTokenID1"),
 			},
@@ -907,6 +913,87 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				userID:       "userID",
 				orgID:        "orgID",
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:tokenID")),
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user deactivated, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusherWithCreationDateNow(user.NewHumanRefreshTokenAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+							"applicationID",
+							"userAgentID",
+							"de",
+							[]string{"clientID1"},
+							[]string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess},
+							[]string{"password"},
+							time.Now(),
+							1*time.Hour,
+							24*time.Hour,
+						)),
+						eventFromEventPusher(
+							user.NewUserDeactivatedEvent(
+								context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+							),
+						),
+					),
+				),
+				keyAlgorithm: refreshTokenEncryptionAlgorithm(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:            context.Background(),
+				userID:         "userID",
+				orgID:          "orgID",
+				refreshToken:   base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:tokenID")),
+				idleExpiration: 1 * time.Hour,
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user signedout, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusherWithCreationDateNow(user.NewHumanRefreshTokenAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+							"applicationID",
+							"userAgentID",
+							"de",
+							[]string{"clientID1"},
+							[]string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess},
+							[]string{"password"},
+							time.Now(),
+							1*time.Hour,
+							24*time.Hour,
+						)),
+						eventFromEventPusher(
+							user.NewHumanSignedOutEvent(
+								context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+								"userAgentID",
+							),
+						),
+					),
+				),
+				keyAlgorithm: refreshTokenEncryptionAlgorithm(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:            context.Background(),
+				userID:         "userID",
+				orgID:          "orgID",
+				refreshToken:   base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:tokenID")),
+				idleExpiration: 1 * time.Hour,
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,

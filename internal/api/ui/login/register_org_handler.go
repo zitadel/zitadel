@@ -14,14 +14,14 @@ const (
 )
 
 type registerOrgFormData struct {
-	RegisterOrgName string `schema:"orgname"`
-	Email           string `schema:"email"`
-	Username        string `schema:"username"`
-	Firstname       string `schema:"firstname"`
-	Lastname        string `schema:"lastname"`
-	Password        string `schema:"register-password"`
-	Password2       string `schema:"register-password-confirmation"`
-	TermsConfirm    bool   `schema:"terms-confirm"`
+	RegisterOrgName string              `schema:"orgname"`
+	Email           domain.EmailAddress `schema:"email"`
+	Username        string              `schema:"username"`
+	Firstname       string              `schema:"firstname"`
+	Lastname        string              `schema:"lastname"`
+	Password        string              `schema:"register-password"`
+	Password2       string              `schema:"register-password-confirmation"`
+	TermsConfirm    bool                `schema:"terms-confirm"`
 }
 
 type registerOrgData struct {
@@ -86,8 +86,9 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	if formData == nil {
 		formData = new(registerOrgFormData)
 	}
+	translator := l.getTranslator(r.Context(), authRequest)
 	data := registerOrgData{
-		baseData:            l.getBaseData(r, authRequest, "Register", errID, errMessage),
+		baseData:            l.getBaseData(r, authRequest, "RegistrationOrg.Title", "RegistrationOrg.Description", errID, errMessage),
 		registerOrgFormData: *formData,
 	}
 	pwPolicy := l.getPasswordComplexityPolicy(r, "0")
@@ -112,7 +113,6 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		data.IamDomain = authz.GetInstance(r.Context()).RequestedDomain()
 	}
 
-	translator := l.getTranslator(r.Context(), authRequest)
 	if authRequest == nil {
 		l.customTexts(r.Context(), translator, "")
 	}
@@ -121,7 +121,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {
 	if d.Username == "" {
-		d.Username = d.Email
+		d.Username = string(d.Email)
 	}
 	return &domain.Human{
 		Username: d.Username,
@@ -140,11 +140,11 @@ func (d registerOrgFormData) toUserDomain() *domain.Human {
 
 func (d registerOrgFormData) toCommandOrg() *command.OrgSetup {
 	if d.Username == "" {
-		d.Username = d.Email
+		d.Username = string(d.Email)
 	}
 	return &command.OrgSetup{
 		Name: d.RegisterOrgName,
-		Human: command.AddHuman{
+		Human: &command.AddHuman{
 			Username:  d.Username,
 			FirstName: d.Firstname,
 			LastName:  d.Lastname,

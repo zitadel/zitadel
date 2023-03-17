@@ -8,8 +8,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type InstanceDomain struct {
@@ -57,7 +59,10 @@ func NewInstanceDomainPrimarySearchQuery(primary bool) (SearchQuery, error) {
 }
 
 func (q *Queries) SearchInstanceDomains(ctx context.Context, queries *InstanceDomainSearchQueries) (domains *InstanceDomains, err error) {
-	query, scan := prepareInstanceDomainsQuery()
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareInstanceDomainsQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			InstanceDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -70,7 +75,10 @@ func (q *Queries) SearchInstanceDomains(ctx context.Context, queries *InstanceDo
 }
 
 func (q *Queries) SearchInstanceDomainsGlobal(ctx context.Context, queries *InstanceDomainSearchQueries) (domains *InstanceDomains, err error) {
-	query, scan := prepareInstanceDomainsQuery()
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareInstanceDomainsQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-IHhLR", "Errors.Query.SQLStatement")
@@ -92,7 +100,7 @@ func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan fu
 	return domains, err
 }
 
-func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*InstanceDomains, error)) {
+func prepareInstanceDomainsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*InstanceDomains, error)) {
 	return sq.Select(
 			InstanceDomainCreationDateCol.identifier(),
 			InstanceDomainChangeDateCol.identifier(),
@@ -102,7 +110,8 @@ func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance
 			InstanceDomainIsGeneratedCol.identifier(),
 			InstanceDomainIsPrimaryCol.identifier(),
 			countColumn.identifier(),
-		).From(instanceDomainsTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(instanceDomainsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*InstanceDomains, error) {
 			domains := make([]*InstanceDomain, 0)
 			var count uint64

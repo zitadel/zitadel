@@ -9,9 +9,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/api/call"
+	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -67,7 +69,7 @@ type Org struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	State         domain.OrgState
+	State         domain_pkg.OrgState
 	Sequence      uint64
 
 	Name   string
@@ -87,12 +89,15 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (*Org, error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.OrgProjection.Trigger(ctx)
 	}
 
-	stmt, scan := prepareOrgQuery()
+	stmt, scan := prepareOrgQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnID.identifier():         id,
 		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -105,8 +110,11 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	return scan(row)
 }
 
-func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (*Org, error) {
-	stmt, scan := prepareOrgQuery()
+func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareOrgQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnDomain.identifier():     domain,
 		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -119,8 +127,11 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (*Org, 
 	return scan(row)
 }
 
-func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (*Org, error) {
-	stmt, scan := prepareOrgWithDomainsQuery()
+func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareOrgWithDomainsQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		OrgDomainDomainCol.identifier():     domain,
 		OrgDomainIsVerifiedCol.identifier(): true,
@@ -135,22 +146,29 @@ func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (*Org,
 }
 
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if name == "" && domain == "" {
 		return false, errors.ThrowInvalidArgument(nil, "QUERY-DGqfd", "Errors.Query.InvalidRequest")
 	}
-	query, scan := prepareOrgUniqueQuery()
+	query, scan := prepareOrgUniqueQuery(ctx, q.client)
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
-				OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+				OrgColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
+				OrgDomainIsVerifiedCol.identifier(): true,
 			},
 			sq.Or{
-				sq.Eq{
-					OrgColumnDomain.identifier(): domain,
+				sq.ILike{
+					OrgDomainDomainCol.identifier(): domain,
 				},
-				sq.Eq{
+				sq.ILike{
 					OrgColumnName.identifier(): name,
 				},
+			},
+			sq.NotEq{
+				OrgColumnState.identifier(): domain_pkg.OrgStateRemoved,
 			},
 		}).ToSql()
 	if err != nil {
@@ -162,11 +180,18 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 }
 
 func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	_, err = q.OrgByID(ctx, true, id)
 	return err
 }
+
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
-	query, scan := prepareOrgsQuery()
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareOrgsQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -195,6 +220,10 @@ func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 	return NewTextQuery(OrgColumnName, value, method)
 }
 
+func NewOrgStateSearchQuery(value int32) (SearchQuery, error) {
+	return NewNumberQuery(OrgColumnState, value, NumberEquals)
+}
+
 func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {
 	list := make([]interface{}, len(ids))
 	for i, value := range ids {
@@ -203,7 +232,7 @@ func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {
 	return NewListQuery(OrgColumnID, list, ListIn)
 }
 
-func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
+func prepareOrgsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 	return sq.Select(
 			OrgColumnID.identifier(),
 			OrgColumnCreationDate.identifier(),
@@ -214,7 +243,8 @@ func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 			OrgColumnName.identifier(),
 			OrgColumnDomain.identifier(),
 			countColumn.identifier()).
-			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(orgsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Orgs, error) {
 			orgs := make([]*Org, 0)
 			var count uint64
@@ -250,7 +280,7 @@ func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 		}
 }
 
-func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
+func prepareOrgQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 	return sq.Select(
 			OrgColumnID.identifier(),
 			OrgColumnCreationDate.identifier(),
@@ -261,42 +291,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 			OrgColumnName.identifier(),
 			OrgColumnDomain.identifier(),
 		).
-			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Org, error) {
-			o := new(Org)
-			err := row.Scan(
-				&o.ID,
-				&o.CreationDate,
-				&o.ChangeDate,
-				&o.ResourceOwner,
-				&o.State,
-				&o.Sequence,
-				&o.Name,
-				&o.Domain,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-iTTGJ", "Errors.Org.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-pWS5H", "Errors.Internal")
-			}
-			return o, nil
-		}
-}
-
-func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
-	return sq.Select(
-			OrgColumnID.identifier(),
-			OrgColumnCreationDate.identifier(),
-			OrgColumnChangeDate.identifier(),
-			OrgColumnResourceOwner.identifier(),
-			OrgColumnState.identifier(),
-			OrgColumnSequence.identifier(),
-			OrgColumnName.identifier(),
-			OrgColumnDomain.identifier(),
-		).
-			From(orgsTable.identifier()).
-			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID)).
+			From(orgsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Org, error) {
 			o := new(Org)
@@ -320,9 +315,47 @@ func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error
 		}
 }
 
-func prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
+func prepareOrgWithDomainsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
+	return sq.Select(
+			OrgColumnID.identifier(),
+			OrgColumnCreationDate.identifier(),
+			OrgColumnChangeDate.identifier(),
+			OrgColumnResourceOwner.identifier(),
+			OrgColumnState.identifier(),
+			OrgColumnSequence.identifier(),
+			OrgColumnName.identifier(),
+			OrgColumnDomain.identifier(),
+		).
+			From(orgsTable.identifier()).
+			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Org, error) {
+			o := new(Org)
+			err := row.Scan(
+				&o.ID,
+				&o.CreationDate,
+				&o.ChangeDate,
+				&o.ResourceOwner,
+				&o.State,
+				&o.Sequence,
+				&o.Name,
+				&o.Domain,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-iTTGJ", "Errors.Org.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-pWS5H", "Errors.Internal")
+			}
+			return o, nil
+		}
+}
+
+func prepareOrgUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select(uniqueColumn.identifier()).
-			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(orgsTable.identifier()).
+			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {

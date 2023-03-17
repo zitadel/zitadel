@@ -39,6 +39,7 @@
   --zitadel-color-background-900: rgb(142, 142, 142);
   --zitadel-color-background-contrast: rgb(0, 0, 0);
   --zitadel-color-footer-line: rgba(0, 0, 0, 0.12);
+  --zitadel-color-card-hover: #ffffff;
   --zitadel-color-input-background: #00000003;
   --zitadel-color-input-border: #1a191938;
   --zitadel-color-input-border-hover: #1a1b1b;
@@ -97,21 +98,25 @@
   --zitadel-logo-powered-by: url("../logo-dark.svg");
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
+  --zitadel-color-github-text: #8b8d8d;
+  --zitadel-color-github-background: #ffffff;
+  --zitadel-color-gitlab-text: #8b8d8d;
+  --zitadel-color-gitlab-background: #ffffff;
   --zitadel-color-qr: var(--zitadel-color-black);
   --zitadel-color-qr-background: var(--zitadel-color-white);
 }
 
 .lgn-dark-theme {
-  --zitadel-color-primary-50: #ffffff;
-  --zitadel-color-primary-100: #dde6f3;
-  --zitadel-color-primary-200: #b4c9e4;
-  --zitadel-color-primary-300: #7fa3d1;
-  --zitadel-color-primary-400: #6992c9;
-  --zitadel-color-primary-500: #5282c1;
-  --zitadel-color-primary-600: #4072b4;
-  --zitadel-color-primary-700: #38649d;
-  --zitadel-color-primary-800: #305687;
-  --zitadel-color-primary-900: #284770;
+  --zitadel-color-primary-50: #f1f7fd;
+  --zitadel-color-primary-100: #afd1f2;
+  --zitadel-color-primary-200: #7fb5ea;
+  --zitadel-color-primary-300: #4192e0;
+  --zitadel-color-primary-400: #2782dc;
+  --zitadel-color-primary-500: #2073c4;
+  --zitadel-color-primary-600: #1c64aa;
+  --zitadel-color-primary-700: #17548f;
+  --zitadel-color-primary-800: #134575;
+  --zitadel-color-primary-900: #0f355b;
   --zitadel-color-warn-50: #ffe7eb;
   --zitadel-color-warn-100: #ffc4ce;
   --zitadel-color-warn-200: #ff9dad;
@@ -135,9 +140,10 @@
   --zitadel-color-background-900: rgb(23, 23, 23);
   --zitadel-color-background-contrast: rgb(255, 255, 255);
   --zitadel-color-footer-line: rgba(255, 255, 255, 0.12);
+  --zitadel-color-card-hover: #ffffff20;
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
   --zitadel-color-input-border: #f9f7f725;
-  --zitadel-color-input-border-hover: #aeafb1;
+  --zitadel-color-input-border-hover: #ffffff;
   --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
   --zitadel-color-text-50: rgb(255, 255, 255);
@@ -182,6 +188,10 @@
   --zitadel-logo-powered-by: url("../logo-light.svg");
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
+  --zitadel-color-github-text: #8b8d8d;
+  --zitadel-color-github-background: #ffffff;
+  --zitadel-color-gitlab-text: #8b8d8d;
+  --zitadel-color-gitlab-background: #ffffff;
 }
 
 body {
@@ -208,7 +218,7 @@ body.waiting * {
 footer {
   width: 100%;
   box-sizing: border-box;
-  background: #00000020;
+  background: rgba(0, 0, 0, 0.1254901961);
   min-height: 50px;
   display: flex;
   align-items: center;
@@ -415,6 +425,7 @@ select::placeholder,
   max-width: 150px;
   overflow-x: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .lgn-label {
@@ -514,7 +525,6 @@ select::placeholder,
 
 a {
   text-decoration: none;
-  outline: none;
   cursor: pointer;
   margin: 2px 0;
 }
@@ -523,6 +533,7 @@ a.block {
 }
 a.sub-formfield-link {
   margin: 10px 0;
+  text-decoration: underline;
 }
 
 .lgn-idp {
@@ -552,6 +563,24 @@ a.sub-formfield-link {
   width: 46px;
   background-image: url("../../../images/idp/google.png");
   background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.github span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/github.png");
+  background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.gitlab span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/gitlab.png");
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
@@ -654,8 +683,14 @@ a.sub-formfield-link {
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
   margin: 0.5rem 1rem;
 }
+.content-container .lgn-login-profile .lgn-names .lgn-loginname {
+  min-width: 0;
+}
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
-  margin: 0.5rem 1rem;
+  margin: 0.5rem 0.5rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .content-container .lgn-left-action {
   position: absolute;
@@ -724,7 +759,7 @@ i {
   letter-spacing: 0.05em;
   font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 0 3px #0000001a;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1019607843);
   width: fit-content;
   line-height: 1rem;
 }
@@ -1147,36 +1182,36 @@ i {
   flex: 1;
   padding: 0 0.5rem;
 }
-.lgn-mfa-options .mfa input[type=radio] + label {
+.lgn-mfa-options .mfa label {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
-.lgn-mfa-options .mfa input[type=radio] + label span {
+.lgn-mfa-options .mfa label input[type=radio] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.lgn-mfa-options .mfa label span {
   text-align: center;
 }
-.lgn-mfa-options .mfa input[type=radio] + label .mfa-img {
-  border: 1px solid var(--zitadel-color-input-border);
+.lgn-mfa-options .mfa label .mfa-img {
+  border-width: 1px;
+  border-style: solid;
   border-radius: 0.5rem;
   padding: 1rem;
   display: flex;
   margin-bottom: 0.5rem;
   transition: all 0.2s ease;
-}
-.lgn-mfa-options .mfa input[type=radio] + label .mfa-img:hover {
-  border: 1px solid var(--zitadel-color-input-border-active);
-}
-.lgn-mfa-options .mfa input[type=radio] {
-  display: none;
-}
-.lgn-mfa-options .mfa input[type=radio]:checked + label .mfa-img {
-  border: 1px solid var(--zitadel-color-primary);
 }
 
 footer {
   width: 100%;
   box-sizing: border-box;
-  background: #00000020;
+  background: rgba(0, 0, 0, 0.1254901961);
   min-height: 50px;
   display: flex;
   align-items: center;
@@ -1383,6 +1418,7 @@ select::placeholder,
   max-width: 150px;
   overflow-x: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .lgn-label {
@@ -1482,7 +1518,6 @@ select::placeholder,
 
 a {
   text-decoration: none;
-  outline: none;
   cursor: pointer;
   margin: 2px 0;
 }
@@ -1491,6 +1526,7 @@ a.block {
 }
 a.sub-formfield-link {
   margin: 10px 0;
+  text-decoration: underline;
 }
 
 .lgn-idp {
@@ -1520,6 +1556,24 @@ a.sub-formfield-link {
   width: 46px;
   background-image: url("../../../images/idp/google.png");
   background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.github span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/github.png");
+  background-size: 25px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+.lgn-idp.gitlab span.logo {
+  height: 46px;
+  width: 46px;
+  background-image: url("../../../images/idp/gitlab.png");
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;
@@ -1622,8 +1676,14 @@ a.sub-formfield-link {
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
   margin: 0.5rem 1rem;
 }
+.content-container .lgn-login-profile .lgn-names .lgn-loginname {
+  min-width: 0;
+}
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
-  margin: 0.5rem 1rem;
+  margin: 0.5rem 0.5rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .content-container .lgn-left-action {
   position: absolute;
@@ -1692,7 +1752,7 @@ i {
   letter-spacing: 0.05em;
   font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 0 3px #0000001a;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1019607843);
   width: fit-content;
   line-height: 1rem;
 }
@@ -2115,30 +2175,30 @@ i {
   flex: 1;
   padding: 0 0.5rem;
 }
-.lgn-mfa-options .mfa input[type=radio] + label {
+.lgn-mfa-options .mfa label {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
-.lgn-mfa-options .mfa input[type=radio] + label span {
+.lgn-mfa-options .mfa label input[type=radio] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.lgn-mfa-options .mfa label span {
   text-align: center;
 }
-.lgn-mfa-options .mfa input[type=radio] + label .mfa-img {
-  border: 1px solid var(--zitadel-color-input-border);
+.lgn-mfa-options .mfa label .mfa-img {
+  border-width: 1px;
+  border-style: solid;
   border-radius: 0.5rem;
   padding: 1rem;
   display: flex;
   margin-bottom: 0.5rem;
   transition: all 0.2s ease;
-}
-.lgn-mfa-options .mfa input[type=radio] + label .mfa-img:hover {
-  border: 1px solid var(--zitadel-color-input-border-active);
-}
-.lgn-mfa-options .mfa input[type=radio] {
-  display: none;
-}
-.lgn-mfa-options .mfa input[type=radio]:checked + label .mfa-img {
-  border: 1px solid var(--zitadel-color-primary);
 }
 
 @font-face {
@@ -2480,8 +2540,14 @@ i {
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
   margin: 0.5rem 1rem;
 }
+.content-container .lgn-login-profile .lgn-names .lgn-loginname {
+  min-width: 0;
+}
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
-  margin: 0.5rem 1rem;
+  margin: 0.5rem 0.5rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .content-container .lgn-left-action {
   position: absolute;
@@ -3025,6 +3091,14 @@ ul li i.lgn-valid {
   color: var(--zitadel-color-google-text);
   background-color: var(--zitadel-color-google-background);
 }
+.lgn-idp.github {
+  color: var(--zitadel-color-github-text);
+  background-color: var(--zitadel-color-github-background);
+}
+.lgn-idp.gitlab {
+  color: var(--zitadel-color-gitlab-text);
+  background-color: var(--zitadel-color-gitlab-background);
+}
 
 .lgn-idp-providers .lgn-idp-desc {
   color: var(--zitadel-color-label);
@@ -3035,15 +3109,17 @@ ul li i.lgn-valid {
   background-color: var(--zitadel-color-success-background);
 }
 
-.lgn-mfa-options .mfa input[type=radio] + label .mfa-img {
+.lgn-mfa-options .mfa label input[type=radio]:hover + .mfa-img, .lgn-mfa-options .mfa label input[type=radio]:focus + .mfa-img {
+  background-color: var(--zitadel-color-card-hover);
+  border-color: var(--zitadel-color-input-border-hover);
+}
+.lgn-mfa-options .mfa label .mfa-img {
   border: 1px solid var(--zitadel-color-input-border);
-  background-color: var(--zitadel-color-input-background);
 }
-.lgn-mfa-options .mfa input[type=radio] + label .mfa-img:hover {
-  border: 1px solid var(--zitadel-color-input-border-hover);
-}
-.lgn-mfa-options .mfa input[type=radio]:checked + label .mfa-img {
-  border: 1px solid var(--zitadel-color-primary);
+.lgn-mfa-options .mfa label input[type=radio]:checked + .mfa-img {
+  background-color: var(--zitadel-color-card-hover);
+  border: 1px solid var(--zitadel-color-input-border-active);
+  box-shadow: 0 0 0 2px var(--zitadel-color-input-border-active);
 }
 
 /*# sourceMappingURL=zitadel.css.map */

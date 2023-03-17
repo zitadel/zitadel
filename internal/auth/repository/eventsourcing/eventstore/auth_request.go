@@ -17,8 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
-	iam_view_model "github.com/zitadel/zitadel/internal/iam/repository/view/model"
 	"github.com/zitadel/zitadel/internal/id"
 	project_view_model "github.com/zitadel/zitadel/internal/project/repository/view/model"
 	"github.com/zitadel/zitadel/internal/query"
@@ -57,11 +55,11 @@ type AuthRequestRepo struct {
 }
 
 type labelPolicyProvider interface {
-	ActiveLabelPolicyByOrg(context.Context, string) (*query.LabelPolicy, error)
+	ActiveLabelPolicyByOrg(context.Context, string, bool) (*query.LabelPolicy, error)
 }
 
 type privacyPolicyProvider interface {
-	PrivacyPolicyByOrg(context.Context, bool, string) (*query.PrivacyPolicy, error)
+	PrivacyPolicyByOrg(context.Context, bool, string, bool) (*query.PrivacyPolicy, error)
 }
 
 type userSessionViewProvider interface {
@@ -73,19 +71,19 @@ type userViewProvider interface {
 }
 
 type loginPolicyViewProvider interface {
-	LoginPolicyByID(context.Context, bool, string) (*query.LoginPolicy, error)
+	LoginPolicyByID(context.Context, bool, string, bool) (*query.LoginPolicy, error)
 }
 
 type lockoutPolicyViewProvider interface {
-	LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error)
+	LockoutPolicyByOrg(context.Context, bool, string, bool) (*query.LockoutPolicy, error)
 }
 
 type idpProviderViewProvider interface {
-	IDPProvidersByAggregateIDAndState(string, string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
+	IDPLoginPolicyLinks(context.Context, string, *query.IDPLoginPolicyLinksSearchQuery, bool) (*query.IDPLoginPolicyLinks, error)
 }
 
 type idpUserLinksProvider interface {
-	IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery) (*query.IDPUserLinks, error)
+	IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery, withOwnerRemoved bool) (*query.IDPUserLinks, error)
 }
 
 type userEventProvider interface {
@@ -102,17 +100,17 @@ type orgViewProvider interface {
 }
 
 type userGrantProvider interface {
-	ProjectByClientID(context.Context, string) (*query.Project, error)
+	ProjectByClientID(context.Context, string, bool) (*query.Project, error)
 	UserGrantsByProjectAndUserID(context.Context, string, string) ([]*query.UserGrant, error)
 }
 
 type projectProvider interface {
-	ProjectByClientID(context.Context, string) (*query.Project, error)
+	ProjectByClientID(context.Context, string, bool) (*query.Project, error)
 	OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*project_view_model.OrgProjectMapping, error)
 }
 
 type applicationProvider interface {
-	AppByOIDCClientID(context.Context, string) (*query.App, error)
+	AppByOIDCClientID(context.Context, string, bool) (*query.App, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -127,7 +125,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		return nil, err
 	}
 	request.ID = reqID
-	project, err := repo.ProjectProvider.ProjectByClientID(ctx, request.ApplicationID)
+	project, err := repo.ProjectProvider.ProjectByClientID(ctx, request.ApplicationID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +133,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -547,20 +545,18 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 }
 
 func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, orgID string) (*query.LoginPolicy, []*domain.IDPProvider, error) {
-	policy, err := repo.LoginPolicyViewProvider.LoginPolicyByID(ctx, false, orgID)
+	policy, err := repo.LoginPolicyViewProvider.LoginPolicyByID(ctx, false, orgID, false)
 	if err != nil {
 		return nil, nil, err
 	}
 	if !policy.AllowExternalIDPs {
 		return policy, nil, nil
 	}
-	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, authz.GetInstance(ctx).InstanceID(), orgID, policy.IsDefault)
+	idpProviders, err := getLoginPolicyIDPProviders(ctx, repo.IDPProviderViewProvider, authz.GetInstance(ctx).InstanceID(), orgID, policy.IsDefault)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	providers := iam_model.IdpProviderViewsToDomain(idpProviders)
-	return policy, providers, nil
+	return policy, idpProviders, nil
 }
 
 func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.AuthRequest) error {
@@ -668,7 +664,15 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if repo.checkDomainDiscovery(ctx, request, loginName) {
 		return nil
 	}
-	// let's just check for if unknown usernames are ignored
+	// let's once again check if the user was just inactive
+	if user != nil && user.State == int32(domain.UserStateInactive) {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
+	}
+	// or locked
+	if user != nil && user.State == int32(domain.UserStateLocked) {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
+	}
+	// let's just check if unknown usernames are ignored
 	if request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames {
 		if request.LabelPolicy != nil && request.LabelPolicy.HideLoginNameSuffix {
 			preferredLoginName = loginName
@@ -685,14 +689,6 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if !user.MachineView.IsZero() {
 		return errors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
 	}
-	// let's once again check if the user was just inactive
-	if user != nil && user.State == int32(domain.UserStateInactive) {
-		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
-	}
-	// or locked
-	if user != nil && user.State == int32(domain.UserStateLocked) {
-		return errors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
-	}
 	// everything should be handled by now
 	logging.WithFields("authRequest", request.ID, "loginName", loginName).Error("unhandled state for checkLoginName")
 	return errors.ThrowInternal(nil, "AUTH-asf3df", "Errors.Internal")
@@ -700,17 +696,17 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 
 func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) bool {
 	// check if there's a suffix in the loginname
-	split := strings.Split(loginName, "@")
-	if len(split) < 2 {
+	index := strings.LastIndex(loginName, "@")
+	if index < 0 {
 		return false
 	}
 	// check if the suffix matches a verified domain
-	org, err := repo.Query.OrgByVerifiedDomain(ctx, split[len(split)-1])
+	org, err := repo.Query.OrgByVerifiedDomain(ctx, loginName[index+1:])
 	if err != nil {
 		return false
 	}
 	// and if the login policy allows domain discovery
-	policy, err := repo.Query.LoginPolicyByID(ctx, true, org.ID)
+	policy, err := repo.Query.LoginPolicyByID(ctx, true, org.ID, false)
 	if err != nil || !policy.AllowDomainDiscovery {
 		return false
 	}
@@ -850,16 +846,32 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 }
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
-	var externalIDP *user_view_model.ExternalIDPView
-	if request.RequestedOrgID != "" {
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID, request.InstanceID)
-	} else {
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID, request.InstanceID)
-	}
+	idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpConfigID)
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID, false)
+	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUserID)
+	if err != nil {
+		return err
+	}
+	queries := []query.SearchQuery{
+		idQuery, externalIDQuery,
+	}
+	if request.RequestedOrgID != "" {
+		orgIDQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(request.RequestedOrgID)
+		if err != nil {
+			return err
+		}
+		queries = append(queries, orgIDQuery)
+	}
+	links, err := repo.Query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	if err != nil {
+		return err
+	}
+	if len(links.Links) != 1 {
+		return errors.ThrowNotFound(nil, "AUTH-Sf8sd", "Errors.ExternalIDP.NotFound")
+	}
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, links.Links[0].UserID, false)
 	if err != nil {
 		return err
 	}
@@ -997,7 +1009,7 @@ func checkExternalIDPsOfUser(ctx context.Context, idpUserLinksProvider idpUserLi
 	if err != nil {
 		return nil, err
 	}
-	return idpUserLinksProvider.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery}})
+	return idpUserLinksProvider.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery}}, false)
 }
 
 func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) ([]domain.UserSelection, error) {
@@ -1113,7 +1125,7 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, reques
 }
 
 func (repo *AuthRequestRepo) GetPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
-	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, false, orgID)
+	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, false, orgID, false)
 	if errors.IsNotFound(err) {
 		return new(domain.PrivacyPolicy), nil
 	}
@@ -1141,7 +1153,7 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 }
 
 func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*query.LockoutPolicy, error) {
-	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID)
+	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -1149,7 +1161,7 @@ func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string)
 }
 
 func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
-	policy, err := repo.LabelPolicyProvider.ActiveLabelPolicyByOrg(ctx, orgID)
+	policy, err := repo.LabelPolicyProvider.ActiveLabelPolicyByOrg(ctx, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -1187,7 +1199,7 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 }
 
 func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText)
+	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText, false)
 	if err != nil {
 		return nil, err
 	}
@@ -1198,7 +1210,7 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 	if _, ok := request.Request.(*domain.AuthRequestOIDC); !ok {
 		return false, nil
 	}
-	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
+	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID, false)
 	if err != nil {
 		return false, err
 	}
@@ -1206,7 +1218,7 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 }
 
 func (repo *AuthRequestRepo) getDomainPolicy(ctx context.Context, orgID string) (*query.DomainPolicy, error) {
-	return repo.Query.DomainPolicyByOrg(ctx, false, orgID)
+	return repo.Query.DomainPolicyByOrg(ctx, false, orgID, false)
 }
 
 func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
@@ -1233,19 +1245,25 @@ func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *dom
 	return nil
 }
 
-func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*iam_model.IDPProviderView, error) {
-	if defaultPolicy {
-		idpProviders, err := provider.IDPProvidersByAggregateIDAndState(iamID, iamID, iam_model.IDPConfigStateActive)
-		if err != nil {
-			return nil, err
-		}
-		return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
+func getLoginPolicyIDPProviders(ctx context.Context, provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*domain.IDPProvider, error) {
+	resourceOwner := iamID
+	if !defaultPolicy {
+		resourceOwner = orgID
 	}
-	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iamID, iam_model.IDPConfigStateActive)
+	links, err := provider.IDPLoginPolicyLinks(ctx, resourceOwner, &query.IDPLoginPolicyLinksSearchQuery{}, false)
 	if err != nil {
 		return nil, err
 	}
-	return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
+	providers := make([]*domain.IDPProvider, len(links.Links))
+	for i, link := range links.Links {
+		providers[i] = &domain.IDPProvider{
+			Type:        link.OwnerType,
+			IDPConfigID: link.IDPID,
+			Name:        link.IDPName,
+			IDPType:     link.IDPType,
+		}
+	}
+	return providers, nil
 }
 
 func checkVerificationTimeMaxAge(verificationTime time.Time, lifetime time.Duration, request *domain.AuthRequest) bool {
@@ -1420,7 +1438,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
-		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID)
+		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID, false)
 		if err != nil {
 			return false, err
 		}
@@ -1441,7 +1459,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
-		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID)
+		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID, false)
 		if err != nil {
 			return false, err
 		}
@@ -1453,10 +1471,8 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	}
 	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, project.ID, request.InstanceID)
 	if errors.IsNotFound(err) {
+		// if not found there is no error returned
 		return true, nil
 	}
-	if err != nil {
-		return false, err
-	}
-	return false, nil
+	return false, err
 }

@@ -6,15 +6,12 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/repository/user"
-
-	"github.com/zitadel/zitadel/internal/repository/project"
-
-	"github.com/zitadel/zitadel/internal/repository/org"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Changes struct {
@@ -33,7 +30,10 @@ type Change struct {
 	ModifierAvatarKey     string
 }
 
-func (q *Queries) OrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) OrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (_ *Changes, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(org.AggregateType).
 			AggregateIDs(orgID)
@@ -42,7 +42,10 @@ func (q *Queries) OrgChanges(ctx context.Context, orgID string, lastSequence uin
 
 }
 
-func (q *Queries) ProjectChanges(ctx context.Context, projectID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) ProjectChanges(ctx context.Context, projectID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (_ *Changes, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID)
@@ -50,7 +53,10 @@ func (q *Queries) ProjectChanges(ctx context.Context, projectID string, lastSequ
 	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
 }
 
-func (q *Queries) ProjectGrantChanges(ctx context.Context, projectID, grantID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) ProjectGrantChanges(ctx context.Context, projectID, grantID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (_ *Changes, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
@@ -61,7 +67,10 @@ func (q *Queries) ProjectGrantChanges(ctx context.Context, projectID, grantID st
 	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
 }
 
-func (q *Queries) ApplicationChanges(ctx context.Context, projectID, appID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) ApplicationChanges(ctx context.Context, projectID, appID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (_ *Changes, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
@@ -72,7 +81,10 @@ func (q *Queries) ApplicationChanges(ctx context.Context, projectID, appID strin
 	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
 }
 
-func (q *Queries) UserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) UserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (_ *Changes, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(user.AggregateType).
 			AggregateIDs(userID)
@@ -81,7 +93,7 @@ func (q *Queries) UserChanges(ctx context.Context, userID string, lastSequence u
 }
 
 func (q *Queries) changes(ctx context.Context, query func(query *eventstore.SearchQuery), lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
-	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(limit)
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(limit).AllowTimeTravel()
 	if !sortAscending {
 		builder.OrderDesc()
 	}
@@ -110,7 +122,7 @@ func (q *Queries) changes(ctx context.Context, query func(query *eventstore.Sear
 			ModifierName:      event.EditorUser(),
 			ModifierLoginName: event.EditorUser(),
 		}
-		editor, _ := q.GetUserByID(ctx, false, change.ModifierId)
+		editor, _ := q.GetUserByID(ctx, false, change.ModifierId, false)
 		if editor != nil {
 			change.ModifierLoginName = editor.PreferredLoginName
 			change.ModifierResourceOwner = editor.ResourceOwner

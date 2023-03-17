@@ -41,16 +41,6 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								true,
-								true,
-								true,
-							),
-						),
-					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
@@ -72,16 +62,6 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								true,
-								true,
-								true,
-							),
-						),
-					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
@@ -103,6 +83,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(),
 					expectFilter(),
 				),
@@ -127,6 +108,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -137,7 +119,6 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -147,6 +128,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 									"name",
 									"description",
 									true,
+									domain.OIDCTokenTypeBearer,
 								),
 							),
 						},
@@ -212,7 +194,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "user invalid, invalid argument error",
+			name: "user invalid, invalid argument error name",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -225,6 +207,26 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					Username: "username",
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user invalid, invalid argument error username",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name: "username",
 				},
 			},
 			res: res{
@@ -267,6 +269,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 								"name",
 								"description",
 								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),
@@ -279,6 +282,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 						ResourceOwner: "org1",
 						AggregateID:   "user1",
 					},
+					Username:    "username",
 					Name:        "name",
 					Description: "description",
 				},
@@ -300,6 +304,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 								"name",
 								"description",
 								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),

@@ -39,10 +39,11 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.secret_generators2 WHERE (aggregate_id = $1) AND (generator_type = $2)",
+							expectedStmt: "DELETE FROM projections.secret_generators2 WHERE (aggregate_id = $1) AND (generator_type = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.SecretGeneratorTypeInitCode,
+								"instance-id",
 							},
 						},
 					},
@@ -66,7 +67,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.secret_generators2 SET (change_date, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (generator_type = $10)",
+							expectedStmt: "UPDATE projections.secret_generators2 SET (change_date, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (generator_type = $10) AND (instance_id = $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -78,6 +79,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 								true,
 								"agg-id",
 								domain.SecretGeneratorTypeInitCode,
+								"instance-id",
 							},
 						},
 					},

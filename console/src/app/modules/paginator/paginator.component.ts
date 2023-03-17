@@ -20,6 +20,9 @@ export class PaginatorComponent {
   @Input() public pageIndex: number = 0;
   @Input() public pageSizeOptions: Array<number> = [10, 25, 50];
   @Input() public hidePagination: boolean = false;
+  @Input() public showMoreButton: boolean = false;
+  @Input() public disableShowMore: boolean | null = false;
+  @Output() public moreRequested: EventEmitter<void> = new EventEmitter();
   @Output() public page: EventEmitter<PageEvent> = new EventEmitter();
   constructor() {}
 

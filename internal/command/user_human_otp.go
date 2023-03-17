@@ -69,7 +69,7 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 
 	accountName := domain.GenerateLoginName(human.GetUsername(), org.PrimaryDomain, orgPolicy.UserLoginMustBeDomain)
 	if accountName == "" {
-		accountName = human.EmailAddress
+		accountName = string(human.EmailAddress)
 	}
 	key, secret, err := domain.NewOTPKey(c.multifactors.OTP.Issuer, accountName, c.multifactors.OTP.CryptoMFA)
 	if err != nil {

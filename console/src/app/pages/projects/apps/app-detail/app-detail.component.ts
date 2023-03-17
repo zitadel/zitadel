@@ -3,8 +3,8 @@ import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatCheckboxChange } from '@angular/material/checkbox';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
@@ -49,8 +49,8 @@ import {
   getAuthMethodFromPartialConfig,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
-  PK_JWT_METHOD,
   PKCE_METHOD,
+  PK_JWT_METHOD,
   POST_METHOD,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
@@ -79,6 +79,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public app?: App.AsObject;
 
   public environmentMap: { [key: string]: string } = {};
+  public wellKnownMap: { [key: string]: string } = {};
 
   public oidcResponseTypes: OIDCResponseType[] = [
     OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
@@ -176,10 +177,20 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.http.get('./assets/environment.json').subscribe((env: any) => {
       this.environmentMap = {
         issuer: env.issuer,
-        adminServiceUrl: env.api,
-        mgmtServiceUrl: env.api,
-        authServiceUrl: env.api,
+        adminServiceUrl: `${env.api}/admin/v1`,
+        mgmtServiceUrl: `${env.api}/management/v1`,
+        authServiceUrl: `${env.api}/auth/v1`,
       };
+
+      this.http.get(`${env.issuer}/.well-known/openid-configuration`).subscribe((wellKnown: any) => {
+        this.wellKnownMap = {
+          authorization_endpoint: wellKnown.authorization_endpoint,
+          end_session_endpoint: wellKnown.end_session_endpoint,
+          introspection_endpoint: wellKnown.introspection_endpoint,
+          token_endpoint: wellKnown.token_endpoint,
+          userinfo_endpoint: wellKnown.userinfo_endpoint,
+        };
+      });
     });
   }
 

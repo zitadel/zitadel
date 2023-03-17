@@ -2,17 +2,18 @@ package query
 
 import (
 	"context"
+	"time"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"time"
 )
 
-type HumanPasswordWriteModel struct {
-	eventstore.WriteModel
+type HumanPasswordReadModel struct {
+	*eventstore.ReadModel
 
 	Secret               *crypto.CryptoValue
 	SecretChangeRequired bool
@@ -26,15 +27,18 @@ type HumanPasswordWriteModel struct {
 }
 
 func (q *Queries) GetHumanPassword(ctx context.Context, orgID, userID string) (passwordHash []byte, algorithm string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if userID == "" {
-		return nil, "", caos_errs.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
+		return nil, "", errors.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
 	}
-	existingPassword, err := q.passwordWriteModel(ctx, userID, orgID)
+	existingPassword, err := q.passwordReadModel(ctx, userID, orgID)
 	if err != nil {
-		return nil, "", caos_errs.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
+		return nil, "", errors.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return nil, "", caos_errs.ThrowPreconditionFailed(nil, "QUERY-3n77z", "Errors.User.NotFound")
+		return nil, "", errors.ThrowPreconditionFailed(nil, "QUERY-3n77z", "Errors.User.NotFound")
 	}
 
 	if existingPassword.Secret != nil && existingPassword.Secret.Crypted != nil {
@@ -44,28 +48,32 @@ func (q *Queries) GetHumanPassword(ctx context.Context, orgID, userID string) (p
 	return nil, "", nil
 }
 
-func (q *Queries) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {
+func (q *Queries) passwordReadModel(ctx context.Context, userID, resourceOwner string) (readModel *HumanPasswordReadModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanPasswordWriteModel(userID, resourceOwner)
-	err = q.eventstore.FilterToQueryReducer(ctx, writeModel)
+	readModel = NewHumanPasswordReadModel(userID, resourceOwner)
+	err = q.eventstore.FilterToQueryReducer(ctx, readModel)
 	if err != nil {
 		return nil, err
 	}
-	return writeModel, nil
+	return readModel, nil
 }
 
-func NewHumanPasswordWriteModel(userID, resourceOwner string) *HumanPasswordWriteModel {
-	return &HumanPasswordWriteModel{
-		WriteModel: eventstore.WriteModel{
+func NewHumanPasswordReadModel(userID, resourceOwner string) *HumanPasswordReadModel {
+	return &HumanPasswordReadModel{
+		ReadModel: &eventstore.ReadModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
 	}
 }
 
-func (wm *HumanPasswordWriteModel) Reduce() error {
+func (rm *HumanPasswordReadModel) AppendEvents(events ...eventstore.Event) {
+	rm.ReadModel.AppendEvents(events...)
+}
+
+func (wm *HumanPasswordReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
@@ -103,11 +111,12 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 			wm.UserState = domain.UserStateDeleted
 		}
 	}
-	return wm.WriteModel.Reduce()
+	return wm.ReadModel.Reduce()
 }
 
-func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *HumanPasswordReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AllowTimeTravel().
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).

@@ -29,6 +29,7 @@
   background-position: center;
   padding: 0.5rem 0;
   pointer-events: none;
+  box-shadow: none !important;
 }
 
 .fillspace {

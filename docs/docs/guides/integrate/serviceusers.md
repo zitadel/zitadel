@@ -2,7 +2,7 @@
 title: Service Users
 ---
 
-This is a guide on how to create service users in ZITADEL. You can read more about users [here](/docs/concepts/structure/users.md).
+This is a guide on how to create service users in ZITADEL. You can read more about users [here](/concepts/structure/users.md).
 ## Create a Service User
 
 1. Navigate to Service Users
@@ -79,7 +79,7 @@ Payload
 * `iat` is a unix timestamp of the creation signing time of the JWT, e.g. now and must not be older than 1 hour ago
 * `exp` is the unix timestamp of expiry of this assertion
 
-Please refer to [JWT_with_Private_Key](../../apis/openidoauth/authn-methods#jwt-with-private-key) in the documentation for further information.
+Please refer to [JWT_with_Private_Key](/apis/openidoauth/authn-methods#jwt-with-private-key) in the documentation for further information.
 
 If you use Go, you might want to use the [provided tool](https://github.com/zitadel/zitadel-tools) to generate a JWT from the downloaded json. There are many [libraries](https://jwt.io/#libraries-io) to generate and sign JWT.
 
@@ -97,7 +97,7 @@ curl --request POST \
 ```
 
 * `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-* `scope` should contain any [Scopes](../../apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
+* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.

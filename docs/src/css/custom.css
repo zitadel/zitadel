@@ -1,9 +1,7 @@
-/* stylelint-disable docusaurus/copyright-header */
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import "../../static/icons/line-awesome/css/line-awesome.min.css";
 
 @font-face {
@@ -129,6 +127,13 @@
   --footer-border: rgba(0, 0, 0, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
   --ifm-pagination-nav-color-hover: #000000;
+  --input-border: #1a191954;
+  --input-hover-border: #000000;
+  --input-background: #00000004;
+}
+
+pre code {
+  font-size: 14px !important;
 }
 
 .get-started {
@@ -299,6 +304,9 @@ h2 {
   --footer-border: rgba(255, 255, 255, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
   --ifm-pagination-nav-color-hover: #ffffff;
+  --input-border: #f9f7f775;
+  --input-hover-border: #ffffff;
+  --input-background: #00000040;
 }
 
 .get-started:hover {
@@ -321,7 +329,7 @@ main .container img {
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
 }
 
-.rounded {
+.custom-rounded {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -332,51 +340,51 @@ main .container img {
   height: 40px;
 }
 
-.rounded svg {
+.custom-rounded svg {
   fill: white;
   height: 1.5rem;
   width: 1.5rem;
 }
 
-.rounded i {
+.custom-rounded i {
   color: white;
 }
 
-.rounded-start {
+.custom-rounded-start {
   background: linear-gradient(40deg, #059669 30%, #047857);
 }
 
-.rounded-password {
+.custom-rounded-password {
   background: linear-gradient(40deg, #f59e0b 30%, #b45309);
 }
 
-.rounded-login,
-.rounded-register {
+.custom-rounded-login,
+.custom-rounded-register {
   background: linear-gradient(40deg, #059669 30%, #047857);
 }
 
-.rounded-privatelabel,
-.rounded-phone,
-.rounded-email,
-.rounded-storage,
-.rounded-service {
+.custom-rounded-privatelabel,
+.custom-rounded-phone,
+.custom-rounded-email,
+.custom-rounded-storage,
+.custom-rounded-service {
   background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
 }
 
-.rounded-split {
+.custom-rounded-split {
   background: linear-gradient(40deg, #3b82f6, #4f46e5);
 }
 
-.rounded-texts,
-.rounded-help,
-.rounded-architecture {
+.custom-rounded-texts,
+.custom-rounded-help,
+.custom-rounded-architecture {
   background: linear-gradient(40deg, #dc2626 30%, #db2777);
 }
 
-.rounded-system,
-.rounded-apis,
-.rounded-policy,
-.rounded-instance {
+.custom-rounded-system,
+.custom-rounded-apis,
+.custom-rounded-policy,
+.custom-rounded-instance {
   background: linear-gradient(40deg, #1f2937, #111827);
 }
 
@@ -479,7 +487,7 @@ table th {
 }
 
 a {
-  transition: all 1s ease;
+  transition: all 0.2s ease;
 }
 
 .alert {
@@ -490,4 +498,67 @@ a {
 
 p strong {
   color: var(--font-color-strong);
+}
+
+/* Sidebar Method labels */
+.api-method > .menu__link {
+  align-items: center;
+  justify-content: start;
+}
+
+.api-method > .menu__link::before {
+  width: 50px;
+  height: 20px;
+  font-size: 12px;
+  line-height: 20px;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  border: 1px solid;
+  border-inline-start-width: 5px;
+  margin-right: var(--ifm-spacing-horizontal);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.get > .menu__link::before {
+  content: "get";
+  background-color: var(--ifm-color-info-contrast-background);
+  color: var(--ifm-color-info-contrast-foreground);
+  border-color: var(--ifm-color-info-dark);
+}
+
+.post > .menu__link::before {
+  content: "post";
+  background-color: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success-contrast-foreground);
+  border-color: var(--ifm-color-success-dark);
+}
+
+.delete > .menu__link::before {
+  content: "del";
+  background-color: var(--ifm-color-danger-contrast-background);
+  color: var(--ifm-color-danger-contrast-foreground);
+  border-color: var(--ifm-color-danger-dark);
+}
+
+.put > .menu__link::before {
+  content: "put";
+  background-color: var(--ifm-color-warning-contrast-background);
+  color: var(--ifm-color-warning-contrast-foreground);
+  border-color: var(--ifm-color-warning-dark);
+}
+
+.patch > .menu__link::before {
+  content: "patch";
+  background-color: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success-contrast-foreground);
+  border-color: var(--ifm-color-success-dark);
+}
+
+.head > .menu__link::before {
+  content: "head";
+  background-color: var(--ifm-color-secondary-contrast-background);
+  color: var(--ifm-color-secondary-contrast-foreground);
+  border-color: var(--ifm-color-secondary-dark);
 }

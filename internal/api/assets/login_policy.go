@@ -376,7 +376,7 @@ func getLabelPolicy(ctx context.Context, defaultPolicy, preview bool, queries *q
 	if preview {
 		return queries.PreviewLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	}
-	return queries.ActiveLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	return queries.ActiveLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID, false)
 }
 
 func getLabelPolicyResourceOwner(ctx context.Context, defaultPolicy, preview bool, queries *query.Queries) string {

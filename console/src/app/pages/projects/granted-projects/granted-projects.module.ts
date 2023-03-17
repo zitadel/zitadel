@@ -1,17 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
+import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
+import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
+import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs';
+import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { MatSortModule } from '@angular/material/sort';
-import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
@@ -24,7 +24,6 @@ import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/project-roles-table.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -64,7 +63,6 @@ import { GrantedProjectsRoutingModule } from './granted-projects-routing.module'
     HasRolePipeModule,
     TimestampToDatePipeModule,
     TopViewModule,
-    SharedModule,
     InfoRowModule,
     LocalizedDatePipeModule,
     MemberCreateDialogModule,
@@ -72,4 +70,4 @@ import { GrantedProjectsRoutingModule } from './granted-projects-routing.module'
     RefreshTableModule,
   ],
 })
-export class GrantedProjectsModule {}
+export default class GrantedProjectsModule {}

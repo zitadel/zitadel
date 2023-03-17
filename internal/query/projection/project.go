@@ -9,11 +9,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
-	ProjectProjectionTable = "projections.projects2"
+	ProjectProjectionTable = "projections.projects3"
 
 	ProjectColumnID                     = "id"
 	ProjectColumnCreationDate           = "creation_date"
@@ -27,6 +28,7 @@ const (
 	ProjectColumnProjectRoleCheck       = "project_role_check"
 	ProjectColumnHasProjectCheck        = "has_project_check"
 	ProjectColumnPrivateLabelingSetting = "private_labeling_setting"
+	ProjectColumnOwnerRemoved           = "owner_removed"
 )
 
 type projectProjection struct {
@@ -51,9 +53,11 @@ func newProjectProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(ProjectColumnProjectRoleCheck, crdb.ColumnTypeBool),
 			crdb.NewColumn(ProjectColumnHasProjectCheck, crdb.ColumnTypeBool),
 			crdb.NewColumn(ProjectColumnPrivateLabelingSetting, crdb.ColumnTypeEnum),
+			crdb.NewColumn(ProjectColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(ProjectColumnInstanceID, ProjectColumnID),
-			crdb.WithIndex(crdb.NewIndex("project_ro_idx", []string{ProjectColumnResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{ProjectColumnResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{ProjectColumnOwnerRemoved})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -84,6 +88,15 @@ func (p *projectProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.ProjectRemovedType,
 					Reduce: p.reduceProjectRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -155,6 +168,7 @@ func (p *projectProjection) reduceProjectChanged(event eventstore.Event) (*handl
 		columns,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -173,6 +187,7 @@ func (p *projectProjection) reduceProjectDeactivated(event eventstore.Event) (*h
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -191,6 +206,7 @@ func (p *projectProjection) reduceProjectReactivated(event eventstore.Event) (*h
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -204,6 +220,27 @@ func (p *projectProjection) reduceProjectRemoved(event eventstore.Event) (*handl
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *projectProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-sbgru", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
+			handler.NewCol(ProjectColumnSequence, e.Sequence()),
+			handler.NewCol(ProjectColumnOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(ProjectColumnResourceOwner, e.Aggregate().ID),
 		},
 	), nil
 }

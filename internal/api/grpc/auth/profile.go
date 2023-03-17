@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) GetMyProfile(ctx context.Context, req *auth_pb.GetMyProfileRequest) (*auth_pb.GetMyProfileResponse, error) {
-	profile, err := s.query.GetHumanProfile(ctx, authz.GetCtxData(ctx).UserID)
+	profile, err := s.query.GetHumanProfile(ctx, authz.GetCtxData(ctx).UserID, false)
 	if err != nil {
 		return nil, err
 	}

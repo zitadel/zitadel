@@ -10,8 +10,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -42,6 +44,10 @@ type CurrentSequencesSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func NewCurrentSequencesInstanceIDSearchQuery(instanceID string) (SearchQuery, error) {
+	return NewTextQuery(CurrentSequenceColInstanceID, instanceID, TextEquals)
+}
+
 func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
@@ -51,7 +57,10 @@ func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.Selec
 }
 
 func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSequencesSearchQueries) (failedEvents *CurrentSequences, err error) {
-	query, scan := prepareCurrentSequencesQuery()
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareCurrentSequencesQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
@@ -64,8 +73,11 @@ func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSe
 	return scan(rows)
 }
 
-func (q *Queries) latestSequence(ctx context.Context, projections ...table) (*LatestSequence, error) {
-	query, scan := prepareLatestSequence()
+func (q *Queries) latestSequence(ctx context.Context, projections ...table) (_ *LatestSequence, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareLatestSequence(ctx, q.client)
 	or := make(sq.Or, len(projections))
 	for i, projection := range projections {
 		or[i] = sq.Eq{CurrentSequenceColProjectionName.identifier(): projection.name}
@@ -190,11 +202,12 @@ func reset(tx *sql.Tx, tables []string, projectionName string) error {
 	return nil
 }
 
-func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence, error)) {
+func prepareLatestSequence(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LatestSequence, error)) {
 	return sq.Select(
 			CurrentSequenceColCurrentSequence.identifier(),
 			CurrentSequenceColTimestamp.identifier()).
-			From(currentSequencesTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(currentSequencesTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LatestSequence, error) {
 			seq := new(LatestSequence)
 			err := row.Scan(
@@ -208,13 +221,13 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 		}
 }
 
-func prepareCurrentSequencesQuery() (sq.SelectBuilder, func(*sql.Rows) (*CurrentSequences, error)) {
+func prepareCurrentSequencesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*CurrentSequences, error)) {
 	return sq.Select(
 			"max("+CurrentSequenceColCurrentSequence.identifier()+") as "+CurrentSequenceColCurrentSequence.name,
 			"max("+CurrentSequenceColTimestamp.identifier()+") as "+CurrentSequenceColTimestamp.name,
 			CurrentSequenceColProjectionName.identifier(),
 			countColumn.identifier()).
-			From(currentSequencesTable.identifier()).
+			From(currentSequencesTable.identifier() + db.Timetravel(call.Took(ctx))).
 			GroupBy(CurrentSequenceColProjectionName.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*CurrentSequences, error) {

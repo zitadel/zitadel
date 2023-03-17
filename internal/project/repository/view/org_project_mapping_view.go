@@ -16,7 +16,8 @@ func OrgProjectMappingByIDs(db *gorm.DB, table, orgID, projectID, instanceID str
 	projectIDQuery := model.OrgProjectMappingSearchQuery{Key: proj_model.OrgProjectMappingSearchKeyProjectID, Value: projectID, Method: domain.SearchMethodEquals}
 	orgIDQuery := model.OrgProjectMappingSearchQuery{Key: proj_model.OrgProjectMappingSearchKeyOrgID, Value: orgID, Method: domain.SearchMethodEquals}
 	instanceIDQuery := model.OrgProjectMappingSearchQuery{Key: proj_model.OrgProjectMappingSearchKeyInstanceID, Value: instanceID, Method: domain.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, projectIDQuery, orgIDQuery, instanceIDQuery)
+	ownerRemovedQuery := model.OrgProjectMappingSearchQuery{Key: proj_model.OrgProjectMappingSearchKeyOwnerRemoved, Value: false, Method: domain.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, projectIDQuery, orgIDQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, orgProjectMapping)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-fn9fs", "Errors.OrgProjectMapping.NotExisting")
@@ -40,6 +41,16 @@ func DeleteOrgProjectMapping(db *gorm.DB, table, orgID, projectID, instanceID st
 func DeleteInstanceOrgProjectMappings(db *gorm.DB, table, instanceID string) error {
 	delete := repository.PrepareDeleteByKey(table, model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyInstanceID), instanceID)
 	return delete(db)
+}
+
+func UpdateOwnerRemovedOrgProjectMappings(db *gorm.DB, table, instanceID, orgID string) error {
+	update := repository.PrepareUpdateByKeys(table,
+		model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyOwnerRemoved),
+		true,
+		repository.Key{Key: model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyOrgID), Value: orgID},
+	)
+	return update(db)
 }
 
 func DeleteOrgProjectMappingsByProjectID(db *gorm.DB, table, projectID, instanceID string) error {

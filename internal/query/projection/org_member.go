@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	OrgMemberProjectionTable = "projections.org_members2"
+	OrgMemberProjectionTable = "projections.org_members3"
 	OrgMemberOrgIDCol        = "org_id"
 )
 
@@ -29,7 +29,9 @@ func newOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 		crdb.NewTable(
 			append(memberColumns, crdb.NewColumn(OrgMemberOrgIDCol, crdb.ColumnTypeText)),
 			crdb.NewPrimaryKey(MemberInstanceID, OrgMemberOrgIDCol, MemberUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("org_memb_user_idx", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{MemberOwnerRemoved})),
+			crdb.WithIndex(crdb.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -89,7 +91,12 @@ func (p *orgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.MemberAddedEventType)
 	}
-	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(OrgMemberOrgIDCol, e.Aggregate().ID))
+	ctx := setMemberContext(e.Aggregate())
+	userOwner, err := getResourceOwnerOfUser(ctx, p.Eventstore, e.Aggregate().InstanceID, e.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return reduceMemberAdded(e.MemberAddedEvent, userOwner, withMemberCol(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
 func (p *orgMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
@@ -128,13 +135,13 @@ func (p *orgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handle
 }
 
 func (p *orgMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
-	//TODO: as soon as org deletion is implemented:
-	// Case: The user has resource owner A and an org has resource owner B
-	// if org B deleted it works
-	// if org A is deleted, the membership wouldn't be deleted
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-jnGAV", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return reduceMemberRemoved(e, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
+	return crdb.NewMultiStatement(
+		e,
+		multiReduceMemberOwnerRemoved(e),
+		multiReduceMemberUserOwnerRemoved(e),
+	), nil
 }

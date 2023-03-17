@@ -60,9 +60,13 @@ curl --request POST \
     --header 'Authorization: Bearer XXXX' \
     --header 'Content-Type: application/json' \
     --data '{
+        "timeout": "10m",
         "data_orgsv1": '$(cat export.json)'
 }'
 ```
+
+* "timeout": timeout of the call to import the data
+* "data_orgsv1": data which was exported from ZITADEL V1 
 
 ### Use a Google Cloud Storage
 

@@ -8,6 +8,12 @@ Metrics:
   # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
   Type: otel
 
+Tracing:
+  # Choose one in "otel", "google", "log" and "none"
+  Type: none
+  Fraction: 1.0
+  MetricPrefix: zitadel
+
 # Port ZITADEL will listen on
 Port: 8080
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
@@ -51,8 +57,9 @@ Database:
     Port: 26257
     Database: zitadel
     MaxOpenConns: 20
+    MaxIdleConns: 10
     MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
+    MaxConnIdleTime: 5m
     Options: ""
     User:
       Username: zitadel
@@ -77,6 +84,7 @@ Database:
     Port:
     Database:
     MaxOpenConns:
+    MaxIdleConns:
     MaxConnLifetime:
     MaxConnIdleTime:
     Options:
@@ -154,7 +162,7 @@ Auth:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
-    ConcurrentInstances: 10
+    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -162,7 +170,7 @@ Admin:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
-    ConcurrentInstances: 10
+    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -219,8 +227,6 @@ SAML:
     #  ContactType: "technical"
     #  Company: ZITADEL
     #  EmailAddress: hi@zitadel.com
-
-
 
 Login:
   LanguageCookieName: zitadel.login.lang
@@ -312,7 +318,59 @@ Actions:
     # wildcard sub domains are currently unsupported
     DenyList:
       - localhost
-      - '127.0.0.1'
+      - "127.0.0.1"
+
+LogStore:
+  Access:
+    Database:
+      # If enabled, all access logs are stored in the database table logstore.access
+      Enabled: false
+      # Logs that are older than the keep duration are cleaned up continuously
+      Keep: 2160h # 90 days
+      # CleanupInterval defines the time between cleanup iterations
+      CleanupInterval: 4h
+      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
+      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      Debounce:
+        MinFrequency: 2m
+        MaxBulkSize: 100
+    Stdout:
+      # If enabled, all access logs are printed to the binaries standard output
+      Enabled: false
+      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
+      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      Debounce:
+        MinFrequency: 0s
+        MaxBulkSize: 0
+  Execution:
+    Database:
+      # If enabled, all action execution logs are stored in the database table logstore.execution
+      Enabled: false
+      # Logs that are older than the keep duration are cleaned up continuously
+      Keep: 2160h # 90 days
+      # CleanupInterval defines the time between cleanup iterations
+      CleanupInterval: 4h
+      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
+      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      Debounce:
+        MinFrequency: 0s
+        MaxBulkSize: 0
+    Stdout:
+      # If enabled, all execution logs are printed to the binaries standard output
+      Enabled: true
+      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
+      # Log entries are held in-memory until one of the conditions MinFrequency or MaxBulkSize meets.
+      Debounce:
+        MinFrequency: 0s
+        MaxBulkSize: 0
+
+Quotas:
+  Access:
+    ExhaustedCookieKey: "zitadel.quota.exhausted"
+    ExhaustedCookieMaxAge: "300s"
+
+Eventstore:
+  PushTimeout: 15s
 
 DefaultInstance:
   InstanceName:
@@ -337,6 +395,15 @@ DefaultInstance:
         Number:
         Verified:
       Password:
+    Machine:
+      Machine:
+        Username:
+        Name:
+      MachineKey:
+        ExpirationDate:
+        Type:
+      Pat:
+        ExpirationDate:
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecret:
@@ -415,15 +482,17 @@ DefaultInstance:
     SecondFactorCheckLifetime: 18h
     MultiFactorCheckLifetime: 12h
   PrivacyPolicy:
-    TOSLink: https://docs.zitadel.com/docs/legal/terms-of-service
-    PrivacyLink: https://docs.zitadel.com/docs/legal/privacy-policy
+    TOSLink: https://zitadel.com/docs/legal/terms-of-service
+    PrivacyLink: https://zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
+  NotificationPolicy:
+    PasswordChange: true
   LabelPolicy:
     PrimaryColor: "#5469d4"
     BackgroundColor: "#fafafa"
     WarnColor: "#cd3d56"
     FontColor: "#000000"
-    PrimaryColorDark: "#bbbafa"
+    PrimaryColorDark: "#2073c4"
     BackgroundColorDark: "#111827"
     WarnColorDark: "#ff3b5b"
     FontColorDark: "#ffffff"
@@ -447,7 +516,7 @@ DefaultInstance:
   SMTPConfiguration:
     # configuration of the host
     SMTP:
-      #for example smtp.mailtrap.io:2525
+      # must include the port, like smtp.mailtrap.io:2525. IPv6 is also supported, like [2001:db8::1]:2525
       Host:
       User:
       Password:
@@ -496,6 +565,14 @@ DefaultInstance:
       Greeting: Hallo {{.FirstName}} {{.LastName}},
       Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue Email hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
       ButtonText: Login
+    - MessageTextType: PasswordChange
+      Language: de
+      Title: ZITADEL - Passwort von Benutzer wurde geändert
+      PreHeader: Passwort Änderung
+      Subject: Passwort von Benutzer wurde geändert
+      Greeting: Hallo {{.FirstName}} {{.LastName}},
+      Text: Das Password vom Benutzer wurde geändert. Wenn diese Änderung von jemand anderem gemacht wurde, empfehlen wir die sofortige Zurücksetzung ihres Passworts.
+      ButtonText: Login
     - MessageTextType: InitCode
       Language: en
       Title: Zitadel - Initialize User
@@ -536,6 +613,48 @@ DefaultInstance:
       Greeting: Hello {{.FirstName}} {{.LastName}},
       Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
       ButtonText: Login
+    - MessageTextType: PasswordChange
+      Language: en
+      Title: ZITADEL - Password of user has changed
+      PreHeader: Change password
+      Subject: Password of user has changed
+      Greeting: Hello {{.FirstName}} {{.LastName}},
+      Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
+      ButtonText: Login
+
+  Quotas:
+    # Items takes a slice of quota configurations, whereas for each unit type and instance, one or zero quotas may exist.
+    # The following unit types are supported
+
+    # "requests.all.authenticated"
+    # The sum of all requests to the ZITADEL API with an authorization header,
+    # excluding the following exceptions
+    # - Calls to the System API
+    # - Calls that cause internal server errors
+    # - Failed authorizations
+    # - Requests after the quota already exceeded
+
+    # "actions.all.runs.seconds"
+    # The sum of all actions run durations in seconds
+    Items:
+#      - Unit: "requests.all.authenticated"
+#        # From defines the starting time from which the current quota period is calculated from.
+#        # This is relevant for querying the current usage.
+#        From: "2023-01-01T00:00:00Z"
+#        # ResetInterval defines the quota periods duration
+#        ResetInterval: 720h # 30 days
+#        # Amount defines the number of units for this quota
+#        Amount: 25000
+#        # Limit defines whether ZITADEL should block further usage when the configured amount is used
+#        Limit: false
+#        # Notifications are emitted by ZITADEL when certain quota percentages are reached
+#        Notifications:
+#            # Percent defines the relative amount of used units, after which a notification should be emitted.
+#          - Percent: 100
+#            # Repeat defines, whether a notification should be emitted each time when a multitude of the configured Percent is used.
+#            Repeat: true
+#            # CallURL is called when a relative amount of the quota is used.
+#            CallURL: "https://httpbin.org/post"
 
 InternalAuthZ:
   RolePermissionMappings:
@@ -562,6 +681,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"
@@ -605,6 +725,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "events.read"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -629,12 +750,14 @@ InternalAuthZ:
         - "project.app.read"
         - "project.grant.read"
         - "project.grant.member.read"
+        - "events.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"
@@ -704,8 +827,8 @@ InternalAuthZ:
       Permissions:
         - "org.read"
         - "org.global.read"
-        - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"
@@ -750,6 +873,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
     - Role: "ORG_USER_MANAGER"
       Permissions:
+        - "org.read"
         - "user.read"
         - "user.global.read"
         - "user.write"
@@ -758,6 +882,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "policy.read"
         - "project.read"
         - "project.role.read"
     - Role: "ORG_OWNER_VIEWER"

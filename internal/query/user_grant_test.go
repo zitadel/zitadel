@@ -15,35 +15,36 @@ import (
 
 var (
 	userGrantStmt = regexp.QuoteMeta(
-		"SELECT projections.user_grants2.id" +
-			", projections.user_grants2.creation_date" +
-			", projections.user_grants2.change_date" +
-			", projections.user_grants2.sequence" +
-			", projections.user_grants2.grant_id" +
-			", projections.user_grants2.roles" +
-			", projections.user_grants2.state" +
-			", projections.user_grants2.user_id" +
-			", projections.users4.username" +
-			", projections.users4.type" +
-			", projections.users4.resource_owner" +
-			", projections.users4_humans.first_name" +
-			", projections.users4_humans.last_name" +
-			", projections.users4_humans.email" +
-			", projections.users4_humans.display_name" +
-			", projections.users4_humans.avatar_key" +
-			", projections.login_names.login_name" +
-			", projections.user_grants2.resource_owner" +
+		"SELECT projections.user_grants3.id" +
+			", projections.user_grants3.creation_date" +
+			", projections.user_grants3.change_date" +
+			", projections.user_grants3.sequence" +
+			", projections.user_grants3.grant_id" +
+			", projections.user_grants3.roles" +
+			", projections.user_grants3.state" +
+			", projections.user_grants3.user_id" +
+			", projections.users8.username" +
+			", projections.users8.type" +
+			", projections.users8.resource_owner" +
+			", projections.users8_humans.first_name" +
+			", projections.users8_humans.last_name" +
+			", projections.users8_humans.email" +
+			", projections.users8_humans.display_name" +
+			", projections.users8_humans.avatar_key" +
+			", projections.login_names2.login_name" +
+			", projections.user_grants3.resource_owner" +
 			", projections.orgs.name" +
 			", projections.orgs.primary_domain" +
-			", projections.user_grants2.project_id" +
-			", projections.projects2.name" +
-			" FROM projections.user_grants2" +
-			" LEFT JOIN projections.users4 ON projections.user_grants2.user_id = projections.users4.id AND projections.user_grants2.instance_id = projections.users4.instance_id" +
-			" LEFT JOIN projections.users4_humans ON projections.user_grants2.user_id = projections.users4_humans.user_id AND projections.user_grants2.instance_id = projections.users4_humans.instance_id" +
-			" LEFT JOIN projections.orgs ON projections.user_grants2.resource_owner = projections.orgs.id AND projections.user_grants2.instance_id = projections.orgs.instance_id" +
-			" LEFT JOIN projections.projects2 ON projections.user_grants2.project_id = projections.projects2.id AND projections.user_grants2.instance_id = projections.projects2.instance_id" +
-			" LEFT JOIN projections.login_names ON projections.user_grants2.user_id = projections.login_names.user_id AND projections.user_grants2.instance_id = projections.login_names.instance_id" +
-			" WHERE projections.login_names.is_primary = $1")
+			", projections.user_grants3.project_id" +
+			", projections.projects3.name" +
+			" FROM projections.user_grants3" +
+			" LEFT JOIN projections.users8 ON projections.user_grants3.user_id = projections.users8.id AND projections.user_grants3.instance_id = projections.users8.instance_id" +
+			" LEFT JOIN projections.users8_humans ON projections.user_grants3.user_id = projections.users8_humans.user_id AND projections.user_grants3.instance_id = projections.users8_humans.instance_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id AND projections.user_grants3.instance_id = projections.orgs.instance_id" +
+			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id AND projections.user_grants3.instance_id = projections.projects3.instance_id" +
+			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id AND projections.user_grants3.instance_id = projections.login_names2.instance_id" +
+			` AS OF SYSTEM TIME '-1 ms' ` +
+			" WHERE projections.login_names2.is_primary = $1")
 	userGrantCols = []string{
 		"id",
 		"creation_date",
@@ -69,36 +70,37 @@ var (
 		"name", //project name
 	}
 	userGrantsStmt = regexp.QuoteMeta(
-		"SELECT projections.user_grants2.id" +
-			", projections.user_grants2.creation_date" +
-			", projections.user_grants2.change_date" +
-			", projections.user_grants2.sequence" +
-			", projections.user_grants2.grant_id" +
-			", projections.user_grants2.roles" +
-			", projections.user_grants2.state" +
-			", projections.user_grants2.user_id" +
-			", projections.users4.username" +
-			", projections.users4.type" +
-			", projections.users4.resource_owner" +
-			", projections.users4_humans.first_name" +
-			", projections.users4_humans.last_name" +
-			", projections.users4_humans.email" +
-			", projections.users4_humans.display_name" +
-			", projections.users4_humans.avatar_key" +
-			", projections.login_names.login_name" +
-			", projections.user_grants2.resource_owner" +
+		"SELECT projections.user_grants3.id" +
+			", projections.user_grants3.creation_date" +
+			", projections.user_grants3.change_date" +
+			", projections.user_grants3.sequence" +
+			", projections.user_grants3.grant_id" +
+			", projections.user_grants3.roles" +
+			", projections.user_grants3.state" +
+			", projections.user_grants3.user_id" +
+			", projections.users8.username" +
+			", projections.users8.type" +
+			", projections.users8.resource_owner" +
+			", projections.users8_humans.first_name" +
+			", projections.users8_humans.last_name" +
+			", projections.users8_humans.email" +
+			", projections.users8_humans.display_name" +
+			", projections.users8_humans.avatar_key" +
+			", projections.login_names2.login_name" +
+			", projections.user_grants3.resource_owner" +
 			", projections.orgs.name" +
 			", projections.orgs.primary_domain" +
-			", projections.user_grants2.project_id" +
-			", projections.projects2.name" +
+			", projections.user_grants3.project_id" +
+			", projections.projects3.name" +
 			", COUNT(*) OVER ()" +
-			" FROM projections.user_grants2" +
-			" LEFT JOIN projections.users4 ON projections.user_grants2.user_id = projections.users4.id AND projections.user_grants2.instance_id = projections.users4.instance_id" +
-			" LEFT JOIN projections.users4_humans ON projections.user_grants2.user_id = projections.users4_humans.user_id AND projections.user_grants2.instance_id = projections.users4_humans.instance_id" +
-			" LEFT JOIN projections.orgs ON projections.user_grants2.resource_owner = projections.orgs.id AND projections.user_grants2.instance_id = projections.orgs.instance_id" +
-			" LEFT JOIN projections.projects2 ON projections.user_grants2.project_id = projections.projects2.id AND projections.user_grants2.instance_id = projections.projects2.instance_id" +
-			" LEFT JOIN projections.login_names ON projections.user_grants2.user_id = projections.login_names.user_id AND projections.user_grants2.instance_id = projections.login_names.instance_id" +
-			" WHERE projections.login_names.is_primary = $1")
+			" FROM projections.user_grants3" +
+			" LEFT JOIN projections.users8 ON projections.user_grants3.user_id = projections.users8.id AND projections.user_grants3.instance_id = projections.users8.instance_id" +
+			" LEFT JOIN projections.users8_humans ON projections.user_grants3.user_id = projections.users8_humans.user_id AND projections.user_grants3.instance_id = projections.users8_humans.instance_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id AND projections.user_grants3.instance_id = projections.orgs.instance_id" +
+			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id AND projections.user_grants3.instance_id = projections.projects3.instance_id" +
+			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id AND projections.user_grants3.instance_id = projections.login_names2.instance_id" +
+			` AS OF SYSTEM TIME '-1 ms' ` +
+			" WHERE projections.login_names2.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,
 		"count",
@@ -923,7 +925,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

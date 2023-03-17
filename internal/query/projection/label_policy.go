@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	LabelPolicyTable = "projections.label_policies"
+	LabelPolicyTable = "projections.label_policies2"
 
 	LabelPolicyIDCol                  = "id"
 	LabelPolicyCreationDateCol        = "creation_date"
@@ -28,6 +28,7 @@ const (
 	LabelPolicyWatermarkDisabledCol   = "watermark_disabled"
 	LabelPolicyShouldErrorPopupCol    = "should_error_popup"
 	LabelPolicyFontURLCol             = "font_url"
+	LabelPolicyOwnerRemovedCol        = "owner_removed"
 
 	LabelPolicyLightPrimaryColorCol    = "light_primary_color"
 	LabelPolicyLightWarnColorCol       = "light_warn_color"
@@ -78,8 +79,10 @@ func newLabelPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LabelPolicyDarkFontColorCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LabelPolicyDarkLogoURLCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LabelPolicyDarkIconURLCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(LabelPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LabelPolicyInstanceIDCol, LabelPolicyIDCol, LabelPolicyStateCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LabelPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -150,6 +153,10 @@ func (p *labelPolicyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.LabelPolicyAssetsRemovedEventType,
 					Reduce: p.reduceAssetsRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -312,6 +319,7 @@ func (p *labelPolicyProjection) reduceChanged(event eventstore.Event) (*handler.
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -324,6 +332,7 @@ func (p *labelPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -425,6 +434,7 @@ func (p *labelPolicyProjection) reduceLogoAdded(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -453,6 +463,7 @@ func (p *labelPolicyProjection) reduceLogoRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -481,6 +492,7 @@ func (p *labelPolicyProjection) reduceIconAdded(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -509,6 +521,7 @@ func (p *labelPolicyProjection) reduceIconRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -533,6 +546,7 @@ func (p *labelPolicyProjection) reduceFontAdded(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -557,6 +571,7 @@ func (p *labelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -582,5 +597,26 @@ func (p *labelPolicyProjection) reduceAssetsRemoved(event eventstore.Event) (*ha
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
+}
+
+func (p *labelPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Su6pX", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(LabelPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(LabelPolicySequenceCol, e.Sequence()),
+			handler.NewCol(LabelPolicyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(LabelPolicyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(LabelPolicyResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
 }

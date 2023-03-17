@@ -1,0 +1,56 @@
+## Postgres
+
+:::caution
+Postgres extension is currently in beta.
+:::
+
+If you want to use a PostgreSQL database instead of CockroachDB you can [overwrite the default configuration](../configure/configure.mdx).
+
+Currently versions >= 14 are supported.
+
+Postgres can be configured as follows:
+```yaml
+Database:
+  postgres:
+    Host: localhost
+    Port: 5432
+    Database: zitadel
+    MaxOpenConns: 25
+    MaxConnLifetime: 1h
+    MaxConnIdleTime: 5m
+    Options:
+    User:
+      Username: zitadel
+      Password: zitadel
+      SSL:
+        Mode: disable
+        RootCert:
+        Cert:
+        Key:
+    Admin:
+      Username: postgres
+      Password: postgres
+      SSL:
+        Mode: disable
+        RootCert:
+        Cert:
+        Key:
+```
+
+The admin user is only needed for the installation step but can also be avoided
+by preparing the necessary requirements:
+
+* the zitadel user
+* the zitadel database
+* granting required permissions to the zitadel user
+
+```sql
+CREATE ROLE zitadel LOGIN;
+CREATE DATABASE zitadel;
+GRANT CONNECT, CREATE ON DATABASE zitadel TO zitadel;
+```
+
+Don't forget to adjust pg_hba.conf and set a password for the zitadel user.
+
+With the setup done, follow the [phases guide](/docs/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime)
+to run the init and then setup phase to get all necessary tables and data set up.

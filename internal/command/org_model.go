@@ -41,7 +41,7 @@ func (wm *OrgWriteModel) Reduce() error {
 			wm.PrimaryDomain = e.Domain
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *OrgWriteModel) Query() *eventstore.SearchQueryBuilder {

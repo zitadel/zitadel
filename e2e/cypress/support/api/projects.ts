@@ -1,7 +1,7 @@
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
-import { API } from './types';
+import { API, Entity } from './types';
 
-export function ensureProjectExists(api: API, projectName: string, orgId?: number): Cypress.Chainable<number> {
+export function ensureProjectExists(api: API, projectName: string, orgId?: string) {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/projects/_search`,
@@ -12,7 +12,7 @@ export function ensureProjectExists(api: API, projectName: string, orgId?: numbe
   );
 }
 
-export function ensureProjectDoesntExist(api: API, projectName: string, orgId?: number): Cypress.Chainable<null> {
+export function ensureProjectDoesntExist(api: API, projectName: string, orgId?: string) {
   return ensureItemDoesntExist(
     api,
     `${api.mgmtBaseURL}/projects/_search`,
@@ -32,22 +32,22 @@ export const Roles = new ResourceType('roles', 'key', 'key');
 
 export function ensureProjectResourceDoesntExist(
   api: API,
-  projectId: number,
+  projectId: string,
   resourceType: ResourceType,
   resourceName: string,
-  orgId?: number,
+  orgId?: string,
 ): Cypress.Chainable<null> {
   return ensureItemDoesntExist(
     api,
     `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/_search`,
-    (resource: any) => resource[resourceType.compareProperty] === resourceName,
-    (resource) =>
+    (resource: Entity) => resource[resourceType.compareProperty] === resourceName,
+    (resource: Entity) =>
       `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`,
     orgId,
   );
 }
 
-export function ensureApplicationExists(api: API, projectId: number, appName: string): Cypress.Chainable<number> {
+export function ensureApplicationExists(api: API, projectId: number, appName: string) {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/projects/${projectId}/${Apps.resourcePath}/_search`,

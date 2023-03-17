@@ -13,7 +13,7 @@ import (
 )
 
 func (s *Server) GetProjectByID(ctx context.Context, req *mgmt_pb.GetProjectByIDRequest) (*mgmt_pb.GetProjectByIDResponse, error) {
-	project, err := s.query.ProjectByID(ctx, true, req.Id)
+	project, err := s.query.ProjectByID(ctx, true, req.Id, false)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (s *Server) GetProjectByID(ctx context.Context, req *mgmt_pb.GetProjectByID
 }
 
 func (s *Server) GetGrantedProjectByID(ctx context.Context, req *mgmt_pb.GetGrantedProjectByIDRequest) (*mgmt_pb.GetGrantedProjectByIDResponse, error) {
-	grant, err := s.query.ProjectGrantByID(ctx, true, req.GrantId)
+	grant, err := s.query.ProjectGrantByID(ctx, true, req.GrantId, false)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	if err != nil {
 		return nil, err
 	}
-	projects, err := s.query.SearchProjects(ctx, queries)
+	projects, err := s.query.SearchProjects(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	if err != nil {
 		return nil, err
 	}
-	projects, err := s.query.SearchProjectGrants(ctx, queries)
+	projects, err := s.query.SearchProjectGrants(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListG
 	if err != nil {
 		return nil, err
 	}
-	roles, err := s.query.SearchGrantedProjectRoles(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID, queries)
+	roles, err := s.query.SearchGrantedProjectRoles(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +172,7 @@ func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRe
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery},
-	})
+	}, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	if err != nil {
 		return nil, err
 	}
-	roles, err := s.query.SearchProjectRoles(ctx, true, queries)
+	roles, err := s.query.SearchProjectRoles(ctx, true, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -257,12 +257,12 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 	}
 	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery, rolesQuery},
-	})
+	}, false, false)
 
 	if err != nil {
 		return nil, err
 	}
-	projectGrants, err := s.query.SearchProjectGrantsByProjectIDAndRoleKey(ctx, req.ProjectId, req.RoleKey)
+	projectGrants, err := s.query.SearchProjectGrantsByProjectIDAndRoleKey(ctx, req.ProjectId, req.RoleKey, false)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +288,7 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 	if err != nil {
 		return nil, err
 	}
-	members, err := s.query.ProjectMembers(ctx, queries)
+	members, err := s.query.ProjectMembers(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}

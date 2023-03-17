@@ -19,7 +19,7 @@ func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "Password", errID, errMessage)
+	data := l.getUserData(r, authReq, "Password.Title", "Password.Description", errID, errMessage)
 	funcs := map[string]interface{}{
 		"showPasswordReset": func() bool {
 			if authReq.LoginPolicy != nil {
@@ -39,6 +39,14 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Password, authReq.AgentID, domain.BrowserInfoFromRequest(r))
+
+	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodPassword, err)
+	if err == nil && actionErr == nil && len(metadata) > 0 {
+		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+	} else if actionErr != nil && err == nil {
+		err = actionErr
+	}
+
 	if err != nil {
 		if authReq.LoginPolicy.IgnoreUnknownUsernames {
 			l.renderLogin(w, r, authReq, err)

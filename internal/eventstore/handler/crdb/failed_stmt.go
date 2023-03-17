@@ -11,9 +11,9 @@ import (
 
 const (
 	setFailureCountStmtFormat = "INSERT INTO %s" +
-		" (projection_name, failed_sequence, failure_count, error, instance_id)" +
-		" VALUES ($1, $2, $3, $4, $5) ON CONFLICT (projection_name, failed_sequence, instance_id)" +
-		" DO UPDATE SET failure_count = EXCLUDED.failure_count, error = EXCLUDED.error"
+		" (projection_name, failed_sequence, failure_count, error, instance_id, last_failed)" +
+		" VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (projection_name, failed_sequence, instance_id)" +
+		" DO UPDATE SET failure_count = EXCLUDED.failure_count, error = EXCLUDED.error, last_failed = EXCLUDED.last_failed"
 	failureCountStmtFormat = "WITH failures AS (SELECT failure_count FROM %s WHERE projection_name = $1 AND failed_sequence = $2 AND instance_id = $3)" +
 		" SELECT COALESCE((SELECT failure_count FROM failures), 0) AS failure_count"
 )
@@ -43,7 +43,7 @@ func (h *StatementHandler) failureCount(tx *sql.Tx, seq uint64, instanceID strin
 }
 
 func (h *StatementHandler) setFailureCount(tx *sql.Tx, seq uint64, count uint, err error, instanceID string) error {
-	_, dbErr := tx.Exec(h.setFailureCountStmt, h.ProjectionName, seq, count, err.Error(), instanceID)
+	_, dbErr := tx.Exec(h.setFailureCountStmt, h.ProjectionName, seq, count, err.Error(), instanceID, "NOW()")
 	if dbErr != nil {
 		return errors.ThrowInternal(dbErr, "CRDB-4Ht4x", "set failure count failed")
 	}

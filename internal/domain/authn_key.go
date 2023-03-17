@@ -8,8 +8,8 @@ import (
 )
 
 type authNKey interface {
-	setPublicKey([]byte)
-	setPrivateKey([]byte)
+	SetPublicKey([]byte)
+	SetPrivateKey([]byte)
 	expiration
 }
 
@@ -44,8 +44,8 @@ func SetNewAuthNKeyPair(key authNKey, keySize int) error {
 	if err != nil {
 		return err
 	}
-	key.setPrivateKey(privateKey)
-	key.setPublicKey(publicKey)
+	key.SetPrivateKey(privateKey)
+	key.SetPublicKey(publicKey)
 	return nil
 }
 

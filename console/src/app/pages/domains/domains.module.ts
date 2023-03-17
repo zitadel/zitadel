@@ -1,16 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { AddDomainDialogModule } from './add-domain-dialog/add-domain-dialog.module';
@@ -23,7 +22,6 @@ import { DomainsComponent } from './domains.component';
   imports: [
     DomainsRoutingModule,
     AddDomainDialogModule,
-    SharedModule,
     CommonModule,
     MatIconModule,
     CardModule,
@@ -39,4 +37,4 @@ import { DomainsComponent } from './domains.component';
     MatProgressSpinnerModule,
   ],
 })
-export class DomainsModule {}
+export default class DomainsModule {}

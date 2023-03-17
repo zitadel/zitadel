@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"reflect"
+	"sort"
 	"sync"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -18,17 +20,21 @@ type Eventstore struct {
 	repo              repository.Repository
 	interceptorMutex  sync.Mutex
 	eventInterceptors map[EventType]eventTypeInterceptors
+	eventTypes        []string
+	aggregateTypes    []string
+	PushTimeout       time.Duration
 }
 
 type eventTypeInterceptors struct {
 	eventMapper func(*repository.Event) (Event, error)
 }
 
-func NewEventstore(repo repository.Repository) *Eventstore {
+func NewEventstore(config *Config) *Eventstore {
 	return &Eventstore{
-		repo:              repo,
+		repo:              config.repo,
 		eventInterceptors: map[EventType]eventTypeInterceptors{},
 		interceptorMutex:  sync.Mutex{},
+		PushTimeout:       config.PushTimeout,
 	}
 }
 
@@ -45,6 +51,13 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 	if err != nil {
 		return nil, err
 	}
+
+	if es.PushTimeout > 0 {
+		var cancel func()
+		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
+		defer cancel()
+	}
+
 	err = es.repo.Push(ctx, events, constraints...)
 	if err != nil {
 		return nil, err
@@ -61,6 +74,14 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 
 func (es *Eventstore) NewInstance(ctx context.Context, instanceID string) error {
 	return es.repo.CreateInstance(ctx, instanceID)
+}
+
+func (es *Eventstore) EventTypes() []string {
+	return es.eventTypes
+}
+
+func (es *Eventstore) AggregateTypes() []string {
+	return es.aggregateTypes
 }
 
 func commandsToRepository(instanceID string, cmds []Command) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
@@ -214,18 +235,37 @@ func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r QueryReducer) 
 }
 
 // RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
-func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (Event, error)) *Eventstore {
+func (es *Eventstore) RegisterFilterEventMapper(aggregateType AggregateType, eventType EventType, mapper func(*repository.Event) (Event, error)) *Eventstore {
 	if mapper == nil || eventType == "" {
 		return es
 	}
 	es.interceptorMutex.Lock()
 	defer es.interceptorMutex.Unlock()
 
+	es.appendEventType(eventType)
+	es.appendAggregateType(aggregateType)
+
 	interceptor := es.eventInterceptors[eventType]
 	interceptor.eventMapper = mapper
 	es.eventInterceptors[eventType] = interceptor
 
 	return es
+}
+
+func (es *Eventstore) appendEventType(typ EventType) {
+	i := sort.SearchStrings(es.eventTypes, string(typ))
+	if i < len(es.eventTypes) && es.eventTypes[i] == string(typ) {
+		return
+	}
+	es.eventTypes = append(es.eventTypes[:i], append([]string{string(typ)}, es.eventTypes[i:]...)...)
+}
+
+func (es *Eventstore) appendAggregateType(typ AggregateType) {
+	i := sort.SearchStrings(es.aggregateTypes, string(typ))
+	if len(es.aggregateTypes) > i && es.aggregateTypes[i] == string(typ) {
+		return
+	}
+	es.aggregateTypes = append(es.aggregateTypes[:i], append([]string{string(typ)}, es.aggregateTypes[i:]...)...)
 }
 
 func EventData(event Command) ([]byte, error) {

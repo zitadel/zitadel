@@ -22,12 +22,12 @@ The main difference between human and machine users is the type of credentials t
 
 ### Managers
 
-Any user, human or service user, can be given a [Manager](/docs/concepts/structure/managers) role.
+Any user, human or service user, can be given a [Manager](/concepts/structure/managers) role.
 Given a manager role, a user is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
 
 ## Constraints
 
-Users can only exist within one [organization](/docs/concepts/structure/organizations).
+Users can only exist within one [organization](/concepts/structure/organizations).
 It is currently not possible to move users between organizations.
 
 User accounts are uniquely identified by their `id` or `loginname` in combination of the `organization domain` (eg, `road.runner@acme.zitadel.local`).
@@ -35,7 +35,7 @@ You can use the same email address for different user accounts.
 
 ## Where to store users
 
-Depending on your [scenario](/docs/guides/solution-scenarios/introduction), you might want to store all users in one organization (CIAM / B2C) or create a new organization for each logical group of users, e.g. each business customer (B2B).
+Depending on your [scenario](/guides/solution-scenarios/introduction), you might want to store all users in one organization (CIAM / B2C) or create a new organization for each logical group of users, e.g. each business customer (B2B).
 With a project grant, you can delegate the access management of an organization's project to another organization.
 You can also create a user grant to allow single users to access projects from another organization.
 This is also an alternative to cases where you might want to move users between organizations.

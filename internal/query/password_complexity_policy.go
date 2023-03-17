@@ -9,9 +9,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type PasswordComplexityPolicy struct {
@@ -31,24 +33,24 @@ type PasswordComplexityPolicy struct {
 	IsDefault bool
 }
 
-func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*PasswordComplexityPolicy, error) {
+func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (_ *PasswordComplexityPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.PasswordComplexityProjection.Trigger(ctx)
 	}
-
-	stmt, scan := preparePasswordComplexityPolicyQuery()
+	eq := sq.Eq{PasswordComplexityColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[PasswordComplexityColOwnerRemoved.identifier()] = false
+	}
+	stmt, scan := preparePasswordComplexityPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{
-				PasswordComplexityColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 			sq.Or{
-				sq.Eq{
-					PasswordComplexityColID.identifier(): orgID,
-				},
-				sq.Eq{
-					PasswordComplexityColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{PasswordComplexityColID.identifier(): orgID},
+				sq.Eq{PasswordComplexityColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
 		}).
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
@@ -61,12 +63,15 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTrigg
 	return scan(row)
 }
 
-func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context, shouldTriggerBulk bool) (*PasswordComplexityPolicy, error) {
+func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context, shouldTriggerBulk bool) (_ *PasswordComplexityPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.PasswordComplexityProjection.Trigger(ctx)
 	}
 
-	stmt, scan := preparePasswordComplexityPolicyQuery()
+	stmt, scan := preparePasswordComplexityPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		PasswordComplexityColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		PasswordComplexityColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -138,9 +143,13 @@ var (
 		name:  projection.ComplexityPolicyStateCol,
 		table: passwordComplexityTable,
 	}
+	PasswordComplexityColOwnerRemoved = Column{
+		name:  projection.ComplexityPolicyOwnerRemovedCol,
+		table: passwordComplexityTable,
+	}
 )
 
-func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PasswordComplexityPolicy, error)) {
+func preparePasswordComplexityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*PasswordComplexityPolicy, error)) {
 	return sq.Select(
 			PasswordComplexityColID.identifier(),
 			PasswordComplexityColSequence.identifier(),
@@ -155,7 +164,8 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 			PasswordComplexityColIsDefault.identifier(),
 			PasswordComplexityColState.identifier(),
 		).
-			From(passwordComplexityTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(passwordComplexityTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PasswordComplexityPolicy, error) {
 			policy := new(PasswordComplexityPolicy)
 			err := row.Scan(

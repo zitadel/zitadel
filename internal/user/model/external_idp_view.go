@@ -36,6 +36,7 @@ const (
 	ExternalIDPSearchKeyIdpConfigID
 	ExternalIDPSearchKeyResourceOwner
 	ExternalIDPSearchKeyInstanceID
+	ExternalIDPSearchKeyOwnerRemoved
 )
 
 type ExternalIDPSearchQuery struct {

@@ -13,8 +13,11 @@ import (
 )
 
 func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, emailCodeGenerator crypto.Generator) (*domain.Email, error) {
-	if !email.IsValid() || email.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
+	if email.AggregateID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
+	}
+	if err := email.Validate(); err != nil {
+		return nil, err
 	}
 
 	existingEmail, err := c.emailWriteModel(ctx, email.AggregateID, email.ResourceOwner)

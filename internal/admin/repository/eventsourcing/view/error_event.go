@@ -21,6 +21,6 @@ func (v *View) latestFailedEvent(viewName, instanceID string, sequence uint64) (
 	return repository.LatestFailedEvent(v.Db, errTable, viewName, instanceID, sequence)
 }
 
-func (v *View) AllFailedEvents(db string) ([]*repository.FailedEvent, error) {
-	return repository.AllFailedEvents(v.Db, db+"."+errColumn)
+func (v *View) AllFailedEvents(db, instanceID string) ([]*repository.FailedEvent, error) {
+	return repository.AllFailedEvents(v.Db, db+"."+errColumn, instanceID)
 }

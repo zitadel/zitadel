@@ -19,12 +19,12 @@ func (v *View) latestSequence(viewName, instanceID string) (*repository.CurrentS
 	return repository.LatestSequence(v.Db, sequencesTable, viewName, instanceID)
 }
 
-func (v *View) latestSequences(viewName string, instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return repository.LatestSequences(v.Db, sequencesTable, viewName, instanceIDs...)
+func (v *View) latestSequences(viewName string, instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return repository.LatestSequences(v.Db, sequencesTable, viewName, instanceIDs)
 }
 
-func (v *View) updateSpoolerRunSequence(viewName string) error {
-	currentSequences, err := repository.LatestSequences(v.Db, sequencesTable, viewName)
+func (v *View) updateSpoolerRunSequence(viewName string, instanceIDs []string) error {
+	currentSequences, err := repository.LatestSequences(v.Db, sequencesTable, viewName, instanceIDs)
 	if err != nil {
 		return err
 	}

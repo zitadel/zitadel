@@ -147,6 +147,7 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderCha
 		[]handler.Condition{
 			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 			handler.NewCond(DebugNotificationProviderTypeCol, providerType),
+			handler.NewCond(DebugNotificationProviderInstanceIDCol, providerEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -170,6 +171,7 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderRem
 		[]handler.Condition{
 			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 			handler.NewCond(DebugNotificationProviderTypeCol, providerType),
+			handler.NewCond(DebugNotificationProviderInstanceIDCol, providerEvent.Aggregate().InstanceID),
 		},
 	), nil
 }

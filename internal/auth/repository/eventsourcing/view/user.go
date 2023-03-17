@@ -14,20 +14,11 @@ import (
 )
 
 const (
-	userTable = "auth.users"
+	userTable = "auth.users2"
 )
 
 func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
 	return view.UserByID(v.Db, userTable, userID, instanceID)
-}
-
-func (v *View) UserByUsername(userName, instanceID string) (*model.UserView, error) {
-	query, err := query.NewUserUsernameSearchQuery(userName, query.TextEquals)
-	if err != nil {
-		return nil, err
-	}
-
-	return v.userByID(instanceID, query)
 }
 
 func (v *View) UserByLoginName(loginName, instanceID string) (*model.UserView, error) {
@@ -53,7 +44,7 @@ func (v *View) UserByLoginNameAndResourceOwner(loginName, resourceOwner, instanc
 }
 
 func (v *View) UserByEmail(email, instanceID string) (*model.UserView, error) {
-	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEquals)
+	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEqualsIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +88,7 @@ func (v *View) UserByPhoneAndResourceOwner(phone, resourceOwner, instanceID stri
 func (v *View) userByID(instanceID string, queries ...query.SearchQuery) (*model.UserView, error) {
 	ctx := authz.WithInstanceID(context.Background(), instanceID)
 
-	queriedUser, err := v.query.GetNotifyUser(ctx, true, queries...)
+	queriedUser, err := v.query.GetNotifyUser(ctx, true, false, queries...)
 	if err != nil {
 		return nil, err
 	}
@@ -189,20 +180,28 @@ func (v *View) DeleteInstanceUsers(event *models.Event) error {
 	return v.ProcessedUserSequence(event)
 }
 
+func (v *View) UpdateOrgOwnerRemovedUsers(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.InstanceID, event.AggregateID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedUserSequence(event)
+}
+
 func (v *View) GetLatestUserSequence(instanceID string) (*repository.CurrentSequence, error) {
 	return v.latestSequence(userTable, instanceID)
 }
 
-func (v *View) GetLatestUserSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(userTable, instanceIDs...)
+func (v *View) GetLatestUserSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(userTable, instanceIDs)
 }
 
 func (v *View) ProcessedUserSequence(event *models.Event) error {
 	return v.saveCurrentSequence(userTable, event)
 }
 
-func (v *View) UpdateUserSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(userTable)
+func (v *View) UpdateUserSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(userTable, instanceIDs)
 }
 
 func (v *View) GetLatestUserFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {

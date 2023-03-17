@@ -16,15 +16,14 @@ const (
 )
 
 type registerFormData struct {
-	Email        string `schema:"email"`
-	Username     string `schema:"username"`
-	Firstname    string `schema:"firstname"`
-	Lastname     string `schema:"lastname"`
-	Language     string `schema:"language"`
-	Gender       int32  `schema:"gender"`
-	Password     string `schema:"register-password"`
-	Password2    string `schema:"register-password-confirmation"`
-	TermsConfirm bool   `schema:"terms-confirm"`
+	Email        domain.EmailAddress `schema:"email"`
+	Username     string              `schema:"username"`
+	Firstname    string              `schema:"firstname"`
+	Lastname     string              `schema:"lastname"`
+	Language     string              `schema:"language"`
+	Password     string              `schema:"register-password"`
+	Password2    string              `schema:"register-password-confirmation"`
+	TermsConfirm bool                `schema:"terms-confirm"`
 }
 
 type registerData struct {
@@ -83,11 +82,48 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
+
+	// For consistency with the external authentication flow,
+	// the setMetadata() function is provided on the pre creation hook, for now,
+	// like for the ExternalAuthentication flow.
+	// If there is a need for additional context after registration,
+	// we could provide that method in the PostCreation trigger too,
+	// without breaking existing actions.
+	// Also, if that field is needed, we probably also should provide it
+	// for ExternalAuthentication.
+	user, metadatas, err := l.runPreCreationActions(authRequest, r, data.toHumanDomain(), make([]*domain.Metadata, 0), resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
+
+	user, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
+	if err != nil {
+		l.renderRegister(w, r, authRequest, data, err)
+		return
+	}
+
+	if len(metadatas) > 0 {
+		_, err = l.command.BulkSetUserMetadata(r.Context(), user.AggregateID, resourceOwner, metadatas...)
+		if err != nil {
+			// TODO: What if action is configured to be allowed to fail? Same question for external registration.
+			l.renderRegister(w, r, authRequest, data, err)
+			return
+		}
+	}
+
+	userGrants, err := l.runPostCreationActions(user.AggregateID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
+	if err != nil {
+		l.renderError(w, r, authRequest, err)
+		return
+	}
+
+	err = l.appendUserGrants(r.Context(), userGrants, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authRequest, err)
+		return
+	}
+
 	if authRequest == nil {
 		l.defaultRedirect(w, r)
 		return
@@ -124,7 +160,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, "Register", errID, errMessage),
+		baseData:         l.getBaseData(r, authRequest, "RegistrationUser.Title", "RegistrationUser.Description", errID, errMessage),
 		registerFormData: *formData,
 	}
 
@@ -167,12 +203,6 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 			}
 			return formData.Language == l
 		},
-		"selectedGender": func(g int32) bool {
-			if formData == nil {
-				return false
-			}
-			return formData.Gender == g
-		},
 	}
 	if authRequest == nil {
 		l.customTexts(r.Context(), translator, resourceOwner)
@@ -187,7 +217,6 @@ func (d registerFormData) toHumanDomain() *domain.Human {
 			FirstName:         d.Firstname,
 			LastName:          d.Lastname,
 			PreferredLanguage: language.Make(d.Language),
-			Gender:            domain.Gender(d.Gender),
 		},
 		Password: &domain.Password{
 			SecretString: d.Password,

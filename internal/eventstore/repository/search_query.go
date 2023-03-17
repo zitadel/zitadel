@@ -6,16 +6,17 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
-//SearchQuery defines the which and how data are queried
+// SearchQuery defines the which and how data are queried
 type SearchQuery struct {
-	Columns Columns
-	Limit   uint64
-	Desc    bool
-	Filters [][]*Filter
-	Tx      *sql.Tx
+	Columns         Columns
+	Limit           uint64
+	Desc            bool
+	Filters         [][]*Filter
+	Tx              *sql.Tx
+	AllowTimeTravel bool
 }
 
-//Columns defines which fields of the event are needed for the query
+// Columns defines which fields of the event are needed for the query
 type Columns int32
 
 const (
@@ -36,14 +37,14 @@ func (c Columns) Validate() error {
 	return nil
 }
 
-//Filter represents all fields needed to compare a field of an event with a value
+// Filter represents all fields needed to compare a field of an event with a value
 type Filter struct {
 	Field     Field
 	Value     interface{}
 	Operation Operation
 }
 
-//Operation defines how fields are compared
+// Operation defines how fields are compared
 type Operation int32
 
 const (
@@ -63,7 +64,7 @@ const (
 	operationCount
 )
 
-//Field is the representation of a field from the event
+// Field is the representation of a field from the event
 type Field int32
 
 const (
@@ -91,7 +92,7 @@ const (
 	fieldCount
 )
 
-//NewFilter is used in tests. Use searchQuery.*Filter() instead
+// NewFilter is used in tests. Use searchQuery.*Filter() instead
 func NewFilter(field Field, value interface{}, operation Operation) *Filter {
 	return &Filter{
 		Field:     field,
@@ -100,7 +101,7 @@ func NewFilter(field Field, value interface{}, operation Operation) *Filter {
 	}
 }
 
-//Validate checks if the fields of the filter have valid values
+// Validate checks if the fields of the filter have valid values
 func (f *Filter) Validate() error {
 	if f == nil {
 		return errors.ThrowPreconditionFailed(nil, "REPO-z6KcG", "filter is nil")

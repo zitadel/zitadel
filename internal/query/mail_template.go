@@ -9,9 +9,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type MailTemplate struct {
@@ -62,22 +64,27 @@ var (
 		name:  projection.MailTemplateStateCol,
 		table: mailTemplateTable,
 	}
+	MailTemplateColOwnerRemoved = Column{
+		name:  projection.MailTemplateOwnerRemovedCol,
+		table: mailTemplateTable,
+	}
 )
 
-func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string) (*MailTemplate, error) {
-	stmt, scan := prepareMailTemplateQuery()
+func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (_ *MailTemplate, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareMailTemplateQuery(ctx, q.client)
+	eq := sq.Eq{MailTemplateColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[MailTemplateColOwnerRemoved.identifier()] = false
+	}
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{
-				MailTemplateColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 			sq.Or{
-				sq.Eq{
-					MailTemplateColAggregateID.identifier(): orgID,
-				},
-				sq.Eq{
-					MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{MailTemplateColAggregateID.identifier(): orgID},
+				sq.Eq{MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
 		}).
 		OrderBy(MailTemplateColIsDefault.identifier()).
@@ -90,8 +97,11 @@ func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string) (*MailTem
 	return scan(row)
 }
 
-func (q *Queries) DefaultMailTemplate(ctx context.Context) (*MailTemplate, error) {
-	stmt, scan := prepareMailTemplateQuery()
+func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareMailTemplateQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		MailTemplateColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
@@ -106,7 +116,7 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (*MailTemplate, error
 	return scan(row)
 }
 
-func prepareMailTemplateQuery() (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
+func prepareMailTemplateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
 	return sq.Select(
 			MailTemplateColAggregateID.identifier(),
 			MailTemplateColSequence.identifier(),
@@ -116,7 +126,8 @@ func prepareMailTemplateQuery() (sq.SelectBuilder, func(*sql.Row) (*MailTemplate
 			MailTemplateColIsDefault.identifier(),
 			MailTemplateColState.identifier(),
 		).
-			From(mailTemplateTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(mailTemplateTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MailTemplate, error) {
 			policy := new(MailTemplate)
 			err := row.Scan(

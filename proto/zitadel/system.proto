@@ -3,9 +3,13 @@ syntax = "proto3";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/instance.proto";
+import "zitadel/member.proto";
+import "zitadel/quota.proto";
+import "zitadel/auth_n_key.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -28,7 +32,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
     };
   };
-
+  tags: [
+    {
+        name: "General"
+    }
+  ];
   schemes: HTTPS;
   schemes: HTTP;
 
@@ -41,12 +49,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "api.zitadel.ch";
+  host: "$ZITADEL_DOMAIN";
   base_path: "/system/v1";
 
   external_docs: {
     description: "Detailed information about ZITADEL",
-    url: "https://docs.zitadel.com"
+    url: "https://zitadel.com/docs"
   }
 
   responses: {
@@ -82,7 +90,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "probes";
+      tags: "General";
       responses: {
         key: "200";
         value: {
@@ -121,6 +129,7 @@ service SystemService {
     };
   }
 
+  // Deprecated: Use CreateInstance instead
   // Creates a new instance with all needed setup data
   // This might take some time
   rpc AddInstance(AddInstanceRequest) returns (AddInstanceResponse) {
@@ -146,11 +155,37 @@ service SystemService {
     };
   }
 
-  // Removes a instances
+  // Creates a new instance with all needed setup data
+  // This might take some time
+  rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse) {
+    option (google.api.http) = {
+      post: "/instances/_create"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  // Removes an instance
   // This might take some time
   rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  //Returns all instance members matching the request
+  // all queries need to match (ANDed)
+  rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
+    option (google.api.http) = {
+      post: "/instances/{instance_id}/members/_search";
+      body: "*";
     };
 
     option (zitadel.v1.auth_option) = {
@@ -232,10 +267,6 @@ service SystemService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "views";
-      external_docs: {
-        url: "https://docs.zitadel.com/concepts#Software_Architecture";
-        description: "details of ZITADEL's event driven software concepts";
-      };
       responses: {
         key: "200";
         value: {
@@ -260,10 +291,6 @@ service SystemService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "views";
-      external_docs: {
-        url: "https://docs.zitadel.com/concepts#Software_Architecture";
-        description: "details of ZITADEL's event driven software concepts";
-      };
       responses: {
         key: "200";
         value: {
@@ -288,10 +315,6 @@ service SystemService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "failed events";
-      external_docs: {
-        url: "https://docs.zitadel.com/concepts#Software_Architecture";
-        description: "details of ZITADEL's event driven software concepts";
-      };
       responses: {
         key: "200";
         value: {
@@ -317,10 +340,6 @@ service SystemService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "failed events";
-      external_docs: {
-        url: "https://docs.zitadel.com/concepts#Software_Architecture";
-        description: "details of ZITADEL's event driven software concepts";
-      };
       responses: {
         key: "200";
         value: {
@@ -338,6 +357,29 @@ service SystemService {
           };
         };
       };
+    };
+  }
+
+  // Creates a new quota
+  rpc AddQuota(AddQuotaRequest) returns (AddQuotaResponse) {
+    option (google.api.http) = {
+      post: "/instances/{instance_id}/quotas"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  // Removes a quota
+  rpc RemoveQuota(RemoveQuotaRequest) returns (RemoveQuotaResponse) {
+    option (google.api.http) = {
+      delete: "/instances/{instance_id}/quotas/{unit}"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
     };
   }
 }
@@ -409,6 +451,72 @@ message AddInstanceResponse {
   zitadel.v1.ObjectDetails details = 2;
 }
 
+message CreateInstanceRequest {
+  message Profile {
+    string first_name = 1 [(validate.rules).string = {max_len: 200}];
+    string last_name = 2 [(validate.rules).string = {max_len: 200}];
+    string preferred_language = 3 [(validate.rules).string = {max_len: 10}];
+  }
+  message Email {
+    string email = 1[(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
+    bool is_email_verified = 2;
+  }
+  message Password {
+    string password = 1 [(validate.rules).string = {max_len: 200}];
+    bool password_change_required = 2;
+  }
+  message Human {
+    string user_name = 1 [(validate.rules).string = {max_len: 200}];
+    Email email = 2 [(validate.rules).message.required = true];
+    Profile profile = 3 [(validate.rules).message.required = false];
+    Password password = 4 [(validate.rules).message.required = false];
+  }
+  message PersonalAccessToken {
+    google.protobuf.Timestamp expiration_date = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2519-04-01T08:45:00.000000Z\"";
+        description: "The date the token will expire and no logins will be possible";
+      }
+    ];
+  }
+  message MachineKey {
+    zitadel.authn.v1.KeyType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    google.protobuf.Timestamp expiration_date = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2519-04-01T08:45:00.000000Z\"";
+        description: "The date the key will expire and no logins will be possible";
+      }
+    ];
+  }
+  message Machine {
+    string user_name = 1 [(validate.rules).string = {max_len: 200}];
+    string name = 2 [(validate.rules).string = {max_len: 200}];
+    PersonalAccessToken personal_access_token = 3;
+    MachineKey machine_key = 4;
+  }
+
+  string instance_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string first_org_name = 2 [(validate.rules).string = {max_len: 200}];
+  string custom_domain = 3 [(validate.rules).string = {max_len: 200}];
+
+  oneof owner {
+    option (validate.required) = true;
+
+    // oneof field for the user managing the instance
+    Human human = 4;
+    Machine machine = 5;
+  }
+
+  string default_language = 6 [(validate.rules).string = {max_len: 10}];
+}
+
+message CreateInstanceResponse {
+  string instance_id = 1;
+  zitadel.v1.ObjectDetails details = 2;
+  string pat = 3;
+  bytes machine_key = 4;
+}
+
 message UpdateInstanceRequest{
   string instance_id = 1;
   string instance_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -426,14 +534,77 @@ message RemoveInstanceResponse {
   zitadel.v1.ObjectDetails details = 1;
 }
 
+message ListIAMMembersRequest {
+  zitadel.v1.ListQuery query = 1;
+  string instance_id = 2;
+  repeated zitadel.member.v1.SearchQuery queries = 3;
+}
+
+message ListIAMMembersResponse {
+  zitadel.v1.ListDetails details = 1;
+  repeated zitadel.member.v1.Member result = 2;
+}
+
 message GetUsageRequest {
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetUsageResponse {
+message AddQuotaRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // the unit a quota should be imposed on
+  zitadel.quota.v1.Unit unit = 2 [
+    (validate.rules).enum = {defined_only: true, not_in: [0]},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "the unit a quota should be imposed on";
+    }
+  ];
+  // the starting time from which the current quota period is calculated from. This is relevant for querying the current usage.
+  google.protobuf.Timestamp from = 3 [
+      (validate.rules).timestamp.required = true,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          example: "\"2019-04-01T08:45:00.000000Z\"";
+          description: "the starting time from which the current quota period is calculated from. This is relevant for querying the current usage.";
+      }
+  ];
+  // the quota periods duration
+  google.protobuf.Duration reset_interval = 4 [
+    (validate.rules).duration.required = true,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the quota periods duration";
+      }
+  ];
+  // the quota amount of units
+  uint64 amount = 5 [
+    (validate.rules).uint64.gt = 0,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the quota amount of units";
+    }
+  ];
+  // whether ZITADEL should block further usage when the configured amount is used
+  bool limit = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "whether ZITADEL should block further usage when the configured amount is used";
+    }
+  ];
+  // the handlers, ZITADEL executes when certain quota percentages are reached
+  repeated zitadel.quota.v1.Notification notifications = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the handlers, ZITADEL executes when certain quota percentages are reached";
+    }
+  ];
+}
+
+message AddQuotaResponse {
   zitadel.v1.ObjectDetails details = 1;
-  uint64 executed_requests = 2;
-  uint64 executed_action_mins = 3;
+}
+
+message RemoveQuotaRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  zitadel.quota.v1.Unit unit = 2;
+}
+
+message RemoveQuotaResponse {
+  zitadel.v1.ObjectDetails details = 1;
 }
 
 message ExistsDomainRequest {
@@ -569,6 +740,11 @@ message RemoveFailedEventRequest {
       example: "\"9823758\"";
     }
   ];
+  string instance_id = 4  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"840498034930840\"";
+    }
+  ];
 }
 
 //This is an empty response
@@ -632,6 +808,11 @@ message FailedEvent {
   string error_message = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"ID=EXAMP-ID3ER Message=Example message\"";
+    }
+  ];
+  google.protobuf.Timestamp last_failed = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The timestamp the failure last occurred";
     }
   ];
 }

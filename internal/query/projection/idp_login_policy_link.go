@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links3"
+	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links4"
 
 	IDPLoginPolicyLinkIDPIDCol         = "idp_id"
 	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"
@@ -24,6 +24,7 @@ const (
 	IDPLoginPolicyLinkResourceOwnerCol = "resource_owner"
 	IDPLoginPolicyLinkInstanceIDCol    = "instance_id"
 	IDPLoginPolicyLinkProviderTypeCol  = "provider_type"
+	IDPLoginPolicyLinkOwnerRemovedCol  = "owner_removed"
 )
 
 type idpLoginPolicyLinkProjection struct {
@@ -44,9 +45,11 @@ func newIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(IDPLoginPolicyLinkResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPLoginPolicyLinkInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPLoginPolicyLinkProviderTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(IDPLoginPolicyLinkOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(IDPLoginPolicyLinkInstanceIDCol, IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
-			crdb.WithIndex(crdb.NewIndex("link_ro_idx", []string{IDPLoginPolicyLinkResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{IDPLoginPolicyLinkResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{IDPLoginPolicyLinkOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -75,12 +78,16 @@ func (p *idpLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reducePolicyRemoved,
 				},
 				{
-					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceOrgRemoved,
-				},
-				{
 					Event:  org.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
+				},
+				{
+					Event:  org.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -102,6 +109,10 @@ func (p *idpLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
+				},
+				{
+					Event:  instance.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
 				},
 				{
 					Event:  instance.InstanceRemovedEventType,
@@ -159,6 +170,7 @@ func (p *idpLoginPolicyLinkProjection) reduceRemoved(event eventstore.Event) (*h
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idp.IDPConfigID),
 			handler.NewCond(IDPLoginPolicyLinkAggregateIDCol, idp.Aggregate().ID),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -179,6 +191,7 @@ func (p *idpLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Eve
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idp.IDPConfigID),
 			handler.NewCond(IDPLoginPolicyLinkAggregateIDCol, idp.Aggregate().ID),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, idp.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -199,18 +212,28 @@ func (p *idpLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idpID),
 			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
 
-func (p *idpLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*org.OrgRemovedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QSoSe", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+func (p *idpLoginPolicyLinkProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var idpID string
+
+	switch e := event.(type) {
+	case *org.IDPRemovedEvent:
+		idpID = e.ID
+	case *instance.IDPRemovedEvent:
+		idpID = e.ID
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SFED3", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
 	}
-	return crdb.NewDeleteStatement(e,
+
+	return crdb.NewDeleteStatement(event,
 		[]handler.Condition{
-			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, e.Aggregate().ID),
+			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idpID),
+			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -223,6 +246,27 @@ func (p *idpLoginPolicyLinkProjection) reducePolicyRemoved(event eventstore.Even
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkAggregateIDCol, e.Aggregate().ID),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, event.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *idpLoginPolicyLinkProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-YbhOv", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(IDPLoginPolicyLinkChangeDateCol, e.CreationDate()),
+			handler.NewCol(IDPLoginPolicyLinkSequenceCol, e.Sequence()),
+			handler.NewCol(IDPLoginPolicyLinkOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, e.Aggregate().ID),
 		},
 	), nil
 }

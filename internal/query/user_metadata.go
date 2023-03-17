@@ -9,9 +9,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type UserMetadataList struct {
@@ -70,23 +71,33 @@ var (
 		name:  projection.UserMetadataColumnValue,
 		table: userMetadataTable,
 	}
+	UserMetadataOwnerRemovedCol = Column{
+		name:  projection.UserMetadataColumnOwnerRemoved,
+		table: userMetadataTable,
+	}
 )
 
-func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bool, userID, key string, queries ...SearchQuery) (*UserMetadata, error) {
+func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bool, userID, key string, withOwnerRemoved bool, queries ...SearchQuery) (_ *UserMetadata, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.UserMetadataProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareUserMetadataQuery()
+	query, scan := prepareUserMetadataQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			UserMetadataUserIDCol.identifier():     userID,
-			UserMetadataKeyCol.identifier():        key,
-			UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		UserMetadataUserIDCol.identifier():     userID,
+		UserMetadataKeyCol.identifier():        key,
+		UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[UserMetadataOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-aDGG2", "Errors.Query.SQLStatment")
 	}
@@ -95,18 +106,23 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 	return scan(row)
 }
 
-func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries) (*UserMetadataList, error) {
+func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries, withOwnerRemoved bool) (_ *UserMetadataList, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.UserMetadataProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareUserMetadataListQuery()
-	stmt, args, err := queries.toQuery(query).Where(
-		sq.Eq{
-			UserMetadataUserIDCol.identifier():     userID,
-			UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).
-		ToSql()
+	query, scan := prepareUserMetadataListQuery(ctx, q.client)
+	eq := sq.Eq{
+		UserMetadataUserIDCol.identifier():     userID,
+		UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[UserMetadataOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Egbgd", "Errors.Query.SQLStatment")
 	}
@@ -148,7 +164,7 @@ func NewUserMetadataKeySearchQuery(value string, comparison TextComparison) (Sea
 	return NewTextQuery(UserMetadataKeyCol, value, comparison)
 }
 
-func prepareUserMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*UserMetadata, error)) {
+func prepareUserMetadataQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserMetadata, error)) {
 	return sq.Select(
 			UserMetadataCreationDateCol.identifier(),
 			UserMetadataChangeDateCol.identifier(),
@@ -157,7 +173,7 @@ func prepareUserMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*UserMetadata
 			UserMetadataKeyCol.identifier(),
 			UserMetadataValueCol.identifier(),
 		).
-			From(userMetadataTable.identifier()).
+			From(userMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*UserMetadata, error) {
 			m := new(UserMetadata)
@@ -180,7 +196,7 @@ func prepareUserMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*UserMetadata
 		}
 }
 
-func prepareUserMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserMetadataList, error)) {
+func prepareUserMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*UserMetadataList, error)) {
 	return sq.Select(
 			UserMetadataCreationDateCol.identifier(),
 			UserMetadataChangeDateCol.identifier(),
@@ -189,7 +205,7 @@ func prepareUserMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserMet
 			UserMetadataKeyCol.identifier(),
 			UserMetadataValueCol.identifier(),
 			countColumn.identifier()).
-			From(userMetadataTable.identifier()).
+			From(userMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*UserMetadataList, error) {
 			metadata := make([]*UserMetadata, 0)

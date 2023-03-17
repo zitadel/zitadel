@@ -14,7 +14,7 @@ import (
 )
 
 func (s *Server) GetLoginPolicy(ctx context.Context, req *mgmt_pb.GetLoginPolicyRequest) (*mgmt_pb.GetLoginPolicyResponse, error) {
-	policy, err := s.query.LoginPolicyByID(ctx, true, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.LoginPolicyByID(ctx, true, authz.GetCtxData(ctx).OrgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s *Server) ResetLoginPolicyToDefault(ctx context.Context, req *mgmt_pb.Res
 }
 
 func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *mgmt_pb.ListLoginPolicyIDPsRequest) (*mgmt_pb.ListLoginPolicyIDPsResponse, error) {
-	res, err := s.query.IDPLoginPolicyLinks(ctx, authz.GetCtxData(ctx).OrgID, ListLoginPolicyIDPsRequestToQuery(req))
+	res, err := s.query.IDPLoginPolicyLinks(ctx, authz.GetCtxData(ctx).OrgID, ListLoginPolicyIDPsRequestToQuery(req), false)
 	if err != nil {
 		return nil, err
 	}
@@ -93,17 +93,22 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *mgmt_pb.AddIDPToL
 }
 
 func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *mgmt_pb.RemoveIDPFromLoginPolicyRequest) (*mgmt_pb.RemoveIDPFromLoginPolicyResponse, error) {
+	orgID := authz.GetCtxData(ctx).OrgID
 	idpQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(req.IdpId)
 	if err != nil {
 		return nil, err
 	}
-	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
-		Queries: []query.SearchQuery{idpQuery},
-	})
+	resourceOwnerQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(orgID)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveIDPFromLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, &domain.IDPProvider{IDPConfigID: req.IdpId}, user.ExternalIDPViewsToExternalIDPs(userLinks.Links)...)
+	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
+		Queries: []query.SearchQuery{idpQuery, resourceOwnerQuery},
+	}, false)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.RemoveIDPFromLoginPolicy(ctx, orgID, &domain.IDPProvider{IDPConfigID: req.IdpId}, user.ExternalIDPViewsToExternalIDPs(userLinks.Links)...)
 	if err != nil {
 		return nil, err
 	}

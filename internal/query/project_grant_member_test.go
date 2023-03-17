@@ -19,28 +19,29 @@ var (
 		", members.resource_owner" +
 		", members.user_id" +
 		", members.roles" +
-		", projections.login_names.login_name" +
-		", projections.users4_humans.email" +
-		", projections.users4_humans.first_name" +
-		", projections.users4_humans.last_name" +
-		", projections.users4_humans.display_name" +
-		", projections.users4_machines.name" +
-		", projections.users4_humans.avatar_key" +
+		", projections.login_names2.login_name" +
+		", projections.users8_humans.email" +
+		", projections.users8_humans.first_name" +
+		", projections.users8_humans.last_name" +
+		", projections.users8_humans.display_name" +
+		", projections.users8_machines.name" +
+		", projections.users8_humans.avatar_key" +
 		", COUNT(*) OVER () " +
-		"FROM projections.project_grant_members2 AS members " +
-		"LEFT JOIN projections.users4_humans " +
-		"ON members.user_id = projections.users4_humans.user_id " +
-		"AND members.instance_id = projections.users4_humans.instance_id " +
-		"LEFT JOIN projections.users4_machines " +
-		"ON members.user_id = projections.users4_machines.user_id " +
-		"AND members.instance_id = projections.users4_machines.instance_id " +
-		"LEFT JOIN projections.login_names " +
-		"ON members.user_id = projections.login_names.user_id " +
-		"AND members.instance_id = projections.login_names.instance_id " +
-		"LEFT JOIN projections.project_grants2 " +
-		"ON members.grant_id = projections.project_grants2.grant_id " +
-		"AND members.instance_id = projections.project_grants2.instance_id " +
-		"WHERE projections.login_names.is_primary = $1")
+		"FROM projections.project_grant_members3 AS members " +
+		"LEFT JOIN projections.users8_humans " +
+		"ON members.user_id = projections.users8_humans.user_id " +
+		"AND members.instance_id = projections.users8_humans.instance_id " +
+		"LEFT JOIN projections.users8_machines " +
+		"ON members.user_id = projections.users8_machines.user_id " +
+		"AND members.instance_id = projections.users8_machines.instance_id " +
+		"LEFT JOIN projections.login_names2 " +
+		"ON members.user_id = projections.login_names2.user_id " +
+		"AND members.instance_id = projections.login_names2.instance_id " +
+		"LEFT JOIN projections.project_grants3 " +
+		"ON members.grant_id = projections.project_grants3.grant_id " +
+		"AND members.instance_id = projections.project_grants3.instance_id " +
+		`AS OF SYSTEM TIME '-1 ms' ` +
+		"WHERE projections.login_names2.is_primary = $1")
 	projectGrantMembersColumns = []string{
 		"creation_date",
 		"change_date",
@@ -277,7 +278,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

@@ -2,10 +2,10 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -27,7 +28,7 @@ import (
 
 type Queries struct {
 	eventstore *eventstore.Eventstore
-	client     *sql.DB
+	client     *database.DB
 
 	idpConfigEncryption crypto.EncryptionAlgorithm
 
@@ -42,7 +43,7 @@ type Queries struct {
 	multifactors                        domain.MultifactorConfigs
 }
 
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *database.DB, projections projection.Config, defaults sd.SystemDefaults, idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login statik dir")
@@ -79,14 +80,19 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql
 		},
 	}
 
-	err = projection.Start(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
+	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	if err != nil {
 		return nil, err
 	}
+	projection.Start()
 
 	return repo, nil
 }
 
 func (q *Queries) Health(ctx context.Context) error {
 	return q.client.Ping()
+}
+
+type prepareDatabase interface {
+	Timetravel(d time.Duration) string
 }

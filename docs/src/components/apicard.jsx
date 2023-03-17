@@ -1,34 +1,32 @@
-import React from 'react';
+import React from "react";
 
-import styles from '../css/apicard.module.css';
+import styles from "../css/apicard.module.css";
 
-export function ApiCard({ title, type, label, children}) {
-  let style = styles.apiauth;
+export function ApiCard({ type, children }) {
+  let classes = "";
   switch (type) {
-    case 'AUTH':
-      style = styles.apiauth;
+    case "AUTH":
+      classes = "bg-green-500/10 dark:bg-green-500/20";
       break;
-    case 'MGMT':
-      style = styles.apimgmt;
+    case "MGMT":
+      classes = "bg-blue-500/10 dark:bg-blue-500/20";
       break;
-    case 'ADMIN':
-      style = styles.apiadmin;
+    case "ADMIN":
+      classes = "bg-red-500/10 dark:bg-red-500/20";
       break;
-    case 'SYSTEM':
-      style = styles.apisystem;
+    case "SYSTEM":
+      classes = "bg-yellow-500/10 dark:bg-yellow-500/20";
       break;
-    case 'ASSET':
-      style = styles.apiasset;
-      break;      
+    case "ASSET":
+      classes = "bg-black/10 dark:bg-black/20";
+      break;
   }
-    
+
   return (
-    <div className={`${styles.apicard} ${style} `}>
-      {/* {title && <h2 className={styles.apicard.title}>{title}</h2>} */}
-      {/* <p className={styles.apicard.description}>
-        
-      </p> */}
+    <div
+      className={`${styles.apicard} flex mb-4 flex-row p-4 rounded-lg ${classes} `}
+    >
       {children}
     </div>
-  )
+  );
 }
