@@ -1,22 +1,26 @@
-package senders
+package instrumenting
 
 import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/notification/channels"
-	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
 )
 
-func instrument(
+func Wrap(
 	ctx context.Context,
 	channel channels.NotificationChannel,
+	traceSpanName,
 	successMetricName,
 	failureMetricName string,
 ) channels.NotificationChannel {
-	return instrumenting.CountReturnValues(
+	return traceMessages(
 		ctx,
-		instrumenting.LogReturnValues(ctx, channel),
-		successMetricName,
-		failureMetricName,
+		countMessages(
+			ctx,
+			logMessages(ctx, channel),
+			successMetricName,
+			failureMetricName,
+		),
+		traceSpanName,
 	)
 }

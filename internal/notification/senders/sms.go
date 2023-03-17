@@ -3,11 +3,15 @@ package senders
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
+
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 )
+
+const twilioSpanName = "twilio.NotificationChannel"
 
 func SMSChannels(
 	ctx context.Context,
@@ -21,9 +25,10 @@ func SMSChannels(
 	if twilioConfig != nil {
 		channels = append(
 			channels,
-			instrument(
+			instrumenting.Wrap(
 				ctx,
-				twilio.InitTwilioChannel(*twilioConfig),
+				twilio.InitChannel(*twilioConfig),
+				twilioSpanName,
 				successMetricName,
 				failureMetricName,
 			),

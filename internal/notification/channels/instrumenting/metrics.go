@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
-func CountReturnValues(ctx context.Context, channel channels.NotificationChannel, successMetricName, errorMetricName string) channels.NotificationChannel {
+func countMessages(ctx context.Context, channel channels.NotificationChannel, successMetricName, errorMetricName string) channels.NotificationChannel {
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 		err := channel.HandleMessage(message)
 		metricName := successMetricName

@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
-func InitWebhookChannel(ctx context.Context, cfg Config) (channels.NotificationChannel, error) {
+func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel, error) {
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}

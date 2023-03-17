@@ -3,11 +3,15 @@ package senders
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
+
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 )
+
+const webhookSpanName = "webhook.NotificationChannel"
 
 func JSONChannels(
 	ctx context.Context,
@@ -21,14 +25,15 @@ func JSONChannels(
 		return nil, err
 	}
 	channels := make([]channels.NotificationChannel, 0, 3)
-	webhookChannel, err := webhook.InitWebhookChannel(ctx, webhookConfig)
+	webhookChannel, err := webhook.InitChannel(ctx, webhookConfig)
 	// TODO: Handle this error?
 	if err == nil {
 		channels = append(
 			channels,
-			instrument(
+			instrumenting.Wrap(
 				ctx,
 				webhookChannel,
+				webhookSpanName,
 				successMetricName,
 				failureMetricName,
 			),

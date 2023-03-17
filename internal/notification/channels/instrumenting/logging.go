@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels"
 )
 
-func LogReturnValues(ctx context.Context, channel channels.NotificationChannel) channels.NotificationChannel {
+func logMessages(ctx context.Context, channel channels.NotificationChannel) channels.NotificationChannel {
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 		logEntry := logging.WithFields(
 			"instance", authz.GetInstance(ctx).InstanceID(),
