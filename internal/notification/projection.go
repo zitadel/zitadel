@@ -99,8 +99,6 @@ func newNotificationsProjection(
 	p.statikDir = statikDir
 	p.phase = phase
 
-	mockLongRunningCall(ctx)
-
 	// needs to be started here as it is not part of the projection.projections / projection.newProjectionsList()
 	p.Start()
 	return p
@@ -178,7 +176,7 @@ func mockLongRunningCall(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println(ctx.Err())
+			fmt.Println("stopping long running call because context is cancelledd", ctx.Err())
 			break
 		case <-ticker.C:
 			fmt.Println("tick")
