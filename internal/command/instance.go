@@ -110,7 +110,7 @@ type InstanceSetup struct {
 	}
 	EmailTemplate     []byte
 	MessageTexts      []*domain.CustomMessageText
-	SMTPConfiguration *smtp.EmailConfig
+	SMTPConfiguration *smtp.Config
 	OIDCSettings      *struct {
 		AccessTokenLifetime        time.Duration
 		IdTokenLifetime            time.Duration

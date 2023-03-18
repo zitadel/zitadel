@@ -135,12 +135,13 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 type OIDCIDPWriteModel struct {
 	eventstore.WriteModel
 
-	Name         string
-	ID           string
-	Issuer       string
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
-	Scopes       []string
+	Name             string
+	ID               string
+	Issuer           string
+	ClientID         string
+	ClientSecret     *crypto.CryptoValue
+	Scopes           []string
+	IsIDTokenMapping bool
 	idp.Options
 
 	State domain.IDPState
@@ -174,6 +175,7 @@ func (wm *OIDCIDPWriteModel) reduceAddedEvent(e *idp.OIDCIDPAddedEvent) {
 	wm.ClientID = e.ClientID
 	wm.ClientSecret = e.ClientSecret
 	wm.Scopes = e.Scopes
+	wm.IsIDTokenMapping = e.IsIDTokenMapping
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -194,6 +196,9 @@ func (wm *OIDCIDPWriteModel) reduceChangedEvent(e *idp.OIDCIDPChangedEvent) {
 	if e.Scopes != nil {
 		wm.Scopes = e.Scopes
 	}
+	if e.IsIDTokenMapping != nil {
+		wm.IsIDTokenMapping = *e.IsIDTokenMapping
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -204,6 +209,7 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
 	scopes []string,
+	idTokenMapping bool,
 	options idp.Options,
 ) ([]idp.OIDCIDPChanges, error) {
 	changes := make([]idp.OIDCIDPChanges, 0)
@@ -227,6 +233,9 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	}
 	if !reflect.DeepEqual(wm.Scopes, scopes) {
 		changes = append(changes, idp.ChangeOIDCScopes(scopes))
+	}
+	if wm.IsIDTokenMapping != idTokenMapping {
+		changes = append(changes, idp.ChangeOIDCIsIDTokenMapping(idTokenMapping))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {

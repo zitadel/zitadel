@@ -1,6 +1,6 @@
 package fs
 
-type FSConfig struct {
+type Config struct {
 	Enabled bool
 	Compact bool
 	Path    string
