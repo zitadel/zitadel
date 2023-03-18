@@ -179,12 +179,65 @@ describe('quotas', () => {
                   return false;
                 }
                 return Cypress._.matches(<ZITADELWebhookEvent>{
-                  callURL: callURL,
-                  threshold: percent,
-                  unit: 1,
-                  usage: percent,
+                  sentStatus: 200,
+                  payload: {
+                    callURL: callURL,
+                    threshold: percent,
+                    unit: 1,
+                    usage: percent,
+                  },
                 })(events[0]);
               }),
+              { timeout: 60_000 },
+            );
+          });
+        });
+
+        it.only('fires until the webhook returns a successful message', () => {
+          cy.task('failWebhookEvents', 2);
+          cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
+            cy.get<Context>('@ctx').then((ctx) => {
+              for (let i = 0; i < usage; i++) {
+                cy.request({
+                  url: urls[0],
+                  method: 'GET',
+                  auth: {
+                    bearer: ctx.api.token,
+                  },
+                });
+              }
+            });
+            cy.waitUntil(
+              () =>
+                cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
+                  if (events.length != 3) {
+                    return false;
+                  }
+                  return events.reduce<boolean>((a, b, i) => {
+                    return !a
+                      ? a
+                      : i === 0 || i === 1
+                      ? Cypress._.matches(<ZITADELWebhookEvent>{
+                          sentStatus: 500,
+                          payload: {
+                            callURL: callURL,
+                            threshold: percent,
+                            unit: 1,
+                            usage: percent,
+                          },
+                        })(b)
+                      : Cypress._.matches(<ZITADELWebhookEvent>{
+                          sentStatus: 200,
+                          payload: {
+                            callURL: callURL,
+                            threshold: percent,
+                            unit: 1,
+                            usage: percent,
+                          },
+                        })(b);
+                  }, true);
+                }),
+              { timeout: 60_000 },
             );
           });
         });
@@ -229,10 +282,13 @@ describe('quotas', () => {
                 const threshold = percent * (i + 1);
                 if (
                   !Cypress._.matches(<ZITADELWebhookEvent>{
-                    callURL: callURL,
-                    threshold: threshold,
-                    unit: 1,
-                    usage: threshold,
+                    sentStatus: 200,
+                    payload: {
+                      callURL: callURL,
+                      threshold: threshold,
+                      unit: 1,
+                      usage: threshold,
+                    },
                   })(events[i])
                 ) {
                   return false;
