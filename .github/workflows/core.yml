@@ -101,7 +101,7 @@ jobs:
         file: build/core/scratch
         platforms: ${{ matrix.goos }}/${{ matrix.goarch }}
         push: false
-        tags: zitadel/core-scratch:${{ github.sha }}
+        tags: zitadel/core:${{ github.sha }}-scratch, zitadel/zitadel:${{ github.sha }}
     - uses: docker/build-push-action@v4
       if: matrix.goos == 'linux'
       with:
@@ -109,7 +109,7 @@ jobs:
         file: build/core/alpine
         platforms: ${{ matrix.goos }}/${{ matrix.goarch }}
         push: false
-        tags: zitadel/core-alpine:${{ github.sha }}
+        tags: zitadel/core:${{ github.sha }}-alpine
 
   success:
     name: success
