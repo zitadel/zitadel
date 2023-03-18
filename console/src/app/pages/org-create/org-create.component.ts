@@ -57,7 +57,7 @@ export class OrgCreateComponent {
   public pwdForm?: UntypedFormGroup;
 
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = ['de', 'en', 'fr', 'it', 'jp', 'pl', 'zh'];
+  public languages: string[] = ['de', 'en', 'fr', 'it', 'ja', 'pl', 'zh'];
 
   public policy?: PasswordComplexityPolicy.AsObject;
   public usePassword: boolean = false;
