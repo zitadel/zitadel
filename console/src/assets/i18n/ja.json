@@ -244,7 +244,16 @@
     "TOKENINVALID": {
       "TITLE": "トークンが期限切れになりました。",
       "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
-    }
+    },
+    "INVALID_FORMAT": "不正なフォーマットです",
+    "NOTANEMAIL": "入力された値がメールアドレスではありません。",
+    "MINLENGTH": "{{requiredLength}} 文字以上の文字列が必要です。",
+    "UPPERCASEMISSING": "大文字を含める必要があります。",
+    "LOWERCASEMISSING": "小文字を含める必要があります。",
+    "SYMBOLERROR": "シンボルや句読点を含める必要があります。",
+    "NUMBERERROR": "小数点を含める必要があります。",
+    "PWNOTEQUAL": "パスワードが一致しません。",
+    "PHONE": "電話番号は00か+で始まる必要があります。"
   },
   "USER": {
     "SETTINGS": {
@@ -525,8 +534,7 @@
       "SET": "新しいパスワードを設定する",
       "RESENDNOTIFICATION": "パスワードリセットのリンクを送信する",
       "REQUIRED": "一部の必須項目が不足しています。",
-      "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。",
-      "NOTEQUAL": "入力されたパスワードが一致しません。"
+      "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。"
     },
     "ID": "id",
     "EMAIL": "Eメール",
@@ -579,17 +587,6 @@
         "2": "プロジェクト名で絞り込み",
         "3": "ロール名で絞り込み"
       }
-    },
-    "VALIDATION": {
-      "INVALIDPATTERN": "パスワードが、定義されたルールを満たしていません。",
-      "NOTANEMAIL": "指定された値はメールアドレスではありません",
-      "REQUIRED": "入力フィールドは空です",
-      "MINLENGTH": "パスワードは、最小で{{requiredLength}}文字の長さが必要です。",
-      "NOEMAIL": "ユーザー名をメールアドレスにすることはできません。",
-      "UPPERCASEMISSING": "大文字を含める必要があります。",
-      "LOWERCASEMISSING": "小文字を含める必要があります。",
-      "SYMBOLERROR": "シンボルまたは句読点を含める必要があります。",
-      "NUMBERERROR": "数字を含める必要があります。"
     },
     "STATE": {
       "0": "不明",
@@ -1635,7 +1632,15 @@
       },
       "GOOGLE": {
         "TITLE": "Googleプロバイダー",
-        "DESCRIPTION": "Google Identity Providerのクレデンシャルを入力してください。"
+        "DESCRIPTION": "Google Identityプロバイダーのクレデンシャルを入力してください。"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlabプロバイダー",
+        "DESCRIPTION": "Gitlabプロバイダーのクレデンシャルを入力してください。"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlabプロバイダー（セルフホスト）",
+        "DESCRIPTION": "Gitlabプロバイダー（セルフホスト）のクレデンシャルを入力してください。"
       },
       "GITHUBES": {
         "TITLE": "GitHub Enterprise Serverプロバイダー",
@@ -1644,6 +1649,10 @@
       "GITHUB": {
         "TITLE": "Githubプロバイダー",
         "DESCRIPTION": "GitHub IDプロバイダーのクレデンシャルを入力してください。"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoftプロバイダー",
+        "DESCRIPTION": "Microsoftプロバイダーのクレデンシャルを入力してください。"
       }
     },
     "DETAIL": {
@@ -1671,6 +1680,14 @@
       "1": "アクティブ",
       "2": "非アクティブ"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "共通",
+      "1": "組織",
+      "2": "顧客"
+    },
+    "AZUREADTENANTTYPE": "テナントタイプ",
+    "AZUREADTENANTID": "テナントID",
+    "EMAILVERIFIED": "検証済みメールアドレス",
     "NAMEHINT": "指定されている場合、ログイン画面に表示されます。",
     "OPTIONAL": "オプション",
     "UPDATECLIENTSECRET": "クライアントシークレットを更新する",
