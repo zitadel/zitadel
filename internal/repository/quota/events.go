@@ -195,13 +195,18 @@ func NewNotifiedEvent(
 			&aggregate,
 			NotifiedEventType,
 		),
-		Unit:        dueEvent.Unit,
-		ID:          id,
-		CallURL:     dueEvent.CallURL,
+		ID:         id,
+		DueEventID: dueEvent.ID,
+		// Deprecated: dereference the NotificationDueEvent
+		Unit: dueEvent.Unit,
+		// Deprecated: dereference the NotificationDueEvent
+		CallURL: dueEvent.CallURL,
+		// Deprecated: dereference the NotificationDueEvent
 		PeriodStart: dueEvent.PeriodStart,
-		Threshold:   dueEvent.Threshold,
-		Usage:       dueEvent.Usage,
-		DueEventID:  dueEvent.ID,
+		// Deprecated: dereference the NotificationDueEvent
+		Threshold: dueEvent.Threshold,
+		// Deprecated: dereference the NotificationDueEvent
+		Usage: dueEvent.Usage,
 	}
 }
 

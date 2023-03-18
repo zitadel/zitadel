@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -21,6 +22,9 @@ func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel,
 	logging.Debug("successfully initialized webhook json channel")
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 
+		requestCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		defer cancel()
+
 		msg, ok := message.(*messages.JSON)
 		if !ok {
 			return caos_errs.ThrowInternal(nil, "WEBH-K686U", "message is not JSON")
@@ -30,7 +34,7 @@ func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel,
 			return err
 		}
 
-		req, err := http.NewRequestWithContext(ctx, cfg.Method, cfg.CallURL, strings.NewReader(payload))
+		req, err := http.NewRequestWithContext(requestCtx, cfg.Method, cfg.CallURL, strings.NewReader(payload))
 		if err != nil {
 			return err
 		}

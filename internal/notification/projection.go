@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -44,7 +45,20 @@ const (
 	metricFailedDeliveriesJSON      = "failed_deliveries_json"
 )
 
-func Start(ctx context.Context, customConfig projection.CustomConfig, externalPort uint16, externalSecure bool, commands *command.Commands, queries *query.Queries, es *eventstore.Eventstore, assetsPrefix func(context.Context) string, fileSystemPath string, userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm) {
+func Start(
+	ctx context.Context,
+	customConfig projection.CustomConfig,
+	externalPort uint16,
+	externalSecure bool,
+	commands *command.Commands,
+	queries *query.Queries,
+	es *eventstore.Eventstore,
+	assetsPrefix func(context.Context) string,
+	fileSystemPath string,
+	userEncryption,
+	smtpEncryption,
+	smsEncryption crypto.EncryptionAlgorithm,
+) {
 	statikFS, err := statik_fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
 	err = metrics.RegisterCounter(metricSuccessfulDeliveriesEmail, "Successfully delivered emails")
@@ -163,6 +177,10 @@ func (p *notificationsProjection) reducers() []handler.AggregateReducer {
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reducePasswordChanged,
 				},
+			},
+		}, {
+			Aggregate: quota.AggregateType,
+			EventRedusers: []handler.EventReducer{
 				{
 					Event:  quota.NotificationDueEventType,
 					Reduce: p.reduceNotificationDue,
@@ -583,6 +601,17 @@ func (p *notificationsProjection) reducePasswordChanged(event eventstore.Event) 
 }
 
 func (p *notificationsProjection) reduceNotificationDue(event eventstore.Event) (*handler.Statement, error) {
+	fmt.Println("---------------------------------------------------")
+	fmt.Println("---------------------------------------------------")
+	fmt.Println("---------------------------------------------------")
+	fmt.Println("---------------------------------------------------")
+	fmt.Println("---------------------------------------------------")
+	fmt.Println("------------ reduceNotificationDue ----------------")
+	fmt.Println("---------------------------------------------------")
+	fmt.Println("---------------------------------------------------")
+	fmt.Println("---------------------------------------------------")
+	fmt.Println("---------------------------------------------------")
+	fmt.Println("---------------------------------------------------")
 	e, ok := event.(*quota.NotificationDueEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DLxdE", "reduce.wrong.event.type %s", quota.NotificationDueEventType)

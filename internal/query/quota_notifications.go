@@ -33,7 +33,7 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, config *quota.Ad
 			threshold = uint16(math.Min(1, math.Floor(float64(usedRel)/float64(notification.Percent)))) * notification.Percent
 		}
 
-		if wm.latestNotifiedThresholds[notification.ID] < threshold {
+		if wm.latestDueThresholds[notification.ID] < threshold {
 			dueNotifications = append(
 				dueNotifications,
 				quota.NewNotificationDueEvent(
