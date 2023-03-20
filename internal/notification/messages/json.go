@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/notification/channels"
 )
 

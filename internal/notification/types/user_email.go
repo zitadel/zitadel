@@ -4,9 +4,8 @@ import (
 	"context"
 	"html"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"

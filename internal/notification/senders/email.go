@@ -3,10 +3,9 @@ package senders
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
-
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 )

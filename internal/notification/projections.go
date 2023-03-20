@@ -3,8 +3,6 @@ package notification
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/notification/handlers/quotanotifier"
-
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
 
@@ -12,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/handlers/notifqry"
+	"github.com/zitadel/zitadel/internal/notification/handlers/quotanotifier"
 	"github.com/zitadel/zitadel/internal/notification/handlers/usernotifier"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"

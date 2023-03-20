@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/notification/channels"
 )
 

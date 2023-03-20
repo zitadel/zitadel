@@ -8,12 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/k3a/html2text"
 	"github.com/zitadel/logging"
 
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
-
-	"github.com/k3a/html2text"
-
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
