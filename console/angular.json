@@ -24,7 +24,7 @@
             "tsConfig": "tsconfig.app.json",
             "assets": ["src/favicon.ico", "src/assets", "src/manifest.webmanifest"],
             "styles": ["src/styles.scss"],
-            "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],
+            "scripts": ["../node_modules/tinycolor2/dist/tinycolor-min.js"],
             "allowedCommonJsDependencies": [
               "fast-sha256",
               "buffer",
@@ -129,7 +129,7 @@
             "karmaConfig": "karma.conf.js",
             "assets": ["src/favicon.ico", "src/assets", "src/manifest.webmanifest"],
             "styles": ["./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css", "src/styles.scss"],
-            "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"]
+            "scripts": ["../node_modules/tinycolor2/dist/tinycolor-min.js"]
           }
         },
         "lint": {

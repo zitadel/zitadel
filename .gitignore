@@ -72,3 +72,4 @@ go.work
 go.work.sum
 # Local Netlify folder
 .netlify
+node_modules

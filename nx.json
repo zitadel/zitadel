@@ -1,0 +1,48 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "npmScope": "zitadel",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "e2e",
+          "generate"
+        ],
+        "accessToken": "YTkyM2M0YzEtNjAyZC00ZWMyLWJjYzMtMGY2Nzk2Yjc5YmIyfHJlYWQtd3JpdGU="
+      }
+    }
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": [
+        "generate",
+        "^build"
+      ],
+      "inputs": [
+        "!{projectRoot}/src/app/proto/generated"
+      ]
+    },
+    "generate": {
+      "outputs": [
+        "{projectRoot}/src/app/proto/generated"
+      ],
+      "inputs": [
+        "{workspaceRoot}/proto"
+      ]
+    }
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default"
+    ],
+    "sharedGlobals": []
+  }
+}
