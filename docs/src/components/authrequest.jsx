@@ -52,7 +52,6 @@ export function SetAuthRequest() {
     "offline_access",
     "urn:zitadel:iam:org:project:id:zitadel:aud",
     "urn:zitadel:iam:user:metadata",
-    "urn:zitadel:iam:org:project:roles",
     `urn:zitadel:iam:org:id:${
       organizationId ? organizationId : "[organizationId]"
     }`,
