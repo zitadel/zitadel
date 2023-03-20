@@ -188,7 +188,6 @@ describe('quotas', () => {
                   },
                 })(events[0]);
               }),
-              { timeout: 60_000 },
             );
           });
         });
@@ -238,7 +237,6 @@ describe('quotas', () => {
                         })(b);
                   }, true);
                 }),
-              { timeout: 60_000 },
             );
           });
         });
