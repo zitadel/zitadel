@@ -194,7 +194,8 @@ describe('quotas', () => {
         });
 
         it.only('fires until the webhook returns a successful message', () => {
-          cy.task('failWebhookEvents', 2);
+          // Default MaxFailureCount is 5, customized to 0 which means infinite
+          cy.task('failWebhookEvents', 8);
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
             cy.get<Context>('@ctx').then((ctx) => {
               for (let i = 0; i < usage; i++) {
@@ -210,13 +211,13 @@ describe('quotas', () => {
             cy.waitUntil(
               () =>
                 cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-                  if (events.length != 3) {
+                  if (events.length != 9) {
                     return false;
                   }
                   return events.reduce<boolean>((a, b, i) => {
                     return !a
                       ? a
-                      : i === 0 || i === 1
+                      : i < 8
                       ? Cypress._.matches(<ZITADELWebhookEvent>{
                           sentStatus: 500,
                           payload: {
