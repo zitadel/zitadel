@@ -63,6 +63,7 @@ var (
 	SecurityPolicyProjection            *securityPolicyProjection
 	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
+	NotificationsQuotaProjection        interface{}
 )
 
 type projection interface {
