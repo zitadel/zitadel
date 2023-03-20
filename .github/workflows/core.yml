@@ -82,7 +82,7 @@ jobs:
         version: ${{ inputs.buf_version }}
         github_token: ${{ github.token }}
     - run: make generate
-    - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+    - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
     - uses: actions/upload-artifact@v3
       with:
         name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
