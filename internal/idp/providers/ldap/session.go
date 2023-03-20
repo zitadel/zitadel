@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"net"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -30,15 +32,37 @@ type Session struct {
 func (s *Session) GetAuthURL() string {
 	return s.loginUrl
 }
-func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
+func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
 	var user *ldap.Entry
-	var err error
 	for _, server := range s.Provider.servers {
+		conn, err := ldap.DialURL(server, ldap.DialWithDialer(&net.Dialer{Timeout: s.Provider.timeout}))
+		if err != nil {
+			// Failed DialURL start with next server
+			continue
+		}
+		defer conn.Close()
+
+		u, err := url.Parse(server)
+		if err != nil {
+			// Failed URL parsing end with error
+			return nil, err
+		}
+		if u.Scheme == "ldaps" && s.Provider.startTLS {
+			err = conn.StartTLS(&tls.Config{ServerName: u.Host})
+			if err != nil {
+				// Failed StartTLS connection try with next server
+				continue
+			}
+		}
+		// Bind as the admin to search for user
+		err = conn.Bind(s.Provider.bindDN, s.Provider.bindPassword)
+		if err != nil {
+			// Failed bind try with next server
+			continue
+		}
+
 		user, err = tryLogin(
-			server,
-			s.Provider.startTLS,
-			s.Provider.bindDN,
-			s.Provider.bindPassword,
+			conn,
 			s.Provider.baseDN,
 			s.Provider.getNecessaryAttributes(),
 			s.Provider.userObjectClasses,
@@ -47,12 +71,9 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 			s.Password,
 			s.Provider.timeout,
 		)
-		if err == nil && user != nil {
-			break
+		if err != nil {
+			return nil, err
 		}
-	}
-	if err != nil {
-		return nil, err
 	}
 
 	var emailVerified bool
@@ -88,10 +109,7 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 }
 
 func tryLogin(
-	server string,
-	startTLS bool,
-	bindDN string,
-	bindPassword string,
+	conn *ldap.Conn,
 	baseDN string,
 	attributes []string,
 	objectClasses []string,
@@ -100,39 +118,23 @@ func tryLogin(
 	password string,
 	timeout time.Duration,
 ) (*ldap.Entry, error) {
-	l, err := ldap.DialURL(server)
-	if err != nil {
-		return nil, err
-	}
-	defer l.Close()
-
-	if !strings.HasPrefix(server, "ldaps") && startTLS {
-		parts := strings.Split(server, "://")
-		parts = strings.Split(parts[1], ":")
-
-		err = l.StartTLS(&tls.Config{ServerName: parts[0]})
-		if err != nil {
-			return nil, err
-		}
-	}
-	// Bind as the admin to search for user
-	err = l.Bind(bindDN, bindPassword)
-	if err != nil {
-		return nil, err
-	}
-
-	searchQuery := queriesAndToSearchQuery(objectClassesToSearchQuery(objectClasses), queriesOrToSearchQuery(userFiltersToSearchQuery(userFilters, username)))
+	searchQuery := queriesAndToSearchQuery(
+		objectClassesToSearchQuery(objectClasses),
+		queriesOrToSearchQuery(
+			userFiltersToSearchQuery(userFilters, username),
+		),
+	)
 
 	// Search for user with the unique attribute for the userDN
 	searchRequest := ldap.NewSearchRequest(
 		baseDN,
-		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, int(timeout.Seconds()), false,
+		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		searchQuery,
 		attributes,
 		nil,
 	)
 
-	sr, err := l.Search(searchRequest)
+	sr, err := conn.Search(searchRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -142,14 +144,19 @@ func tryLogin(
 
 	user := sr.Entries[0]
 	// Bind as the user to verify their password
-
-	if err = l.Bind(user.DN, password); err != nil {
+	if err = conn.Bind(user.DN, password); err != nil {
 		return nil, ErrFailedLogin
 	}
 	return user, nil
 }
 
 func queriesAndToSearchQuery(queries ...string) string {
+	if len(queries) == 0 {
+		return ""
+	}
+	if len(queries) == 1 {
+		return queries[0]
+	}
 	joinQueries := []string{"(&"}
 	joinQueries = append(joinQueries, queries...)
 	joinQueries = append(joinQueries, ")")
@@ -157,6 +164,12 @@ func queriesAndToSearchQuery(queries ...string) string {
 }
 
 func queriesOrToSearchQuery(queries ...string) string {
+	if len(queries) == 0 {
+		return ""
+	}
+	if len(queries) == 1 {
+		return queries[0]
+	}
 	joinQueries := []string{"(|"}
 	joinQueries = append(joinQueries, queries...)
 	joinQueries = append(joinQueries, ")")

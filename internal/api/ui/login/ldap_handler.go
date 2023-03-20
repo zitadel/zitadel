@@ -51,6 +51,7 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 		err := l.authRepo.ResetSelectedIDP(r.Context(), authReq.ID, userAgentID)
 		if err != nil {
 			l.renderLDAPLogin(w, r, authReq, err)
+			return
 		}
 
 		l.handleLoginName(w, r)
