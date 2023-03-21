@@ -3,7 +3,7 @@
     "rewrites": [
         {
             "source": "/docs/proxy/js/script.js",
-            "destination": "https://plausible.io/js/script.js"
+            "destination": "https://plausible.io/js/script.tagged-events.outbound-links.js"
         },
         {
             "source": "/docs/proxy/api/event",
