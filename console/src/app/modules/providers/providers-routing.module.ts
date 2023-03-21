@@ -9,6 +9,7 @@ import { ProviderGitlabSelfHostedComponent } from './provider-gitlab-self-hosted
 import { ProviderGitlabComponent } from './provider-gitlab/provider-gitlab.component';
 import { ProviderGoogleComponent } from './provider-google/provider-google.component';
 import { ProviderJWTComponent } from './provider-jwt/provider-jwt.component';
+import { ProviderLDAPComponent } from './provider-ldap/provider-ldap.component';
 import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.component';
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
 
@@ -25,6 +26,7 @@ const typeMap = {
   [ProviderType.PROVIDER_TYPE_JWT]: { path: 'jwt', component: ProviderJWTComponent },
   [ProviderType.PROVIDER_TYPE_OAUTH]: { path: 'oauth', component: ProviderOAuthComponent },
   [ProviderType.PROVIDER_TYPE_OIDC]: { path: 'oidc', component: ProviderOIDCComponent },
+  [ProviderType.PROVIDER_TYPE_LDAP]: { path: 'ldap', component: ProviderLDAPComponent },
 };
 
 const routes: Routes = Object.entries(typeMap).map(([key, value]) => {

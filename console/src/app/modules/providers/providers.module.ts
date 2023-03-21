@@ -22,6 +22,7 @@ import { ProviderGitlabSelfHostedComponent } from './provider-gitlab-self-hosted
 import { ProviderGitlabComponent } from './provider-gitlab/provider-gitlab.component';
 import { ProviderGoogleComponent } from './provider-google/provider-google.component';
 import { ProviderJWTComponent } from './provider-jwt/provider-jwt.component';
+import { ProviderLDAPComponent } from './provider-ldap/provider-ldap.component';
 import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.component';
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
 import { ProvidersRoutingModule } from './providers-routing.module';
@@ -38,6 +39,7 @@ import { ProvidersRoutingModule } from './providers-routing.module';
     ProviderJWTComponent,
     ProviderOIDCComponent,
     ProviderOAuthComponent,
+    ProviderLDAPComponent,
   ],
   imports: [
     ProvidersRoutingModule,

@@ -30,6 +30,8 @@ import {
   AddIDPToLoginPolicyResponse,
   AddJWTProviderRequest,
   AddJWTProviderResponse,
+  AddLDAPProviderRequest,
+  AddLDAPProviderResponse,
   AddMultiFactorToLoginPolicyRequest,
   AddMultiFactorToLoginPolicyResponse,
   AddNotificationPolicyRequest,
@@ -228,6 +230,8 @@ import {
   UpdateJWTProviderResponse,
   UpdateLabelPolicyRequest,
   UpdateLabelPolicyResponse,
+  UpdateLDAPProviderRequest,
+  UpdateLDAPProviderResponse,
   UpdateLockoutPolicyRequest,
   UpdateLockoutPolicyResponse,
   UpdateLoginPolicyRequest,
@@ -932,6 +936,14 @@ export class AdminService {
 
   public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
     return this.grpcService.admin.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addLDAPProvider(req: AddLDAPProviderRequest): Promise<AddLDAPProviderResponse.AsObject> {
+    return this.grpcService.admin.addLDAPProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateLDAPProvider(req: UpdateLDAPProviderRequest): Promise<UpdateLDAPProviderResponse.AsObject> {
+    return this.grpcService.admin.updateLDAPProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGitLabProvider(req: AddGitLabProviderRequest): Promise<AddGitLabProviderResponse.AsObject> {
