@@ -50,10 +50,16 @@ export class ProviderLDAPComponent {
     private breadcrumbService: BreadcrumbService,
   ) {
     this.form = new FormGroup({
-      name: new FormControl('', []),
-      clientId: new FormControl('', [requiredValidator]),
-      clientSecret: new FormControl('', [requiredValidator]),
-      scopesList: new FormControl(['openid', 'profile', 'email'], []),
+      name: new FormControl('', [requiredValidator]),
+      serversList: new FormControl('', [requiredValidator]),
+      baseDn: new FormControl('', [requiredValidator]),
+      bindDn: new FormControl('', [requiredValidator]),
+      bindPassword: new FormControl('', [requiredValidator]),
+      userBase: new FormControl('', [requiredValidator]),
+      userFiltersList: new FormControl('', [requiredValidator]),
+      userObjectClassesList: new FormControl('', [requiredValidator]),
+      timeout: new FormControl('', [requiredValidator]),
+      startTls: new FormControl(false, [requiredValidator]),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {

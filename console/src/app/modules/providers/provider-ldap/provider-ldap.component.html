@@ -22,34 +22,26 @@
         </cnsl-form-field>
 
         <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.BASEDN' | translate }}</cnsl-label>
-          <input cnslInput formControlName="baseDn" />
-        </cnsl-form-field>
-
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.BINDDN' | translate }}</cnsl-label>
-          <input cnslInput formControlName="bindDn" />
-        </cnsl-form-field>
-
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.BINDPASSWORD' | translate }}</cnsl-label>
-          <input cnslInput formControlName="bindPassword" />
-        </cnsl-form-field>
-
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.SERVERSLIST' | translate }}</cnsl-label>
+          <cnsl-label>{{ 'IDP.SERVERS' | translate }}</cnsl-label>
           <input cnslInput formControlName="serversList" />
         </cnsl-form-field>
 
         <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.STARTTLS' | translate }}</cnsl-label>
-          <input cnslInput formControlName="startTls" />
+          <cnsl-label>{{ 'IDP.BASEDN' | translate }}</cnsl-label>
+          <input cnslInput formControlName="baseDn" />
         </cnsl-form-field>
 
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.TIMEOUT' | translate }}</cnsl-label>
-          <input cnslInput formControlName="timeout" />
-        </cnsl-form-field>
+        <div class="identity-provider-2-col">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.BINDDN' | translate }}</cnsl-label>
+            <input cnslInput formControlName="bindDn" />
+          </cnsl-form-field>
+
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.BINDPASSWORD' | translate }}</cnsl-label>
+            <input cnslInput formControlName="bindPassword" />
+          </cnsl-form-field>
+        </div>
 
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.USERBASE' | translate }}</cnsl-label>
@@ -57,12 +49,12 @@
         </cnsl-form-field>
 
         <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.USERFILTERLIST' | translate }}</cnsl-label>
-          <input cnslInput formControlName="userFilterList" />
+          <cnsl-label>{{ 'IDP.USERFILTERS' | translate }}</cnsl-label>
+          <input cnslInput formControlName="userFiltersList" />
         </cnsl-form-field>
 
         <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.USEROBJECTCLASSESLIST' | translate }}</cnsl-label>
+          <cnsl-label>{{ 'IDP.USEROBJECTCLASSES' | translate }}</cnsl-label>
           <input cnslInput formControlName="userObjectClassesList" />
         </cnsl-form-field>
 
@@ -74,6 +66,13 @@
           </button>
         </div>
         <div *ngIf="showOptional">
+          <mat-checkbox formControlName="startTls">{{ 'IDP.STARTTLS' | translate }}</mat-checkbox>
+
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.TIMEOUT' | translate }}</cnsl-label>
+            <input cnslInput formControlName="timeout" />
+          </cnsl-form-field>
+
           <cnsl-provider-options
             [initialOptions]="provider?.config?.options"
             (optionsChanged)="options = $event"
