@@ -52,7 +52,7 @@ export class ProviderGitlabSelfHostedComponent {
     private breadcrumbService: BreadcrumbService,
   ) {
     this.form = new FormGroup({
-      name: new FormControl('', []),
+      name: new FormControl('', [requiredValidator]),
       issuer: new FormControl('', [requiredValidator]),
       clientId: new FormControl('', [requiredValidator]),
       clientSecret: new FormControl('', [requiredValidator]),
