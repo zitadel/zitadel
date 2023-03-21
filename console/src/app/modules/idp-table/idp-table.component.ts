@@ -142,31 +142,17 @@ export class IdpTableComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        if (this.serviceType === PolicyComponentServiceType.MGMT) {
-          (this.service as ManagementService).removeOrgIDP(idp.id).then(
-            () => {
-              this.toast.showInfo('IDP.TOAST.DELETED', true);
-              setTimeout(() => {
-                this.refreshPage();
-              }, 1000);
-            },
-            (error) => {
-              this.toast.showError(error);
-            },
-          );
-        } else {
-          (this.service as AdminService).removeIDP(idp.id).then(
-            () => {
-              this.toast.showInfo('IDP.TOAST.DELETED', true);
-              setTimeout(() => {
-                this.refreshPage();
-              }, 1000);
-            },
-            (error) => {
-              this.toast.showError(error);
-            },
-          );
-        }
+        this.service.deleteProvider(idp.id).then(
+          () => {
+            this.toast.showInfo('IDP.TOAST.DELETED', true);
+            setTimeout(() => {
+              this.refreshPage();
+            }, 1000);
+          },
+          (error) => {
+            this.toast.showError(error);
+          },
+        );
       }
     });
   }
