@@ -46,21 +46,13 @@ const LinkButton = ({
       )}&organization_id=${encodeURIComponent(organizationId)}
   `}
       onCopy={() => {
-        try {
-          window.plausible("OIDC Playground", {
-            props: { method: "Save", pageloc: "Authorize" },
-          });
-        } catch (error) {
-          console.error(error);
-        }
-
         setCopied(true);
         setTimeout(() => {
           setCopied(false);
         }, 2000);
       }}
     >
-      <button className="cursor-pointer border-none h-10 flex flex-row items-center py-2 px-4 text-white bg-gray-500 dark:bg-gray-600 hover:dark:bg-gray-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm">
+      <button className="cursor-pointer border-none h-10 flex flex-row items-center py-2 px-4 text-white bg-gray-500 dark:bg-gray-600 hover:dark:bg-gray-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm plausible-event-name=OIDC+Playground plausible-event-method=Save">
         Copy link
         {copied ? (
           <i className="text-[20px] ml-2 las la-clipboard-check"></i>
