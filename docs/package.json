@@ -155,6 +155,7 @@
     "raw-body": "2.5.1",
     "raw-loader": "^4.0.2",
     "react": "^17.0.2",
+    "react-copy-to-clipboard": "^5.1.0",
     "react-dev-utils": "12.0.1",
     "react-dom": "^17.0.2",
     "react-error-overlay": "6.0.11",
