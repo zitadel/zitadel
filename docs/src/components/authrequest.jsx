@@ -639,7 +639,7 @@ export function SetAuthRequest() {
             });
           }}
           target="_blank"
-          className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
+          className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm plausible-event-name=OIDC+Playground plausible-event-method=Try+it+out"
           href={`${
             instance.endsWith("/") ? instance : instance + "/"
           }oauth/v2/authorize?client_id=${encodeURIComponent(
