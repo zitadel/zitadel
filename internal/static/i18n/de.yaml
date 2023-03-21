@@ -292,7 +292,7 @@ Errors:
     RequiredFieldsMissing: Benötigte Felder fehlen
     Grant:
       AlreadyExists: Projekt Grant existiert bereits
-      Invalid: Projekt Grant ist ungültigP
+      Invalid: Projekt Grant ist ungültig
       NotFound: Grant konnte nicht gefunden werden
       NotExisting: Projekt Grant existiert nicht
       HasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
