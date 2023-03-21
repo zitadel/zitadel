@@ -134,6 +134,7 @@ module.exports = {
             "guides/integrate/identity-providers/introduction",
             "guides/integrate/identity-providers/google-oidc",
             "guides/integrate/identity-providers/azuread-oidc",
+            "guides/integrate/identity-providers/github",
           ],
         },
         {
