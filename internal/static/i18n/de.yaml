@@ -241,6 +241,9 @@ Errors:
       NotFound: Notification Policy konnte nicht gefunden werden
       NotChanged: Notification Policy wurde nicht verändert
       AlreadyExists: Notification Policy existiert bereits
+    LabelPolicy:
+      NotFound: Private Label Policy konnte nicht gefunden
+      NotChanged: Private Label Policy wurde nicht verändert
   Project:
     ProjectIDMissing: Project ID fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
@@ -289,7 +292,7 @@ Errors:
     RequiredFieldsMissing: Benötigte Felder fehlen
     Grant:
       AlreadyExists: Projekt Grant existiert bereits
-      Invalid: Projekt Grant ist ungültig
+      Invalid: Projekt Grant ist ungültigP
       NotFound: Grant konnte nicht gefunden werden
       NotExisting: Projekt Grant existiert nicht
       HasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
