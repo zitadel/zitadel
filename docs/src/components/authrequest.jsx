@@ -6,6 +6,7 @@ import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { Buffer } from "buffer";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import BrowserOnly from "@docusaurus/BrowserOnly";
 
 export function SetAuthRequest() {
   const {
@@ -117,57 +118,63 @@ export function SetAuthRequest() {
 
   const [copied, setCopied] = useState(false);
 
-  function copy() {
-    try {
-      window.plausible("OIDC Playground", {
-        props: { method: "Save", pageloc: "Authorize" },
-      });
-    } catch (error) {
-      console.error(error);
-    }
-
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-  }
-
   return (
     <div className="bg-white/5 rounded-md p-6 shadow">
       <div className="flex flex-row justify-between">
         <h5 className="text-lg mt-0 mb-4 font-semibold">Your Domain</h5>
-        <CopyToClipboard
-          text={`/docs/apis/openidoauth/authrequest?instance=${encodeURIComponent(
-            instance
-          )}&client_id=${encodeURIComponent(
-            clientId
-          )}&redirect_uri=${encodeURIComponent(
-            redirectUri
-          )}&response_type=${encodeURIComponent(
-            responseType
-          )}&scope=${encodeURIComponent(scope)}&prompt=${encodeURIComponent(
-            prompt
-          )}&auth_method=${encodeURIComponent(
-            authMethod
-          )}&code_verifier=${encodeURIComponent(
-            codeVerifier
-          )}&login_hint=${encodeURIComponent(
-            loginHint
-          )}&id_token_hint=${encodeURIComponent(
-            idTokenHint
-          )}&organization_id=${encodeURIComponent(organizationId)}
+        <BrowserOnly>
+          {() => {
+            return (
+              <CopyToClipboard
+                text={`https://zitadel.com/docs/apis/openidoauth/authrequest?instance=${encodeURIComponent(
+                  instance
+                )}&client_id=${encodeURIComponent(
+                  clientId
+                )}&redirect_uri=${encodeURIComponent(
+                  redirectUri
+                )}&response_type=${encodeURIComponent(
+                  responseType
+                )}&scope=${encodeURIComponent(
+                  scope
+                )}&prompt=${encodeURIComponent(
+                  prompt
+                )}&auth_method=${encodeURIComponent(
+                  authMethod
+                )}&code_verifier=${encodeURIComponent(
+                  codeVerifier
+                )}&login_hint=${encodeURIComponent(
+                  loginHint
+                )}&id_token_hint=${encodeURIComponent(
+                  idTokenHint
+                )}&organization_id=${encodeURIComponent(organizationId)}
         `}
-          onCopy={copy}
-        >
-          <button className="cursor-pointer border-none h-10 flex flex-row items-center py-2 px-4 text-white bg-gray-500 dark:bg-gray-600 hover:dark:bg-gray-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm">
-            Copy link
-            {copied ? (
-              <i class="text-[20px] ml-2 las la-clipboard-check"></i>
-            ) : (
-              <i class="text-[20px] ml-2 las la-clipboard"></i>
-            )}
-          </button>
-        </CopyToClipboard>
+                onCopy={() => {
+                  try {
+                    window.plausible("OIDC Playground", {
+                      props: { method: "Save", pageloc: "Authorize" },
+                    });
+                  } catch (error) {
+                    console.error(error);
+                  }
+
+                  setCopied(true);
+                  setTimeout(() => {
+                    setCopied(false);
+                  }, 2000);
+                }}
+              >
+                <button className="cursor-pointer border-none h-10 flex flex-row items-center py-2 px-4 text-white bg-gray-500 dark:bg-gray-600 hover:dark:bg-gray-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm">
+                  Copy link
+                  {copied ? (
+                    <i className="text-[20px] ml-2 las la-clipboard-check"></i>
+                  ) : (
+                    <i className="text-[20px] ml-2 las la-clipboard"></i>
+                  )}
+                </button>
+              </CopyToClipboard>
+            );
+          }}
+        </BrowserOnly>
       </div>
       <div className="flex flex-col">
         <label className={`${labelClasses} text-yellow-500`}>
