@@ -41,9 +41,6 @@ To be able to connect GitHub to ZITADEL you will need a client ID and a client s
 The client ID you can copy directly. A secret you have to generate by clicking "Generate new client secret".
 Make sure to save the secret, as you will not be able to show it again.
 
-86a165bcc649f86c730f
-5688e013746f30b3b4680d59bbe93e6dafdbac18
-
 ![Client ID and Secret](/img/guides/github_oauth_client_id_secret.png)
 
 ## ZITADEL Configuration
