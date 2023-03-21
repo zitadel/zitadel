@@ -330,8 +330,6 @@ import {
   RemoveMultiFactorFromLoginPolicyResponse,
   RemoveOrgDomainRequest,
   RemoveOrgDomainResponse,
-  RemoveOrgIDPRequest,
-  RemoveOrgIDPResponse,
   RemoveOrgMemberRequest,
   RemoveOrgMemberResponse,
   RemoveOrgMetadataRequest,
