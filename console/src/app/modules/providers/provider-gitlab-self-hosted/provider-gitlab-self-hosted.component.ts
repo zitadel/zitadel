@@ -120,109 +120,63 @@ export class ProviderGitlabSelfHostedComponent {
   }
 
   public addGitlabSelfHostedProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGitLabSelfHostedProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddGitLabSelfHostedProviderRequest()
+        : new AdminAddGitLabSelfHostedProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setIssuer(this.issuer?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
+    req.setName(this.name?.value);
+    req.setIssuer(this.issuer?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGitLabSelfHostedProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addGitLabSelfHostedProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGitLabSelfHostedProviderRequest();
-      req.setName(this.name?.value);
-      req.setIssuer(this.issuer?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGitLabSelfHostedProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.loading = false;
-          this.toast.showError(error);
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateGitlabSelfHostedProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGitLabSelfHostedProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setClientId(this.clientId?.value);
-        req.setScopesList(this.scopesList?.value);
-        req.setProviderOptions(this.options);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateGitLabSelfHostedProviderRequest()
+          : new AdminUpdateGitLabSelfHostedProviderRequest();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setIssuer(this.issuer?.value);
+      req.setClientId(this.clientId?.value);
+      req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
-        if (this.updateClientSecret) {
-          req.setClientSecret(this.clientSecret?.value);
-        }
-
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateGitLabSelfHostedProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGitLabSelfHostedProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setClientId(this.clientId?.value);
-        req.setScopesList(this.scopesList?.value);
-        req.setProviderOptions(this.options);
-
-        if (this.updateClientSecret) {
-          req.setClientSecret(this.clientSecret?.value);
-        }
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateGitLabSelfHostedProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.loading = false;
-            this.toast.showError(error);
-          });
+      if (this.updateClientSecret) {
+        req.setClientSecret(this.clientSecret?.value);
       }
+
+      this.loading = true;
+      this.service
+        .updateGitLabSelfHostedProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 
