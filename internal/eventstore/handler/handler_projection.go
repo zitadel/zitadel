@@ -45,18 +45,17 @@ type Unlock func(...string) error
 
 type ProjectionHandler struct {
 	Handler
-	ProjectionName             string
-	reduce                     Reduce
-	update                     Update
-	searchQuery                SearchQuery
-	triggerProjection          *time.Timer
-	lock                       Lock
-	unlock                     Unlock
-	requeueAfter               time.Duration
-	retryFailedAfter           time.Duration
-	retries                    int
-	concurrentInstances        int
-	lastSuccessfulCreationDate time.Time
+	ProjectionName      string
+	reduce              Reduce
+	update              Update
+	searchQuery         SearchQuery
+	triggerProjection   *time.Timer
+	lock                Lock
+	unlock              Unlock
+	requeueAfter        time.Duration
+	retryFailedAfter    time.Duration
+	retries             int
+	concurrentInstances int
 }
 
 func NewProjectionHandler(
@@ -113,7 +112,8 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 		if len(events) == 0 {
 			return nil
 		}
-		if err = h.Process(ctx, events...); err != nil {
+		_, err = h.Process(ctx, events...)
+		if err != nil {
 			return err
 		}
 		if !hasLimitExceeded {
@@ -123,31 +123,29 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 }
 
 // Process handles multiple events by reducing them to statements and updating the projection
-func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Event) (err error) {
+func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Event) (index int, err error) {
 	if len(events) == 0 {
-		return nil
+		return 0, nil
 	}
-	failedStatements := make([]*Statement, 0)
-	for _, event := range events {
-		statement, err := h.reduce(event)
+	index = -1
+	statements := make([]*Statement, len(events))
+	for i, event := range events {
+		statements[i], err = h.reduce(event)
 		if err != nil {
-			failedStatements = append(failedStatements, statement)
-		}
-		if event.CreationDate().After(h.lastSuccessfulCreationDate) {
-			h.lastSuccessfulCreationDate = event.CreationDate()
+			return index, err
 		}
 	}
 	for retry := 0; retry <= h.retries; retry++ {
-		_, err = h.update(ctx, failedStatements, h.reduce)
-		if err == nil {
-			break
+		index, err = h.update(ctx, statements[index+1:], h.reduce)
+		if err != nil && !errors.Is(err, ErrSomeStmtsFailed) {
+			return index, err
 		}
-		if !errors.Is(err, ErrSomeStmtsFailed) {
-			return err
+		if err == nil {
+			return index, nil
 		}
 		time.Sleep(h.retryFailedAfter)
 	}
-	return err
+	return index, err
 }
 
 // FetchEvents checks the current sequences and filters for newer events
@@ -175,7 +173,9 @@ func (h *ProjectionHandler) subscribe(ctx context.Context) {
 	}()
 	for firstEvent := range h.EventQueue {
 		events := checkAdditionalEvents(h.EventQueue, firstEvent)
-		if err := h.Process(ctx, events...); err != nil {
+
+		index, err := h.Process(ctx, events...)
+		if err != nil || index < len(events)-1 {
 			logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("unable to process all events from subscription")
 		}
 	}
@@ -222,9 +222,9 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			go h.cancelOnErr(lockCtx, errs, cancelLock)
 		}
 		if succeededOnce {
-			// just use events that are not successfully processed, already
-			// TODO: Does this obsolete the succededOnce handling?
-			query = query.CreationDateAfter(h.lastSuccessfulCreationDate)
+			// since we have at least one successful run, we can restrict it to events not older than
+			// twice the requeue time (just to be sure not to miss an event)
+			query = query.CreationDateAfter(time.Now().Add(-2 * h.requeueAfter))
 		}
 		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
 		if err != nil {
