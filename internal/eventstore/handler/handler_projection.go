@@ -113,8 +113,7 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 		if len(events) == 0 {
 			return nil
 		}
-		_, err = h.Process(ctx, events...)
-		if err != nil {
+		if err = h.Process(ctx, events...); err != nil {
 			return err
 		}
 		if !hasLimitExceeded {
@@ -124,29 +123,31 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 }
 
 // Process handles multiple events by reducing them to statements and updating the projection
-func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Event) (index int, err error) {
+func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Event) (err error) {
 	if len(events) == 0 {
-		return 0, nil
+		return nil
 	}
-	index = -1
-	statements := make([]*Statement, len(events))
-	for i, event := range events {
-		statements[i], err = h.reduce(event)
-		if err == nil && event.CreationDate().After(h.lastSuccessfulCreationDate) {
+	failedStatements := make([]*Statement, 0)
+	for _, event := range events {
+		statement, err := h.reduce(event)
+		if err != nil {
+			failedStatements = append(failedStatements, statement)
+		}
+		if event.CreationDate().After(h.lastSuccessfulCreationDate) {
 			h.lastSuccessfulCreationDate = event.CreationDate()
 		}
 	}
 	for retry := 0; retry <= h.retries; retry++ {
-		index, err = h.update(ctx, statements[index+1:], h.reduce)
-		if err != nil && !errors.Is(err, ErrSomeStmtsFailed) {
-			return index, err
-		}
+		_, err = h.update(ctx, failedStatements, h.reduce)
 		if err == nil {
-			return index, nil
+			break
+		}
+		if !errors.Is(err, ErrSomeStmtsFailed) {
+			return err
 		}
 		time.Sleep(h.retryFailedAfter)
 	}
-	return index, err
+	return err
 }
 
 // FetchEvents checks the current sequences and filters for newer events
@@ -174,9 +175,7 @@ func (h *ProjectionHandler) subscribe(ctx context.Context) {
 	}()
 	for firstEvent := range h.EventQueue {
 		events := checkAdditionalEvents(h.EventQueue, firstEvent)
-
-		index, err := h.Process(ctx, events...)
-		if err != nil || index < len(events)-1 {
+		if err := h.Process(ctx, events...); err != nil {
 			logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("unable to process all events from subscription")
 		}
 	}
