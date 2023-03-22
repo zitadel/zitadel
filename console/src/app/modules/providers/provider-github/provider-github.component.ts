@@ -30,7 +30,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderGithubComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
@@ -130,6 +130,7 @@ export class ProviderGithubComponent {
     req.setScopesList(this.scopesList?.value);
     req.setProviderOptions(this.options);
 
+    console.log(this.options.toObject());
     this.loading = true;
     this.service
       .addGitHubProvider(req)
