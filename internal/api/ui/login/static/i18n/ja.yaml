@@ -1,0 +1,386 @@
+Login:
+  Title: ようこそ！
+  Description: ログイン情報を入力してください。
+  TitleLinking: ユーザーリンク用のログイン
+  DescriptionLinking: ログインデータを入力して、外部ユーザーをZITADELユーザーにリンクします。
+  LoginNameLabel: ログイン名
+  UsernamePlaceHolder: ユーザー名
+  LoginnamePlaceHolder: ユーザー名@ドメイン
+  ExternalUserDescription: 外部ユーザーでログインします
+  MustBeMemberOfOrg: ユーザーは組織 {{.OrgName}} のメンバーである必要があります。
+  RegisterButtonText: 登録
+  NextButtonText: 次へ
+
+SelectAccount:
+  Title: アカウントの選択
+  Description: ZITADELアカウントを使用します。
+  TitleLinking: ユーザーリンクのアカウント選択
+  DescriptionLinking: アカウントを選択して、外部ユーザーにリンクします。
+  OtherUser: その他のユーザー
+  SessionState0: アクティブ
+  SessionState1: 非アクティブ
+  MustBeMemberOfOrg: ユーザーは組織 {{.OrgName}} のメンバーである必要があります。
+
+Password:
+  Title: パスワードの入力
+  Description: ログインデータを入力します。
+  PasswordLabel: パスワード
+  MinLength: 文字列の長さ
+  HasUppercase: 大文字
+  HasLowercase: 小文字
+  HasNumber: 数字
+  HasSymbol: シンボル
+  Confirmation: パスワードの確認
+  ResetLinkText: パスワードを再設定する
+  BackButtonText: 戻る
+  NextButtonText: 次へ
+
+UsernameChange:
+  Title: ユーザー名の変更
+  Description: 新しいユーザー名を設定します。
+  UsernameLabel: ユーザー名
+  CancelButtonText: キャンセル
+  NextButtonText: 次へ
+
+UsernameChangeDone:
+  Title: ユーザー名の変更完了
+  Description: ユーザー名は正常に変更されました。
+  NextButtonText: 次へ
+
+InitPassword:
+  Title: パスワードの設定
+  Description: 以下のフォームに入力するパスワード再設定用のコードを送信しました。
+  CodeLabel: コード
+  NewPasswordLabel: 新しいパスワード
+  NewPasswordConfirmLabel: 新しいパスワードの確認
+  ResendButtonText: コードを再送信
+  NextButtonText: 次へ
+
+InitPasswordDone:
+  Title: パスワードの設定完了
+  Description: パスワードが正常にセットされました。
+  NextButtonText: 次へ
+  CancelButtonText: キャンセル
+
+InitUser:
+  Title: ユーザーのアクティベーション
+  Description: 下記のコードでメールアドレスを認証し、パスワードを設定してください。
+  CodeLabel: コード
+  NewPasswordLabel: 新しいパスワード
+  NewPasswordConfirm: 新しいパスワードの確認
+  NextButtonText: 次へ
+  ResendButtonText: コードを再送信
+
+InitUserDone:
+  Title: ユーザーのアクティベーション完了
+  Description: メールアドレスが承認され、パスワードが正常にセットされました。
+  NextButtonText: 次へ
+  CancelButtonText: キャンセル
+
+InitMFAPrompt:
+  Title: 二要素認証のセットアップ
+  Description: 二要素認証でアカウントのセキュリティを強化します。
+  Provider0: 認証アプリ（Google/Microsoft Authenticator、Authyなど）
+  Provider1: デバイス依存（例：FaceID、Windows Hello、指紋など）
+  NextButtonText: 次へ
+  SkipButtonText: スキップ
+
+InitMFAOTP:
+  Title: 二要素認証
+  Description: 二要素認証を作成します。認証アプリ等を所有していない場合は、任意の端末にダウンロードしてください。
+  OTPDescription: 認証アプリ（Google/Microsoft Authenticator、Authyなど）でコードをスキャンするか、シークレットをコピーして、生成されたコードを以下に入力してください。
+  SecretLabel: シークレット
+  CodeLabel: コード
+  NextButtonText: 次へ
+  CancelButtonText: キャンセル
+
+InitMFAU2F:
+  Title: セキュリティキーの追加
+  Description: セキュリティキーは、携帯電話への組み込みや、Bluetoothの使用、パソコンのUSBポートに直接差し込むことなどで認証する方法です。
+  TokenNameLabel: セキュリティキー（デバイス）の名前
+  NotSupported: WebAuthNはお使いのブラウザでサポートされていません。ブラウザが最新のものであることを確認するか、別のブラウザ（Chrome、Safari、Firefoxなど）を使用してください
+  RegisterTokenButtonText: セキュリティキーを追加
+  ErrorRetry: もう一度実行するか、新しいチャレンジの作成、または別の方法を選択してください。
+
+InitMFADone:
+  Title: セキュリティキーが認証されました
+  Description: 成功です！二要素認証を正常にセットアップし、アカウントを保護しました。ログインの際には表示されるワンタイムパスワードを入力する必要があります。
+  NextButtonText: 次へ
+  CancelButtonText: キャンセル
+
+MFAProvider:
+  Provider0: Authenticatorアプリ（Google/Microsoft Authenticator、Authyなど）
+  Provider1: デバイス依存（FaceID、Windows Hello、指紋など）
+  ChooseOther: または、他のオプションを選択
+
+VerifyMFAOTP:
+  Title: 二要素認証の検証
+  Description: 二要素認証を検証します。
+  CodeLabel: コード
+  NextButtonText: 次へ
+
+VerifyMFAU2F:
+  Title: 二要素認証
+  Description: 登録されたデバイスで二要素認証を実行します（FaceID、Windows Hello、指紋など）
+  NotSupported: WebAuthNはお使いのブラウザでサポートされていません。ブラウザが最新のものであることを確認するか、別のブラウザ（Chrome、Safari、Firefoxなど）を使用してください。
+  ErrorRetry: もう一度実行するか、新しいチャレンジの作成、または別の方法を選択してください。
+  ValidateTokenButtonText: 認証
+
+Passwordless:
+  Title: パスワードレスログイン
+  Description: FaceID、Windows Hello、または指紋などのデバイスが提供する認証方法でログインします。
+  NotSupported: WebAuthNはお使いのブラウザでサポートされていません。ブラウザが最新のものであることを確認するか、別のブラウザ（Chrome、Safari、Firefoxなど）を使用してください。
+  ErrorRetry: もう一度実行するか、新しいチャレンジの作成、または別の方法を選択してください。
+  LoginWithPwButtonText: パスワードでログイン
+  ValidateTokenButtonText: パスワードレスでログイン
+
+PasswordlessPrompt:
+  Title: パスワードレスのセットアップ
+  Description: パスワードレスログインをセットアップしますか？ （FaceID、Windows Hello、または指紋などのデバイスが提供する認証メソッド）
+  DescriptionInit: パスワードレスログインをセットアップする必要があります。発行されたリンクを使用して、デバイスを登録してください。
+  PasswordlessButtonText: パスワードレスに移動
+  NextButtonText: 次へ
+  SkipButtonText: スキップ
+
+PasswordlessRegistration:
+  Title: パスワードレスのセットアップ
+  Description: 名前（MyMobilePhone、MacBookなど）を入力して認証を追加し、下の「パスワードレスを登録する」ボタンをクリックしてください。
+  TokenNameLabel: デバイスの名前
+  NotSupported: WebAuthNはお使いのブラウザでサポートされていません。ブラウザが最新のものであることを確認するか、別のブラウザ（Chrome、Safari、Firefoxなど）を使用してください。
+  RegisterTokenButtonText: パスワードレスの登録
+  ErrorRetry: もう一度実行するか、新しいチャレンジの作成、または別の方法を選択してください。
+
+PasswordlessRegistrationDone:
+  Title: パスワードレスのセットアップ
+  Description: パスワードレスのデバイスが正常に追加されました。
+  DescriptionClose: このウィンドウは閉じることができます。
+  NextButtonText: 次へ
+  CancelButtonText: キャンセル
+
+PasswordChange:
+  Title: パスワードの変更
+  Description: 旧パスワードと新パスワードを入力し、パスワードを変更してください。
+  OldPasswordLabel: 旧パスワード
+  NewPasswordLabel: 新パスワード
+  NewPasswordConfirmLabel: 新パスワードの確認
+  CancelButtonText: キャンセル
+  NextButtonText: 次へ
+
+PasswordChangeDone:
+  Title: パスワードの変更完了
+  Description: パスワードは正常に変更されました。
+  NextButtonText: 次へ
+
+PasswordResetDone:
+  Title: パスワード再設定用リンクの送信完了
+  Description: メールを確認してパスワードをリセットしてください。
+  NextButtonText: 次へ
+
+EmailVerification:
+  Title: メールアドレスの検証
+  Description: メールアドレスを検証するためのメールを送信しました。以下のフォームにコードを入力してください。
+  CodeLabel: コード
+  NextButtonText: 次へ
+  ResendButtonText: コードを再送信
+
+EmailVerificationDone:
+  Title: メールアドレスの検証完了
+  Description: あなたのメールアドレスが正常に検証されました。
+  NextButtonText: 次へ
+  CancelButtonText: キャンセル
+  LoginButtonText: ログイン
+
+RegisterOption:
+  Title: 登録オプション
+  Description: 登録方法を選択してください。
+  RegisterUsernamePasswordButtonText: ユーザー名とパスワード
+  ExternalLoginDescription: または、外部ユーザーで登録
+  LoginButtonText: ログイン
+
+RegistrationUser:
+  Title: 登録
+  Description: ユーザー情報を入力してください。メールアドレスはログイン名として使用されます。
+  DescriptionOrgRegister: ユーザー情報を入力してください。
+  EmailLabel: Eメール
+  UsernameLabel: ユーザー名
+  FirstnameLabel: 名
+  LastnameLabel: 姓
+  LanguageLabel: 言語
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  GenderLabel: 性別
+  Female: 女性
+  Male: 男性
+  Diverse: その他
+  PasswordLabel: パスワード
+  PasswordConfirmLabel: パスワードの確認
+  TosAndPrivacyLabel: 利用規約
+  TosConfirm: 私は利用規約を承諾します。
+  TosLinkText: TOS
+  PrivacyConfirm: 私はプライバシーポリシーを承諾します。
+  PrivacyLinkText: プライバシーポリシー
+  ExternalLogin: または、外部ユーザーで登録
+  BackButtonText: ログイン
+  NextButtonText: 次へ
+
+ExternalRegistrationUserOverview:
+  Title: 外部ユーザーの登録
+  Description: 選択したプロバイダーからユーザー情報を取得しました。必要であれば変更し、完了してください。
+  EmailLabel: Eメール
+  UsernameLabel: ユーザー名
+  FirstnameLabel: 名
+  LastnameLabel: 姓
+  NicknameLabel: ニックネーム
+  PhoneLabel: 電話番号
+  LanguageLabel: 言語
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  TosAndPrivacyLabel: 利用規約
+  TosConfirm: 私は利用規約を承諾します。
+  TosLinkText: TOS
+  PrivacyConfirm: 私はプライバシーポリシーを承諾します。
+  PrivacyLinkText: プライバシーポリシー
+  ExternalLogin: または、外部ユーザーで登録
+  BackButtonText: 戻る
+  NextButtonText: 保存
+
+RegistrationOrg:
+  Title: 組織の登録
+  Description: 組織名とユーザー情報を入力してください。
+  OrgNameLabel: 組織名
+  EmailLabel: Eメール
+  UsernameLabel: ユーザー名
+  FirstnameLabel: 名
+  LastnameLabel: 姓
+  PasswordLabel: パスワード
+  PasswordConfirmLabel: パスワードの確認
+  TosAndPrivacyLabel: 利用規約
+  TosConfirm: 私は利用規約を承諾します。
+  TosLinkText: TOS
+  PrivacyConfirm: 私はプライバシーポリシーを承諾します。
+  PrivacyLinkText: プライバシーポリシー
+  SaveButtonText: 組織を作成
+
+LoginSuccess:
+  Title: ログイン成功
+  AutoRedirectDescription: 自動的にアプリケーションに戻ります。画面遷移しない場合は、下のボタンをクリックしてください。その後、ウィンドウを閉じることができます。
+  RedirectedDescription: このウィンドウは閉じることができます。
+  NextButtonText: 次へ
+
+LogoutDone:
+  Title: ログアウトしました
+  Description: 正常にログアウトしました。
+  LoginButtonText: ログイン
+
+LinkingUsersDone:
+  Title: ユーザーリンク
+  Description: ユーザーリンクが完了しました。
+  CancelButtonText: キャンセル
+  NextButtonText: 次へ
+
+ExternalNotFound:
+  Title: 外部ユーザーが見つかりません
+  Description: 外部ユーザーが見つかりません。ユーザーをリンクさせるか、新規に自動登録しますか？
+  LinkButtonText: リンク
+  AutoRegisterButtonText: 登録
+  TosAndPrivacyLabel: 利用規約
+  TosConfirm: 私は利用規約を承諾します。
+  TosLinkText: TOS
+  PrivacyConfirm: 私はプライバシーポリシーを承諾します。
+  PrivacyLinkText: プライバシーポリシー
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+
+Footer:
+  PoweredBy: Powered By
+  Tos: TOS
+  PrivacyPolicy: プライバシーポリシー
+  Help: ヘルプ
+
+Errors:
+  Internal: 内部でエラーが発生しました
+  AuthRequest:
+    NotFound: 認証リクエストが見つかりません
+    UserAgentNotCorresponding: ユーザーエージェントが対応していません
+    UserAgentNotFound: ユーザーエージェントIDが見つかりません
+    TokenNotFound: トークンが見つかりません
+    RequestTypeNotSupported: リクエストタイプがサポートされていません
+    MissingParameters: 必要なパラメーターが不足しています
+  User:
+    NotFound: ユーザーが見つかりません
+    Inactive: ユーザーは非アクティブです
+    NotFoundOnOrg: ユーザーは、選択した組織で見つけることができませんでした
+    NotAllowedOrg: ユーザーは必要な組織のメンバーではありません
+    NotMatchingUserID: AuthRequestのユーザーとユーザーは一致しません
+    UserIDMissing: ユーザーIDが空です
+    Invalid: 無効なユーザーデータです
+    DomainNotAllowedAsUsername: このドメインはすでに予約されているため使用できません
+    NotAllowedToLink: このユーザーは外部ログインプロバイダーにリンクすることを許可されていません
+    Password:
+      ConfirmationWrong: 確認用パスワードが間違っています
+      Empty: パスワードが空です
+      Invalid: 無効なパスワードです
+      InvalidAndLocked: パスワードが無効かつユーザーがロックされているため、管理者に連絡してください。
+    UsernameOrPassword:
+      Invalid: ユーザー名またはパスワードは無効です
+    PasswordComplexityPolicy:
+      NotFound: パスワードポリシーが見つかりません
+      MinLength: パスワードが短すぎます
+      HasLower: パスワードに小文字を含める必要があります
+      HasUpper: パスワードに大文字を含める必要があります
+      HasNumber: パスワードに数字を含める必要があります
+      HasSymbol: パスワードに記号を含める必要があります
+    Code:
+      Expired: 有効期限切れのコードです
+      Invalid: 無効なコードです
+      Empty: コードが空です
+      CryptoCodeNil: 暗号コードがありません
+      NotFound: コードが見つかりません
+      GeneratorAlgNotSupported: サポートされていない生成アルゴリズムです
+    EmailVerify:
+      UserIDEmpty: ユーザーIDが空です
+    ExternalData:
+      CouldNotRead: 外部データを正しく読み取ることができません
+    MFA:
+      NoProviders: 利用可能なMFAプロバイダーはありません
+      OTP:
+        AlreadyReady: 多要素OTP（ワンタイムパスワード）は設定済みです
+        NotExisting: 多要素OTP（ワンタイムパスワード）が存在しません
+        InvalidCode: 無効なコード
+        NotReady: 多要素OTP（ワンタイムパスワード）は利用可能でありません
+    Locked: ユーザーはロックされています
+    SomethingWentWrong: エラーが発生しました
+    NotActive: ユーザーはアクティブではありません
+    ExternalIDP:
+      IDPTypeNotImplemented: IDPタイプが実装されていません
+      NotAllowed: 外部ログインプロバイダーが許可されていません
+      IDPConfigIDEmpty: IDプロバイダーIDが空です
+      ExternalUserIDEmpty: 外部ユーザーIDが空です
+      UserDisplayNameEmpty: 表示ユーザー名が空です
+      NoExternalUserData: 外部ユーザー情報を取得できません
+      CreationNotAllowed: このプロバイダーでは、新しいユーザーの作成は許可されていません
+      LinkingNotAllowed: このプロバイダーでは、ユーザーのリンクが許可されていません
+    GrantRequired: ログインできません。このユーザーは、アプリケーションに少なくとも1つの権限を付与されていることが必要です。管理者にお問い合わせください。
+    ProjectRequired: ログインできません。ユーザーの組織がプロジェクトに権限を付与されている必要があります。管理者にお問い合わせください。
+  IdentityProvider:
+    InvalidConfig: 無効なIDプロバイダーの構成です
+  IAM:
+    LockoutPolicy:
+      NotExisting: ロックアウトポリシーが存在しません
+
+optional: "（オプション）"

@@ -267,15 +267,15 @@ export class AppComponent implements OnDestroy {
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['en', 'de', 'fr', 'it', 'pl', 'zh']);
+    this.translate.addLangs(['de', 'en', 'fr', 'it', 'ja', 'pl', 'zh']);
     this.translate.setDefaultLang('en');
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de|fr|it|pl|zh/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/de|en|fr|it|ja|pl|zh/) ? cropped : 'en';
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|fr|it|pl|zh/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/de|en|fr|it|ja|pl|zh/)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);
