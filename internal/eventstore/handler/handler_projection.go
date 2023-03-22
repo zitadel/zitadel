@@ -45,18 +45,17 @@ type Unlock func(...string) error
 
 type ProjectionHandler struct {
 	Handler
-	ProjectionName             string
-	reduce                     Reduce
-	update                     Update
-	searchQuery                SearchQuery
-	triggerProjection          *time.Timer
-	lock                       Lock
-	unlock                     Unlock
-	requeueAfter               time.Duration
-	retryFailedAfter           time.Duration
-	retries                    int
-	concurrentInstances        int
-	lastSuccessfulCreationDate time.Time
+	ProjectionName      string
+	reduce              Reduce
+	update              Update
+	searchQuery         SearchQuery
+	triggerProjection   *time.Timer
+	lock                Lock
+	unlock              Unlock
+	requeueAfter        time.Duration
+	retryFailedAfter    time.Duration
+	retries             int
+	concurrentInstances int
 }
 
 func NewProjectionHandler(
@@ -131,10 +130,9 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 	index = -1
 	statements := make([]*Statement, len(events))
 	for i, event := range events {
-		statements[i], err = h.reduce(event)
-		if err == nil && event.CreationDate().After(h.lastSuccessfulCreationDate) {
-			h.lastSuccessfulCreationDate = event.CreationDate()
-		}
+		var reduceErr error
+		statements[i], reduceErr = h.reduce(event)
+		logging.OnError(reduceErr).WithField("event", event.Type()).WithField("aggregate", event.Aggregate().Type).Warn("reducing event failed")
 	}
 	for retry := 0; retry <= h.retries; retry++ {
 		index, err = h.update(ctx, statements[index+1:], h.reduce)
@@ -221,11 +219,6 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 				continue
 			}
 			go h.cancelOnErr(lockCtx, errs, cancelLock)
-		}
-		if succeededOnce {
-			// just use events that are not successfully processed, already
-			// TODO: Does this obsolete the succededOnce handling?
-			query = query.CreationDateAfter(h.lastSuccessfulCreationDate)
 		}
 		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
 		if err != nil {
