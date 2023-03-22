@@ -135,10 +135,12 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 		if reduceErr != nil {
 			return index, reduceErr
 		}
+		// statement can be nil (see notifications)
 		if statement != nil {
 			statements = append(statements, statement)
 		}
 	}
+	// update panics if there are no statements
 	if len(statements) == 0 {
 		return index, caos_errors.ThrowInternal(nil, "HANDL-vjxj7", "Errors.Handlers.Process.NoStatements")
 	}
