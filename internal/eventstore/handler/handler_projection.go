@@ -130,10 +130,9 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 	index = -1
 	statements := make([]*Statement, len(events))
 	for i, event := range events {
-		statements[i], err = h.reduce(event)
-		if err != nil {
-			return index, err
-		}
+		var reduceErr error
+		statements[i], reduceErr = h.reduce(event)
+		logging.OnError(reduceErr).WithField("event", event.Type()).WithField("aggregate", event.Aggregate().Type).Warn("reducing event failed")
 	}
 	for retry := 0; retry <= h.retries; retry++ {
 		index, err = h.update(ctx, statements[index+1:], h.reduce)
@@ -220,11 +219,6 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 				continue
 			}
 			go h.cancelOnErr(lockCtx, errs, cancelLock)
-		}
-		if succeededOnce {
-			// since we have at least one successful run, we can restrict it to events not older than
-			// twice the requeue time (just to be sure not to miss an event)
-			query = query.CreationDateAfter(time.Now().Add(-2 * h.requeueAfter))
 		}
 		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
 		if err != nil {
