@@ -109,7 +109,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public KeyNamesArray: string[] = KeyNamesArray;
-  public LOCALES: string[] = ['en', 'de', 'it', 'fr', 'pl', 'zh'];
+  public LOCALES: string[] = ['de', 'en', 'fr', 'it', 'ja', 'pl', 'zh'];
 
   private sub: Subscription = new Subscription();
 
