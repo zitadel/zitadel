@@ -198,7 +198,6 @@ export class UserDetailComponent implements OnInit {
       .generateMachineSecret(this.user.id)
       .then((resp) => {
         this.toast.showInfo('USER.TOAST.SECRETGENERATED', true);
-        console.log(resp.clientSecret);
         this.dialog.open(MachineSecretDialogComponent, {
           data: {
             clientId: resp.clientId,

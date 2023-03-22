@@ -29,7 +29,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderJWTComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
@@ -50,7 +50,6 @@ export class ProviderJWTComponent {
   ) {
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
-      console.log(data.serviceType);
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
