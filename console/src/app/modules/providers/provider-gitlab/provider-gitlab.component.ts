@@ -119,105 +119,61 @@ export class ProviderGitlabComponent {
   }
 
   public addGitlabProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGitLabProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddGitLabProviderRequest()
+        : new AdminAddGitLabProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
+    req.setName(this.name?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGitLabProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addGitLabProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGitLabProviderRequest();
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGitLabProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.loading = false;
-          this.toast.showError(error);
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateGitlabProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGitLabProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setScopesList(this.scopesList?.value);
-        req.setProviderOptions(this.options);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateGitLabProviderRequest()
+          : new AdminUpdateGitLabProviderRequest();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setClientId(this.clientId?.value);
+      req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
-        if (this.updateClientSecret) {
-          req.setClientSecret(this.clientSecret?.value);
-        }
-
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateGitLabProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGitLabProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setScopesList(this.scopesList?.value);
-        req.setProviderOptions(this.options);
-
-        if (this.updateClientSecret) {
-          req.setClientSecret(this.clientSecret?.value);
-        }
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateGoogleProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.loading = false;
-            this.toast.showError(error);
-          });
+      if (this.updateClientSecret) {
+        req.setClientSecret(this.clientSecret?.value);
       }
+
+      this.loading = true;
+      this.service
+        .updateGitLabProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 

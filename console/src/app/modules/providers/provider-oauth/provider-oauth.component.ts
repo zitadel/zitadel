@@ -124,111 +124,64 @@ export class ProviderOAuthComponent {
   }
 
   public addGenericOAuthProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGenericOAuthProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddGenericOAuthProviderRequest()
+        : new AdminAddGenericOAuthProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-      req.setIdAttribute(this.idAttribute?.value);
-      req.setTokenEndpoint(this.tokenEndpoint?.value);
-      req.setUserEndpoint(this.userEndpoint?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
+    req.setName(this.name?.value);
+    req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+    req.setIdAttribute(this.idAttribute?.value);
+    req.setTokenEndpoint(this.tokenEndpoint?.value);
+    req.setUserEndpoint(this.userEndpoint?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setScopesList(this.scopesList?.value);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGenericOAuthProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addGenericOAuthProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGenericOAuthProviderRequest();
-      req.setName(this.name?.value);
-      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-      req.setIdAttribute(this.idAttribute?.value);
-      req.setTokenEndpoint(this.tokenEndpoint?.value);
-      req.setUserEndpoint(this.userEndpoint?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGenericOAuthProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-          this.loading = false;
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateGenericOAuthProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGenericOAuthProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-        req.setIdAttribute(this.idAttribute?.value);
-        req.setTokenEndpoint(this.tokenEndpoint?.value);
-        req.setUserEndpoint(this.userEndpoint?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setScopesList(this.scopesList?.value);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateGenericOAuthProviderRequest()
+          : new AdminUpdateGenericOAuthProviderRequest();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+      req.setIdAttribute(this.idAttribute?.value);
+      req.setTokenEndpoint(this.tokenEndpoint?.value);
+      req.setUserEndpoint(this.userEndpoint?.value);
+      req.setClientId(this.clientId?.value);
+      req.setClientSecret(this.clientSecret?.value);
+      req.setScopesList(this.scopesList?.value);
 
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateGenericOAuthProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
+      this.loading = true;
+      this.service
+        .updateGenericOAuthProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
             this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGenericOAuthProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-        req.setIdAttribute(this.idAttribute?.value);
-        req.setTokenEndpoint(this.tokenEndpoint?.value);
-        req.setUserEndpoint(this.userEndpoint?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setScopesList(this.scopesList?.value);
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateGenericOAuthProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      }
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 

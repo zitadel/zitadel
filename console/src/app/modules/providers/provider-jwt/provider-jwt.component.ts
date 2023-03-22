@@ -117,104 +117,60 @@ export class ProviderJWTComponent {
   }
 
   public addJWTProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddJWTProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddJWTProviderRequest()
+        : new AdminAddJWTProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setHeaderName(this.headerName?.value);
-      req.setIssuer(this.issuer?.value);
-      req.setJwtEndpoint(this.jwtEndpoint?.value);
-      req.setKeysEndpoint(this.keysEndpoint?.value);
-      req.setProviderOptions(this.options);
+    req.setName(this.name?.value);
+    req.setHeaderName(this.headerName?.value);
+    req.setIssuer(this.issuer?.value);
+    req.setJwtEndpoint(this.jwtEndpoint?.value);
+    req.setKeysEndpoint(this.keysEndpoint?.value);
+    req.setProviderOptions(this.options);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addJWTProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addJWTProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddJWTProviderRequest();
-
-      req.setName(this.name?.value);
-      req.setHeaderName(this.headerName?.value);
-      req.setIssuer(this.issuer?.value);
-      req.setJwtEndpoint(this.jwtEndpoint?.value);
-      req.setKeysEndpoint(this.keysEndpoint?.value);
-      req.setProviderOptions(this.options);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addJWTProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-          this.loading = false;
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateJWTProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateJWTProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setHeaderName(this.headerName?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setJwtEndpoint(this.jwtEndpoint?.value);
-        req.setKeysEndpoint(this.keysEndpoint?.value);
-        req.setProviderOptions(this.options);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateJWTProviderRequest()
+          : new AdminUpdateJWTProviderRequest();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setHeaderName(this.headerName?.value);
+      req.setIssuer(this.issuer?.value);
+      req.setJwtEndpoint(this.jwtEndpoint?.value);
+      req.setKeysEndpoint(this.keysEndpoint?.value);
+      req.setProviderOptions(this.options);
 
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateJWTProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
+      this.loading = true;
+      this.service
+        .updateJWTProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
             this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateJWTProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setHeaderName(this.headerName?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setJwtEndpoint(this.jwtEndpoint?.value);
-        req.setKeysEndpoint(this.keysEndpoint?.value);
-        req.setProviderOptions(this.options);
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateJWTProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      }
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 
