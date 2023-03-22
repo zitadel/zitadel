@@ -91,7 +91,7 @@
     "css-minimizer-webpack-plugin": "3.4.1",
     "cssnano": "5.1.7",
     "cssnano-preset-advanced": "5.3.3",
-    "dns-packet": "5.3.1",
+    "dns-packet": "5.4.0",
     "docusaurus-plugin-image-zoom": "^0.1.1",
     "docusaurus-plugin-openapi-docs": "1.5.2",
     "docusaurus-theme-openapi-docs": "1.5.2",
