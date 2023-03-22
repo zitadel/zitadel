@@ -271,10 +271,7 @@ func TestProvider_mapLDAPEntryToUser(t *testing.T) {
 			},
 			want: want{
 				err: func(err error) bool {
-					if err != nil {
-						return true
-					}
-					return false
+					return err != nil
 				},
 			},
 		},
@@ -314,10 +311,7 @@ func TestProvider_mapLDAPEntryToUser(t *testing.T) {
 			},
 			want: want{
 				err: func(err error) bool {
-					if err != nil {
-						return true
-					}
-					return false
+					return err != nil
 				},
 			},
 		},

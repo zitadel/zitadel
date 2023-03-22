@@ -47,7 +47,7 @@ func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
 			s.User,
 			s.Password, s.Provider.timeout)
 		// If there were invalid credentials or multiple users with the credentials cancel process
-		if err != nil && (err == ErrFailedLogin || err == ErrNoSingleUser) {
+		if err != nil && (errors.Is(err, ErrFailedLogin) || errors.Is(err, ErrNoSingleUser)) {
 			return nil, err
 		}
 		// If a user bind was successful and user is filled continue with login, otherwise try next server
