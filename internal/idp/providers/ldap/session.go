@@ -32,6 +32,7 @@ type Session struct {
 func (s *Session) GetAuthURL() string {
 	return s.loginUrl
 }
+
 func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
 	var user *ldap.Entry
 	for _, server := range s.Provider.servers {
@@ -58,36 +59,22 @@ func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
 		return nil, err
 	}
 
-	var emailVerified bool
-	if v := user.GetAttributeValue(s.Provider.emailVerifiedAttribute); v != "" {
-		emailVerified, err = strconv.ParseBool(user.GetAttributeValue(s.Provider.emailVerifiedAttribute))
-		if err != nil {
-			return nil, err
-		}
-	}
-	var phoneVerified bool
-	if v := user.GetAttributeValue(s.Provider.phoneVerifiedAttribute); v != "" {
-		phoneVerified, err = strconv.ParseBool(v)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return NewUser(
-		user.GetAttributeValue(s.Provider.idAttribute),
-		user.GetAttributeValue(s.Provider.firstNameAttribute),
-		user.GetAttributeValue(s.Provider.lastNameAttribute),
-		user.GetAttributeValue(s.Provider.displayNameAttribute),
-		user.GetAttributeValue(s.Provider.nickNameAttribute),
-		user.GetAttributeValue(s.Provider.preferredUsernameAttribute),
-		domain.EmailAddress(user.GetAttributeValue(s.Provider.emailAttribute)),
-		emailVerified,
-		domain.PhoneNumber(user.GetAttributeValue(s.Provider.phoneAttribute)),
-		phoneVerified,
-		language.Make(user.GetAttributeValue(s.Provider.preferredLanguageAttribute)),
-		user.GetAttributeValue(s.Provider.avatarURLAttribute),
-		user.GetAttributeValue(s.Provider.profileAttribute),
-	), nil
+	return mapLDAPEntryToUser(
+		user,
+		s.Provider.idAttribute,
+		s.Provider.firstNameAttribute,
+		s.Provider.lastNameAttribute,
+		s.Provider.displayNameAttribute,
+		s.Provider.nickNameAttribute,
+		s.Provider.preferredUsernameAttribute,
+		s.Provider.emailAttribute,
+		s.Provider.emailVerifiedAttribute,
+		s.Provider.phoneAttribute,
+		s.Provider.phoneVerifiedAttribute,
+		s.Provider.preferredLanguageAttribute,
+		s.Provider.avatarURLAttribute,
+		s.Provider.profileAttribute,
+	)
 }
 
 func tryBind(
@@ -232,4 +219,52 @@ func userFiltersToSearchQuery(filters []string, username string) string {
 		searchQuery += "(" + filter + "=" + ldap.EscapeFilter(username) + ")"
 	}
 	return searchQuery
+}
+
+func mapLDAPEntryToUser(
+	user *ldap.Entry,
+	idAttribute,
+	firstNameAttribute,
+	lastNameAttribute,
+	displayNameAttribute,
+	nickNameAttribute,
+	preferredUsernameAttribute,
+	emailAttribute,
+	emailVerifiedAttribute,
+	phoneAttribute,
+	phoneVerifiedAttribute,
+	preferredLanguageAttribute,
+	avatarURLAttribute,
+	profileAttribute string,
+) (_ *User, err error) {
+	var emailVerified bool
+	if v := user.GetAttributeValue(emailVerifiedAttribute); v != "" {
+		emailVerified, err = strconv.ParseBool(v)
+		if err != nil {
+			return nil, err
+		}
+	}
+	var phoneVerified bool
+	if v := user.GetAttributeValue(phoneVerifiedAttribute); v != "" {
+		phoneVerified, err = strconv.ParseBool(v)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return NewUser(
+		user.GetAttributeValue(idAttribute),
+		user.GetAttributeValue(firstNameAttribute),
+		user.GetAttributeValue(lastNameAttribute),
+		user.GetAttributeValue(displayNameAttribute),
+		user.GetAttributeValue(nickNameAttribute),
+		user.GetAttributeValue(preferredUsernameAttribute),
+		domain.EmailAddress(user.GetAttributeValue(emailAttribute)),
+		emailVerified,
+		domain.PhoneNumber(user.GetAttributeValue(phoneAttribute)),
+		phoneVerified,
+		language.Make(user.GetAttributeValue(preferredLanguageAttribute)),
+		user.GetAttributeValue(avatarURLAttribute),
+		user.GetAttributeValue(profileAttribute),
+	), nil
 }
