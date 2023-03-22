@@ -192,7 +192,7 @@ describe('quotas', () => {
           });
         });
 
-        it.only('fires until the webhook returns a successful message', () => {
+        it('fires until the webhook returns a successful message', () => {
           // Default MaxFailureCount is 5, customized to 0 which means infinite
           cy.task('failWebhookEvents', 8);
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {

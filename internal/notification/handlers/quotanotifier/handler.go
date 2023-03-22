@@ -2,7 +2,6 @@ package quotanotifier
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/command"
@@ -66,17 +65,6 @@ func (u *quotaNotifier) reducers() []handler.AggregateReducer {
 }
 
 func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("------------ reduceNotificationDue ----------------")
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("---------------------------------------------------")
 	e, ok := event.(*quota.NotificationDueEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DLxdE", "reduce.wrong.event.type %s", quota.NotificationDueEventType)
