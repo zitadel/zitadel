@@ -45,17 +45,18 @@ type Unlock func(...string) error
 
 type ProjectionHandler struct {
 	Handler
-	ProjectionName      string
-	reduce              Reduce
-	update              Update
-	searchQuery         SearchQuery
-	triggerProjection   *time.Timer
-	lock                Lock
-	unlock              Unlock
-	requeueAfter        time.Duration
-	retryFailedAfter    time.Duration
-	retries             int
-	concurrentInstances int
+	ProjectionName             string
+	reduce                     Reduce
+	update                     Update
+	searchQuery                SearchQuery
+	triggerProjection          *time.Timer
+	lock                       Lock
+	unlock                     Unlock
+	requeueAfter               time.Duration
+	retryFailedAfter           time.Duration
+	retries                    int
+	concurrentInstances        int
+	lastSuccessfulCreationDate time.Time
 }
 
 func NewProjectionHandler(
@@ -133,6 +134,9 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 		statements[i], err = h.reduce(event)
 		if err != nil {
 			return index, err
+		}
+		if event.CreationDate().After(h.lastSuccessfulCreationDate) {
+			h.lastSuccessfulCreationDate = event.CreationDate()
 		}
 	}
 	for retry := 0; retry <= h.retries; retry++ {
@@ -222,9 +226,9 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			go h.cancelOnErr(lockCtx, errs, cancelLock)
 		}
 		if succeededOnce {
-			// since we have at least one successful run, we can restrict it to events not older than
-			// twice the requeue time (just to be sure not to miss an event)
-			query = query.CreationDateAfter(time.Now().Add(-2 * h.requeueAfter))
+			// just use events that are not successfully processed, already
+			// TODO: Does this obsolete the succededOnce handling?
+			query = query.CreationDateAfter(h.lastSuccessfulCreationDate)
 		}
 		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
 		if err != nil {
