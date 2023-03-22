@@ -132,10 +132,7 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 	statements := make([]*Statement, len(events))
 	for i, event := range events {
 		statements[i], err = h.reduce(event)
-		if err != nil {
-			return index, err
-		}
-		if event.CreationDate().After(h.lastSuccessfulCreationDate) {
+		if err == nil && event.CreationDate().After(h.lastSuccessfulCreationDate) {
 			h.lastSuccessfulCreationDate = event.CreationDate()
 		}
 	}
