@@ -145,11 +145,6 @@ export function ListElement({
     <a 
       className={styles.listelement} 
       href={link} 
-      onClick={() => {
-        window.plausible("ListElement", {
-          props: { method: title },
-        });
-      }}
     >
       {type
         ? type

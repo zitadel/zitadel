@@ -38,7 +38,6 @@ export class SecretGeneratorComponent implements OnInit {
       .then((generators) => {
         if (generators.resultList) {
           this.generators = generators.resultList;
-          console.log(this.generators);
         }
       })
       .catch((error) => {

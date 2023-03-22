@@ -330,8 +330,6 @@ import {
   RemoveMultiFactorFromLoginPolicyResponse,
   RemoveOrgDomainRequest,
   RemoveOrgDomainResponse,
-  RemoveOrgIDPRequest,
-  RemoveOrgIDPResponse,
   RemoveOrgMemberRequest,
   RemoveOrgMemberResponse,
   RemoveOrgMetadataRequest,
@@ -857,12 +855,6 @@ export class ManagementService {
     return this.grpcService.mgmt.listLoginPolicyIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public removeOrgIDP(idpId: string): Promise<RemoveOrgIDPResponse.AsObject> {
-    const req = new RemoveOrgIDPRequest();
-    req.setIdpId(idpId);
-    return this.grpcService.mgmt.removeOrgIDP(req, null).then((resp) => resp.toObject());
-  }
-
   public deactivateOrgIDP(idpId: string): Promise<DeactivateOrgIDPResponse.AsObject> {
     const req = new DeactivateOrgIDPRequest();
     req.setIdpId(idpId);
@@ -961,7 +953,9 @@ export class ManagementService {
     return this.grpcService.mgmt.updateGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {
+  public deleteProvider(id: string): Promise<DeleteProviderResponse.AsObject> {
+    const req = new DeleteProviderRequest();
+    req.setId(id);
     return this.grpcService.mgmt.deleteProvider(req, null).then((resp) => resp.toObject());
   }
 
