@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         browser: [firefox, chrome]
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     env:
       ZITADEL_IMAGE_REGISTRY: 'ghcr.io/zitadel/zitadel'
     steps:

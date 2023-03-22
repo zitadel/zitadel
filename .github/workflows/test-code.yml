@@ -10,7 +10,7 @@ on:
 
 jobs:
   Build-ZITADEL:
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     env:
       DOCKER_BUILDKIT: 1
     steps:
