@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production --base-href=/ui/console/ --verbose",
+    "build": "node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng build --configuration production --base-href=/ui/console/ --verbose",
     "prelint": "npm run generate",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
