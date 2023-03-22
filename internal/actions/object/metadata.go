@@ -61,11 +61,8 @@ type MetadataList struct {
 }
 
 type Metadata struct {
-	Key string
-	// Value is for exporting to javascript
-	Value goja.Value
-	// value is for mapping to [domain.Metadata]
-	value []byte
+	Key   string
+	Value []byte
 }
 
 func (md *MetadataList) AppendMetadataFunc(call goja.FunctionCall) goja.Value {
@@ -82,8 +79,7 @@ func (md *MetadataList) AppendMetadataFunc(call goja.FunctionCall) goja.Value {
 	md.Metadata = append(md.Metadata,
 		&Metadata{
 			Key:   call.Arguments[0].Export().(string),
-			Value: call.Arguments[1],
-			value: value,
+			Value: value,
 		})
 	return nil
 }
@@ -97,26 +93,11 @@ func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
 	for i, metadata := range metadataList.Metadata {
 		list[i] = &domain.Metadata{
 			Key:   metadata.Key,
-			Value: metadata.value,
+			Value: metadata.Value,
 		}
 	}
 
 	return list
-}
-
-func MetadataField(metadata *MetadataList) func(c *actions.FieldConfig) interface{} {
-	return func(c *actions.FieldConfig) interface{} {
-		for _, md := range metadata.Metadata {
-			if json.Valid(md.value) {
-				err := json.Unmarshal(md.value, &md.Value)
-				if err != nil {
-					panic(err)
-				}
-			}
-		}
-
-		return metadata.Metadata
-	}
 }
 
 func MetadataListFromDomain(metadata []*domain.Metadata) *MetadataList {
@@ -133,7 +114,7 @@ func MetadataListFromDomain(metadata []*domain.Metadata) *MetadataList {
 
 		list.Metadata[i] = &Metadata{
 			Key:   md.Key,
-			value: md.Value,
+			Value: md.Value,
 		}
 	}
 
