@@ -350,7 +350,7 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceJWTIDPAdded,
 				},
 				{
-					Event:  instance.JWTIDPAddedEventType,
+					Event:  instance.JWTIDPChangedEventType,
 					Reduce: p.reduceJWTIDPChanged,
 				},
 				{
@@ -467,7 +467,7 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceJWTIDPAdded,
 				},
 				{
-					Event:  org.JWTIDPAddedEventType,
+					Event:  org.JWTIDPChangedEventType,
 					Reduce: p.reduceJWTIDPChanged,
 				},
 				{
