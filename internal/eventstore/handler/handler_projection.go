@@ -127,15 +127,18 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 	if len(events) == 0 {
 		return 0, nil
 	}
-	index = -1
-	statements := make([]*Statement, len(events))
-	for i, event := range events {
-		var reduceErr error
-		statements[i], reduceErr = h.reduce(event)
-		logging.OnError(reduceErr).WithField("event", event.Type()).WithField("aggregate", event.Aggregate().Type).Warn("reducing event failed")
+	statements := make([]*Statement, 0)
+	for _, event := range events {
+		statement, reduceErr := h.reduce(event)
+		if reduceErr != nil {
+			logging.OnError(reduceErr).WithField("event", event.Type()).WithField("aggregate", event.Aggregate().Type).Warn("reducing event failed")
+		}
+		if statement != nil {
+			statements = append(statements, statement)
+		}
 	}
 	for retry := 0; retry <= h.retries; retry++ {
-		index, err = h.update(ctx, statements[index+1:], h.reduce)
+		index, err = h.update(ctx, statements, h.reduce)
 		if err != nil && !errors.Is(err, ErrSomeStmtsFailed) {
 			return index, err
 		}
