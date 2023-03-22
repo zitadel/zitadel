@@ -237,6 +237,7 @@ describe('quotas', () => {
                         })(b);
                   }, true);
                 }),
+                {timeout: 60_000}
             );
           });
         });

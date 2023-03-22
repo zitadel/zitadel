@@ -167,7 +167,7 @@ func startZitadel(config *Config, masterKey string) error {
 	}
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsQuotas"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsquotas"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()

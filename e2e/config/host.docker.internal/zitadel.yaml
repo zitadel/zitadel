@@ -37,8 +37,8 @@ Quotas:
 
 Projections:
   Customizations:
-    notificationsQuotas:
-      MaxFailureCount: 0
+    NotificationsQuotas:
+      RequeueEvery: 1s
 
 DefaultInstance:
   LoginPolicy:
