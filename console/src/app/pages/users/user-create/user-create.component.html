@@ -15,12 +15,6 @@
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}*</cnsl-label>
             <input cnslInput matRipple formControlName="email" required />
-            <span cnslError *ngIf="email?.invalid && !email?.errors?.required">
-              {{ 'USER.VALIDATION.NOTANEMAIL' | translate }}
-            </span>
-            <span cnslError *ngIf="email?.invalid && email?.errors?.required">
-              {{ 'USER.VALIDATION.REQUIRED' | translate }}
-            </span>
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}*</cnsl-label>
@@ -31,35 +25,19 @@
               [ngStyle]="{ 'padding-right': suffixPadding ? suffixPadding : '10px' }"
             />
             <span #suffix *ngIf="envSuffix" cnslSuffix>{{ envSuffix }}</span>
-
-            <span cnslError *ngIf="userName?.invalid && userName?.errors?.required">
-              {{ 'USER.VALIDATION.REQUIRED' | translate }}
-            </span>
-            <span cnslError *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
-              {{ 'USER.VALIDATION.NOEMAIL' | translate }}
-            </span>
           </cnsl-form-field>
 
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}*</cnsl-label>
             <input cnslInput formControlName="firstName" required />
-            <span cnslError *ngIf="firstName?.invalid && firstName?.errors?.required">
-              {{ 'USER.VALIDATION.REQUIRED' | translate }}
-            </span>
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}*</cnsl-label>
             <input cnslInput formControlName="lastName" required />
-            <span cnslError *ngIf="lastName?.invalid && lastName?.errors?.required">
-              {{ 'USER.VALIDATION.REQUIRED' | translate }}
-            </span>
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</cnsl-label>
             <input cnslInput formControlName="nickName" />
-            <span cnslError *ngIf="nickName?.invalid && nickName?.errors?.required">
-              {{ 'USER.VALIDATION.REQUIRED' | translate }}
-            </span>
           </cnsl-form-field>
         </div>
 
@@ -84,10 +62,6 @@
               <cnsl-form-field *ngIf="password">
                 <cnsl-label>{{ 'USER.PASSWORD.NEWINITIAL' | translate }}</cnsl-label>
                 <input cnslInput autocomplete="off" name="firstpassword" formControlName="password" type="password" />
-
-                <span cnslError *ngIf="password?.errors?.required">
-                  {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                </span>
               </cnsl-form-field>
               <cnsl-form-field *ngIf="confirmPassword">
                 <cnsl-label>{{ 'USER.PASSWORD.CONFIRMINITIAL' | translate }}</cnsl-label>
@@ -98,13 +72,6 @@
                   formControlName="confirmPassword"
                   type="password"
                 />
-
-                <span cnslError *ngIf="confirmPassword?.errors?.required">
-                  {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                </span>
-                <span cnslError *ngIf="confirmPassword?.errors?.notequal">
-                  {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
-                </span>
               </cnsl-form-field>
             </div>
           </form>
@@ -120,9 +87,6 @@
                 {{ 'GENDERS.' + gender | translate }}
               </mat-option>
             </mat-select>
-            <span cnslError *ngIf="gender?.invalid && gender?.errors?.required">
-              {{ 'USER.VALIDATION.REQUIRED' | translate }}
-            </span>
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</cnsl-label>
@@ -130,9 +94,6 @@
               <mat-option *ngFor="let language of languages" [value]="language">
                 {{ 'LANGUAGES.' + language | translate }}
               </mat-option>
-              <span cnslError *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
-                {{ 'USER.VALIDATION.REQUIRED' | translate }}
-              </span>
             </mat-select>
           </cnsl-form-field>
         </div>
@@ -154,9 +115,6 @@
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.PHONE' | translate }}</cnsl-label>
             <input cnslInput formControlName="phone" matTooltip="{{ 'USER.PROFILE.PHONE_HINT' | translate }}" />
-            <span cnslError *ngIf="phone?.invalid && phone?.errors?.required">
-              {{ 'USER.VALIDATION.REQUIRED' | translate }}
-            </span>
           </cnsl-form-field>
         </div>
       </div>

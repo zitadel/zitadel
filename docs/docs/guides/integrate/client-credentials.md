@@ -29,7 +29,7 @@ To be able to access the ZITADEL APIs your service user needs permissions to ZIT
 1. Go to the detail page of your organization
 2. Click in the top right corner the "+" button
 3. Search for your service user
-4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](../manage/console/managers))
+4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/guides/manage/console/managers))
 
 ![Add org owner to service user](/img/guides/console-service-user-org-owner.gif)
 
@@ -49,7 +49,7 @@ curl --request POST \
 ```
 
 * `grant_type` should be set to `client_credentials`
-* `scope` should contain any [Scopes](../../apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`, `email`
+* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`, `email`
   and `urn:zitadel:iam:org:project:id:zitadel:aud`. The latter provides access to the ZITADEL API.
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.

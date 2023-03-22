@@ -268,7 +268,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			if user.Human == nil {
 				continue
 			}
-			userInfo.SetEmail(user.Human.Email, user.Human.IsEmailVerified)
+			userInfo.SetEmail(string(user.Human.Email), user.Human.IsEmailVerified)
 		case oidc.ScopeProfile:
 			userInfo.SetPreferredUsername(user.PreferredLoginName)
 			userInfo.SetUpdatedAt(user.ChangeDate)
@@ -287,7 +287,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			if user.Human == nil {
 				continue
 			}
-			userInfo.SetPhone(user.Human.Phone, user.Human.IsPhoneVerified)
+			userInfo.SetPhone(string(user.Human.Phone), user.Human.IsPhoneVerified)
 		case oidc.ScopeAddress:
 			//TODO: handle address for human users as soon as implemented
 		case ScopeUserMetaData:
@@ -327,21 +327,19 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		}
 	}
 
-	if len(roles) == 0 || applicationID == "" {
-		return o.userinfoFlows(ctx, user.ResourceOwner, userInfo)
-	}
-	projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
+	userGrants, projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
 	if err != nil {
 		return err
 	}
+
 	if len(projectRoles) > 0 {
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
 
-	return o.userinfoFlows(ctx, user.ResourceOwner, userInfo)
+	return o.userinfoFlows(ctx, user.ResourceOwner, userGrants, userInfo)
 }
 
-func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, userInfo oidc.UserInfoSetter) error {
+func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, userGrants *query.UserGrants, userInfo oidc.UserInfoSetter) error {
 	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, resourceOwner, false)
 	if err != nil {
 		return err
@@ -349,6 +347,16 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 
 	ctxFields := actions.SetContextFields(
 		actions.SetFields("v1",
+			actions.SetFields("claims", userinfoClaims(userInfo)),
+			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
+				return func(call goja.FunctionCall) goja.Value {
+					user, err := o.query.GetUserByID(ctx, true, userInfo.GetSubject(), false)
+					if err != nil {
+						panic(err)
+					}
+					return object.UserFromQuery(c, user)
+				}
+			}),
 			actions.SetFields("user",
 				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
@@ -371,6 +379,9 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 						return object.UserMetadataListFromQuery(c, metadata)
 					}
 				}),
+				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
+					return object.UserGrantsFromQuery(c, userGrants)
+				}),
 			),
 		),
 	)
@@ -382,6 +393,18 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 		apiFields := actions.WithAPIFields(
 			actions.SetFields("v1",
 				actions.SetFields("userinfo",
+					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if userInfo.GetClaim(key) == nil {
+							userInfo.AppendClaims(key, value)
+							return
+						}
+						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))
+					}),
+					actions.SetFields("appendLogIntoClaims", func(entry string) {
+						claimLogs = append(claimLogs, entry)
+					}),
+				),
+				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
 						if userInfo.GetClaim(key) == nil {
 							userInfo.AppendClaims(key, value)
@@ -480,21 +503,19 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 	}
 
-	if len(roles) == 0 || clientID == "" {
-		return o.privateClaimsFlows(ctx, userID, claims)
-	}
-	projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
+	userGrants, projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
 	if err != nil {
 		return nil, err
 	}
+
 	if len(projectRoles) > 0 {
 		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
 
-	return o.privateClaimsFlows(ctx, userID, claims)
+	return o.privateClaimsFlows(ctx, userID, userGrants, claims)
 }
 
-func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claims map[string]interface{}) (map[string]interface{}, error) {
+func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userGrants *query.UserGrants, claims map[string]interface{}) (map[string]interface{}, error) {
 	user, err := o.query.GetUserByID(ctx, true, userID, false)
 	if err != nil {
 		return nil, err
@@ -506,6 +527,18 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 
 	ctxFields := actions.SetContextFields(
 		actions.SetFields("v1",
+			actions.SetFields("claims", func(c *actions.FieldConfig) interface{} {
+				return c.Runtime.ToValue(claims)
+			}),
+			actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
+				return func(call goja.FunctionCall) goja.Value {
+					user, err := o.query.GetUserByID(ctx, true, userID, false)
+					if err != nil {
+						panic(err)
+					}
+					return object.UserFromQuery(c, user)
+				}
+			}),
 			actions.SetFields("user",
 				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
@@ -527,6 +560,9 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 						}
 						return object.UserMetadataListFromQuery(c, metadata)
 					}
+				}),
+				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
+					return object.UserGrantsFromQuery(c, userGrants)
 				}),
 			),
 		),
@@ -598,24 +634,27 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 	return claims, nil
 }
 
-func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {
+func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (*query.UserGrants, map[string]map[string]string, error) {
+	if applicationID == "" || len(requestedRoles) == 0 {
+		return nil, nil, nil
+	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID, false)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(projectID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	userIDQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery, userIDQuery},
-	}, false)
+	}, true, false)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	projectRoles := make(map[string]map[string]string)
 	for _, requestedRole := range requestedRoles {
@@ -623,7 +662,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 			checkGrantedRoles(projectRoles, grant, requestedRole)
 		}
 	}
-	return projectRoles, nil
+	return grants, projectRoles, nil
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
@@ -688,4 +727,19 @@ func appendClaim(claims map[string]interface{}, claim string, value interface{})
 	}
 	claims[claim] = value
 	return claims
+}
+
+func userinfoClaims(userInfo oidc.UserInfoSetter) func(c *actions.FieldConfig) interface{} {
+	return func(c *actions.FieldConfig) interface{} {
+		marshalled, err := json.Marshal(userInfo)
+		if err != nil {
+			panic(err)
+		}
+
+		claims := make(map[string]interface{}, 10)
+		if err = json.Unmarshal(marshalled, &claims); err != nil {
+			panic(err)
+		}
+		return c.Runtime.ToValue(claims)
+	}
 }

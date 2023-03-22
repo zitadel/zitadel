@@ -11,7 +11,7 @@ Before you start, make sure you have everything set up correctly.
 
 - You need to be at least a ZITADEL _ORG_OWNER_
 - Your ZITADEL organization needs to have the actions feature enabled. <!-- TODO: How to enable it for SaaS ZITADEL? -->
-- [Your ZITADEL organization needs to have at least one external identity provider enabled](../../integrate/identity-brokering)
+- [Your ZITADEL organization needs to have at least one external identity provider enabled](../../integrate/identity-providers/introduction.md)
 - [You need to have at least one role configured for a project](../console/projects)
 
 ## Copy some information for the action
@@ -35,7 +35,7 @@ https://github.com/zitadel/actions/blob/main/examples/add_user_grant.js
 
 ## Run the action when a user registers
 
-Now, make the action hook into the [external authentication flow](../../../apis/actions/external-authentication).
+Now, make the action hook into the [external authentication flow](/apis/actions/external-authentication).
 
 1. In the **Flows <i className="las la-exchange-alt"></i>** section, select the **+ New** button.
 1. Select the **Flow Type** _External Authentication_.
@@ -49,5 +49,5 @@ New users automatically are assiged a role now if they register by authenticatin
 
 ## What's next?
 
-- [Read more about the concepts around actions](../../../concepts/features/actions)
-- [Read more about all the options you have with actions](../../../apis/actions/introduction)
+- [Read more about the concepts around actions](/concepts/features/actions)
+- [Read more about all the options you have with actions](/apis/actions/introduction)

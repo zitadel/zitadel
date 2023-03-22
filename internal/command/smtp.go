@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
@@ -33,7 +33,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.EmailConfig) 
 	}, nil
 }
 
-func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.SMTP.Host, config.SMTP.User, config.Tls)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)

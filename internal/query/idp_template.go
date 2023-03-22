@@ -37,6 +37,11 @@ type IDPTemplate struct {
 	*OAuthIDPTemplate
 	*OIDCIDPTemplate
 	*JWTIDPTemplate
+	*AzureADIDPTemplate
+	*GitHubIDPTemplate
+	*GitHubEnterpriseIDPTemplate
+	*GitLabIDPTemplate
+	*GitLabSelfHostedIDPTemplate
 	*GoogleIDPTemplate
 	*LDAPIDPTemplate
 }
@@ -58,11 +63,12 @@ type OAuthIDPTemplate struct {
 }
 
 type OIDCIDPTemplate struct {
-	IDPID        string
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
-	Issuer       string
-	Scopes       database.StringArray
+	IDPID            string
+	ClientID         string
+	ClientSecret     *crypto.CryptoValue
+	Issuer           string
+	Scopes           database.StringArray
+	IsIDTokenMapping bool
 }
 
 type JWTIDPTemplate struct {
@@ -71,6 +77,47 @@ type JWTIDPTemplate struct {
 	KeysEndpoint string
 	HeaderName   string
 	Endpoint     string
+}
+
+type AzureADIDPTemplate struct {
+	IDPID           string
+	ClientID        string
+	ClientSecret    *crypto.CryptoValue
+	Scopes          database.StringArray
+	Tenant          string
+	IsEmailVerified bool
+}
+
+type GitHubIDPTemplate struct {
+	IDPID        string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.StringArray
+}
+
+type GitHubEnterpriseIDPTemplate struct {
+	IDPID                 string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	AuthorizationEndpoint string
+	TokenEndpoint         string
+	UserEndpoint          string
+	Scopes                database.StringArray
+}
+
+type GitLabIDPTemplate struct {
+	IDPID        string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.StringArray
+}
+
+type GitLabSelfHostedIDPTemplate struct {
+	IDPID        string
+	Issuer       string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.StringArray
 }
 
 type GoogleIDPTemplate struct {
@@ -232,6 +279,10 @@ var (
 		name:  projection.OIDCScopesCol,
 		table: oidcIdpTemplateTable,
 	}
+	OIDCIDTokenMappingCol = Column{
+		name:  projection.OIDCIDTokenMappingCol,
+		table: oidcIdpTemplateTable,
+	}
 )
 
 var (
@@ -262,6 +313,165 @@ var (
 	JWTHeaderNameCol = Column{
 		name:  projection.JWTHeaderNameCol,
 		table: jwtIdpTemplateTable,
+	}
+)
+
+var (
+	azureadIdpTemplateTable = table{
+		name:          projection.IDPTemplateAzureADTable,
+		instanceIDCol: projection.AzureADInstanceIDCol,
+	}
+	AzureADIDCol = Column{
+		name:  projection.AzureADIDCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADInstanceIDCol = Column{
+		name:  projection.AzureADInstanceIDCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADClientIDCol = Column{
+		name:  projection.AzureADClientIDCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADClientSecretCol = Column{
+		name:  projection.AzureADClientSecretCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADScopesCol = Column{
+		name:  projection.AzureADScopesCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADTenantCol = Column{
+		name:  projection.AzureADTenantCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADIsEmailVerified = Column{
+		name:  projection.AzureADIsEmailVerified,
+		table: azureadIdpTemplateTable,
+	}
+)
+
+var (
+	githubIdpTemplateTable = table{
+		name:          projection.IDPTemplateGitHubTable,
+		instanceIDCol: projection.GitHubInstanceIDCol,
+	}
+	GitHubIDCol = Column{
+		name:  projection.GitHubIDCol,
+		table: githubIdpTemplateTable,
+	}
+	GitHubInstanceIDCol = Column{
+		name:  projection.GitHubInstanceIDCol,
+		table: githubIdpTemplateTable,
+	}
+	GitHubClientIDCol = Column{
+		name:  projection.GitHubClientIDCol,
+		table: githubIdpTemplateTable,
+	}
+	GitHubClientSecretCol = Column{
+		name:  projection.GitHubClientSecretCol,
+		table: githubIdpTemplateTable,
+	}
+	GitHubScopesCol = Column{
+		name:  projection.GitHubScopesCol,
+		table: githubIdpTemplateTable,
+	}
+)
+
+var (
+	githubEnterpriseIdpTemplateTable = table{
+		name:          projection.IDPTemplateGitHubEnterpriseTable,
+		instanceIDCol: projection.GitHubEnterpriseInstanceIDCol,
+	}
+	GitHubEnterpriseIDCol = Column{
+		name:  projection.GitHubEnterpriseIDCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseInstanceIDCol = Column{
+		name:  projection.GitHubEnterpriseInstanceIDCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseClientIDCol = Column{
+		name:  projection.GitHubEnterpriseClientIDCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseClientSecretCol = Column{
+		name:  projection.GitHubEnterpriseClientSecretCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseAuthorizationEndpointCol = Column{
+		name:  projection.GitHubEnterpriseAuthorizationEndpointCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseTokenEndpointCol = Column{
+		name:  projection.GitHubEnterpriseTokenEndpointCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseUserEndpointCol = Column{
+		name:  projection.GitHubEnterpriseUserEndpointCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+	GitHubEnterpriseScopesCol = Column{
+		name:  projection.GitHubEnterpriseScopesCol,
+		table: githubEnterpriseIdpTemplateTable,
+	}
+)
+
+var (
+	gitlabIdpTemplateTable = table{
+		name:          projection.IDPTemplateGitLabTable,
+		instanceIDCol: projection.GitLabInstanceIDCol,
+	}
+	GitLabIDCol = Column{
+		name:  projection.GitLabIDCol,
+		table: gitlabIdpTemplateTable,
+	}
+	GitLabInstanceIDCol = Column{
+		name:  projection.GitLabInstanceIDCol,
+		table: gitlabIdpTemplateTable,
+	}
+	GitLabClientIDCol = Column{
+		name:  projection.GitLabClientIDCol,
+		table: gitlabIdpTemplateTable,
+	}
+	GitLabClientSecretCol = Column{
+		name:  projection.GitLabClientSecretCol,
+		table: gitlabIdpTemplateTable,
+	}
+	GitLabScopesCol = Column{
+		name:  projection.GitLabScopesCol,
+		table: gitlabIdpTemplateTable,
+	}
+)
+
+var (
+	gitlabSelfHostedIdpTemplateTable = table{
+		name:          projection.IDPTemplateGitLabSelfHostedTable,
+		instanceIDCol: projection.GitLabSelfHostedInstanceIDCol,
+	}
+	GitLabSelfHostedIDCol = Column{
+		name:  projection.GitLabSelfHostedIDCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedInstanceIDCol = Column{
+		name:  projection.GitLabSelfHostedInstanceIDCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedIssuerCol = Column{
+		name:  projection.GitLabSelfHostedIssuerCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedClientIDCol = Column{
+		name:  projection.GitLabSelfHostedClientIDCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedClientSecretCol = Column{
+		name:  projection.GitLabSelfHostedClientSecretCol,
+		table: gitlabSelfHostedIdpTemplateTable,
+	}
+	GitLabSelfHostedScopesCol = Column{
+		name:  projection.GitLabSelfHostedScopesCol,
+		table: gitlabSelfHostedIdpTemplateTable,
 	}
 )
 
@@ -517,12 +727,44 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OIDCClientIDCol.identifier(),
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
+			OIDCIDTokenMappingCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			// azure
+			AzureADIDCol.identifier(),
+			AzureADClientIDCol.identifier(),
+			AzureADClientSecretCol.identifier(),
+			AzureADScopesCol.identifier(),
+			AzureADTenantCol.identifier(),
+			AzureADIsEmailVerified.identifier(),
+			// github
+			GitHubIDCol.identifier(),
+			GitHubClientIDCol.identifier(),
+			GitHubClientSecretCol.identifier(),
+			GitHubScopesCol.identifier(),
+			// github enterprise
+			GitHubEnterpriseIDCol.identifier(),
+			GitHubEnterpriseClientIDCol.identifier(),
+			GitHubEnterpriseClientSecretCol.identifier(),
+			GitHubEnterpriseAuthorizationEndpointCol.identifier(),
+			GitHubEnterpriseTokenEndpointCol.identifier(),
+			GitHubEnterpriseUserEndpointCol.identifier(),
+			GitHubEnterpriseScopesCol.identifier(),
+			// gitlab
+			GitLabIDCol.identifier(),
+			GitLabClientIDCol.identifier(),
+			GitLabClientSecretCol.identifier(),
+			GitLabScopesCol.identifier(),
+			// gitlab self hosted
+			GitLabSelfHostedIDCol.identifier(),
+			GitLabSelfHostedIssuerCol.identifier(),
+			GitLabSelfHostedClientIDCol.identifier(),
+			GitLabSelfHostedClientSecretCol.identifier(),
+			GitLabSelfHostedScopesCol.identifier(),
 			// google
 			GoogleIDCol.identifier(),
 			GoogleClientIDCol.identifier(),
@@ -555,6 +797,11 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(AzureADIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitHubIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitHubEnterpriseIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -577,12 +824,44 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcScopes := database.StringArray{}
+			oidcIDTokenMapping := sql.NullBool{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
 			jwtEndpoint := sql.NullString{}
 			jwtKeysEndpoint := sql.NullString{}
 			jwtHeaderName := sql.NullString{}
+
+			azureadID := sql.NullString{}
+			azureadClientID := sql.NullString{}
+			azureadClientSecret := new(crypto.CryptoValue)
+			azureadScopes := database.StringArray{}
+			azureadTenant := sql.NullString{}
+			azureadIsEmailVerified := sql.NullBool{}
+
+			githubID := sql.NullString{}
+			githubClientID := sql.NullString{}
+			githubClientSecret := new(crypto.CryptoValue)
+			githubScopes := database.StringArray{}
+
+			githubEnterpriseID := sql.NullString{}
+			githubEnterpriseClientID := sql.NullString{}
+			githubEnterpriseClientSecret := new(crypto.CryptoValue)
+			githubEnterpriseAuthorizationEndpoint := sql.NullString{}
+			githubEnterpriseTokenEndpoint := sql.NullString{}
+			githubEnterpriseUserEndpoint := sql.NullString{}
+			githubEnterpriseScopes := database.StringArray{}
+
+			gitlabID := sql.NullString{}
+			gitlabClientID := sql.NullString{}
+			gitlabClientSecret := new(crypto.CryptoValue)
+			gitlabScopes := database.StringArray{}
+
+			gitlabSelfHostedID := sql.NullString{}
+			gitlabSelfHostedIssuer := sql.NullString{}
+			gitlabSelfHostedClientID := sql.NullString{}
+			gitlabSelfHostedClientSecret := new(crypto.CryptoValue)
+			gitlabSelfHostedScopes := database.StringArray{}
 
 			googleID := sql.NullString{}
 			googleClientID := sql.NullString{}
@@ -641,12 +920,44 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oidcClientID,
 				&oidcClientSecret,
 				&oidcScopes,
+				&oidcIDTokenMapping,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
 				&jwtEndpoint,
 				&jwtKeysEndpoint,
 				&jwtHeaderName,
+				// azure
+				&azureadID,
+				&azureadClientID,
+				&azureadClientSecret,
+				&azureadScopes,
+				&azureadTenant,
+				&azureadIsEmailVerified,
+				// github
+				&githubID,
+				&githubClientID,
+				&githubClientSecret,
+				&githubScopes,
+				// github enterprise
+				&githubEnterpriseID,
+				&githubEnterpriseClientID,
+				&githubEnterpriseClientSecret,
+				&githubEnterpriseAuthorizationEndpoint,
+				&githubEnterpriseTokenEndpoint,
+				&githubEnterpriseUserEndpoint,
+				&githubEnterpriseScopes,
+				// gitlab
+				&gitlabID,
+				&gitlabClientID,
+				&gitlabClientSecret,
+				&gitlabScopes,
+				// gitlab self hosted
+				&gitlabSelfHostedID,
+				&gitlabSelfHostedIssuer,
+				&gitlabSelfHostedClientID,
+				&gitlabSelfHostedClientSecret,
+				&gitlabSelfHostedScopes,
 				// google
 				&googleID,
 				&googleClientID,
@@ -699,11 +1010,12 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			}
 			if oidcID.Valid {
 				idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-					IDPID:        oidcID.String,
-					ClientID:     oidcClientID.String,
-					ClientSecret: oidcClientSecret,
-					Issuer:       oidcIssuer.String,
-					Scopes:       oidcScopes,
+					IDPID:            oidcID.String,
+					ClientID:         oidcClientID.String,
+					ClientSecret:     oidcClientSecret,
+					Issuer:           oidcIssuer.String,
+					Scopes:           oidcScopes,
+					IsIDTokenMapping: oidcIDTokenMapping.Bool,
 				}
 			}
 			if jwtID.Valid {
@@ -713,6 +1025,52 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					KeysEndpoint: jwtKeysEndpoint.String,
 					HeaderName:   jwtHeaderName.String,
 					Endpoint:     jwtEndpoint.String,
+				}
+			}
+			if azureadID.Valid {
+				idpTemplate.AzureADIDPTemplate = &AzureADIDPTemplate{
+					IDPID:           azureadID.String,
+					ClientID:        azureadClientID.String,
+					ClientSecret:    azureadClientSecret,
+					Scopes:          azureadScopes,
+					Tenant:          azureadTenant.String,
+					IsEmailVerified: azureadIsEmailVerified.Bool,
+				}
+			}
+			if githubID.Valid {
+				idpTemplate.GitHubIDPTemplate = &GitHubIDPTemplate{
+					IDPID:        githubID.String,
+					ClientID:     githubClientID.String,
+					ClientSecret: githubClientSecret,
+					Scopes:       githubScopes,
+				}
+			}
+			if githubEnterpriseID.Valid {
+				idpTemplate.GitHubEnterpriseIDPTemplate = &GitHubEnterpriseIDPTemplate{
+					IDPID:                 githubEnterpriseID.String,
+					ClientID:              githubEnterpriseClientID.String,
+					ClientSecret:          githubEnterpriseClientSecret,
+					AuthorizationEndpoint: githubEnterpriseAuthorizationEndpoint.String,
+					TokenEndpoint:         githubEnterpriseTokenEndpoint.String,
+					UserEndpoint:          githubEnterpriseUserEndpoint.String,
+					Scopes:                githubEnterpriseScopes,
+				}
+			}
+			if gitlabID.Valid {
+				idpTemplate.GitLabIDPTemplate = &GitLabIDPTemplate{
+					IDPID:        gitlabID.String,
+					ClientID:     gitlabClientID.String,
+					ClientSecret: gitlabClientSecret,
+					Scopes:       gitlabScopes,
+				}
+			}
+			if gitlabSelfHostedID.Valid {
+				idpTemplate.GitLabSelfHostedIDPTemplate = &GitLabSelfHostedIDPTemplate{
+					IDPID:        gitlabSelfHostedID.String,
+					Issuer:       gitlabSelfHostedIssuer.String,
+					ClientID:     gitlabSelfHostedClientID.String,
+					ClientSecret: gitlabSelfHostedClientSecret,
+					Scopes:       gitlabSelfHostedScopes,
 				}
 			}
 			if googleID.Valid {
@@ -786,12 +1144,44 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OIDCClientIDCol.identifier(),
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
+			OIDCIDTokenMappingCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			// azure
+			AzureADIDCol.identifier(),
+			AzureADClientIDCol.identifier(),
+			AzureADClientSecretCol.identifier(),
+			AzureADScopesCol.identifier(),
+			AzureADTenantCol.identifier(),
+			AzureADIsEmailVerified.identifier(),
+			// github
+			GitHubIDCol.identifier(),
+			GitHubClientIDCol.identifier(),
+			GitHubClientSecretCol.identifier(),
+			GitHubScopesCol.identifier(),
+			// github enterprise
+			GitHubEnterpriseIDCol.identifier(),
+			GitHubEnterpriseClientIDCol.identifier(),
+			GitHubEnterpriseClientSecretCol.identifier(),
+			GitHubEnterpriseAuthorizationEndpointCol.identifier(),
+			GitHubEnterpriseTokenEndpointCol.identifier(),
+			GitHubEnterpriseUserEndpointCol.identifier(),
+			GitHubEnterpriseScopesCol.identifier(),
+			// gitlab
+			GitLabIDCol.identifier(),
+			GitLabClientIDCol.identifier(),
+			GitLabClientSecretCol.identifier(),
+			GitLabScopesCol.identifier(),
+			// gitlab self hosted
+			GitLabSelfHostedIDCol.identifier(),
+			GitLabSelfHostedIssuerCol.identifier(),
+			GitLabSelfHostedClientIDCol.identifier(),
+			GitLabSelfHostedClientSecretCol.identifier(),
+			GitLabSelfHostedScopesCol.identifier(),
 			// google
 			GoogleIDCol.identifier(),
 			GoogleClientIDCol.identifier(),
@@ -825,6 +1215,11 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(AzureADIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitHubIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitHubEnterpriseIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitLabSelfHostedIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -850,12 +1245,44 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcScopes := database.StringArray{}
+				oidcIDTokenMapping := sql.NullBool{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
 				jwtEndpoint := sql.NullString{}
 				jwtKeysEndpoint := sql.NullString{}
 				jwtHeaderName := sql.NullString{}
+
+				azureadID := sql.NullString{}
+				azureadClientID := sql.NullString{}
+				azureadClientSecret := new(crypto.CryptoValue)
+				azureadScopes := database.StringArray{}
+				azureadTenant := sql.NullString{}
+				azureadIsEmailVerified := sql.NullBool{}
+
+				githubID := sql.NullString{}
+				githubClientID := sql.NullString{}
+				githubClientSecret := new(crypto.CryptoValue)
+				githubScopes := database.StringArray{}
+
+				githubEnterpriseID := sql.NullString{}
+				githubEnterpriseClientID := sql.NullString{}
+				githubEnterpriseClientSecret := new(crypto.CryptoValue)
+				githubEnterpriseAuthorizationEndpoint := sql.NullString{}
+				githubEnterpriseTokenEndpoint := sql.NullString{}
+				githubEnterpriseUserEndpoint := sql.NullString{}
+				githubEnterpriseScopes := database.StringArray{}
+
+				gitlabID := sql.NullString{}
+				gitlabClientID := sql.NullString{}
+				gitlabClientSecret := new(crypto.CryptoValue)
+				gitlabScopes := database.StringArray{}
+
+				gitlabSelfHostedID := sql.NullString{}
+				gitlabSelfHostedIssuer := sql.NullString{}
+				gitlabSelfHostedClientID := sql.NullString{}
+				gitlabSelfHostedClientSecret := new(crypto.CryptoValue)
+				gitlabSelfHostedScopes := database.StringArray{}
 
 				googleID := sql.NullString{}
 				googleClientID := sql.NullString{}
@@ -914,12 +1341,44 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oidcClientID,
 					&oidcClientSecret,
 					&oidcScopes,
+					&oidcIDTokenMapping,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
 					&jwtEndpoint,
 					&jwtKeysEndpoint,
 					&jwtHeaderName,
+					// azure
+					&azureadID,
+					&azureadClientID,
+					&azureadClientSecret,
+					&azureadScopes,
+					&azureadTenant,
+					&azureadIsEmailVerified,
+					// github
+					&githubID,
+					&githubClientID,
+					&githubClientSecret,
+					&githubScopes,
+					// github enterprise
+					&githubEnterpriseID,
+					&githubEnterpriseClientID,
+					&githubEnterpriseClientSecret,
+					&githubEnterpriseAuthorizationEndpoint,
+					&githubEnterpriseTokenEndpoint,
+					&githubEnterpriseUserEndpoint,
+					&githubEnterpriseScopes,
+					// gitlab
+					&gitlabID,
+					&gitlabClientID,
+					&gitlabClientSecret,
+					&gitlabScopes,
+					// gitlab self hosted
+					&gitlabSelfHostedID,
+					&gitlabSelfHostedIssuer,
+					&gitlabSelfHostedClientID,
+					&gitlabSelfHostedClientSecret,
+					&gitlabSelfHostedScopes,
 					// google
 					&googleID,
 					&googleClientID,
@@ -971,11 +1430,12 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				}
 				if oidcID.Valid {
 					idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-						IDPID:        oidcID.String,
-						ClientID:     oidcClientID.String,
-						ClientSecret: oidcClientSecret,
-						Issuer:       oidcIssuer.String,
-						Scopes:       oidcScopes,
+						IDPID:            oidcID.String,
+						ClientID:         oidcClientID.String,
+						ClientSecret:     oidcClientSecret,
+						Issuer:           oidcIssuer.String,
+						Scopes:           oidcScopes,
+						IsIDTokenMapping: oidcIDTokenMapping.Bool,
 					}
 				}
 				if jwtID.Valid {
@@ -985,6 +1445,52 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						KeysEndpoint: jwtKeysEndpoint.String,
 						HeaderName:   jwtHeaderName.String,
 						Endpoint:     jwtEndpoint.String,
+					}
+				}
+				if azureadID.Valid {
+					idpTemplate.AzureADIDPTemplate = &AzureADIDPTemplate{
+						IDPID:           azureadID.String,
+						ClientID:        azureadClientID.String,
+						ClientSecret:    azureadClientSecret,
+						Scopes:          azureadScopes,
+						Tenant:          azureadTenant.String,
+						IsEmailVerified: azureadIsEmailVerified.Bool,
+					}
+				}
+				if githubID.Valid {
+					idpTemplate.GitHubIDPTemplate = &GitHubIDPTemplate{
+						IDPID:        githubID.String,
+						ClientID:     githubClientID.String,
+						ClientSecret: githubClientSecret,
+						Scopes:       githubScopes,
+					}
+				}
+				if githubEnterpriseID.Valid {
+					idpTemplate.GitHubEnterpriseIDPTemplate = &GitHubEnterpriseIDPTemplate{
+						IDPID:                 githubEnterpriseID.String,
+						ClientID:              githubEnterpriseClientID.String,
+						ClientSecret:          githubEnterpriseClientSecret,
+						AuthorizationEndpoint: githubEnterpriseAuthorizationEndpoint.String,
+						TokenEndpoint:         githubEnterpriseTokenEndpoint.String,
+						UserEndpoint:          githubEnterpriseUserEndpoint.String,
+						Scopes:                githubEnterpriseScopes,
+					}
+				}
+				if gitlabID.Valid {
+					idpTemplate.GitLabIDPTemplate = &GitLabIDPTemplate{
+						IDPID:        gitlabID.String,
+						ClientID:     gitlabClientID.String,
+						ClientSecret: gitlabClientSecret,
+						Scopes:       gitlabScopes,
+					}
+				}
+				if gitlabSelfHostedID.Valid {
+					idpTemplate.GitLabSelfHostedIDPTemplate = &GitLabSelfHostedIDPTemplate{
+						IDPID:        gitlabSelfHostedID.String,
+						Issuer:       gitlabSelfHostedIssuer.String,
+						ClientID:     gitlabSelfHostedClientID.String,
+						ClientSecret: gitlabSelfHostedClientSecret,
+						Scopes:       gitlabSelfHostedScopes,
 					}
 				}
 				if googleID.Valid {

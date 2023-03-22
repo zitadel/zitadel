@@ -239,11 +239,20 @@
     "NOROWS": "Brak danych"
   },
   "ERRORS": {
-    "REQUIRED": "Brakuje niektórych wymaganych pól.",
+    "REQUIRED": "Proszę wypełnić to pole.",
     "TOKENINVALID": {
       "TITLE": "Twój token autoryzacji wygasł.",
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
-    }
+    },
+    "INVALID_FORMAT": "Format jest nieprawidłowy.",
+    "NOTANEMAIL": "Podana wartość nie jest adresem e-mail.",
+    "MINLENGTH": "Musi mieć co najmniej {{requiredLength}} znaków.",
+    "UPPERCASEMISSING": "Musi zawierać wielką literę.",
+    "LOWERCASEMISSING": "Musi zawierać małą literę.",
+    "SYMBOLERROR": "Musi zawierać symbol lub znak interpunkcyjny.",
+    "NUMBERERROR": "Musi zawierać cyfrę.",
+    "PWNOTEQUAL": "Podane hasła nie są identyczne.",
+    "PHONE": "Numer telefonu musi zaczynać się od 00 lub +."
   },
   "USER": {
     "SETTINGS": {
@@ -524,8 +533,7 @@
       "SET": "Ustaw nowe hasło",
       "RESENDNOTIFICATION": "Wyślij link resetowania hasła",
       "REQUIRED": "Brakuje niektórych wymaganych pól.",
-      "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków.",
-      "NOTEQUAL": "Podane hasła nie są identyczne."
+      "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -535,7 +543,7 @@
     "EMAILVERIFIED": "Email zweryfikowany",
     "NOTVERIFIED": "niezweryfikowany",
     "PREFERRED_LOGINNAME": "Preferowana nazwa użytkownika",
-    "ISINITIAL": "Ten użytkownik nie zweryfikował jeszcze swojego adresu e-mail.",
+    "ISINITIAL": "Użytkownik nie jest jeszcze aktywny.",
     "LOGINMETHODS": {
       "TITLE": "Informacje kontaktowe",
       "DESCRIPTION": "Podane informacje służą do wysyłania ważnych informacji, takich jak e-maile z linkiem resetowania hasła.",
@@ -579,17 +587,6 @@
         "3": "filtruj po roli"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "Hasło nie spełnia określonych reguł.",
-      "NOTANEMAIL": "Podana wartość nie jest adresem e-mail",
-      "REQUIRED": "Pole jest puste.",
-      "MINLENGTH": "Hasło musi mieć co najmniej {{requiredLength}} znaków.",
-      "NOEMAIL": "Nazwa użytkownika nie może być adresem e-mail.",
-      "UPPERCASEMISSING": "Musi zawierać wielką literę.",
-      "LOWERCASEMISSING": "Musi zawierać małą literę.",
-      "SYMBOLERROR": "Musi zawierać symbol lub znak interpunkcyjny.",
-      "NUMBERERROR": "Musi zawierać cyfrę."
-    },
     "STATE": {
       "0": "Nieznany",
       "1": "Aktywny",
@@ -612,7 +609,7 @@
     "SIGNEDOUT_BTN": "Zaloguj się",
     "EDITACCOUNT": "Edytuj konto",
     "ADDACCOUNT": "Zaloguj się z innym kontem",
-    "RESENDINITIALEMAIL": "Wyślij nowego maila inicjalizującego",
+    "RESENDINITIALEMAIL": "Wyślij ponownie wiadomość aktywacyjną",
     "RESENDEMAILNOTIFICATION": "Wyślij ponownie powiadomienie e-mailem",
     "TOAST": {
       "CREATED": "Użytkownik został utworzony pomyślnie.",
@@ -1014,11 +1011,12 @@
     "DEFAULTLANGUAGE": "Domyślny język",
     "LANGUAGE": {
       "de": "Deutsch",
-      "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
@@ -1207,10 +1205,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -1622,6 +1621,10 @@
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OIDC."
       },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy OAuth."
+      },
       "JWT": {
         "TITLE": "JWT Provider",
         "DESCRIPTION": "Wprowadź wymagane dane dla swojego dostawcy JWT."
@@ -1629,6 +1632,26 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Google"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Gitlab Self Hosted"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Microsoft"
       }
     },
     "DETAIL": {
@@ -1661,6 +1684,14 @@
       "1": "aktywny",
       "2": "nieaktywny"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Rodzaj najemcy",
+    "AZUREADTENANTID": "Identyfikator najemcy",
+    "EMAILVERIFIED": "Email zweryfikowany",
     "NAMEHINT": "Jeśli zostanie podany, będzie widoczny w interfejsie logowania.",
     "OPTIONAL": "opcjonalnie",
     "UPDATECLIENTSECRET": "aktualizacja tajemnicy klienta",
@@ -1669,6 +1700,10 @@
     "OWNER": "Właściciel",
     "ID": "ID",
     "NAME": "Nazwa",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "Atrybut identyfikatora",
     "AVAILABILITY": "Dostępność",
     "AVAILABLE": "dostępny",
     "AVAILABLEBUTINACTIVE": "dostępny ale nieaktywny",
@@ -1999,10 +2034,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

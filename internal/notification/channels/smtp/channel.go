@@ -22,7 +22,7 @@ type Email struct {
 	senderName    string
 }
 
-func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context) (*EmailConfig, error)) (*Email, error) {
+func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context) (*Config, error)) (*Email, error) {
 	smtpConfig, err := getSMTPConfig(ctx)
 	if err != nil {
 		return nil, err

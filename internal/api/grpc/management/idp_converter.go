@@ -290,6 +290,116 @@ func updateJWTProviderToCommand(req *mgmt_pb.UpdateJWTProviderRequest) command.J
 	}
 }
 
+func addAzureADProviderToCommand(req *mgmt_pb.AddAzureADProviderRequest) command.AzureADProvider {
+	return command.AzureADProvider{
+		Name:          req.Name,
+		ClientID:      req.ClientId,
+		ClientSecret:  req.ClientSecret,
+		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
+		EmailVerified: req.EmailVerified,
+		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateAzureADProviderToCommand(req *mgmt_pb.UpdateAzureADProviderRequest) command.AzureADProvider {
+	return command.AzureADProvider{
+		Name:          req.Name,
+		ClientID:      req.ClientId,
+		ClientSecret:  req.ClientSecret,
+		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
+		EmailVerified: req.EmailVerified,
+		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGitHubProviderToCommand(req *mgmt_pb.AddGitHubProviderRequest) command.GitHubProvider {
+	return command.GitHubProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitHubProviderToCommand(req *mgmt_pb.UpdateGitHubProviderRequest) command.GitHubProvider {
+	return command.GitHubProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGitHubEnterpriseProviderToCommand(req *mgmt_pb.AddGitHubEnterpriseServerProviderRequest) command.GitHubEnterpriseProvider {
+	return command.GitHubEnterpriseProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitHubEnterpriseProviderToCommand(req *mgmt_pb.UpdateGitHubEnterpriseServerProviderRequest) command.GitHubEnterpriseProvider {
+	return command.GitHubEnterpriseProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGitLabProviderToCommand(req *mgmt_pb.AddGitLabProviderRequest) command.GitLabProvider {
+	return command.GitLabProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitLabProviderToCommand(req *mgmt_pb.UpdateGitLabProviderRequest) command.GitLabProvider {
+	return command.GitLabProvider{
+		Name:         req.Name,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGitLabSelfHostedProviderToCommand(req *mgmt_pb.AddGitLabSelfHostedProviderRequest) command.GitLabSelfHostedProvider {
+	return command.GitLabSelfHostedProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitLabSelfHostedProviderToCommand(req *mgmt_pb.UpdateGitLabSelfHostedProviderRequest) command.GitLabSelfHostedProvider {
+	return command.GitLabSelfHostedProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
 func addGoogleProviderToCommand(req *mgmt_pb.AddGoogleProviderRequest) command.GoogleProvider {
 	return command.GoogleProvider{
 		Name:         req.Name,

@@ -656,6 +656,8 @@ DefaultInstance:
 #            # CallURL is called when a relative amount of the quota is used.
 #            CallURL: "https://httpbin.org/post"
 
+AuditLogRetention: 0s
+
 InternalAuthZ:
   RolePermissionMappings:
     - Role: "IAM_OWNER"
@@ -827,7 +829,6 @@ InternalAuthZ:
       Permissions:
         - "org.read"
         - "org.global.read"
-        - "org.create"
         - "org.write"
         - "org.delete"
         - "org.member.read"

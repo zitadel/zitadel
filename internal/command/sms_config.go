@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, config *twilio.TwilioConfig) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, config *twilio.Config) (string, *domain.ObjectDetails, error) {
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -46,7 +46,7 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, co
 	return id, writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id string, config *twilio.TwilioConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id string, config *twilio.Config) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-e9jwf", "Errors.IDMissing")
 	}

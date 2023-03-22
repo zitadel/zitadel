@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -18,13 +20,15 @@ import (
 )
 
 type UserGrant struct {
+	// ID represents the aggregate id (id of the user grant)
 	ID           string
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
 	Roles        database.StringArray
-	GrantID      string
-	State        domain.UserGrantState
+	// GrantID represents the project grant id
+	GrantID string
+	State   domain.UserGrantState
 
 	UserID             string
 	Username           string
@@ -243,9 +247,15 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 	return scan(row)
 }
 
-func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, withOwnerRemoved bool) (_ *UserGrants, err error) {
+func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk, withOwnerRemoved bool) (_ *UserGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		logging.OnError(
+			projection.UserGrantProjection.Trigger(ctx),
+		).Debug("unable to trigger")
+	}
 
 	query, scan := prepareUserGrantsQuery(ctx, q.client)
 	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}

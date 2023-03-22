@@ -37,7 +37,6 @@
         <cnsl-form-field class="name-formfield">
           <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
           <input cnslInput cdkFocusInitial formControlName="name" />
-          <span cnslError *ngIf="name?.errors?.required">{{ 'PROJECT.APP.NAMEREQUIRED' | translate }}</span>
         </cnsl-form-field>
 
         <p class="step-title">{{ 'APP.TYPETITLE' | translate }}</p>
