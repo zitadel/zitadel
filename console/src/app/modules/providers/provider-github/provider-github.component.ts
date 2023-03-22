@@ -130,7 +130,6 @@ export class ProviderGithubComponent {
     req.setScopesList(this.scopesList?.value);
     req.setProviderOptions(this.options);
 
-    console.log(this.options.toObject());
     this.loading = true;
     this.service
       .addGitHubProvider(req)

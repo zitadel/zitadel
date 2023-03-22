@@ -50,7 +50,6 @@ export class ProviderJWTComponent {
   ) {
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
-      console.log(data.serviceType);
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:

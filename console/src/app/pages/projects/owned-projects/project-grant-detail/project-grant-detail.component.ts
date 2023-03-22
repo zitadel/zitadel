@@ -70,7 +70,6 @@ export class ProjectGrantDetailComponent {
       this.mgmtService
         .getProjectGrantByID(this.grantid, this.projectid)
         .then((resp) => {
-          console.log(resp);
           if (resp.projectGrant) {
             this.grant = resp.projectGrant;
 
