@@ -139,6 +139,7 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 			h.lastSuccessfulCreationDate = event.CreationDate()
 		}
 	}
+	// TODO: What do we retry here? We are on the happy path, right?
 	for retry := 0; retry <= h.retries; retry++ {
 		index, err = h.update(ctx, statements[index+1:], h.reduce)
 		if err != nil && !errors.Is(err, ErrSomeStmtsFailed) {
