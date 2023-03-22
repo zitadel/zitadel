@@ -30,7 +30,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderGithubESComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
   public id: string | null = '';
   public updateClientSecret: boolean = false;
