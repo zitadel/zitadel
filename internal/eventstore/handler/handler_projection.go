@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -125,17 +126,21 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 // Process handles multiple events by reducing them to statements and updating the projection
 func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Event) (index int, err error) {
 	if len(events) == 0 {
-		return 0, nil
+		return index, nil
 	}
+	index = -1
 	statements := make([]*Statement, 0)
 	for _, event := range events {
 		statement, reduceErr := h.reduce(event)
 		if reduceErr != nil {
-			logging.OnError(reduceErr).WithField("event", event.Type()).WithField("aggregate", event.Aggregate().Type).Warn("reducing event failed")
+			return index, reduceErr
 		}
 		if statement != nil {
 			statements = append(statements, statement)
 		}
+	}
+	if len(statements) == 0 {
+		return index, caos_errors.ThrowInternal(nil, "HANDL-vjxj7", "Errors.Handlers.Process.NoStatements")
 	}
 	for retry := 0; retry <= h.retries; retry++ {
 		index, err = h.update(ctx, statements, h.reduce)
