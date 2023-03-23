@@ -30,7 +30,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderAzureADComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
@@ -130,134 +130,77 @@ export class ProviderAzureADComponent {
   }
 
   public addAzureADProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddAzureADProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddAzureADProviderRequest()
+        : new AdminAddAzureADProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setEmailVerified(this.emailVerified?.value);
+    req.setName(this.name?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setEmailVerified(this.emailVerified?.value);
 
-      const tenant = new AzureADTenant();
-      tenant.setTenantId(this.tenantId?.value);
-      tenant.setTenantType(this.tenantType?.value);
-      req.setTenant(tenant);
+    const tenant = new AzureADTenant();
+    tenant.setTenantId(this.tenantId?.value);
+    tenant.setTenantType(this.tenantType?.value);
+    req.setTenant(tenant);
 
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
+    req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addAzureADProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addAzureADProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddAzureADProviderRequest();
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setEmailVerified(this.emailVerified?.value);
-
-      const tenant = new AzureADTenant();
-      tenant.setTenantId(this.tenantId?.value);
-      tenant.setTenantType(this.tenantType?.value);
-      req.setTenant(tenant);
-
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addAzureADProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
-          }, 2000);
-        })
-        .catch((error) => {
-          this.loading = false;
-          this.toast.showError(error);
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateAzureADProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateAzureADProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setEmailVerified(this.emailVerified?.value);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateAzureADProviderRequest()
+          : new AdminUpdateAzureADProviderRequest();
 
-        const tenant = new AzureADTenant();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setClientId(this.clientId?.value);
+      req.setEmailVerified(this.emailVerified?.value);
 
-        tenant.setTenantId(this.tenantId?.value);
-        tenant.setTenantType(this.tenantType?.value);
-        req.setTenant(tenant);
+      const tenant = new AzureADTenant();
 
-        req.setScopesList(this.scopesList?.value);
-        req.setProviderOptions(this.options);
+      tenant.setTenantId(this.tenantId?.value);
+      tenant.setTenantType(this.tenantType?.value);
+      req.setTenant(tenant);
 
-        if (this.updateClientSecret) {
-          req.setClientSecret(this.clientSecret?.value);
-        }
+      req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateAzureADProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateAzureADProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setEmailVerified(this.emailVerified?.value);
-
-        const tenant = new AzureADTenant();
-        tenant.setTenantId(this.tenantId?.value);
-        tenant.setTenantType(this.tenantType?.value);
-        req.setTenant(tenant);
-
-        req.setScopesList(this.scopesList?.value);
-        req.setProviderOptions(this.options);
-
-        if (this.updateClientSecret) {
-          req.setClientSecret(this.clientSecret?.value);
-        }
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateAzureADProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
-            }, 2000);
-          })
-          .catch((error) => {
-            this.loading = false;
-            this.toast.showError(error);
-          });
+      if (this.updateClientSecret) {
+        req.setClientSecret(this.clientSecret?.value);
       }
+
+      this.loading = true;
+      this.service
+        .updateAzureADProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 

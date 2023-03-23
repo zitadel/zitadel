@@ -41,12 +41,10 @@ export class EditDialogComponent implements OnInit {
   }
 
   public setCountryCallingCode(): void {
-    console.log(this);
     let value = (this.dialogForm.controls[this.controlKey]?.value as string) || '';
     this.countryPhoneCodes.forEach((code) => (value = value.replace(`+${code.countryCallingCode}`, '')));
     value = value.trim();
     this.dialogForm.controls[this.controlKey]?.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
-    console.log(this);
   }
 
   ngOnInit(): void {
