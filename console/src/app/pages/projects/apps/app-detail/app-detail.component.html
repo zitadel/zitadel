@@ -334,11 +334,9 @@
             <cnsl-redirect-uris
               *ngIf="appType?.value !== undefined"
               class="redirect-section"
-              [canWrite]="canWrite"
+              [disabled]="!canWrite"
               [devMode]="devMode?.value"
-              [getValues]="requestRedirectValuesSubject$"
-              (changedUris)="redirectUrisList = $any($event)"
-              [urisList]="redirectUrisList"
+              [(ngModel)]="redirectUrisList"
               title="{{ 'APP.OIDC.REDIRECT' | translate }}"
               [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
             >
@@ -347,11 +345,9 @@
             <cnsl-redirect-uris
               *ngIf="appType?.value !== undefined"
               class="redirect-section"
-              [canWrite]="canWrite"
+              [disabled]="!canWrite"
               [devMode]="devMode?.value"
-              (changedUris)="postLogoutRedirectUrisList = $any($event)"
-              [urisList]="postLogoutRedirectUrisList"
-              [getValues]="requestRedirectValuesSubject$"
+              [(ngModel)]="postLogoutRedirectUrisList"
               title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
               [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
             >
