@@ -1651,6 +1651,10 @@
       "AZUREAD": {
         "TITLE": "Microsoft Provider",
         "DESCRIPTION": "Enter the credentials for your Microsoft Identity Provider"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Enter the credentials for your LDAP Provider"
       }
     },
     "DETAIL": {
@@ -1688,6 +1692,8 @@
     "EMAILVERIFIED": "Email verified",
     "NAMEHINT": "If specified it will be shown in the login interface.",
     "OPTIONAL": "optional",
+    "LDAPATTRIBUTES": "LDAP Attributes",
+    "UPDATEBINDPASSWORD": "update Bind Password",
     "UPDATECLIENTSECRET": "update client secret",
     "ADD": "Add Identity Provider",
     "TYPE": "Type",
@@ -1709,6 +1715,8 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "Connection",
+    "LDAPUSERBINDING": "User binding",
     "BASEDN": "BaseDn",
     "BINDDN": "BindDn",
     "BINDPASSWORD": "Bind Password",
@@ -1718,6 +1726,19 @@
     "USERBASE": "Userbase",
     "USERFILTERS": "User filters",
     "USEROBJECTCLASSES": "User Object Classes",
+    "IDATTRIBUTEATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred langauge attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP Display Name Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Dates",

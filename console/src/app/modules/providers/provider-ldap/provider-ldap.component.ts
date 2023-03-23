@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { take } from 'rxjs';
 import {
   AddLDAPProviderRequest as AdminAddLDAPProviderRequest,
@@ -28,8 +29,11 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
   templateUrl: './provider-ldap.component.html',
 })
 export class ProviderLDAPComponent {
+  public updateBindPassword: boolean = false;
+  public showAttributes: boolean = false;
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  public attributes: LDAPAttributes = new LDAPAttributes();
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
@@ -58,8 +62,8 @@ export class ProviderLDAPComponent {
       userBase: new FormControl('', [requiredValidator]),
       userFiltersList: new FormControl('', [requiredValidator]),
       userObjectClassesList: new FormControl('', [requiredValidator]),
-      timeout: new FormControl('', [requiredValidator]),
-      startTls: new FormControl(false, [requiredValidator]),
+      timeout: new FormControl<number>(0),
+      startTls: new FormControl(false),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -91,6 +95,7 @@ export class ProviderLDAPComponent {
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
         this.getData(this.id);
+        this.bindPassword?.setValidators([]);
       }
     });
   }
@@ -106,9 +111,10 @@ export class ProviderLDAPComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        if (this.provider?.config?.github) {
-          this.form.patchValue(this.provider.config.github);
+        if (this.provider?.config?.ldap) {
+          this.form.patchValue(this.provider.config.ldap);
           this.name?.setValue(this.provider.name);
+          this.timeout?.setValue(this.provider.config.ldap.timeout?.seconds);
         }
       })
       .catch((error) => {
@@ -122,102 +128,82 @@ export class ProviderLDAPComponent {
   }
 
   public addLDAPProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddLDAPProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddLDAPProviderRequest()
+        : new AdminAddLDAPProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setProviderOptions(this.options);
+    req.setName(this.name?.value);
+    req.setProviderOptions(this.options);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addLDAPProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    const attr = new LDAPAttributes();
+    req.setAttributes(attr);
+
+    req.setBaseDn(this.baseDn?.value);
+    req.setBindDn(this.bindDn?.value);
+    req.setBindPassword(this.bindPassword?.value);
+    req.setServersList(this.serversList?.value); // list
+    req.setStartTls(this.startTls?.value);
+    req.setTimeout(new Duration().setSeconds(this.timeout?.value ?? 0));
+    req.setUserBase(this.userBase?.value);
+    req.setUserFiltersList(this.userFiltersList?.value); // list
+    req.setUserObjectClassesList(this.userObjectClassesList?.value); // list
+
+    this.loading = true;
+    (this.service as ManagementService)
+      .addLDAPProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddLDAPProviderRequest();
-      req.setName(this.name?.value);
-      req.setProviderOptions(this.options);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addLDAPProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.loading = false;
-          this.toast.showError(error);
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateLDAPProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateLDAPProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setProviderOptions(this.options);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateLDAPProviderRequest()
+          : new AdminUpdateLDAPProviderRequest();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setProviderOptions(this.options);
 
-        const attr = new LDAPAttributes();
-        // attr.setAvatarUrlAttribute();
-        // attr.setDisplayNameAttribute();
-        req.setAttributes(attr);
+      const attr = new LDAPAttributes();
+      // attr.setAvatarUrlAttribute();
+      // attr.setDisplayNameAttribute();
+      req.setAttributes(attr);
 
-        // req.setBaseDn();
-        // req.setBindDn();
-        // req.setBindPassword();
-        // req.setServersList();
-        // req.setStartTls();
-        // req.setTimeout();
-        // req.setUserBase();
-        // req.setUserFiltersList();
-        // req.setUserObjectClassesList();
-
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateLDAPProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateLDAPProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setProviderOptions(this.options);
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateLDAPProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.loading = false;
-            this.toast.showError(error);
-          });
+      req.setBaseDn(this.baseDn?.value);
+      req.setBindDn(this.bindDn?.value);
+      if (this.updateBindPassword) {
+        req.setBindPassword(this.bindPassword?.value);
       }
+      req.setServersList(this.serversList?.value);
+      req.setStartTls(this.startTls?.value);
+      req.setTimeout(new Duration().setSeconds(this.timeout?.value ?? 0));
+      req.setUserBase(this.userBase?.value);
+      req.setUserFiltersList(this.userFiltersList?.value);
+      req.setUserObjectClassesList(this.userObjectClassesList?.value);
+
+      this.loading = true;
+      (this.service as ManagementService)
+        .updateLDAPProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 

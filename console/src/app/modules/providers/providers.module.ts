@@ -15,6 +15,7 @@ import { CardModule } from '../card/card.module';
 import { CreateLayoutModule } from '../create-layout/create-layout.module';
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { ProviderOptionsModule } from '../provider-options/provider-options.module';
+import { LDAPAttributesComponent } from './ldap-attributes/ldap-attributes.component';
 import { ProviderAzureADComponent } from './provider-azure-ad/provider-azure-ad.component';
 import { ProviderGithubESComponent } from './provider-github-es/provider-github-es.component';
 import { ProviderGithubComponent } from './provider-github/provider-github.component';
@@ -33,6 +34,7 @@ import { ProvidersRoutingModule } from './providers-routing.module';
     ProviderGithubComponent,
     ProviderGithubESComponent,
     ProviderAzureADComponent,
+    LDAPAttributesComponent,
     ProviderGitlabSelfHostedComponent,
     ProviderGitlabComponent,
     ProviderGithubESComponent,
