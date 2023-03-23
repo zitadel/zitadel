@@ -6,7 +6,7 @@ sidebar_label: GitHub
 This guides shows you how to connect GitHub or GitHub Enterprise as an identity provider in ZITADEL.
 
 :::info
-In ZITADEL you can connect an Identity Provider (IdP) like an GitHub to your instance and provide it as default to all organizations or you can register the IdP to a specific organization only. This can also be done through your customers in a self-service fashion.
+In ZITADEL you can connect an Identity Provider (IdP) like GitHub to your instance and provide it as default to all organizations or you can register the IdP to a specific organization only. This can also be done through your customers in a self-service fashion.
 :::
 
 ## Prerequisite
@@ -87,7 +87,7 @@ If the user is not yet linked in ZITADEL the user will see the screen below.
 Because GitHub is an OAuth provider and oAuth does not provide a standardized way to get the user data not all of the data can be taken over. First and Lastname are not filled.
 The user has to enter the rest of the data himself.
 
-![GitHub Login](/img/guides/zitadel_login_external_not_found.png)
+![GitHub Login](/img/guides/zitadel_login_external_not_found_registration.png)
 
 ### Optional: Add ZITADEL action to autofill userdata
 
@@ -96,15 +96,10 @@ If you don't want the user to have to enter his first and lastname himself, you 
 1. Go to the settings of the organization where the users will be registered
 2. Add an new action with the following body. Make sure the action name is the same as in the script itself. Make sure to change the id in the script to the id of your own identity provider configuration. 
 
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/github_identity_provider
 ```
-function mapGitHubOAuth(ctx, api) {
-  if (ctx.v1.externalUser.externalIdpId != "206217465405899009") {
-    return
-  }
-  api.setFirstName(ctx.v1.providerInfo.name);
-  api.setLastName(ctx.v1.providerInfo.name);
-}
-```
+
 
 3. Add the action to the flow "External Authentication" on the trigger Post Authentication
   
