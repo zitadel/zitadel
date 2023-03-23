@@ -93,4 +93,18 @@ The user has to enter the rest of the data himself.
 
 If you don't want the user to have to enter his first and lastname himself, you can add a ZITADEL action in which you specify how the data should be transferred.
 
+1. Go to the settings of the organization where the users will be registered
+2. Add an new action with the following body. Make sure the action name is the same as in the script itself. Make sure to change the id in the script to the id of your own identity provider configuration. 
 
+```
+function mapGitHubOAuth(ctx, api) {
+  if (ctx.v1.externalUser.externalIdpId != "206217465405899009") {
+    return
+  }
+  api.setFirstName(ctx.v1.providerInfo.name);
+  api.setLastName(ctx.v1.providerInfo.name);
+}
+```
+
+3. Add the action to the flow "External Authentication" on the trigger Post Authentication
+  
