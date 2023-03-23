@@ -105,7 +105,6 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
         this.adminService
           .listIAMMemberRoles()
           .then((resp) => {
-            console.log(resp);
             this.membershipRoleOptions = resp.rolesList;
             this.loadingRoles = false;
           })

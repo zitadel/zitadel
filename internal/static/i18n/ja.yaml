@@ -1,0 +1,1159 @@
+Errors:
+  Internal: 内部でエラーが発生しました
+  NoChangesFound: 変更はありません
+  OriginNotAllowed: このオリジンは許可されていません
+  IDMissing: IDがありません
+  ResourceOwnerMissing: リソース所有者の組織がありません
+  RemoveFailed: 削除できませんでした
+  ProjectionName:
+    Invalid: 無効なプロジェクション名です
+  Assets:
+    EmptyKey: アセットキーが空です
+    Store:
+      NotInitialized: アセットストレージが初期化されていません
+      NotConfigured: アセットストレージが設定されていません
+    Bucket:
+      Internal: バケットの作成時に内部がエラー発生しましたs
+      AlreadyExists: バケットはすでに存在しています
+      CreateFailed: バケットの作成に失敗しました
+      ListFailed: バケットの読み込みに失敗しました
+      RemoveFailed: バケットの削除に失敗しました
+      SetPublicFailed: バケットの公開に失敗しました
+    Object:
+      PutFailed: オブジェクトの作成に失敗しました
+      GetFailed: オブジェクトの読み込みに失敗しました
+      NotFound: オブジェクトが見つかりません
+      PresignedTokenFailed: 署名トークンの作成に失敗しました
+      ListFailed: オブジェクト一覧の読み込みに失敗しました
+      RemoveFailed: オブジェクトの削除に失敗しました
+  Limit:
+    ExceedsDefault: デフォルトの制限を超えています
+  Language:
+    NotParsed: 言語のパースに失敗しました
+  OIDCSettings:
+    NotFound: OIDC構成が見つかりません
+    AlreadyExists: すでに存在するOIDC構成です
+  SecretGenerator:
+    AlreadyExists: すでに存在するシークレット生成です
+    TypeMissing: シークレット生成タイプがありません
+    NotFound: シークレット生成が見つかりません
+  SMSConfig:
+    NotFound: SMS構成が見つかりません
+    AlreadyActive: このSMS構成はすでにアクティブです
+    AlreadyDeactivated: このSMS構成はすでに非アクティブです
+  SMTPConfig:
+    NotFound: SMTP構成が見つかりません
+    AlreadyExists: すでに存在するSMTP構成です
+    SenderAdressNotCustomDomain: 送信者アドレスは、インスタンスのカスタムドメインとして構成する必要があります。
+  Notification:
+    NoDomain: メッセージのドメインが見つかりません
+  User:
+    NotFound: ユーザーが見つかりません
+    AlreadyExists: 既に存在するユーザーです
+    NotFoundOnOrg: ユーザーが選択した組織内で見つかりません
+    NotAllowedOrg: ユーザーが必要な組織のメンバーでありません
+    UserIDMissing: ユーザーIDがありません
+    DomainPolicyNil: 組織ポリシーが空です
+    EmailAsUsernameNotAllowed: メールアドレスはユーザー名として使用できません
+    Invalid: 無効なユーザーデータです
+    DomainNotAllowedAsUsername: このドメインはすでに予約されており、使用できません
+    AlreadyInactive: このユーザーはすでに非アクティブです
+    NotInactive: このユーザーは非アクティブではありません
+    CantDeactivateInitial: 初期化待ちのユーザーは、削除のみ可能で、非アクティブにはできません。
+    ShouldBeActiveOrInitial: ユーザーがアクティブまたは初期化待ちでありません
+    AlreadyInitialised: このユーザーはすでに初期化されています
+    NotInitialised: このユーザーはまだ初期化されていません
+    NotLocked: このユーザーはロックされていません
+    NoChanges: 変更は見つかりません
+    InitCodeNotFound: 初期化コードが見つかりません
+    UsernameNotChanged: ユーザー名は変更されていません
+    Profile:
+      NotFound: プロファイルが見つかりません
+      NotChanged: プロファイルが変更されていません
+      Invalid: プロファイルデータが無効です
+    Email:
+      NotFound: メールアドレスが見つかりません
+      Invalid: 無効なメールアドレスです
+      AlreadyVerified: メールアドレスはすでに検証済みです
+      NotChanged: メールアドレスが変更されていません
+    Phone:
+      NotFound: 電話番号が見つかりません
+      Invalid: 無効な電話番号です
+      AlreadyVerified: 電話番号はすでに認証済みです
+    Address:
+      NotFound: 住所が見つかりません
+      NotChanged: 住所は変更されていません
+    Machine:
+      Key:
+        NotFound: マシーンキーが見つかりません
+        AlreadyExisting: すでに存在しているマシーンキーです
+      Secret:
+        NotExisting: シークレットは存在しません
+        Invalid: 無効なシークレットです
+        CouldNotGenerate: シークレットの生成に失敗しました
+    PAT:
+      NotFound: パーソナルアクセストークンが見つかりません
+    NotHuman: ユーザーはパーソナルである必要があります
+    NotMachine: ユーザーはテクニカルである必要があります
+    WrongType: このユーザータイプは許可されていません
+    NotAllowedToLink: このユーザーは外部ログインプロバイダーにリンクすることを許可されていません
+    Username:
+      AlreadyExists: ユーザー名はすでに使用されています
+      Reserved: ユーザー名はすでに使用されています
+    Code:
+      Empty: コードは空です
+      NotFound: コードが見つかりません
+      Expired: 有効期限切れのコードです
+      GeneratorAlgNotSupported: サポートされていない生成アルゴリズムです
+    Password:
+      NotFound: パスワードが見つかりません
+      Empty: パスワードは空です
+      Invalid: 無効なパスワードです
+      NotSet: パスワードが未設置です
+    PasswordComplexityPolicy:
+      NotFound: パスワードポリシーが見つかりません
+      MinLength: パスワードが短すぎます
+      MinLengthNotAllowed: 最小の長さを指定することはできません。
+      HasLower: パスワードに小文字を含める必要があります
+      HasUpper: パスワードに大文字を含める必要があります
+      HasNumber: パスワードに数字を必要があります
+      HasSymbol: パスワードに記号を含める必要があります
+    ExternalIDP:
+      Invalid: 無効な外部IDPです
+      IDPConfigNotExisting: この組織はIDPプロバイダーが無効です
+      NotAllowed: この組織では外部IDPが許可されていません
+      MinimumExternalIDPNeeded: 少なくとも1つのIDPを追加する必要があります
+      AlreadyExists: 外部IDPはすでに使用されています
+      NotFound: 外部IDPが見つかりません
+    MFA:
+      OTP:
+        AlreadyReady: 多要素OTP（ワンタイムパスワード）は設定済みです
+        NotExisting: 多要素OTP（ワンタイムパスワード）が存在しません
+        NotReady: 多要素OTP（ワンタイムパスワード）が利用可能でありません
+        InvalidCode: 無効なコードです
+      U2F:
+        NotExisting: U2Fは存在しません
+      Passwordless:
+        NotExisting: パスワードレスは存在しません
+    WebAuthN:
+      NotFound: WebAuthNトークンが見つかりませんでした
+      BeginRegisterFailed: WebAuthN登録の開始に失敗しました
+      MarshalError: データのマーシャル時にエラーが発生しました
+      ErrorOnParseCredential: クレデンシャルデータのパース時にエラーが発生しました
+      CreateCredentialFailed: クレデンシャルデータの作成時にエラーが発生しました
+      BeginLoginFailed: WebAuthNの開始ログインに失敗しました
+      ValidateLoginFailed: ログインクレデンシャルの検証時にエラーが発生しました
+      CloneWarning: クレデンシャルはクローンされる場合があります
+    RefreshToken:
+      Invalid: 無効なリフレッシュトークンです
+      NotFound: リフレッシュトークンが見つかりません
+  Instance:
+    NotFound: インスタンスが見つかりません
+    AlreadyExists: すでに存在するインスタンス
+    NotChanged: インスタンスは変更されていません
+  Org:
+    AlreadyExists: 組織の名前はすでに使用されています
+    Invalid: 無効な組織です
+    AlreadyDeactivated: 組織はすでに非アクティブです
+    AlreadyActive: 組織はすでにアクティブです
+    Empty: 組織は空です
+    NotFound: 組織が見つかりません
+    NotChanged: 組織は変更されていません
+    DefaultOrgNotDeletable: デフォルトの組織は削除できません
+    ZitadelOrgNotDeletable: Zitadelプロジェクトの組織は削除できません
+    InvalidDomain: 無効なドメインです
+    DomainMissing: ドメインがありません
+    DomainNotOnOrg: ドメインは組織に存在しません
+    DomainNotVerified: ドメインは認証されていません
+    DomainAlreadyVerified: ドメインはすでに認証されています
+    DomainVerificationTypeInvalid: ドメイン認証タイプが無効です
+    DomainVerificationMissing: ドメイン認証はまだ開始されていません
+    DomainVerificationFailed: ドメイン認証に失敗しました
+    PrimaryDomainNotDeletable: プライマリドメインは削除できません
+    DomainNotFound: ドメインが見つかりません
+    MemberIDMissing: メンバーIDがありません
+    MemberNotFound: 組織メンバーが見つかりません
+    InvalidMember: 無効な組織メンバーです
+    UserIDMissing: ユーザーIDがありません
+    PolicyAlreadyExists: ポリシーはすでに存在します
+    PolicyNotExisting: ポリシーは存在しません
+    IdpInvalid: 無効なIDP構成です
+    IdpNotExisting: IDP構成は存在しません
+    OIDCConfigInvalid: 無効なOIDC IDP構成です
+    IdpIsNotOIDC: IDP構成はOIDCタイプではありません
+    Domain:
+      AlreadyExists: ドメインはすでに存在します
+      InvalidCharacter: ドメインは英数字、'.'、'-'のみ使用可能です。
+    IDP:
+      InvalidSearchQuery: 無効な検索クエリです
+    LoginPolicy:
+      NotFound: ログインポリシーが見つかりません
+      Invalid: 無効なログインポリシーです
+      RedirectURIInvalid: デフォルトのリダイレクトURIは無効です
+      NotExisting: ログインポリシーは存在しません
+      AlreadyExists: ログインポリシーはすでに存在します
+      IdpProviderAlreadyExisting: すでに存在しているIDプロバイダーです
+      IdpProviderNotExisting: 存在しないIDプロバイダーです
+      RegistrationNotAllowed: 登録は許可されていません
+      UsernamePasswordNotAllowed: ユーザー名・パスワードでのログインは許可されていません
+      MFA:
+        AlreadyExists: MFAはすでに存在します
+        NotExisting: 存在しないMFAです
+        Unspecified: 無効なMFAです
+    MailTemplate:
+      NotFound: デフォルトのメールテンプレートが見つかりません
+      NotChanged: デフォルトのメールテンプレートは変更されていません
+      AlreadyExists: デフォルトのメールテンプレートはすでに存在しています
+      Invalid: 無効なデフォルトのメールテンプレートです
+    CustomMessageText:
+      NotFound: デフォルトのメッセージテキストが見つかりません
+      NotChanged: デフォルトのメッセージテキストは変更されていません
+      AlreadyExists: デフォルトのメッセージテキストはすでに存在しています
+      Invalid: 無効なデフォルトのメッセージテキストです
+    PasswordComplexityPolicy:
+      NotFound: パスワード複雑さポリシーが見つかりません
+      Empty: パスワード複雑さポリシーは空です
+      NotExisting: パスワード複雑さポリシーは存在しません
+      AlreadyExists: パスワード複雑さポリシーはすでに存在します
+    PasswordLockoutPolicy:
+      NotFound: パスワードロックアウトポリシーが見つかりません
+      Empty: パスワードロックアウトポリシーは空です
+      NotExisting: パスワードロックアウトポリシーは存在しません
+      AlreadyExists: パスワードロックアウトポリシーはすでに存在します
+    PasswordAgePolicy:
+      NotFound: パスワード期限ポリシーが見つかりません
+      Empty: パスワード期限ポリシーは空です
+      NotExisting: パスワード期限ポリシーは存在しません
+      AlreadyExists: パスワード期限ポリシーはすでに存在しています
+    OrgIAMPolicy:
+      Empty: 組織IAMポリシーは空です
+      NotExisting: 組織IAMポリシーは存在しません
+      AlreadyExists: 組織IAMポリシーはすでに存在しています
+    NotificationPolicy:
+      NotFound: 通知ポリシーが見つかりません
+      NotChanged: 通知ポリシーは変更されていません
+      AlreadyExists: 通知ポリシーはすでに存在しています
+  Project:
+    ProjectIDMissing: プロジェクトIDがありません
+    AlreadyExists: プロジェクトはすでに組織に存在しています
+    OrgNotExisting: 組織は存在しません
+    UserNotExisting: ユーザーは存在しません
+    CouldNotGenerateClientSecret: クライアントシークレットの生成に失敗しました
+    Invalid: 無効なプロジェクトです
+    NotActive: プロジェクトはアクティブではありません
+    NotInactive: プロジェクトは非アクティブではありません
+    NotFound: プロジェクトが見つかりません
+    UserIDMissing: ユーザーIDがありません
+    Member:
+      NotFound: プロジェクトメンバーが見つかりません
+      Invalid: プロジェクトメンバーは無効です
+      AlreadyExists: プロジェクトメンバーはすでに存在しています
+      NotExisting: プロジェクトメンバーは存在しません
+    MinimumOneRoleNeeded: 少なくとも1つのロールを追加する必要があります
+    Role:
+      AlreadyExists: ロールはすでに存在します
+      Invalid: 無効なロールです
+      NotExisting: ロールは存在しません
+    IDMissing: IDがありません
+    App:
+      AlreadyExists: アプリケーションはすでに存在しています
+      NotFound: アプリケーションが見つかりません
+      Invalid: 無効なアプリケーションです
+      NotExisting: アプリケーションは存在しません
+      NotActive: アプリケーションはアクティブではありません
+      NotInactive: アプリケーションは非アクティブではありません
+      OIDCConfigInvalid: 無効なOIDC構成です
+      APIConfigInvalid: 無効なAPI構成です
+      SAMLConfigInvalid: 無効なSAML構成です
+      IsNotOIDC: アプリケーションのタイプはOIDCではありません
+      IsNotAPI: アプリケーションのタイプはAPIではありません
+      IsNotSAML: アプリケーションのタイプはSAMLではありません
+      SAMLMetadataMissing: SAMLメタデータがありません
+      SAMLMetadataFormat: SAMLメタデータ形式エラー
+      SAMLEntityIDAlreadyExisting: SAMLエンティティIDはすでに存在しています
+      OIDCAuthMethodNoSecret: 選択されたOIDCメソッドは、シークレットを必要としません
+      APIAuthMethodNoSecret: 選択されたAPIメソッドには、シークレットを必要としません
+      AuthMethodNoPrivateKeyJWT: 選択されたメソッドには、キーを必要としません
+      ClientSecretInvalid: 無効なクライアントシークレットです
+      Key:
+        AlreadyExisting: すでに存在しているアプリケーションキーです
+        NotFound: アプリケーションキーが見つかりません
+    RequiredFieldsMissing: 一部の必須項目が不足しています
+    Grant:
+      AlreadyExists: プロジェクトグラントはすでに存在しています
+      NotFound: グラントが見つかりません
+      Invalid: 無効なプロジェクトグラントです
+      NotExisting: プロジェクトグラントは存在しません
+      HasNotExistingRole: プロジェクトに1つのロールが存在しません
+      NotActive: プロジェクトグラントはアクティブではありません
+      NotInactive: プロジェクトグラントは非アクティブではありません
+  IAM:
+    NotFound: インスタンスが見つかりません
+    Member:
+      RolesNotChanged: ロールは変更されていません
+    MemberInvalid: 無効なメンバーです
+    MemberAlreadyExisting: メンバーはすでに存在します
+    MemberNotExisting: メンバーは存在しません
+    IDMissing: IDがありません
+    IAMProjectIDMissing: IAMプロジェクトIDがありません
+    IamProjectAlreadySet: IAMプロジェクトIDはすでに設定されています
+    IdpInvalid: 無効なIDP構成です
+    IdpNotExisting: IDP構成は存在しません
+    OIDCConfigInvalid: 無効なOIDC IDP構成です
+    IdpIsNotOIDC: IDP構成のタイプはOIDCではありません
+    LoginPolicyInvalid: 無効なログインポリシーです
+    LoginPolicyNotExisting: ログインポリシーは存在しません
+    IdpProviderInvalid: 無効なIDプロバイダーです
+    LoginPolicy:
+      NotFound: デフォルトログインポリシーが見つかりません
+      NotChanged: デフォルトログインポリシーは変更されていません
+      NotExisting: デフォルトログインポリシーは存在しません
+      AlreadyExists: デフォルトログインポリシーはすでに存在します
+      RedirectURIInvalid: 無効なデフォルトのリダイレクトURIです
+      MFA:
+        AlreadyExists: MFAはすでに存在します
+        NotExisting: 存在しないMFAです
+        Unspecified: 無効なMFAです
+      IDP:
+        AlreadyExists: IDプロバイダーはすでに存在しています
+        NotExisting: IDプロバイダーが存在しません
+        Invalid: 無効なIDプロバイダーです
+      IDPConfig:
+        AlreadyExists: IDプロバイダーの構成はすでに存在しています
+        NotInactive: アイデンティティプロバイダーの構成が非アクティブではありません
+        NotActive: IDプロバイダーの構成がアクティブではありません
+    LabelPolicy:
+      NotFound: デフォルトのプライベートラベルポリシーが見つかりません
+      NotChanged: デフォルトのプライベートラベルポリシーは変更されていません
+    MailTemplate:
+      NotFound: デフォルトのメールテンプレートが見つかりません
+      NotChanged: デフォルトのメールテンプレートは変更されていません
+      AlreadyExists: デフォルトのメールテンプレートはすでに存在しています
+      Invalid: 無効なデフォルトのメールテンプレートです
+    CustomMessageText:
+      NotFound: デフォルトのメッセージテキストが見つかりません
+      NotChanged: デフォルトのメッセージテキストは変更されていません
+      AlreadyExists: デフォルトのメッセージテキストはすでに存在しています
+      Invalid: 無効なデフォルトのメッセージテキストです
+    PasswordComplexityPolicy:
+      NotFound: デフォルトのパスワード複雑さポリシーが見つかりません
+      NotExisting: デフォルトのパスワード複雑さポリシーは存在しません
+      AlreadyExists: デフォルトのパスワード複雑さポリシーはすでに存在しています
+      Empty: デフォルトのパスワード複雑さポリシーが空です
+      NotChanged: デフォルトのパスワード複雑さポリシーは変更されていません
+    PasswordAgePolicy:
+      NotFound: デフォルトのパスワード期限ポリシーが見つかりません
+      NotExisting: デフォルトのパスワード期限ポリシーは存在しません
+      AlreadyExists: すでに存在しているデフォルトのパスワード期限ポリシーです
+      Empty: デフォルトのパスワード期限ポリシーが空です
+      NotChanged: デフォルトのパスワード期限ポリシーは変更されていません
+    PasswordLockoutPolicy:
+      NotFound: デフォルトのパスワードロックアウトポリシーが見つかりません
+      NotExisting: デフォルトのパスワードロックアウトポリシーは存在しません
+      AlreadyExists: デフォルトのパスワードロックアウトポリシー既に存在しています
+      Empty: デフォルトのパスワードロックアウトポリシーが空です
+      NotChanged: デフォルトのパスワードロックアウトポリシーは変更されていません
+    DomainPolicy:
+      NotFound: 組織IAMポリシーは見つかりません
+      Empty: 組織IAMポリシーは空です
+      NotExisting: 組織IAMポリシーは存在しません
+      AlreadyExists: 組織IAMポリシーはすでに存在しています
+      NotChanged: 組織IAMポリシーは変更されていません
+    NotificationPolicy:
+      NotFound: デフォルトの通知ポリシーが見つかりません
+      NotChanged: デフォルトの通知ポリシーは変更されていません
+      AlreadyExists: デフォルトの通知ポリシーはすでに存在しています
+  Policy:
+    AlreadyExists: ポリシーはすでに存在します
+    Label:
+      Invalid:
+        PrimaryColor: プライマリカラーは有効なHexカラー値ではありません
+        BackgroundColor: 背景色は有効なHexカラー値ありません
+        WarnColor: ワーンカラーは有効なHexカラー値ではありません
+        FontColor: フォントカラーは有効なHexカラー値ではありません
+        PrimaryColorDark: プライマリカラー（ダークモード）は有効なHexカラー値ではありません
+        BackgroundColorDark: 背景色（ダークモード）は有効なHexカラー値ではありません
+        WarnColorDark: ワーンカラー（ダークモード）は有効なHexカラー値ではありません
+        FontColorDark: フォントカラー（ダークモード）は有効なHexカラー値ではありません
+  UserGrant:
+    AlreadyExists: ユーザーグラントはすでに存在しています
+    NotFound: ユーザーグラントが見つかりません
+    Invalid: 無効なユーザーグラントです
+    NotChanged: ユーザーグラントは変更されていません
+    IDMissing: IDがありません
+    NotActive: ユーザーグラントはアクティブではありません
+    NotInactive: ユーザーグラントは非アクティブではありません
+    NoPermissionForProject: ユーザーにはこのプロジェクトに許可がありません
+    RoleKeyNotFound: ロールが見つかりません
+  Member:
+    AlreadyExists: メンバーはすでに存在しています
+  IDPConfig:
+    AlreadyExists: この名前を持つIDP構成は既に存在しています
+    NotExisting: IDプロバイダーの構成は存在しません
+  Changes:
+    NotFound: 履歴は見つかりません
+    AuditRetention: 履歴は監査ログの管理外にあります
+  Token:
+    NotFound: トークンが見つかりません
+  UserSession:
+    NotFound: ユーザーが見つかりません
+  Key:
+    ExpireBeforeNow: 有効期限が過去です
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: MFAは必須で設定されてますが、可能なプロバイダーが設定されていません。システム管理者にお問い合わせください。
+  Step:
+    Started:
+      AlreadyExists: 開始ステップはすでに存在しています
+    Done:
+      AlreadyExists: 完了ステップはすでに存在しています
+  CustomText:
+    AlreadyExists: カスタムテキストはすでに存在しています
+    Invalid: 無効なカスタムテキストです
+    NotFound: カスタムテキストが見つかりません
+  TranslationFile:
+    ReadError: 翻訳ファイルの読み取りのエラー
+    MergeError: 翻訳ファイルをカスタム翻訳と統合できませんでした
+    NotFound: 翻訳ファイルは存在しません
+  Metadata:
+    NotFound: メタデータが見つかりません
+    NoData: メタデータリストは空です
+    Invalid: 無効なメタデータです
+    KeyNotExisting: 1つ以上のキーは存在しません
+  Action:
+    Invalid: 無効なアクションです
+    NotFound: アクションが見つかりません
+    NotActive: アクションはアクティブではありません
+    NotInactive: アクションは非アクティブではありません
+    MaxAllowed: 追加のアクティブアクションは許可されていません
+  Flow:
+    FlowTypeMissing: フロータイプがありません
+    Empty: フローはすでに空です
+    WrongTriggerType: 無効なトリガータイプです
+    NoChanges: 変更はありません
+    ActionIDsNotExist: アクションIDが存在しません
+  Query:
+    CloseRows: SQLステートメントの終了に失敗しました
+    SQLStatement: SQLステートメントの作成に失敗しました
+    InvalidRequest: 無効なリクエストです
+  Quota:
+    AlreadyExists: このユニットにはすでにクォータが存在しています
+    NotFound: このユニットにはクォータが見つかりません
+    Invalid:
+      CallURL: 無効なクォータコールURLです
+      Percent: クォータパーセントが1未満です
+      Unimplemented: このユニットにはクォータは実装されていません
+      Amount: クォータ量が1未満です
+      ResetInterval: クォータリセット間隔が1分より短いです
+      Noop: 通知のない無制限のクォータは効果がありません
+    Access:
+      Exhausted: 認証されたリクエストのクォータを使い果たしました
+    Execution:
+      Exhausted: 実行時間のクォータを使い果たしました
+  LogStore:
+    Access:
+      StorageFailed: データベースへのアクセスログの保存に失敗しました
+      ScanFailed: 認証されたリクエストの使用状況クエリに失敗しました
+    Execution:
+      StorageFailed: アクション実行ログのデータベースへの保存に失敗しました
+      ScanFailed: アクション実行時間を取得する使用状況クエリに失敗しました
+
+AggregateTypes:
+  action: アクション
+  instance: インスタンス
+  key_pair: キーペア
+  org: 組織
+  project: プロジェクト
+  user: ユーザー
+  usergrant: ユーザーグラント
+  quota: クォータ
+
+EventTypes:
+  user:
+    added: ユーザーの追加
+    selfregistered: ユーザー自身の登録
+    initialization:
+      code:
+        added: 初期化コードの生成
+        sent: 初期化コードの送信
+      check:
+        succeeded: 初期化チェックの成功
+        failed: 初期化チェックの失敗
+    token:
+      added: アクセストークンの作成
+      removed: アクセストークンの削除
+    username:
+      reserved: ユーザー名の予約
+      released: ユーザー名の解放
+      changed: ユーザー名の変更
+    email:
+      reserved: メールアドレスの予約
+      released: メールアドレスの解放
+      changed: メールアドレスの変更
+      verified: メールアドレスの検証
+      verification:
+        failed: メールアドレス検証の失敗
+      code:
+        added: メールアドレス検証コードの生成
+        sent: メールアドレス検証コードの送信
+    machine:
+      added: テクニカルユーザーの追加
+      changed: テクニカルユーザーの変更
+      key:
+        added: キーの追加
+        removed: キーの削除
+      secret:
+        set: シークレットのセット
+        removed: シークレットの削除
+        check:
+          succeeded: シークレットチェックの成功
+          failed: シークレットチェックの失敗
+    human:
+      added: ヒューマンユーザーの追加
+      selfregistered: ヒューマンユーザー自身の登録
+      avatar:
+        added: アバターの追加
+        removed: アバターの削除
+      initialization:
+        code:
+          added: 初期化コードの生成
+          sent: 初期化コードの送信
+        check:
+          succeeded: 初期化チェックの成功
+          failed: 初期化チェックの失敗
+      username:
+        reserved: ユーザー名の予約
+        released: ユーザー名の解放
+      email:
+        changed: メールアドレスの変更
+        verified: メールアドレスの検証
+        verification:
+          failed: メールアドレス検証の失敗
+        code:
+          added: メールアドレス検証コードの生成
+          sent: メールアドレス検証コードの送信
+      password:
+        changed: パスワードの変更
+        code:
+          added: パスワードコードの生成
+          sent: パスワードコードの送信
+        check:
+          succeeded: パスワードチェックの成功
+          failed: パスワードチェックの失敗
+      externallogin:
+        check:
+          succeeded: 外部ログインの成功
+      externalidp:
+        added: 外部IDPの追加
+        removed: 外部IDPの削除
+        cascade:
+          removed: 外部IDPカスケードの削除
+      phone:
+        changed: 電話番号の変更
+        verified: 電話番号の検証
+        verification:
+          failed: 電話番号検証の失敗
+        code:
+          added: 電話番号コードの生成
+          sent: 電話番号コードの送信
+        removed: 電話番号の削除
+      profile:
+        changed: ユーザープロファイルの変更
+      address:
+        changed: ユーザー住所の変更
+      mfa:
+        otp:
+          added: MFA OTPの追加
+          verified: MFA OTPの検証
+          removed: MFA OTPの削除
+          check:
+            succeeded: MFA OTPチェックの成功
+            failed: MFA OTPチェックの失敗
+        u2f:
+          token:
+            added: MFA U2Fトークンの追加
+            verified: MFA U2Fトークンの検証
+            removed: MFA U2Fトークンの削除
+            begin:
+              login: MFA U2Fチェックの開始
+            check:
+              succeeded: MFA U2Fチェックの成功
+              failed: MFA U2Fチェックの失敗
+            signcount:
+              changed: MFA U2Fトークンチェックサムの変更
+        init:
+          skipped: MFAの初期化のスキップ
+      passwordless:
+        token:
+          added: パスワードレスログイン用トークンの追加
+          verified: パスワードレスログイン用トークンの検証
+          removed: パスワードレスログイン用トークンの削除
+          begin:
+            login: パスワードレスログインチェックの開始
+          check:
+            succeeded: パスワードレスログインチェックの成功
+            failed: パスワードレスログインチェックの失敗
+          signcount:
+            changed: パスワードレスログイン用トークンチェックサムの変更
+        initialization:
+          code:
+            added: パスワードレス初期化コードの追加
+            sent: パスワードレス初期化コードの送信
+            requested: パスワードレス初期化コードのリクエスト
+            check:
+              succeeded: パスワードレス初期化コードチェックの成功
+              failed: パスワードレス初期化コードチェックの失敗
+      signed:
+        out: ユーザーのサインアウト
+      refresh:
+        token:
+          added: リフレッシュトークンの作成
+          renewed: リフレッシュトークンの更新
+          removed: リフレッシュトークンの削除
+    locked: ユーザーのロック
+    unlocked: ユーザーのロック解除
+    deactivated: ユーザーの非アクティブ化
+    reactivated: ユーザーのアクティブ化
+    removed: ユーザーの削除
+    password:
+      changed: パスワードの変更
+      code:
+        added: パスワードコードの生成
+        sent: パスワードコードの送信
+      check:
+        succeeded: パスワードチェックの成功
+        failed: パスワードチェックの失敗
+    phone:
+      changed: 電話番号の変更
+      verified: 電話番号の検証
+      verification:
+        failed: 電話番号検証の失敗
+      code:
+        added: 電話番号コードの生成
+        sent: 電話番号コードの送信
+      removed: 電話番号の削除
+    profile:
+      changed: ユーザープロファイルの変更
+    address:
+      changed: ユーザー住所の変更
+    mfa:
+      otp:
+        added: MFA OTPの追加
+        verified: MFA OTPの検証
+        removed: MFA OTPの削除
+        check:
+          succeeded: MFA OTPチェックの成功
+          failed: MFA OTPチェックの失敗
+        init:
+          skipped: MFA OTP初期化のスキップ
+      init:
+        skipped: MFA初期化のスキップ
+    signed:
+      out: ユーザーのサインアウト
+    grant:
+      added: 認可の追加
+      changed: 認可の変更
+      removed: 認可の削除
+      deactivated: 認可の非アクティブ化
+      reactivated: 認可のアクティブ化
+      reserved: 認可の予約
+      released: 認可の解放
+      cascade:
+        removed: 認可の削除
+        changed: 認可の変更
+    metadata:
+      set: ユーザーメタデータのセット
+      removed: ユーザーメタデータの削除
+      removed.all: 全ユーザーメタデータの削除
+    domain:
+      claimed: ドメインの登録
+      claimed.sent: ドメイン登録通知の送信
+    pat:
+      added: パーソナルアクセストークンの追加
+      removed: パーソナルアクセストークンの削除
+  org:
+    added: 組織の追加
+    changed: 組織の変更
+    deactivated: 組織の非アクティブ化
+    reactivated: 組織のアクティブ化
+    removed: 組織の削除
+    domain:
+      added: ドメインの追加
+      verification:
+        added: ドメイン検証の追加
+        failed: ドメイン検証の失敗
+      verified: ドメインの検証
+      removed: ドメインの削除
+      primary:
+        set: プライマリドメインのセット
+      reserved: ドメインの予約
+      released: リリースの解放
+    name:
+      reserved: 組織名の予約
+      released: 組織名の解放
+    member:
+      added: 組織メンバーの追加
+      changed: 組織メンバーの変更
+      removed: 組織メンバーの削除
+      cascade:
+        removed: 組織メンバーカスケードの削除
+    iam:
+      policy:
+        added: システムポリシーの追加
+        changed: システムポリシーの変更
+        removed: システムポリシーの削除
+    idp:
+      config:
+        added: IDP構成の追加
+        changed: IDP構成の変更
+        removed: IDP構成の削除
+        deactivated: IDP構成の非アクティブ化
+        reactivated: IDP構成のアクティブ化
+      oidc:
+        config:
+          added: OIDC IDP構成の追加
+          changed: OIDC IDP構成の変更
+      saml:
+        config:
+          added: SAML IDP構成の追加
+          changed: SAML IDP構成の変更
+      jwt:
+        config:
+          added: JWT IDP構成の追加
+          changed: JWT IDP構成の変更
+    customtext:
+      set: カスタムテキストのセット
+      removed: カスタムテキストの削除
+      template:
+        removed: カスタムテキストテンプレートの削除
+    policy:
+      login:
+        added: ログインポリシーの追加
+        changed: ログインポリシーの変更
+        removed: ログインポリシーの削除
+        idpprovider:
+          added: IDプロバイダーのログインポリシーへの追加
+          removed: IDプロバイダーのログインポリシーからの削除
+          cascade:
+            removed: IDプロバイダーカスケードのログインポリシーからの削除
+        secondfactor:
+          added: 二要素認証のログインポリシーへの追加
+          removed: 二要素認証のログインポリシーからの削除
+        multifactor:
+          added: MFAのログインポリシーへの追加
+          removed: MFAのログインポリシーからの削除
+      password:
+        complexity:
+          added: パスワード複雑さポリシーの追加
+          changed: パスワード複雑さポリシーの変更
+          removed: パスワード複雑さポリシーの削除
+        age:
+          added: パスワード期限ポリシーの追加
+          changed: パスワード期限ポリシーの変更
+          removed: パスワード期限ポリシーの削除
+        lockout:
+          added: パスワードロックアウトポリシーの追加
+          changed: パスワードロックアウトポリシーの変更
+          removed: パスワードロックアウトポリシーの削除
+      label:
+        added: ラベルポリシーの追加
+        changed: ラベルポリシーの変更
+        activated: ラベルポリシーのアクティブ化
+        removed: ラベルポリシーの削除
+        logo:
+          added: ロゴのラベルポリシーへの追加
+          removed: ロゴのラベルポリシーからの削除
+          dark:
+            added: ロゴのラベルポリシーへの追加（ダークモード）
+            removed: ロゴのラベルポリシーからの削除（ダークモード）
+        icon:
+          added: アイコンのラベルポリシーへの追加
+          removed: アイコンのラベルポリシーからの削除
+          dark:
+            added: アイコンのラベルポリシーへの追加（ダークモード）
+            removed: アイコンのラベルポリシーからの削除（ダークモード）
+        font:
+          added: フォントのラベルポリシーへの追加
+          removed: フォントのラベルポリシーからの削除
+        assets:
+          removed: アセットのラベルポリシーからの削除
+      privacy:
+        added: プライバシーポリシーとサービス利用規約の追加
+        changed: プライバシーポリシーとサービス利用規約の変更
+        removed: プライバシーポリシーとサービス利用規約の削除
+      domain:
+        added: ドメインポリシーの追加
+        changed: ドメインポリシーの変更
+        removed: ドメインポリシーの削除
+      lockout:
+        added: ロックアウトポリシーの追加
+        changed: ロックアウトポリシーの変更
+        removed: ロックアウトポリシーの削除
+      notification:
+        added: 通知ポリシーの追加
+        changed: 通知ポリシーの変更
+        removed: 通知ポリシーの削除
+    flow:
+      trigger_actions:
+        set: アクションのセット
+        cascade:
+          removed: アクションカスケードの削除
+        removed: アクションの削除
+      cleared: フローのクリア
+    mail:
+      template:
+        added: メールテンプレートの追加
+        changed: メールテンプレートの変更
+        removed: メールテンプレートの削除
+      text:
+        added: メールテキストの追加
+        changed: メールテキストの変更
+        removed: メールテキストの削除
+    metadata:
+      removed: メタデータの削除
+      removed.all: 全メタデータの削除
+      set: メタデータのセット
+  project:
+    added: プロジェクトの追加
+    changed: プロジェクトの変更
+    deactivated: プロジェクトの非アクティブ化
+    reactivated: プロジェクトのアクティブ化
+    removed: プロジェクトの削除
+    member:
+      added: プロジェクトメンバーの追加
+      changed: プロジェクトメンバーの変更
+      removed: プロジェクトメンバーの削除
+      cascade:
+        removed: プロジェクトメンバーカスケードの削除
+    role:
+      added: プロジェクトロールの追加
+      changed: プロジェクトロールの変更
+      removed: プロジェクトロールの削除
+    grant:
+      added: 管理アクセスの追加
+      changed: 管理アクセスの変更
+      removed: 管理アクセスの削除
+      deactivated: 管理アクセスの非アクティブ化
+      reactivated: 管理アクセスのアクティブ化
+      cascade:
+        changed: 管理アクセスの変更
+      member:
+        added: 管理アクセスメンバーの追加
+        changed: 管理アクセスメンバーの変更
+        removed: 管理アクセスメンバーの削除
+        cascade:
+          removed: 管理アクセスカスケードの削除
+    application:
+      added: アプリケーションの追加
+      changed: アプリケーションの変更
+      removed: アプリケーションの削除
+      deactivated: アプリケーションの非アクティブ化
+      reactivated: アプリケーションのアクティブ化
+      oidc:
+        secret:
+          check:
+            succeeded: OIDCクライアントシークレットチェックの成功
+            failed: OIDCクライアントシークレットチェックの失敗
+        key:
+          added: アプリケーションキーの追加
+          removed: アプリケーションキーの削除
+      config:
+        saml:
+          added: SAML構成の追加
+          changed: SAML構成の変更
+        oidc:
+          added: OIDC構成の追加
+          changed: OIDC構成の変更
+          secret:
+            changed: OIDCシークレットの変更
+        api:
+          added: API構成の追加
+          changed: API構成の変更
+          secret:
+            changed: APIのシークレットの変更
+  policy:
+    password:
+      complexity:
+        added: パスワードの複雑さポリシーの追加
+        changed: パスワードの複雑さポリシーの変更
+      age:
+        added: パスワード年齢ポリシーの追加
+        changed: パスワード年齢ポリシーの変更
+      lockout:
+        added: パスワードロックアウトポリシーの追加
+        changed: パスワードロックアウトポリシーの変更
+  iam:
+    setup:
+      started: ZITADELセットアップの開始
+      done: ZITADELセットアップの完了
+    global:
+      org:
+        set: グローバル組織のセット
+    project:
+      iam:
+        set: ZITADELプロジェクトのセット
+    member:
+      added: ZITADELメンバーの追加
+      changed: ZITADELメンバーの変更
+      removed: ZITADELメンバーの削除
+      cascade:
+        removed: ZITADELメンバーカスケードの削除
+    idp:
+      config:
+        added: IDP構成の追加
+        changed: IDP構成の変更
+        removed: IDP構成の削除
+        deactivated: IDP構成の非アクティブ化
+        reactivated: IDP構成のアクティブ化
+      oidc:
+        config:
+          added: OIDC IDP構成の追加
+          changed: OIDC IDP構成の変更
+      saml:
+        config:
+          added: SAML IDP構成の追加
+          changed: SAML IDP構成の変更
+      jwt:
+        config:
+          added: JWT構成のIDプロバイダーへの追加
+          changed: JWT構成のIDプロバイダーからの削除
+    customtext:
+      set: テキストのセット
+      removed: テキストの削除
+    policy:
+      login:
+        added: デフォルトログインポリシーの追加
+        changed: デフォルトログインポリシーの変更
+        idpprovider:
+          added: IDプロバイダーのデフォルトログインポリシーへの追加
+          removed: IDプロバイダーのデフォルトログインポリシーからの削除
+      label:
+        added: ラベルポリシーの追加
+        changed: ラベルポリシーの変更
+        activated: ラベルポリシーのアクティブ化
+        logo:
+          added: ロゴのラベルポリシーへの追加
+          removed: ロゴのラベルポリシーからの削除
+          dark:
+            added: ロゴのラベルポリシーへの追加（ダークモード）
+            removed: ロゴのラベルポリシーからの削除（ダークモード）
+        icon:
+          added: アイコンのラベルポリシーへの追加
+          removed: アイコンのラベルポリシーからの削除
+          dark:
+            added: アイコンのラベルポリシーへの追加（ダークモード）
+            removed: アイコンのラベルポリシーからの削除（ダークモード）
+        font:
+          added: フォントのラベルポリシーへの追加
+          removed: フォントのラベルポリシーからの削除
+        assets:
+          removed: アセットのラベルポリシーからの削除
+    default:
+      language:
+        set: デフォルト言語のセット
+    oidc:
+      settings:
+        added: OIDC構成の追加
+        changed: OIDC構成の変更
+        removed: OIDC構成の削除
+    secret:
+      generator:
+        added: シークレット生成の追加
+        changed: シークレット生成の変更
+        removed: シークレット生成の削除
+    smtp:
+      config:
+        added: SMTP構成の追加
+        changed: SMTP構成の変更
+        password:
+          changed: SMTP構成シークレットの変更
+    sms:
+      config:
+        twilio:
+          added: Twilio SMSプロバイダーの追加
+          changed: Twilio SMSプロバイダーの変更
+          token:
+            changed: Twilio SMSプロバイダートークンの変更
+          removed: Twilio SMSプロバイダーの削除
+          activated: Twilio SMSプロバイダーのアクティブ化
+          deactivated: Twilio SMSプロバイダーの非アクティブ化
+  key_pair:
+    added: キーペアの追加
+    certificate:
+      added: 証明書の追加
+  action:
+    added: アクションの追加
+    changed: アクションの変更
+    deactivated: アクションの非アクティブ化
+    reactivated: アクションのアクティブ化
+    removed: アクションの削除
+  instance:
+    added: インスタンスの追加
+    changed: インスタンスの変更
+    customtext:
+      removed: カスタムテキストの削除
+      set: カスタムテキストのセット
+      template:
+        removed: カスタムテキストテンプレートの削除
+    default:
+      language:
+        set: デフォルト言語のセット
+      org:
+        set: デフォルト組織のセット
+    domain:
+      added: ドメインの追加
+      primary:
+        set: プライマリドメインのセット
+      removed: ドメインの削除
+    iam:
+      console:
+        set: ZITADELコンソールアプリケーションのセット
+      project:
+        set: ZITADELプロジェクトのセット
+    mail:
+      template:
+        added: メールテンプレートの追加
+        changed: メールテンプレートの変更
+      text:
+        added: メールテキストの追加
+        changed: メールテキストの変更
+    member:
+      added: インスタンスメンバーの追加
+      changed: インスタンスメンバーの変更
+      removed: インスタンスメンバーの削除
+      cascade:
+        removed: インスタンスメンバーカスケードの削除
+    notification:
+      provider:
+        debug:
+          fileadded: ファイルデバッグ通知プロバイダーの追加
+          filechanged: ファイルデバッグ通知プロバイダーの変更
+          fileremoved: ファイルデバッグ通知プロバイダーの削除
+          logadded: ログデバッグ通知プロバイダーの追加
+          logchanged: ログデバッグ通知プロバイダーの変更
+          logremoved: ログデバッグ通知プロバイダーの削除
+    oidc:
+      settings:
+        added: OIDC設定の追加
+        changed: OIDC設定の変更
+    policy:
+      domain:
+        added: ドメインポリシーの追加
+        changed: ドメインポリシーの変更
+      label:
+        activated: ラベルポリシーのアクティブ化
+        added: ラベルポリシーの追加
+        assets:
+          removed: アセットのラベルポリシーからの削除
+        changed: ラベルポリシーの変更
+        font:
+          added: フォントのラベルポリシーへの追加
+          removed: フォントのラベルポリシーからの削除
+        icon:
+          added: アイコンのラベルポリシーへの追加
+          removed: アイコンのラベルポリシーからの削除
+          dark:
+            added: アイコンのダークラベルポリシーへの追加
+            removed: アイコンのダークラベルポリシーからの削除
+        logo:
+          added: ロゴのラベルポリシーへの追加
+          removed: ロゴのラベルポリシーからの削除
+          dark:
+            added: ロゴのダークラベルポリシーへの追加
+            removed: ロゴのダークラベルポリシーからの削除
+      lockout:
+        added: ロックアウトポリシーの追加
+        changed: ロックアウトポリシーの変更
+      login:
+        added: ログインポリシーの追加
+        changed: ログインポリシーの変更
+        idpprovider:
+          added: IDプロバイダーのログインポリシーへの追加
+          cascade:
+            removed: IDプロバイダーカスケードのログインポリシーからの削除
+          removed: IDプロバイダーのログインポリシーからの削除
+        multifactor:
+          added: MFAのログインポリシーへの追加
+          removed: MFAのログインポリシーからの削除
+        secondfactor:
+          added: 二要素認証のログインポリシーへの追加
+          removed: 二要素認証のログインポリシーからの削除
+      password:
+        age:
+          added: パスワード期限ポリシーの追加
+          changed: パスワード期限ポリシーの変更
+        complexity:
+          added: パスワード複雑さポリシーの追加
+          changed: パスワード複雑さポリシーの削除
+      privacy:
+        added: プライバシーポリシーの追加
+        changed: プライバシーポリシーの変更
+      security:
+        set: セキュリティポリシーのセット
+
+    removed: インスタンスの削除
+    secret:
+      generator:
+        added: シークレット生成の追加
+        changed: シークレット生成の変更
+        removed: シークレット生成の削除
+    sms:
+      configtwilio:
+        activated: Twilio SMS構成のアクティブ化
+        added: Twilio SMS構成の追加
+        changed: Twilio SMS構成の変更
+        deactivated: Twilio SMS構成の非アクティブ化
+        removed: Twilio SMS構成の削除
+        token:
+          changed: Twilio SMS構成トークンの変更
+    smtp:
+      config:
+        added: SMTP構成の追加
+        changed: SMTP構成の変更
+        password:
+          changed: SMTP構成パスワードの変更
+        removed: SMTP構成の削除
+
+Application:
+  OIDC:
+    UnsupportedVersion: OIDCバージョンはサポートされていません
+    V1:
+      NotCompliant: この構成は、OIDC 1.0規格に準拠していません。
+      NoRedirectUris: 少なくとも1つのリダイレクトURIを登録する必要があります。
+      NotAllCombinationsAreAllowed: 構成は準拠していますが、すべての可能な組み合わせが許可されているわけではありません。
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: グラントタイプコードは、アプリタイプがWebのHTTPリダイレクトURIのみを許可しました。
+          CustomOnlyForNative: グラントタイプコードは、アプリタイプがNativeのカスタムリダイレクトURIのみを許可します（例： appname://）
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: グラントタイプImplicitは、カスタムリダイレクトURIを許可しません
+          HttpNotAllowed: グラントタイプImplicitでは、HTTPをリダイレクトURIを許可しません
+          HttpLocalhostOnlyForNative: http://localhost リダイレクトURIは、Nativeアプリケーションでのみ許可されます。
+      Native:
+        AuthMethodType:
+          NotNone: Nativeアプリケーションは、認証メソッドタイプnoneが必要です。
+        RedirectUris:
+          MustBeHttpLocalhost: リダイレクトURIは、独自のプロトコル、http://127.0.0.1、http://[::1] または http://localhostで開始する必要があります。
+      UserAgent:
+        AuthMethodType:
+          NotNone: User agentアプリは、認証メソッドタイプnoneが必要です。
+      GrantType:
+        Refresh:
+          NoAuthCode: リフレッシュトークンはAuthorization Codeと組み合わせてのみ使用可能です。
+
+Action:
+  Flow:
+    Type:
+      Unspecified: 未定義
+      ExternalAuthentication: 外部認証
+      CustomiseToken: トークンを補完
+      InternalAuthentication: 内部認証
+  TriggerType:
+    Unspecified: 未定義
+    PostAuthentication: 認証後
+    PreCreation: 作成前
+    PostCreation: 作成後
+    PreUserinfoCreation: ユーザー情報作成前
+    PreAccessTokenCreation: アクセストークン作成前

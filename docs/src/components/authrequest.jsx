@@ -5,6 +5,64 @@ import { Transition } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { Buffer } from "buffer";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import BrowserOnly from "@docusaurus/BrowserOnly";
+
+const LinkButton = ({
+  instance,
+  clientId,
+  redirectUri,
+  responseType,
+  prompt,
+  organizationId,
+  authMethod,
+  codeVerifier,
+  scope,
+  loginHint,
+  idTokenHint,
+}) => {
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <CopyToClipboard
+      text={`https://zitadel.com/docs/apis/openidoauth/authrequest?instance=${encodeURIComponent(
+        instance
+      )}&client_id=${encodeURIComponent(
+        clientId
+      )}&redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}&response_type=${encodeURIComponent(
+        responseType
+      )}&scope=${encodeURIComponent(scope)}&prompt=${encodeURIComponent(
+        prompt
+      )}&auth_method=${encodeURIComponent(
+        authMethod
+      )}&code_verifier=${encodeURIComponent(
+        codeVerifier
+      )}&login_hint=${encodeURIComponent(
+        loginHint
+      )}&id_token_hint=${encodeURIComponent(
+        idTokenHint
+      )}&organization_id=${encodeURIComponent(organizationId)}
+  `}
+      onCopy={() => {
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      }}
+    >
+      <button className="cursor-pointer border-none h-10 flex flex-row items-center py-2 px-4 text-white bg-gray-500 dark:bg-gray-600 hover:dark:bg-gray-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm plausible-event-name=OIDC+Playground plausible-event-method=Save">
+        Copy link
+        {copied ? (
+          <i className="text-[20px] ml-2 las la-clipboard-check"></i>
+        ) : (
+          <i className="text-[20px] ml-2 las la-clipboard"></i>
+        )}
+      </button>
+    </CopyToClipboard>
+  );
+};
 
 export function SetAuthRequest() {
   const {
@@ -116,7 +174,26 @@ export function SetAuthRequest() {
 
   return (
     <div className="bg-white/5 rounded-md p-6 shadow">
-      <h5 className="text-lg mt-0 mb-4 font-semibold">Your Domain</h5>
+      <div className="flex flex-row justify-between">
+        <h5 className="text-lg mt-0 mb-4 font-semibold">Your Domain</h5>
+        <BrowserOnly>
+          {() => (
+            <LinkButton
+              instance={instance}
+              clientId={clientId}
+              redirectUri={redirectUri}
+              responseType={responseType}
+              prompt={prompt}
+              scope={scope}
+              organizationId={organizationId}
+              authMethod={authMethod}
+              codeVerifier={codeVerifier}
+              loginHint={loginHint}
+              idTokenHint={idTokenHint}
+            />
+          )}
+        </BrowserOnly>
+      </div>
       <div className="flex flex-col">
         <label className={`${labelClasses} text-yellow-500`}>
           Instance Domain
@@ -562,7 +639,7 @@ export function SetAuthRequest() {
             });
           }}
           target="_blank"
-          className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
+          className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm plausible-event-name=OIDC+Playground plausible-event-method=Try+it+out"
           href={`${
             instance.endsWith("/") ? instance : instance + "/"
           }oauth/v2/authorize?client_id=${encodeURIComponent(
