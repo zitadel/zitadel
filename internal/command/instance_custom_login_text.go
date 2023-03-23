@@ -56,7 +56,6 @@ func (c *Commands) setCustomInstanceLoginText(ctx context.Context, instanceAgg *
 	if !text.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "Instance-kd9fs", "Errors.CustomText.Invalid")
 	}
-	
 	existingLoginText, err := c.defaultLoginTextWriteModelByID(ctx, text.Language)
 	if err != nil {
 		return nil, nil, err

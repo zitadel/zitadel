@@ -3,9 +3,9 @@ package policy
 import (
 	"encoding/json"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -18,10 +18,10 @@ const (
 type PrivacyPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TOSLink     string `json:"tosLink,omitempty"`
-	PrivacyLink string `json:"privacyLink,omitempty"`
-	HelpLink    string `json:"helpLink,omitempty"`
-	SupportEmail string `json:"supportEmail,omitempty"`
+	TOSLink      string              `json:"tosLink,omitempty"`
+	PrivacyLink  string              `json:"privacyLink,omitempty"`
+	HelpLink     string              `json:"helpLink,omitempty"`
+	SupportEmail domain.EmailAddress `json:"supportEmail,omitempty"`
 }
 
 func (e *PrivacyPolicyAddedEvent) Data() interface{} {
@@ -37,13 +37,13 @@ func NewPrivacyPolicyAddedEvent(
 	tosLink,
 	privacyLink,
 	helpLink string,
-	supportEmail string,
+	supportEmail domain.EmailAddress,
 ) *PrivacyPolicyAddedEvent {
 	return &PrivacyPolicyAddedEvent{
-		BaseEvent:   *base,
-		TOSLink:     tosLink,
-		PrivacyLink: privacyLink,
-		HelpLink:    helpLink,
+		BaseEvent:    *base,
+		TOSLink:      tosLink,
+		PrivacyLink:  privacyLink,
+		HelpLink:     helpLink,
 		SupportEmail: supportEmail,
 	}
 }
@@ -63,10 +63,10 @@ func PrivacyPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, e
 type PrivacyPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TOSLink     *string `json:"tosLink,omitempty"`
-	PrivacyLink *string `json:"privacyLink,omitempty"`
-	HelpLink    *string `json:"helpLink,omitempty"`
-	SupportEmail *string `json:"supportEmail,omitempty"`
+	TOSLink      *string              `json:"tosLink,omitempty"`
+	PrivacyLink  *string              `json:"privacyLink,omitempty"`
+	HelpLink     *string              `json:"helpLink,omitempty"`
+	SupportEmail *domain.EmailAddress `json:"supportEmail,omitempty"`
 }
 
 func (e *PrivacyPolicyChangedEvent) Data() interface{} {
@@ -113,7 +113,7 @@ func ChangeHelpLink(helpLink string) func(*PrivacyPolicyChangedEvent) {
 	}
 }
 
-func ChangeSupportEmail(supportEmail string) func(*PrivacyPolicyChangedEvent) {
+func ChangeSupportEmail(supportEmail domain.EmailAddress) func(*PrivacyPolicyChangedEvent) {
 	return func(e *PrivacyPolicyChangedEvent) {
 		e.SupportEmail = &supportEmail
 	}

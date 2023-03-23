@@ -24,10 +24,10 @@ type PrivacyPolicy struct {
 	ResourceOwner string
 	State         domain.PolicyState
 
-	TOSLink     string
-	PrivacyLink string
-	HelpLink    string
-	SupportEmail string
+	TOSLink      string
+	PrivacyLink  string
+	HelpLink     string
+	SupportEmail domain.EmailAddress
 
 	IsDefault bool
 }
@@ -186,10 +186,10 @@ func preparePrivacyPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 
 func (p *PrivacyPolicy) ToDomain() *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
-		TOSLink:     p.TOSLink,
-		PrivacyLink: p.PrivacyLink,
-		HelpLink:    p.HelpLink,
+		TOSLink:      p.TOSLink,
+		PrivacyLink:  p.PrivacyLink,
+		HelpLink:     p.HelpLink,
 		SupportEmail: p.SupportEmail,
-		Default:     p.IsDefault,
+		Default:      p.IsDefault,
 	}
 }

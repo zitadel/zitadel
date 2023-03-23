@@ -950,6 +950,6 @@ func FooterTextPbToDomain(text *text_pb.FooterText) domain.FooterText {
 		TOS:           text.Tos,
 		PrivacyPolicy: text.PrivacyPolicy,
 		Help:          text.Help,
-		SupportEmail: text.SupportEmail,
+		SupportEmail:  text.SupportEmail,
 	}
 }

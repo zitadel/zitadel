@@ -521,10 +521,10 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *managem
 	}
 	if !queriedPrivacy.IsDefault {
 		return &management_pb.AddCustomPrivacyPolicyRequest{
-			TosLink:     queriedPrivacy.TOSLink,
-			PrivacyLink: queriedPrivacy.PrivacyLink,
-			HelpLink:    queriedPrivacy.HelpLink,
-			SupportEmail: queriedPrivacy.SupportEmail,
+			TosLink:      queriedPrivacy.TOSLink,
+			PrivacyLink:  queriedPrivacy.PrivacyLink,
+			HelpLink:     queriedPrivacy.HelpLink,
+			SupportEmail: string(queriedPrivacy.SupportEmail),
 		}, nil
 	}
 	return nil, nil

@@ -9,11 +9,11 @@ import (
 type PrivacyPolicyWriteModel struct {
 	eventstore.WriteModel
 
-	TOSLink     string
-	PrivacyLink string
-	HelpLink    string
-	SupportEmail string
-	State       domain.PolicyState
+	TOSLink      string
+	PrivacyLink  string
+	HelpLink     string
+	SupportEmail domain.EmailAddress
+	State        domain.PolicyState
 }
 
 func (wm *PrivacyPolicyWriteModel) Reduce() error {

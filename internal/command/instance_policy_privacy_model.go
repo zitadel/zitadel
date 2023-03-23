@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -56,8 +57,8 @@ func (wm *InstancePrivacyPolicyWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	tosLink,
 	privacyLink,
-	helpLink,
-	supportEmail string,
+	helpLink string,
+	supportEmail domain.EmailAddress,
 ) (*instance.PrivacyPolicyChangedEvent, bool) {
 
 	changes := make([]policy.PrivacyPolicyChanges, 0)

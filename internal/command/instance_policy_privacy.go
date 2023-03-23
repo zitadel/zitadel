@@ -12,15 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacyLink, helpLink, supportEmail string) (*domain.ObjectDetails, error) {
-	if supportEmail != "" {
-		email := domain.Email{EmailAddress: supportEmail}
-
-		if !email.IsValid() {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
-		}
-	}
-
+func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacyLink, helpLink string, supportEmail domain.EmailAddress) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPrivacyPolicy(instanceAgg, tosLink, privacyLink, helpLink, supportEmail))
 	if err != nil {
@@ -35,11 +27,10 @@ func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacy
 
 func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
 	if policy.SupportEmail != "" {
-		email := domain.Email{EmailAddress: policy.SupportEmail}
-
-		if !email.IsValid() {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
+		if err := policy.SupportEmail.Validate(); err != nil {
+			return nil, err
 		}
+		policy.SupportEmail = policy.SupportEmail.Normalize()
 	}
 
 	existingPolicy, err := c.defaultPrivacyPolicyWriteModelByID(ctx)
@@ -96,10 +87,16 @@ func prepareAddDefaultPrivacyPolicy(
 	a *instance.Aggregate,
 	tosLink,
 	privacyLink,
-	helpLink,
-	supportEmail string,
+	helpLink string,
+	supportEmail domain.EmailAddress,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if supportEmail != "" {
+			if err := supportEmail.Validate(); err != nil {
+				return nil, err
+			}
+			supportEmail = supportEmail.Normalize()
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewInstancePrivacyPolicyWriteModel(ctx)
 			events, err := filter(ctx, writeModel.Query())

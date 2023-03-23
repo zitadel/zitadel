@@ -1155,7 +1155,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, "PrivacyPolicy", language.English,
 								),
-							),							
+							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
@@ -2560,7 +2560,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, "PrivacyPolicy", language.English,
 							),
-						),						
+						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
@@ -4810,7 +4810,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, "PrivacyPolicy", language.English,
 							),
-						),						
+						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
@@ -7003,7 +7003,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, "PrivacyPolicy", language.English,
 								),
-							),							
+							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
@@ -7308,7 +7308,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOS:           "TOS",
 						PrivacyPolicy: "PrivacyPolicy",
 						Help:          "Help",
-						SupportEmail: "Support Email",
+						SupportEmail:  "Support Email",
 					},
 				},
 			},

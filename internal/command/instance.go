@@ -87,10 +87,10 @@ type InstanceSetup struct {
 		PasswordChange bool
 	}
 	PrivacyPolicy struct {
-		TOSLink     string
-		PrivacyLink string
-		HelpLink    string
-		SupportEmail string
+		TOSLink      string
+		PrivacyLink  string
+		HelpLink     string
+		SupportEmail domain.EmailAddress
 	}
 	LabelPolicy struct {
 		PrimaryColor        string

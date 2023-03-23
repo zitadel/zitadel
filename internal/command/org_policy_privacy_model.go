@@ -3,8 +3,8 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
@@ -58,8 +58,8 @@ func (wm *OrgPrivacyPolicyWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	tosLink,
 	privacyLink,
-	helpLink,
-	supportEmail string,
+	helpLink string,
+	supportEmail domain.EmailAddress,
 ) (*org.PrivacyPolicyChangedEvent, bool) {
 
 	changes := make([]policy.PrivacyPolicyChanges, 0)

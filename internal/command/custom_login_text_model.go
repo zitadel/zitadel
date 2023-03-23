@@ -2529,7 +2529,7 @@ func (wm *CustomLoginTextReadModel) handleFooterTextRemoveEvent(e *policy.Custom
 	if e.Key == domain.LoginKeyFooterPrivacyPolicy {
 		wm.FooterPrivacyPolicy = ""
 		return
-	}	
+	}
 	if e.Key == domain.LoginKeyFooterHelp {
 		wm.FooterHelp = ""
 		return

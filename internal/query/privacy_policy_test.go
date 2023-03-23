@@ -102,7 +102,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 				PrivacyLink:   "privacy.ch",
 				TOSLink:       "tos.ch",
 				HelpLink:      "help.ch",
-				SupportEmail: "support@example.com",
+				SupportEmail:  "support@example.com",
 				IsDefault:     true,
 			},
 		},

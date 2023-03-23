@@ -438,7 +438,7 @@ func (l *Login) setLinksOnBaseData(baseData baseData, privacyPolicy *domain.Priv
 	if link, err := templates.ParseTemplateText(privacyPolicy.HelpLink, lang); err == nil {
 		baseData.HelpLink = link
 	}
-	if link, err := templates.ParseTemplateText(privacyPolicy.SupportEmail, lang); err == nil {
+	if link, err := templates.ParseTemplateText(string(privacyPolicy.SupportEmail), lang); err == nil {
 		baseData.SupportEmail = link
 	}
 	return baseData
@@ -601,7 +601,7 @@ type baseData struct {
 	TOSLink                string
 	PrivacyLink            string
 	HelpLink               string
-	SupportEmail 		   string
+	SupportEmail           string
 	AuthReqID              string
 	CSRF                   template.HTML
 	Nonce                  string
