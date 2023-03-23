@@ -135,9 +135,7 @@ export class ProviderLDAPComponent {
 
     req.setName(this.name?.value);
     req.setProviderOptions(this.options);
-
-    const attr = new LDAPAttributes();
-    req.setAttributes(attr);
+    req.setAttributes(this.attributes);
 
     req.setBaseDn(this.baseDn?.value);
     req.setBindDn(this.bindDn?.value);
@@ -174,10 +172,7 @@ export class ProviderLDAPComponent {
       req.setName(this.name?.value);
       req.setProviderOptions(this.options);
 
-      const attr = new LDAPAttributes();
-      // attr.setAvatarUrlAttribute();
-      // attr.setDisplayNameAttribute();
-      req.setAttributes(attr);
+      req.setAttributes(this.attributes);
 
       req.setBaseDn(this.baseDn?.value);
       req.setBindDn(this.bindDn?.value);

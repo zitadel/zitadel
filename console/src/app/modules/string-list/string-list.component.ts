@@ -1,26 +1,25 @@
-import { Component, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, forwardRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
 @Component({
-  selector: 'cnsl-redirect-uris',
-  templateUrl: './redirect-uris.component.html',
-  styleUrls: ['./redirect-uris.component.scss'],
+  selector: 'cnsl-string-list',
+  templateUrl: './string-list.component.html',
+  styleUrls: ['./string-list.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => RedirectUrisComponent),
+      useExisting: forwardRef(() => StringListComponent),
       multi: true,
     },
   ],
 })
-export class RedirectUrisComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class StringListComponent implements ControlValueAccessor, OnInit, OnDestroy {
   @Input() title: string = '';
-  @Input() devMode: boolean = false;
-  @Input() isNative!: boolean;
   @Input() public getValues: Observable<void> = new Observable(); // adds formfieldinput to array on emission
 
-  public redirectControl: FormControl = new FormControl<string>({ value: '', disabled: true });
+  @Input() public control: FormControl = new FormControl<string>({ value: '', disabled: true });
   private destroy$: Subject<void> = new Subject();
   @ViewChild('redInput') input!: any;
 
@@ -41,6 +40,7 @@ export class RedirectUrisComponent implements ControlValueAccessor, OnInit, OnDe
   private val: string[] = [];
 
   set value(val: string[]) {
+    console.log('setvalue', val);
     if (val !== undefined && this.val !== val) {
       this.val = val;
       this.onChange(val);
@@ -66,14 +66,15 @@ export class RedirectUrisComponent implements ControlValueAccessor, OnInit, OnDe
 
   public setDisabledState(isDisabled: boolean): void {
     if (isDisabled) {
-      this.redirectControl.disable();
+      this.control.disable();
     } else {
-      this.redirectControl.enable();
+      this.control.enable();
     }
   }
 
   public add(input: any): void {
-    if (this.redirectControl.valid) {
+    console.log(input.value);
+    if (this.control.valid) {
       if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
         this.val.push(input.value);
         this.onChange(this.val);
@@ -85,8 +86,8 @@ export class RedirectUrisComponent implements ControlValueAccessor, OnInit, OnDe
     }
   }
 
-  public remove(redirect: any): void {
-    const index = this.value.indexOf(redirect);
+  public remove(str: string): void {
+    const index = this.value.indexOf(str);
 
     if (index >= 0) {
       this.value.splice(index, 1);

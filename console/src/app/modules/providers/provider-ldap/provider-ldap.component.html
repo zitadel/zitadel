@@ -22,10 +22,11 @@
 
         <h2 class="subheader">{{ 'IDP.LDAPCONNECTION' | translate }}</h2>
 
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.SERVERS' | translate }}</cnsl-label>
-          <input cnslInput formControlName="serversList" />
-        </cnsl-form-field>
+        <cnsl-string-list
+          title="{{ 'IDP.SERVERS' | translate }}"
+          formControlName="serversList"
+          [ngModel]="['helel']"
+        ></cnsl-string-list>
 
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.BASEDN' | translate }}</cnsl-label>
@@ -54,22 +55,22 @@
           <input cnslInput formControlName="userBase" />
         </cnsl-form-field>
 
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.USERFILTERS' | translate }}</cnsl-label>
-          <input cnslInput formControlName="userFiltersList" />
-        </cnsl-form-field>
+        <cnsl-string-list title="{{ 'IDP.USERFILTERS' | translate }}" formControlName="userFiltersList"></cnsl-string-list>
 
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'IDP.USEROBJECTCLASSES' | translate }}</cnsl-label>
-          <input cnslInput formControlName="userObjectClassesList" />
-        </cnsl-form-field>
+        <cnsl-string-list
+          title="{{ 'IDP.USEROBJECTCLASSES' | translate }}"
+          formControlName="userObjectClassesList"
+        ></cnsl-string-list>
 
         <div class="identity-provider-optional-h-wrapper">
           <h2>{{ 'IDP.LDAPATTRIBUTES' | translate }}</h2>
+
           <button (click)="showAttributes = !showAttributes" type="button" mat-icon-button>
             <mat-icon *ngIf="showAttributes">keyboard_arrow_up</mat-icon
             ><mat-icon *ngIf="!showAttributes">keyboard_arrow_down</mat-icon>
           </button>
+
+          <span class="state warn">required</span>
         </div>
         <div *ngIf="showAttributes">
           <cnsl-ldap-attributes
@@ -101,7 +102,13 @@
       </div>
 
       <div class="identity-provider-create-actions">
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
+        <button
+          color="primary"
+          mat-raised-button
+          class="continue-button"
+          [disabled]="form.invalid && attributes.toObject().idAttribute !== ''"
+          type="submit"
+        >
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
           <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
         </button>
