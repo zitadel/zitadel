@@ -1,11 +1,12 @@
 import { Component, Inject } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import {
   MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../form-field/validators/validators';
 
 @Component({
   selector: 'cnsl-project-role-detail-dialog',
@@ -24,7 +25,7 @@ export class ProjectRoleDetailDialogComponent {
   ) {
     this.projectId = data.projectId;
     this.formGroup = new UntypedFormGroup({
-      key: new UntypedFormControl({ value: '', disabled: true }, [Validators.required]),
+      key: new UntypedFormControl({ value: '', disabled: true }, [requiredValidator]),
       displayName: new UntypedFormControl(''),
       group: new UntypedFormControl(''),
     });

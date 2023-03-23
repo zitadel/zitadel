@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
@@ -20,17 +20,17 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
   selector: 'cnsl-provider-oidc',
   templateUrl: './provider-oidc.component.html',
-  styleUrls: ['./provider-oidc.component.scss'],
 })
 export class ProviderOIDCComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
   public id: string | null = '';
   public updateClientSecret: boolean = false;
@@ -51,10 +51,10 @@ export class ProviderOIDCComponent {
     breadcrumbService: BreadcrumbService,
   ) {
     this.oidcFormGroup = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      clientId: new UntypedFormControl('', [Validators.required]),
-      clientSecret: new UntypedFormControl('', [Validators.required]),
-      issuer: new UntypedFormControl('', [Validators.required]),
+      name: new UntypedFormControl('', [requiredValidator]),
+      clientId: new UntypedFormControl('', [requiredValidator]),
+      clientSecret: new UntypedFormControl('', [requiredValidator]),
+      issuer: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
 
@@ -120,99 +120,58 @@ export class ProviderOIDCComponent {
   }
 
   public addGenericOIDCProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGenericOIDCProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddGenericOIDCProviderRequest()
+        : new AdminAddGenericOIDCProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setIssuer(this.issuer?.value);
-      req.setScopesList(this.scopesList?.value);
+    req.setName(this.name?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setIssuer(this.issuer?.value);
+    req.setScopesList(this.scopesList?.value);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGenericOIDCProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addGenericOIDCProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGenericOIDCProviderRequest();
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setIssuer(this.issuer?.value);
-      req.setScopesList(this.scopesList?.value);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGenericOIDCProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-          this.loading = false;
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateGenericOIDCProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGenericOIDCProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setScopesList(this.scopesList?.value);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateGenericOIDCProviderRequest()
+          : new AdminUpdateGenericOIDCProviderRequest();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setClientId(this.clientId?.value);
+      req.setClientSecret(this.clientSecret?.value);
+      req.setIssuer(this.issuer?.value);
+      req.setScopesList(this.scopesList?.value);
 
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateGenericOIDCProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
+      this.loading = true;
+      this.service
+        .updateGenericOIDCProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
             this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGenericOIDCProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setIssuer(this.issuer?.value);
-        req.setScopesList(this.scopesList?.value);
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateGenericOIDCProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      }
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 

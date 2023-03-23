@@ -12,8 +12,10 @@ import (
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -35,13 +37,37 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgBy
 }
 
 func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChangesRequest) (*mgmt_pb.ListOrgChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	response, err := s.query.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, s.auditLogRetention)
+	var (
+		limit    uint64
+		sequence uint64
+		asc      bool
+	)
+	if req.Query != nil {
+		limit = uint64(req.Query.Limit)
+		sequence = req.Query.Sequence
+		asc = req.Query.Asc
+	}
+
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AllowTimeTravel().
+		Limit(limit).
+		OrderDesc().
+		ResourceOwner(authz.GetCtxData(ctx).OrgID).
+		AddQuery().
+		SequenceGreater(sequence).
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(authz.GetCtxData(ctx).OrgID).
+		Builder()
+	if asc {
+		query.OrderAsc()
+	}
+
+	response, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgChangesResponse{
-		Result: change_grpc.ChangesToPb(response.Changes, s.assetAPIPrefix(ctx)),
+		Result: change_grpc.EventsToChangesPb(response, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 

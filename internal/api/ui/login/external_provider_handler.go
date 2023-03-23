@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
@@ -144,6 +145,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.oidcProvider(r.Context(), identityProvider)
 	case domain.IDPTypeJWT:
 		provider, err = l.jwtProvider(identityProvider)
+	case domain.IDPTypeAzureAD:
+		provider, err = l.azureProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGitHubEnterprise:
@@ -155,7 +158,6 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 	case domain.IDPTypeLDAP,
-		domain.IDPTypeAzureAD,
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
@@ -212,6 +214,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
+	case domain.IDPTypeAzureAD:
+		provider, err = l.azureProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &oauth.Session{Provider: provider.(*azuread.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -249,7 +258,6 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
-		domain.IDPTypeAzureAD,
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
@@ -619,6 +627,11 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
+	opts := make([]openid.ProviderOpts, 1, 2)
+	opts[0] = openid.WithSelectAccount()
+	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
+		opts = append(opts, openid.WithIDTokenMapping())
+	}
 	return openid.New(identityProvider.Name,
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
@@ -626,7 +639,7 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.OIDCIDPTemplate.Scopes,
 		openid.DefaultMapper,
-		openid.WithSelectAccount(),
+		opts...,
 	)
 }
 
@@ -663,6 +676,28 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+	)
+}
+
+func (l *Login) azureProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*azuread.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.AzureADIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]azuread.ProviderOptions, 0, 2)
+	if identityProvider.AzureADIDPTemplate.IsEmailVerified {
+		opts = append(opts, azuread.WithEmailVerified())
+	}
+	if identityProvider.AzureADIDPTemplate.Tenant != "" {
+		opts = append(opts, azuread.WithTenant(azuread.TenantType(identityProvider.AzureADIDPTemplate.Tenant)))
+	}
+	return azuread.New(
+		identityProvider.Name,
+		identityProvider.AzureADIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.AzureADIDPTemplate.Scopes,
+		opts...,
 	)
 }
 

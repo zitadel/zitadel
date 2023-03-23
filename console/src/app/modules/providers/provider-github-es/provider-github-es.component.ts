@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
@@ -20,17 +20,17 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
   selector: 'cnsl-provider-github-es',
   templateUrl: './provider-github-es.component.html',
-  styleUrls: ['./provider-github-es.component.scss'],
 })
 export class ProviderGithubESComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
   public id: string | null = '';
   public updateClientSecret: boolean = false;
@@ -51,12 +51,12 @@ export class ProviderGithubESComponent {
     breadcrumbService: BreadcrumbService,
   ) {
     this.form = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      clientId: new UntypedFormControl('', [Validators.required]),
-      clientSecret: new UntypedFormControl('', [Validators.required]),
-      authorizationEndpoint: new UntypedFormControl('', [Validators.required]),
-      tokenEndpoint: new UntypedFormControl('', [Validators.required]),
-      userEndpoint: new UntypedFormControl('', [Validators.required]),
+      name: new UntypedFormControl('', [requiredValidator]),
+      clientId: new UntypedFormControl('', [requiredValidator]),
+      clientSecret: new UntypedFormControl('', [requiredValidator]),
+      authorizationEndpoint: new UntypedFormControl('', [requiredValidator]),
+      tokenEndpoint: new UntypedFormControl('', [requiredValidator]),
+      userEndpoint: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
 
@@ -122,107 +122,62 @@ export class ProviderGithubESComponent {
   }
 
   public addGenericOAuthProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGitHubEnterpriseServerProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddGitHubEnterpriseServerProviderRequest()
+        : new AdminAddGitHubEnterpriseServerProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-      req.setTokenEndpoint(this.tokenEndpoint?.value);
-      req.setUserEndpoint(this.userEndpoint?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
+    req.setName(this.name?.value);
+    req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+    req.setTokenEndpoint(this.tokenEndpoint?.value);
+    req.setUserEndpoint(this.userEndpoint?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setScopesList(this.scopesList?.value);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGitHubEnterpriseServerProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addGitHubEnterpriseServerProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGitHubEnterpriseServerProviderRequest();
-      req.setName(this.name?.value);
-      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-      req.setTokenEndpoint(this.tokenEndpoint?.value);
-      req.setUserEndpoint(this.userEndpoint?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGitHubEnterpriseServerProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-          this.loading = false;
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateGenericOAuthProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGitHubEnterpriseServerProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-        req.setTokenEndpoint(this.tokenEndpoint?.value);
-        req.setUserEndpoint(this.userEndpoint?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setScopesList(this.scopesList?.value);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateGitHubEnterpriseServerProviderRequest()
+          : new AdminUpdateGitHubEnterpriseServerProviderRequest();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+      req.setTokenEndpoint(this.tokenEndpoint?.value);
+      req.setUserEndpoint(this.userEndpoint?.value);
+      req.setClientId(this.clientId?.value);
+      req.setClientSecret(this.clientSecret?.value);
+      req.setScopesList(this.scopesList?.value);
 
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateGitHubEnterpriseServerProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
+      this.loading = true;
+      this.service
+        .updateGitHubEnterpriseServerProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
             this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGitHubEnterpriseServerProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-        req.setTokenEndpoint(this.tokenEndpoint?.value);
-        req.setUserEndpoint(this.userEndpoint?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setScopesList(this.scopesList?.value);
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateGitHubEnterpriseServerProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      }
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 

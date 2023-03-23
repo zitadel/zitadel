@@ -4,6 +4,7 @@ import (
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -329,6 +330,33 @@ func LDAPAttributesToCommand(attributes *idp_pb.LDAPAttributes) idp.LDAPAttribut
 	}
 }
 
+func AzureADTenantToCommand(tenant *idp_pb.AzureADTenant) string {
+	if tenant == nil {
+		return string(azuread.CommonTenant)
+	}
+	switch t := tenant.Type.(type) {
+	case *idp_pb.AzureADTenant_TenantType:
+		return string(azureADTenantTypeToCommand(t.TenantType))
+	case *idp_pb.AzureADTenant_TenantId:
+		return t.TenantId
+	default:
+		return string(azuread.CommonTenant)
+	}
+}
+
+func azureADTenantTypeToCommand(tenantType idp_pb.AzureADTenantType) azuread.TenantType {
+	switch tenantType {
+	case idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_COMMON:
+		return azuread.CommonTenant
+	case idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_ORGANISATIONS:
+		return azuread.OrganizationsTenant
+	case idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_CONSUMERS:
+		return azuread.ConsumersTenant
+	default:
+		return azuread.CommonTenant
+	}
+}
+
 func ProvidersToPb(providers []*query.IDPTemplate) []*idp_pb.Provider {
 	list := make([]*idp_pb.Provider, len(providers))
 	for i, provider := range providers {
@@ -412,6 +440,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		jwtConfigToPb(providerConfig, config.JWTIDPTemplate)
 		return providerConfig
 	}
+	if config.AzureADIDPTemplate != nil {
+		azureConfigToPb(providerConfig, config.AzureADIDPTemplate)
+		return providerConfig
+	}
 	if config.GitHubIDPTemplate != nil {
 		githubConfigToPb(providerConfig, config.GitHubIDPTemplate)
 		return providerConfig
@@ -455,9 +487,10 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCIDPTemplate) {
 	providerConfig.Config = &idp_pb.ProviderConfig_Oidc{
 		Oidc: &idp_pb.GenericOIDCConfig{
-			ClientId: template.ClientID,
-			Issuer:   template.Issuer,
-			Scopes:   template.Scopes,
+			ClientId:         template.ClientID,
+			Issuer:           template.Issuer,
+			Scopes:           template.Scopes,
+			IsIdTokenMapping: template.IsIDTokenMapping,
 		},
 	}
 }
@@ -471,6 +504,32 @@ func jwtConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.JWTIDP
 			HeaderName:   template.HeaderName,
 		},
 	}
+}
+
+func azureConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.AzureADIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_AzureAd{
+		AzureAd: &idp_pb.AzureADConfig{
+			ClientId:      template.ClientID,
+			Tenant:        azureTenantToPb(template.Tenant),
+			EmailVerified: template.IsEmailVerified,
+			Scopes:        template.Scopes,
+		},
+	}
+}
+
+func azureTenantToPb(tenant string) *idp_pb.AzureADTenant {
+	var tenantType idp_pb.IsAzureADTenantType
+	switch azuread.TenantType(tenant) {
+	case azuread.CommonTenant:
+		tenantType = &idp_pb.AzureADTenant_TenantType{TenantType: idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_COMMON}
+	case azuread.OrganizationsTenant:
+		tenantType = &idp_pb.AzureADTenant_TenantType{TenantType: idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_ORGANISATIONS}
+	case azuread.ConsumersTenant:
+		tenantType = &idp_pb.AzureADTenant_TenantType{TenantType: idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_CONSUMERS}
+	default:
+		tenantType = &idp_pb.AzureADTenant_TenantId{TenantId: tenant}
+	}
+	return &idp_pb.AzureADTenant{Type: tenantType}
 }
 
 func githubConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitHubIDPTemplate) {

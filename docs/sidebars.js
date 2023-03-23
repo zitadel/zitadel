@@ -451,6 +451,7 @@ module.exports = {
         "legal/privacy-policy",
         "legal/acceptable-use-policy",
         "legal/rate-limit-policy",
+        "legal/vulnerability-disclosure-policy",
       ],
     },
   ],

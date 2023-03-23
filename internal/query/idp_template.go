@@ -37,6 +37,7 @@ type IDPTemplate struct {
 	*OAuthIDPTemplate
 	*OIDCIDPTemplate
 	*JWTIDPTemplate
+	*AzureADIDPTemplate
 	*GitHubIDPTemplate
 	*GitHubEnterpriseIDPTemplate
 	*GitLabIDPTemplate
@@ -62,11 +63,12 @@ type OAuthIDPTemplate struct {
 }
 
 type OIDCIDPTemplate struct {
-	IDPID        string
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
-	Issuer       string
-	Scopes       database.StringArray
+	IDPID            string
+	ClientID         string
+	ClientSecret     *crypto.CryptoValue
+	Issuer           string
+	Scopes           database.StringArray
+	IsIDTokenMapping bool
 }
 
 type JWTIDPTemplate struct {
@@ -75,6 +77,15 @@ type JWTIDPTemplate struct {
 	KeysEndpoint string
 	HeaderName   string
 	Endpoint     string
+}
+
+type AzureADIDPTemplate struct {
+	IDPID           string
+	ClientID        string
+	ClientSecret    *crypto.CryptoValue
+	Scopes          database.StringArray
+	Tenant          string
+	IsEmailVerified bool
 }
 
 type GitHubIDPTemplate struct {
@@ -268,6 +279,10 @@ var (
 		name:  projection.OIDCScopesCol,
 		table: oidcIdpTemplateTable,
 	}
+	OIDCIDTokenMappingCol = Column{
+		name:  projection.OIDCIDTokenMappingCol,
+		table: oidcIdpTemplateTable,
+	}
 )
 
 var (
@@ -298,6 +313,41 @@ var (
 	JWTHeaderNameCol = Column{
 		name:  projection.JWTHeaderNameCol,
 		table: jwtIdpTemplateTable,
+	}
+)
+
+var (
+	azureadIdpTemplateTable = table{
+		name:          projection.IDPTemplateAzureADTable,
+		instanceIDCol: projection.AzureADInstanceIDCol,
+	}
+	AzureADIDCol = Column{
+		name:  projection.AzureADIDCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADInstanceIDCol = Column{
+		name:  projection.AzureADInstanceIDCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADClientIDCol = Column{
+		name:  projection.AzureADClientIDCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADClientSecretCol = Column{
+		name:  projection.AzureADClientSecretCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADScopesCol = Column{
+		name:  projection.AzureADScopesCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADTenantCol = Column{
+		name:  projection.AzureADTenantCol,
+		table: azureadIdpTemplateTable,
+	}
+	AzureADIsEmailVerified = Column{
+		name:  projection.AzureADIsEmailVerified,
+		table: azureadIdpTemplateTable,
 	}
 )
 
@@ -677,12 +727,20 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OIDCClientIDCol.identifier(),
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
+			OIDCIDTokenMappingCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			// azure
+			AzureADIDCol.identifier(),
+			AzureADClientIDCol.identifier(),
+			AzureADClientSecretCol.identifier(),
+			AzureADScopesCol.identifier(),
+			AzureADTenantCol.identifier(),
+			AzureADIsEmailVerified.identifier(),
 			// github
 			GitHubIDCol.identifier(),
 			GitHubClientIDCol.identifier(),
@@ -739,6 +797,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(AzureADIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitHubIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitHubEnterpriseIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
@@ -765,12 +824,20 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcScopes := database.StringArray{}
+			oidcIDTokenMapping := sql.NullBool{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
 			jwtEndpoint := sql.NullString{}
 			jwtKeysEndpoint := sql.NullString{}
 			jwtHeaderName := sql.NullString{}
+
+			azureadID := sql.NullString{}
+			azureadClientID := sql.NullString{}
+			azureadClientSecret := new(crypto.CryptoValue)
+			azureadScopes := database.StringArray{}
+			azureadTenant := sql.NullString{}
+			azureadIsEmailVerified := sql.NullBool{}
 
 			githubID := sql.NullString{}
 			githubClientID := sql.NullString{}
@@ -853,12 +920,20 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oidcClientID,
 				&oidcClientSecret,
 				&oidcScopes,
+				&oidcIDTokenMapping,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
 				&jwtEndpoint,
 				&jwtKeysEndpoint,
 				&jwtHeaderName,
+				// azure
+				&azureadID,
+				&azureadClientID,
+				&azureadClientSecret,
+				&azureadScopes,
+				&azureadTenant,
+				&azureadIsEmailVerified,
 				// github
 				&githubID,
 				&githubClientID,
@@ -935,11 +1010,12 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			}
 			if oidcID.Valid {
 				idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-					IDPID:        oidcID.String,
-					ClientID:     oidcClientID.String,
-					ClientSecret: oidcClientSecret,
-					Issuer:       oidcIssuer.String,
-					Scopes:       oidcScopes,
+					IDPID:            oidcID.String,
+					ClientID:         oidcClientID.String,
+					ClientSecret:     oidcClientSecret,
+					Issuer:           oidcIssuer.String,
+					Scopes:           oidcScopes,
+					IsIDTokenMapping: oidcIDTokenMapping.Bool,
 				}
 			}
 			if jwtID.Valid {
@@ -949,6 +1025,16 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					KeysEndpoint: jwtKeysEndpoint.String,
 					HeaderName:   jwtHeaderName.String,
 					Endpoint:     jwtEndpoint.String,
+				}
+			}
+			if azureadID.Valid {
+				idpTemplate.AzureADIDPTemplate = &AzureADIDPTemplate{
+					IDPID:           azureadID.String,
+					ClientID:        azureadClientID.String,
+					ClientSecret:    azureadClientSecret,
+					Scopes:          azureadScopes,
+					Tenant:          azureadTenant.String,
+					IsEmailVerified: azureadIsEmailVerified.Bool,
 				}
 			}
 			if githubID.Valid {
@@ -1058,12 +1144,20 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OIDCClientIDCol.identifier(),
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
+			OIDCIDTokenMappingCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			// azure
+			AzureADIDCol.identifier(),
+			AzureADClientIDCol.identifier(),
+			AzureADClientSecretCol.identifier(),
+			AzureADScopesCol.identifier(),
+			AzureADTenantCol.identifier(),
+			AzureADIsEmailVerified.identifier(),
 			// github
 			GitHubIDCol.identifier(),
 			GitHubClientIDCol.identifier(),
@@ -1121,6 +1215,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(AzureADIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitHubIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitHubEnterpriseIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
@@ -1150,12 +1245,20 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcScopes := database.StringArray{}
+				oidcIDTokenMapping := sql.NullBool{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
 				jwtEndpoint := sql.NullString{}
 				jwtKeysEndpoint := sql.NullString{}
 				jwtHeaderName := sql.NullString{}
+
+				azureadID := sql.NullString{}
+				azureadClientID := sql.NullString{}
+				azureadClientSecret := new(crypto.CryptoValue)
+				azureadScopes := database.StringArray{}
+				azureadTenant := sql.NullString{}
+				azureadIsEmailVerified := sql.NullBool{}
 
 				githubID := sql.NullString{}
 				githubClientID := sql.NullString{}
@@ -1238,12 +1341,20 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oidcClientID,
 					&oidcClientSecret,
 					&oidcScopes,
+					&oidcIDTokenMapping,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
 					&jwtEndpoint,
 					&jwtKeysEndpoint,
 					&jwtHeaderName,
+					// azure
+					&azureadID,
+					&azureadClientID,
+					&azureadClientSecret,
+					&azureadScopes,
+					&azureadTenant,
+					&azureadIsEmailVerified,
 					// github
 					&githubID,
 					&githubClientID,
@@ -1319,11 +1430,12 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				}
 				if oidcID.Valid {
 					idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-						IDPID:        oidcID.String,
-						ClientID:     oidcClientID.String,
-						ClientSecret: oidcClientSecret,
-						Issuer:       oidcIssuer.String,
-						Scopes:       oidcScopes,
+						IDPID:            oidcID.String,
+						ClientID:         oidcClientID.String,
+						ClientSecret:     oidcClientSecret,
+						Issuer:           oidcIssuer.String,
+						Scopes:           oidcScopes,
+						IsIDTokenMapping: oidcIDTokenMapping.Bool,
 					}
 				}
 				if jwtID.Valid {
@@ -1333,6 +1445,16 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						KeysEndpoint: jwtKeysEndpoint.String,
 						HeaderName:   jwtHeaderName.String,
 						Endpoint:     jwtEndpoint.String,
+					}
+				}
+				if azureadID.Valid {
+					idpTemplate.AzureADIDPTemplate = &AzureADIDPTemplate{
+						IDPID:           azureadID.String,
+						ClientID:        azureadClientID.String,
+						ClientSecret:    azureadClientSecret,
+						Scopes:          azureadScopes,
+						Tenant:          azureadTenant.String,
+						IsEmailVerified: azureadIsEmailVerified.Bool,
 					}
 				}
 				if githubID.Valid {

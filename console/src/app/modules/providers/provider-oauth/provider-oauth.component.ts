@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
@@ -20,17 +20,17 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
   selector: 'cnsl-provider-oauth',
   templateUrl: './provider-oauth.component.html',
-  styleUrls: ['./provider-oauth.component.scss'],
 })
 export class ProviderOAuthComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
   public id: string | null = '';
   public updateClientSecret: boolean = false;
@@ -52,13 +52,13 @@ export class ProviderOAuthComponent {
     breadcrumbService: BreadcrumbService,
   ) {
     this.form = new UntypedFormGroup({
-      name: new UntypedFormControl('', [Validators.required]),
-      clientId: new UntypedFormControl('', [Validators.required]),
-      clientSecret: new UntypedFormControl('', [Validators.required]),
-      authorizationEndpoint: new UntypedFormControl('', [Validators.required]),
-      tokenEndpoint: new UntypedFormControl('', [Validators.required]),
-      userEndpoint: new UntypedFormControl('', [Validators.required]),
-      idAttribute: new UntypedFormControl('', [Validators.required]),
+      name: new UntypedFormControl('', [requiredValidator]),
+      clientId: new UntypedFormControl('', [requiredValidator]),
+      clientSecret: new UntypedFormControl('', [requiredValidator]),
+      authorizationEndpoint: new UntypedFormControl('', [requiredValidator]),
+      tokenEndpoint: new UntypedFormControl('', [requiredValidator]),
+      userEndpoint: new UntypedFormControl('', [requiredValidator]),
+      idAttribute: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
 
@@ -124,111 +124,64 @@ export class ProviderOAuthComponent {
   }
 
   public addGenericOAuthProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGenericOAuthProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddGenericOAuthProviderRequest()
+        : new AdminAddGenericOAuthProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-      req.setIdAttribute(this.idAttribute?.value);
-      req.setTokenEndpoint(this.tokenEndpoint?.value);
-      req.setUserEndpoint(this.userEndpoint?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
+    req.setName(this.name?.value);
+    req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+    req.setIdAttribute(this.idAttribute?.value);
+    req.setTokenEndpoint(this.tokenEndpoint?.value);
+    req.setUserEndpoint(this.userEndpoint?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setScopesList(this.scopesList?.value);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGenericOAuthProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addGenericOAuthProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGenericOAuthProviderRequest();
-      req.setName(this.name?.value);
-      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-      req.setIdAttribute(this.idAttribute?.value);
-      req.setTokenEndpoint(this.tokenEndpoint?.value);
-      req.setUserEndpoint(this.userEndpoint?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGenericOAuthProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-          this.loading = false;
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateGenericOAuthProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGenericOAuthProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-        req.setIdAttribute(this.idAttribute?.value);
-        req.setTokenEndpoint(this.tokenEndpoint?.value);
-        req.setUserEndpoint(this.userEndpoint?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setScopesList(this.scopesList?.value);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateGenericOAuthProviderRequest()
+          : new AdminUpdateGenericOAuthProviderRequest();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+      req.setIdAttribute(this.idAttribute?.value);
+      req.setTokenEndpoint(this.tokenEndpoint?.value);
+      req.setUserEndpoint(this.userEndpoint?.value);
+      req.setClientId(this.clientId?.value);
+      req.setClientSecret(this.clientSecret?.value);
+      req.setScopesList(this.scopesList?.value);
 
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateGenericOAuthProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.router.navigate(['/org-settings'], { queryParams: { id: 'idp' } });
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
+      this.loading = true;
+      this.service
+        .updateGenericOAuthProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
             this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGenericOAuthProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-        req.setIdAttribute(this.idAttribute?.value);
-        req.setTokenEndpoint(this.tokenEndpoint?.value);
-        req.setUserEndpoint(this.userEndpoint?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setScopesList(this.scopesList?.value);
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateGenericOAuthProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.router.navigate(['/settings'], { queryParams: { id: 'idp' } });
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      }
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 

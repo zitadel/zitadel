@@ -213,6 +213,7 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -244,6 +245,7 @@ ExternalRegistrationUserOverview:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -303,6 +305,7 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Obsługiwane przez
@@ -322,6 +325,7 @@ Errors:
     MissingParameters: Brakujące wymagane parametry
   User:
     NotFound: Nie znaleziono użytkownika
+    AlreadyExists: Użytkownik już istnieje
     Inactive: Użytkownik jest nieaktywny
     NotFoundOnOrg: Nie znaleziono użytkownika w wybranej organizacji
     NotAllowedOrg: Użytkownik nie jest członkiem wymaganej organizacji
