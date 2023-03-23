@@ -407,5 +407,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy not existing
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registration is not allowed
 
 optional: (optional)
