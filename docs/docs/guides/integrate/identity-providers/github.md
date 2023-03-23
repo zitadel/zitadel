@@ -26,7 +26,7 @@ Fill in the application name and homepage URL.
 You have to add the authorization callback URL, where GitHub should redirect, after the user has authenticated himself.
 In this example our test instance has the domain `https://acme-gzoe4x.zitadel.cloud`.
 This results in the following authorization callback URL:
- `https://acme-gzoe4x.zitadel.cloud/ui/login/register/externalidp/callback`
+ `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
 
 :::info
 To adapt this for you setup just replace the domain
@@ -72,13 +72,25 @@ Either account creation or account linking have to be enabled. Otherwise, the pr
 
 Once you created the IdP you need to activate it, to make it usable for your users.
 
-![Activate the AzureAD](/img/guides/zitadel_activate_github.png)
+![Activate the GitHub](/img/guides/zitadel_activate_github.png)
 
 ## Test the setup
 
 To test the setup use incognito mode and browse to your login page.
 If you succeeded you should see a new button which should redirect you to your GitHub.
 
-![AzureAD Button](/img/guides/zitadel_login_github.png)
+![GitHub Button](/img/guides/zitadel_login_github.png)
 
-![AzureAD Login](/img/guides/github_login.png)
+![GitHub Login](/img/guides/github_login.png)
+
+If the user is not yet linked in ZITADEL the user will see the screen below.
+Because GitHub is an OAuth provider and oAuth does not provide a standardized way to get the user data not all of the data can be taken over. First and Lastname are not filled.
+The user has to enter the rest of the data himself.
+
+![GitHub Login](/img/guides/zitadel_login_external_not_found.png)
+
+### Optional: Add ZITADEL action to autofill userdata
+
+If you don't want the user to have to enter his first and lastname himself, you can add a ZITADEL action in which you specify how the data should be transferred.
+
+
