@@ -30,7 +30,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderGoogleComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
@@ -119,50 +119,30 @@ export class ProviderGoogleComponent {
   }
 
   public addGoogleProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGoogleProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddGoogleProviderRequest()
+        : new AdminAddGoogleProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
+    req.setName(this.name?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGoogleProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addGoogleProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGoogleProviderRequest();
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGoogleProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.loading = false;
-          this.toast.showError(error);
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateGoogleProvider(): void {
