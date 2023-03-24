@@ -230,6 +230,12 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			}
 			go h.cancelOnErr(lockCtx, errs, cancelLock)
 		}
+		if succeededOnce {
+			// since we have at least one successful run, we can restrict it to events not older than
+			// twice the requeue time (just to be sure not to miss an event)
+			// This ensures that only active instances are projected
+			query = query.CreationDateAfter(time.Now().Add(-2 * h.requeueAfter))
+		}
 		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
 		if err != nil {
 			logging.WithFields("projection", h.ProjectionName).WithError(err).Error("instance ids")
