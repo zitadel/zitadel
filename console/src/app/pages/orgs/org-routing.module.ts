@@ -17,7 +17,7 @@ const routes: Routes = [
     loadChildren: () => import('src/app/modules/providers/providers.module'),
     data: {
       roles: ['org.idp.write'],
-      serviceType: PolicyComponentServiceType.ADMIN,
+      serviceType: PolicyComponentServiceType.MGMT,
     },
   },
   {

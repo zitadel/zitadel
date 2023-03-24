@@ -17,7 +17,13 @@
   <div *ngFor="let str of value" class="value-line">
     <span>{{ str }}</span>
     <span class="fill-space"></span>
-    <button matTooltip="{{ 'ACTIONS.DELETE' | translate }}" mat-icon-button (click)="remove(str)" class="icon-button">
+    <button
+      type="button"
+      matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+      mat-icon-button
+      (click)="remove(str)"
+      class="icon-button"
+    >
       <mat-icon class="icon">cancel</mat-icon>
     </button>
   </div>

@@ -1,6 +1,7 @@
 import { Component, forwardRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
+import { requiredValidator } from '../form-field/validators/validators';
 
 @Component({
   selector: 'cnsl-string-list',
@@ -17,16 +18,20 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 })
 export class StringListComponent implements ControlValueAccessor, OnInit, OnDestroy {
   @Input() title: string = '';
+  @Input() required: boolean = false;
   @Input() public getValues: Observable<void> = new Observable(); // adds formfieldinput to array on emission
 
   @Input() public control: FormControl = new FormControl<string>({ value: '', disabled: true });
   private destroy$: Subject<void> = new Subject();
   @ViewChild('redInput') input!: any;
+  private val: string[] = [];
 
   ngOnInit(): void {
     this.getValues.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.add(this.input.nativeElement);
     });
+
+    this.required ? this.control.setValidators([requiredValidator]) : this.control.setValidators([]);
   }
 
   ngOnDestroy(): void {
@@ -37,10 +42,7 @@ export class StringListComponent implements ControlValueAccessor, OnInit, OnDest
   onChange: any = () => {};
   onTouch: any = () => {};
 
-  private val: string[] = [];
-
   set value(val: string[]) {
-    console.log('setvalue', val);
     if (val !== undefined && this.val !== val) {
       this.val = val;
       this.onChange(val);
@@ -73,10 +75,9 @@ export class StringListComponent implements ControlValueAccessor, OnInit, OnDest
   }
 
   public add(input: any): void {
-    console.log(input.value);
     if (this.control.valid) {
       if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
-        this.val.push(input.value);
+        this.val ? this.val.push(input.value) : (this.val = [input.value]);
         this.onChange(this.val);
         this.onTouch(this.val);
       }

@@ -25,7 +25,7 @@
         <cnsl-string-list
           title="{{ 'IDP.SERVERS' | translate }}"
           formControlName="serversList"
-          [ngModel]="['helel']"
+          [required]="true"
         ></cnsl-string-list>
 
         <cnsl-form-field class="formfield">
@@ -55,11 +55,16 @@
           <input cnslInput formControlName="userBase" />
         </cnsl-form-field>
 
-        <cnsl-string-list title="{{ 'IDP.USERFILTERS' | translate }}" formControlName="userFiltersList"></cnsl-string-list>
+        <cnsl-string-list
+          title="{{ 'IDP.USERFILTERS' | translate }}"
+          formControlName="userFiltersList"
+          [required]="true"
+        ></cnsl-string-list>
 
         <cnsl-string-list
           title="{{ 'IDP.USEROBJECTCLASSES' | translate }}"
           formControlName="userObjectClassesList"
+          [required]="true"
         ></cnsl-string-list>
 
         <div class="identity-provider-optional-h-wrapper">
@@ -70,7 +75,7 @@
             ><mat-icon *ngIf="!showAttributes">keyboard_arrow_down</mat-icon>
           </button>
 
-          <span class="state warn">required</span>
+          <span *ngIf="!provider?.config?.ldap?.attributes?.idAttribute" class="state error">required</span>
         </div>
         <div *ngIf="showAttributes">
           <cnsl-ldap-attributes

@@ -1724,7 +1724,7 @@
     "BINDPASSWORD": "Bind Password",
     "SERVERS": "Servers",
     "STARTTLS": "Start TLS",
-    "TIMEOUT": "Timeout",
+    "TIMEOUT": "Timeout in seconds",
     "USERBASE": "Userbase",
     "USERFILTERS": "User filters",
     "USEROBJECTCLASSES": "User Object Classes",
