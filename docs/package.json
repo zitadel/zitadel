@@ -36,8 +36,7 @@
         "inputs": [
           "{workspaceRoot}/proto/**/*",
           "!{projectRoot}/build/**/*",
-          "!{projectRoot}/.docusaurus/**/*",
-          "!{projectRoot}/**/*"
+          "!{projectRoot}/.docusaurus/**/*"
         ],
         "outputs": [
           "{projectRoot}/.artifacts/**/*",
@@ -129,9 +128,9 @@
     "cssnano-preset-advanced": "5.3.3",
     "dns-packet": "5.3.1",
     "docusaurus-plugin-image-zoom": "^0.1.1",
-    "docusaurus-plugin-openapi-docs": "1.5.2",
+    "docusaurus-plugin-openapi-docs": "1.7.0",
     "docusaurus-plugin-plausible": "^0.0.5",
-    "docusaurus-theme-openapi-docs": "1.5.2",
+    "docusaurus-theme-openapi-docs": "1.7.0",
     "eastasianwidth": "0.2.0",
     "enhanced-resolve": "5.9.3",
     "eval": "0.1.8",
