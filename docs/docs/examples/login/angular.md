@@ -83,17 +83,6 @@ https://github.com/zitadel/zitadel-angular/blob/main/src/app/app.module.ts#L26-L
 https://github.com/zitadel/zitadel-angular/blob/main/src/app/app.module.ts#L55-L78
 ```
 
-### Refresh token
-
-If you want to add a refresh token to your application you have to navigate to the console application and tick the checkbox in the configuration section.
-Then add `offline_access` to the scopes and add the line
-
-```
-this.oauthService.setupAutomaticSilentRefresh();
-```
-
-this will automatically refresh a token before it expires.
-
 ### Add Login to Your Application
 
 To log a user in, you need a component or a guard.
@@ -158,6 +147,17 @@ And in your HTML file:
 ```html reference
 https://github.com/zitadel/zitadel-angular/blob/main/src/app/components/user/user.component.html
 ```
+
+### Refresh token
+
+If you want to add a refresh token to your application you have to navigate to the console application and tick the checkbox in the configuration section.
+Then add `offline_access` to the scopes and add the line
+
+```
+this.oauthService.setupAutomaticSilentRefresh();
+```
+
+this will automatically refresh a token before it expires.
 
 ## Completion
 
