@@ -143,7 +143,7 @@ func getInfoFromRequest(req op.TokenRequest) (string, string, string, time.Time,
 }
 
 func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (op.RefreshTokenRequest, error) {
-	tokenView, err := o.repo.RefreshTokenByID(ctx, refreshToken)
+	tokenView, err := o.repo.RefreshTokenByToken(ctx, refreshToken)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 }
 
 func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) *oidc.Error {
-	refreshToken, err := o.repo.RefreshTokenByID(ctx, token)
+	refreshToken, err := o.repo.RefreshTokenByID(ctx, token, userID)
 	if err == nil {
 		if refreshToken.ClientID != clientID {
 			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
@@ -204,9 +204,9 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 }
 
 func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {
-	refreshToken, err := o.repo.RefreshTokenByID(ctx, token)
+	refreshToken, err := o.repo.RefreshTokenByToken(ctx, token)
 	if err != nil {
-		return "", "", oidc.ErrServerError().WithParent(err)
+		return "", "", op.ErrInvalidRefreshToken
 	}
 	if refreshToken.ClientID != clientID {
 		return "", "", oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
