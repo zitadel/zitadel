@@ -410,5 +410,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Politique de cadenassage non existante
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: L'enregistrement n'est pas autorisé
 
 optional: (facultatif)
