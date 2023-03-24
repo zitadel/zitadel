@@ -3,6 +3,7 @@ syntax = "proto3";
 import "zitadel/object.proto";
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/duration.proto";
 
 package zitadel.idp.v1;
 
@@ -321,15 +322,15 @@ message GitLabSelfHostedConfig {
 }
 
 message LDAPConfig {
-    string host = 1;
-    string port = 2;
-    bool tls = 3;
-    string base_dn = 4;
-    string user_object_class = 5;
-    string user_unique_attribute = 6;
-    string admin = 7;
-    LDAPAttributes attributes = 8;
-    Options provider_options = 9;
+    repeated string servers = 1;
+    bool start_tls = 2;
+    string base_dn = 3;
+    string bind_dn = 4;
+    string user_base = 5;
+    repeated string user_object_classes = 6;
+    repeated string user_filters = 7;
+    google.protobuf.Duration timeout = 8;
+    LDAPAttributes attributes = 9;
 }
 
 message AzureADConfig {
