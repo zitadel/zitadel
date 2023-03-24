@@ -64,16 +64,16 @@ func smsStateToPb(state domain.SMSConfigState) settings_pb.SMSProviderConfigStat
 	}
 }
 
-func AddSMSConfigTwilioToConfig(req *admin_pb.AddSMSProviderTwilioRequest) *twilio.TwilioConfig {
-	return &twilio.TwilioConfig{
+func AddSMSConfigTwilioToConfig(req *admin_pb.AddSMSProviderTwilioRequest) *twilio.Config {
+	return &twilio.Config{
 		SID:          req.Sid,
 		SenderNumber: req.SenderNumber,
 		Token:        req.Token,
 	}
 }
 
-func UpdateSMSConfigTwilioToConfig(req *admin_pb.UpdateSMSProviderTwilioRequest) *twilio.TwilioConfig {
-	return &twilio.TwilioConfig{
+func UpdateSMSConfigTwilioToConfig(req *admin_pb.UpdateSMSProviderTwilioRequest) *twilio.Config {
+	return &twilio.Config{
 		SID:          req.Sid,
 		SenderNumber: req.SenderNumber,
 	}

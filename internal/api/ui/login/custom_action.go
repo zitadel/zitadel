@@ -55,19 +55,21 @@ func (l *Login) runPostExternalAuthenticationActions(
 		actions.SetFields("setPreferredUsername", func(username string) {
 			user.PreferredUsername = username
 		}),
-		actions.SetFields("setEmail", func(email string) {
+		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			user.Email = email
 		}),
 		actions.SetFields("setEmailVerified", func(verified bool) {
 			user.IsEmailVerified = verified
 		}),
-		actions.SetFields("setPhone", func(phone string) {
+		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			user.Phone = phone
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			user.IsPhoneVerified = verified
 		}),
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -145,7 +147,9 @@ func (l *Login) runPostInternalAuthenticationActions(
 
 	metadataList := object.MetadataListFromDomain(nil)
 	apiFields := actions.WithAPIFields(
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -222,7 +226,7 @@ func (l *Login) runPreCreationActions(
 		actions.SetFields("setUsername", func(username string) {
 			user.Username = username
 		}),
-		actions.SetFields("setEmail", func(email string) {
+		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			if user.Email == nil {
 				user.Email = &domain.Email{}
 			}
@@ -234,11 +238,11 @@ func (l *Login) runPreCreationActions(
 			}
 			user.Email.IsEmailVerified = verified
 		}),
-		actions.SetFields("setPhone", func(email string) {
+		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			if user.Phone == nil {
 				user.Phone = &domain.Phone{}
 			}
-			user.Phone.PhoneNumber = email
+			user.Phone.PhoneNumber = phone
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			if user.Phone == nil {
@@ -246,7 +250,9 @@ func (l *Login) runPreCreationActions(
 			}
 			user.Phone.IsPhoneVerified = verified
 		}),
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),

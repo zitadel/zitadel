@@ -14,10 +14,9 @@ import (
 )
 
 func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, resourceOwner string, phoneCodeGenerator crypto.Generator) (*domain.Phone, error) {
-	if !phone.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6M0ds", "Errors.Phone.Invalid")
+	if err := phone.Normalize(); err != nil {
+		return nil, err
 	}
-
 	existingPhone, err := c.phoneWriteModelByID(ctx, phone.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err

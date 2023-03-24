@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/domain"
+
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
@@ -68,44 +70,44 @@ func newConfig(clientID, secret, callbackURL, authURL, tokenURL string, scopes [
 // User is a representation of the authenticated GitHub user and implements the [idp.User] interface
 // https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#get-the-authenticated-user
 type User struct {
-	Login                   string    `json:"login"`
-	ID                      int       `json:"id"`
-	NodeId                  string    `json:"node_id"`
-	AvatarUrl               string    `json:"avatar_url"`
-	GravatarId              string    `json:"gravatar_id"`
-	Url                     string    `json:"url"`
-	HtmlUrl                 string    `json:"html_url"`
-	FollowersUrl            string    `json:"followers_url"`
-	FollowingUrl            string    `json:"following_url"`
-	GistsUrl                string    `json:"gists_url"`
-	StarredUrl              string    `json:"starred_url"`
-	SubscriptionsUrl        string    `json:"subscriptions_url"`
-	OrganizationsUrl        string    `json:"organizations_url"`
-	ReposUrl                string    `json:"repos_url"`
-	EventsUrl               string    `json:"events_url"`
-	ReceivedEventsUrl       string    `json:"received_events_url"`
-	Type                    string    `json:"type"`
-	SiteAdmin               bool      `json:"site_admin"`
-	Name                    string    `json:"name"`
-	Company                 string    `json:"company"`
-	Blog                    string    `json:"blog"`
-	Location                string    `json:"location"`
-	Email                   string    `json:"email"`
-	Hireable                bool      `json:"hireable"`
-	Bio                     string    `json:"bio"`
-	TwitterUsername         string    `json:"twitter_username"`
-	PublicRepos             int       `json:"public_repos"`
-	PublicGists             int       `json:"public_gists"`
-	Followers               int       `json:"followers"`
-	Following               int       `json:"following"`
-	CreatedAt               time.Time `json:"created_at"`
-	UpdatedAt               time.Time `json:"updated_at"`
-	PrivateGists            int       `json:"private_gists"`
-	TotalPrivateRepos       int       `json:"total_private_repos"`
-	OwnedPrivateRepos       int       `json:"owned_private_repos"`
-	DiskUsage               int       `json:"disk_usage"`
-	Collaborators           int       `json:"collaborators"`
-	TwoFactorAuthentication bool      `json:"two_factor_authentication"`
+	Login                   string              `json:"login"`
+	ID                      int                 `json:"id"`
+	NodeId                  string              `json:"node_id"`
+	AvatarUrl               string              `json:"avatar_url"`
+	GravatarId              string              `json:"gravatar_id"`
+	Url                     string              `json:"url"`
+	HtmlUrl                 string              `json:"html_url"`
+	FollowersUrl            string              `json:"followers_url"`
+	FollowingUrl            string              `json:"following_url"`
+	GistsUrl                string              `json:"gists_url"`
+	StarredUrl              string              `json:"starred_url"`
+	SubscriptionsUrl        string              `json:"subscriptions_url"`
+	OrganizationsUrl        string              `json:"organizations_url"`
+	ReposUrl                string              `json:"repos_url"`
+	EventsUrl               string              `json:"events_url"`
+	ReceivedEventsUrl       string              `json:"received_events_url"`
+	Type                    string              `json:"type"`
+	SiteAdmin               bool                `json:"site_admin"`
+	Name                    string              `json:"name"`
+	Company                 string              `json:"company"`
+	Blog                    string              `json:"blog"`
+	Location                string              `json:"location"`
+	Email                   domain.EmailAddress `json:"email"`
+	Hireable                bool                `json:"hireable"`
+	Bio                     string              `json:"bio"`
+	TwitterUsername         string              `json:"twitter_username"`
+	PublicRepos             int                 `json:"public_repos"`
+	PublicGists             int                 `json:"public_gists"`
+	Followers               int                 `json:"followers"`
+	Following               int                 `json:"following"`
+	CreatedAt               time.Time           `json:"created_at"`
+	UpdatedAt               time.Time           `json:"updated_at"`
+	PrivateGists            int                 `json:"private_gists"`
+	TotalPrivateRepos       int                 `json:"total_private_repos"`
+	OwnedPrivateRepos       int                 `json:"owned_private_repos"`
+	DiskUsage               int                 `json:"disk_usage"`
+	Collaborators           int                 `json:"collaborators"`
+	TwoFactorAuthentication bool                `json:"two_factor_authentication"`
 	Plan                    struct {
 		Name          string `json:"name"`
 		Space         int    `json:"space"`
@@ -150,7 +152,7 @@ func (u *User) GetPreferredUsername() string {
 }
 
 // GetEmail is an implementation of the [idp.User] interface.
-func (u *User) GetEmail() string {
+func (u *User) GetEmail() domain.EmailAddress {
 	return u.Email
 }
 
@@ -162,7 +164,7 @@ func (u *User) IsEmailVerified() bool {
 
 // GetPhone is an implementation of the [idp.User] interface.
 // It returns an empty string because GitHub does not provide the user's phone.
-func (u *User) GetPhone() string {
+func (u *User) GetPhone() domain.PhoneNumber {
 	return ""
 }
 

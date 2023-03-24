@@ -26,7 +26,6 @@ export function ensureOrgExists(ctx: Context, name: string) {
 }
 
 export function isDefaultOrg(ctx: Context, orgId: string): Cypress.Chainable<boolean> {
-  console.log('huhu', orgId);
   return cy
     .request({
       method: 'GET',

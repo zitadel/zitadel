@@ -29,6 +29,7 @@
 @import 'src/app/modules/top-view/top-view.component';
 @import 'src/app/pages/projects/projects.component';
 @import 'src/app/modules/edit-text/edit-text.component.scss';
+@import 'src/app/modules/providers/providers.scss';
 @import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
 @import 'src/app/pages/users/user-detail/user-detail/user-detail.component';
 @import 'src/app/pages/users/user-list/user-table/user-table.component';
@@ -39,7 +40,7 @@
 @import './styles/color.scss';
 @import 'src/app/pages/instance/instance.component.scss';
 @import 'src/app/modules/refresh-table/refresh-table.component.scss';
-@import 'src/app/modules/form-field/form-field.component.scss';
+@import 'src/app/modules/form-field/field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
 @import 'src/app/modules/meta-layout/meta.scss';
 @import 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-illustration/project-grant-illustration.component';
@@ -89,6 +90,7 @@
   @include table-theme($theme);
   @include detail-layout-theme($theme);
   @include app-card-theme($theme);
+  @include identity-provider-theme($theme);
   @include login-policy-mfas-theme($theme);
   @include changes-theme($theme);
   @include home-theme($theme);
