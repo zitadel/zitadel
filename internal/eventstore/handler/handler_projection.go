@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -21,11 +20,12 @@ const (
 
 type ProjectionHandlerConfig struct {
 	HandlerConfig
-	ProjectionName      string
-	RequeueEvery        time.Duration
-	RetryFailedAfter    time.Duration
-	Retries             uint
-	ConcurrentInstances uint
+	ProjectionName          string
+	RequeueEvery            time.Duration
+	RetryFailedAfter        time.Duration
+	Retries                 uint
+	ConcurrentInstances     uint
+	HandleInactiveInstances bool
 }
 
 // Update updates the projection with the given statements
@@ -46,17 +46,18 @@ type Unlock func(...string) error
 
 type ProjectionHandler struct {
 	Handler
-	ProjectionName      string
-	reduce              Reduce
-	update              Update
-	searchQuery         SearchQuery
-	triggerProjection   *time.Timer
-	lock                Lock
-	unlock              Unlock
-	requeueAfter        time.Duration
-	retryFailedAfter    time.Duration
-	retries             int
-	concurrentInstances int
+	ProjectionName          string
+	reduce                  Reduce
+	update                  Update
+	searchQuery             SearchQuery
+	triggerProjection       *time.Timer
+	lock                    Lock
+	unlock                  Unlock
+	requeueAfter            time.Duration
+	retryFailedAfter        time.Duration
+	retries                 int
+	concurrentInstances     int
+	handleInactiveInstances bool
 }
 
 func NewProjectionHandler(
@@ -74,18 +75,19 @@ func NewProjectionHandler(
 		concurrentInstances = 1
 	}
 	h := &ProjectionHandler{
-		Handler:             NewHandler(config.HandlerConfig),
-		ProjectionName:      config.ProjectionName,
-		reduce:              reduce,
-		update:              update,
-		searchQuery:         query,
-		lock:                lock,
-		unlock:              unlock,
-		requeueAfter:        config.RequeueEvery,
-		triggerProjection:   time.NewTimer(0), // first trigger is instant on startup
-		retryFailedAfter:    config.RetryFailedAfter,
-		retries:             int(config.Retries),
-		concurrentInstances: concurrentInstances,
+		Handler:                 NewHandler(config.HandlerConfig),
+		ProjectionName:          config.ProjectionName,
+		reduce:                  reduce,
+		update:                  update,
+		searchQuery:             query,
+		lock:                    lock,
+		unlock:                  unlock,
+		requeueAfter:            config.RequeueEvery,
+		triggerProjection:       time.NewTimer(0), // first trigger is instant on startup
+		retryFailedAfter:        config.RetryFailedAfter,
+		retries:                 int(config.Retries),
+		concurrentInstances:     concurrentInstances,
+		handleInactiveInstances: config.HandleInactiveInstances,
 	}
 
 	go func() {
@@ -126,26 +128,18 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 // Process handles multiple events by reducing them to statements and updating the projection
 func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Event) (index int, err error) {
 	if len(events) == 0 {
-		return index, nil
+		return 0, nil
 	}
 	index = -1
-	statements := make([]*Statement, 0)
-	for _, event := range events {
-		statement, reduceErr := h.reduce(event)
-		if reduceErr != nil {
-			return index, reduceErr
+	statements := make([]*Statement, len(events))
+	for i, event := range events {
+		statements[i], err = h.reduce(event)
+		if err != nil {
+			return index, err
 		}
-		// statement can be nil (see notifications)
-		if statement != nil {
-			statements = append(statements, statement)
-		}
-	}
-	// update panics if there are no statements
-	if len(statements) == 0 {
-		return index, caos_errors.ThrowInternal(nil, "HANDL-vjxj7", "Errors.Handlers.Process.NoStatements")
 	}
 	for retry := 0; retry <= h.retries; retry++ {
-		index, err = h.update(ctx, statements, h.reduce)
+		index, err = h.update(ctx, statements[index+1:], h.reduce)
 		if err != nil && !errors.Is(err, ErrSomeStmtsFailed) {
 			return index, err
 		}
@@ -230,10 +224,10 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			}
 			go h.cancelOnErr(lockCtx, errs, cancelLock)
 		}
-		if succeededOnce {
+		if succeededOnce && !h.handleInactiveInstances {
 			// since we have at least one successful run, we can restrict it to events not older than
 			// twice the requeue time (just to be sure not to miss an event)
-			// This ensures that only active instances are projected
+			// This ensures that only instances with recent events on the handler are projected
 			query = query.CreationDateAfter(time.Now().Add(-2 * h.requeueAfter))
 		}
 		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
