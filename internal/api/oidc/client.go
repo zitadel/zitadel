@@ -635,6 +635,9 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 }
 
 func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (*query.UserGrants, map[string]map[string]string, error) {
+	if applicationID == "" || len(requestedRoles) == 0 {
+		return nil, nil, nil
+	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID, false)
 	if err != nil {
 		return nil, nil, err

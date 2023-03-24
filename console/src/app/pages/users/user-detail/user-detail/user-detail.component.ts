@@ -44,7 +44,7 @@ export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'it', 'fr', 'pl', 'zh'];
+  public languages: string[] = ['de', 'en', 'it', 'fr', 'ja', 'pl', 'zh'];
 
   public ChangeType: any = ChangeType;
 
@@ -198,7 +198,6 @@ export class UserDetailComponent implements OnInit {
       .generateMachineSecret(this.user.id)
       .then((resp) => {
         this.toast.showInfo('USER.TOAST.SECRETGENERATED', true);
-        console.log(resp.clientSecret);
         this.dialog.open(MachineSecretDialogComponent, {
           data: {
             clientId: resp.clientId,
