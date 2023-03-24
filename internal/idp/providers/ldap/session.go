@@ -254,8 +254,6 @@ func mapLDAPEntryToUser(
 			return nil, err
 		}
 	}
-	return searchQuery
-}
 
 	return NewUser(
 		user.GetAttributeValue(idAttribute),
