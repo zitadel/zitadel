@@ -14,6 +14,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 )
 
@@ -22,6 +23,7 @@ func TestProvider_FetchUser(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		httpMock     func()
 		authURL      string
 		code         string
@@ -55,6 +57,7 @@ func TestProvider_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				httpMock: func() {
 					gock.New("https://gitlab.com/oauth").
 						Get("/userinfo").
@@ -74,6 +77,7 @@ func TestProvider_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				httpMock: func() {
 					gock.New("https://gitlab.com/oauth").
 						Get("/userinfo").
@@ -110,6 +114,7 @@ func TestProvider_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				httpMock: func() {
 					gock.New("https://gitlab.com/oauth").
 						Get("/userinfo").
@@ -161,7 +166,7 @@ func TestProvider_FetchUser(t *testing.T) {
 
 			// call the real discovery endpoint
 			gock.New(issuer).Get(openid.DiscoveryEndpoint).EnableNetworking()
-			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.options...)
+			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
 			require.NoError(t, err)
 
 			session := &oidc.Session{
@@ -183,9 +188,9 @@ func TestProvider_FetchUser(t *testing.T) {
 				a.Equal(tt.want.displayName, user.GetDisplayName())
 				a.Equal(tt.want.nickName, user.GetNickname())
 				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
-				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(domain.EmailAddress(tt.want.email), user.GetEmail())
 				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
-				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(domain.PhoneNumber(tt.want.phone), user.GetPhone())
 				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
 				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
 				a.Equal(tt.want.avatarURL, user.GetAvatarURL())

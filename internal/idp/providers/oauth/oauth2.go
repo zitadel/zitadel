@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 
 	"github.com/zitadel/zitadel/internal/idp"
@@ -86,8 +87,14 @@ func (p *Provider) Name() string {
 
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an OAuth2.0 authorization request as AuthURL.
-func (p *Provider) BeginAuth(ctx context.Context, state string, _ ...any) (idp.Session, error) {
-	url := rp.AuthURL(state, p.RelyingParty)
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
+	opts := []rp.AuthURLOpt{rp.WithPrompt(oidc.PromptSelectAccount)}
+	for _, param := range params {
+		if option, ok := param.(rp.AuthURLOpt); ok {
+			opts = append(opts, option)
+		}
+	}
+	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p}, nil
 }
 

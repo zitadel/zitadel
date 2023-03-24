@@ -2,7 +2,7 @@
 title: External Authentication Flow
 ---
 
-This flow is executed if the user logs in using an [identity provider](../../guides/integrate/identity-brokering) or using a [jwt token](../../concepts/structure/jwt_idp).
+This flow is executed if the user logs in using an [identity provider](/guides/integrate/identity-providers/introduction.md) or using a [jwt token](/concepts/structure/jwt_idp).
 
 ## Post Authentication
 
@@ -26,6 +26,9 @@ The first parameter contains the following fields
       This is a verification errors string representation. If the verification succeeds, this is "none"
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
     - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
+    - `providerInfo` *Any*  
+      Returns the response of the provider. In case the provider is a Generic OAuth Provider, the information is accessible through:
+      - `rawInfo`  *Any*
 - `api`  
   The second parameter contains the following fields
   - `v1`

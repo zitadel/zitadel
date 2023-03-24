@@ -23,14 +23,14 @@ var (
 			", projections.user_grants3.roles" +
 			", projections.user_grants3.state" +
 			", projections.user_grants3.user_id" +
-			", projections.users7.username" +
-			", projections.users7.type" +
-			", projections.users7.resource_owner" +
-			", projections.users7_humans.first_name" +
-			", projections.users7_humans.last_name" +
-			", projections.users7_humans.email" +
-			", projections.users7_humans.display_name" +
-			", projections.users7_humans.avatar_key" +
+			", projections.users8.username" +
+			", projections.users8.type" +
+			", projections.users8.resource_owner" +
+			", projections.users8_humans.first_name" +
+			", projections.users8_humans.last_name" +
+			", projections.users8_humans.email" +
+			", projections.users8_humans.display_name" +
+			", projections.users8_humans.avatar_key" +
 			", projections.login_names2.login_name" +
 			", projections.user_grants3.resource_owner" +
 			", projections.orgs.name" +
@@ -38,11 +38,12 @@ var (
 			", projections.user_grants3.project_id" +
 			", projections.projects3.name" +
 			" FROM projections.user_grants3" +
-			" LEFT JOIN projections.users7 ON projections.user_grants3.user_id = projections.users7.id AND projections.user_grants3.instance_id = projections.users7.instance_id" +
-			" LEFT JOIN projections.users7_humans ON projections.user_grants3.user_id = projections.users7_humans.user_id AND projections.user_grants3.instance_id = projections.users7_humans.instance_id" +
+			" LEFT JOIN projections.users8 ON projections.user_grants3.user_id = projections.users8.id AND projections.user_grants3.instance_id = projections.users8.instance_id" +
+			" LEFT JOIN projections.users8_humans ON projections.user_grants3.user_id = projections.users8_humans.user_id AND projections.user_grants3.instance_id = projections.users8_humans.instance_id" +
 			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id AND projections.user_grants3.instance_id = projections.orgs.instance_id" +
 			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id AND projections.user_grants3.instance_id = projections.projects3.instance_id" +
 			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id AND projections.user_grants3.instance_id = projections.login_names2.instance_id" +
+			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names2.is_primary = $1")
 	userGrantCols = []string{
 		"id",
@@ -77,14 +78,14 @@ var (
 			", projections.user_grants3.roles" +
 			", projections.user_grants3.state" +
 			", projections.user_grants3.user_id" +
-			", projections.users7.username" +
-			", projections.users7.type" +
-			", projections.users7.resource_owner" +
-			", projections.users7_humans.first_name" +
-			", projections.users7_humans.last_name" +
-			", projections.users7_humans.email" +
-			", projections.users7_humans.display_name" +
-			", projections.users7_humans.avatar_key" +
+			", projections.users8.username" +
+			", projections.users8.type" +
+			", projections.users8.resource_owner" +
+			", projections.users8_humans.first_name" +
+			", projections.users8_humans.last_name" +
+			", projections.users8_humans.email" +
+			", projections.users8_humans.display_name" +
+			", projections.users8_humans.avatar_key" +
 			", projections.login_names2.login_name" +
 			", projections.user_grants3.resource_owner" +
 			", projections.orgs.name" +
@@ -93,11 +94,12 @@ var (
 			", projections.projects3.name" +
 			", COUNT(*) OVER ()" +
 			" FROM projections.user_grants3" +
-			" LEFT JOIN projections.users7 ON projections.user_grants3.user_id = projections.users7.id AND projections.user_grants3.instance_id = projections.users7.instance_id" +
-			" LEFT JOIN projections.users7_humans ON projections.user_grants3.user_id = projections.users7_humans.user_id AND projections.user_grants3.instance_id = projections.users7_humans.instance_id" +
+			" LEFT JOIN projections.users8 ON projections.user_grants3.user_id = projections.users8.id AND projections.user_grants3.instance_id = projections.users8.instance_id" +
+			" LEFT JOIN projections.users8_humans ON projections.user_grants3.user_id = projections.users8_humans.user_id AND projections.user_grants3.instance_id = projections.users8_humans.instance_id" +
 			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id AND projections.user_grants3.instance_id = projections.orgs.instance_id" +
 			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id AND projections.user_grants3.instance_id = projections.projects3.instance_id" +
 			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id AND projections.user_grants3.instance_id = projections.login_names2.instance_id" +
+			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names2.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,
@@ -923,7 +925,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

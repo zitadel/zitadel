@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -159,7 +160,7 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	filter, query, scan := prepareInstancesQuery()
+	filter, query, scan := prepareInstancesQuery(ctx, q.client)
 	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
@@ -184,7 +185,7 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Inst
 		projection.InstanceProjection.Trigger(ctx)
 	}
 
-	stmt, scan := prepareInstanceDomainQuery(authz.GetInstance(ctx).RequestedDomain())
+	stmt, scan := prepareInstanceDomainQuery(ctx, q.client, authz.GetInstance(ctx).RequestedDomain())
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
@@ -203,7 +204,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAuthzInstanceQuery(host)
+	stmt, scan := prepareAuthzInstanceQuery(ctx, q.client, host)
 	host = strings.Split(host, ":")[0] //remove possible port
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceDomainDomainCol.identifier(): host,
@@ -219,6 +220,10 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 	return scan(row)
 }
 
+func (q *Queries) InstanceByID(ctx context.Context) (_ authz.Instance, err error) {
+	return q.Instance(ctx, true)
+}
+
 func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	instance, err := q.Instance(ctx, false)
 	if err != nil {
@@ -227,7 +232,7 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	return instance.DefaultLanguage()
 }
 
-func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+func prepareInstanceQuery(ctx context.Context, db prepareDatabase, host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
@@ -239,7 +244,8 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			InstanceColumnConsoleAppID.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
 		).
-			From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(instanceTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
 			instance := &Instance{host: host}
 			lang := ""
@@ -265,7 +271,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 		}
 }
 
-func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
 	instanceFilterTable := instanceTable.setAlias(InstancesFilterTableAlias)
 	instanceFilterIDColumn := InstanceColumnID.setTable(instanceFilterTable)
 	instanceFilterCountColumn := InstancesFilterTableAlias + ".count"
@@ -294,7 +300,7 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.Select
 				InstanceDomainSequenceCol.identifier(),
 			).FromSelect(builder, InstancesFilterTableAlias).
 				LeftJoin(join(InstanceColumnID, instanceFilterIDColumn)).
-				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn)).
+				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn) + db.Timetravel(call.Took(ctx))).
 				PlaceholderFormat(sq.Dollar)
 		},
 		func(rows *sql.Rows) (*Instances, error) {
@@ -369,7 +375,7 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.Select
 		}
 }
 
-func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
+func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase, host string) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
@@ -389,7 +395,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 			InstanceDomainSequenceCol.identifier(),
 		).
 			From(instanceTable.identifier()).
-			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{
@@ -451,7 +457,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 		}
 }
 
-func prepareAuthzInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
+func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host string) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
@@ -474,7 +480,7 @@ func prepareAuthzInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Rows) (
 		).
 			From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
-			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID)).
+			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{

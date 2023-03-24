@@ -67,8 +67,9 @@ func CreateLogin(config Config,
 	userAgentCookie,
 	issuerInterceptor,
 	oidcInstanceHandler,
-	samlInstanceHandler mux.MiddlewareFunc,
-	assetCache mux.MiddlewareFunc,
+	samlInstanceHandler,
+	assetCache,
+	accessHandler mux.MiddlewareFunc,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
@@ -94,7 +95,7 @@ func CreateLogin(config Config,
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
-	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor)
+	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
 	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 	return login, nil

@@ -66,14 +66,14 @@ func VerifyZitadel(db *sql.DB, config database.Config) error {
 }
 
 func verifyZitadel(config database.Config) error {
-	logging.WithFields("database", config.Database()).Info("verify zitadel")
+	logging.WithFields("database", config.DatabaseName()).Info("verify zitadel")
 
 	db, err := database.Connect(config, false)
 	if err != nil {
 		return err
 	}
 
-	if err := VerifyZitadel(db, config); err != nil {
+	if err := VerifyZitadel(db.DB, config); err != nil {
 		return err
 	}
 

@@ -211,6 +211,8 @@ RegistrationUser:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -236,11 +238,13 @@ ExternalRegistrationUserOverview:
   NicknameLabel: 昵称
   PhoneLabel: 手机号码
   LanguageLabel: 语言
-  German: 德语
-  English: 英语
-  Italian: 意大利语
-  French: 法语
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -299,6 +303,8 @@ ExternalNotFound:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Powered By
@@ -317,6 +323,7 @@ Errors:
     MissingParameters: 缺少必需的参数
   User:
     NotFound: 找不到用户
+    AlreadyExists: 用户已存在
     Inactive: 用户处于停用状态
     NotFoundOnOrg: 在所选组织中找不到用户
     NotAllowedOrg: 用户不是所需组织的成员
@@ -325,6 +332,33 @@ Errors:
     Invalid: 无效的用户数据
     DomainNotAllowedAsUsername: 域名已存在，但无法使用
     NotAllowedToLink: 不允许用户使用外部身份提供者注册
+    Profile:
+      NotFound: 未找到个人资料
+      NotChanged: 个人资料未更改
+      Empty: 简介是空的
+      FirstNameEmpty: 简介中的名字是空的
+      LastNameEmpty: 简介中的姓氏是空的
+      IDMissing: 简介ID丢失
+    Email:
+      NotFound: 电子邮件没有找到
+      Invalid: 电子邮件无效
+      AlreadyVerified: 电子邮件已经过验证
+      NotChanged: 电子邮件未更改
+      Empty: 电子邮件是空的
+      IDMissing: 电子邮件ID丢失
+    Phone:
+      NotFound: 手机号码未找到
+      Invalid: 手机号码无效
+      AlreadyVerified: 手机号码已经验证
+      Empty: 电话号码是空的
+      NotChanged: 电话号码没有改变
+    Address:
+      NotFound: 找不到地址
+      NotChanged: 地址没有改变
+    Username:
+      AlreadyExists: 用户名已被使用
+      Reserved: 用户名已被使用
+      Empty: 用户名是空的
     Password:
       ConfirmationWrong: 密码不一致
       Empty: 密码为空
@@ -367,6 +401,8 @@ Errors:
       ExternalUserIDEmpty: 外部用户 ID 为空
       UserDisplayNameEmpty: 用户显示名称为空
       NoExternalUserData: 未收到外部用户数据
+      CreationNotAllowed: 不允许在该供应商上创建新用户
+      LinkingNotAllowed: 在此提供者上不允许链接一个用户
     GrantRequired: 无法登录，用户需要在应用程序上拥有至少一项授权，请联系您的管理员。
     ProjectRequired: 无法登录，用户的组织必须授予项目，请联系您的管理员。
   IdentityProvider:
@@ -374,5 +410,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: 用户锁定政策不存在
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: 不允许注册
 
 optional: (可选)

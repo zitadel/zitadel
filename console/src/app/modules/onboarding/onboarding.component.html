@@ -1,0 +1,57 @@
+<div class="onboarding-header">
+  <h1 class="title" data-e2e="authenticated-welcome">{{ 'HOME.WELCOME' | translate }}</h1>
+
+  <p class="desc cnsl-secondary-text">{{ 'ONBOARDING.DESCRIPTION' | translate }}</p>
+
+  <ng-container *ngIf="!adminService.hideOnboarding && (adminService.progressAllDone | async) === false">
+    <div class="onboarding-progress-bar-wrapper">
+      <mat-progress-bar
+        class="progress"
+        mode="determinate"
+        [value]="adminService.progressPercentage | async"
+      ></mat-progress-bar>
+
+      <div class="prog-desc cnsl-secondary-text">
+        {{ adminService.progressDone | async }} / {{ adminService.progressTotal | async }}
+        {{ 'ONBOARDING.COMPLETED' | translate }}
+      </div>
+
+      <mat-spinner diameter="20" *ngIf="adminService.onboardingLoading | async"></mat-spinner>
+    </div>
+  </ng-container>
+
+  <div
+    class="action-card-wrapper"
+    [ngClass]="{ alldone: adminService.hideOnboarding || (adminService.progressAllDone | async) }"
+  >
+    <ng-container *ngFor="let action of actions | async">
+      <a
+        [routerLink]="action[1].link"
+        [queryParams]="{ id: action[1].fragment }"
+        class="action-card card"
+        [ngClass]="{ done: action[1].event !== undefined }"
+      >
+        <div class="state-circle">
+          <mat-icon *ngIf="action[1]?.event !== undefined" matTooltip="{{ action[1].event | event }}" class="success-icon"
+            >check_circle</mat-icon
+          >
+        </div>
+
+        <div class="action-content">
+          <div class="text-block">
+            <span class="name">{{ 'ONBOARDING.EVENTS.' + action[0] + '.title' | translate }}</span>
+            <span class="cnsl-secondary-text description">{{
+              'ONBOARDING.EVENTS.' + action[0] + '.description' | translate
+            }}</span>
+          </div>
+
+          <span class="fill-space"></span>
+          <div class="action-row">
+            <span>{{ 'ACTIONS.SETUP' | translate }}</span>
+            <mat-icon class="icon">keyboard_arrow_right</mat-icon>
+          </div>
+        </div>
+      </a>
+    </ng-container>
+  </div>
+</div>

@@ -211,6 +211,8 @@ RegistrationUser:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -241,6 +243,8 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
@@ -299,6 +303,8 @@ ExternalNotFound:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Powered By
@@ -317,6 +323,7 @@ Errors:
     MissingParameters: Benötigte Parameter fehlen
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    AlreadyExists: Benutzer existiert bereits
     Inactive: Benutzer ist inaktiv
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
@@ -325,6 +332,33 @@ Errors:
     Invalid: Userdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
+    Profile:
+      NotFound: Profil nicht gefunden
+      NotChanged: Profil nicht verändert
+      Empty: Profil ist leer
+      FirstNameEmpty: Vorname im Profil ist leer
+      LastNameEmpty: Nachname im Profil ist leer
+      IDMissing: Profil ID fehlt
+    Email:
+      NotFound: Email nicht gefunden
+      Invalid: Email ist ungültig
+      AlreadyVerified: Email ist bereits verifiziert
+      NotChanged: Email wurde nicht geändert
+      Empty: Email ist leer
+      IDMissing: Email ID fehlt
+    Phone:
+      NotFound: Telefonnummer nicht gefunden
+      Invalid: Telefonnummer ist ungültig
+      AlreadyVerified: Telefonnummer bereits verifiziert
+      Empty: Telefonnummer ist leer
+      NotChanged: Telefonnummer wurde nicht geändert
+    Address:
+      NotFound: Adresse nicht gefunden
+      NotChanged: Adresse wurde nicht geändert
+    Username:
+      AlreadyExists: Benutzername ist bereits vergeben
+      Reserved: Benutzername ist bereits vergeben
+      Empty: Benutzername ist leer
     Password:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer
@@ -367,6 +401,8 @@ Errors:
       ExternalUserIDEmpty: Externe User ID  ist leer
       UserDisplayNameEmpty: Benutzer Anzeige Name ist leer
       NoExternalUserData: Keine externe User Daten erhalten
+      CreationNotAllowed: Erstellen eines neuen User ist auf diesem Provider nicht erlaubt
+      LinkingNotAllowed: Linken eines Users ist auf diesem Provider nicht erlaubt
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
     ProjectRequired: Der Login an diese Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
@@ -374,5 +410,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy existiert nicht
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrierung ist nicht erlaubt
 
 optional: (optional)

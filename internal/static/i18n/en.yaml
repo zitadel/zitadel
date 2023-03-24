@@ -70,16 +70,23 @@ Errors:
     Profile:
       NotFound: Profile not found
       NotChanged: Profile not changed
-      Invalid: Profile data invalid
+      Empty: Profile is empty
+      FirstNameEmpty: First name in profile is empty
+      LastNameEmpty: Last name in profile is empty
+      IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found
       Invalid: Email is invalid
       AlreadyVerified: Email is already verified
       NotChanged: Email not changed
+      Empty: Email is empty
+      IDMissing: Email ID is missing
     Phone:
       NotFound: Phone not found
       Invalid: Phone is invalid
       AlreadyVerified: Phone already verified
+      Empty: Phone is empty
+      NotChanged: Phone not changed
     Address:
       NotFound: Address not found
       NotChanged: Address not changed
@@ -100,6 +107,7 @@ Errors:
     Username:
       AlreadyExists:  Username already taken
       Reserved: Username is already taken
+      Empty: Username is empty
     Code:
       Empty: Code is empty
       NotFound: Code not found
@@ -233,6 +241,9 @@ Errors:
       NotFound: Notification Policy not found
       NotChanged: Notification Policy not changed
       AlreadyExists: Notification Policy already exists
+    LabelPolicy:
+      NotFound: Private Label Policy not found
+      NotChanged: Private Label Policy has not been changed
   Project:
     ProjectIDMissing: Project Id missing
     AlreadyExists: Project already exists on organization
@@ -437,6 +448,28 @@ Errors:
     CloseRows: SQL Statement could not be finished
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
+  Quota:
+    AlreadyExists: Quota already exists for this unit
+    NotFound: Quota not found for this unit
+    Invalid:
+      CallURL: Quota call URL is invalid
+      Percent: Quota percent is lower than 1
+      Unimplemented: Quotas are not implemented for this unit
+      Amount: Quota amount is lower than 1
+      ResetInterval: Quota reset interval is shorter than a minute
+      Noop: An unlimited quota without notifications has no effect
+    Access:
+      Exhausted: The quota for authenticated requests is exhausted
+    Execution:
+      Exhausted: The quota for execution seconds is exhausted
+  LogStore:
+    Access:
+      StorageFailed: Storing access log to database failed
+      ScanFailed: Querying usage for authenticated requests failed
+    Execution:
+      StorageFailed: Storing action execution log to database failed
+      ScanFailed: Querying usage for action execution seconds failed
+
 
 AggregateTypes:
   action: Action
@@ -446,6 +479,7 @@ AggregateTypes:
   project: Project
   user: User
   usergrant: User grant
+  quota: Quota
 
 EventTypes:
   user:

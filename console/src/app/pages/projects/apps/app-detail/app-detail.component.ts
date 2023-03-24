@@ -49,8 +49,8 @@ import {
   getAuthMethodFromPartialConfig,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
-  PK_JWT_METHOD,
   PKCE_METHOD,
+  PK_JWT_METHOD,
   POST_METHOD,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
@@ -177,9 +177,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.http.get('./assets/environment.json').subscribe((env: any) => {
       this.environmentMap = {
         issuer: env.issuer,
-        adminServiceUrl: `${env.api}/auth/v1`,
+        adminServiceUrl: `${env.api}/admin/v1`,
         mgmtServiceUrl: `${env.api}/management/v1`,
-        authServiceUrl: `${env.api}/admin/v1`,
+        authServiceUrl: `${env.api}/auth/v1`,
       };
 
       this.http.get(`${env.issuer}/.well-known/openid-configuration`).subscribe((wellKnown: any) => {

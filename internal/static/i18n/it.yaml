@@ -70,16 +70,23 @@ Errors:
     Profile:
       NotFound: Profilo non trovato
       NotChanged: Profilo non cambiato
-      Invalid: Dati non sono validi
+      Empty: Profilo è vuoto
+      FirstNameEmpty: Il nome nel profilo è vuoto
+      LastNameEmpty: Il cognome nel profilo è vuoto
+      IDMissing: Profilo ID mancante
     Email:
       NotFound: Email non trovata
       Invalid: L'e-mail non è valida
       AlreadyVerified: L'e-mail è già verificata
       NotChanged: Email non cambiata
+      Empty: Email è vuota
+      IDMissing: Email ID mancante
     Phone:
       NotFound: Telefono non trovato
       Invalid: Il telefono non è valido
       AlreadyVerified: Telefono già verificato
+      Empty: Il telefono è vuoto
+      NotChanged: Telefono non cambiato
     Address:
       NotFound: Indirizzo non trovato
       NotChanged: Indirizzo non cambiato
@@ -100,6 +107,7 @@ Errors:
     Username:
       AlreadyExists: Nome utente già preso
       Reserved: Il nome utente è già preso
+      Empty: Il nome utente è vuoto
     Code:
       Empty: Il codice è vuoto
       NotFound: Codice non trovato
@@ -233,6 +241,9 @@ Errors:
       NotFound: Impostazioni di notifica non trovate
       NotChanged: Impostazioni di notifica non è stato cambiato
       AlreadyExists: Impostazioni di notifica già esistente
+    LabelPolicy:
+      NotFound: Etichettatura privata non trovata
+      NotChanged: Private Labelling non è stata cambiata
   Project:
     ProjectIDMissing: ID del progetto mancante
     AlreadyExists: Il progetto è già stato creato nell'organizzazione
@@ -437,6 +448,27 @@ Errors:
     CloseRows: Lo statement SQL non può essere terminato
     SQLStatement: Lo statement SQL non può essere creato
     InvalidRequest: La richiesta non è valida
+  Quota:
+    AlreadyExists: La quota esiste già per questa unità
+    NotFound: Quota non trovata per questa unità
+    Invalid:
+      CallURL: L'URL di chiamata per la quota non è valido
+      Percent: La percentuale contingente è inferiore all'1
+      Unimplemented: La quota non è implementata per questa unità
+      Amount: L'importo contingente è inferiore all'1
+      ResetInterval: L'intervallo di reset contingente è inferiore a un minuto
+      Noop: Una quota illimitata senza notifiche non ha alcun effetto
+    Access:
+      Exhausted: La quota per le richieste autenticate è esaurita
+    Execution:
+      Exhausted: La quota per i secondi di azione è esaurita
+  LogStore:
+    Access:
+      StorageFailed: Il salvataggio del registro degli accessi nel database non è riuscito
+      ScanFailed: La query delle richieste autenticate utilizzate non è riuscita
+    Execution:
+      StorageFailed: Il salvataggio del registro delle azioni nel database non è riuscito
+      ScanFailed: La query dei secondi delle azioni utilizzate non è riuscita
 
 AggregateTypes:
   action: Azione
@@ -446,6 +478,7 @@ AggregateTypes:
   project: Progetto
   user: Utente
   usergrant: Sovvenzione utente
+  quota: Quota
 
 EventTypes:
   user:

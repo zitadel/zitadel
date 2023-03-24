@@ -1,0 +1,20 @@
+{
+    "cleanUrls": true,
+    "rewrites": [
+        {
+            "source": "/docs/proxy/js/script.js",
+            "destination": "https://plausible.io/js/script.tagged-events.outbound-links.js"
+        },
+        {
+            "source": "/docs/proxy/api/event",
+            "destination": "https://plausible.io/api/event"
+        },
+        { 
+            "source": "/docs/:match*",
+            "destination": "/:match*"
+        }
+    ],
+    "redirects": [
+        { "source": "/", "destination": "/docs" }
+    ]
+}

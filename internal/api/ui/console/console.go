@@ -88,7 +88,7 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 	return f, nil
 }
 
-func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, instanceHandler func(http.Handler) http.Handler, customerPortal string) (http.Handler, error) {
+func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler, accessInterceptor func(http.Handler) http.Handler, customerPortal string) (http.Handler, error) {
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 
 	handler := mux.NewRouter()
 
-	handler.Use(instanceHandler, security)
+	handler.Use(callDurationInterceptor, instanceHandler, security, accessInterceptor)
 	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
 		environmentJSON, err := createEnvironmentJSON(url, issuer(r), authz.GetInstance(r.Context()).ConsoleClientID(), customerPortal)

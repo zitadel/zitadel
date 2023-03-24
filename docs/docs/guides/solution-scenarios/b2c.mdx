@@ -29,7 +29,7 @@ You can read more about how ZITADEL handles usernames [here](../manage/console/o
 ZITADEL gives you a basic storage for users and manages phone and email addresses. It also allows you to store your own application data such as preferences or external identifiers to the metadata of a user.
 
 If you are migrating an existing project and you already have an external identity store you can consider bulk importing your user datasets.
-Read our [Management API definitions](../../apis/proto/management#importhumanuser) for more info. If the users email is not verified or no password is set, a initialization mail will be send.
+Read our [Management API definitions](/apis/mgmt) for more info. If the users email is not verified or no password is set, a initialization mail will be send.
 
 :::info
 Requests to the management API are rate limited. Read our [Rate limit Policy](../../legal/rate-limit-policy) for more info.
@@ -57,7 +57,6 @@ Particularly because you should focus building your applications.
 ### Federation
 
 ZITADEL supports signup with OIDC Identity providers as well as JWT Identity Providers. On signup, ZITADEL imports user information to the own profile.
-//TODO extend this passage
 
 ### Hosted Login
 

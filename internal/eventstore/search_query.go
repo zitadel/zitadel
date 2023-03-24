@@ -12,14 +12,15 @@ import (
 // SearchQueryBuilder represents the builder for your filter
 // if invalid data are set the filter will fail
 type SearchQueryBuilder struct {
-	columns       repository.Columns
-	limit         uint64
-	desc          bool
-	resourceOwner string
-	instanceID    string
-	editorUser    string
-	queries       []*SearchQuery
-	tx            *sql.Tx
+	columns         repository.Columns
+	limit           uint64
+	desc            bool
+	resourceOwner   string
+	instanceID      string
+	editorUser      string
+	queries         []*SearchQuery
+	tx              *sql.Tx
+	allowTimeTravel bool
 }
 
 type SearchQuery struct {
@@ -127,6 +128,13 @@ func (builder *SearchQueryBuilder) SetTx(tx *sql.Tx) *SearchQueryBuilder {
 
 func (builder *SearchQueryBuilder) EditorUser(id string) *SearchQueryBuilder {
 	builder.editorUser = id
+	return builder
+}
+
+// AllowTimeTravel activates the time travel feature of the database if supported
+// The queries will be made based on the call time
+func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
+	builder.allowTimeTravel = true
 	return builder
 }
 
@@ -264,11 +272,12 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 	}
 
 	return &repository.SearchQuery{
-		Columns: builder.columns,
-		Limit:   builder.limit,
-		Desc:    builder.desc,
-		Filters: filters,
-		Tx:      builder.tx,
+		Columns:         builder.columns,
+		Limit:           builder.limit,
+		Desc:            builder.desc,
+		Filters:         filters,
+		Tx:              builder.tx,
+		AllowTimeTravel: builder.allowTimeTravel,
 	}, nil
 }
 

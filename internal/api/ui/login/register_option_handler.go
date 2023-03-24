@@ -42,7 +42,7 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 	if err == nil {
 		// if only external allowed with a single idp then use that
 		if !allowed && externalAllowed && len(authReq.AllowedExternalIDPs) == 1 {
-			l.handleExternalRegisterByConfigID(w, r, authReq, authReq.AllowedExternalIDPs[0].IDPConfigID)
+			l.handleIDP(w, r, authReq, authReq.AllowedExternalIDPs[0].IDPConfigID)
 			return
 		}
 		// if only direct registration is allowed, show the form
@@ -94,7 +94,7 @@ func (l *Login) passLoginHintToRegistration(r *http.Request, authReq *domain.Aut
 	if authReq == nil {
 		return data
 	}
-	data.Email = authReq.LoginHint
+	data.Email = domain.EmailAddress(authReq.LoginHint)
 	domainPolicy, err := l.getOrgDomainPolicy(r, authReq.RequestedOrgID)
 	if err != nil {
 		logging.WithFields("authRequest", authReq.ID, "org", authReq.RequestedOrgID).Error("unable to load domain policy for registration loginHint")

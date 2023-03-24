@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
-import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
 import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
@@ -32,12 +32,12 @@ import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
+import ProjectGrantsModule from '../project-grants/project-grants.module';
+import ProjectRolesModule from '../project-roles/project-roles.module';
 import { ApplicationGridComponent } from './application-grid/application-grid.component';
 import { ApplicationsComponent } from './applications/applications.component';
 import { OwnedProjectDetailRoutingModule } from './owned-project-detail-routing.module';
 import { OwnedProjectDetailComponent } from './owned-project-detail.component';
-import ProjectGrantsModule from '../project-grants/project-grants.module';
-import ProjectRolesModule from '../project-roles/project-roles.module';
 
 @NgModule({
   declarations: [OwnedProjectDetailComponent, ApplicationGridComponent, ApplicationsComponent],

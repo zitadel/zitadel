@@ -17,6 +17,7 @@ import (
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
@@ -27,6 +28,7 @@ func TestSession_FetchUser(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		userMapper   func(oidc.UserInfo) idp.User
 		httpMock     func(issuer string)
 		authURL      string
@@ -62,6 +64,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -93,6 +96,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -141,6 +145,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -201,6 +206,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -254,7 +260,7 @@ func TestSession_FetchUser(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.userMapper)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper)
 			require.NoError(t, err)
 
 			session := &Session{
@@ -276,9 +282,9 @@ func TestSession_FetchUser(t *testing.T) {
 				a.Equal(tt.want.displayName, user.GetDisplayName())
 				a.Equal(tt.want.nickName, user.GetNickname())
 				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
-				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(domain.EmailAddress(tt.want.email), user.GetEmail())
 				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
-				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(domain.PhoneNumber(tt.want.phone), user.GetPhone())
 				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
 				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
 				a.Equal(tt.want.avatarURL, user.GetAvatarURL())

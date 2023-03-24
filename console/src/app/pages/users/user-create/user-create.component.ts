@@ -1,8 +1,7 @@
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { parsePhoneNumber, CountryCode } from 'libphonenumber-js';
 import { Subject } from 'rxjs';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
@@ -12,29 +11,19 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../validators';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-
-function passwordConfirmValidator(c: AbstractControl): any {
-  if (!c.parent || !c) {
-    return;
-  }
-  const pwd = c.parent.get('password');
-  const cpwd = c.parent.get('confirmPassword');
-
-  if (!pwd || !cpwd) {
-    return;
-  }
-  if (pwd.value !== cpwd.value) {
-    return {
-      invalid: true,
-      notequal: {
-        valid: false,
-      },
-    };
-  }
-}
+import {
+  containsLowerCaseValidator,
+  containsNumberValidator,
+  containsSymbolValidator,
+  containsUpperCaseValidator,
+  emailValidator,
+  minLengthValidator,
+  passwordConfirmValidator,
+  phoneValidator,
+  requiredValidator,
+} from '../../../modules/form-field/validators/validators';
 
 @Component({
   selector: 'cnsl-user-create',
@@ -44,7 +33,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
 export class UserCreateComponent implements OnInit, OnDestroy {
   public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = ['de', 'en', 'it', 'fr'];
+  public languages: string[] = ['de', 'en', 'fr', 'it', 'ja', 'pl', 'zh'];
   public selected: CountryPhoneCode | undefined;
   public countryPhoneCodes: CountryPhoneCode[] = [];
   public userForm!: UntypedFormGroup;
@@ -114,40 +103,40 @@ export class UserCreateComponent implements OnInit, OnDestroy {
 
   private initForm(): void {
     this.userForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      userName: ['', [Validators.required, Validators.minLength(2)]],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      email: ['', [requiredValidator, emailValidator]],
+      userName: ['', [requiredValidator, minLengthValidator(2)]],
+      firstName: ['', requiredValidator],
+      lastName: ['', requiredValidator],
       nickName: [''],
       gender: [],
       preferredLanguage: [''],
-      phone: [''],
+      phone: ['', phoneValidator],
       isVerified: [false, []],
     });
 
-    const validators: Validators[] = [Validators.required];
+    const validators: Validators[] = [requiredValidator];
 
     this.mgmtService.getPasswordComplexityPolicy().then((data) => {
       if (data.policy) {
         this.policy = data.policy;
 
         if (this.policy.minLength) {
-          validators.push(Validators.minLength(this.policy.minLength));
+          validators.push(minLengthValidator(this.policy.minLength));
         }
         if (this.policy.hasLowercase) {
-          validators.push(lowerCaseValidator);
+          validators.push(containsLowerCaseValidator);
         }
         if (this.policy.hasUppercase) {
-          validators.push(upperCaseValidator);
+          validators.push(containsUpperCaseValidator);
         }
         if (this.policy.hasNumber) {
-          validators.push(numberValidator);
+          validators.push(containsNumberValidator);
         }
         if (this.policy.hasSymbol) {
-          validators.push(symbolValidator);
+          validators.push(containsSymbolValidator);
         }
         const pwdValidators = [...validators] as ValidatorFn[];
-        const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+        const confirmPwdValidators = [requiredValidator, passwordConfirmValidator()] as ValidatorFn[];
 
         this.pwdForm = this.fb.group({
           password: ['', pwdValidators],
@@ -204,14 +193,13 @@ export class UserCreateComponent implements OnInit, OnDestroy {
 
   public setCountryCallingCode(): void {
     let value = (this.phone?.value as string) || '';
-    this.phone?.setValue('+' + this.selected?.countryCallingCode + ' ' + value.replace(/\+[0-9]*\s/, ''));
+    this.countryPhoneCodes.forEach((code) => (value = value.replace(`+${code.countryCallingCode}`, '')));
+    value = value.trim();
+    this.phone?.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
   }
 
   ngOnInit(): void {
-    // Set default selected country for phone numbers
-    const defaultCountryCallingCode = 'CH';
     this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
-    this.selected = this.countryPhoneCodes.find((code) => code.countryCode === defaultCountryCallingCode);
   }
 
   ngOnDestroy(): void {

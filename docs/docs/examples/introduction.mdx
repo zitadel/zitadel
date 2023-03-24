@@ -2,110 +2,198 @@
 title: Overview
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import { Card, CardWrapper } from "../../src/components/card";
+Our examples cover a range of programming languages and frameworks, so no matter what you're into, we've got you covered.
 
-Get started with ZITADEL quickly by reading a quickstart or by cloning a [ZITADEL example](https://github.com/search?q=topic%3Aexamples+org%3Azitadel) repo.
+## Frontend
 
-<Tabs>
-  <TabItem value="app" label="Web · Native applications" default>
-    <CardWrapper>
-      <Card
-        link="/docs/examples/login/angular"
-        imageSource="/docs/img/tech/angular.svg"
-        title="Angular"
-        description="Add the user login to your application and query some data from the userinfo endpoint"
-      />
-      <Card
-        link="/docs/examples/login/react"
-        imageSource="/docs/img/tech/react.png"
-        title="React"
-        description="Logs into your application and queries some data from the userinfo endpoint"
-      />
-      <Card
-        link="/docs/examples/login/flutter"
-        imageSource="/docs/img/tech/flutter.svg"
-        title="Flutter"
-        description="Mobile Application working for iOS and Android that authenticates your user."
-      />
-      <Card
-        link="/docs/examples/login/nextjs"
-        imageSource="/docs/img/tech/nextjs.svg"
-        title="NextJS"
-        description="A simple application to log into your user account and query some data from User endpoint."
-      />
-      <Card
-        link="/docs/examples/login/nextjs-b2b"
-        imageSource="/docs/img/tech/nextjs.svg"
-        title="NextJS B2B Scenario"
-        description="An application to showcase your user account having multiple organizations and the use of Personal Access Tokens."
-      />
-    </CardWrapper>
-  </TabItem>
-  <TabItem value="backend" label="Backend · API">
-    <CardWrapper>
-      <Card
-        link="/docs/examples/call-zitadel-api/go"
-        imageSource="/docs/img/tech/golang.svg"
-        title="GO"
-        description="Demonstrates how to fetch some data from the ZITADEL management API."
-      />
-      <Card
-        link="/docs/examples/call-zitadel-api/dot-net"
-        imageSource="/docs/img/tech/dotnet.svg"
-        title=".NET"
-        description="This integration guide shows you how to integrate ZITADEL into your .NET application. It demonstrates how to fetch some data from the ZITADEL management API."
-      />
-    </CardWrapper>
-  </TabItem>
-  <TabItem value="proxy" label="Proxy">
-    <CardWrapper>
-      <Card
-        link="/docs/examples/identity-proxy/oauth2-proxy"
-        imageSource="/docs/img/tech/oauth2-proxy.svg"
-        title="OAuth 2.0 Proxy"
-        description="Allows services to delegate the authentication flow to a IDP, for example ZITADEL"
-      />
-    </CardWrapper>
-  </TabItem>
-</Tabs>
+### Single Page Application
 
-## Clone a sample project
+<table>
+  <tr>
+    <th></th>
+    <th>Language</th>
+    <th>Example</th>
+    <th>Quickstart</th>
+    <th>SDK</th>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/angular.svg" alt="angular"/>
+    </td>
+    <td>Angular</td>
+    <td><a href="https://github.com/zitadel/zitadel-angular" target="_blank"><i class="lab la-github"></i></a></td>
+    <td><a href="/examples/login/angular">Guide</a></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/react.png" alt="react"/>
+    </td>
+    <td>React</td>
+    <td><a href="https://github.com/zitadel/react-user-authentication" target="_blank"><i class="lab la-github"></i></a></td>
+    <td><a href="/examples/login/react">Guide</a></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/vue.svg" alt="vue"/>
+    </td>
+    <td>React</td>
+    <td><a href="https://github.com/zitadel/zitadel/issues/5223" target="_blank">🚧</a></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
-<CardWrapper>
-  <Card
-    githubLink="https://github.com/zitadel/zitadel-java"
-    title="Java"
-    label="Java"
-  />
-  <Card
-    githubLink="https://github.com/zitadel/zitadel-python3"
-    title="Python"
-    label="Python"
-  />
-  <Card
-    githubLink="https://github.com/zitadel/zitadel-angular"
-    title="Angular"
-    label="Web · Mobile Web"
-  />
-  <Card
-    githubLink="https://github.com/zitadel/zitadel-nextjs"
-    title="NextJS"
-    label="Web · Mobile Web"
-  />
-  <Card
-    githubLink="https://github.com/zitadel/zitadel_flutter"
-    title="Flutter"
-    label="Android · iOS · Web · Mobile Web"
-  />
-</CardWrapper>
+### Native / Mobile App
 
-## Libraries
+<table>
+  <tr>
+    <th></th>
+    <th>Language</th>
+    <th>Example</th>
+    <th>Quickstart</th>
+    <th>SDK</th>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/flutter.svg" alt="flutter"/>
+    </td>
+    <td>Flutter</td>
+    <td><a href="https://github.com/zitadel/zitadel_flutter" target="_blank"><i class="lab la-github"></i></a></td>
+    <td><a href="/examples/login/flutter">Guide</a></td>
+    <td></td>
+  </tr>
+</table>
 
-| Language | Description                                                                                       | Link                                                                               |
-| -------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Go       | Go client library for ZITADEL.                                                                    | [https://github.com/zitadel/zitadel-go](https://github.com/zitadel/zitadel-go)     |
-| .Net     | Authentication / Authorization library written in dotnet for the asp.net web application package. | [https://github.com/zitadel/zitadel-net](https://github.com/zitadel/zitadel-net)   |
-| Dart     | Dart library for ZITADEL, contains gRPC and API access elements.                                  | [https://github.com/zitadel/zitadel-dart](https://github.com/zitadel/zitadel-dart) |
-| Elixir   | API Client for the ZITADEL API.                                                                   | [https://github.com/jshmrtn/zitadel_api](https://github.com/jshmrtn/zitadel_api)   |
+### Regular Web App
+
+<table>
+  <tr>
+    <th></th>
+    <th>Language</th>
+    <th>Example</th>
+    <th>Quickstart</th>
+    <th>SDK</th>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/nextjs.svg" alt="nextjs"/>
+    </td>
+    <td>NextJS</td>
+    <td><a href="https://github.com/zitadel/zitadel-nextjs" target="_blank"><i class="lab la-github"></i></a></td>
+    <td><a href="/examples/login/nextjs">Guide</a></td>
+    <td><a href="./sdks#more">NextAuth Provider</a></td>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/golang.svg" alt="golang"/>
+    </td>
+    <td>Go Web</td>
+    <td></td>
+    <td></td>
+    <td><a href="./sdks">SDK</a></td>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/java.svg" alt="java"/>
+    </td>
+    <td>Java Spring Boot Web</td>
+    <td><a href="https://github.com/zitadel/zitadel-java" target="_blank"><i class="lab la-github"></i></a></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/php.svg" alt="php"/>
+    </td>
+    <td>PHP Web</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/python.svg" alt="python"/>
+    </td>
+    <td>Python3 Flask Web</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/dotnet.svg" alt="dotnet"/>
+    </td>
+    <td>ASP.NET Core MVC Web</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+## Backend
+
+<table>
+  <tr>
+    <th></th>
+    <th>Language</th>
+    <th>Example</th>
+    <th>Quickstart</th>
+    <th>SDK</th>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/golang.svg" alt="golang"/>
+    </td>
+    <td>Golang</td>
+    <td><a href="https://github.com/zitadel/zitadel-go" target="_blank"><i class="lab la-github"></i></a></td>
+    <td><a href="./secure-api/go">Guide</a></td>
+    <td><a href="https://github.com/zitadel/zitadel-go" target="_blank">SDK</a></td>
+  </tr>
+  <tr>
+    <td>
+      <img src="/docs/img/tech/python.svg" alt="phyton"/>
+    </td>
+    <td>Python Flask</td>
+    <td><a href="https://github.com/zitadel/example-api-python3-flask" target="_blank"><i class="lab la-github"></i></a></td>
+    <td><a href="./secure-api/python-flask">Guide</a></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>
+      <img src="/docs/img/tech/dotnet.svg" alt="dotnet"/>
+    </td>
+    <td>ASP.NET Core WebAPI</td>
+    <td></td>
+    <td><a href="./call-zitadel-api/dot-net">Guide</a></td>
+    <td><a href="https://github.com/smartive/zitadel-net">SDK</a></td>
+  </tr>
+  <tr>
+    <td>
+      <img src="/docs/img/tech/nodejs.svg" alt="node"/>
+    </td>
+    <td>NodeJS</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td width="100px">
+      <img src="/docs/img/tech/php.svg" alt="php"/>
+    </td>
+    <td>PHP API</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>
+      <img src="/docs/img/tech/java.svg" alt="java"/>
+    </td>
+    <td>Java Spring Boot API</td>
+    <td><a href="https://github.com/zitadel/zitadel-java" target="_blank"><i class="lab la-github"></i></a></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>

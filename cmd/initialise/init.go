@@ -37,7 +37,7 @@ func New() *cobra.Command {
 		Short: "initialize ZITADEL instance",
 		Long: `Sets up the minimum requirements to start ZITADEL.
 
-Prereqesits:
+Prerequisites:
 - cockroachdb
 
 The user provided by flags needs privileges to
@@ -59,8 +59,8 @@ The user provided by flags needs privileges to
 func InitAll(config *Config) {
 	err := initialise(config.Database,
 		VerifyUser(config.Database.Username(), config.Database.Password()),
-		VerifyDatabase(config.Database.Database()),
-		VerifyGrant(config.Database.Database(), config.Database.Username()),
+		VerifyDatabase(config.Database.DatabaseName()),
+		VerifyGrant(config.Database.DatabaseName(), config.Database.Username()),
 	)
 	logging.OnError(err).Fatal("unable to initialize the database")
 
@@ -82,7 +82,7 @@ func initialise(config database.Config, steps ...func(*sql.DB) error) error {
 	}
 	defer db.Close()
 
-	return Init(db, steps...)
+	return Init(db.DB, steps...)
 }
 
 func Init(db *sql.DB, steps ...func(*sql.DB) error) error {

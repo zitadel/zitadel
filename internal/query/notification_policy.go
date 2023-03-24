@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -88,7 +89,7 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 	if !withOwnerRemoved {
 		eq[NotificationPolicyColOwnerRemoved.identifier()] = false
 	}
-	stmt, scan := prepareNotificationPolicyQuery()
+	stmt, scan := prepareNotificationPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(
 		sq.And{
 			eq,
@@ -116,7 +117,7 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 		}
 	}
 
-	stmt, scan := prepareNotificationPolicyQuery()
+	stmt, scan := prepareNotificationPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		NotificationPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		NotificationPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -131,7 +132,7 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 	return scan(row)
 }
 
-func prepareNotificationPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*NotificationPolicy, error)) {
+func prepareNotificationPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*NotificationPolicy, error)) {
 	return sq.Select(
 			NotificationPolicyColID.identifier(),
 			NotificationPolicyColSequence.identifier(),
@@ -142,7 +143,8 @@ func prepareNotificationPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Notifi
 			NotificationPolicyColIsDefault.identifier(),
 			NotificationPolicyColState.identifier(),
 		).
-			From(notificationPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(notificationPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*NotificationPolicy, error) {
 			policy := new(NotificationPolicy)
 			err := row.Scan(

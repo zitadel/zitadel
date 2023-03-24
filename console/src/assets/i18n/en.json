@@ -42,6 +42,41 @@
       "ADD": "Hold and drag a tile to add"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Your onboarding process",
+    "COMPLETED": "completed",
+    "DISMISS": "No thanks, I'm a pro.",
+    "CARD": {
+      "TITLE": "Get your ZITADEL running",
+      "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Setup your brand",
+        "description": "Define coloring and shape of your login and upload your logo and icons."
+      },
+      "instance.smtp.config.added": {
+        "title": "Setup your SMTP settings",
+        "description": "Set your own mail server settings."
+      },
+      "project.added": {
+        "title": "Create your first project",
+        "description": "Add your first project and define its roles and authorizations."
+      },
+      "project.application.added": {
+        "title": "Create your first application",
+        "description": "Create a web, native, api or saml application and setup your authentication flow."
+      },
+      "user.human.added": {
+        "title": "Add users",
+        "description": "Add your application users"
+      },
+      "user.grant.added": {
+        "title": "Grant users",
+        "description": "Allow users to access your application and setup their role."
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Instance",
     "DASHBOARD": "Home",
@@ -124,6 +159,8 @@
     "NEXT": "Next",
     "MORE": "more",
     "STEP": "Step",
+    "SETUP": "Setup",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -203,11 +240,20 @@
     "NOROWS": "No data"
   },
   "ERRORS": {
-    "REQUIRED": "Some required fields are missing.",
+    "REQUIRED": "Please fill in this field.",
     "TOKENINVALID": {
       "TITLE": "Your authorization token has expired.",
       "DESCRIPTION": "Click the button below to log in again."
-    }
+    },
+    "INVALID_FORMAT": "The formatting is invalid.",
+    "NOTANEMAIL": "The given value is not an e-mail address.",
+    "MINLENGTH": "Must be at least {{requiredLength}} characters long.",
+    "UPPERCASEMISSING": "Must include an uppercase character.",
+    "LOWERCASEMISSING": "Must include a lowercase character.",
+    "SYMBOLERROR": "Must include a symbol or punctuation mark.",
+    "NUMBERERROR": "Must include a digit.",
+    "PWNOTEQUAL": "The passwords provided do not match.",
+    "PHONE": "The phone number must start with 00 or +."
   },
   "USER": {
     "SETTINGS": {
@@ -452,6 +498,11 @@
       "CHOOSEEXPIRY": "Select an expiration date",
       "CREATIONDATE": "Creation Date",
       "KEYDETAILS": "Key Details",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Add Key",
         "DESCRIPTION": "Select your key type and choose an optional expiration date."
@@ -483,8 +534,7 @@
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Send Password Reset Link",
       "REQUIRED": "Some required fields are missing.",
-      "MINLENGTHERROR": "Has to be at least {{value}} characters long.",
-      "NOTEQUAL": "The passwords provided do not match."
+      "MINLENGTHERROR": "Has to be at least {{value}} characters long."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -494,7 +544,7 @@
     "EMAILVERIFIED": "Email verified",
     "NOTVERIFIED": "not verified",
     "PREFERRED_LOGINNAME": "Preferred Loginname",
-    "ISINITIAL": "This users email is not verified yet.",
+    "ISINITIAL": "User is not active, yet.",
     "LOGINMETHODS": {
       "TITLE": "Contact Information",
       "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -538,17 +588,6 @@
         "3": "filter for rolename"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "The password does not fulfil the defined rules.",
-      "NOTANEMAIL": "The given value is not an e-mail address",
-      "REQUIRED": "The input field is empty.",
-      "MINLENGTH": "The password has to be at least {{requiredLength}} characters long.",
-      "NOEMAIL": "The user name cannot be an e-mail address.",
-      "UPPERCASEMISSING": "Must include an uppercase character.",
-      "LOWERCASEMISSING": "Must include a lowercase character.",
-      "SYMBOLERROR": "Must include a symbol or punctuation mark.",
-      "NUMBERERROR": "Must include a digit."
-    },
     "STATE": {
       "0": "Unknown",
       "1": "Active",
@@ -571,7 +610,7 @@
     "SIGNEDOUT_BTN": "Sign In",
     "EDITACCOUNT": "Edit Account",
     "ADDACCOUNT": "Log in With Another Account",
-    "RESENDINITIALEMAIL": "Send new initialization mail",
+    "RESENDINITIALEMAIL": "Resend activation mail",
     "RESENDEMAILNOTIFICATION": "Resend Email notification",
     "TOAST": {
       "CREATED": "User created successfully.",
@@ -843,6 +882,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
       "ORGDETAILUSER_TITLE": "Configure Organization Owner",
       "DELETE": "Delete organization",
+      "DEFAULTLABEL": "Default",
+      "SETASDEFAULT": "Set as default organization",
+      "DEFAULTORGSET": "Default organization changed successfully",
       "RENAME": {
         "ACTION": "Rename",
         "TITLE": "Rename Organization",
@@ -970,9 +1012,11 @@
     "DEFAULTLANGUAGE": "Default Language",
     "LANGUAGE": {
       "de": "Deutsch",
-      "it": "Italiano",
       "en": "English",
       "fr": "Français",
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
       "zh": "简体中文"
     },
     "SMTP": {
@@ -1162,8 +1206,10 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
         "zh": "简体中文"
       },
       "KEYS": {
@@ -1569,45 +1615,91 @@
       "ACTIVETITLE": "Active Identity Providers"
     },
     "CREATE": {
-      "TITLE": "New Identity Provider",
-      "DESCRIPTION": "Choose one of the following Identity Provider types."
+      "TITLE": "Add provider",
+      "DESCRIPTION": "Select one ore more of the following providers.",
+      "STEPPERTITLE": "Create Provider",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Enter the required data for your OIDC provider."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Enter the required data for your OAuth provider."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Enter the required data for your JWT provider."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Enter the credentials for your Gitlab Identity Provider"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Enter the credentials for your Gitlab Self Hosted Identity Provider"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Enter the credentials for your GitHub Enterprise Server Identity Provider"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Enter the credentials for your Github Identity Provider"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Enter the credentials for your Microsoft Identity Provider"
+      }
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "General Configuration of your identity provider.",
+      "DESCRIPTION": "Update your provider configuration",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatic creation",
+      "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
+      "ISAUTOUPDATE": "Automatic update",
+      "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
+      "ISCREATIONALLOWED": "Account creation allowed",
+      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
+      "ISLINKINGALLOWED": "Account linking allowed",
+      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
     },
     "OWNERTYPES": {
       "0": "unknown",
       "1": "Instance",
       "2": "Organization"
     },
-    "TYPES": {
-      "0": "unknown",
-      "1": "OIDC",
-      "3": "JWT"
-    },
     "STATES": {
       "1": "active",
       "2": "inactive"
     },
-    "MAPPINGFIELD": {
-      "1": "Preferred Username",
-      "2": "Email"
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
     },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "No Styling",
-      "1": "Google"
-    },
+    "AZUREADTENANTTYPE": "Tenant Type",
+    "AZUREADTENANTID": "Tenant ID",
+    "EMAILVERIFIED": "Email verified",
+    "NAMEHINT": "If specified it will be shown in the login interface.",
+    "OPTIONAL": "optional",
+    "UPDATECLIENTSECRET": "update client secret",
     "ADD": "Add Identity Provider",
-    "AUTOREGISTER": "Auto Register",
-    "AUTOREGISTER_DESC": "If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
     "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Name",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "ID Attribute",
     "AVAILABILITY": "Availability",
     "AVAILABLE": "available",
     "AVAILABLEBUTINACTIVE": "available but inactive",
@@ -1707,7 +1799,7 @@
   "APP": {
     "LIST": "Applications",
     "COMPLIANCE": "OIDC Compliance",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "Configuration",
     "TOKEN": "Token Settings",
     "PAGES": {
@@ -1715,12 +1807,14 @@
       "ID": "ID",
       "DESCRIPTION": "Here you can edit your application data and it's configuration.",
       "CREATE": "Create application",
+      "CREATE_SELECT_PROJECT": "Select your project first",
+      "CREATE_NEW_PROJECT": "or create a new one <a href='{{url}}' title='Create project'>here</a>.",
       "CREATE_DESC_TITLE": "Enter Your Application Details Step by Step",
       "CREATE_DESC_SUB": "A recommended configuration will be automatically generated.",
       "STATE": "Status",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "Delete App",
       "DETAIL": {
         "TITLE": "Detail",
@@ -1936,8 +2030,10 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
     "zh": "简体中文"
   },
   "MEMBER": {

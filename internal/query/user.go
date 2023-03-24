@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -46,9 +47,9 @@ type Human struct {
 	AvatarKey         string
 	PreferredLanguage language.Tag
 	Gender            domain.Gender
-	Email             string
+	Email             domain.EmailAddress
 	IsEmailVerified   bool
-	Phone             string
+	Phone             domain.PhoneNumber
 	IsPhoneVerified   bool
 }
 
@@ -73,7 +74,7 @@ type Email struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	Sequence      uint64
-	Email         string
+	Email         domain.EmailAddress
 	IsVerified    bool
 }
 
@@ -88,9 +89,10 @@ type Phone struct {
 }
 
 type Machine struct {
-	Name        string
-	Description string
-	HasSecret   bool
+	Name            string
+	Description     string
+	HasSecret       bool
+	AccessTokenType domain.OIDCTokenType
 }
 
 type NotifyUser struct {
@@ -282,6 +284,10 @@ var (
 		name:  projection.MachineHasSecretCol,
 		table: machineTable,
 	}
+	MachineAccessTokenTypeCol = Column{
+		name:  projection.MachineAccessTokenTypeCol,
+		table: machineTable,
+	}
 )
 
 var (
@@ -336,7 +342,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		projection.LoginNameProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareUserQuery()
+	query, scan := prepareUserQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -365,7 +371,7 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 		projection.LoginNameProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareUserQuery()
+	query, scan := prepareUserQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -388,7 +394,7 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerR
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProfileQuery()
+	query, scan := prepareProfileQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -412,7 +418,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareEmailQuery()
+	query, scan := prepareEmailQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -436,7 +442,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := preparePhoneQuery()
+	query, scan := preparePhoneQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -465,7 +471,7 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 		projection.LoginNameProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareNotifyUserQuery()
+	query, scan := prepareNotifyUserQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -494,7 +500,7 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 		projection.LoginNameProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareNotifyUserQuery()
+	query, scan := prepareNotifyUserQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -517,7 +523,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, w
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUsersQuery()
+	query, scan := prepareUsersQuery(ctx, q.client)
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		addUserWithoutOwnerRemoved(eq)
@@ -544,7 +550,7 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserUniqueQuery()
+	query, scan := prepareUserUniqueQuery(ctx, q.client)
 	queries := make([]SearchQuery, 0, 3)
 	if username != "" {
 		usernameQuery, err := NewUserUsernameSearchQuery(username, TextEquals)
@@ -717,7 +723,7 @@ func preparePreferredLoginNamesQuery() (string, []interface{}, error) {
 		).ToSql()
 }
 
-func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -753,6 +759,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
 			MachineHasSecretCol.identifier(),
+			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier(),
 		).
 			From(userTable.identifier()).
@@ -764,7 +771,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
 				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*User, error) {
@@ -789,6 +796,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			name := sql.NullString{}
 			description := sql.NullString{}
 			hasSecret := sql.NullBool{}
+			accessTokenType := sql.NullInt32{}
 
 			err := row.Scan(
 				&u.ID,
@@ -817,6 +825,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				&name,
 				&description,
 				&hasSecret,
+				&accessTokenType,
 				&count,
 			)
 
@@ -838,23 +847,24 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 					AvatarKey:         avatarKey.String,
 					PreferredLanguage: language.Make(preferredLanguage.String),
 					Gender:            domain.Gender(gender.Int32),
-					Email:             email.String,
+					Email:             domain.EmailAddress(email.String),
 					IsEmailVerified:   isEmailVerified.Bool,
-					Phone:             phone.String,
+					Phone:             domain.PhoneNumber(phone.String),
 					IsPhoneVerified:   isPhoneVerified.Bool,
 				}
 			} else if machineID.Valid {
 				u.Machine = &Machine{
-					Name:        name.String,
-					Description: description.String,
-					HasSecret:   hasSecret.Bool,
+					Name:            name.String,
+					Description:     description.String,
+					HasSecret:       hasSecret.Bool,
+					AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 				}
 			}
 			return u, nil
 		}
 }
 
-func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) {
+func prepareProfileQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -870,7 +880,7 @@ func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) 
 			HumanGenderCol.identifier(),
 			HumanAvatarURLCol.identifier()).
 			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Profile, error) {
 			p := new(Profile)
@@ -920,7 +930,7 @@ func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) 
 		}
 }
 
-func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
+func prepareEmailQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -931,7 +941,7 @@ func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier()).
 			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Email, error) {
 			e := new(Email)
@@ -960,14 +970,14 @@ func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
 				return nil, errors.ThrowPreconditionFailed(nil, "QUERY-pt7HY", "Errors.User.NotHuman")
 			}
 
-			e.Email = email.String
+			e.Email = domain.EmailAddress(email.String)
 			e.IsVerified = isEmailVerified.Bool
 
 			return e, nil
 		}
 }
 
-func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
+func preparePhoneQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -978,7 +988,7 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier()).
 			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Phone, error) {
 			e := new(Phone)
@@ -1014,7 +1024,7 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 		}
 }
 
-func prepareNotifyUserQuery() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
+func prepareNotifyUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
 	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -1059,7 +1069,7 @@ func prepareNotifyUserQuery() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, er
 				loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
 				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*NotifyUser, error) {
@@ -1146,7 +1156,7 @@ func prepareNotifyUserQuery() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, er
 		}
 }
 
-func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
+func prepareUserUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserStateCol.identifier(),
@@ -1155,7 +1165,7 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier()).
 			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (bool, error) {
 			userID := sql.NullString{}
@@ -1183,7 +1193,7 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -1219,6 +1229,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
 			MachineHasSecretCol.identifier(),
+			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier()).
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
@@ -1229,7 +1240,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
 				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Users, error) {
@@ -1257,6 +1268,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				name := sql.NullString{}
 				description := sql.NullString{}
 				hasSecret := sql.NullBool{}
+				accessTokenType := sql.NullInt32{}
 
 				err := rows.Scan(
 					&u.ID,
@@ -1285,6 +1297,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&name,
 					&description,
 					&hasSecret,
+					&accessTokenType,
 					&count,
 				)
 				if err != nil {
@@ -1305,16 +1318,17 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 						AvatarKey:         avatarKey.String,
 						PreferredLanguage: language.Make(preferredLanguage.String),
 						Gender:            domain.Gender(gender.Int32),
-						Email:             email.String,
+						Email:             domain.EmailAddress(email.String),
 						IsEmailVerified:   isEmailVerified.Bool,
-						Phone:             phone.String,
+						Phone:             domain.PhoneNumber(phone.String),
 						IsPhoneVerified:   isPhoneVerified.Bool,
 					}
 				} else if machineID.Valid {
 					u.Machine = &Machine{
-						Name:        name.String,
-						Description: description.String,
-						HasSecret:   hasSecret.Bool,
+						Name:            name.String,
+						Description:     description.String,
+						HasSecret:       hasSecret.Bool,
+						AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 					}
 				}
 

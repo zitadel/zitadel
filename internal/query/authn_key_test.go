@@ -12,6 +12,80 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
+var (
+	prepareAuthNKeysStmt = `SELECT projections.authn_keys2.id,` +
+		` projections.authn_keys2.creation_date,` +
+		` projections.authn_keys2.change_date,` +
+		` projections.authn_keys2.resource_owner,` +
+		` projections.authn_keys2.sequence,` +
+		` projections.authn_keys2.expiration,` +
+		` projections.authn_keys2.type,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.authn_keys2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareAuthNKeysCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"sequence",
+		"expiration",
+		"type",
+		"count",
+	}
+
+	prepareAuthNKeysDataStmt = `SELECT projections.authn_keys2.id,` +
+		` projections.authn_keys2.creation_date,` +
+		` projections.authn_keys2.change_date,` +
+		` projections.authn_keys2.resource_owner,` +
+		` projections.authn_keys2.sequence,` +
+		` projections.authn_keys2.expiration,` +
+		` projections.authn_keys2.type,` +
+		` projections.authn_keys2.identifier,` +
+		` projections.authn_keys2.public_key,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.authn_keys2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareAuthNKeysDataCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"sequence",
+		"expiration",
+		"type",
+		"identifier",
+		"public_key",
+		"count",
+	}
+
+	prepareAuthNKeyStmt = `SELECT projections.authn_keys2.id,` +
+		` projections.authn_keys2.creation_date,` +
+		` projections.authn_keys2.change_date,` +
+		` projections.authn_keys2.resource_owner,` +
+		` projections.authn_keys2.sequence,` +
+		` projections.authn_keys2.expiration,` +
+		` projections.authn_keys2.type` +
+		` FROM projections.authn_keys2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareAuthNKeyCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"sequence",
+		"expiration",
+		"type",
+	}
+
+	prepareAuthNKeyPublicKeyStmt = `SELECT projections.authn_keys2.public_key` +
+		` FROM projections.authn_keys2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareAuthNKeyPublicKeyCols = []string{
+		"public_key",
+	}
+)
+
 func Test_AuthNKeyPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -28,15 +102,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.authn_keys2`),
+					regexp.QuoteMeta(prepareAuthNKeysStmt),
 					nil,
 					nil,
 				),
@@ -48,25 +114,8 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.authn_keys2`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"expiration",
-						"type",
-						"count",
-					},
+					regexp.QuoteMeta(prepareAuthNKeysStmt),
+					prepareAuthNKeysCols,
 					[][]driver.Value{
 						{
 							"id",
@@ -102,25 +151,8 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.authn_keys2`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"expiration",
-						"type",
-						"count",
-					},
+					regexp.QuoteMeta(prepareAuthNKeysStmt),
+					prepareAuthNKeysCols,
 					[][]driver.Value{
 						{
 							"id-1",
@@ -174,15 +206,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeysQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.authn_keys2`),
+					regexp.QuoteMeta(prepareAuthNKeysStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -199,17 +223,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeysDataQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type,`+
-						` projections.authn_keys2.identifier,`+
-						` projections.authn_keys2.public_key,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.authn_keys2`),
+					regexp.QuoteMeta(prepareAuthNKeysDataStmt),
 					nil,
 					nil,
 				),
@@ -221,29 +235,8 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeysDataQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type,`+
-						` projections.authn_keys2.identifier,`+
-						` projections.authn_keys2.public_key,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.authn_keys2`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"expiration",
-						"type",
-						"identifier",
-						"public_key",
-						"count",
-					},
+					regexp.QuoteMeta(prepareAuthNKeysDataStmt),
+					prepareAuthNKeysDataCols,
 					[][]driver.Value{
 						{
 							"id",
@@ -283,29 +276,8 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeysDataQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type,`+
-						` projections.authn_keys2.identifier,`+
-						` projections.authn_keys2.public_key,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.authn_keys2`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"expiration",
-						"type",
-						"identifier",
-						"public_key",
-						"count",
-					},
+					regexp.QuoteMeta(prepareAuthNKeysDataStmt),
+					prepareAuthNKeysDataCols,
 					[][]driver.Value{
 						{
 							"id-1",
@@ -367,17 +339,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeysDataQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type,`+
-						` projections.authn_keys2.identifier,`+
-						` projections.authn_keys2.public_key,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.authn_keys2`),
+					regexp.QuoteMeta(prepareAuthNKeysDataStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -394,14 +356,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type`+
-						` FROM projections.authn_keys2`),
+					regexp.QuoteMeta(prepareAuthNKeyStmt),
 					nil,
 					nil,
 				),
@@ -419,23 +374,8 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type`+
-						` FROM projections.authn_keys2`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"expiration",
-						"type",
-					},
+					regexp.QuoteMeta(prepareAuthNKeyStmt),
+					prepareAuthNKeyCols,
 					[]driver.Value{
 						"id",
 						testNow,
@@ -462,14 +402,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.id,`+
-						` projections.authn_keys2.creation_date,`+
-						` projections.authn_keys2.change_date,`+
-						` projections.authn_keys2.resource_owner,`+
-						` projections.authn_keys2.sequence,`+
-						` projections.authn_keys2.expiration,`+
-						` projections.authn_keys2.type`+
-						` FROM projections.authn_keys2`),
+					regexp.QuoteMeta(prepareAuthNKeyStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -486,8 +419,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeyPublicKeyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.public_key`+
-						` FROM projections.authn_keys2`),
+					regexp.QuoteMeta(prepareAuthNKeyPublicKeyStmt),
 					nil,
 					nil,
 				),
@@ -505,11 +437,8 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeyPublicKeyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.public_key`+
-						` FROM projections.authn_keys2`),
-					[]string{
-						"public_key",
-					},
+					regexp.QuoteMeta(prepareAuthNKeyPublicKeyStmt),
+					prepareAuthNKeyPublicKeyCols,
 					[]driver.Value{
 						[]byte("publicKey"),
 					},
@@ -522,8 +451,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 			prepare: prepareAuthNKeyPublicKeyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.authn_keys2.public_key`+
-						` FROM projections.authn_keys2`),
+					regexp.QuoteMeta(prepareAuthNKeyPublicKeyStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -538,7 +466,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

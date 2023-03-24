@@ -1,8 +1,6 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { MatLegacyOptionSelectionChange } from '@angular/material/legacy-core';
-import { MatLegacySelectChange } from '@angular/material/legacy-select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { take } from 'rxjs';

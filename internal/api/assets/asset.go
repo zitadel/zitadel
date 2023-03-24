@@ -82,7 +82,7 @@ func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, code
 	http.Error(w, err.Error(), code)
 }
 
-func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, instanceInterceptor, assetCacheInterceptor func(handler http.Handler) http.Handler) http.Handler {
+func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler,
@@ -94,7 +94,7 @@ func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authC
 
 	verifier.RegisterServer("Assets-API", "assets", AssetsService_AuthMethods)
 	router := mux.NewRouter()
-	router.Use(instanceInterceptor, assetCacheInterceptor)
+	router.Use(callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
 	return http_util.CopyHeadersToContext(http_mw.CORSInterceptor(router))

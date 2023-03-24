@@ -211,6 +211,8 @@ RegistrationUser:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -241,6 +243,8 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Japanese: 日本語
+  Polish: Polski
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -299,6 +303,8 @@ ExternalNotFound:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Powered By
@@ -317,6 +323,7 @@ Errors:
     MissingParameters: Required parameters missing
   User:
     NotFound: User could not be found
+    AlreadyExists: User already exists
     Inactive: User is inactive
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
@@ -325,6 +332,33 @@ Errors:
     Invalid: Invalid userdata
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
     NotAllowedToLink: User is not allowed to link with external login provider
+    Profile:
+      NotFound: Profile not found
+      NotChanged: Profile not changed
+      Empty: Profile is empty
+      FirstNameEmpty: First name in profile is empty
+      LastNameEmpty: Last name in profile is empty
+      IDMissing: Profile ID is missing
+    Email:
+      NotFound: Email not found
+      Invalid: Email is invalid
+      AlreadyVerified: Email is already verified
+      NotChanged: Email not changed
+      Empty: Email is empty
+      IDMissing: Email ID is missing
+    Phone:
+      NotFound: Phone not found
+      Invalid: Phone is invalid
+      AlreadyVerified: Phone already verified
+      Empty: Phone is empty
+      NotChanged: Phone not changed
+    Address:
+      NotFound: Address not found
+      NotChanged: Address not changed
+    Username:
+      AlreadyExists:  Username already taken
+      Reserved: Username is already taken
+      Empty: Username is empty
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
@@ -367,6 +401,8 @@ Errors:
       ExternalUserIDEmpty: External User ID is empty
       UserDisplayNameEmpty: User Display Name is empty
       NoExternalUserData: No external User Data received
+      CreationNotAllowed: Creation of a new user is not allowed on this Provider
+      LinkingNotAllowed: Linking of a user is not allowed on this Provider
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
     ProjectRequired: Login not possible. The organisation of the user must be granted to the project. Please contact your administrator.
   IdentityProvider:
@@ -374,5 +410,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy not existing
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registration is not allowed
 
 optional: (optional)

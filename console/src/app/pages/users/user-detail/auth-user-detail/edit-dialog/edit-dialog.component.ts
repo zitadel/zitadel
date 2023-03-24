@@ -1,10 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { UntypedFormControl, Validators } from '@angular/forms';
+import { FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import {
-  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
   MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
-import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 
@@ -14,15 +14,16 @@ export enum EditDialogType {
 }
 
 @Component({
-  selector: 'cnsl-edit-email-dialog',
+  selector: 'cnsl-edit-dialog',
   templateUrl: './edit-dialog.component.html',
   styleUrls: ['./edit-dialog.component.scss'],
 })
 export class EditDialogComponent implements OnInit {
+  public controlKey = 'editingField';
   public isPhone: boolean = false;
   public isVerified: boolean = false;
   public phoneCountry: string = 'CH';
-  public valueControl: UntypedFormControl = new UntypedFormControl(['', [Validators.required]]);
+  public dialogForm!: UntypedFormGroup;
   public EditDialogType: any = EditDialogType;
   public selected: CountryPhoneCode | undefined;
   public countryPhoneCodes: CountryPhoneCode[] = [];
@@ -31,24 +32,28 @@ export class EditDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private countryCallingCodesService: CountryCallingCodesService,
   ) {
-    this.valueControl.setValue(data.value);
     if (data.type === EditDialogType.PHONE) {
       this.isPhone = true;
     }
+    this.dialogForm = new FormGroup({
+      [this.controlKey]: new UntypedFormControl(data.value, data.validator || requiredValidator),
+    });
   }
 
   public setCountryCallingCode(): void {
-    let value = (this.valueControl?.value as string) || '';
-    this.valueControl?.setValue('+' + this.selected?.countryCallingCode + ' ' + value.replace(/\+[0-9]*\s/, ''));
+    let value = (this.dialogForm.controls[this.controlKey]?.value as string) || '';
+    this.countryPhoneCodes.forEach((code) => (value = value.replace(`+${code.countryCallingCode}`, '')));
+    value = value.trim();
+    this.dialogForm.controls[this.controlKey]?.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
   }
 
   ngOnInit(): void {
     if (this.isPhone) {
       // Get country phone codes and set selected flag to guessed country or default country
       this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
-      const phoneNumber = formatPhone(this.valueControl?.value);
+      const phoneNumber = formatPhone(this.dialogForm.controls[this.controlKey]?.value);
       this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
-      this.valueControl.setValue(phoneNumber.phone);
+      this.dialogForm.controls[this.controlKey].setValue(phoneNumber.phone);
     }
   }
 
@@ -57,6 +62,10 @@ export class EditDialogComponent implements OnInit {
   }
 
   closeDialogWithValue(): void {
-    this.dialogRef.close({ value: this.valueControl.value, isVerified: this.isVerified });
+    this.dialogRef.close({ value: this.dialogForm.controls[this.controlKey].value, isVerified: this.isVerified });
+  }
+
+  public get ctrl() {
+    return this.dialogForm.get(this.controlKey);
   }
 }

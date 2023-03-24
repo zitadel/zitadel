@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { CountryCode, getCountries, getCountryCallingCode } from 'libphonenumber-js';
 import * as i18nIsoCountries from 'i18n-iso-countries';
+import { CountryCode, getCountries, getCountryCallingCode } from 'libphonenumber-js';
 
 export interface CountryPhoneCode {
   countryCode: string;

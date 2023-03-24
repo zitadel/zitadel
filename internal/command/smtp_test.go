@@ -24,7 +24,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 	}
 	type args struct {
 		ctx  context.Context
-		smtp *smtp.EmailConfig
+		smtp *smtp.Config
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -55,7 +55,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -105,7 +105,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -167,7 +167,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -191,7 +191,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -213,7 +213,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -275,7 +275,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -319,7 +319,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 	}
 	type args struct {
 		ctx  context.Context
-		smtp *smtp.EmailConfig
+		smtp *smtp.Config
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -340,7 +340,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx:  authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{},
+				smtp: &smtp.Config{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -356,7 +356,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -406,7 +406,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@wrongdomain.ch",
 					FromName: "name",
@@ -456,7 +456,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -521,7 +521,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      false,
 					From:     "from2@domain.ch",
 					FromName: "name2",
@@ -544,7 +544,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -566,7 +566,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      true,
 					From:     "from@domain.ch",
 					FromName: "name",
@@ -632,7 +632,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				smtp: &smtp.EmailConfig{
+				smtp: &smtp.Config{
 					Tls:      false,
 					From:     "from2@domain.ch",
 					FromName: "name2",

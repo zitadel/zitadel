@@ -70,16 +70,23 @@ Errors:
     Profile:
       NotFound: Profil non trouvé
       NotChanged: Le profil n'a pas changé
-      Invalid: Données de profil non valides
+      Empty: Profil est vide
+      FirstNameEmpty: Le prénom dans le profil est vide
+      LastNameEmpty: Le nom de famille dans le profil est vide
+      IDMissing: Profil ID manquant
     Email:
       NotFound: Email non trouvé
       Invalid: L'email n'est pas valide
       AlreadyVerified: L'adresse électronique est déjà vérifiée
       NotChanged: L'adresse électronique n'a pas changé
+      Empty: Email est vide
+      IDMissing: Email ID manquant
     Phone:
       Notfound: Téléphone non trouvé
       Invalid: Le téléphone n'est pas valide
       AlreadyVerified: Téléphone déjà vérifié
+      Empty: Téléphone est vide
+      NotChanged: Téléphone n'a pas changé
     Address:
       NotFound: Adresse non trouvée
       NotChanged: L'adresse n'a pas changé
@@ -100,6 +107,7 @@ Errors:
     Username:
       AlreadyExists: Nom d'utilisateur déjà pris
       Reserved: Le nom d'utilisateur est déjà pris
+      Empty: Le nom d'utilisateur est vide
     Code:
       Empty: Le code est vide
       NotFound: Code non trouvé
@@ -233,6 +241,9 @@ Errors:
       NotFound: La politique notification n'a pas été trouvée
       NotChanged: La politique notification n'a pas été modifiée
       AlreadyExists: La politique notification existe déjà
+    LabelPolicy:
+      NotFound: La politique d'étiquetage privé n'a pas été trouvée
+      NotChanged: La politique en matière de marques privées n'a pas été modifiée
   Project:
     ProjectIDMissing: Id de projet manquant
     AlreadyExists: Le projet existe déjà dans l'organisation
@@ -437,6 +448,27 @@ Errors:
     CloseRows: L'instruction SQL n'a pas pu être terminée
     SQLStatement: L'instruction SQL n'a pas pu être créée
     InvalidRequest: La requête n'est pas valide
+  Quota:
+    AlreadyExists: Contingent existe déjà pour cette unité
+    NotFound: Contingent non trouvé pour cette unité
+    Invalid:
+      CallURL: L'URL d'appel du contingent n'est pas valide
+      Percent: Pourcent du contingent est inférieure à 1
+      Unimplemented: Les contingents ne sont pas implémentés pour cette unité
+      Amount: Quantité contingentée est inférieure à 1
+      ResetInterval: L'intervalle de réinitialisation entre les contingents est inférieur à une minute
+      Noop: Un contingent illimité sans notifications n'a aucun effet
+    Access:
+      Exhausted: Le quota de requêtes authentifiées est épuisé
+    Execution:
+      Exhausted: Le quota de secondes d'action est épuisé
+  LogStore:
+    Access:
+      StorageFailed: L'enregistrement du journal d'accès dans la base de données a échoué
+      ScanFailed: L'interrogation des requêtes authentifiées consommées a échoué
+    Execution:
+      StorageFailed: L'enregistrement du journal d'action dans la base de données a échoué
+      ScanFailed: L'interrogation des secondes d'action consommées a échoué
 
 AggregateTypes:
   action: Action
@@ -446,6 +478,7 @@ AggregateTypes:
   project: Projet
   user: Utilisateur
   usergrant: Subvention de l'utilisateur
+  quota: Contingent
 
 EventTypes:
   user:

@@ -2,6 +2,8 @@ package admin
 
 import (
 	"context"
+	"time"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/admin/repository"
@@ -24,13 +26,14 @@ var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
 	admin.UnimplementedAdminServiceServer
-	database        string
-	command         *command.Commands
-	query           *query.Queries
-	administrator   repository.AdministratorRepository
-	assetsAPIDomain func(context.Context) string
-	userCodeAlg     crypto.EncryptionAlgorithm
-	passwordHashAlg crypto.HashAlgorithm
+	database          string
+	command           *command.Commands
+	query             *query.Queries
+	administrator     repository.AdministratorRepository
+	assetsAPIDomain   func(context.Context) string
+	userCodeAlg       crypto.EncryptionAlgorithm
+	passwordHashAlg   crypto.HashAlgorithm
+	auditLogRetention time.Duration
 }
 
 type Config struct {
@@ -45,15 +48,17 @@ func CreateServer(
 	repo repository.Repository,
 	externalSecure bool,
 	userCodeAlg crypto.EncryptionAlgorithm,
+	auditLogRetention time.Duration,
 ) *Server {
 	return &Server{
-		database:        database,
-		command:         command,
-		query:           query,
-		administrator:   repo,
-		assetsAPIDomain: assets.AssetAPI(externalSecure),
-		userCodeAlg:     userCodeAlg,
-		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
+		database:          database,
+		command:           command,
+		query:             query,
+		administrator:     repo,
+		assetsAPIDomain:   assets.AssetAPI(externalSecure),
+		userCodeAlg:       userCodeAlg,
+		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
+		auditLogRetention: auditLogRetention,
 	}
 }
 

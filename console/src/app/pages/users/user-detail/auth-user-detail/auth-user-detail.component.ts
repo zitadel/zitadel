@@ -1,27 +1,29 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
+import { Validators } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Buffer } from 'buffer';
 import { Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
+import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
+import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { Buffer } from 'buffer';
-import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
-import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
-import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { formatPhone } from 'src/app/utils/formatPhone';
+import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -31,7 +33,7 @@ import { formatPhone } from 'src/app/utils/formatPhone';
 export class AuthUserDetailComponent implements OnDestroy {
   public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'fr', 'it', 'zh'];
+  public languages: string[] = ['de', 'en', 'fr', 'it', 'ja', 'pl', 'zh'];
 
   private subscription: Subscription = new Subscription();
 
@@ -42,7 +44,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   public userLoginMustBeDomain: boolean = false;
   public UserState: any = UserState;
 
-  public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
+  public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.AUTHUSER;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
   public metadata: Metadata.AsObject[] = [];
@@ -304,6 +306,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user?.human?.phone?.phone,
             type: type,
+            validator: Validators.compose([phoneValidator, requiredValidator]),
           },
           width: '400px',
         });

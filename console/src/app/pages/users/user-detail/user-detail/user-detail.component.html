@@ -1,7 +1,7 @@
 <cnsl-top-view
   *ngIf="user"
   title="{{ user.human ? user.human.profile?.displayName : user.machine?.name }}"
-  docLink="https://zitadel.com/docs/guides/manage/console/projects"
+  docLink="https://zitadel.com/docs/guides/manage/console/users"
   sub="{{ user.preferredLoginName }}"
   [isActive]="user.state === UserState.USER_STATE_ACTIVE"
   [isInactive]="user.state === UserState.USER_STATE_INACTIVE"
@@ -113,7 +113,11 @@
                 [canWrite]="['user.write:' + user.id, 'user.write$'] | hasRole | async"
                 *ngIf="user?.human"
                 [human]="user.human"
-                (editType)="user.state !== UserState.USER_STATE_INITIAL ? openEditDialog($event) : resendInitEmail()"
+                (editType)="
+                  user.state === UserState.USER_STATE_INITIAL && $event === EditDialogType.EMAIL
+                    ? resendInitEmail()
+                    : openEditDialog($event)
+                "
                 (deletedPhone)="deletePhone()"
                 (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()"

@@ -13,6 +13,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
@@ -93,9 +94,7 @@ func TestProvider_FetchUser(t *testing.T) {
 						Reply(http.StatusInternalServerError)
 				},
 				userMapper: func() idp.User {
-					return &UserMapper{
-						ID: "userID",
-					}
+					return NewUserMapper("userID")
 				},
 				authURL: "https://oauth2.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
 				tokens: &oidc.Tokens{
@@ -135,7 +134,7 @@ func TestProvider_FetchUser(t *testing.T) {
 						})
 				},
 				userMapper: func() idp.User {
-					return &UserMapper{}
+					return NewUserMapper("userID")
 				},
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
 				tokens: &oidc.Tokens{
@@ -147,12 +146,13 @@ func TestProvider_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &UserMapper{
-					info: map[string]interface{}{
+					idAttribute: "userID",
+					RawInfo: map[string]interface{}{
 						"userID": "id",
 						"custom": "claim",
 					},
 				},
-				id:                "",
+				id:                "id",
 				firstName:         "",
 				lastName:          "",
 				displayName:       "",
@@ -202,7 +202,7 @@ func TestProvider_FetchUser(t *testing.T) {
 						})
 				},
 				userMapper: func() idp.User {
-					return &UserMapper{}
+					return NewUserMapper("userID")
 				},
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
 				tokens:  nil,
@@ -210,12 +210,13 @@ func TestProvider_FetchUser(t *testing.T) {
 			},
 			want: want{
 				user: &UserMapper{
-					info: map[string]interface{}{
+					idAttribute: "userID",
+					RawInfo: map[string]interface{}{
 						"userID": "id",
 						"custom": "claim",
 					},
 				},
-				id:                "",
+				id:                "id",
 				firstName:         "",
 				lastName:          "",
 				displayName:       "",
@@ -260,9 +261,9 @@ func TestProvider_FetchUser(t *testing.T) {
 				a.Equal(tt.want.displayName, user.GetDisplayName())
 				a.Equal(tt.want.nickName, user.GetNickname())
 				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
-				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(domain.EmailAddress(tt.want.email), user.GetEmail())
 				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
-				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(domain.PhoneNumber(tt.want.phone), user.GetPhone())
 				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
 				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
 				a.Equal(tt.want.avatarURL, user.GetAvatarURL())
