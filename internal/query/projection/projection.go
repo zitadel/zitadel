@@ -174,6 +174,9 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 	if customConfig.RetryFailedAfter != nil {
 		config.RetryFailedAfter = *customConfig.RetryFailedAfter
 	}
+	if customConfig.HandleInactiveInstances != nil {
+		config.HandleInactiveInstances = *customConfig.HandleInactiveInstances
+	}
 
 	return config
 }
