@@ -1377,7 +1377,6 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 				ctx,
 				&a.Aggregate,
 				writeModel.ID,
-				writeModel.Name,
 				provider.Name,
 				provider.Servers,
 				provider.StartTLS,

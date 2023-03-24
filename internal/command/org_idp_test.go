@@ -18,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
-	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -3916,7 +3915,6 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "org1")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3989,7 +3987,6 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 									IsAutoUpdate:      true,
 								},
 							)),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "org1")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4352,7 +4349,6 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 								t := true
 								event, _ := org.NewLDAPIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 									"id1",
-									"name",
 									[]idp.LDAPIDPChanges{
 										idp.ChangeLDAPName("new name"),
 										idp.ChangeLDAPServers([]string{"new server"}),
@@ -4395,8 +4391,6 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 								return event
 							}(),
 						),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name", "org1")),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("new name", "org1")),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),

@@ -18,7 +18,6 @@ import (
 
 var ErrNoSingleUser = errors.New("user does not exist or too many entries returned")
 var ErrFailedLogin = errors.New("user failed to login")
-var ErrFailedConnection = errors.New("failed to connect")
 
 var _ idp.Session = (*Session)(nil)
 
@@ -117,6 +116,10 @@ func getConnection(
 	startTLS bool,
 	timeout time.Duration,
 ) (*ldap.Conn, error) {
+	if timeout == 0 {
+		timeout = ldap.DefaultTimeout
+	}
+
 	conn, err := ldap.DialURL(server, ldap.DialWithDialer(&net.Dialer{Timeout: timeout}))
 	if err != nil {
 		return nil, err

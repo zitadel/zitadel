@@ -745,7 +745,6 @@ func (wm *InstanceLDAPIDPWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
-	oldName,
 	name string,
 	servers []string,
 	startTLS bool,
@@ -779,7 +778,7 @@ func (wm *InstanceLDAPIDPWriteModel) NewChangedEvent(
 	if err != nil || len(changes) == 0 {
 		return nil, err
 	}
-	return instance.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
+	return instance.NewLDAPIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceIDPRemoveWriteModel struct {

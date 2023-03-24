@@ -806,8 +806,7 @@ type LDAPIDPChangedEvent struct {
 func NewLDAPIDPChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	id,
-	oldName string,
+	id string,
 	changes []idp.LDAPIDPChanges,
 ) (*LDAPIDPChangedEvent, error) {
 
@@ -818,7 +817,6 @@ func NewLDAPIDPChangedEvent(
 			LDAPIDPChangedEventType,
 		),
 		id,
-		oldName,
 		changes,
 	)
 	if err != nil {

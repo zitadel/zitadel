@@ -1367,7 +1367,6 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, writeModel *Or
 				ctx,
 				&a.Aggregate,
 				writeModel.ID,
-				writeModel.Name,
 				provider.Name,
 				provider.Servers,
 				provider.StartTLS,

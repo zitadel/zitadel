@@ -755,7 +755,6 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
-	oldName,
 	name string,
 	servers []string,
 	startTLS bool,
@@ -789,7 +788,7 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	if err != nil || len(changes) == 0 {
 		return nil, err
 	}
-	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
+	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type OrgIDPRemoveWriteModel struct {

@@ -584,6 +584,10 @@ func googleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.Goo
 }
 
 func ldapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPIDPTemplate) {
+	var timeout *durationpb.Duration
+	if template.Timeout != 0 {
+		timeout = durationpb.New(template.Timeout)
+	}
 	providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
 		Ldap: &idp_pb.LDAPConfig{
 			Servers:           template.Servers,
@@ -593,7 +597,7 @@ func ldapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPI
 			UserBase:          template.UserBase,
 			UserObjectClasses: template.UserObjectClasses,
 			UserFilters:       template.UserFilters,
-			Timeout:           durationpb.New(template.Timeout),
+			Timeout:           timeout,
 			Attributes:        ldapAttributesToPb(template.LDAPAttributes),
 		},
 	}

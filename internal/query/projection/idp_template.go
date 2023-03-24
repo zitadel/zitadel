@@ -38,7 +38,7 @@ const (
 	IDPTemplateGitLabSuffix           = "gitlab"
 	IDPTemplateGitLabSelfHostedSuffix = "gitlab_self_hosted"
 	IDPTemplateGoogleSuffix           = "google"
-	IDPTemplateLDAPSuffix             = "ldap"
+	IDPTemplateLDAPSuffix             = "ldap2"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"

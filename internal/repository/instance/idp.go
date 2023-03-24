@@ -29,8 +29,8 @@ const (
 	GitLabSelfHostedIDPChangedEventType eventstore.EventType = "instance.idp.gitlab_self_hosted.changed"
 	GoogleIDPAddedEventType             eventstore.EventType = "instance.idp.google.added"
 	GoogleIDPChangedEventType           eventstore.EventType = "instance.idp.google.changed"
-	LDAPIDPAddedEventType               eventstore.EventType = "instance.idp.ldap.added"
-	LDAPIDPChangedEventType             eventstore.EventType = "instance.idp.ldap.changed"
+	LDAPIDPAddedEventType               eventstore.EventType = "instance.idp.ldap.v2.added"
+	LDAPIDPChangedEventType             eventstore.EventType = "instance.idp.ldap.v2.changed"
 	IDPRemovedEventType                 eventstore.EventType = "instance.idp.removed"
 )
 
@@ -806,8 +806,7 @@ type LDAPIDPChangedEvent struct {
 func NewLDAPIDPChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	id,
-	oldName string,
+	id string,
 	changes []idp.LDAPIDPChanges,
 ) (*LDAPIDPChangedEvent, error) {
 
@@ -818,7 +817,6 @@ func NewLDAPIDPChangedEvent(
 			LDAPIDPChangedEventType,
 		),
 		id,
-		oldName,
 		changes,
 	)
 	if err != nil {
