@@ -157,6 +157,8 @@ Projections:
   Customizations:
     projects:
       BulkLimit: 2000
+    NotificationsQuotas:
+      HandleInactiveInstances: true
 
 Auth:
   SearchLimit: 1000
