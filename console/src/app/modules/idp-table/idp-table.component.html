@@ -166,6 +166,10 @@
             </button>
             <button
               actions
+              *ngIf="
+                (serviceType === PolicyComponentServiceType.MGMT && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
+                (serviceType === PolicyComponentServiceType.ADMIN && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM)
+              "
               [disabled]="
                 (serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
                 ([
