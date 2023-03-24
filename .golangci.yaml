@@ -123,7 +123,7 @@ linters:
     # see no reason. allows to define regexp which are not allowed to use
     - forbidigo
     # finds forced type assertions [fast: true, auto-fix: false]
-    # not used because we mostly use `_, _ = a.(int)` 
+    # not used because we mostly use `_, _ = a.(int)`
     - forcetypeassert
     # Tool for detection of long functions [fast: true, auto-fix: false]
     # not used because it ignores complexity

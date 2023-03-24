@@ -11,59 +11,58 @@ on:
         type: string
 
 jobs:
-
   tidy:
     name: tidy
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
-      with:
-        go-version: ${{ inputs.go_version }}
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - run: make generate
-    - run: make tidy
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ inputs.go_version }}
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: ${{ inputs.buf_version }}
+          github_token: ${{ github.token }}
+      - run: make generate
+      - run: make tidy
 
   test:
     name: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
-      with:
-        go-version: ${{ inputs.go_version }}
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - run: make generate
-    - run: make test
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ inputs.go_version }}
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: ${{ inputs.buf_version }}
+          github_token: ${{ github.token }}
+      - run: make generate
+      - run: make test
 
   lint:
     name: lint
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: '0'
-    - uses: actions/setup-go@v3
-      with:
-        go-version: ${{ inputs.go_version }}
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - run: make generate
-    - name: linting
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: v1.50.1
-        only-new-issues: true
-        skip-pkg-cache: true
-        args: -v
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ inputs.go_version }}
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: ${{ inputs.buf_version }}
+          github_token: ${{ github.token }}
+      - run: make generate
+      - name: linting
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.50.1
+          only-new-issues: true
+          skip-pkg-cache: true
+          args: -v
 
   build:
     name: build
@@ -73,48 +72,48 @@ jobs:
         goos: [linux, darwin]
         goarch: [amd64, arm64]
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
-      with:
-        go-version: ${{ inputs.go_version }}
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - run: make generate
-    - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
-    - uses: actions/upload-artifact@v3
-      with:
-        name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
-    - uses: docker/setup-qemu-action@v2
-    - uses: docker/setup-buildx-action@v2
-      # uses: docker/login-action@v2
-      # with:
-      #   registry: ghcr.io
-      #   username: ${{ github.actor }}
-      #   password: ${{ secrets.GITHUB_TOKEN }}
-    - uses: docker/build-push-action@v4
-      if: matrix.goos == 'linux'
-      with:
-        context: .
-        file: build/core/scratch
-        platforms: ${{ matrix.goos }}/${{ matrix.goarch }}
-        push: false
-        tags: zitadel/core:${{ github.sha }}-scratch, zitadel/zitadel:${{ github.sha }}
-    - uses: docker/build-push-action@v4
-      if: matrix.goos == 'linux'
-      with:
-        context: .
-        file: build/core/alpine
-        platforms: ${{ matrix.goos }}/${{ matrix.goarch }}
-        push: false
-        tags: zitadel/core:${{ github.sha }}-alpine
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ inputs.go_version }}
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: ${{ inputs.buf_version }}
+          github_token: ${{ github.token }}
+      - run: make generate
+      - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+        # uses: docker/login-action@v2
+        # with:
+        #   registry: ghcr.io
+        #   username: ${{ github.actor }}
+        #   password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v4
+        if: matrix.goos == 'linux'
+        with:
+          context: .
+          file: build/core/scratch
+          platforms: ${{ matrix.goos }}/${{ matrix.goarch }}
+          push: false
+          tags: zitadel/core:${{ github.sha }}-scratch, zitadel/zitadel:${{ github.sha }}
+      - uses: docker/build-push-action@v4
+        if: matrix.goos == 'linux'
+        with:
+          context: .
+          file: build/core/alpine
+          platforms: ${{ matrix.goos }}/${{ matrix.goarch }}
+          push: false
+          tags: zitadel/core:${{ github.sha }}-alpine
 
   success:
     name: success
     runs-on: ubuntu-latest
     needs: [test, tidy, lint, build]
     steps:
-    - uses: actions/checkout@v3
-    - run: echo "core sucessful built"
+      - uses: actions/checkout@v3
+      - run: echo "core sucessful built"

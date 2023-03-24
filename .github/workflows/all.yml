@@ -2,9 +2,8 @@ name: All in one build
 
 on:
   pull_request:
-    
-jobs:
 
+jobs:
   api:
     uses: ./.github/workflows/api.yml
     with:
@@ -29,11 +28,11 @@ jobs:
       node_version: 18
 
   # login:
-  # placeholder 
+  # placeholder
 
   release:
     name: release zitadel
     runs-on: ubuntu-latest
     needs: [api, core, console, docs]
     steps:
-    - run: echo "This is a placeholder"
+      - run: echo "This is a placeholder"

@@ -13,16 +13,33 @@
   "nx": {
     "targets": {
       "build": {
-        "inputs": ["!{projectRoot}/dist/**/*", "!{projectRoot}/.angular/**/*"],
-        "outputs": ["{projectRoot}/dist/console/**/*", "{projectRoot}/.angular/**/*"],
-        "dependsOn": ["generate"]
+        "inputs": [
+          "!{projectRoot}/dist/**/*",
+          "!{projectRoot}/.angular/**/*"
+        ],
+        "outputs": [
+          "{projectRoot}/dist/console/**/*",
+          "{projectRoot}/.angular/**/*"
+        ],
+        "dependsOn": [
+          "generate"
+        ]
       },
       "generate": {
-        "inputs": ["{workspaceRoot}/proto/**/*", "!{projectRoot}/dist/**/*", "!{projectRoot}/.angular/**/*"],
-        "outputs": ["{projectRoot}/src/app/proto/generated/**/*"]
+        "inputs": [
+          "{workspaceRoot}/proto/**/*",
+          "!{projectRoot}/dist/**/*",
+          "!{projectRoot}/.angular/**/*"
+        ],
+        "outputs": [
+          "{projectRoot}/src/app/proto/generated/**/*"
+        ]
       }
     },
-    "includedScripts": ["generate", "build"]
+    "includedScripts": [
+      "generate",
+      "build"
+    ]
   },
   "dependencies": {
     "@angular/animations": "^15.2.2",

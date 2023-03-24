@@ -6,12 +6,12 @@ plugins:
     out: .artifacts/grpc
   - plugin: buf.build/grpc-ecosystem/gateway
     out: .artifacts/grpc
-    opt: 
-    - allow_delete_body=true
+    opt:
+      - allow_delete_body=true
   - plugin: buf.build/grpc-ecosystem/openapiv2
     out: .artifacts/grpc
-    opt: 
-    - allow_delete_body=true
+    opt:
+      - allow_delete_body=true
   - plugin: buf.build/bufbuild/validate-go
     out: .artifacts/grpc
   - plugin: authoption

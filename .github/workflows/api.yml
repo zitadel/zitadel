@@ -11,46 +11,45 @@ on:
         required: true
 
 jobs:
-  
   lint:
     name: lint
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-    - uses: actions/checkout@v3
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - uses: bufbuild/buf-lint-action@v1
+      - uses: actions/checkout@v3
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: ${{ inputs.buf_version }}
+          github_token: ${{ github.token }}
+      - uses: bufbuild/buf-lint-action@v1
     ## TODO add comment action with report
 
   breaking:
     name: breaking
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - uses: bufbuild/buf-breaking-action@v1
-      with:
-        against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
+      - uses: actions/checkout@v3
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: ${{ inputs.buf_version }}
+          github_token: ${{ github.token }}
+      - uses: bufbuild/buf-breaking-action@v1
+        with:
+          against: 'https://github.com/${GITHUB_REPOSITORY}.git#branch=main'
 
   push:
     name: push
     runs-on: ubuntu-latest
     needs: [lint, breaking]
     steps:
-    - uses: actions/checkout@v3
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - uses: bufbuild/buf-push-action@v1
-      with:
-        buf_token: ${{ secrets.buf_token }}
-        input: proto
-        ## Currently no tags are supported in the action https://github.com/bufbuild/buf-push-action/issues/20
-        draft: ${{ github.ref_name != 'main'}}
+      - uses: actions/checkout@v3
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: ${{ inputs.buf_version }}
+          github_token: ${{ github.token }}
+      - uses: bufbuild/buf-push-action@v1
+        with:
+          buf_token: ${{ secrets.buf_token }}
+          input: proto
+          ## Currently no tags are supported in the action https://github.com/bufbuild/buf-push-action/issues/20
+          draft: ${{ github.ref_name != 'main'}}
