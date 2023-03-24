@@ -2,6 +2,7 @@ package command
 
 import (
 	"reflect"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -999,16 +1000,17 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 type LDAPIDPWriteModel struct {
 	eventstore.WriteModel
 
-	ID                  string
-	Name                string
-	Host                string
-	Port                string
-	TLS                 bool
-	BaseDN              string
-	UserObjectClass     string
-	UserUniqueAttribute string
-	Admin               string
-	Password            *crypto.CryptoValue
+	ID                string
+	Name              string
+	Servers           []string
+	StartTLS          bool
+	BaseDN            string
+	BindDN            string
+	BindPassword      *crypto.CryptoValue
+	UserBase          string
+	UserObjectClasses []string
+	UserFilters       []string
+	Timeout           time.Duration
 	idp.LDAPAttributes
 	idp.Options
 
@@ -1040,14 +1042,15 @@ func (wm *LDAPIDPWriteModel) Reduce() error {
 
 func (wm *LDAPIDPWriteModel) reduceAddedEvent(e *idp.LDAPIDPAddedEvent) {
 	wm.Name = e.Name
-	wm.Host = e.Host
-	wm.Port = e.Port
-	wm.TLS = e.TLS
+	wm.Servers = e.Servers
+	wm.StartTLS = e.StartTLS
 	wm.BaseDN = e.BaseDN
-	wm.UserObjectClass = e.UserObjectClass
-	wm.UserUniqueAttribute = e.UserUniqueAttribute
-	wm.Admin = e.Admin
-	wm.Password = e.Password
+	wm.BindDN = e.BindDN
+	wm.BindPassword = e.BindPassword
+	wm.UserBase = e.UserBase
+	wm.UserObjectClasses = e.UserObjectClasses
+	wm.UserFilters = e.UserFilters
+	wm.Timeout = e.Timeout
 	wm.LDAPAttributes = e.LDAPAttributes
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
@@ -1060,44 +1063,48 @@ func (wm *LDAPIDPWriteModel) reduceChangedEvent(e *idp.LDAPIDPChangedEvent) {
 	if e.Name != nil {
 		wm.Name = *e.Name
 	}
-	if e.Host != nil {
-		wm.Host = *e.Host
+	if e.Servers != nil {
+		wm.Servers = e.Servers
 	}
-	if e.Port != nil {
-		wm.Port = *e.Port
-	}
-	if e.TLS != nil {
-		wm.TLS = *e.TLS
+	if e.StartTLS != nil {
+		wm.StartTLS = *e.StartTLS
 	}
 	if e.BaseDN != nil {
 		wm.BaseDN = *e.BaseDN
 	}
-	if e.UserObjectClass != nil {
-		wm.UserObjectClass = *e.UserObjectClass
+	if e.BindDN != nil {
+		wm.BindDN = *e.BindDN
 	}
-	if e.UserUniqueAttribute != nil {
-		wm.UserUniqueAttribute = *e.UserUniqueAttribute
+	if e.BindPassword != nil {
+		wm.BindPassword = e.BindPassword
 	}
-	if e.Admin != nil {
-		wm.Admin = *e.Admin
+	if e.UserBase != nil {
+		wm.UserBase = *e.UserBase
 	}
-	if e.Password != nil {
-		wm.Password = e.Password
+	if e.UserObjectClasses != nil {
+		wm.UserObjectClasses = e.UserObjectClasses
+	}
+	if e.UserFilters != nil {
+		wm.UserFilters = e.UserFilters
+	}
+	if e.Timeout != nil {
+		wm.Timeout = *e.Timeout
 	}
 	wm.LDAPAttributes.ReduceChanges(e.LDAPAttributeChanges)
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
 func (wm *LDAPIDPWriteModel) NewChanges(
-	name,
-	host,
-	port string,
-	tls bool,
-	baseDN,
-	userObjectClass,
-	userUniqueAttribute,
-	admin string,
-	password string,
+	name string,
+	servers []string,
+	startTLS bool,
+	baseDN string,
+	bindDN string,
+	bindPassword string,
+	userBase string,
+	userObjectClasses []string,
+	userFilters []string,
+	timeout time.Duration,
 	secretCrypto crypto.Crypto,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
@@ -1105,36 +1112,39 @@ func (wm *LDAPIDPWriteModel) NewChanges(
 	changes := make([]idp.LDAPIDPChanges, 0)
 	var cryptedPassword *crypto.CryptoValue
 	var err error
-	if password != "" {
-		cryptedPassword, err = crypto.Crypt([]byte(password), secretCrypto)
+	if bindPassword != "" {
+		cryptedPassword, err = crypto.Crypt([]byte(bindPassword), secretCrypto)
 		if err != nil {
 			return nil, err
 		}
-		changes = append(changes, idp.ChangeLDAPPassword(cryptedPassword))
+		changes = append(changes, idp.ChangeLDAPBindPassword(cryptedPassword))
 	}
 	if wm.Name != name {
 		changes = append(changes, idp.ChangeLDAPName(name))
 	}
-	if wm.Host != host {
-		changes = append(changes, idp.ChangeLDAPHost(host))
+	if !reflect.DeepEqual(wm.Servers, servers) {
+		changes = append(changes, idp.ChangeLDAPServers(servers))
 	}
-	if wm.Port != port {
-		changes = append(changes, idp.ChangeLDAPPort(port))
-	}
-	if wm.TLS != tls {
-		changes = append(changes, idp.ChangeLDAPTLS(tls))
+	if wm.StartTLS != startTLS {
+		changes = append(changes, idp.ChangeLDAPStartTLS(startTLS))
 	}
 	if wm.BaseDN != baseDN {
 		changes = append(changes, idp.ChangeLDAPBaseDN(baseDN))
 	}
-	if wm.UserObjectClass != userObjectClass {
-		changes = append(changes, idp.ChangeLDAPUserObjectClass(userObjectClass))
+	if wm.BindDN != bindDN {
+		changes = append(changes, idp.ChangeLDAPBindDN(bindDN))
 	}
-	if wm.UserUniqueAttribute != userUniqueAttribute {
-		changes = append(changes, idp.ChangeLDAPUserUniqueAttribute(userUniqueAttribute))
+	if wm.UserBase != userBase {
+		changes = append(changes, idp.ChangeLDAPUserBase(userBase))
 	}
-	if wm.Admin != admin {
-		changes = append(changes, idp.ChangeLDAPAdmin(admin))
+	if !reflect.DeepEqual(wm.UserObjectClasses, userObjectClasses) {
+		changes = append(changes, idp.ChangeLDAPUserObjectClasses(userObjectClasses))
+	}
+	if !reflect.DeepEqual(wm.UserFilters, userFilters) {
+		changes = append(changes, idp.ChangeLDAPUserFilters(userFilters))
+	}
+	if wm.Timeout != timeout {
+		changes = append(changes, idp.ChangeLDAPTimeout(timeout))
 	}
 	attrs := wm.LDAPAttributes.Changes(attributes)
 	if !attrs.IsZero() {

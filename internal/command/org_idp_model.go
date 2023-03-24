@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -754,16 +755,16 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
-	oldName,
-	name,
-	host,
-	port string,
-	tls bool,
-	baseDN,
-	userObjectClass,
-	userUniqueAttribute,
-	admin string,
-	password string,
+	name string,
+	servers []string,
+	startTLS bool,
+	baseDN string,
+	bindDN string,
+	bindPassword string,
+	userBase string,
+	userObjectClasses []string,
+	userFilters []string,
+	timeout time.Duration,
 	secretCrypto crypto.Crypto,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
@@ -771,14 +772,15 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 
 	changes, err := wm.LDAPIDPWriteModel.NewChanges(
 		name,
-		host,
-		port,
-		tls,
+		servers,
+		startTLS,
 		baseDN,
-		userObjectClass,
-		userUniqueAttribute,
-		admin,
-		password,
+		bindDN,
+		bindPassword,
+		userBase,
+		userObjectClasses,
+		userFilters,
+		timeout,
 		secretCrypto,
 		attributes,
 		options,
@@ -786,7 +788,7 @@ func (wm *OrgLDAPIDPWriteModel) NewChangedEvent(
 	if err != nil || len(changes) == 0 {
 		return nil, err
 	}
-	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, oldName, changes)
+	return org.NewLDAPIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type OrgIDPRemoveWriteModel struct {
