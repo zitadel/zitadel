@@ -23,8 +23,9 @@ func (l *Login) runPostExternalAuthenticationActions(
 	httpRequest *http.Request,
 	idpUser idp.User,
 	authenticationError error,
-) (*domain.ExternalUser, error) {
+) (*domain.ExternalUser, bool, error) {
 	ctx := httpRequest.Context()
+	change := false
 
 	resourceOwner := authRequest.RequestedOrgID
 	if resourceOwner == "" {
@@ -32,40 +33,50 @@ func (l *Login) runPostExternalAuthenticationActions(
 	}
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	metadataList := object.MetadataListFromDomain(user.Metadatas)
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("setFirstName", func(firstName string) {
 			user.FirstName = firstName
+			change = true
 		}),
 		actions.SetFields("setLastName", func(lastName string) {
 			user.LastName = lastName
+			change = true
 		}),
 		actions.SetFields("setNickName", func(nickName string) {
 			user.NickName = nickName
+			change = true
 		}),
 		actions.SetFields("setDisplayName", func(displayName string) {
 			user.DisplayName = displayName
+			change = true
 		}),
 		actions.SetFields("setPreferredLanguage", func(preferredLanguage string) {
 			user.PreferredLanguage = language.Make(preferredLanguage)
+			change = true
 		}),
 		actions.SetFields("setPreferredUsername", func(username string) {
 			user.PreferredUsername = username
+			change = true
 		}),
 		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			user.Email = email
+			change = true
 		}),
 		actions.SetFields("setEmailVerified", func(verified bool) {
 			user.IsEmailVerified = verified
+			change = true
 		}),
 		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			user.Phone = phone
+			change = true
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			user.IsPhoneVerified = verified
+			change = true
 		}),
 		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
 			return metadataList.MetadataListFromDomain(c.Runtime)
@@ -111,11 +122,11 @@ func (l *Login) runPostExternalAuthenticationActions(
 		)
 		cancel()
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 	}
 	user.Metadatas = object.MetadataListToDomain(metadataList)
-	return user, err
+	return user, change, err
 }
 
 type authMethod string
