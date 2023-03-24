@@ -44,6 +44,20 @@ type Lock func(context.Context, time.Duration, ...string) <-chan error
 // Unlock releases the mutex of the projection
 type Unlock func(...string) error
 
+// Clock makes time.Now() mockable
+type Clock interface {
+	Now() time.Time
+}
+
+var _ Clock = NowFunc(nil)
+
+// NowFunc is a convenience type that implements the Clock interface
+type NowFunc func() time.Time
+
+func (n NowFunc) Now() time.Time {
+	return n()
+}
+
 type ProjectionHandler struct {
 	Handler
 	ProjectionName          string
@@ -58,6 +72,7 @@ type ProjectionHandler struct {
 	retries                 int
 	concurrentInstances     int
 	handleInactiveInstances bool
+	clock                   Clock
 }
 
 func NewProjectionHandler(
@@ -88,6 +103,7 @@ func NewProjectionHandler(
 		retries:                 int(config.Retries),
 		concurrentInstances:     concurrentInstances,
 		handleInactiveInstances: config.HandleInactiveInstances,
+		clock:                   NowFunc(time.Now),
 	}
 
 	go func() {
@@ -228,7 +244,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			// since we have at least one successful run, we can restrict it to events not older than
 			// twice the requeue time (just to be sure not to miss an event)
 			// This ensures that only instances with recent events on the handler are projected
-			query = query.CreationDateAfter(time.Now().Add(-2 * h.requeueAfter))
+			query = query.CreationDateAfter(h.clock.Now().Add(-2 * h.requeueAfter))
 		}
 		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
 		if err != nil {
