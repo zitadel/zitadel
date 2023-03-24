@@ -5,8 +5,8 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "start:api": "yarn generate && docusaurus start",
-    "build": "yarn generate && docusaurus build --no-minify",
+    "start:api": "docusaurus start",
+    "build": "docusaurus build --no-minify",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -16,6 +16,42 @@
     "generate": "yarn generate:grpc && yarn generate:apidocs",
     "generate:grpc": "buf generate ../proto",
     "generate:apidocs": "docusaurus clean-api-docs all && docusaurus gen-api-docs all"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "inputs": [
+          "!{projectRoot}/build/**/*",
+          "!{projectRoot}/.docusaurus/**/*"
+        ],
+        "outputs": [
+          "{projectRoot}/build/**/*",
+          "{projectRoot}/.docusaurus/**/*"
+        ],
+        "dependsOn": [
+          "generate"
+        ]
+      },
+      "generate": {
+        "inputs": [
+          "{workspaceRoot}/proto/**/*",
+          "!{projectRoot}/build/**/*",
+          "!{projectRoot}/.docusaurus/**/*",
+          "!{projectRoot}/**/*"
+        ],
+        "outputs": [
+          "{projectRoot}/.artifacts/**/*",
+          "{projectRoot}/docs/apis/admin/**/*",
+          "{projectRoot}/docs/apis/auth/**/*",
+          "{projectRoot}/docs/apis/mgmt/**/*",
+          "{projectRoot}/docs/apis/system/**/*"
+        ]
+      }
+    },
+    "includedScripts": [
+      "generate",
+      "build"
+    ]
   },
   "dependencies": {
     "@algolia/autocomplete-core": "1.5.2",

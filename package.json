@@ -4,7 +4,8 @@
   "scripts": {},
   "private": true,
   "workspaces": [
-    "console"
+    "console",
+    "docs"
   ],
   "dependencies": {},
   "devDependencies": {
