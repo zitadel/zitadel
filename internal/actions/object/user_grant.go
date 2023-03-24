@@ -59,6 +59,9 @@ func AppendGrantFunc(userGrants *UserGrants) func(c *actions.FieldConfig) func(c
 }
 
 func UserGrantsFromQuery(c *actions.FieldConfig, userGrants *query.UserGrants) goja.Value {
+	if userGrants == nil {
+		return c.Runtime.ToValue(nil)
+	}
 	grantList := &userGrantList{
 		Count:     userGrants.Count,
 		Sequence:  userGrants.Sequence,

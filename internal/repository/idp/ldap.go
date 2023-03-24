@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
 type LDAPIDPAddedEvent struct {
@@ -171,7 +170,7 @@ func (e *LDAPIDPAddedEvent) Data() interface{} {
 }
 
 func (e *LDAPIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	return nil
 }
 
 func LDAPIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
@@ -189,8 +188,6 @@ func LDAPIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) 
 
 type LDAPIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-
-	oldName string
 
 	ID                string              `json:"id"`
 	Name              *string             `json:"name,omitempty"`
@@ -243,7 +240,6 @@ func (o LDAPAttributeChanges) IsZero() bool {
 func NewLDAPIDPChangedEvent(
 	base *eventstore.BaseEvent,
 	id string,
-	oldName string,
 	changes []LDAPIDPChanges,
 ) (*LDAPIDPChangedEvent, error) {
 	if len(changes) == 0 {
@@ -252,7 +248,6 @@ func NewLDAPIDPChangedEvent(
 	changedEvent := &LDAPIDPChangedEvent{
 		BaseEvent: *base,
 		ID:        id,
-		oldName:   oldName,
 	}
 	for _, change := range changes {
 		change(changedEvent)
@@ -339,13 +334,7 @@ func (e *LDAPIDPChangedEvent) Data() interface{} {
 }
 
 func (e *LDAPIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	if e.Name == nil || e.oldName == *e.Name { // TODO: nil check should be enough?
-		return nil
-	}
-	return []*eventstore.EventUniqueConstraint{
-		idpconfig.NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
-		idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
-	}
+	return nil
 }
 
 func LDAPIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {

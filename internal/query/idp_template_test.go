@@ -88,29 +88,29 @@ var (
 		` projections.idp_templates4_google.client_secret,` +
 		` projections.idp_templates4_google.scopes,` +
 		// ldap
-		` projections.idp_templates4_ldap.idp_id,` +
-		` projections.idp_templates4_ldap.servers,` +
-		` projections.idp_templates4_ldap.start_tls,` +
-		` projections.idp_templates4_ldap.base_dn,` +
-		` projections.idp_templates4_ldap.bind_dn,` +
-		` projections.idp_templates4_ldap.bind_password,` +
-		` projections.idp_templates4_ldap.user_base,` +
-		` projections.idp_templates4_ldap.user_object_classes,` +
-		` projections.idp_templates4_ldap.user_filters,` +
-		` projections.idp_templates4_ldap.timeout,` +
-		` projections.idp_templates4_ldap.id_attribute,` +
-		` projections.idp_templates4_ldap.first_name_attribute,` +
-		` projections.idp_templates4_ldap.last_name_attribute,` +
-		` projections.idp_templates4_ldap.display_name_attribute,` +
-		` projections.idp_templates4_ldap.nick_name_attribute,` +
-		` projections.idp_templates4_ldap.preferred_username_attribute,` +
-		` projections.idp_templates4_ldap.email_attribute,` +
-		` projections.idp_templates4_ldap.email_verified,` +
-		` projections.idp_templates4_ldap.phone_attribute,` +
-		` projections.idp_templates4_ldap.phone_verified_attribute,` +
-		` projections.idp_templates4_ldap.preferred_language_attribute,` +
-		` projections.idp_templates4_ldap.avatar_url_attribute,` +
-		` projections.idp_templates4_ldap.profile_attribute` +
+		` projections.idp_templates4_ldap2.idp_id,` +
+		` projections.idp_templates4_ldap2.servers,` +
+		` projections.idp_templates4_ldap2.start_tls,` +
+		` projections.idp_templates4_ldap2.base_dn,` +
+		` projections.idp_templates4_ldap2.bind_dn,` +
+		` projections.idp_templates4_ldap2.bind_password,` +
+		` projections.idp_templates4_ldap2.user_base,` +
+		` projections.idp_templates4_ldap2.user_object_classes,` +
+		` projections.idp_templates4_ldap2.user_filters,` +
+		` projections.idp_templates4_ldap2.timeout,` +
+		` projections.idp_templates4_ldap2.id_attribute,` +
+		` projections.idp_templates4_ldap2.first_name_attribute,` +
+		` projections.idp_templates4_ldap2.last_name_attribute,` +
+		` projections.idp_templates4_ldap2.display_name_attribute,` +
+		` projections.idp_templates4_ldap2.nick_name_attribute,` +
+		` projections.idp_templates4_ldap2.preferred_username_attribute,` +
+		` projections.idp_templates4_ldap2.email_attribute,` +
+		` projections.idp_templates4_ldap2.email_verified,` +
+		` projections.idp_templates4_ldap2.phone_attribute,` +
+		` projections.idp_templates4_ldap2.phone_verified_attribute,` +
+		` projections.idp_templates4_ldap2.preferred_language_attribute,` +
+		` projections.idp_templates4_ldap2.avatar_url_attribute,` +
+		` projections.idp_templates4_ldap2.profile_attribute` +
 		` FROM projections.idp_templates4` +
 		` LEFT JOIN projections.idp_templates4_oauth2 ON projections.idp_templates4.id = projections.idp_templates4_oauth2.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_oauth2.instance_id` +
 		` LEFT JOIN projections.idp_templates4_oidc ON projections.idp_templates4.id = projections.idp_templates4_oidc.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_oidc.instance_id` +
@@ -121,7 +121,7 @@ var (
 		` LEFT JOIN projections.idp_templates4_gitlab ON projections.idp_templates4.id = projections.idp_templates4_gitlab.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_gitlab.instance_id` +
 		` LEFT JOIN projections.idp_templates4_gitlab_self_hosted ON projections.idp_templates4.id = projections.idp_templates4_gitlab_self_hosted.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates4_google ON projections.idp_templates4.id = projections.idp_templates4_google.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_google.instance_id` +
-		` LEFT JOIN projections.idp_templates4_ldap ON projections.idp_templates4.id = projections.idp_templates4_ldap.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_ldap.instance_id` +
+		` LEFT JOIN projections.idp_templates4_ldap2 ON projections.idp_templates4.id = projections.idp_templates4_ldap2.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_ldap2.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplateCols = []string{
 		"id",
@@ -292,29 +292,29 @@ var (
 		` projections.idp_templates4_google.client_secret,` +
 		` projections.idp_templates4_google.scopes,` +
 		// ldap
-		` projections.idp_templates4_ldap.idp_id,` +
-		` projections.idp_templates4_ldap.servers,` +
-		` projections.idp_templates4_ldap.start_tls,` +
-		` projections.idp_templates4_ldap.base_dn,` +
-		` projections.idp_templates4_ldap.bind_dn,` +
-		` projections.idp_templates4_ldap.bind_password,` +
-		` projections.idp_templates4_ldap.user_base,` +
-		` projections.idp_templates4_ldap.user_object_classes,` +
-		` projections.idp_templates4_ldap.user_filters,` +
-		` projections.idp_templates4_ldap.timeout,` +
-		` projections.idp_templates4_ldap.id_attribute,` +
-		` projections.idp_templates4_ldap.first_name_attribute,` +
-		` projections.idp_templates4_ldap.last_name_attribute,` +
-		` projections.idp_templates4_ldap.display_name_attribute,` +
-		` projections.idp_templates4_ldap.nick_name_attribute,` +
-		` projections.idp_templates4_ldap.preferred_username_attribute,` +
-		` projections.idp_templates4_ldap.email_attribute,` +
-		` projections.idp_templates4_ldap.email_verified,` +
-		` projections.idp_templates4_ldap.phone_attribute,` +
-		` projections.idp_templates4_ldap.phone_verified_attribute,` +
-		` projections.idp_templates4_ldap.preferred_language_attribute,` +
-		` projections.idp_templates4_ldap.avatar_url_attribute,` +
-		` projections.idp_templates4_ldap.profile_attribute,` +
+		` projections.idp_templates4_ldap2.idp_id,` +
+		` projections.idp_templates4_ldap2.servers,` +
+		` projections.idp_templates4_ldap2.start_tls,` +
+		` projections.idp_templates4_ldap2.base_dn,` +
+		` projections.idp_templates4_ldap2.bind_dn,` +
+		` projections.idp_templates4_ldap2.bind_password,` +
+		` projections.idp_templates4_ldap2.user_base,` +
+		` projections.idp_templates4_ldap2.user_object_classes,` +
+		` projections.idp_templates4_ldap2.user_filters,` +
+		` projections.idp_templates4_ldap2.timeout,` +
+		` projections.idp_templates4_ldap2.id_attribute,` +
+		` projections.idp_templates4_ldap2.first_name_attribute,` +
+		` projections.idp_templates4_ldap2.last_name_attribute,` +
+		` projections.idp_templates4_ldap2.display_name_attribute,` +
+		` projections.idp_templates4_ldap2.nick_name_attribute,` +
+		` projections.idp_templates4_ldap2.preferred_username_attribute,` +
+		` projections.idp_templates4_ldap2.email_attribute,` +
+		` projections.idp_templates4_ldap2.email_verified,` +
+		` projections.idp_templates4_ldap2.phone_attribute,` +
+		` projections.idp_templates4_ldap2.phone_verified_attribute,` +
+		` projections.idp_templates4_ldap2.preferred_language_attribute,` +
+		` projections.idp_templates4_ldap2.avatar_url_attribute,` +
+		` projections.idp_templates4_ldap2.profile_attribute,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_templates4` +
 		` LEFT JOIN projections.idp_templates4_oauth2 ON projections.idp_templates4.id = projections.idp_templates4_oauth2.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_oauth2.instance_id` +
@@ -326,7 +326,7 @@ var (
 		` LEFT JOIN projections.idp_templates4_gitlab ON projections.idp_templates4.id = projections.idp_templates4_gitlab.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_gitlab.instance_id` +
 		` LEFT JOIN projections.idp_templates4_gitlab_self_hosted ON projections.idp_templates4.id = projections.idp_templates4_gitlab_self_hosted.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_gitlab_self_hosted.instance_id` +
 		` LEFT JOIN projections.idp_templates4_google ON projections.idp_templates4.id = projections.idp_templates4_google.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_google.instance_id` +
-		` LEFT JOIN projections.idp_templates4_ldap ON projections.idp_templates4.id = projections.idp_templates4_ldap.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_ldap.instance_id` +
+		` LEFT JOIN projections.idp_templates4_ldap2 ON projections.idp_templates4.id = projections.idp_templates4_ldap2.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_ldap2.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplatesCols = []string{
 		"id",

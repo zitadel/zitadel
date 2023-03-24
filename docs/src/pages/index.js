@@ -23,7 +23,8 @@ const features = [
     link: "guides/overview",
     description: (
       <>
-        Read our documentation and learn how you can setup, customize, and integrate authentication and authorization to your project.
+        Read our documentation and learn how you can setup, customize, and
+        integrate authentication and authorization to your project.
       </>
     ),
     content: (
@@ -36,7 +37,7 @@ const features = [
               title="Get started"
               description=""
             />
-             <ListElement
+            <ListElement
               link="/docs/examples/sdks"
               type={ICONTYPE.APIS}
               title="SDKs"
@@ -60,11 +61,9 @@ const features = [
               title="Integrate"
               description="Access our APIs and configure services and tools"
             />
-           
-            
           </div>
           <div>
-          <ListElement
+            <ListElement
               link="/docs/guides/solution-scenarios/introduction"
               iconClasses="las la-paragraph"
               roundClasses="custom-rounded custom-rounded-split"
@@ -107,36 +106,38 @@ const features = [
     lightImageUrl: "img/index/Quickstarts-light.svg",
     link: "examples/introduction",
     description: (
-      <>Learn how to integrate your applications and build secure workflows and
-      APIs with ZITADEL.</>
+      <>
+        Learn how to integrate your applications and build secure workflows and
+        APIs with ZITADEL.
+      </>
     ),
     content: (
       <div className={styles.apilinks}>
         <ListWrapper>
           <ListElement
-            link=""
+            link="/docs/guides/start/quickstart"
             type={ICONTYPE.START}
             title="Quick Start Guide"
             description="The ultimate guide to get started with ZITADEL."
           />
           <ListElement
-            link=""
+            link="/docs/examples/login/angular"
             type={ICONTYPE.APIS}
             title="Frontend Quickstart Guides"
             description=""
           />
           <ListElement
-            link=""
+            link="/docs/examples/secure-api/go"
             type={ICONTYPE.APIS}
             title="Backend Quickstart Guides"
             description=""
           />
           <ListElement
-              link="/docs/examples/introduction"
-              type={ICONTYPE.APIS}
-              title="Examples"
-              description="Clone an existing example application."
-            />
+            link="/docs/examples/introduction"
+            type={ICONTYPE.APIS}
+            title="Examples"
+            description="Clone an existing example application."
+          />
         </ListWrapper>
       </div>
     ),
@@ -164,46 +165,40 @@ const features = [
             title="Organization Objects"
             description="Mutate IAM objects like organizations, projects, clients, users etc."
           />
-        <ListElement
+          <ListElement
             link="/docs/apis/admin/administration-api-aka-admin"
             type={ICONTYPE.APIS}
             title="Instance Objects"
             description="Configure and manage the IAM instance."
           />
-        <ListElement
+          <ListElement
             link="/docs/apis/openidoauth/endpoints"
             type={ICONTYPE.APIS}
             title="OIDC Endpoints"
             description=""
-        />
-        <ListElement
-          link="/docs/apis/saml/endpoints"
-          type={ICONTYPE.APIS}
-          title="SAML Endpoints"
-          description=""
-        />
-        <ListElement
-          link="/docs/apis/actions/introduction"
-          type={ICONTYPE.APIS}
-          title="Actions"
-          description="Customize and integrate ZITADEL into your landscape"
-        />
-        
+          />
+          <ListElement
+            link="/docs/apis/saml/endpoints"
+            type={ICONTYPE.APIS}
+            title="SAML Endpoints"
+            description=""
+          />
+          <ListElement
+            link="/docs/apis/actions/introduction"
+            type={ICONTYPE.APIS}
+            title="Actions"
+            description="Customize and integrate ZITADEL into your landscape"
+          />
         </ListWrapper>
-        
       </div>
     ),
   },
   {
-    title: "Self-hosting", 
+    title: "Self-hosting",
     darkImageUrl: "img/index/Concepts-dark.svg",
     lightImageUrl: "img/index/Concepts-light.svg",
     link: "/docs/self-hosting/deploy/overview",
-    description: (
-      <>
-        Everything you need to know about self-hosting ZITADEL.
-      </>
-    ),
+    description: <>Everything you need to know about self-hosting ZITADEL.</>,
     content: (
       <ListWrapper>
         <ListElement

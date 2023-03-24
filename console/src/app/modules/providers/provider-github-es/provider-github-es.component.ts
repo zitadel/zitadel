@@ -30,7 +30,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderGithubESComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
   public id: string | null = '';
   public updateClientSecret: boolean = false;
@@ -122,107 +122,62 @@ export class ProviderGithubESComponent {
   }
 
   public addGenericOAuthProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGitHubEnterpriseServerProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddGitHubEnterpriseServerProviderRequest()
+        : new AdminAddGitHubEnterpriseServerProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-      req.setTokenEndpoint(this.tokenEndpoint?.value);
-      req.setUserEndpoint(this.userEndpoint?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
+    req.setName(this.name?.value);
+    req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+    req.setTokenEndpoint(this.tokenEndpoint?.value);
+    req.setUserEndpoint(this.userEndpoint?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setScopesList(this.scopesList?.value);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGitHubEnterpriseServerProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addGitHubEnterpriseServerProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGitHubEnterpriseServerProviderRequest();
-      req.setName(this.name?.value);
-      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-      req.setTokenEndpoint(this.tokenEndpoint?.value);
-      req.setUserEndpoint(this.userEndpoint?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGitHubEnterpriseServerProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-          this.loading = false;
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateGenericOAuthProvider(): void {
     if (this.provider) {
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        const req = new MgmtUpdateGitHubEnterpriseServerProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-        req.setTokenEndpoint(this.tokenEndpoint?.value);
-        req.setUserEndpoint(this.userEndpoint?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setScopesList(this.scopesList?.value);
+      const req =
+        this.serviceType === PolicyComponentServiceType.MGMT
+          ? new MgmtUpdateGitHubEnterpriseServerProviderRequest()
+          : new AdminUpdateGitHubEnterpriseServerProviderRequest();
+      req.setId(this.provider.id);
+      req.setName(this.name?.value);
+      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
+      req.setTokenEndpoint(this.tokenEndpoint?.value);
+      req.setUserEndpoint(this.userEndpoint?.value);
+      req.setClientId(this.clientId?.value);
+      req.setClientSecret(this.clientSecret?.value);
+      req.setScopesList(this.scopesList?.value);
 
-        this.loading = true;
-        (this.service as ManagementService)
-          .updateGitHubEnterpriseServerProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
+      this.loading = true;
+      this.service
+        .updateGitHubEnterpriseServerProvider(req)
+        .then((idp) => {
+          setTimeout(() => {
             this.loading = false;
-          });
-      } else if (PolicyComponentServiceType.ADMIN) {
-        const req = new AdminUpdateGitHubEnterpriseServerProviderRequest();
-        req.setId(this.provider.id);
-        req.setName(this.name?.value);
-        req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-        req.setTokenEndpoint(this.tokenEndpoint?.value);
-        req.setUserEndpoint(this.userEndpoint?.value);
-        req.setClientId(this.clientId?.value);
-        req.setClientSecret(this.clientSecret?.value);
-        req.setScopesList(this.scopesList?.value);
-
-        this.loading = true;
-        (this.service as AdminService)
-          .updateGitHubEnterpriseServerProvider(req)
-          .then((idp) => {
-            setTimeout(() => {
-              this.loading = false;
-              this.close();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loading = false;
-          });
-      }
+            this.close();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.loading = false;
+        });
     }
   }
 

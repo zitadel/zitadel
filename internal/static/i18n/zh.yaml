@@ -241,6 +241,9 @@ Errors:
       NotFound: 未找到通知政策
       NotChanged: 通知政策没有改变
       AlreadyExists: 已经存在的通知政策
+    LabelPolicy:
+      NotFound: 不存在私人政策
+      NotChanged: 私人政策不改变
   Project:
     ProjectIDMissing: P缺少项目 ID
     AlreadyExists: 项目以存在于组织中

@@ -38,7 +38,7 @@ const (
 	IDPTemplateGitLabSuffix           = "gitlab"
 	IDPTemplateGitLabSelfHostedSuffix = "gitlab_self_hosted"
 	IDPTemplateGoogleSuffix           = "google"
-	IDPTemplateLDAPSuffix             = "ldap"
+	IDPTemplateLDAPSuffix             = "ldap2"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -352,7 +352,7 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceJWTIDPAdded,
 				},
 				{
-					Event:  instance.JWTIDPAddedEventType,
+					Event:  instance.JWTIDPChangedEventType,
 					Reduce: p.reduceJWTIDPChanged,
 				},
 				{
@@ -469,7 +469,7 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceJWTIDPAdded,
 				},
 				{
-					Event:  org.JWTIDPAddedEventType,
+					Event:  org.JWTIDPChangedEventType,
 					Reduce: p.reduceJWTIDPChanged,
 				},
 				{

@@ -158,8 +158,6 @@ import {
   RemoveIAMMemberResponse,
   RemoveIDPFromLoginPolicyRequest,
   RemoveIDPFromLoginPolicyResponse,
-  RemoveIDPRequest,
-  RemoveIDPResponse,
   RemoveLabelPolicyFontRequest,
   RemoveLabelPolicyFontResponse,
   RemoveLabelPolicyIconDarkRequest,
@@ -902,12 +900,6 @@ export class AdminService {
     return this.grpcService.admin.listLoginPolicyIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public removeIDP(id: string): Promise<RemoveIDPResponse.AsObject> {
-    const req = new RemoveIDPRequest();
-    req.setIdpId(id);
-    return this.grpcService.admin.removeIDP(req, null).then((resp) => resp.toObject());
-  }
-
   public deactivateIDP(id: string): Promise<DeactivateIDPResponse.AsObject> {
     const req = new DeactivateIDPRequest();
     req.setIdpId(id);
@@ -1014,7 +1006,9 @@ export class AdminService {
     return this.grpcService.admin.updateGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {
+  public deleteProvider(id: string): Promise<DeleteProviderResponse.AsObject> {
+    const req = new DeleteProviderRequest();
+    req.setId(id);
     return this.grpcService.admin.deleteProvider(req, null).then((resp) => resp.toObject());
   }
 
