@@ -10,9 +10,11 @@
     <p>{{t "LoginSuccess.AutoRedirectDescription"}}</p>
 </div>
 
-<form action="{{ .RedirectURI }}" method="GET">
+<form action="{{ .RedirectURI }}" method="POST">
 
-    <input type="hidden" name="id" value="{{ .AuthReqID }}" />
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     {{ template "error-message" .}}
 

@@ -104,6 +104,7 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrg).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrgCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLoginSuccess, login.handleLoginSuccess).Methods(http.MethodGet)
+	router.HandleFunc(EndpointLoginSuccess, login.handleLoginSuccessCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLDAPLogin, login.handleLDAP).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLDAPCallback, login.handleLDAPCallback).Methods(http.MethodPost)
 	router.SkipClean(true).Handle("", http.RedirectHandler(HandlerPrefix+"/", http.StatusMovedPermanently))
