@@ -42,9 +42,9 @@ The <span className="text-yellow-500">Instance Domain</span> to your ZITADEL ins
 </p>
 
 <p>
-  <span className="text-orange-500">Response Type</span> defines whether a
-  code, id_token token or just id_token will be returned. Most use cases will
-  need code.
+  <span className="text-orange-500">Response Type</span> defines whether a code,
+  id_token token or just id_token will be returned. Most use cases will need
+  code.
 </p>
 
 More in the <a href="/apis/openidoauth/endpoints#required-request-parameters">documentation</a> about required Parameters.
@@ -63,16 +63,26 @@ More in the [documentation](/apis/openidoauth/authn-methods) about authenticatio
 
 ### Additional Parameters
 
-<p>
+<div>
   <span className="text-cyan-500">Prompt</span> defines if and how the user
-  should be prompted on login. For example: 
+  should be prompted on login. For example:
   <ul>
-    <li><code>select_account</code>: user is prompted to select one of the existing sessions or create a new one</li>
-    <li><code>create</code>: present the register form</li>
-    <li><code>login</code>: requires the user to re-authenticate</li>
-    <li><code>none</code>: user must be authenticated without interaction, an error is returned otherwise; use for silent-refresh</li>
+    <li>
+      <code>select_account</code>: user is prompted to select one of the
+      existing sessions or create a new one
+    </li>
+    <li>
+      <code>create</code>: present the register form
+    </li>
+    <li>
+      <code>login</code>: requires the user to re-authenticate
+    </li>
+    <li>
+      <code>none</code>: user must be authenticated without interaction, an
+      error is returned otherwise; use for silent-refresh
+    </li>
   </ul>
-</p>
+</div>
 
 <p>
   <span className="text-rose-500">Login hint</span> must be a valid logon name

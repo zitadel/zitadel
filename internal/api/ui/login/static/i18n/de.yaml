@@ -212,6 +212,7 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -243,6 +244,7 @@ ExternalRegistrationUserOverview:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
@@ -302,6 +304,7 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Powered By
@@ -407,5 +410,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy existiert nicht
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrierung ist nicht erlaubt
 
 optional: (optional)

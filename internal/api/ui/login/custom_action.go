@@ -67,7 +67,9 @@ func (l *Login) runPostExternalAuthenticationActions(
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			user.IsPhoneVerified = verified
 		}),
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -145,7 +147,9 @@ func (l *Login) runPostInternalAuthenticationActions(
 
 	metadataList := object.MetadataListFromDomain(nil)
 	apiFields := actions.WithAPIFields(
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -246,7 +250,9 @@ func (l *Login) runPreCreationActions(
 			}
 			user.Phone.IsPhoneVerified = verified
 		}),
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
