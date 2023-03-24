@@ -1,6 +1,7 @@
 {
   "name": "console",
   "version": "0.0.0",
+  "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -9,7 +10,20 @@
     "lint:fix": "prettier --write src",
     "generate": "buf generate ../proto --include-imports --include-wkt"
   },
-  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "inputs": ["!{projectRoot}/dist/**/*", "!{projectRoot}/.angular/**/*"],
+        "outputs": ["{projectRoot}/dist/console/**/*", "{projectRoot}/.angular/**/*"],
+        "dependsOn": ["generate"]
+      },
+      "generate": {
+        "inputs": ["{workspaceRoot}/proto/**/*", "!{projectRoot}/dist/**/*", "!{projectRoot}/.angular/**/*"],
+        "outputs": ["{projectRoot}/src/app/proto/generated/**/*"]
+      }
+    },
+    "includedScripts": ["generate", "build"]
+  },
   "dependencies": {
     "@angular/animations": "^15.2.2",
     "@angular/cdk": "^15.2.2",
