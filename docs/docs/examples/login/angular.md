@@ -92,7 +92,7 @@ Then add `offline_access` to the scopes and add the line
 this.oauthService.setupAutomaticSilentRefresh();
 ```
 
-this will refresh a token before it expires automatically.
+this will automatically refresh a token before it expires.
 
 ### Add Login to Your Application
 
