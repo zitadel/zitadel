@@ -2,57 +2,57 @@ const path = require('path');
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
-  title: "ZITADEL Docs",
+  title: 'ZITADEL Docs',
   trailingSlash: false,
-  url: "https://zitadel.com",
-  baseUrl: "docs",
-  onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
-  organizationName: "zitadel",
-  projectName: "zitadel",
+  url: 'https://zitadel.com',
+  baseUrl: 'docs',
+  onBrokenLinks: 'throw',
+  onBrokenMarkdownLinks: 'warn',
+  favicon: 'img/favicon.ico',
+  organizationName: 'zitadel',
+  projectName: 'zitadel',
   scripts: [
     {
-      src: "/docs/proxy/js/script.js",
+      src: '/docs/proxy/js/script.js',
       async: true,
       defer: true,
-      "data-domain": "zitadel.com",
-      "data-api": "/docs/proxy/api/event",
+      'data-domain': 'zitadel.com',
+      'data-api': '/docs/proxy/api/event',
     },
   ],
   customFields: {
     description:
-      "Documentation for ZITADEL - The best of Auth0 and Keycloak combined. Built for the serverless era.",
+      'Documentation for ZITADEL - The best of Auth0 and Keycloak combined. Built for the serverless era.',
   },
   themeConfig: {
     metadata: [
       {
-        name: "keywords",
+        name: 'keywords',
         content:
-          "zitadel, documentation, jwt, saml, oauth2, authentication, serverless, login, auth, authorization, sso, openid-connect, oidc, mfa, 2fa, passkeys, fido2, docker",
+          'zitadel, documentation, jwt, saml, oauth2, authentication, serverless, login, auth, authorization, sso, openid-connect, oidc, mfa, 2fa, passkeys, fido2, docker',
       },
       {
-        property: "og:type",
-        content: "website",
+        property: 'og:type',
+        content: 'website',
       },
-      { property: "og:url", content: "https://www.zitadel.com/docs" },
+      { property: 'og:url', content: 'https://www.zitadel.com/docs' },
       {
-        property: "og:image",
-        content: "https://www.zitadel.com/docs/img/preview.png",
+        property: 'og:image',
+        content: 'https://www.zitadel.com/docs/img/preview.png',
       },
-      { property: "twitter:card", content: "summary_large_image" },
-      { property: "twitter:url", content: "https://www.zitadel.com/docs" },
-      { property: "twitter:title", content: "ZITADEL Docs" },
+      { property: 'twitter:card', content: 'summary_large_image' },
+      { property: 'twitter:url', content: 'https://www.zitadel.com/docs' },
+      { property: 'twitter:title', content: 'ZITADEL Docs' },
       {
-        property: "twitter:image",
-        content: "https://www.zitadel.com/docs/img/preview.png",
+        property: 'twitter:image',
+        content: 'https://www.zitadel.com/docs/img/preview.png',
       },
     ],
     zoom: {
-      selector: ".markdown :not(em) > img",
+      selector: '.markdown :not(em) > img',
       background: {
-        light: "rgb(243, 244, 246)",
-        dark: "rgb(55, 59, 82)",
+        light: 'rgb(243, 244, 246)',
+        dark: 'rgb(55, 59, 82)',
       },
       // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
       config: {},
@@ -60,50 +60,50 @@ module.exports = {
     navbar: {
       // title: 'ZITADEL',
       logo: {
-        alt: "ZITADEL logo",
-        src: "img/zitadel-logo-dark.svg",
-        srcDark: "img/zitadel-logo-light.svg",
+        alt: 'ZITADEL logo',
+        src: 'img/zitadel-logo-dark.svg',
+        srcDark: 'img/zitadel-logo-light.svg',
       },
       items: [
         {
-          type: "doc",
-          label: "Documentation",
-          docId: "guides/overview",
-          position: "left",
-        }, 
-        {
-          type: "doc",
-          label: "APIs",
-          docId: "apis/introduction",
-          position: "left",
+          type: 'doc',
+          label: 'Documentation',
+          docId: 'guides/overview',
+          position: 'left',
         },
         {
-          type: "doc",
-          label: "Self-Hosting",
-          docId: "self-hosting/deploy/overview",
-          position: "left",
+          type: 'doc',
+          label: 'APIs',
+          docId: 'apis/introduction',
+          position: 'left',
         },
         {
-          type: "doc",
-          docId: "legal/introduction",
-          label: "Legal",
-          position: "right",
+          type: 'doc',
+          label: 'Self-Hosting',
+          docId: 'self-hosting/deploy/overview',
+          position: 'left',
         },
         {
-          type: "html",
-          position: "right",
+          type: 'doc',
+          docId: 'legal/introduction',
+          label: 'Legal',
+          position: 'right',
+        },
+        {
+          type: 'html',
+          position: 'right',
           value:
             '<a href="https://github.com/zitadel/zitadel/discussions" style="text-decoration: none; width: 20px; height: 24px; display: flex"><i class="las la-comments"></i></a>',
         },
         {
-          type: "html",
-          position: "right",
+          type: 'html',
+          position: 'right',
           value:
             '<a href="https://github.com/zitadel/zitadel" style="text-decoration: none; width: 20px; height: 24px; display: flex"><i class="lab la-github"></i></a>',
         },
         {
-          type: "html",
-          position: "right",
+          type: 'html',
+          position: 'right',
           value:
             '<a href="https://zitadel.com/chat" style="text-decoration: none; width: 20px; height: 24px; display: flex; margin: 0 .5rem 0 0"><i class="lab la-discord"></i></a>',
         },
@@ -112,78 +112,78 @@ module.exports = {
     footer: {
       links: [
         {
-          title: "Community",
+          title: 'Community',
           items: [
             {
-              label: "Chat",
-              href: "https://zitadel.com/chat",
+              label: 'Chat',
+              href: 'https://zitadel.com/chat',
             },
             {
-              label: "GitHub Discussions",
-              href: "https://github.com/zitadel/zitadel/discussions",
+              label: 'GitHub Discussions',
+              href: 'https://github.com/zitadel/zitadel/discussions',
             },
             {
-              label: "Twitter",
-              href: "https://twitter.com/zitadel",
+              label: 'Twitter',
+              href: 'https://twitter.com/zitadel',
             },
             {
-              label: "Linkedin",
-              href: "https://www.linkedin.com/company/zitadel/",
+              label: 'Linkedin',
+              href: 'https://www.linkedin.com/company/zitadel/',
             },
             {
-              label: "Blog",
-              href: "https://zitadel.com/blog",
+              label: 'Blog',
+              href: 'https://zitadel.com/blog',
             },
           ],
         },
         {
-          title: "Legal",
+          title: 'Legal',
           items: [
             {
-              label: "Terms and Conditions",
-              href: "/legal/terms-of-service",
+              label: 'Terms and Conditions',
+              href: '/legal/terms-of-service',
             },
             {
-              label: "Privacy Policy",
-              href: "/legal/privacy-policy",
+              label: 'Privacy Policy',
+              href: '/legal/privacy-policy',
             },
           ],
         },
         {
-          title: "About",
+          title: 'About',
           items: [
             {
-              label: "Website",
-              href: "https://zitadel.com",
+              label: 'Website',
+              href: 'https://zitadel.com',
             },
             {
-              label: "Contact",
-              href: "https://zitadel.com/contact/",
+              label: 'Contact',
+              href: 'https://zitadel.com/contact/',
             },
             {
-              label: "GitHub",
-              href: "https://github.com/zitadel",
+              label: 'GitHub',
+              href: 'https://github.com/zitadel',
             },
             {
-              label: "Status",
-              href: "https://status.zitadel.com/",
-            }
+              label: 'Status',
+              href: 'https://status.zitadel.com/',
+            },
           ],
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     algolia: {
-      appId: "8H6ZKXENLO",
-      apiKey: "124fe1c102a184bc6fc70c75dc84f96f",
-      indexName: "zitadel",
-      selector: "div#",
+      appId: '8H6ZKXENLO',
+      apiKey: '124fe1c102a184bc6fc70c75dc84f96f',
+      indexName: 'zitadel',
+      selector: 'div#',
     },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy", "regex"],
+      additionalLanguages: ['csharp', 'dart', 'groovy', 'regex'],
     },
     colorMode: {
-      defaultMode: "dark",
+      defaultMode: 'dark',
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
@@ -207,76 +207,78 @@ module.exports = {
   },
   presets: [
     [
-      "classic",
+      'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          routeBasePath: "/",
-          sidebarPath: require.resolve("./sidebars.js"),
+          routeBasePath: '/',
+          sidebarPath: require.resolve('./sidebars.js'),
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
-          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
-          remarkPlugins: [require("mdx-mermaid")],
-          docLayoutComponent: "@theme/DocPage",
-          docItemComponent:  '@theme/ApiItem'
+          editUrl: 'https://github.com/zitadel/zitadel/edit/main/docs/',
+          remarkPlugins: [require('mdx-mermaid')],
+          docLayoutComponent: '@theme/DocPage',
+          docItemComponent: '@theme/ApiItem',
         },
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: require.resolve('./src/css/custom.css'),
         },
-      })
+      }),
     ],
-
   ],
   plugins: [
     [
       'docusaurus-plugin-openapi-docs',
       {
-        id: "apiDocs",
-        docsPluginId: "classic",
+        id: 'apiDocs',
+        docsPluginId: 'classic',
         config: {
           auth: {
-            specPath: ".artifacts/openapi/zitadel/auth.swagger.json",
-            outputDir: "docs/apis/auth",
+            specPath: '.artifacts/openapi/zitadel/auth.swagger.json',
+            outputDir: 'docs/apis/auth',
             sidebarOptions: {
-              groupPathsBy: "tag",
+              groupPathsBy: 'tag',
             },
           },
           mgmt: {
-            specPath: ".artifacts/openapi/zitadel/management.swagger.json",
-            outputDir: "docs/apis/mgmt",
+            specPath: '.artifacts/openapi/zitadel/management.swagger.json',
+            outputDir: 'docs/apis/mgmt',
             sidebarOptions: {
-              groupPathsBy: "tag",
+              groupPathsBy: 'tag',
             },
           },
           admin: {
-            specPath: ".artifacts/openapi/zitadel/admin.swagger.json",
-            outputDir: "docs/apis/admin",
+            specPath: '.artifacts/openapi/zitadel/admin.swagger.json',
+            outputDir: 'docs/apis/admin',
             sidebarOptions: {
-              groupPathsBy: "tag",
+              groupPathsBy: 'tag',
             },
           },
           system: {
-            specPath: ".artifacts/openapi/zitadel/system.swagger.json",
-            outputDir: "docs/apis/system",
+            specPath: '.artifacts/openapi/zitadel/system.swagger.json',
+            outputDir: 'docs/apis/system',
             sidebarOptions: {
-              groupPathsBy: "tag",
+              groupPathsBy: 'tag',
             },
-          }
-        }
+          },
+        },
       },
     ],
-    require.resolve("docusaurus-plugin-image-zoom"),
+    require.resolve('docusaurus-plugin-image-zoom'),
     async function myPlugin(context, options) {
       return {
-        name: "docusaurus-tailwindcss",
+        name: 'docusaurus-tailwindcss',
         configurePostCss(postcssOptions) {
           // Appends TailwindCSS and AutoPrefixer.
-          postcssOptions.plugins.push(require("tailwindcss"));
-          postcssOptions.plugins.push(require("autoprefixer"));
+          postcssOptions.plugins.push(require('tailwindcss'));
+          postcssOptions.plugins.push(require('autoprefixer'));
           return postcssOptions;
         },
       };
     },
   ],
-  themes: ["@saucelabs/theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  themes: [
+    '@saucelabs/theme-github-codeblock',
+    'docusaurus-theme-openapi-docs',
+  ],
 };

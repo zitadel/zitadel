@@ -51,11 +51,11 @@ With ZITADEL you can rely on a hardened and extensible turnkey solution to solve
 
 Deploying ZITADEL locally takes less than 3 minutes. So go ahead and give it a try!
 
-* [Linux](https://zitadel.com/docs/self-hosting/deploy/linux)
-* [MacOS](https://zitadel.com/docs/self-hosting/deploy/macos)
-* [Docker compose](https://zitadel.com/docs/self-hosting/deploy/compose)
-* [Knative](https://zitadel.com/docs/self-hosting/deploy/knative)
-* [Kubernetes](https://zitadel.com/docs/self-hosting/deploy/kubernetes)
+- [Linux](https://zitadel.com/docs/self-hosting/deploy/linux)
+- [MacOS](https://zitadel.com/docs/self-hosting/deploy/macos)
+- [Docker compose](https://zitadel.com/docs/self-hosting/deploy/compose)
+- [Knative](https://zitadel.com/docs/self-hosting/deploy/knative)
+- [Kubernetes](https://zitadel.com/docs/self-hosting/deploy/kubernetes)
 
 See all guides [here](https://zitadel.com/docs/self-hosting/deploy/overview)
 
@@ -125,19 +125,19 @@ Made with [contrib.rocks](https://contrib.rocks).
 
 Secure a React Application using OpenID Connect Authorization Code with PKCE
 
-[![Quick Start Guide](https://user-images.githubusercontent.com/1366906/223662449-f17b734d-405c-4945-a8a1-200440c459e5.gif)](http://www.youtube.com/watch?v=5THbQljoPKg "Quick Start Guide")
+[![Quick Start Guide](https://user-images.githubusercontent.com/1366906/223662449-f17b734d-405c-4945-a8a1-200440c459e5.gif)](http://www.youtube.com/watch?v=5THbQljoPKg 'Quick Start Guide')
 
 ### Login with Passkeys
 
 Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of Passkeys (FIDO 2 / WebAuthN):
 
-[![Passkeys](https://user-images.githubusercontent.com/1366906/223664178-4132faef-4832-4014-b9ab-90c2a8d15436.gif)](https://www.youtube.com/watch?v=cZjHQYurSjw&list=PLTDa7jTlOyRLdABgD2zL0LGM7rx5GZ1IR&index=2 "Passkeys")
+[![Passkeys](https://user-images.githubusercontent.com/1366906/223664178-4132faef-4832-4014-b9ab-90c2a8d15436.gif)](https://www.youtube.com/watch?v=cZjHQYurSjw&list=PLTDa7jTlOyRLdABgD2zL0LGM7rx5GZ1IR&index=2 'Passkeys')
 
 ### Admin Console
 
 Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
 
-[![Console Showcase](https://user-images.githubusercontent.com/1366906/223663344-67038d5f-4415-4285-ab20-9a4d397e2138.gif)](http://www.youtube.com/watch?v=RPpHktAcCtk "Console Showcase")
+[![Console Showcase](https://user-images.githubusercontent.com/1366906/223663344-67038d5f-4415-4285-ab20-9a4d397e2138.gif)](http://www.youtube.com/watch?v=RPpHktAcCtk 'Console Showcase')
 
 ## Security
 
