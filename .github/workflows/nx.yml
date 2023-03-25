@@ -10,18 +10,16 @@ jobs:
     uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.11.3
     with:
       main-branch-name: main
-      number-of-agents: 3
+      number-of-agents: 5
       init-commands: |
-        yarn nx-cloud start-ci-run --stop-agents-after="build" --agent-count=3
+        yarn nx-cloud start-ci-run --stop-agents-after="build" --agent-count=5
       parallel-commands: |
         yarn nx-cloud record -- yarn nx format:check
       parallel-commands-on-agents: |
-        yarn nx affected --target=build --parallel=3 --exclude=docs,console
-        yarn nx affected --target=build --parallel=3 --exclude=zitadel,console
-        yarn nx affected --target=build --parallel=3 --exclude=zitadel,docs
+        yarn nx affected --target=build --parallel=1
 
   agents:
     name: Nx Cloud - Agents
     uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.11.3
     with:
-      number-of-agents: 3
+      number-of-agents: 5
