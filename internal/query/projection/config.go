@@ -11,7 +11,7 @@ type Config struct {
 	ConcurrentInstances     uint
 	BulkLimit               uint64
 	Customizations          map[string]CustomConfig
-	HandleInactiveInstances *bool
+	HandleInactiveInstances bool
 }
 
 type CustomConfig struct {
