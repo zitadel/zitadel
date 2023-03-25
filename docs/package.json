@@ -25,7 +25,7 @@
           "!{projectRoot}/.docusaurus/**/*"
         ],
         "outputs": [
-          "{projectRoot}/build/**/*",
+          "{projectRoot}/build/emptyPlaceHolder",
           "{projectRoot}/.docusaurus/**/*"
         ],
         "dependsOn": [

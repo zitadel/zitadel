@@ -1,17 +1,53 @@
 {
   "name": "zitadel",
   "version": "0.0.0",
-  "scripts": {},
   "private": true,
-  "workspaces": [
-    "console",
-    "docs"
-  ],
+  "scripts": {
+    "generate": "make generate",
+    "build": "go build -o zitadel"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "inputs": [
+          "!{workspaceRoot}/console/**/*",
+          "!{workspaceRoot}/docs/**/*"
+        ],
+        "outputs": [
+          "{workspaceRoot}/zitadel"
+        ],
+        "dependsOn": [
+          "generate"
+        ]
+      },
+      "generate": {
+        "inputs": [
+          "{workspaceRoot}/proto/**/*",
+          "{workspaceRoot}/tools/**/*",
+          "{workspaceRoot}/internal/protoc/**/*",
+          "{workspaceRoot}/internal/api/ui/**/*",
+          "{workspaceRoot}/internal/notification/**/*",
+          "{workspaceRoot}/internal/statik/**/*",
+          "{workspaceRoot}/internal/api/assets/**/*",
+          "!{workspaceRoot}/**/*"
+        ],
+        "outputs": [
+          "{workspaceRoot}/.artifacts/grpc/zitadel/**/*",
+          "{workspaceRoot}/docs/apis/assets/**/*"
+        ]
+      }
+    },
+    "includedScripts": [
+      "generate",
+      "build"
+    ]
+  },
   "dependencies": {},
   "devDependencies": {
     "@nrwl/nx-cloud": "latest",
     "@nrwl/workspace": "15.8.7",
     "nx": "15.8.8",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "@bufbuild/buf": "^1.14.0"
   }
 }
