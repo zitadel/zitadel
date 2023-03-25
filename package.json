@@ -6,6 +6,11 @@
     "generate": "make generate",
     "build": "go build -o zitadel"
   },
+  "workspaces": [
+    "docs",
+    "console",
+    "./"
+  ],
   "nx": {
     "targets": {
       "build": {
