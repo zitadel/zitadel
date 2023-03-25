@@ -228,6 +228,12 @@ module.exports = {
   ],
   plugins: [
     [
+      '@docusaurus/plugin-ideal-image',
+      {
+        quality: 70,
+      },
+    ],
+    [
       'docusaurus-plugin-openapi-docs',
       {
         id: 'apiDocs',
