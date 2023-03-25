@@ -11,7 +11,6 @@ type Config struct {
 	ConcurrentInstances     uint
 	BulkLimit               uint64
 	Customizations          map[string]CustomConfig
-	MaxIterators            int
 	HandleInactiveInstances *bool
 }
 
