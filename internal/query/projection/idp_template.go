@@ -38,7 +38,7 @@ const (
 	IDPTemplateGitLabSuffix           = "gitlab"
 	IDPTemplateGitLabSelfHostedSuffix = "gitlab_self_hosted"
 	IDPTemplateGoogleSuffix           = "google"
-	IDPTemplateLDAPSuffix             = "ldap"
+	IDPTemplateLDAPSuffix             = "ldap2"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -125,14 +125,15 @@ const (
 
 	LDAPIDCol                         = "idp_id"
 	LDAPInstanceIDCol                 = "instance_id"
-	LDAPHostCol                       = "host"
-	LDAPPortCol                       = "port"
-	LDAPTlsCol                        = "tls"
+	LDAPServersCol                    = "servers"
+	LDAPStartTLSCol                   = "start_tls"
 	LDAPBaseDNCol                     = "base_dn"
-	LDAPUserObjectClassCol            = "user_object_class"
-	LDAPUserUniqueAttributeCol        = "user_unique_attribute"
-	LDAPAdminCol                      = "admin"
-	LDAPPasswordCol                   = "password"
+	LDAPBindDNCol                     = "bind_dn"
+	LDAPBindPasswordCol               = "bind_password"
+	LDAPUserBaseCol                   = "user_base"
+	LDAPUserObjectClassesCol          = "user_object_classes"
+	LDAPUserFiltersCol                = "user_filters"
+	LDAPTimeoutCol                    = "timeout"
 	LDAPIDAttributeCol                = "id_attribute"
 	LDAPFirstNameAttributeCol         = "first_name_attribute"
 	LDAPLastNameAttributeCol          = "last_name_attribute"
@@ -293,14 +294,15 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LDAPIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LDAPInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LDAPHostCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPPortCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPTlsCol, crdb.ColumnTypeBool, crdb.Nullable()),
-			crdb.NewColumn(LDAPBaseDNCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPUserObjectClassCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPUserUniqueAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPAdminCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPPasswordCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(LDAPServersCol, crdb.ColumnTypeTextArray),
+			crdb.NewColumn(LDAPStartTLSCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LDAPBaseDNCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LDAPBindDNCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LDAPBindPasswordCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(LDAPUserBaseCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LDAPUserObjectClassesCol, crdb.ColumnTypeTextArray),
+			crdb.NewColumn(LDAPUserFiltersCol, crdb.ColumnTypeTextArray),
+			crdb.NewColumn(LDAPTimeoutCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(LDAPIDAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LDAPFirstNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LDAPLastNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -1663,14 +1665,15 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 			[]handler.Column{
 				handler.NewCol(LDAPIDCol, idpEvent.ID),
 				handler.NewCol(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(LDAPHostCol, idpEvent.Host),
-				handler.NewCol(LDAPPortCol, idpEvent.Port),
-				handler.NewCol(LDAPTlsCol, idpEvent.TLS),
+				handler.NewCol(LDAPServersCol, database.StringArray(idpEvent.Servers)),
+				handler.NewCol(LDAPStartTLSCol, idpEvent.StartTLS),
 				handler.NewCol(LDAPBaseDNCol, idpEvent.BaseDN),
-				handler.NewCol(LDAPUserObjectClassCol, idpEvent.UserObjectClass),
-				handler.NewCol(LDAPUserUniqueAttributeCol, idpEvent.UserUniqueAttribute),
-				handler.NewCol(LDAPAdminCol, idpEvent.Admin),
-				handler.NewCol(LDAPPasswordCol, idpEvent.Password),
+				handler.NewCol(LDAPBindDNCol, idpEvent.BindDN),
+				handler.NewCol(LDAPBindPasswordCol, idpEvent.BindPassword),
+				handler.NewCol(LDAPUserBaseCol, idpEvent.UserBase),
+				handler.NewCol(LDAPUserObjectClassesCol, database.StringArray(idpEvent.UserObjectClasses)),
+				handler.NewCol(LDAPUserFiltersCol, database.StringArray(idpEvent.UserFilters)),
+				handler.NewCol(LDAPTimeoutCol, idpEvent.Timeout),
 				handler.NewCol(LDAPIDAttributeCol, idpEvent.IDAttribute),
 				handler.NewCol(LDAPFirstNameAttributeCol, idpEvent.FirstNameAttribute),
 				handler.NewCol(LDAPLastNameAttributeCol, idpEvent.LastNameAttribute),
@@ -1962,29 +1965,32 @@ func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler
 
 func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
 	ldapCols := make([]handler.Column, 0, 4)
-	if idpEvent.Host != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPHostCol, *idpEvent.Host))
+	if idpEvent.Servers != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPServersCol, database.StringArray(idpEvent.Servers)))
 	}
-	if idpEvent.Port != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPPortCol, *idpEvent.Port))
-	}
-	if idpEvent.TLS != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPTlsCol, *idpEvent.TLS))
+	if idpEvent.StartTLS != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPStartTLSCol, *idpEvent.StartTLS))
 	}
 	if idpEvent.BaseDN != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPBaseDNCol, *idpEvent.BaseDN))
 	}
-	if idpEvent.UserObjectClass != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPUserObjectClassCol, *idpEvent.UserObjectClass))
+	if idpEvent.BindDN != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPBindDNCol, *idpEvent.BindDN))
 	}
-	if idpEvent.UserUniqueAttribute != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPUserUniqueAttributeCol, *idpEvent.UserUniqueAttribute))
+	if idpEvent.BindPassword != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPBindPasswordCol, idpEvent.BindPassword))
 	}
-	if idpEvent.Admin != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPAdminCol, *idpEvent.Admin))
+	if idpEvent.UserBase != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserBaseCol, *idpEvent.UserBase))
 	}
-	if idpEvent.Password != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPPasswordCol, *idpEvent.Password))
+	if idpEvent.UserObjectClasses != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserObjectClassesCol, database.StringArray(idpEvent.UserObjectClasses)))
+	}
+	if idpEvent.UserFilters != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserFiltersCol, database.StringArray(idpEvent.UserFilters)))
+	}
+	if idpEvent.Timeout != nil {
+		ldapCols = append(ldapCols, handler.NewCol(LDAPTimeoutCol, *idpEvent.Timeout))
 	}
 	if idpEvent.IDAttribute != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPIDAttributeCol, *idpEvent.IDAttribute))
