@@ -8,7 +8,7 @@ grpc:
 	mv .artifacts/grpc/zitadel/admin.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/admin
 	mv .artifacts/grpc/zitadel/management.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/management
 	mv .artifacts/grpc/zitadel/system.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/system
-	cp -rT .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/ pkg/grpc/
+	cp -R .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc
 	mkdir -p openapi/v2/zitadel
 	cp .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel
 
