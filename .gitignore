@@ -73,3 +73,4 @@ go.work.sum
 # Local Netlify folder
 .netlify
 node_modules
+docs/apis/assets/assets.md
