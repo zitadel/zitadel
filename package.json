@@ -2,52 +2,11 @@
   "name": "zitadel",
   "version": "0.0.0",
   "private": true,
-  "scripts": {
-    "generate": "make generate",
-    "build": "go build -o zitadel"
-  },
   "workspaces": [
     "docs",
     "console",
-    "./"
+    "."
   ],
-  "nx": {
-    "targets": {
-      "build": {
-        "inputs": [
-          "!{workspaceRoot}/console/**/*",
-          "!{workspaceRoot}/docs/**/*"
-        ],
-        "outputs": [
-          "{workspaceRoot}/zitadel"
-        ],
-        "dependsOn": [
-          "generate"
-        ]
-      },
-      "generate": {
-        "inputs": [
-          "!{workspaceRoot}/**/*",
-          "{workspaceRoot}/proto/**/*",
-          "{workspaceRoot}/tools/**/*",
-          "{workspaceRoot}/internal/protoc/**/*",
-          "{workspaceRoot}/internal/api/ui/**/*",
-          "{workspaceRoot}/internal/notification/**/*",
-          "{workspaceRoot}/internal/statik/**/*",
-          "{workspaceRoot}/internal/api/assets/**/*"
-          
-        ],
-        "outputs": [
-          "{workspaceRoot}/.artifacts/grpc/zitadel/**/*",
-          "{workspaceRoot}/docs/apis/assets/**/*"
-        ]
-      }
-    },
-    "includedScripts": [
-      "generate",
-      "build"
-    ]
-  },
   "dependencies": {},
   "devDependencies": {
     "@nrwl/nx-cloud": "latest",
