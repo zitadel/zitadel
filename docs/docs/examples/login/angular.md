@@ -21,10 +21,9 @@ We recommend you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/gran
 ### Redirect URIs
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+The Post logout redirect send the users back to a route on your application after they have logged out.
 
-> If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.
-
-If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.
+> If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set dev mode to `true`, the Redirect URIs to <http://localhost:4200/auth/callback> and Post redirect URI to <http://localhost:4200/signedout>.
 
 Continue and create the application.
 
@@ -147,6 +146,17 @@ And in your HTML file:
 ```html reference
 https://github.com/zitadel/zitadel-angular/blob/main/src/app/components/user/user.component.html
 ```
+
+### Refresh token
+
+If you want to add a refresh token to your application you have to navigate to the console application and tick the checkbox in the configuration section.
+Then add `offline_access` to the scopes and add the line
+
+```
+this.oauthService.setupAutomaticSilentRefresh();
+```
+
+this will automatically refresh a token before it expires.
 
 ## Completion
 
