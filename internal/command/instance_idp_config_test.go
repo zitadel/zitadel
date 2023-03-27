@@ -120,18 +120,6 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				/*want: &domain.IDPConfig{
-					ObjectRoot: models.ObjectRoot{
-						InstanceID:    "INSTANCE",
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					IDPConfigID:  "config1",
-					Name:         "name1",
-					StylingType:  domain.IDPConfigStylingTypeGoogle,
-					State:        domain.IDPConfigStateActive,
-					AutoRegister: true,
-				},*/
 				want: &domain.ObjectDetails{Sequence: 0x0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
 			},
 		},
@@ -185,17 +173,6 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				/*want: &domain.IDPConfig{
-					ObjectRoot: models.ObjectRoot{
-						InstanceID:    "INSTANCE",
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					IDPConfigID: "config1",
-					Name:        "name1",
-					StylingType: domain.IDPConfigStylingTypeGoogle,
-					State:       domain.IDPConfigStateActive,
-				},*/
 				want: &domain.ObjectDetails{Sequence: 0x0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
 			},
 		},
@@ -332,19 +309,6 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				/*
-					want: &domain.IDPConfig{
-						ObjectRoot: models.ObjectRoot{
-							AggregateID:   "INSTANCE",
-							ResourceOwner: "INSTANCE",
-						},
-						IDPConfigID:  "config1",
-						Name:         "name2",
-						StylingType:  domain.IDPConfigStylingTypeUnspecified,
-						State:        domain.IDPConfigStateActive,
-						AutoRegister: false,
-					},
-				*/
 				want: &domain.ObjectDetails{Sequence: 0x0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
 			},
 		},
