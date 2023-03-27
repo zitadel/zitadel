@@ -6,7 +6,10 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "go build -o=zitadel",
+        "commands": [
+          "go mod download",
+          "go build -o=zitadel"
+        ],
         "cwd": ""
       },
       "inputs": ["!{workspaceRoot}/console/**/*", "!{workspaceRoot}/docs/**/*"],
@@ -41,7 +44,10 @@
         "{workspaceRoot}/tools/**/*",
         "{workspaceRoot}/internal/protoc/**/*"
       ],
-      "outputs": ["{workspaceRoot}/.artifacts/grpc/zitadel/**/*"]
+      "outputs": [
+        "{workspaceRoot}/.artifacts/grpc/zitadel/**/*",
+        "{workspaceRoot}/pkg/grpc/**/*"
+      ]
     },
     "generate_static": {
       "executor": "nx:run-commands",
