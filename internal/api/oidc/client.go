@@ -267,53 +267,21 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 		case oidc.ScopeOpenID:
 			userInfo.Subject = user.ID
 		case oidc.ScopeEmail:
-			if user.Human == nil {
-				continue
-			}
-			userInfo.UserInfoEmail = oidc.UserInfoEmail{
-				Email:         string(user.Human.Email),
-				EmailVerified: oidc.Bool(user.Human.IsEmailVerified)}
+			setUserInfoEmail(userInfo, user)
 		case oidc.ScopeProfile:
-			userInfo.PreferredUsername = user.PreferredLoginName
-			userInfo.UpdatedAt = oidc.FromTime(user.ChangeDate)
-			if user.Human != nil {
-				userInfo.Name = user.Human.DisplayName
-				userInfo.FamilyName = user.Human.LastName
-				userInfo.GivenName = user.Human.FirstName
-				userInfo.Nickname = user.Human.NickName
-				userInfo.Gender = getGender(user.Human.Gender)
-				userInfo.Locale = oidc.NewLocale(user.Human.PreferredLanguage)
-				userInfo.Picture = domain.AvatarURL(o.assetAPIPrefix(ctx), user.ResourceOwner, user.Human.AvatarKey)
-			} else {
-				userInfo.Name = user.Machine.Name
-			}
+			o.setUserInfoProfile(ctx, userInfo, user)
 		case oidc.ScopePhone:
-			if user.Human == nil {
-				continue
-			}
-			userInfo.UserInfoPhone = oidc.UserInfoPhone{
-				PhoneNumber:         string(user.Human.Phone),
-				PhoneNumberVerified: user.Human.IsPhoneVerified,
-			}
+			setUserInfoPhone(userInfo, user)
 		case oidc.ScopeAddress:
 			//TODO: handle address for human users as soon as implemented
 		case ScopeUserMetaData:
-			userMetaData, err := o.assertUserMetaData(ctx, userID)
-			if err != nil {
+			if err := o.setUserInfoMetadata(ctx, userInfo, userID); err != nil {
 				return err
-			}
-			if len(userMetaData) > 0 {
-				userInfo.AppendClaims(ClaimUserMetaData, userMetaData)
 			}
 		case ScopeResourceOwner:
-			resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
-			if err != nil {
+			if err := o.setUserInfoResourceOwner(ctx, userInfo, userID); err != nil {
 				return err
 			}
-			for claim, value := range resourceOwnerClaims {
-				userInfo.AppendClaims(claim, value)
-			}
-
 		default:
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
@@ -323,12 +291,8 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 			}
 			if strings.HasPrefix(scope, domain.OrgIDScope) {
 				userInfo.AppendClaims(domain.OrgIDClaim, strings.TrimPrefix(scope, domain.OrgIDScope))
-				resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
-				if err != nil {
+				if err := o.setUserInfoResourceOwner(ctx, userInfo, userID); err != nil {
 					return err
-				}
-				for claim, value := range resourceOwnerClaims {
-					userInfo.AppendClaims(claim, value)
 				}
 			}
 		}
@@ -344,6 +308,63 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	}
 
 	return o.userinfoFlows(ctx, user.ResourceOwner, userGrants, userInfo)
+}
+
+func (o *OPStorage) setUserInfoProfile(ctx context.Context, userInfo *oidc.UserInfo, user *query.User) {
+	userInfo.PreferredUsername = user.PreferredLoginName
+	userInfo.UpdatedAt = oidc.FromTime(user.ChangeDate)
+	if user.Machine != nil {
+		userInfo.Name = user.Machine.Name
+		return
+	}
+	userInfo.Name = user.Human.DisplayName
+	userInfo.FamilyName = user.Human.LastName
+	userInfo.GivenName = user.Human.FirstName
+	userInfo.Nickname = user.Human.NickName
+	userInfo.Gender = getGender(user.Human.Gender)
+	userInfo.Locale = oidc.NewLocale(user.Human.PreferredLanguage)
+	userInfo.Picture = domain.AvatarURL(o.assetAPIPrefix(ctx), user.ResourceOwner, user.Human.AvatarKey)
+}
+
+func setUserInfoEmail(userInfo *oidc.UserInfo, user *query.User) {
+	if user.Human == nil {
+		return
+	}
+	userInfo.UserInfoEmail = oidc.UserInfoEmail{
+		Email:         string(user.Human.Email),
+		EmailVerified: oidc.Bool(user.Human.IsEmailVerified)}
+}
+
+func setUserInfoPhone(userInfo *oidc.UserInfo, user *query.User) {
+	if user.Human == nil {
+		return
+	}
+	userInfo.UserInfoPhone = oidc.UserInfoPhone{
+		PhoneNumber:         string(user.Human.Phone),
+		PhoneNumberVerified: user.Human.IsPhoneVerified,
+	}
+}
+
+func (o *OPStorage) setUserInfoMetadata(ctx context.Context, userInfo *oidc.UserInfo, userID string) error {
+	userMetaData, err := o.assertUserMetaData(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if len(userMetaData) > 0 {
+		userInfo.AppendClaims(ClaimUserMetaData, userMetaData)
+	}
+	return nil
+}
+
+func (o *OPStorage) setUserInfoResourceOwner(ctx context.Context, userInfo *oidc.UserInfo, userID string) error {
+	resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+	if err != nil {
+		return err
+	}
+	for claim, value := range resourceOwnerClaims {
+		userInfo.AppendClaims(claim, value)
+	}
+	return nil
 }
 
 func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, userGrants *query.UserGrants, userInfo *oidc.UserInfo) error {
