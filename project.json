@@ -48,11 +48,11 @@
       "options": {
         "commands": [
           "export PATH=$(go env GOPATH)/bin:$PATH",
-          "go install github.com/rakyll/statik@v0.1.7",
-          "go generate internal/api/ui/login/statik/generate.go",
-          "go generate internal/api/ui/login/static/generate.go",
-          "go generate internal/notification/statik/generate.go",
-          "go generate internal/statik/generate.go"
+          "export PATH=$(go env GOPATH)/bin:$PATH && go install github.com/rakyll/statik@v0.1.7",
+          "export PATH=$(go env GOPATH)/bin:$PATH && go generate internal/api/ui/login/statik/generate.go",
+          "export PATH=$(go env GOPATH)/bin:$PATH && go generate internal/api/ui/login/static/generate.go",
+          "export PATH=$(go env GOPATH)/bin:$PATH && go generate internal/notification/statik/generate.go",
+          "export PATH=$(go env GOPATH)/bin:$PATH && go generate internal/statik/generate.go"
         ],
         "cwd": "",
         "parallel": false
@@ -69,9 +69,8 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "export PATH=$(go env GOPATH)/bin:$PATH",
           "go install github.com/rakyll/statik@v0.1.7",
-          "go generate openapi/statik/generate.go",
+          "export PATH=$(go env GOPATH)/bin:$PATH && go generate openapi/statik/generate.go",
           "mkdir -p docs/apis/assets/",
           "go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md"
         ],
