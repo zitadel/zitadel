@@ -71,7 +71,7 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "go install github.com/rakyll/statik@v0.1.7",
+          "export PATH=$(go env GOPATH)/bin:$PATH && go install github.com/rakyll/statik@v0.1.7",
           "export PATH=$(go env GOPATH)/bin:$PATH && go generate openapi/statik/generate.go",
           "mkdir -p docs/apis/assets/",
           "export PATH=$(go env GOPATH)/bin:$PATH && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md"
