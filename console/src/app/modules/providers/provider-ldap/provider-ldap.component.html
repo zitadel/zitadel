@@ -75,7 +75,9 @@
             ><mat-icon *ngIf="!showAttributes">keyboard_arrow_down</mat-icon>
           </button>
 
-          <span *ngIf="!provider?.config?.ldap?.attributes?.idAttribute" class="state error">required</span>
+          <span *ngIf="!provider?.config?.ldap?.attributes?.idAttribute" class="state error">{{
+            'IDP.REQUIRED' | translate
+          }}</span>
         </div>
         <div *ngIf="showAttributes">
           <cnsl-ldap-attributes
