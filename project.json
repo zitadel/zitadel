@@ -53,7 +53,6 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "export PATH=$(go env GOPATH)/bin:$PATH",
           "export PATH=$(go env GOPATH)/bin:$PATH && go install github.com/rakyll/statik@v0.1.7",
           "export PATH=$(go env GOPATH)/bin:$PATH && go generate internal/api/ui/login/statik/generate.go",
           "export PATH=$(go env GOPATH)/bin:$PATH && go generate internal/api/ui/login/static/generate.go",
