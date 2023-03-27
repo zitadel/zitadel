@@ -2,26 +2,28 @@ package ldap
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestProvider_Options(t *testing.T) {
 	type fields struct {
-		name                string
-		host                string
-		baseDN              string
-		userObjectClass     string
-		userUniqueAttribute string
-		admin               string
-		password            string
-		loginUrl            string
-		opts                []ProviderOpts
+		name              string
+		servers           []string
+		baseDN            string
+		bindDN            string
+		bindPassword      string
+		userBase          string
+		userObjectClasses []string
+		userFilters       []string
+		timeout           time.Duration
+		loginUrl          string
+		opts              []ProviderOpts
 	}
 	type want struct {
 		name                       string
-		port                       string
-		tls                        bool
+		startTls                   bool
 		linkingAllowed             bool
 		creationAllowed            bool
 		autoCreation               bool
@@ -48,39 +50,43 @@ func TestProvider_Options(t *testing.T) {
 		{
 			name: "default",
 			fields: fields{
-				name:                "ldap",
-				host:                "host",
-				baseDN:              "base",
-				userObjectClass:     "class",
-				userUniqueAttribute: "attr",
-				admin:               "admin",
-				password:            "password",
-				loginUrl:            "url",
-				opts:                nil,
+				name:              "ldap",
+				servers:           []string{"server"},
+				baseDN:            "base",
+				bindDN:            "binddn",
+				bindPassword:      "password",
+				userBase:          "user",
+				userObjectClasses: []string{"object"},
+				userFilters:       []string{"filter"},
+				timeout:           30 * time.Second,
+				loginUrl:          "url",
+				opts:              nil,
 			},
 			want: want{
 				name:            "ldap",
-				port:            DefaultPort,
-				tls:             true,
+				startTls:        true,
 				linkingAllowed:  false,
 				creationAllowed: false,
 				autoCreation:    false,
 				autoUpdate:      false,
-				idAttribute:     "attr",
+				idAttribute:     "",
 			},
 		},
 		{
 			name: "all true",
 			fields: fields{
-				name:                "ldap",
-				host:                "host",
-				baseDN:              "base",
-				userObjectClass:     "class",
-				userUniqueAttribute: "attr",
-				admin:               "admin",
-				password:            "password",
-				loginUrl:            "url",
+				name:              "ldap",
+				servers:           []string{"server"},
+				baseDN:            "base",
+				bindDN:            "binddn",
+				bindPassword:      "password",
+				userBase:          "user",
+				userObjectClasses: []string{"object"},
+				userFilters:       []string{"filter"},
+				timeout:           30 * time.Second,
+				loginUrl:          "url",
 				opts: []ProviderOpts{
+					WithoutStartTLS(),
 					WithLinkingAllowed(),
 					WithCreationAllowed(),
 					WithAutoCreation(),
@@ -89,28 +95,28 @@ func TestProvider_Options(t *testing.T) {
 			},
 			want: want{
 				name:            "ldap",
-				port:            DefaultPort,
-				tls:             true,
+				startTls:        false,
 				linkingAllowed:  true,
 				creationAllowed: true,
 				autoCreation:    true,
 				autoUpdate:      true,
-				idAttribute:     "attr",
+				idAttribute:     "",
 			},
 		}, {
 			name: "all true, attributes set",
 			fields: fields{
-				name:                "ldap",
-				host:                "host",
-				baseDN:              "base",
-				userObjectClass:     "class",
-				userUniqueAttribute: "attr",
-				admin:               "admin",
-				password:            "password",
-				loginUrl:            "url",
+				name:              "ldap",
+				servers:           []string{"server"},
+				baseDN:            "base",
+				bindDN:            "binddn",
+				bindPassword:      "password",
+				userBase:          "user",
+				userObjectClasses: []string{"object"},
+				userFilters:       []string{"filter"},
+				timeout:           30 * time.Second,
+				loginUrl:          "url",
 				opts: []ProviderOpts{
-					Insecure(),
-					WithCustomPort("port"),
+					WithoutStartTLS(),
 					WithLinkingAllowed(),
 					WithCreationAllowed(),
 					WithAutoCreation(),
@@ -132,8 +138,7 @@ func TestProvider_Options(t *testing.T) {
 			},
 			want: want{
 				name:                       "ldap",
-				port:                       "port",
-				tls:                        false,
+				startTls:                   false,
 				linkingAllowed:             true,
 				creationAllowed:            true,
 				autoCreation:               true,
@@ -157,11 +162,22 @@ func TestProvider_Options(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
-			provider := New(tt.fields.name, tt.fields.host, tt.fields.baseDN, tt.fields.userObjectClass, tt.fields.userUniqueAttribute, tt.fields.admin, tt.fields.password, tt.fields.loginUrl, tt.fields.opts...)
+			provider := New(
+				tt.fields.name,
+				tt.fields.servers,
+				tt.fields.baseDN,
+				tt.fields.bindDN,
+				tt.fields.bindPassword,
+				tt.fields.userBase,
+				tt.fields.userObjectClasses,
+				tt.fields.userFilters,
+				tt.fields.timeout,
+				tt.fields.loginUrl,
+				tt.fields.opts...,
+			)
 
 			a.Equal(tt.want.name, provider.Name())
-			a.Equal(tt.want.port, provider.port)
-			a.Equal(tt.want.tls, provider.tls)
+			a.Equal(tt.want.startTls, provider.startTLS)
 			a.Equal(tt.want.linkingAllowed, provider.IsLinkingAllowed())
 			a.Equal(tt.want.creationAllowed, provider.IsCreationAllowed())
 			a.Equal(tt.want.autoCreation, provider.IsAutoCreation())

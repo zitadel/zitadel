@@ -2,6 +2,7 @@ package ldap
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/idp"
 )
@@ -12,16 +13,18 @@ var _ idp.Provider = (*Provider)(nil)
 
 // Provider is the [idp.Provider] implementation for a generic LDAP provider
 type Provider struct {
-	name                string
-	host                string
-	port                string
-	tls                 bool
-	baseDN              string
-	userObjectClass     string
-	userUniqueAttribute string
-	admin               string
-	password            string
-	loginUrl            string
+	name              string
+	servers           []string
+	startTLS          bool
+	baseDN            string
+	bindDN            string
+	bindPassword      string
+	userBase          string
+	userObjectClasses []string
+	userFilters       []string
+	timeout           time.Duration
+
+	loginUrl string
 
 	isLinkingAllowed  bool
 	isCreationAllowed bool
@@ -74,17 +77,10 @@ func WithAutoUpdate() ProviderOpts {
 	}
 }
 
-// WithCustomPort configures a custom port used for the communication instead of :389 as per default
-func WithCustomPort(port string) ProviderOpts {
+// WithoutStartTLS configures to communication insecure with the LDAP server without startTLS
+func WithoutStartTLS() ProviderOpts {
 	return func(p *Provider) {
-		p.port = port
-	}
-}
-
-// Insecure configures to communication insecure with the LDAP server without TLS
-func Insecure() ProviderOpts {
-	return func(p *Provider) {
-		p.tls = false
+		p.startTLS = false
 	}
 }
 
@@ -181,27 +177,29 @@ func WithProfileAttribute(name string) ProviderOpts {
 
 func New(
 	name string,
-	host string,
+	servers []string,
 	baseDN string,
-	userObjectClass string,
-	userUniqueAttribute string,
-	admin string,
-	password string,
+	bindDN string,
+	bindPassword string,
+	userBase string,
+	userObjectClasses []string,
+	userFilters []string,
+	timeout time.Duration,
 	loginUrl string,
 	options ...ProviderOpts,
 ) *Provider {
 	provider := &Provider{
-		name:                name,
-		host:                host,
-		port:                DefaultPort,
-		tls:                 true,
-		baseDN:              baseDN,
-		userObjectClass:     userObjectClass,
-		userUniqueAttribute: userUniqueAttribute,
-		admin:               admin,
-		password:            password,
-		loginUrl:            loginUrl,
-		idAttribute:         userUniqueAttribute,
+		name:              name,
+		servers:           servers,
+		startTLS:          true,
+		baseDN:            baseDN,
+		bindDN:            bindDN,
+		bindPassword:      bindPassword,
+		userBase:          userBase,
+		userObjectClasses: userObjectClasses,
+		userFilters:       userFilters,
+		timeout:           timeout,
+		loginUrl:          loginUrl,
 	}
 	for _, option := range options {
 		option(provider)
@@ -216,7 +214,7 @@ func (p *Provider) Name() string {
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
 	return &Session{
 		Provider: p,
-		loginUrl: p.loginUrl + "?state=" + state,
+		loginUrl: p.loginUrl + state,
 	}, nil
 }
 
@@ -234,4 +232,48 @@ func (p *Provider) IsAutoCreation() bool {
 
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
+}
+
+func (p *Provider) getNecessaryAttributes() []string {
+	attributes := []string{p.userBase}
+	if p.idAttribute != "" {
+		attributes = append(attributes, p.idAttribute)
+	}
+	if p.firstNameAttribute != "" {
+		attributes = append(attributes, p.firstNameAttribute)
+	}
+	if p.lastNameAttribute != "" {
+		attributes = append(attributes, p.lastNameAttribute)
+	}
+	if p.displayNameAttribute != "" {
+		attributes = append(attributes, p.displayNameAttribute)
+	}
+	if p.nickNameAttribute != "" {
+		attributes = append(attributes, p.nickNameAttribute)
+	}
+	if p.preferredUsernameAttribute != "" {
+		attributes = append(attributes, p.preferredUsernameAttribute)
+	}
+	if p.emailAttribute != "" {
+		attributes = append(attributes, p.emailAttribute)
+	}
+	if p.emailVerifiedAttribute != "" {
+		attributes = append(attributes, p.emailVerifiedAttribute)
+	}
+	if p.phoneAttribute != "" {
+		attributes = append(attributes, p.phoneAttribute)
+	}
+	if p.phoneVerifiedAttribute != "" {
+		attributes = append(attributes, p.phoneVerifiedAttribute)
+	}
+	if p.preferredLanguageAttribute != "" {
+		attributes = append(attributes, p.preferredLanguageAttribute)
+	}
+	if p.avatarURLAttribute != "" {
+		attributes = append(attributes, p.avatarURLAttribute)
+	}
+	if p.profileAttribute != "" {
+		attributes = append(attributes, p.profileAttribute)
+	}
+	return attributes
 }
