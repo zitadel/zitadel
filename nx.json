@@ -3,7 +3,13 @@
     "default": {
       "runner": "@nrwl/nx-cloud",
       "options": {
-        "cacheableOperations": ["generate", "build"],
+        "cacheableOperations": [
+          "generate",
+          "build",
+          "generate_grpc",
+          "generate_static",
+          "generate_assets"
+        ],
         "parallel": 5,
         "accessToken": "YTkyM2M0YzEtNjAyZC00ZWMyLWJjYzMtMGY2Nzk2Yjc5YmIyfHJlYWQtd3JpdGU="
       }

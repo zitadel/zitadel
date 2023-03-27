@@ -41,9 +41,7 @@
         "{workspaceRoot}/tools/**/*",
         "{workspaceRoot}/internal/protoc/**/*"
       ],
-      "outputs": [
-        "{workspaceRoot}/.artifacts/grpc/zitadel/**/*"
-      ]
+      "outputs": ["{workspaceRoot}/.artifacts/grpc/zitadel/**/*"]
     },
     "generate_static": {
       "executor": "nx:run-commands",
@@ -64,8 +62,7 @@
         "{workspaceRoot}/internal/notification/**/*",
         "{workspaceRoot}/internal/statik/**/*"
       ],
-      "outputs": [
-      ]
+      "outputs": []
     },
     "generate_assets": {
       "executor": "nx:run-commands",
@@ -82,9 +79,7 @@
         "!{workspaceRoot}/**/*",
         "{workspaceRoot}/internal/api/assets/**/*"
       ],
-      "outputs": [
-        "{workspaceRoot}/docs/apis/assets/**/*"
-      ]
+      "outputs": ["{workspaceRoot}/docs/apis/assets/**/*"]
     }
   }
 }
