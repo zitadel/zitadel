@@ -16,6 +16,7 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="language" value="{{.Language}}" />
 
     <div class="lgn-register">
 
@@ -34,52 +35,20 @@
 
         <div class="lgn-field double">
             <label class="lgn-label" for="email">{{t "RegistrationUser.EmailLabel"}}</label>
-            <input class="lgn-input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" required>
+            <input class="lgn-input" type="email" id="email" name="email" autocomplete="email" value="{{ .Email }}" required>
         </div>
 
         {{if .ShowUsername}}
         <div class="lgn-field double">
             <label class="lgn-label" for="username">{{t "RegistrationUser.UsernameLabel"}}</label>
             <div class="lgn-suffix-wrapper">
-                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Email }}" required>
+                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Username }}" required>
                 {{if .ShowUsernameSuffix}}
                     <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
                 {{end}}
             </div>
         </div>
         {{end}}
-
-        <div class="double-col">
-            <div class="lgn-field">
-                <label class="lgn-label" for="languages">{{t "RegistrationUser.LanguageLabel"}}</label>
-                <select id="languages" name="language">
-                    <option value=""></option>
-                    <option value="de" id="de" {{if (selectedLanguage "de")}} selected {{end}}>{{t "RegistrationUser.German"}}
-                    </option>
-                    <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "RegistrationUser.English"}}
-                    </option>
-                    <option value="it" id="it" {{if (selectedLanguage "it")}} selected {{end}}>{{t "RegistrationUser.Italian"}}
-                    </option>
-                    <option value="fr" id="fr" {{if (selectedLanguage "fr")}} selected {{end}}>{{t "RegistrationUser.French"}}
-                    </option>
-                </select>
-            </div>
-            <div class="lgn-field" >
-                <label class="lgn-label" for="genders">
-                    {{t "RegistrationUser.GenderLabel"}}
-                    <span class="optional">{{t "optional"}}</span>
-                </label>
-                <select id="genders" name="gender">
-                    <option value=""></option>
-                    <option value="1" id="female" {{if (selectedGender 1)}} selected {{end}}>{{t "RegistrationUser.Female"}}
-                    </option>
-                    <option value="2" id="male" {{if (selectedGender 2)}} selected {{end}}>{{t "RegistrationUser.Male"}}
-                    </option>
-                    <option value="3" id="diverse" {{if (selectedGender 3)}} selected {{end}}>{{t "RegistrationUser.Diverse"}}
-                    </option>
-                </select>
-            </div>
-        </div>
 
         <div class="double-col">
             <div class="lgn-field">
@@ -103,26 +72,33 @@
         {{ if or .TOSLink .PrivacyLink }}
         <div class="lgn-field">
             <label class="lgn-label">{{t "RegistrationUser.TosAndPrivacyLabel"}}</label>
+            {{ if .TOSLink }}
             <div class="lgn-checkbox">
                 <input type="checkbox" id="register-term-confirmation"
-                    name="register-term-confirmation" required>
+                       name="register-term-confirmation" required>
                 <label for="register-term-confirmation">
-                   {{t "RegistrationUser.TosConfirm"}}
-                    {{ if .TOSLink }}
-                        <a class="tos-link" target="_blank" href="{{ .TOSLink }}" rel="noopener noreferrer">
-                            {{t "RegistrationUser.TosLinkText"}}
-                        </a>
-                    {{end}}
-                    {{ if and .TOSLink .PrivacyLink }}
-                        {{t "RegistrationUser.TosConfirmAnd"}}
-                    {{ end }}
-                    {{ if .PrivacyLink }}
-                        <a class="tos-link" target="_blank" href="{{ .PrivacyLink}}" rel="noopener noreferrer">
-                        {{t "RegistrationUser.PrivacyLinkText"}}
-                        </a>
-                    {{end}}
+                    {{t "RegistrationUser.TosConfirm"}}
+                    <a class="tos-link" target="_blank" href="{{ .TOSLink }}" rel="noopener noreferrer">
+                        {{t "RegistrationUser.TosLinkText"}}
+                    </a>
                 </label>
             </div>
+            {{end}}
+            {{ if and .TOSLink .PrivacyLink }}
+            <br />
+            {{end}}
+            {{ if .PrivacyLink }}
+            <div class="lgn-checkbox">
+                <input type="checkbox" id="register-term-confirmation-privacy"
+                       name="register-term-confirmation-privacy" required>
+                <label for="register-term-confirmation-privacy">
+                    {{t "RegistrationUser.PrivacyConfirm"}}
+                    <a class="tos-link" target="_blank" href="{{ .PrivacyLink}}" rel="noopener noreferrer">
+                        {{t "RegistrationUser.PrivacyLinkText"}}
+                    </a>
+                </label>
+            </div>
+            {{end}}
         </div>
         {{ end }}
     </div>

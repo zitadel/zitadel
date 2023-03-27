@@ -17,11 +17,12 @@ import (
 func Test_customDomainPolicy(t *testing.T) {
 	type args struct {
 		filter preparation.FilterToQueryReducer
+		orgID  string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *PolicyDomainWriteModel
+		want    *OrgDomainPolicyWriteModel
 		wantErr bool
 	}{
 		{
@@ -30,6 +31,7 @@ func Test_customDomainPolicy(t *testing.T) {
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return nil, errors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
 				},
+				orgID: "id",
 			},
 			want:    nil,
 			wantErr: true,
@@ -40,8 +42,17 @@ func Test_customDomainPolicy(t *testing.T) {
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{}, nil
 				},
+				orgID: "id",
 			},
-			want:    nil,
+			want: &OrgDomainPolicyWriteModel{
+				PolicyDomainWriteModel: PolicyDomainWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "id",
+						ResourceOwner: "id",
+					},
+					State: domain.PolicyStateUnspecified,
+				},
+			},
 			wantErr: false,
 		},
 		{
@@ -58,24 +69,27 @@ func Test_customDomainPolicy(t *testing.T) {
 						),
 					}, nil
 				},
+				orgID: "id",
 			},
-			want: &PolicyDomainWriteModel{
-				WriteModel: eventstore.WriteModel{
-					AggregateID:   "id",
-					ResourceOwner: "id",
-					Events:        []eventstore.Event{},
+			want: &OrgDomainPolicyWriteModel{
+				PolicyDomainWriteModel: PolicyDomainWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "id",
+						ResourceOwner: "id",
+						Events:        []eventstore.Event{},
+					},
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
+					State:                                  domain.PolicyStateActive,
 				},
-				UserLoginMustBeDomain:                  true,
-				ValidateOrgDomains:                     true,
-				SMTPSenderAddressMatchesInstanceDomain: true,
-				State:                                  domain.PolicyStateActive,
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := orgDomainPolicy(context.Background(), tt.args.filter)
+			got, err := orgDomainPolicy(context.Background(), tt.args.filter, tt.args.orgID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("customDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -94,7 +108,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *PolicyDomainWriteModel
+		want    *InstanceDomainPolicyWriteModel
 		wantErr bool
 	}{
 		{
@@ -114,7 +128,15 @@ func Test_defaultDomainPolicy(t *testing.T) {
 					return []eventstore.Event{}, nil
 				},
 			},
-			want:    nil,
+			want: &InstanceDomainPolicyWriteModel{
+				PolicyDomainWriteModel: PolicyDomainWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
+					},
+					State: domain.PolicyStateUnspecified,
+				},
+			},
 			wantErr: false,
 		},
 		{
@@ -132,16 +154,19 @@ func Test_defaultDomainPolicy(t *testing.T) {
 					}, nil
 				},
 			},
-			want: &PolicyDomainWriteModel{
-				WriteModel: eventstore.WriteModel{
-					AggregateID:   "INSTANCE",
-					ResourceOwner: "INSTANCE",
-					Events:        []eventstore.Event{},
+			want: &InstanceDomainPolicyWriteModel{
+				PolicyDomainWriteModel: PolicyDomainWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
+						Events:        []eventstore.Event{},
+						InstanceID:    "INSTANCE",
+					},
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
+					State:                                  domain.PolicyStateActive,
 				},
-				UserLoginMustBeDomain:                  true,
-				ValidateOrgDomains:                     true,
-				SMTPSenderAddressMatchesInstanceDomain: true,
-				State:                                  domain.PolicyStateActive,
 			},
 			wantErr: false,
 		},
@@ -163,6 +188,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 func Test_DomainPolicy(t *testing.T) {
 	type args struct {
 		filter preparation.FilterToQueryReducer
+		orgID  string
 	}
 	tests := []struct {
 		name    string
@@ -176,6 +202,7 @@ func Test_DomainPolicy(t *testing.T) {
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return nil, errors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
 				},
+				orgID: "id",
 			},
 			want:    nil,
 			wantErr: true,
@@ -194,6 +221,7 @@ func Test_DomainPolicy(t *testing.T) {
 						),
 					}, nil
 				},
+				orgID: "id",
 			},
 			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
@@ -219,6 +247,7 @@ func Test_DomainPolicy(t *testing.T) {
 						return nil, errors.ThrowInternal(nil, "USER-6HnsD", "Errors.Internal")
 					}).
 					Filter(),
+				orgID: "id",
 			},
 			want:    nil,
 			wantErr: true,
@@ -242,12 +271,14 @@ func Test_DomainPolicy(t *testing.T) {
 						}, nil
 					}).
 					Filter(),
+				orgID: "id",
 			},
 			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "INSTANCE",
 					ResourceOwner: "INSTANCE",
 					Events:        []eventstore.Event{},
+					InstanceID:    "INSTANCE",
 				},
 				UserLoginMustBeDomain:                  true,
 				ValidateOrgDomains:                     true,
@@ -269,7 +300,7 @@ func Test_DomainPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := domainPolicyWriteModel(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter)
+			got, err := domainPolicyWriteModel(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter, tt.args.orgID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return

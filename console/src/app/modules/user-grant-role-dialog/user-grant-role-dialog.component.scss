@@ -3,10 +3,15 @@
   margin-top: 0;
 }
 
-.role-table {
-  display: block;
-  width: 100%;
-  margin-top: 1rem;
+.dialog-table-wrapper {
+  max-height: 500px;
+  overflow-y: auto;
+
+  .role-table {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+  }
 }
 
 .action {

@@ -31,7 +31,6 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceDomainProjection{}).reduceDomainAdded,
 			want: wantReduce{
-				projection:       InstanceDomainTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -64,7 +63,6 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceDomainProjection{}).reduceDomainRemoved,
 			want: wantReduce{
-				projection:       InstanceDomainTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -74,6 +72,32 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 							expectedStmt: "DELETE FROM projections.instance_domains WHERE (domain = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"domain.new",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(InstanceDomainInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.instance_domains WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
 								"agg-id",
 							},
 						},
@@ -92,7 +116,7 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, InstanceDomainTable, tt.want)
 		})
 	}
 }

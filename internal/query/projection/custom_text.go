@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	CustomTextTable = "projections.custom_texts"
+	CustomTextTable = "projections.custom_texts2"
 
 	CustomTextAggregateIDCol  = "aggregate_id"
 	CustomTextInstanceIDCol   = "instance_id"
@@ -25,6 +25,7 @@ const (
 	CustomTextLanguageCol     = "language"
 	CustomTextKeyCol          = "key"
 	CustomTextTextCol         = "text"
+	CustomTextOwnerRemovedCol = "owner_removed"
 )
 
 type customTextProjection struct {
@@ -47,8 +48,10 @@ func newCustomTextProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(CustomTextLanguageCol, crdb.ColumnTypeText),
 			crdb.NewColumn(CustomTextKeyCol, crdb.ColumnTypeText),
 			crdb.NewColumn(CustomTextTextCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(CustomTextInstanceIDCol, CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{CustomTextOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -72,6 +75,10 @@ func (p *customTextProjection) reducers() []handler.AggregateReducer {
 					Event:  org.CustomTextTemplateRemovedEventType,
 					Reduce: p.reduceTemplateRemoved,
 				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
+				},
 			},
 		},
 		{
@@ -88,6 +95,10 @@ func (p *customTextProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.CustomTextTemplateRemovedEventType,
 					Reduce: p.reduceTemplateRemoved,
+				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(CustomTextInstanceIDCol),
 				},
 			},
 		},
@@ -147,6 +158,7 @@ func (p *customTextProjection) reduceRemoved(event eventstore.Event) (*handler.S
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
 			handler.NewCond(CustomTextKeyCol, customTextEvent.Key),
 			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
+			handler.NewCond(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -166,5 +178,26 @@ func (p *customTextProjection) reduceTemplateRemoved(event eventstore.Event) (*h
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
 			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
+			handler.NewCond(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 		}), nil
+}
+
+func (p *customTextProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-V2T3z", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(CustomTextChangeDateCol, e.CreationDate()),
+			handler.NewCol(CustomTextSequenceCol, e.Sequence()),
+			handler.NewCol(CustomTextOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(CustomTextInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(CustomTextAggregateIDCol, e.Aggregate().ID),
+		},
+	), nil
 }

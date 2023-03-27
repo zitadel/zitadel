@@ -1,31 +1,36 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Validators } from '@angular/forms';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Buffer } from 'buffer';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
+import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { SendHumanResetPasswordNotificationRequest, UnlockUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
+import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
+import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
+import { MachineSecretDialogComponent } from './machine-secret-dialog/machine-secret-dialog.component';
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
 const METADATA: SidenavSetting = { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA' };
 const IDP: SidenavSetting = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' };
-const PASSWORDLESS: SidenavSetting = { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS' };
-const MFA: SidenavSetting = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA' };
+const SECURITY: SidenavSetting = { id: 'security', i18nKey: 'USER.SETTINGS.SECURITY' };
 const PERSONALACCESSTOKEN: SidenavSetting = { id: 'pat', i18nKey: 'USER.SETTINGS.PAT' };
 const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS' };
 const MEMBERSHIPS: SidenavSetting = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' };
@@ -39,10 +44,12 @@ export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'it', 'fr'];
+  public languages: string[] = ['de', 'en', 'it', 'fr', 'ja', 'pl', 'zh'];
 
   public ChangeType: any = ChangeType;
+
   public loading: boolean = true;
+  public loadingMetadata: boolean = true;
 
   public UserState: any = UserState;
   public copied: string = '';
@@ -56,6 +63,7 @@ export class UserDetailComponent implements OnInit {
 
   public settingsList: SidenavSetting[] = [GENERAL, GRANTS, MEMBERSHIPS, METADATA];
   public currentSetting: string | undefined = 'general';
+  public loginPolicy?: LoginPolicy.AsObject;
 
   constructor(
     public translate: TranslateService,
@@ -113,12 +121,13 @@ export class UserDetailComponent implements OnInit {
       this.mgmtUserService
         .getUserByID(id)
         .then((resp) => {
+          this.loadMetadata(id);
           this.loading = false;
           if (resp.user) {
             this.user = resp.user;
 
             if (this.user.human) {
-              this.settingsList = [GENERAL, MFA, PASSWORDLESS, IDP, GRANTS, MEMBERSHIPS, METADATA];
+              this.settingsList = [GENERAL, SECURITY, IDP, GRANTS, MEMBERSHIPS, METADATA];
             } else if (this.user.machine) {
               this.settingsList = [GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA];
             }
@@ -129,22 +138,17 @@ export class UserDetailComponent implements OnInit {
           this.loading = false;
           this.toast.showError(err);
         });
-
-      this.mgmtUserService
-        .listUserMetadata(id, 0, 100, [])
-        .then((resp) => {
-          if (resp.resultList) {
-            this.metadata = resp.resultList;
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
     });
   }
 
   public ngOnInit(): void {
     this.refreshUser();
+
+    this.mgmtUserService.getLoginPolicy().then((policy) => {
+      if (policy.policy) {
+        this.loginPolicy = policy.policy;
+      }
+    });
   }
 
   public changeUsername(): void {
@@ -182,6 +186,37 @@ export class UserDetailComponent implements OnInit {
       .unlockUser(req)
       .then(() => {
         this.toast.showInfo('USER.TOAST.UNLOCKED', true);
+        this.refreshUser();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public generateMachineSecret(): void {
+    this.mgmtUserService
+      .generateMachineSecret(this.user.id)
+      .then((resp) => {
+        this.toast.showInfo('USER.TOAST.SECRETGENERATED', true);
+        this.dialog.open(MachineSecretDialogComponent, {
+          data: {
+            clientId: resp.clientId,
+            clientSecret: resp.clientSecret,
+          },
+          width: '400px',
+        });
+        this.refreshUser();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public removeMachineSecret(): void {
+    this.mgmtUserService
+      .removeMachineSecret(this.user.id)
+      .then((resp) => {
+        this.toast.showInfo('USER.TOAST.SECRETREMOVED', true);
         this.refreshUser();
       })
       .catch((error) => {
@@ -240,9 +275,15 @@ export class UserDetailComponent implements OnInit {
     if (this.user.machine) {
       this.user.machine.name = machineData.name;
       this.user.machine.description = machineData.description;
+      this.user.machine.accessTokenType = machineData.accessTokenType;
 
       this.mgmtUserService
-        .updateMachine(this.user.id, this.user.machine.name, this.user.machine.description)
+        .updateMachine(
+          this.user.id,
+          this.user.machine.name,
+          this.user.machine.description,
+          this.user.machine.accessTokenType,
+        )
         .then(() => {
           this.toast.showInfo('USER.TOAST.SAVED', true);
           this.refreshChanges$.emit();
@@ -322,6 +363,9 @@ export class UserDetailComponent implements OnInit {
 
   public savePhone(phone: string): void {
     if (this.user.id && phone) {
+      // Format phone before save (add +)
+      phone = formatPhone(phone).phone;
+
       this.mgmtUserService
         .updateHumanPhone(this.user.id, phone)
         .then(() => {
@@ -371,8 +415,9 @@ export class UserDetailComponent implements OnInit {
           .then(() => {
             const params: Params = {
               deferredReload: true,
+              type: this.user.human ? 'humans' : 'machines',
             };
-            this.router.navigate(['/users/list', this.user.human ? 'humans' : 'machines'], { queryParams: params });
+            this.router.navigate(['/users'], { queryParams: params });
             this.toast.showInfo('USER.TOAST.DELETED', true);
           })
           .catch((error) => {
@@ -385,6 +430,9 @@ export class UserDetailComponent implements OnInit {
   public resendInitEmail(): void {
     const dialogRef = this.dialog.open(ResendEmailDialogComponent, {
       width: '400px',
+      data: {
+        email: this.user.human?.email?.email ?? '',
+      },
     });
 
     dialogRef.afterClosed().subscribe((resp) => {
@@ -414,6 +462,7 @@ export class UserDetailComponent implements OnInit {
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user.human?.phone?.phone,
             type: EditDialogType.PHONE,
+            validator: Validators.compose([phoneValidator, requiredValidator]),
           },
           width: '400px',
         });
@@ -446,6 +495,45 @@ export class UserDetailComponent implements OnInit {
           }
         });
         break;
+    }
+  }
+
+  public loadMetadata(id: string): Promise<any> | void {
+    this.loadingMetadata = true;
+    return this.mgmtUserService
+      .listUserMetadata(id)
+      .then((resp) => {
+        this.loadingMetadata = false;
+        this.metadata = resp.resultList.map((md) => {
+          return {
+            key: md.key,
+            value: Buffer.from(md.value as string, 'base64').toString('ascii'),
+          };
+        });
+      })
+      .catch((error) => {
+        this.loadingMetadata = false;
+        this.toast.showError(error);
+      });
+  }
+
+  public editMetadata(): void {
+    if (this.user) {
+      const setFcn = (key: string, value: string): Promise<any> =>
+        this.mgmtUserService.setUserMetadata(key, Buffer.from(value).toString('base64'), this.user.id);
+      const removeFcn = (key: string): Promise<any> => this.mgmtUserService.removeUserMetadata(key, this.user.id);
+
+      const dialogRef = this.dialog.open(MetadataDialogComponent, {
+        data: {
+          metadata: this.metadata,
+          setFcn: setFcn,
+          removeFcn: removeFcn,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.loadMetadata(this.user.id);
+      });
     }
   }
 }

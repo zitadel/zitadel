@@ -95,7 +95,11 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "Login", errID, errMessage)
+	if singleIDPAllowed(authReq) {
+		l.handleIDP(w, r, authReq, authReq.AllowedExternalIDPs[0].IDPConfigID)
+		return
+	}
+	data := l.getUserData(r, authReq, "Login.Title", "Login.Description", errID, errMessage)
 	funcs := map[string]interface{}{
 		"hasUsernamePasswordLogin": func() bool {
 			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword
@@ -108,4 +112,8 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 		},
 	}
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplLogin], data, funcs)
+}
+
+func singleIDPAllowed(authReq *domain.AuthRequest) bool {
+	return authReq != nil && authReq.LoginPolicy != nil && !authReq.LoginPolicy.AllowUsernamePassword && authReq.LoginPolicy.AllowExternalIDP && len(authReq.AllowedExternalIDPs) == 1
 }

@@ -9,14 +9,17 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	AuthNKeyTable            = "projections.authn_keys"
+	AuthNKeyTable            = "projections.authn_keys2"
 	AuthNKeyIDCol            = "id"
 	AuthNKeyCreationDateCol  = "creation_date"
+	AuthNKeyChangeDateCol    = "change_date"
 	AuthNKeyResourceOwnerCol = "resource_owner"
 	AuthNKeyInstanceIDCol    = "instance_id"
 	AuthNKeyAggregateIDCol   = "aggregate_id"
@@ -27,6 +30,7 @@ const (
 	AuthNKeyPublicKeyCol     = "public_key"
 	AuthNKeyTypeCol          = "type"
 	AuthNKeyEnabledCol       = "enabled"
+	AuthNKeyOwnerRemovedCol  = "owner_removed"
 )
 
 type authNKeyProjection struct {
@@ -41,6 +45,7 @@ func newAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(AuthNKeyIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthNKeyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AuthNKeyChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(AuthNKeyResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthNKeyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthNKeyAggregateIDCol, crdb.ColumnTypeText),
@@ -51,10 +56,12 @@ func newAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(AuthNKeyPublicKeyCol, crdb.ColumnTypeBytes),
 			crdb.NewColumn(AuthNKeyEnabledCol, crdb.ColumnTypeBool, crdb.Default(true)),
 			crdb.NewColumn(AuthNKeyTypeCol, crdb.ColumnTypeEnum, crdb.Default(0)),
+			crdb.NewColumn(AuthNKeyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AuthNKeyInstanceIDCol, AuthNKeyIDCol),
-			crdb.WithIndex(crdb.NewIndex("enabled_idx", []string{AuthNKeyEnabledCol})),
-			crdb.WithIndex(crdb.NewIndex("identifier_idx", []string{AuthNKeyIdentifierCol})),
+			crdb.WithIndex(crdb.NewIndex("enabled", []string{AuthNKeyEnabledCol})),
+			crdb.WithIndex(crdb.NewIndex("identifier", []string{AuthNKeyIdentifierCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{AuthNKeyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -109,6 +116,24 @@ func (p *authNKeyProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(AuthNKeyInstanceIDCol),
+				},
+			},
+		},
 	}
 }
 
@@ -142,29 +167,30 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
 	}
-	return crdb.NewMultiStatement(
+	return crdb.NewCreateStatement(
 		&authNKeyEvent,
-		crdb.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(AuthNKeyIDCol, authNKeyEvent.keyID),
-				handler.NewCol(AuthNKeyCreationDateCol, authNKeyEvent.CreationDate()),
-				handler.NewCol(AuthNKeyResourceOwnerCol, authNKeyEvent.Aggregate().ResourceOwner),
-				handler.NewCol(AuthNKeyInstanceIDCol, authNKeyEvent.Aggregate().InstanceID),
-				handler.NewCol(AuthNKeyAggregateIDCol, authNKeyEvent.Aggregate().ID),
-				handler.NewCol(AuthNKeySequenceCol, authNKeyEvent.Sequence()),
-				handler.NewCol(AuthNKeyObjectIDCol, authNKeyEvent.objectID),
-				handler.NewCol(AuthNKeyExpirationCol, authNKeyEvent.expiration),
-				handler.NewCol(AuthNKeyIdentifierCol, authNKeyEvent.identifier),
-				handler.NewCol(AuthNKeyPublicKeyCol, authNKeyEvent.publicKey),
-				handler.NewCol(AuthNKeyTypeCol, authNKeyEvent.keyType),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(AuthNKeyIDCol, authNKeyEvent.keyID),
+			handler.NewCol(AuthNKeyCreationDateCol, authNKeyEvent.CreationDate()),
+			handler.NewCol(AuthNKeyChangeDateCol, authNKeyEvent.CreationDate()),
+			handler.NewCol(AuthNKeyResourceOwnerCol, authNKeyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(AuthNKeyInstanceIDCol, authNKeyEvent.Aggregate().InstanceID),
+			handler.NewCol(AuthNKeyAggregateIDCol, authNKeyEvent.Aggregate().ID),
+			handler.NewCol(AuthNKeySequenceCol, authNKeyEvent.Sequence()),
+			handler.NewCol(AuthNKeyObjectIDCol, authNKeyEvent.objectID),
+			handler.NewCol(AuthNKeyExpirationCol, authNKeyEvent.expiration),
+			handler.NewCol(AuthNKeyIdentifierCol, authNKeyEvent.identifier),
+			handler.NewCol(AuthNKeyPublicKeyCol, authNKeyEvent.publicKey),
+			handler.NewCol(AuthNKeyTypeCol, authNKeyEvent.keyType),
+		},
 	), nil
 }
 
 func (p *authNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event) (*handler.Statement, error) {
 	var appID string
 	var enabled bool
+	var changeDate time.Time
+	var sequence uint64
 	switch e := event.(type) {
 	case *project.APIConfigChangedEvent:
 		if e.AuthMethodType == nil {
@@ -172,19 +198,30 @@ func (p *authNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event
 		}
 		appID = e.AppID
 		enabled = *e.AuthMethodType == domain.APIAuthMethodTypePrivateKeyJWT
+		changeDate = e.CreationDate()
+		sequence = e.Sequence()
 	case *project.OIDCConfigChangedEvent:
 		if e.AuthMethodType == nil {
 			return crdb.NewNoOpStatement(event), nil
 		}
 		appID = e.AppID
 		enabled = *e.AuthMethodType == domain.OIDCAuthMethodTypePrivateKeyJWT
+		changeDate = e.CreationDate()
+		sequence = e.Sequence()
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dbrt1", "reduce.wrong.event.type %v", []eventstore.EventType{project.APIConfigChangedType, project.OIDCConfigChangedType})
 	}
 	return crdb.NewUpdateStatement(
 		event,
-		[]handler.Column{handler.NewCol(AuthNKeyEnabledCol, enabled)},
-		[]handler.Condition{handler.NewCond(AuthNKeyObjectIDCol, appID)},
+		[]handler.Column{
+			handler.NewCol(AuthNKeyChangeDateCol, changeDate),
+			handler.NewCol(AuthNKeySequenceCol, sequence),
+			handler.NewCol(AuthNKeyEnabledCol, enabled),
+		},
+		[]handler.Condition{
+			handler.NewCond(AuthNKeyObjectIDCol, appID),
+			handler.NewCond(AuthNKeyInstanceIDCol, event.Aggregate().InstanceID),
+		},
 	), nil
 }
 
@@ -206,6 +243,29 @@ func (p *authNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 	}
 	return crdb.NewDeleteStatement(
 		event,
-		[]handler.Condition{condition},
+		[]handler.Condition{
+			condition,
+			handler.NewCond(AuthNKeyInstanceIDCol, event.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *authNKeyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(AuthNKeyChangeDateCol, e.CreationDate()),
+			handler.NewCol(AuthNKeySequenceCol, e.Sequence()),
+			handler.NewCol(AuthNKeyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(AuthNKeyResourceOwnerCol, e.Aggregate().ID),
+		},
 	), nil
 }

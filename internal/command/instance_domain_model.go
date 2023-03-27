@@ -69,3 +69,65 @@ func (wm *InstanceDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.InstanceDomainRemovedEventType).
 		Builder()
 }
+
+type InstanceDomainsWriteModel struct {
+	eventstore.WriteModel
+
+	Domains []string
+}
+
+func (wm *InstanceDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			instance.InstanceDomainAddedEventType,
+			instance.InstanceDomainRemovedEventType).
+		Builder()
+}
+
+func NewInstanceDomainsWriteModel(instanceID string) *InstanceDomainsWriteModel {
+	return &InstanceDomainsWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
+		},
+		Domains: []string{},
+	}
+}
+
+func (wm *InstanceDomainsWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *instance.DomainAddedEvent:
+			wm.WriteModel.AppendEvents(e)
+		case *instance.DomainRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *InstanceDomainsWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *instance.DomainAddedEvent:
+			wm.Domains = append(wm.Domains, e.Domain)
+		case *instance.DomainRemovedEvent:
+			wm.Domains = removeDomainFromDomains(wm.Domains, e.Domain)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func removeDomainFromDomains(items []string, domain string) []string {
+	for i := len(items) - 1; i >= 0; i-- {
+		if items[i] == domain {
+			items[i] = items[len(items)-1]
+			items[len(items)-1] = ""
+			items = items[:len(items)-1]
+		}
+	}
+	return items
+}

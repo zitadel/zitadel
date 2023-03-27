@@ -3,7 +3,6 @@ import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChil
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
-import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -22,7 +21,6 @@ export class HeaderComponent implements OnDestroy {
 
   @Input() public isDarkTheme: boolean = true;
   @Input() public user?: User.AsObject;
-  @Input() public labelpolicy?: LabelPolicy.AsObject;
   public showOrgContext: boolean = false;
 
   public orgs$: Observable<Org.AsObject[]> = of([]);
@@ -45,7 +43,7 @@ export class HeaderComponent implements OnDestroy {
   ];
   constructor(
     public authenticationService: AuthenticationService,
-    private authService: GrpcAuthService,
+    public authService: GrpcAuthService,
     public mgmtService: ManagementService,
     public breadcrumbService: BreadcrumbService,
     public router: Router,
@@ -81,6 +79,7 @@ export class HeaderComponent implements OnDestroy {
       '/instance',
       '/settings',
       '/views',
+      '/events',
       '/orgs',
       '/settings',
       '/failed-events',

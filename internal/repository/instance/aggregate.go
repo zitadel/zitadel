@@ -20,6 +20,7 @@ type Aggregate struct {
 func NewAggregate(instanceID string) *Aggregate {
 	return &Aggregate{
 		Aggregate: eventstore.Aggregate{
+			InstanceID:    instanceID,
 			Type:          AggregateType,
 			Version:       AggregateVersion,
 			ID:            instanceID,

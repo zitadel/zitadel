@@ -161,10 +161,10 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Reduce() error {
 			wm.ensureMultiFactor(e.MFAType)
 			wm.MultiFactors[e.MFAType].Org = domain.FactorStateRemoved
 		case *org.LoginPolicyRemovedEvent:
-			for factorType, _ := range wm.SecondFactors {
+			for factorType := range wm.SecondFactors {
 				wm.SecondFactors[factorType].Org = domain.FactorStateRemoved
 			}
-			for factorType, _ := range wm.MultiFactors {
+			for factorType := range wm.MultiFactors {
 				wm.MultiFactors[factorType].Org = domain.FactorStateRemoved
 			}
 		}

@@ -4,27 +4,15 @@ title: Projects
 
 # Project
 
-import ProjectDescription from './_project_description.mdx';
+import ProjectDescription from './\_project_description.mdx';
 
 <ProjectDescription name="ProjectDescription" />
 
-## Project Settings
-
-On default the login screen will be shown in the private labeling settings of the system.
-With the [primary domain scope](../../apis/openidoauth/scopes#reserves-scopes) it is possible to trigger the setting of the given organization. 
-But this will also restrict, the login to user of the given organization.  
-
-With the private labeling setting it is possible to choose which settings should trigger.
-
-| Setting | Description |
-| --- | --- |
-| Unspecified | If nothing is specified the default will trigger. (System settings) |
-| Enforce project resource owner policy | This setting will enforce the private labeling of the organization (resource owner) of the project through the whole login process. |
-| Allow Login User resource owner policy | With this setting first the private labeling of the organization (resource owner) of the project will trigger. As soon as the user and its organization (resource owner) is identified by ZITADEL, the settings will change to the organization of the user. |
+To learn how to set up a project read this console guide [here](../../guides/manage/console/projects.mdx).
 
 ## Applications
 
-Applications define the different clients, that share the same roles. 
+Applications define the different clients, that share the same roles.
 At the moment we support OIDC and almost every OAuth2 client. We'll be expanding this with SAML shortly.
 Go to [Applications](./applications) for more details.
 
@@ -40,15 +28,7 @@ More about granted projects: [Granted Projects](./granted_projects)
 ## Roles
 
 A role consists of different attributes. Only the key is relevant to the authorization and must therefore be unique.
-The display name is only to provide a human-readable name if needed. 
+The display name is only to provide a human-readable name if needed.
 And the group should enable a better handling in ZITADEL console, like give a user all the roles of a specific group. (Not implemented yet)
 
-All applications in a project share the roles.
-
-### Role specific Project Settings
-
-| Setting | Description |
-| --- | --- |
-| Assert roles on authentication | If this setting is enabled role information is sent from userinfo endpoint and depending on your application settings in tokens and other types.  |
-| Check roles on authentication | If set, users are only allowed to authenticate if any role is assigned to their account. |
-| Check for project on authentication | The user will only be able to authenticate if his organization is the owner or has a grant to the project. |
+All applications in a project share the roles. Read more about roles [here](../../guides/manage/console/roles)

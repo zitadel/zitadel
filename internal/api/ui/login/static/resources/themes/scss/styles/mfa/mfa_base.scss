@@ -1,0 +1,43 @@
+@mixin lgn-mfa-base {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  margin: 2rem 0;
+
+  .mfa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding: 0 0.5rem;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+
+      input[type="radio"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+
+      span {
+        text-align: center;
+      }
+
+      .mfa-img {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        display: flex;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s ease;
+      }
+    }
+  }
+}

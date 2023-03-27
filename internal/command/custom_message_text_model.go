@@ -54,7 +54,7 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 			}
 			wm.State = domain.PolicyStateActive
 		case *policy.CustomTextRemovedEvent:
-			if e.Key != wm.MessageTextType || wm.Language != e.Language {
+			if e.Template != wm.MessageTextType || wm.Language != e.Language {
 				continue
 			}
 			if e.Key == domain.MessageSubject {
@@ -79,7 +79,7 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 				wm.FooterText = ""
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
-			if wm.Language != e.Language {
+			if e.Template != wm.MessageTextType || wm.Language != e.Language {
 				continue
 			}
 			wm.Subject = ""
@@ -168,9 +168,7 @@ func (wm *CustomMessageTemplatesReadModel) Reduce() error {
 				wm.CustomMessageTemplate[e.Template+e.Language.String()].FooterText = ""
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
-			if _, ok := wm.CustomMessageTemplate[e.Template+e.Language.String()]; ok {
-				delete(wm.CustomMessageTemplate, e.Template+e.Language.String())
-			}
+			delete(wm.CustomMessageTemplate, e.Template+e.Language.String())
 		}
 	}
 	return wm.WriteModel.Reduce()

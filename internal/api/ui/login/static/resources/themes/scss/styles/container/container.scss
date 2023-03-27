@@ -89,9 +89,15 @@ $lgn-container-bottom-margin: 50px;
       .lgn-displayname {
         margin: 0.5rem 1rem;
       }
+
       .lgn-loginname {
+        min-width: 0;
+
         p {
-          margin: 0.5rem 1rem;
+          margin: 0.5rem 0.5rem;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
         }
       }
     }

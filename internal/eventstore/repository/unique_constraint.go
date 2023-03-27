@@ -1,6 +1,6 @@
 package repository
 
-//UniqueCheck represents all information about a unique attribute
+// UniqueCheck represents all information about a unique attribute
 type UniqueConstraint struct {
 	//UniqueField is the field which should be unique
 	UniqueField string
@@ -23,6 +23,7 @@ type UniqueConstraintAction int32
 const (
 	UniqueConstraintAdd UniqueConstraintAction = iota
 	UniqueConstraintRemoved
+	UniqueConstraintInstanceRemoved
 
 	uniqueConstraintActionCount
 )

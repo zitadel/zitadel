@@ -19,10 +19,12 @@ type Instance interface {
 	RequestedHost() string
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
+	SecurityPolicyAllowedOrigins() []string
 }
 
 type InstanceVerifier interface {
-	InstanceByHost(context.Context, string) (Instance, error)
+	InstanceByHost(ctx context.Context, host string) (Instance, error)
+	InstanceByID(ctx context.Context) (Instance, error)
 }
 
 type instance struct {
@@ -64,6 +66,10 @@ func (i *instance) DefaultLanguage() language.Tag {
 
 func (i *instance) DefaultOrganisationID() string {
 	return i.orgID
+}
+
+func (i *instance) SecurityPolicyAllowedOrigins() []string {
+	return nil
 }
 
 func GetInstance(ctx context.Context) Instance {

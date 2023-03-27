@@ -8,14 +8,17 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
 	userAuthMethodTable = table{
-		name: projection.UserAuthMethodTable,
+		name:          projection.UserAuthMethodTable,
+		instanceIDCol: projection.UserAuthMethodInstanceIDCol,
 	}
 	UserAuthMethodColumnTokenID = Column{
 		name:  projection.UserAuthMethodTokenIDCol,
@@ -57,6 +60,10 @@ var (
 		name:  projection.UserAuthMethodTypeCol,
 		table: userAuthMethodTable,
 	}
+	UserAuthMethodColumnOwnerRemoved = Column{
+		name:  projection.UserAuthMethodOwnerRemovedCol,
+		table: userAuthMethodTable,
+	}
 )
 
 type AuthMethods struct {
@@ -81,12 +88,16 @@ type UserAuthMethodSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries) (userAuthMethods *AuthMethods, err error) {
-	query, scan := prepareUserAuthMethodsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, withOwnerRemoved bool) (userAuthMethods *AuthMethods, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareUserAuthMethodsQuery(ctx, q.client)
+	eq := sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[UserAuthMethodColumnOwnerRemoved.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
 	}
@@ -193,7 +204,7 @@ func (q *UserAuthMethodSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectB
 	return query
 }
 
-func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
+func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
 	return sq.Select(
 			UserAuthMethodColumnTokenID.identifier(),
 			UserAuthMethodColumnCreationDate.identifier(),
@@ -205,7 +216,8 @@ func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMeth
 			UserAuthMethodColumnState.identifier(),
 			UserAuthMethodColumnMethodType.identifier(),
 			countColumn.identifier()).
-			From(userAuthMethodTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(userAuthMethodTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*AuthMethods, error) {
 			userAuthMethods := make([]*AuthMethod, 0)
 			var count uint64

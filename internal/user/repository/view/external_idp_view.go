@@ -28,7 +28,12 @@ func ExternalIDPByExternalUserIDAndIDPConfigID(db *gorm.DB, table, externalUserI
 		Method: domain.SearchMethodEquals,
 		Value:  instanceID,
 	}
-	query := repository.PrepareGetByQuery(table, userIDQuery, idpConfigIDQuery, instanceIDQuery)
+	ownerRemovedQuery := &model.ExternalIDPSearchQuery{
+		Key:    usr_model.ExternalIDPSearchKeyOwnerRemoved,
+		Method: domain.SearchMethodEquals,
+		Value:  false,
+	}
+	query := repository.PrepareGetByQuery(table, userIDQuery, idpConfigIDQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Mso9f", "Errors.ExternalIDP.NotFound")
@@ -58,7 +63,12 @@ func ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(db *gorm.DB, tabl
 		Method: domain.SearchMethodEquals,
 		Value:  instanceID,
 	}
-	query := repository.PrepareGetByQuery(table, userIDQuery, idpConfigIDQuery, resourceOwnerQuery, instanceIDQuery)
+	ownerRemovedQuery := &model.ExternalIDPSearchQuery{
+		Key:    usr_model.ExternalIDPSearchKeyOwnerRemoved,
+		Method: domain.SearchMethodEquals,
+		Value:  false,
+	}
+	query := repository.PrepareGetByQuery(table, userIDQuery, idpConfigIDQuery, resourceOwnerQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Sf8sd", "Errors.ExternalIDP.NotFound")
@@ -78,8 +88,13 @@ func ExternalIDPsByIDPConfigID(db *gorm.DB, table, idpConfigID, instanceID strin
 		Method: domain.SearchMethodEquals,
 		Value:  instanceID,
 	}
+	ownerRemovedQuery := &usr_model.ExternalIDPSearchQuery{
+		Key:    usr_model.ExternalIDPSearchKeyOwnerRemoved,
+		Method: domain.SearchMethodEquals,
+		Value:  false,
+	}
 	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{
-		Queries: []*usr_model.ExternalIDPSearchQuery{orgIDQuery, instanceIDQuery},
+		Queries: []*usr_model.ExternalIDPSearchQuery{orgIDQuery, instanceIDQuery, ownerRemovedQuery},
 	})
 	_, err := query(db, &externalIDPs)
 	return externalIDPs, err
@@ -114,4 +129,19 @@ func DeleteExternalIDPsByUserID(db *gorm.DB, table, userID, instanceID string) e
 		repository.Key{model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyInstanceID), instanceID},
 	)
 	return delete(db)
+}
+
+func DeleteInstanceExternalIDPs(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyInstanceID), instanceID)
+	return delete(db)
+}
+
+func UpdateOrgOwnerRemovedExternalIDPs(db *gorm.DB, table, instanceID, aggID string) error {
+	update := repository.PrepareUpdateByKeys(table,
+		model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyOwnerRemoved),
+		true,
+		repository.Key{Key: model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyResourceOwner), Value: aggID},
+	)
+	return update(db)
 }

@@ -2,7 +2,6 @@ package saml
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
@@ -38,9 +38,10 @@ func NewProvider(
 	encAlg crypto.EncryptionAlgorithm,
 	certEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
-	projections *sql.DB,
+	projections *database.DB,
 	instanceHandler,
-	userAgentCookie func(http.Handler) http.Handler,
+	userAgentCookie,
+	accessHandler func(http.Handler) http.Handler,
 ) (*provider.Provider, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
@@ -64,6 +65,7 @@ func NewProvider(
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
+			accessHandler,
 			http_utils.CopyHeadersToContext,
 		),
 	}
@@ -87,12 +89,12 @@ func newStorage(
 	encAlg crypto.EncryptionAlgorithm,
 	certEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
-	projections *sql.DB,
+	db *database.DB,
 ) (*Storage, error) {
 	return &Storage{
 		encAlg:          encAlg,
 		certEncAlg:      certEncAlg,
-		locker:          crdb.NewLocker(projections, locksTable, signingKey),
+		locker:          crdb.NewLocker(db.DB, locksTable, signingKey),
 		eventstore:      es,
 		repo:            repo,
 		command:         command,

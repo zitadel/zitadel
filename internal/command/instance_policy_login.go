@@ -15,27 +15,9 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultLoginPolicy(
-	ctx context.Context,
-	allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, hidePasswordReset, ignoreUnknownUsernames bool,
-	passwordlessType domain.PasswordlessType,
-	defaultRedirectURI string,
-	passwordCheckLifetime, externalLoginCheckLifetime, mfaInitSkipLifetime, secondFactorCheckLifetime, multiFactorCheckLifetime time.Duration,
-) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *ChangeLoginPolicy) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultLoginPolicy(instanceAgg, allowUsernamePassword,
-		allowRegister,
-		allowExternalIDP,
-		forceMFA,
-		hidePasswordReset,
-		ignoreUnknownUsernames,
-		passwordlessType,
-		defaultRedirectURI,
-		passwordCheckLifetime,
-		externalLoginCheckLifetime,
-		mfaInitSkipLifetime,
-		secondFactorCheckLifetime,
-		multiFactorCheckLifetime))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareChangeDefaultLoginPolicy(instanceAgg, policy))
 	if err != nil {
 		return nil, err
 	}
@@ -44,57 +26,6 @@ func (c *Commands) AddDefaultLoginPolicy(
 		return nil, err
 	}
 	return pushedEventsToObjectDetails(pushedEvents), nil
-}
-
-func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
-	existingPolicy := NewInstanceLoginPolicyWriteModel(ctx)
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
-	event, err := c.changeDefaultLoginPolicy(ctx, instanceAgg, existingPolicy, policy)
-	if err != nil {
-		return nil, err
-	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
-}
-
-func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, instanceAgg *eventstore.Aggregate, existingPolicy *InstanceLoginPolicyWriteModel, policy *domain.LoginPolicy) (eventstore.Command, error) {
-	if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-SFdqd", "Errors.IAM.LoginPolicy.RedirectURIInvalid")
-	}
-	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
-	if err != nil {
-		return nil, err
-	}
-	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-M0sif", "Errors.IAM.LoginPolicy.NotFound")
-	}
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx,
-		instanceAgg,
-		policy.AllowUsernamePassword,
-		policy.AllowRegister,
-		policy.AllowExternalIDP,
-		policy.ForceMFA,
-		policy.HidePasswordReset,
-		policy.IgnoreUnknownUsernames,
-		policy.PasswordlessType,
-		policy.DefaultRedirectURI,
-		policy.PasswordCheckLifetime,
-		policy.ExternalLoginCheckLifetime,
-		policy.MFAInitSkipLifetime,
-		policy.SecondFactorCheckLifetime,
-		policy.MultiFactorCheckLifetime,
-	)
-	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")
-	}
-	return changedEvent, nil
 }
 
 func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
@@ -110,8 +41,8 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-GVDfe", "Errors.IAM.LoginPolicy.NotFound")
 	}
 
-	_, err = c.getInstanceIDPConfigByID(ctx, idpProvider.IDPConfigID)
-	if err != nil {
+	exists, err := ExistsInstanceIDP(ctx, c.eventstore.Filter, idpProvider.IDPConfigID)
+	if err != nil || !exists {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "INSTANCE-m8fsd", "Errors.IDPConfig.NotExisting")
 	}
 	idpModel := NewInstanceIdentityProviderWriteModel(ctx, idpProvider.IDPConfigID)
@@ -285,6 +216,44 @@ func (c *Commands) getDefaultLoginPolicy(ctx context.Context) (*domain.LoginPoli
 	return policy, nil
 }
 
+func prepareChangeDefaultLoginPolicy(a *instance.Aggregate, policy *ChangeLoginPolicy) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-SFdqd", "Errors.IAM.LoginPolicy.RedirectURIInvalid")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			wm := NewInstanceLoginPolicyWriteModel(ctx)
+			if err := queryAndReduce(ctx, filter, wm); err != nil {
+				return nil, err
+			}
+			if !wm.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-M0sif", "Errors.IAM.LoginPolicy.NotFound")
+			}
+			changedEvent, hasChanged := wm.NewChangedEvent(ctx, &a.Aggregate,
+				policy.AllowUsernamePassword,
+				policy.AllowRegister,
+				policy.AllowExternalIDP,
+				policy.ForceMFA,
+				policy.HidePasswordReset,
+				policy.IgnoreUnknownUsernames,
+				policy.AllowDomainDiscovery,
+				policy.DisableLoginWithEmail,
+				policy.DisableLoginWithPhone,
+				policy.PasswordlessType,
+				policy.DefaultRedirectURI,
+				policy.PasswordCheckLifetime,
+				policy.ExternalLoginCheckLifetime,
+				policy.MFAInitSkipLifetime,
+				policy.SecondFactorCheckLifetime,
+				policy.MultiFactorCheckLifetime)
+			if !hasChanged {
+				return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")
+			}
+			return []eventstore.Command{changedEvent}, nil
+		}, nil
+	}
+}
+
 func prepareAddDefaultLoginPolicy(
 	a *instance.Aggregate,
 	allowUsernamePassword bool,
@@ -293,6 +262,9 @@ func prepareAddDefaultLoginPolicy(
 	forceMFA bool,
 	hidePasswordReset bool,
 	ignoreUnknownUsernames bool,
+	allowDomainDiscovery bool,
+	disableLoginWithEmail bool,
+	disableLoginWithPhone bool,
 	passwordlessType domain.PasswordlessType,
 	defaultRedirectURI string,
 	passwordCheckLifetime time.Duration,
@@ -323,6 +295,9 @@ func prepareAddDefaultLoginPolicy(
 					forceMFA,
 					hidePasswordReset,
 					ignoreUnknownUsernames,
+					allowDomainDiscovery,
+					disableLoginWithEmail,
+					disableLoginWithPhone,
 					passwordlessType,
 					defaultRedirectURI,
 					passwordCheckLifetime,

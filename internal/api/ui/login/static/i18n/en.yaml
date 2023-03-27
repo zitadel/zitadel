@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: register
   NextButtonText: next
 
+LDAP:
+  Title: Login
+  Description: Enter your login data.
+  LoginNameLabel: Loginname
+  PasswordLabel: Password
+  NextButtonText: next
+
 SelectAccount:
   Title: Select account
   Description: Use your ZITADEL-Account
@@ -47,13 +54,13 @@ UsernameChangeDone:
   Description: Your username was changed successfully.
   NextButtonText: next
 
-InitPassword: 
+InitPassword:
   Title: Set Password
   Description: You have received a code, which you have to enter in the form below, to set your new password.
   CodeLabel: Code
   NewPasswordLabel: New Password
   NewPasswordConfirmLabel: Confirm Password
-  ResendButtonText: resend
+  ResendButtonText: resend code
   NextButtonText: next
 
 InitPasswordDone:
@@ -64,12 +71,12 @@ InitPasswordDone:
 
 InitUser:
   Title: Activate User
-  Description: You have received a code, which you have to enter in the form below, to verify your email and set your new password.
+  Description: Verify your e-mail with the code below and set your password.
   CodeLabel: Code
   NewPasswordLabel: New Password
-  NewPasswordConfirmLabel: Confirm Password
+  NewPasswordConfirm: Confirm Password
   NextButtonText: next
-  ResendButtonText: resend
+  ResendButtonText: resend code
 
 InitUserDone:
   Title: User activated
@@ -78,65 +85,65 @@ InitUserDone:
   CancelButtonText: cancel
 
 InitMFAPrompt:
-  Title: Multifactor Setup
-  Description: Would you like to setup multifactor authentication?
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
+  Title: 2-Factor Setup
+  Description: 2-factor authentication gives you an additional security for your user account. This ensures that only you have access to your account.
+  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
+  Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
   NextButtonText: next
   SkipButtonText: skip
 
 InitMFAOTP:
-  Title: Multifactor Verification
-  Description: Verify your multifactor.
-  OTPDescription: Scan the code with your authenticator app (e.g Google Authenticator) or copy the secret and insert the generated code below.
+  Title: 2-Factor Verification
+  Description: Create your 2-factor. Download an authenticator app if you do not already have one.
+  OTPDescription: Scan the code with your authenticator app (e.g Google/Microsoft Authenticator, Authy) or copy the secret and insert the generated code below.
   SecretLabel: Secret
   CodeLabel: Code
   NextButtonText: next
   CancelButtonText: cancel
 
 InitMFAU2F:
-  Title: Multifactor Setup U2F / WebAuthN
-  Description: Add your Token by providing a name and then clicking on the 'Register Token' button below.
-  TokenNameLabel: Name of the token / machine
+  Title: Add security key
+  Description: A security key is a verification method that can be built into your phone, use Bluetooth, or plug directly into your computer's USB port.
+  TokenNameLabel: Name of the security key / device
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Register Token
+  RegisterTokenButtonText: Add security key
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 InitMFADone:
-  Title: Multifactor Verification done
-  Description: Multifactor verification successfully done. The multifactor has to be entered on each login.
+  Title: Security key verified
+  Description: Awesome! You just successfully set up your 2-factor and made your account way more secure. The Factor has to be entered on each login.
   NextButtonText: next
   CancelButtonText: cancel
 
 MFAProvider:
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
+  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
+  Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
   ChooseOther: or choose an other option
 
 VerifyMFAOTP:
-  Title: Verify Multifactor
-  Description: Verify your multifactor
+  Title: Verify 2-Factor
+  Description: Verify your second factor
   CodeLabel: Code
   NextButtonText: next
 
 VerifyMFAU2F:
-  Title: Multifactor Verification
-  Description: Verify your multifactor U2F / WebAuthN token
+  Title: 2-Factor Verification
+  Description: Verify your 2-Factor with the registered device (e.g FaceID, Windows Hello, Fingerprint)
   NotSupported: WebAuthN is not supported by your browser. Make sure you are using the newest version or change your browser to a supported one (Chrome, Safari, Firefox)
   ErrorRetry: Retry, create a new request or choose a other method.
-  ValidateTokenButtonText: Validate Token
+  ValidateTokenButtonText: Verify 2-Factor
 
 Passwordless:
   Title: Login passwordless
-  Description: Verify your token
+  Description: Login with authentication methods provided by your device like FaceID, Windows Hello or Fingerprint.
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
   ErrorRetry: Retry, create a new challenge or choose a different method.
   LoginWithPwButtonText: Login with password
-  ValidateTokenButtonText: Validate Token
+  ValidateTokenButtonText: Login with passwordless
 
 PasswordlessPrompt:
   Title: Passwordless setup
-  Description: Would you like to setup passwordless login?
+  Description: Would you like to setup passwordless login? (Authenticationmethods of your device like FaceID, Windows Hello or Fingerprint)
   DescriptionInit: You need to set up passwordless login. Use the link you were given to register your device.
   PasswordlessButtonText: Go passwordless
   NextButtonText: next
@@ -144,15 +151,15 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: Passwordless setup
-  Description: Add your Token by providing a name and then clicking on the 'Register Token' button below.
-  TokenNameLabel: Name of the token / machine
+  Description: Add your authentication by providing a name (e.g MyMobilePhone, MacBook, etc) and then clicking on the 'Register passwordless' button below.
+  TokenNameLabel: Name of the device
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Register Token
+  RegisterTokenButtonText: Register passwordless
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 PasswordlessRegistrationDone:
   Title: Passwordless set up
-  Description: Token for passwordless successfully added.
+  Description: Device for passwordless successfully added.
   DescriptionClose: You can now close this window.
   NextButtonText: next
   CancelButtonText: cancel
@@ -172,7 +179,7 @@ PasswordChangeDone:
   NextButtonText: next
 
 PasswordResetDone:
-  Title: Reset link set
+  Title: Password reset link sent
   Description: Check your email to reset your password.
   NextButtonText: next
 
@@ -181,7 +188,7 @@ EmailVerification:
   Description: We have sent you an email to verify your address. Please enter the code in the form below.
   CodeLabel: Code
   NextButtonText: next
-  ResendButtonText: resend
+  ResendButtonText: resend code
 
 EmailVerificationDone:
   Title: E-Mail Verification
@@ -195,6 +202,7 @@ RegisterOption:
   Description: Choose how you'd like to register
   RegisterUsernamePasswordButtonText: With username password
   ExternalLoginDescription: or register with an external user
+  LoginButtonText: login
 
 RegistrationUser:
   Title: Registration
@@ -202,14 +210,16 @@ RegistrationUser:
   DescriptionOrgRegister: Enter your Userdata.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Firstname
-  LastnameLabel: Lastname
+  FirstnameLabel: First name
+  LastnameLabel: Surname
   LanguageLabel: Language
   German: Deutsch
   English: English
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -219,10 +229,10 @@ RegistrationUser:
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
-  TosConfirmAnd: and the
+  PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   ExternalLogin: or register with an external user
-  BackButtonText: back
+  BackButtonText: login
   NextButtonText: next
 
 ExternalRegistrationUserOverview:
@@ -230,8 +240,8 @@ ExternalRegistrationUserOverview:
   Description: We have taken your user details from the selected provider. You can now change or complete them.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Firstname
-  LastnameLabel: Lastname
+  FirstnameLabel: First name
+  LastnameLabel: Surname
   NicknameLabel: Nickname
   PhoneLabel: Phonenumber
   LanguageLabel: Language
@@ -239,10 +249,13 @@ ExternalRegistrationUserOverview:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
+  Japanese: 日本語
+  Polish: Polski
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
-  TosConfirmAnd: and the
+  PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   ExternalLogin: or register with an external user
   BackButtonText: back
@@ -254,14 +267,14 @@ RegistrationOrg:
   OrgNameLabel: Organisationname
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Firstname
-  LastnameLabel: Lastname
+  FirstnameLabel: First name
+  LastnameLabel: Surname
   PasswordLabel: Password
   PasswordConfirmLabel: Password confirmation
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
-  TosConfirmAnd: and the
+  PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   SaveButtonText: Create organization
 
@@ -282,20 +295,23 @@ LinkingUsersDone:
   CancelButtonText: cancel
   NextButtonText: next
 
-ExternalNotFoundOption:
-  Title: External User
+ExternalNotFound:
+  Title: External User not found
   Description: External user not found. Do you want to link your user or auto register a new one.
   LinkButtonText: Link
   AutoRegisterButtonText: register
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
-  TosConfirmAnd: and the
+  PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   German: Deutsch
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Powered By
@@ -314,6 +330,7 @@ Errors:
     MissingParameters: Required parameters missing
   User:
     NotFound: User could not be found
+    AlreadyExists: User already exists
     Inactive: User is inactive
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
@@ -322,6 +339,33 @@ Errors:
     Invalid: Invalid userdata
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
     NotAllowedToLink: User is not allowed to link with external login provider
+    Profile:
+      NotFound: Profile not found
+      NotChanged: Profile not changed
+      Empty: Profile is empty
+      FirstNameEmpty: First name in profile is empty
+      LastNameEmpty: Last name in profile is empty
+      IDMissing: Profile ID is missing
+    Email:
+      NotFound: Email not found
+      Invalid: Email is invalid
+      AlreadyVerified: Email is already verified
+      NotChanged: Email not changed
+      Empty: Email is empty
+      IDMissing: Email ID is missing
+    Phone:
+      NotFound: Phone not found
+      Invalid: Phone is invalid
+      AlreadyVerified: Phone already verified
+      Empty: Phone is empty
+      NotChanged: Phone not changed
+    Address:
+      NotFound: Address not found
+      NotChanged: Address not changed
+    Username:
+      AlreadyExists:  Username already taken
+      Reserved: Username is already taken
+      Empty: Username is empty
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
@@ -364,6 +408,8 @@ Errors:
       ExternalUserIDEmpty: External User ID is empty
       UserDisplayNameEmpty: User Display Name is empty
       NoExternalUserData: No external User Data received
+      CreationNotAllowed: Creation of a new user is not allowed on this Provider
+      LinkingNotAllowed: Linking of a user is not allowed on this Provider
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
     ProjectRequired: Login not possible. The organisation of the user must be granted to the project. Please contact your administrator.
   IdentityProvider:
@@ -371,5 +417,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy not existing
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registration is not allowed
 
 optional: (optional)

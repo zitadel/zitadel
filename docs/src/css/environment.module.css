@@ -1,0 +1,42 @@
+.inputwrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.input {
+  box-sizing: border-box;
+  padding-inline-start: 10px;
+  outline: none;
+  display: inline-block;
+  text-align: start;
+  cursor: text;
+  transform: all 0.2 linear;
+  font-size: 1rem;
+  border: none;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-background);
+  border-radius: 4px;
+  height: 40px;
+  padding: 10px;
+  max-width: 400px;
+  transition: border-color 0.15s ease-in-out,
+    background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+    color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  width: 100%;
+  color: var(--ifm-font-color-base);
+  margin-bottom: 2px;
+}
+
+input:hover {
+  border-color: var(--input-hover-border);
+}
+
+input:active,
+input:focus {
+  border-color: var(--ifm-color-primary);
+}

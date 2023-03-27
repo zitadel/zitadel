@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -57,9 +58,10 @@ func (wm *InstanceDomainPolicyWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	userLoginMustBeDomain,
 	validateOrgDomain,
-	smtpSenderAddresssMatchesInstanceDomain bool) (*instance.DomainPolicyChangedEvent, bool) {
+	smtpSenderAddresssMatchesInstanceDomain bool) (changedEvent *instance.DomainPolicyChangedEvent, usernameChange bool, err error) {
 	changes := make([]policy.DomainPolicyChanges, 0)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
+		usernameChange = true
 		changes = append(changes, policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain))
 	}
 	if wm.ValidateOrgDomains != validateOrgDomain {
@@ -69,11 +71,55 @@ func (wm *InstanceDomainPolicyWriteModel) NewChangedEvent(
 		changes = append(changes, policy.ChangeSMTPSenderAddressMatchesInstanceDomain(smtpSenderAddresssMatchesInstanceDomain))
 	}
 	if len(changes) == 0 {
-		return nil, false
+		return nil, false, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-pl9fN", "Errors.IAM.DomainPolicy.NotChanged")
 	}
-	changedEvent, err := instance.NewDomainPolicyChangedEvent(ctx, aggregate, changes)
-	if err != nil {
-		return nil, false
+	changedEvent, err = instance.NewDomainPolicyChangedEvent(ctx, aggregate, changes)
+	return changedEvent, usernameChange, err
+}
+
+type DomainPolicyOrgsWriteModel struct {
+	eventstore.WriteModel
+
+	OrgIDs []string
+}
+
+func NewDomainPolicyOrgsWriteModel() *DomainPolicyOrgsWriteModel {
+	return &DomainPolicyOrgsWriteModel{
+		WriteModel: eventstore.WriteModel{},
 	}
-	return changedEvent, true
+}
+
+func (wm *DomainPolicyOrgsWriteModel) AppendEvents(events ...eventstore.Event) {
+	wm.WriteModel.AppendEvents(events...)
+}
+
+func (wm *DomainPolicyOrgsWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *org.OrgAddedEvent:
+			wm.OrgIDs = append(wm.OrgIDs, e.Aggregate().ID)
+		case *org.DomainPolicyAddedEvent:
+			for i, orgID := range wm.OrgIDs {
+				if orgID == e.Aggregate().ID {
+					wm.OrgIDs[i] = wm.OrgIDs[len(wm.OrgIDs)-1]
+					wm.OrgIDs = wm.OrgIDs[:len(wm.OrgIDs)-1]
+					break
+				}
+			}
+		case *org.DomainPolicyRemovedEvent:
+			wm.OrgIDs = append(wm.OrgIDs, e.Aggregate().ID)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *DomainPolicyOrgsWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		EventTypes(
+			org.OrgAddedEventType,
+			org.DomainPolicyAddedEventType,
+			org.DomainPolicyRemovedEventType).
+		Builder()
 }

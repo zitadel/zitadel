@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';

@@ -873,7 +873,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -953,7 +953,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -1033,7 +1033,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -1103,7 +1103,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -1383,7 +1383,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
 						TOSConfirm:             "TOSConfirm",
 						TOSLinkText:            "TOSLinkText",
-						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyConfirm:         "PrivacyConfirm",
 						PrivacyLinkText:        "PrivacyLinkText",
 						NextButtonText:         "NextButtonText",
 						BackButtonText:         "BackButtonText",
@@ -1401,7 +1401,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOSAndPrivacyLabel: "TOSAndPrivacyLabel",
 						TOSConfirm:         "TOSConfirm",
 						TOSLinkText:        "TOSLinkText",
-						TOSConfirmAnd:      "TOSConfirmAnd",
+						PrivacyConfirm:     "PrivacyConfirm",
 						PrivacyLinkText:    "PrivacyLinkText",
 						BackButtonText:     "BackButtonText",
 						NextButtonText:     "NextButtonText",
@@ -1419,7 +1419,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:   "TOSAndPrivacyLabel",
 						TOSConfirm:           "TOSConfirm",
 						TOSLinkText:          "TOSLinkText",
-						TOSConfirmAnd:        "TOSConfirmAnd",
+						PrivacyConfirm:       "PrivacyConfirm",
 						PrivacyLinkText:      "PrivacyLinkText",
 						SaveButtonText:       "SaveButtonText",
 					},
@@ -1429,7 +1429,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						CancelButtonText: "CancelButtonText",
 						NextButtonText:   "NextButtonText",
 					},
-					ExternalNotFoundOption: domain.ExternalUserNotFoundScreenText{
+					ExternalNotFound: domain.ExternalUserNotFoundScreenText{
 						Title:                  "Title",
 						Description:            "Description",
 						LinkButtonText:         "LinkButtonText",
@@ -1437,7 +1437,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
 						TOSConfirm:             "TOSConfirm",
 						TOSLinkText:            "TOSLinkText",
-						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyConfirm:         "PrivacyConfirm",
 						PrivacyLinkText:        "PrivacyLinkText",
 					},
 					LoginSuccess: domain.SuccessLoginScreenText{
@@ -2272,7 +2272,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2352,7 +2352,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2432,7 +2432,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2502,7 +2502,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -3365,7 +3365,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -3445,7 +3445,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -3525,7 +3525,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -3595,7 +3595,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -3692,7 +3692,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					RegistrationUser:                 domain.RegistrationUserScreenText{},
 					RegistrationOrg:                  domain.RegistrationOrgScreenText{},
 					LinkingUsersDone:                 domain.LinkingUserDoneScreenText{},
-					ExternalNotFoundOption:           domain.ExternalUserNotFoundScreenText{},
+					ExternalNotFound:                 domain.ExternalUserNotFoundScreenText{},
 					LoginSuccess:                     domain.SuccessLoginScreenText{},
 					LogoutDone:                       domain.LogoutDoneScreenText{},
 					Footer:                           domain.FooterText{},
@@ -4512,7 +4512,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4592,7 +4592,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4672,7 +4672,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4742,7 +4742,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5602,7 +5602,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5682,7 +5682,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5762,7 +5762,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5832,7 +5832,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, language.English,
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -6695,7 +6695,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -6775,7 +6775,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -6855,7 +6855,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -6925,7 +6925,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -7205,7 +7205,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
 						TOSConfirm:             "TOSConfirm",
 						TOSLinkText:            "TOSLinkText",
-						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyConfirm:         "PrivacyConfirm",
 						PrivacyLinkText:        "PrivacyLinkText",
 						NextButtonText:         "NextButtonText",
 						BackButtonText:         "BackButtonText",
@@ -7223,7 +7223,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOSAndPrivacyLabel: "TOSAndPrivacyLabel",
 						TOSConfirm:         "TOSConfirm",
 						TOSLinkText:        "TOSLinkText",
-						TOSConfirmAnd:      "TOSConfirmAnd",
+						PrivacyConfirm:     "PrivacyConfirm",
 						PrivacyLinkText:    "PrivacyLinkText",
 						NextButtonText:     "NextButtonText",
 						BackButtonText:     "BackButtonText",
@@ -7241,7 +7241,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:   "TOSAndPrivacyLabel",
 						TOSConfirm:           "TOSConfirm",
 						TOSLinkText:          "TOSLinkText",
-						TOSConfirmAnd:        "TOSConfirmAnd",
+						PrivacyConfirm:       "PrivacyConfirm",
 						PrivacyLinkText:      "PrivacyLinkText",
 						SaveButtonText:       "SaveButtonText",
 					},
@@ -7251,7 +7251,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						CancelButtonText: "CancelButtonText",
 						NextButtonText:   "NextButtonText",
 					},
-					ExternalNotFoundOption: domain.ExternalUserNotFoundScreenText{
+					ExternalNotFound: domain.ExternalUserNotFoundScreenText{
 						Title:                  "Title",
 						Description:            "Description",
 						LinkButtonText:         "LinkButtonText",
@@ -7259,7 +7259,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
 						TOSConfirm:             "TOSConfirm",
 						TOSLinkText:            "TOSLinkText",
-						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyConfirm:         "PrivacyConfirm",
 						PrivacyLinkText:        "PrivacyLinkText",
 					},
 					LoginSuccess: domain.SuccessLoginScreenText{

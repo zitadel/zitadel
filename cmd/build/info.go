@@ -10,6 +10,10 @@ var (
 )
 
 func Version() string {
+	if version != "" {
+		return version
+	}
+	version = Date().Format(time.RFC3339)
 	return version
 }
 

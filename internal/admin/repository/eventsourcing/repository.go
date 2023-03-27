@@ -2,11 +2,12 @@ package eventsourcing
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/spooler"
 	admin_view "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/database"
+	eventstore2 "github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_spol "github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
 	"github.com/zitadel/zitadel/internal/static"
@@ -22,7 +23,7 @@ type EsRepository struct {
 	eventstore.AdministratorRepo
 }
 
-func Start(conf Config, static static.Storage, dbClient *sql.DB) (*EsRepository, error) {
+func Start(ctx context.Context, conf Config, static static.Storage, dbClient *database.DB, esV2 *eventstore2.Eventstore) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
@@ -32,7 +33,7 @@ func Start(conf Config, static static.Storage, dbClient *sql.DB) (*EsRepository,
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, static)
+	spool := spooler.StartSpooler(ctx, conf.Spooler, es, esV2, view, dbClient, static)
 
 	return &EsRepository{
 		spooler: spool,

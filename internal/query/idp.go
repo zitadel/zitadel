@@ -9,12 +9,13 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/database"
-
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type IDP struct {
@@ -59,7 +60,8 @@ type JWTIDP struct {
 
 var (
 	idpTable = table{
-		name: projection.IDPTable,
+		name:          projection.IDPTable,
+		instanceIDCol: projection.IDPInstanceIDCol,
 	}
 	IDPIDCol = Column{
 		name:  projection.IDPIDCol,
@@ -109,11 +111,16 @@ var (
 		name:  projection.IDPTypeCol,
 		table: idpTable,
 	}
+	IDPOwnerRemovedCol = Column{
+		name:  projection.IDPOwnerRemovedCol,
+		table: idpTable,
+	}
 )
 
 var (
 	oidcIDPTable = table{
-		name: projection.IDPOIDCTable,
+		name:          projection.IDPOIDCTable,
+		instanceIDCol: projection.OIDCConfigInstanceIDCol,
 	}
 	OIDCIDPColIDPID = Column{
 		name:  projection.OIDCConfigIDPIDCol,
@@ -155,7 +162,8 @@ var (
 
 var (
 	jwtIDPTable = table{
-		name: projection.IDPJWTTable,
+		name:          projection.IDPJWTTable,
+		instanceIDCol: projection.JWTConfigInstanceIDCol,
 	}
 	JWTIDPColIDPID = Column{
 		name:  projection.JWTConfigIDPIDCol,
@@ -179,29 +187,31 @@ var (
 	}
 )
 
-//IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
-func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string) (*IDP, error) {
+// IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
+func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string, withOwnerRemoved bool) (_ *IDP, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.IDPProjection.Trigger(ctx)
 	}
 
-	stmt, scan := prepareIDPByIDQuery()
-	query, args, err := stmt.Where(
-		sq.And{
-			sq.Eq{
-				IDPIDCol.identifier():         id,
-				IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
-			sq.Or{
-				sq.Eq{
-					IDPResourceOwnerCol.identifier(): resourceOwner,
-				},
-				sq.Eq{
-					IDPResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
-			},
+	eq := sq.Eq{
+		IDPIDCol.identifier():         id,
+		IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[IDPOwnerRemovedCol.identifier()] = false
+	}
+	where := sq.And{
+		eq,
+		sq.Or{
+			sq.Eq{IDPResourceOwnerCol.identifier(): resourceOwner},
+			sq.Eq{IDPResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID()},
 		},
-	).ToSql()
+	}
+	stmt, scan := prepareIDPByIDQuery(ctx, q.client)
+	query, args, err := stmt.Where(where).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
 	}
@@ -210,13 +220,19 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	return scan(row)
 }
 
-//IDPs searches idps matching the query
-func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries) (idps *IDPs, err error) {
-	query, scan := prepareIDPsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+// IDPs searches idps matching the query
+func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwnerRemoved bool) (idps *IDPs, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareIDPsQuery(ctx, q.client)
+	eq := sq.Eq{
+		IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[IDPOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")
 	}
@@ -270,7 +286,7 @@ func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
+func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 	return sq.Select(
 			IDPIDCol.identifier(),
 			IDPResourceOwnerCol.identifier(),
@@ -298,7 +314,7 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 			JWTIDPColEndpoint.identifier(),
 		).From(idpTable.identifier()).
 			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
-			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
+			LeftJoin(join(JWTIDPColIDPID, IDPIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDP, error) {
 			idp := new(IDP)
@@ -378,7 +394,7 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 		}
 }
 
-func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
+func prepareIDPsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 	return sq.Select(
 			IDPIDCol.identifier(),
 			IDPResourceOwnerCol.identifier(),
@@ -407,7 +423,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 			countColumn.identifier(),
 		).From(idpTable.identifier()).
 			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
-			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
+			LeftJoin(join(JWTIDPColIDPID, IDPIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPs, error) {
 			idps := make([]*IDP, 0)
@@ -503,8 +519,11 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 		}
 }
 
-func (q *Queries) GetOIDCIDPClientSecret(ctx context.Context, shouldRealTime bool, resourceowner, idpID string) (string, error) {
-	idp, err := q.IDPByIDAndResourceOwner(ctx, shouldRealTime, idpID, resourceowner)
+func (q *Queries) GetOIDCIDPClientSecret(ctx context.Context, shouldRealTime bool, resourceowner, idpID string, withOwnerRemoved bool) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	idp, err := q.IDPByIDAndResourceOwner(ctx, shouldRealTime, idpID, resourceowner, withOwnerRemoved)
 	if err != nil {
 		return "", err
 	}

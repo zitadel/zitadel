@@ -1,23 +1,20 @@
-.default {
-  color: var(--color-main);
-  margin-top: 0;
-}
-
 .policy-applied-to {
   margin: -1rem 0 0 0;
   font-size: 14px;
 }
 
-.content {
+.domain-policy-content {
   padding-top: 1rem;
   display: flex;
   flex-direction: column;
   width: 100%;
+  max-width: 700px;
 
   .row {
     display: flex;
     align-items: center;
     padding: 0.3rem 0;
+    margin-top: 1rem;
 
     .left-desc {
       font-size: 0.9rem;
@@ -30,6 +27,37 @@
     .length-wrapper {
       display: flex;
       align-items: center;
+    }
+  }
+
+  .loginname-preview {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .left-right {
+      display: flex;
+      flex-direction: row;
+
+      @media only screen and (max-width: 600px) {
+        flex-direction: column;
+      }
+
+      div {
+        display: flex;
+        flex-direction: column;
+        margin: 0.5rem;
+
+        small {
+          opacity: 0.9;
+        }
+      }
+    }
+
+    i {
+      margin: 0 1rem;
     }
   }
 }

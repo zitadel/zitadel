@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { take } from 'rxjs';
 import {
@@ -11,12 +11,14 @@ import {
 import {
   AddCustomLoginPolicyRequest,
   GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
+  UpdateCustomLoginPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
@@ -44,11 +46,11 @@ export class LoginPolicyComponent implements OnInit {
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
   public lifetimeForm: UntypedFormGroup = this.fb.group({
-    passwordCheckLifetime: [{ disabled: true, value: 240 }, [Validators.required]],
-    externalLoginCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
-    mfaInitSkipLifetime: [{ disabled: true, value: 720 }, [Validators.required]],
-    secondFactorCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
-    multiFactorCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
+    passwordCheckLifetime: [{ disabled: true }, [requiredValidator]],
+    externalLoginCheckLifetime: [{ disabled: true }, [requiredValidator]],
+    mfaInitSkipLifetime: [{ disabled: true }, [requiredValidator]],
+    secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
+    multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
   });
   constructor(
     private toast: ToastService,
@@ -66,29 +68,29 @@ export class LoginPolicyComponent implements OnInit {
           this.loading = false;
 
           this.passwordCheckLifetime?.setValue(
-            this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 240,
+            this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 0,
           );
 
           this.externalLoginCheckLifetime?.setValue(
             this.loginData.externalLoginCheckLifetime?.seconds
               ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
-              : 12,
+              : 0,
           );
 
           this.mfaInitSkipLifetime?.setValue(
-            this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 720,
+            this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 0,
           );
 
           this.secondFactorCheckLifetime?.setValue(
             this.loginData.secondFactorCheckLifetime?.seconds
               ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
-              : 12,
+              : 0,
           );
 
           this.multiFactorCheckLifetime?.setValue(
             this.loginData.multiFactorCheckLifetime?.seconds
               ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60
-              : 12,
+              : 0,
           );
         }
       })
@@ -144,37 +146,69 @@ export class LoginPolicyComponent implements OnInit {
     if (this.loginData) {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
-          const mgmtreq = new AddCustomLoginPolicyRequest();
-          mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
-          mgmtreq.setAllowRegister(this.loginData.allowRegister);
-          mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
-          mgmtreq.setForceMfa(this.loginData.forceMfa);
-          mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
-          mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
-          mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
-          mgmtreq.setSecondFactorsList(this.loginData.secondFactorsList);
-
-          const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
-          mgmtreq.setPasswordCheckLifetime(pcl);
-
-          const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
-          mgmtreq.setExternalLoginCheckLifetime(elcl);
-
-          const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
-          mgmtreq.setMfaInitSkipLifetime(misl);
-
-          const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
-          mgmtreq.setSecondFactorCheckLifetime(sfcl);
-
-          const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
-          mgmtreq.setMultiFactorCheckLifetime(mficl);
-
-          mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
-          mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
-
           if (this.isDefault) {
+            const mgmtreq = new AddCustomLoginPolicyRequest();
+            mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
+            mgmtreq.setAllowRegister(this.loginData.allowRegister);
+            mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+            mgmtreq.setForceMfa(this.loginData.forceMfa);
+            mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
+            mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+            mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
+            mgmtreq.setSecondFactorsList(this.loginData.secondFactorsList);
+            mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
+            mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
+
+            const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setPasswordCheckLifetime(pcl);
+
+            const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setExternalLoginCheckLifetime(elcl);
+
+            const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setMfaInitSkipLifetime(misl);
+
+            const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setSecondFactorCheckLifetime(sfcl);
+
+            const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setMultiFactorCheckLifetime(mficl);
+
+            mgmtreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
+            mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+            mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+
             return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
           } else {
+            const mgmtreq = new UpdateCustomLoginPolicyRequest();
+            mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
+            mgmtreq.setAllowRegister(this.loginData.allowRegister);
+            mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+            mgmtreq.setForceMfa(this.loginData.forceMfa);
+            mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
+            mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+            mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
+            mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
+
+            const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setPasswordCheckLifetime(pcl);
+
+            const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setExternalLoginCheckLifetime(elcl);
+
+            const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setMfaInitSkipLifetime(misl);
+
+            const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setSecondFactorCheckLifetime(sfcl);
+
+            const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 0) * 60 * 60);
+            mgmtreq.setMultiFactorCheckLifetime(mficl);
+
+            mgmtreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
+            mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+            mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+
             return (this.service as ManagementService).updateCustomLoginPolicy(mgmtreq);
           }
         case PolicyComponentServiceType.ADMIN:
@@ -185,21 +219,24 @@ export class LoginPolicyComponent implements OnInit {
           adminreq.setForceMfa(this.loginData.forceMfa);
           adminreq.setPasswordlessType(this.loginData.passwordlessType);
           adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+          adminreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
+          adminreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
 
-          const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+          const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 0) * 60 * 60);
           adminreq.setPasswordCheckLifetime(admin_pcl);
 
-          const admin_elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+          const admin_elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 0) * 60 * 60);
           adminreq.setExternalLoginCheckLifetime(admin_elcl);
 
-          const admin_misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+          const admin_misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 0) * 60 * 60);
           adminreq.setMfaInitSkipLifetime(admin_misl);
 
-          const admin_sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+          const admin_sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 0) * 60 * 60);
           adminreq.setSecondFactorCheckLifetime(admin_sfcl);
 
-          const admin_mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+          const admin_mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 0) * 60 * 60);
           adminreq.setMultiFactorCheckLifetime(admin_mficl);
+          adminreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
           adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
           adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 

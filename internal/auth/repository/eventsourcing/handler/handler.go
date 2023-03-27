@@ -33,24 +33,16 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults, queries *query2.Queries) []query.Handler {
+func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults, queries *query2.Queries) []query.Handler {
 	return []query.Handler{
-		newUser(
+		newUser(ctx,
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es}, queries),
-		newUserSession(
+		newUserSession(ctx,
 			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}, queries),
-		newToken(
+		newToken(ctx,
 			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
-		newIDPConfig(
-			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		newIDPProvider(
-			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-			systemDefaults, queries),
-		newExternalIDP(
-			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			systemDefaults, queries),
-		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
-		newOrgProjectMapping(handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),
+		newRefreshToken(ctx, handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
+		newOrgProjectMapping(ctx, handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),
 	}
 }
 
@@ -80,9 +72,9 @@ func withInstanceID(ctx context.Context, instanceID string) context.Context {
 
 func newSearchQuery(sequences []*repository.CurrentSequence, aggregateTypes []models.AggregateType, instanceIDs []string) *models.SearchQuery {
 	searchQuery := models.NewSearchQuery()
-	for _, sequence := range sequences {
+	for _, instanceID := range instanceIDs {
 		var seq uint64
-		for _, instanceID := range instanceIDs {
+		for _, sequence := range sequences {
 			if sequence.InstanceID == instanceID {
 				seq = sequence.CurrentSequence
 				break
@@ -91,7 +83,7 @@ func newSearchQuery(sequences []*repository.CurrentSequence, aggregateTypes []mo
 		searchQuery.AddQuery().
 			AggregateTypeFilter(aggregateTypes...).
 			LatestSequenceFilter(seq).
-			InstanceIDFilter(sequence.InstanceID)
+			InstanceIDFilter(instanceID)
 	}
 	return searchQuery
 }

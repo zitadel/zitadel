@@ -26,6 +26,9 @@ type LoginPolicyAddedEvent struct {
 	ForceMFA                   bool                    `json:"forceMFA,omitempty"`
 	HidePasswordReset          bool                    `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames     bool                    `json:"ignoreUnknownUsernames,omitempty"`
+	AllowDomainDiscovery       bool                    `json:"allowDomainDiscovery,omitempty"`
+	DisableLoginWithEmail      bool                    `json:"disableLoginWithEmail,omitempty"`
+	DisableLoginWithPhone      bool                    `json:"disableLoginWithPhone,omitempty"`
 	PasswordlessType           domain.PasswordlessType `json:"passwordlessType,omitempty"`
 	DefaultRedirectURI         string                  `json:"defaultRedirectURI,omitempty"`
 	PasswordCheckLifetime      time.Duration           `json:"passwordCheckLifetime,omitempty"`
@@ -50,7 +53,10 @@ func NewLoginPolicyAddedEvent(
 	allowExternalIDP,
 	forceMFA,
 	hidePasswordReset,
-	ignoreUnknownUsernames bool,
+	ignoreUnknownUsernames,
+	allowDomainDiscovery,
+	disableLoginWithEmail,
+	disableLoginWithPhone bool,
 	passwordlessType domain.PasswordlessType,
 	defaultRedirectURI string,
 	passwordCheckLifetime,
@@ -68,12 +74,15 @@ func NewLoginPolicyAddedEvent(
 		PasswordlessType:           passwordlessType,
 		HidePasswordReset:          hidePasswordReset,
 		IgnoreUnknownUsernames:     ignoreUnknownUsernames,
+		AllowDomainDiscovery:       allowDomainDiscovery,
 		DefaultRedirectURI:         defaultRedirectURI,
 		PasswordCheckLifetime:      passwordCheckLifetime,
 		ExternalLoginCheckLifetime: externalLoginCheckLifetime,
 		MFAInitSkipLifetime:        mfaInitSkipLifetime,
 		SecondFactorCheckLifetime:  secondFactorCheckLifetime,
 		MultiFactorCheckLifetime:   multiFactorCheckLifetime,
+		DisableLoginWithEmail:      disableLoginWithEmail,
+		DisableLoginWithPhone:      disableLoginWithPhone,
 	}
 }
 
@@ -99,6 +108,9 @@ type LoginPolicyChangedEvent struct {
 	ForceMFA                   *bool                    `json:"forceMFA,omitempty"`
 	HidePasswordReset          *bool                    `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames     *bool                    `json:"ignoreUnknownUsernames,omitempty"`
+	AllowDomainDiscovery       *bool                    `json:"allowDomainDiscovery,omitempty"`
+	DisableLoginWithEmail      *bool                    `json:"disableLoginWithEmail,omitempty"`
+	DisableLoginWithPhone      *bool                    `json:"disableLoginWithPhone,omitempty"`
 	PasswordlessType           *domain.PasswordlessType `json:"passwordlessType,omitempty"`
 	DefaultRedirectURI         *string                  `json:"defaultRedirectURI,omitempty"`
 	PasswordCheckLifetime      *time.Duration           `json:"passwordCheckLifetime,omitempty"`
@@ -206,9 +218,27 @@ func ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames bool) func(*LoginPolicy
 	}
 }
 
+func ChangeAllowDomainDiscovery(allowDomainDiscovery bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.AllowDomainDiscovery = &allowDomainDiscovery
+	}
+}
+
 func ChangeDefaultRedirectURI(defaultRedirectURI string) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.DefaultRedirectURI = &defaultRedirectURI
+	}
+}
+
+func ChangeDisableLoginWithEmail(disableLoginWithEmail bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.DisableLoginWithEmail = &disableLoginWithEmail
+	}
+}
+
+func ChangeDisableLoginWithPhone(DisableLoginWithPhone bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.DisableLoginWithPhone = &DisableLoginWithPhone
 	}
 }
 

@@ -15,6 +15,7 @@ type Storage interface {
 	GetObjectInfo(ctx context.Context, instanceID, resourceOwner, name string) (*Asset, error)
 	RemoveObject(ctx context.Context, instanceID, resourceOwner, name string) error
 	RemoveObjects(ctx context.Context, instanceID, resourceOwner string, objectType ObjectType) error
+	RemoveInstanceObjects(ctx context.Context, instanceID string) error
 	//TODO: add functionality to move asset location
 }
 

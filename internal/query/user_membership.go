@@ -8,9 +8,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Memberships struct {
@@ -103,12 +105,13 @@ func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
-func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery) (*Memberships, error) {
-	query, scan := prepareMembershipsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery, withOwnerRemoved bool) (_ *Memberships, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, queryArgs, scan := prepareMembershipsQuery(ctx, q.client, withOwnerRemoved)
+	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
@@ -116,8 +119,9 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, err
 	}
+	queryArgs = append(queryArgs, args...)
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	rows, err := q.client.QueryContext(ctx, stmt, queryArgs...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-eAV2x", "Errors.Internal")
 	}
@@ -132,7 +136,8 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 var (
 	//membershipAlias is a hack to satisfy checks in the queries
 	membershipAlias = table{
-		name: "memberships",
+		name:          "memberships",
+		instanceIDCol: projection.MemberInstanceID,
 	}
 	membershipUserID = Column{
 		name:  projection.MemberUserIDCol,
@@ -183,18 +188,42 @@ var (
 		table: membershipAlias,
 	}
 
-	membershipFrom = "(" +
-		prepareOrgMember() +
-		" UNION ALL " +
-		prepareIAMMember() +
-		" UNION ALL " +
-		prepareProjectMember() +
-		" UNION ALL " +
-		prepareProjectGrantMember() +
-		") AS " + membershipAlias.identifier()
+	membershipOwnerRemoved = Column{
+		name:  projection.MemberOwnerRemoved,
+		table: membershipAlias,
+	}
+	membershipOwnerRemovedUser = Column{
+		name:  projection.MemberUserOwnerRemoved,
+		table: membershipAlias,
+	}
+	membershipGrantedOrgRemoved = Column{
+		name:  projection.ProjectGrantMemberGrantedOrgRemoved,
+		table: membershipAlias,
+	}
 )
 
-func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+func getMembershipFromQuery(withOwnerRemoved bool) (string, []interface{}) {
+	orgMembers, orgMembersArgs := prepareOrgMember(withOwnerRemoved)
+	iamMembers, iamMembersArgs := prepareIAMMember(withOwnerRemoved)
+	projectMembers, projectMembersArgs := prepareProjectMember(withOwnerRemoved)
+	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(withOwnerRemoved)
+	args := make([]interface{}, 0)
+	args = append(append(append(append(args, orgMembersArgs...), iamMembersArgs...), projectMembersArgs...), projectGrantMembersArgs...)
+
+	return "(" +
+			orgMembers +
+			" UNION ALL " +
+			iamMembers +
+			" UNION ALL " +
+			projectMembers +
+			" UNION ALL " +
+			projectGrantMembers +
+			") AS " + membershipAlias.identifier(),
+		args
+}
+
+func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerRemoved bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
+	query, args := getMembershipFromQuery(withOwnerRemoved)
 	return sq.Select(
 			membershipUserID.identifier(),
 			membershipRoles.identifier(),
@@ -210,11 +239,12 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 			ProjectColumnName.identifier(),
 			OrgColumnName.identifier(),
 			countColumn.identifier(),
-		).From(membershipFrom).
+		).From(query).
 			LeftJoin(join(ProjectColumnID, membershipProjectID)).
 			LeftJoin(join(OrgColumnID, membershipOrgID)).
-			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
+		args,
 		func(rows *sql.Rows) (*Memberships, error) {
 			memberships := make([]*Membership, 0)
 			var count uint64
@@ -292,8 +322,8 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 		}
 }
 
-func prepareOrgMember() string {
-	stmt, _ := sq.Select(
+func prepareOrgMember(withOwnerRemoved bool) (string, []interface{}) {
+	builder := sq.Select(
 		OrgMemberUserID.identifier(),
 		OrgMemberRoles.identifier(),
 		OrgMemberCreationDate.identifier(),
@@ -305,12 +335,17 @@ func prepareOrgMember() string {
 		"NULL::TEXT AS "+membershipIAMID.name,
 		"NULL::TEXT AS "+membershipProjectID.name,
 		"NULL::TEXT AS "+membershipGrantID.name,
-	).From(orgMemberTable.identifier()).MustSql()
-	return stmt
+	).From(orgMemberTable.identifier())
+	if !withOwnerRemoved {
+		eq := sq.Eq{}
+		addOrgMemberWithoutOwnerRemoved(eq)
+		builder = builder.Where(eq)
+	}
+	return builder.MustSql()
 }
 
-func prepareIAMMember() string {
-	stmt, _ := sq.Select(
+func prepareIAMMember(withOwnerRemoved bool) (string, []interface{}) {
+	builder := sq.Select(
 		InstanceMemberUserID.identifier(),
 		InstanceMemberRoles.identifier(),
 		InstanceMemberCreationDate.identifier(),
@@ -322,12 +357,17 @@ func prepareIAMMember() string {
 		InstanceMemberIAMID.identifier(),
 		"NULL::TEXT AS "+membershipProjectID.name,
 		"NULL::TEXT AS "+membershipGrantID.name,
-	).From(instanceMemberTable.identifier()).MustSql()
-	return stmt
+	).From(instanceMemberTable.identifier())
+	if !withOwnerRemoved {
+		eq := sq.Eq{}
+		addIamMemberWithoutOwnerRemoved(eq)
+		builder = builder.Where(eq)
+	}
+	return builder.MustSql()
 }
 
-func prepareProjectMember() string {
-	stmt, _ := sq.Select(
+func prepareProjectMember(withOwnerRemoved bool) (string, []interface{}) {
+	builder := sq.Select(
 		ProjectMemberUserID.identifier(),
 		ProjectMemberRoles.identifier(),
 		ProjectMemberCreationDate.identifier(),
@@ -339,13 +379,17 @@ func prepareProjectMember() string {
 		"NULL::TEXT AS "+membershipIAMID.name,
 		ProjectMemberProjectID.identifier(),
 		"NULL::TEXT AS "+membershipGrantID.name,
-	).From(projectMemberTable.identifier()).MustSql()
-
-	return stmt
+	).From(projectMemberTable.identifier())
+	if !withOwnerRemoved {
+		eq := sq.Eq{}
+		addProjectMemberWithoutOwnerRemoved(eq)
+		builder = builder.Where(eq)
+	}
+	return builder.MustSql()
 }
 
-func prepareProjectGrantMember() string {
-	stmt, _ := sq.Select(
+func prepareProjectGrantMember(withOwnerRemoved bool) (string, []interface{}) {
+	builder := sq.Select(
 		ProjectGrantMemberUserID.identifier(),
 		ProjectGrantMemberRoles.identifier(),
 		ProjectGrantMemberCreationDate.identifier(),
@@ -357,8 +401,11 @@ func prepareProjectGrantMember() string {
 		"NULL::TEXT AS "+membershipIAMID.name,
 		ProjectGrantMemberProjectID.identifier(),
 		ProjectGrantMemberGrantID.identifier(),
-	).From(projectGrantMemberTable.identifier()).
-		MustSql()
-
-	return stmt
+	).From(projectGrantMemberTable.identifier())
+	if !withOwnerRemoved {
+		eq := sq.Eq{}
+		addProjectGrantMemberWithoutOwnerRemoved(eq)
+		builder = builder.Where(eq)
+	}
+	return builder.MustSql()
 }

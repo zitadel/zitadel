@@ -22,7 +22,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name:   "instance.reduceNotificationProviderFileAdded",
+			name:   "instance reduceNotificationProviderFileAdded",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -37,7 +37,6 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -59,7 +58,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceNotificationProviderFileChanged",
+			name:   "instance reduceNotificationProviderFileChanged",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -74,17 +73,17 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.notification_providers SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
+							expectedStmt: "UPDATE projections.notification_providers SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								true,
 								"agg-id",
 								domain.NotificationProviderTypeFile,
+								"instance-id",
 							},
 						},
 					},
@@ -92,7 +91,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceNotificationProviderFileRemoved",
+			name:   "instance reduceNotificationProviderFileRemoved",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -105,14 +104,14 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.notification_providers WHERE (aggregate_id = $1) AND (provider_type = $2)",
+							expectedStmt: "DELETE FROM projections.notification_providers WHERE (aggregate_id = $1) AND (provider_type = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.NotificationProviderTypeFile,
+								"instance-id",
 							},
 						},
 					},
@@ -120,7 +119,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceNotificationProviderLogAdded",
+			name:   "instance reduceNotificationProviderLogAdded",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -135,7 +134,6 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -157,7 +155,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceNotificationProviderLogChanged",
+			name:   "instance reduceNotificationProviderLogChanged",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -172,17 +170,17 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.notification_providers SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
+							expectedStmt: "UPDATE projections.notification_providers SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								true,
 								"agg-id",
 								domain.NotificationProviderTypeLog,
+								"instance-id",
 							},
 						},
 					},
@@ -190,7 +188,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceNotificationProviderLogRemoved",
+			name:   "instance reduceNotificationProviderLogRemoved",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -203,14 +201,40 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.notification_providers WHERE (aggregate_id = $1) AND (provider_type = $2)",
+							expectedStmt: "DELETE FROM projections.notification_providers WHERE (aggregate_id = $1) AND (provider_type = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.NotificationProviderTypeLog,
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(DebugNotificationProviderInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.notification_providers WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
 							},
 						},
 					},
@@ -228,7 +252,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, DebugNotificationProviderTable, tt.want)
 		})
 	}
 }

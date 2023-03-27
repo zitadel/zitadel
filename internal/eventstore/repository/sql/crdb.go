@@ -13,6 +13,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
@@ -92,22 +93,24 @@ const (
 
 	uniqueDelete = `DELETE FROM eventstore.unique_constraints
 					WHERE unique_type = $1 and unique_field = $2 and instance_id = $3`
+	uniqueDeleteInstance = `DELETE FROM eventstore.unique_constraints
+					WHERE instance_id = $1`
 )
 
 type CRDB struct {
-	client *sql.DB
+	*database.DB
 }
 
-func NewCRDB(client *sql.DB) *CRDB {
+func NewCRDB(client *database.DB) *CRDB {
 	return &CRDB{client}
 }
 
-func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
+func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
 
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
-	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
+	err := crdb.ExecuteTx(ctx, db.DB.DB, nil, func(tx *sql.Tx) error {
 
 		var (
 			previousAggregateSequence     Sequence
@@ -157,7 +160,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
 
 func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
-	row := db.client.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID)
+	row := db.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID)
 	if row.Err() != nil {
 		return caos_errs.ThrowInvalidArgument(row.Err(), "SQL-7gtFA", "Errors.InvalidArgument")
 	}
@@ -166,7 +169,7 @@ func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
 		return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
 	}
 
-	if _, err := db.client.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
+	if _, err := db.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
 		return caos_errs.ThrowInternal(err, "SQL-7gtFA", "Errors.Internal")
 	}
 
@@ -193,7 +196,7 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 					return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", uniqueConstraint.ErrorMessage)
 				}
 
-				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint ")
+				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint")
 			}
 		case repository.UniqueConstraintRemoved:
 			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
@@ -201,7 +204,14 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
-				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint ")
+				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint")
+			}
+		case repository.UniqueConstraintInstanceRemoved:
+			_, err := tx.ExecContext(ctx, uniqueDeleteInstance, uniqueConstraint.InstanceID)
+			if err != nil {
+				logging.WithFields(
+					"instance_id", uniqueConstraint.InstanceID).WithError(err).Info("delete instance unique constraints failed")
+				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraints of instance")
 			}
 		}
 	}
@@ -240,7 +250,7 @@ func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQ
 }
 
 func (db *CRDB) db() *sql.DB {
-	return db.client
+	return db.DB.DB
 }
 
 func (db *CRDB) orderByEventSequence(desc bool) string {

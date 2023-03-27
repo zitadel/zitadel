@@ -44,7 +44,7 @@
     >
       <div class="role-cb-content">
         <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
-        <span>{{ role | roletransform }}</span>
+        <span data-e2e="role-checkbox">{{ role | roletransform }}</span>
         <i class="info-hover las la-question-circle" matTooltip="{{ 'MEMBERROLES.' + role | translate }}"></i>
       </div>
     </mat-checkbox>
@@ -61,6 +61,7 @@
     mat-raised-button
     class="ok-button"
     (click)="closeDialogWithSuccess()"
+    data-e2e="confirm-add-member-button"
   >
     {{ 'ACTIONS.ADD' | translate }}
   </button>

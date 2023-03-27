@@ -32,6 +32,7 @@ func (msg *Email) GetContent() string {
 		from = fmt.Sprintf("%s <%s>", msg.SenderName, msg.SenderEmail)
 	}
 	headers["From"] = from
+	headers["Return-Path"] = msg.SenderEmail
 	headers["To"] = strings.Join(msg.Recipients, ", ")
 	headers["Cc"] = strings.Join(msg.CC, ", ")
 

@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: registrieren
   NextButtonText: weiter
 
+LDAP:
+  Title: Anmeldung
+  Description: Mit Konto anmelden.
+  LoginNameLabel: Loginname
+  PasswordLabel: Passwort
+  NextButtonText: weiter
+
 SelectAccount:
   Title: Account auswählen
   Description: Wähle deinen Account aus.
@@ -53,7 +60,7 @@ InitPassword:
   CodeLabel: Code
   NewPasswordLabel: Neues Passwort
   NewPasswordConfirmLabel: Passwort bestätigen
-  ResendButtonText: erneut senden
+  ResendButtonText: Code erneut senden
   NextButtonText: weiter
 
 InitPasswordDone:
@@ -64,12 +71,12 @@ InitPasswordDone:
 
 InitUser:
   Title: User aktivieren
-  Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine E-Mail zu verifizieren und ein neues Passwort zu setzen.
+  Description: Bestätige deine E-Mail mit dem unten stehenden Code und legen dein Passwort fest.
   CodeLabel: Code
   NewPasswordLabel: Neues Passwort
-  NewPasswordConfirmLabel: Passwort bestätigen
+  NewPasswordConfirm: Passwort bestätigen
   NextButtonText: weiter
-  ResendButtonText: erneut senden
+  ResendButtonText: Code erneut senden
 
 InitUserDone:
   Title: User aktiviert
@@ -78,65 +85,65 @@ InitUserDone:
   CancelButtonText: abbrechen
 
 InitMFAPrompt:
-  Title: Multifaktor hinzufügen
-  Description: Möchtest du einen Mulitfaktor hinzufügen?
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
+  Title: 2-Faktor hinzufügen
+  Description: 2-Faktor-Authentifizierung gibt dir eine zusätzliche Sicherheit für dein Benutzerkonto. Damit stellst du sicher, dass nur du Zugriff auf deinen Account hast.
+  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
+  Provider1: Geräte abhängig (e.g FaceID, Windows Hello, Fingerprint)
   NextButtonText: weiter
   SkipButtonText: überspringen
 
 InitMFAOTP:
-  Title: Multifaktor Verifizierung
-  Description: Verifiziere deinen Multifaktor
-  OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authenticator) oder kopiere das Secret und gib anschliessend den Code ein.
+  Title: 2-Faktor Verifizierung
+  Description: Erstelle deinen 2-Faktor. Lade eine Authenticator-App herunter, wenn du noch keines hast.
+  OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google/Mircorsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
   SecretLabel: Secret
   CodeLabel: Code
   NextButtonText: weiter
   CancelButtonText: abbrechen
 
 InitMFAU2F:
-  Title: Multifaktor U2F / WebAuthN hinzufügen
-  Description: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.
-  TokenNameLabel: Name des Tokens / Geräts
-  NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Token registrieren
+  Title: Sicherheitsschlüssel hinzufügen
+  Description: Ein Sicherheitsschlüssel ist eine Verifizierungsmethode, die in Ihrem Telefon integriert sein kann, Bluetooth verwenden oder direkt an den USB-Anschluss Ihres Computers angeschlossen werden.
+  TokenNameLabel: Name des Geräts
+  NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze eine anderen (z.B. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Sicherschlüssel hinzufügen
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
 
 InitMFADone:
-  Title: Multifaktor Verifizierung erstellt
-  Description: Multifikator Verifizierung erfolgreich abgeschlossen. Der Multifaktor muss bei jeder Anmeldung eingegeben werden.
+  Title: Sicherheitsschlüssel eingerichtet
+  Description: Großartig! Du hast gerade erfolgreich deinen 2-Faktor eingerichtet und dein Konto viel sicherer gemacht. Der 2-Faktor muss bei jeder Anmeldung verwendet werden.
   NextButtonText: weiter
   CancelButtonText: abbrechen
 
 MFAProvider:
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
+  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
+  Provider1: Geräte abhängig (e.g FaceID, Windows Hello, Fingerprint)
   ChooseOther: oder wähle eine andere Option aus
 
 VerifyMFAOTP:
-  Title: Multifaktor verifizieren
-  Description: Verifiziere deinen Multifaktor
+  Title: 2-Faktor verifizieren
+  Description: Verifiziere deinen Zweitfaktor
   CodeLabel: Code
   NextButtonText: next
 
 VerifyMFAU2F:
-  Title: Multifaktor Verifizierung
+  Title: 2-Faktor Verifizierung
   Description: Verifiziere deinen Multifaktor U2F / WebAuthN Token
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
-  ValidateTokenButtonText: Token validieren
+  ValidateTokenButtonText: 2-Faktor verifizieren
 
 Passwordless:
   Title: Passwortlos einloggen
-  Description: Verifiziere dein Token
+  Description: Melden Sie sich mit den von Ihrem Gerät bereitgestellten Authentifizierungsmethoden wie FaceID, Windows Hello oder Fingerabdruck an.
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
   LoginWithPwButtonText: Mit Passwort anmelden
-  ValidateTokenButtonText: Token validieren
+  ValidateTokenButtonText: Passwortlos anmelden
 
 PasswordlessPrompt:
   Title: Passwortloser Login hinzufügen
-  Description: Möchtest du einen passwortlosen Login hinzufügen?
+  Description: Möchtest du einen passwortlosen Login hinzufügen? (Authentifizierungsmethoden deines Gerätes wie FaceID, Windows Hello oder Fingerprint)
   DescriptionInit: Du musst zuerst den Passwortlosen Login hinzufügen. Nutze dazu den Link, den du erhalten hast um dein Gerät zu registrieren.
   PasswordlessButtonText: Werde Passwortlos
   NextButtonText: weiter
@@ -144,15 +151,15 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: Passwortloser Login hinzufügen
-  Description: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.
-  TokenNameLabel: Name des Tokens / Geräts
+  Description: Füge dein Authentifizierung hinzu, indem du einen Namen eingibst (eg. MyPhone, MacBook, etc) und den 'Passwortlos registrieren' Button drückst.
+  TokenNameLabel: Name des Geräts
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Token registrieren
+  RegisterTokenButtonText: Passwortlos registrieren
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle eine andere Methode.
 
 PasswordlessRegistrationDone:
   Title: Passwortloser Login erstellt
-  Description: Token für passwortlosen Login erfolgreich hinzugefügt.
+  Description: Gerät für passwortlosen Login erfolgreich hinzugefügt.
   DescriptionClose: Du kannst das Fenster nun schliessen.
   NextButtonText: weiter
   CancelButtonText: abbrechen
@@ -181,7 +188,7 @@ EmailVerification:
   Description: Du hast ein E-Mail zur Verifizierung deiner E-Mail Adresse bekommen. Gib den Code im untenstehenden Formular ein. Mit erneut versenden, wird dir ein neues E-Mail zugestellt.
   CodeLabel: Code
   NextButtonText: weiter
-  ResendButtonText: erneut senden
+  ResendButtonText: Code erneut senden
 
 EmailVerificationDone:
   Title: E-Mail Verifizierung
@@ -195,6 +202,7 @@ RegisterOption:
   Description: Wähle aus wie du dich registrieren möchtest.
   RegisterUsernamePasswordButtonText: Mit Benutzername Passwort
   ExternalLoginDescription: oder registriere dich mit einem externen Benutzer
+  LoginButtonText: login
 
 RegistrationUser:
   Title: Registration
@@ -210,6 +218,8 @@ RegistrationUser:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -219,10 +229,10 @@ RegistrationUser:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   ExternalLogin: oder registriere dich mit einem externen Benutzer
-  BackButtonText: zurück
+  BackButtonText: login
   NextButtonText: weiter
 
 ExternalRegistrationUserOverview:
@@ -239,10 +249,13 @@ ExternalRegistrationUserOverview:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   ExternalLogin: oder registriere dich mit einem externen Benutzer
   BackButtonText: zurück
@@ -261,7 +274,7 @@ RegistrationOrg:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   SaveButtonText: Organisation speichern
 
@@ -282,20 +295,23 @@ LinkingUsersDone:
   CancelButtonText: abbrechen
   NextButtonText: weiter
 
-ExternalNotFoundOption:
-  Title: Externer Benutzer
+ExternalNotFound:
+  Title: Externer Benutzer nicht gefunden
   Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
   LinkButtonText: Verlinken
   AutoRegisterButtonText: registrieren
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   German: Deutsch
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Powered By
@@ -314,6 +330,7 @@ Errors:
     MissingParameters: Benötigte Parameter fehlen
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    AlreadyExists: Benutzer existiert bereits
     Inactive: Benutzer ist inaktiv
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
@@ -322,6 +339,33 @@ Errors:
     Invalid: Userdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
+    Profile:
+      NotFound: Profil nicht gefunden
+      NotChanged: Profil nicht verändert
+      Empty: Profil ist leer
+      FirstNameEmpty: Vorname im Profil ist leer
+      LastNameEmpty: Nachname im Profil ist leer
+      IDMissing: Profil ID fehlt
+    Email:
+      NotFound: Email nicht gefunden
+      Invalid: Email ist ungültig
+      AlreadyVerified: Email ist bereits verifiziert
+      NotChanged: Email wurde nicht geändert
+      Empty: Email ist leer
+      IDMissing: Email ID fehlt
+    Phone:
+      NotFound: Telefonnummer nicht gefunden
+      Invalid: Telefonnummer ist ungültig
+      AlreadyVerified: Telefonnummer bereits verifiziert
+      Empty: Telefonnummer ist leer
+      NotChanged: Telefonnummer wurde nicht geändert
+    Address:
+      NotFound: Adresse nicht gefunden
+      NotChanged: Adresse wurde nicht geändert
+    Username:
+      AlreadyExists: Benutzername ist bereits vergeben
+      Reserved: Benutzername ist bereits vergeben
+      Empty: Benutzername ist leer
     Password:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer
@@ -364,6 +408,8 @@ Errors:
       ExternalUserIDEmpty: Externe User ID  ist leer
       UserDisplayNameEmpty: Benutzer Anzeige Name ist leer
       NoExternalUserData: Keine externe User Daten erhalten
+      CreationNotAllowed: Erstellen eines neuen User ist auf diesem Provider nicht erlaubt
+      LinkingNotAllowed: Linken eines Users ist auf diesem Provider nicht erlaubt
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
     ProjectRequired: Der Login an diese Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
@@ -371,5 +417,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy existiert nicht
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrierung ist nicht erlaubt
 
 optional: (optional)

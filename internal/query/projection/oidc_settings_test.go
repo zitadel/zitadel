@@ -32,14 +32,13 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 			},
 			reduce: (&oidcSettingsProjection{}).reduceOIDCSettingsChanged,
 			want: wantReduce{
-				projection:       OIDCSettingsProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.oidc_settings SET (change_date, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) = ($1, $2, $3, $4, $5, $6) WHERE (aggregate_id = $7)",
+							expectedStmt: "UPDATE projections.oidc_settings2 SET (change_date, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) = ($1, $2, $3, $4, $5, $6) WHERE (aggregate_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -48,6 +47,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 								time.Millisecond * 10,
 								time.Millisecond * 10,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -65,14 +65,13 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 			},
 			reduce: (&oidcSettingsProjection{}).reduceOIDCSettingsAdded,
 			want: wantReduce{
-				projection:       OIDCSettingsProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.oidc_settings (aggregate_id, creation_date, change_date, resource_owner, instance_id, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.oidc_settings2 (aggregate_id, creation_date, change_date, resource_owner, instance_id, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -90,6 +89,32 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(OIDCSettingsColumnInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.oidc_settings2 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -101,7 +126,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, OIDCSettingsProjectionTable, tt.want)
 		})
 	}
 }

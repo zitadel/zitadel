@@ -39,7 +39,7 @@ func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, au
 	}
 	data := &mfaU2FData{
 		webAuthNData: webAuthNData{
-			userData:               l.getUserData(r, authReq, "Login WebAuthNToken", errID, errMessage),
+			userData:               l.getUserData(r, authReq, "VerifyMFAU2F.Title", "VerifyMFAU2F.Description", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		MFAProviders:     providers,
@@ -71,6 +71,14 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	err = l.authRepo.VerifyMFAU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID, credData, domain.BrowserInfoFromRequest(r))
+
+	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodU2F, err)
+	if err == nil && actionErr == nil && len(metadata) > 0 {
+		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+	} else if actionErr != nil && err == nil {
+		err = actionErr
+	}
+
 	if err != nil {
 		l.renderU2FVerification(w, r, authReq, step.MFAProviders, err)
 		return

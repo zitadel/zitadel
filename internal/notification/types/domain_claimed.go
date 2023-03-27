@@ -10,8 +10,9 @@ import (
 
 func (notify Notify) SendDomainClaimed(user *query.NotifyUser, origin, username string) error {
 	url := login.LoginLink(origin, user.ResourceOwner)
+	index := strings.LastIndex(user.LastEmail, "@")
 	args := make(map[string]interface{})
 	args["TempUsername"] = username
-	args["Domain"] = strings.Split(user.LastEmail, "@")[1]
+	args["Domain"] = user.LastEmail[index+1:]
 	return notify(url, args, domain.DomainClaimedMessageType, true)
 }

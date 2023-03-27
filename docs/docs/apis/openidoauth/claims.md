@@ -39,42 +39,43 @@ Please check below the matrix for an overview where which scope is asserted.
 
 ## Standard Claims
 
-| Claims             | Example                                  | Description                                                                                   |
-|:-------------------|:-----------------------------------------|-----------------------------------------------------------------------------------------------|
-| acr                | TBA                                      | TBA                                                                                           |
-| address            | `Teufener Strasse 19, 9000 St. Gallen`   | TBA                                                                                           |
+| Claims             | Example                                  | Description                                                                                                                                            |
+|:-------------------|:-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| acr                | TBA                                      | TBA                                                                                                                                                    |
+| address            | `Teufener Strasse 19, 9000 St. Gallen`   | TBA                                                                                                                                                    |
 | amr                | `pwd mfa`                                | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) <br/> `password` value is deprecated, please check `pwd` |
-| aud                | `69234237810729019`                      | The audience of the token, by default all client id's and the project id are included         |
-| auth_time          | `1311280969`                             | Unix time of the authentication                                                               |
-| azp                | `69234237810729234`                      | Client id of the client who requested the token                                               |
-| email              | `road.runner@acme.ch`                    | Email Address of the subject                                                                  |
-| email_verified     | `true`                                   | Boolean if the email was verified by ZITADEL                                                  |
-| exp                | `1311281970`                             | Time the token expires (as unix time)                                                         |
-| family_name        | `Runner`                                 | The subjects family name                                                                      |
-| gender             | `other`                                  | Gender of the subject                                                                         |
-| given_name         | `Road`                                   | Given name of the subject                                                                     |
-| iat                | `1311280970`                             | Time of the token was issued at (as unix time)                                                |
-| iss                | `{your_domain}`                          | Issuing domain of a token                                                                     |
-| jti                | `69234237813329048`                      | Unique id of the token                                                                        |
-| locale             | `en`                                     | Language from the subject                                                                     |
-| name               | `Road Runner`                            | The subjects full name                                                                        |
-| nbf                | `1311280970`                             | Time the token must not be used before (as unix time)                                         |
-| nonce              | `blQtVEJHNTF0WHhFQmhqZ0RqeHJsdzdkd2d...` | The nonce provided by the client                                                              |
-| phone              | `+41 79 XXX XX XX`                       | Phone number provided by the user                                                             |
-| phone_verified     | `true`                                   | Boolean if the phone was verified by ZITADEL                                                  |
-| preferred_username | `road.runner@acme.caos.ch`               | ZITADEL's login name of the user. Consist of `username@primarydomain`                         |
-| sub                | `77776025198584418`                      | Subject ID of the user                                                                        |
+| aud                | `69234237810729019`                      | The audience of the token, by default all client id's and the project id are included                                                                  |
+| auth_time          | `1311280969`                             | Unix time of the authentication                                                                                                                        |
+| azp                | `69234237810729234`                      | Client id of the client who requested the token                                                                                                        |
+| email              | `road.runner@acme.ch`                    | Email Address of the subject                                                                                                                           |
+| email_verified     | `true`                                   | Boolean if the email was verified by ZITADEL                                                                                                           |
+| exp                | `1311281970`                             | Time the token expires (as unix time)                                                                                                                  |
+| family_name        | `Runner`                                 | The subjects family name                                                                                                                               |
+| gender             | `other`                                  | Gender of the subject                                                                                                                                  |
+| given_name         | `Road`                                   | Given name of the subject                                                                                                                              |
+| iat                | `1311280970`                             | Time of the token was issued at (as unix time)                                                                                                         |
+| iss                | `{your_domain}`                          | Issuing domain of a token                                                                                                                              |
+| jti                | `69234237813329048`                      | Unique id of the token                                                                                                                                 |
+| locale             | `en`                                     | Language from the subject                                                                                                                              |
+| name               | `Road Runner`                            | The subjects full name                                                                                                                                 |
+| nbf                | `1311280970`                             | Time the token must not be used before (as unix time)                                                                                                  |
+| nonce              | `blQtVEJHNTF0WHhFQmhqZ0RqeHJsdzdkd2d...` | The nonce provided by the client                                                                                                                       |
+| phone              | `+41 79 XXX XX XX`                       | Phone number provided by the user                                                                                                                      |
+| phone_verified     | `true`                                   | Boolean if the phone was verified by ZITADEL                                                                                                           |
+| preferred_username | `road.runner@acme.caos.ch`               | ZITADEL's login name of the user. Consist of `username@primarydomain`                                                                                  |
+| sub                | `77776025198584418`                      | Subject ID of the user                                                                                                                                 |
 
 ## Custom Claims
 
-> This feature is not yet released
+You can add custom claims using the [complement token flow](/docs/apis/actions/complement-token) of the [actions feature](/docs/apis/actions/introduction).
 
 ## Reserved Claims
 
-ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](scopes#reserved-scopes). 
+ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](scopes#reserved-scopes).
 
 | Claims                                            | Example                                                                                              | Description                                                                                                                                                                        |
 |:--------------------------------------------------|:-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| urn:zitadel:iam:action:{actionname}:log           | `{"urn:zitadel:iam:action:appendCustomClaims:log": ["test log", "another test log"]}`                | This claim is set during Actions as a log, e.g. if two custom claims with the same keys are set.                                                                                   |
 | urn:zitadel:iam:org:domain:primary:{domainname}   | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                                  | This claim represents the primary domain of the organization the user belongs to.                                                                                                  |
 | urn:zitadel:iam:org:project:roles                 | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role. |
 | urn:zitadel:iam:roles:{rolename}                  | TBA                                                                                                  | TBA                                                                                                                                                                                |

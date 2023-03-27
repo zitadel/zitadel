@@ -9,11 +9,12 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Key interface {
@@ -101,7 +102,8 @@ func (r *rsaPublicKey) Key() interface{} {
 
 var (
 	keyTable = table{
-		name: projection.KeyProjectionTable,
+		name:          projection.KeyProjectionTable,
+		instanceIDCol: projection.KeyColumnInstanceID,
 	}
 	KeyColID = Column{
 		name:  projection.KeyColumnID,
@@ -139,7 +141,8 @@ var (
 
 var (
 	keyPrivateTable = table{
-		name: projection.KeyPrivateTable,
+		name:          projection.KeyPrivateTable,
+		instanceIDCol: projection.KeyPrivateColumnInstanceID,
 	}
 	KeyPrivateColID = Column{
 		name:  projection.KeyPrivateColumnID,
@@ -157,7 +160,8 @@ var (
 
 var (
 	keyPublicTable = table{
-		name: projection.KeyPublicTable,
+		name:          projection.KeyPublicTable,
+		instanceIDCol: projection.KeyPrivateColumnInstanceID,
 	}
 	KeyPublicColID = Column{
 		name:  projection.KeyPublicColumnID,
@@ -173,19 +177,18 @@ var (
 	}
 )
 
-func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (*PublicKeys, error) {
-	query, scan := preparePublicKeysQuery()
+func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (_ *PublicKeys, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := preparePublicKeysQuery(ctx, q.client)
 	if t.IsZero() {
 		t = time.Now()
 	}
 	stmt, args, err := query.Where(
 		sq.And{
-			sq.Eq{
-				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
-			sq.Gt{
-				KeyPublicColExpiry.identifier(): t,
-			},
+			sq.Eq{KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+			sq.Gt{KeyPublicColExpiry.identifier(): t},
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDFfg", "Errors.Query.SQLStatement")
@@ -206,8 +209,11 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (*PublicKey
 	return keys, nil
 }
 
-func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*PrivateKeys, error) {
-	stmt, scan := preparePrivateKeysQuery()
+func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (_ *PrivateKeys, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := preparePrivateKeysQuery(ctx, q.client)
 	if t.IsZero() {
 		t = time.Now()
 	}
@@ -217,9 +223,7 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*Pr
 				KeyColUse.identifier():        domain.KeyUsageSigning,
 				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
-			sq.Gt{
-				KeyPrivateColExpiry.identifier(): t,
-			},
+			sq.Gt{KeyPrivateColExpiry.identifier(): t},
 		}).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDff2", "Errors.Query.SQLStatement")
@@ -240,7 +244,7 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*Pr
 	return keys, nil
 }
 
-func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, error)) {
+func preparePublicKeysQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, error)) {
 	return sq.Select(
 			KeyColID.identifier(),
 			KeyColCreationDate.identifier(),
@@ -253,7 +257,7 @@ func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, e
 			KeyPublicColKey.identifier(),
 			countColumn.identifier(),
 		).From(keyTable.identifier()).
-			LeftJoin(join(KeyPublicColID, KeyColID)).
+			LeftJoin(join(KeyPublicColID, KeyColID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*PublicKeys, error) {
 			keys := make([]PublicKey, 0)
@@ -296,7 +300,7 @@ func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, e
 		}
 }
 
-func preparePrivateKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PrivateKeys, error)) {
+func preparePrivateKeysQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*PrivateKeys, error)) {
 	return sq.Select(
 			KeyColID.identifier(),
 			KeyColCreationDate.identifier(),
@@ -309,7 +313,7 @@ func preparePrivateKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PrivateKeys,
 			KeyPrivateColKey.identifier(),
 			countColumn.identifier(),
 		).From(keyTable.identifier()).
-			LeftJoin(join(KeyPrivateColID, KeyColID)).
+			LeftJoin(join(KeyPrivateColID, KeyColID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*PrivateKeys, error) {
 			keys := make([]PrivateKey, 0)

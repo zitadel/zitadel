@@ -52,6 +52,10 @@ var (
 	}
 )
 
+func LoginHintLink(origin, username string) string {
+	return origin + HandlerPrefix + "?login_hint=" + username
+}
+
 func (i *spaHandler) Open(name string) (http.File, error) {
 	ret, err := i.fileSystem.Open(name)
 	if !os.IsNotExist(err) || path.Ext(name) != "" {
@@ -65,8 +69,8 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return &file{File: f}, nil
 }
 
-//file wraps the http.File and fs.FileInfo interfaces
-//to return the build.Date() as ModTime() of the file
+// file wraps the http.File and fs.FileInfo interfaces
+// to return the build.Date() as ModTime() of the file
 type file struct {
 	http.File
 	fs.FileInfo
@@ -84,7 +88,7 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 	return f, nil
 }
 
-func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, instanceHandler func(http.Handler) http.Handler, customerPortal string) (http.Handler, error) {
+func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler, accessInterceptor func(http.Handler) http.Handler, customerPortal string) (http.Handler, error) {
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
@@ -99,7 +103,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 
 	handler := mux.NewRouter()
 
-	handler.Use(security, instanceHandler)
+	handler.Use(callDurationInterceptor, instanceHandler, security, accessInterceptor)
 	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
 		environmentJSON, err := createEnvironmentJSON(url, issuer(r), authz.GetInstance(r.Context()).ConsoleClientID(), customerPortal)

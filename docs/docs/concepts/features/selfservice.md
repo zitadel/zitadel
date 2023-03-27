@@ -5,15 +5,15 @@ title: Self-Service
 ZITADEL allows users to perform many tasks themselves.
 For these tasks we either provide an user interface, or the tasks can be initiated or completed through ZITADEL's APIs.
 
-It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:  
+It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:
 
 - `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators etc. There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
-- `Managers` are users with a [special manager role within ZITADEL](/docs/concepts/structure/managers) and can perform administrative actions such as system configuration or granting access rights to users.
+- `Managers` are users with a [special manager role](../../guides/manage/console/managers) within ZITADEL and can perform administrative actions such as system configuration or granting access rights to users.
 
-All self-service interfaces are available in different [languages](/docs/guides/manage/customize/texts#internationalization).
+All self-service interfaces are available in different [languages](/guides/manage/customize/texts#internationalization).
 
 :::info
-ZTIADEL covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).
+ZITADEL covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).
 :::
 
 ## Registration
@@ -31,7 +31,7 @@ Allows anonymous users and authenticated users, who are not yet in the given org
 - Mandatory profile fields
 - Set password
 - Accept terms of service and privacy policy
-- User receives an email with an one-time code for verfication purpose
+- User receives an email with an one-time code for verification purpose
 - User has to enter the one-time code to finish registration
 - User can re-request a new one-time code
 
@@ -40,7 +40,7 @@ This step can be made mandatory if MFA is enforced in the login policy.
 
 ### Existing Identity / SSO / Social Login
 
-anonymous users and authenticated users, who are not yet in the given organization, to register with an external identity provider.
+Anonymous users and authenticated users, who are not yet in the given organization, to register with an external identity provider.
 An external identity provider can be a Social Login Provider or a pre-configured identity provider.
 
 - Information from the external identity provider is used to pre-fill the profile information
@@ -49,7 +49,7 @@ An external identity provider can be a Social Login Provider or a pre-configured
 
 #### Account Linking
 
-When you login with an external identity provider, and the user does not exist in ZITADEL, then an autoregister flow is triggered. The user is presented with two options: 
+When you login with an external identity provider, and the user does not exist in ZITADEL, then an autoregister flow is triggered. The user is presented with two options:
 
 - Create a new account: A new account will be created as stated above
 - Autolinking: The user is prompted to login with an existing [local account](#local-account). If successful, the existing identity from the external identity provider will be linked with the local account. A user can now login with either the local account or any of the linked external accounts.
@@ -64,7 +64,7 @@ By default, the displayed branding is defined based on the user's domain. In cas
 
 ### Web, Mobile, and Single-Page Applications
 
-[This guide](/docs/guides/integrate/login-users) explains in more detail the login-flows for different application types.
+[This guide](/guides/integrate/login-users) explains in more detail the login-flows for different application types.
 Human users are redirected to ZITADEL's login page and complete sign-in with the interactive login flow.
 It is important to understand that ZITADEL provides a hosted login page and the device of the users opens this login page in a browser, even on Native/Mobile apps.
 
@@ -72,7 +72,7 @@ It is important to understand that ZITADEL provides a hosted login page and the 
 
 Users are automatically prompted to provide a second factor, when
 
-- Instance or organization [login policy](/docs/concepts/structure/policies#login-policy) is set
+- Instance or organization [login policy](/concepts/structure/policies#login-policy) is set
 - Requested by the client
 - A multi-factor is setup for the user
 
@@ -104,7 +104,7 @@ Given an external identity provider is configured on the instance or on the orga
 ### Machines
 
 Machine accounts can't use an interactive login but require other means of authentication, such as privately-signed JWT or personal access tokens.
-Read more about [Service Users](/docs/guides/integrate/serviceusers) and recommended [OpenID Connect Flows](/docs/guides/integrate/oauth-recommended-flows#different-client-profiles).
+Read more about [Service Users](/guides/integrate/serviceusers) and recommended [OpenID Connect Flows](/guides/integrate/oauth-recommended-flows#different-client-profiles).
 
 ### Other Clients
 
@@ -119,7 +119,7 @@ The user can click the account in the list and does not need to type the usernam
 Users can still login with a different user that is not in the list.
 
 :::info
-This behavior can be changed with the authorization request. Please refer to our [guide](/docs/guides/integrate/login-users).
+This behavior can be changed with the authorization request. Please refer to our [guide](/guides/integrate/login-users).
 :::
 
 ### Password reset
@@ -133,12 +133,12 @@ Unauthenticated users can request a password reset after providing the loginname
 ## Logout
 
 Users can terminate the session for all their users (logout).
-A client can also implement this, by calling the [specific endpoint](/docs/apis/openidoauth/endpoints#end_session_endpoint).
+A client can also implement this, by calling the [specific endpoint](/apis/openidoauth/endpoints#end_session_endpoint).
 
 ## Profile
 
 These actions are available for authenticated users only.
-ZITADEL provides a self-service UI for the user profile out-of-the box under the path *{your_domain}/ui/console/users/me*.
+ZITADEL provides a self-service UI for the user profile out-of-the box under the path _{your_domain}/ui/console/users/me_.
 You can also implement your own version in your application by using our APIs.
 
 ### Change password
@@ -193,7 +193,7 @@ Thus we will explain service for two very common scenarios in ZITADEL:
 - `Managers in isolation`: Granting administrative permissions within a single organization context.
 - `Managers in delegation`: Granting administrative permissions to a user from a different organization where the organizations depend on each other
 
-A list of [Manager Roles](/docs/concepts/structure/managers#roles) is available with a description of permissions.
+A list of [Manager Roles](../../guides/manage/console/managers#roles) is available with a description of permissions.
 Managers can be assigned to both human users and service users eg, for managing certain tasks programmatically.
 
 ### Managers in isolation
@@ -203,7 +203,7 @@ This could be permission to assign authorizations within this isolated organizat
 
 ### Managers in delegation
 
-In a setup like described in the [B2B Scenario](/docs/guides/solution-scenarios/b2b), there exists an organization of the project owner and a customer organization.
+In a setup like described in the [B2B Scenario](/guides/solution-scenarios/b2b), there exists an organization of the project owner and a customer organization.
 The project is granted to the customer organization, such that the customer can access the project and assign authorization to their users.
 
 Given such as setup the owner might want to give one administrative user of the customer organization the role `ORG_OWNER`.

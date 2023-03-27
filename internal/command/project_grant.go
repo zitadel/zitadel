@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"

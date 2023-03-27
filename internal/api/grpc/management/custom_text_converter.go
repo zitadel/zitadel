@@ -83,6 +83,21 @@ func SetDomainClaimedCustomTextToDomain(msg *mgmt_pb.SetCustomDomainClaimedMessa
 	}
 }
 
+func SetPasswordChangeCustomTextToDomain(msg *mgmt_pb.SetCustomPasswordChangeMessageTextRequest) *domain.CustomMessageText {
+	langTag := language.Make(msg.Language)
+	return &domain.CustomMessageText{
+		MessageTextType: domain.PasswordChangeMessageType,
+		Language:        langTag,
+		Title:           msg.Title,
+		PreHeader:       msg.PreHeader,
+		Subject:         msg.Subject,
+		Greeting:        msg.Greeting,
+		Text:            msg.Text,
+		ButtonText:      msg.ButtonText,
+		FooterText:      msg.FooterText,
+	}
+}
+
 func SetPasswordlessRegistrationCustomTextToDomain(msg *mgmt_pb.SetCustomPasswordlessRegistrationMessageTextRequest) *domain.CustomMessageText {
 	langTag := language.Make(msg.Language)
 	return &domain.CustomMessageText{
@@ -122,6 +137,7 @@ func SetLoginCustomTextToDomain(req *mgmt_pb.SetCustomLoginTextsRequest) *domain
 	result.VerifyMFAOTP = text.VerifyMFAOTPScreenTextPbToDomain(req.VerifyMfaOtpText)
 	result.VerifyMFAU2F = text.VerifyMFAU2FScreenTextPbToDomain(req.VerifyMfaU2FText)
 	result.Passwordless = text.PasswordlessScreenTextPbToDomain(req.PasswordlessText)
+	result.PasswordlessPrompt = text.PasswordlessPromptScreenTextPbToDomain(req.PasswordlessPromptText)
 	result.PasswordlessRegistration = text.PasswordlessRegistrationScreenTextPbToDomain(req.PasswordlessRegistrationText)
 	result.PasswordlessRegistrationDone = text.PasswordlessRegistrationDoneScreenTextPbToDomain(req.PasswordlessRegistrationDoneText)
 	result.PasswordChange = text.PasswordChangeScreenTextPbToDomain(req.PasswordChangeText)
@@ -132,7 +148,7 @@ func SetLoginCustomTextToDomain(req *mgmt_pb.SetCustomLoginTextsRequest) *domain
 	result.ExternalRegistrationUserOverview = text.ExternalRegistrationUserOverviewScreenTextPbToDomain(req.ExternalRegistrationUserOverviewText)
 	result.RegistrationOrg = text.RegistrationOrgScreenTextPbToDomain(req.RegistrationOrgText)
 	result.LinkingUsersDone = text.LinkingUserDoneScreenTextPbToDomain(req.LinkingUserDoneText)
-	result.ExternalNotFoundOption = text.ExternalUserNotFoundScreenTextPbToDomain(req.ExternalUserNotFoundText)
+	result.ExternalNotFound = text.ExternalUserNotFoundScreenTextPbToDomain(req.ExternalUserNotFoundText)
 	result.LoginSuccess = text.SuccessLoginScreenTextPbToDomain(req.SuccessLoginText)
 	result.LogoutDone = text.LogoutDoneScreenTextPbToDomain(req.LogoutText)
 	result.Footer = text.FooterTextPbToDomain(req.FooterText)

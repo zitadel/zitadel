@@ -1,29 +1,30 @@
 <mat-toolbar class="header-wrapper">
   <div class="header-content">
-    <a
-      class="title custom"
-      [routerLink]="['/']"
-      *ngIf="org && labelpolicy && labelpolicy.disableWatermark; else defaultHome"
-    >
-      <img
-        class="logo"
-        alt="home logo"
-        *ngIf="isDarkTheme; else customlighttheme"
-        [src]="labelpolicy.iconUrlDark ? labelpolicy.iconUrlDark : './assets/images/zitadel-logo-solo-light.svg'"
-        (error)="errorHandler($event, './assets/images/zitadel-logo-solo-light.svg')"
-      />
-      <ng-template #customlighttheme>
+    <div *ngIf="authService.labelPolicyLoading$ | async; else logo" class="logo-placeholder">
+      <mat-spinner [diameter]="20"></mat-spinner>
+    </div>
+    <ng-template #logo>
+      <a class="title custom" [routerLink]="['/']" *ngIf="authService.labelpolicy | async as lP; else defaultHome">
         <img
-          alt="home logo"
           class="logo"
-          [src]="labelpolicy.iconUrl ? labelpolicy.iconUrl : './assets/images/zitadel-logo-solo-dark.svg'"
-          (error)="errorHandler($event, './assets/images/zitadel-logo-solo-dark.svg')"
+          alt="home logo"
+          *ngIf="isDarkTheme; else customlighttheme"
+          [src]="lP.iconUrlDark ? lP.iconUrlDark : './assets/images/zitadel-logo-solo-light.svg'"
+          (error)="errorHandler($event, './assets/images/zitadel-logo-solo-light.svg')"
         />
-      </ng-template>
-    </a>
+        <ng-template #customlighttheme>
+          <img
+            alt="home logo"
+            class="logo"
+            [src]="lP.iconUrl ? lP.iconUrl : './assets/images/zitadel-logo-solo-dark.svg'"
+            (error)="errorHandler($event, './assets/images/zitadel-logo-solo-dark.svg')"
+          />
+        </ng-template>
+      </a>
+    </ng-template>
 
     <ng-template #defaultHome>
-      <a class="title" [routerLink]="['/']">
+      <a class="title" [routerLink]="authService.zitadelPermissions.getValue().length === 0 ? ['/users', 'me'] : ['/']">
         <img
           class="logo"
           alt="zitadel logo"
@@ -169,7 +170,7 @@
 
     <span class="fill-space"></span>
 
-    <a class="doc-link" href="https://docs.zitadel.com" mat-stroked-button target="_blank">
+    <a class="doc-link" href="https://zitadel.com/docs" mat-stroked-button target="_blank">
       {{ 'MENU.DOCUMENTATION' | translate }}
     </a>
 

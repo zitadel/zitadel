@@ -1,28 +1,21 @@
 import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription, take } from 'rxjs';
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
+import { Subject, Subscription, take, takeUntil } from 'rxjs';
+import {
+  containsLowerCaseValidator,
+  containsNumberValidator,
+  containsSymbolValidator,
+  containsUpperCaseValidator,
+  minLengthValidator,
+  passwordConfirmValidator,
+  requiredValidator,
+} from 'src/app/modules/form-field/validators/validators';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
-function passwordConfirmValidator(c: AbstractControl): any {
-  if (!c.parent || !c) {
-    return;
-  }
-  const pwd = c.parent.get('password');
-  const cpwd = c.parent.get('confirmPassword');
-
-  if (!pwd || !cpwd) {
-    return;
-  }
-  if (pwd.value !== cpwd.value) {
-    return { invalid: true, notequal: 'Password is not equal' };
-  }
-}
 
 @Component({
   selector: 'cnsl-password',
@@ -31,11 +24,13 @@ function passwordConfirmValidator(c: AbstractControl): any {
 })
 export class PasswordComponent implements OnDestroy {
   userId: string = '';
+  public username: string = '';
 
   public policy!: PasswordComplexityPolicy.AsObject;
   public passwordForm!: UntypedFormGroup;
 
   private formSub: Subscription = new Subscription();
+  private destroy$: Subject<void> = new Subject();
 
   constructor(
     activatedRoute: ActivatedRoute,
@@ -45,11 +40,14 @@ export class PasswordComponent implements OnDestroy {
     private toast: ToastService,
     private breadcrumbService: BreadcrumbService,
   ) {
-    activatedRoute.params.subscribe((data) => {
+    activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      const { username } = data;
+      this.username = username;
+    });
+    activatedRoute.params.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       const { id } = data;
       if (id) {
         this.userId = id;
-
         breadcrumbService.setBreadcrumb([
           new Breadcrumb({
             type: BreadcrumbType.ORG,
@@ -59,6 +57,7 @@ export class PasswordComponent implements OnDestroy {
       } else {
         this.authService.user.pipe(take(1)).subscribe((user) => {
           if (user) {
+            this.username = user.preferredLoginName;
             this.breadcrumbService.setBreadcrumb([
               new Breadcrumb({
                 type: BreadcrumbType.AUTHUSER,
@@ -70,7 +69,7 @@ export class PasswordComponent implements OnDestroy {
         });
       }
 
-      const validators: Validators[] = [Validators.required];
+      const validators: Validators[] = [requiredValidator];
       this.authService
         .getMyPasswordComplexityPolicy()
         .then((resp) => {
@@ -78,19 +77,19 @@ export class PasswordComponent implements OnDestroy {
             this.policy = resp.policy;
           }
           if (this.policy.minLength) {
-            validators.push(Validators.minLength(this.policy.minLength));
+            validators.push(minLengthValidator(this.policy.minLength));
           }
           if (this.policy.hasLowercase) {
-            validators.push(lowerCaseValidator);
+            validators.push(containsLowerCaseValidator);
           }
           if (this.policy.hasUppercase) {
-            validators.push(upperCaseValidator);
+            validators.push(containsUpperCaseValidator);
           }
           if (this.policy.hasNumber) {
-            validators.push(numberValidator);
+            validators.push(containsNumberValidator);
           }
           if (this.policy.hasSymbol) {
-            validators.push(symbolValidator);
+            validators.push(containsSymbolValidator);
           }
 
           this.setupForm(validators);
@@ -102,6 +101,8 @@ export class PasswordComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.formSub.unsubscribe();
   }
 
@@ -109,13 +110,13 @@ export class PasswordComponent implements OnDestroy {
     if (this.userId) {
       this.passwordForm = this.fb.group({
         password: ['', validators],
-        confirmPassword: ['', [...validators, passwordConfirmValidator]],
+        confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
       });
     } else {
       this.passwordForm = this.fb.group({
-        currentPassword: ['', Validators.required],
+        currentPassword: ['', requiredValidator],
         newPassword: ['', validators],
-        confirmPassword: ['', [...validators, passwordConfirmValidator]],
+        confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
       });
     }
   }

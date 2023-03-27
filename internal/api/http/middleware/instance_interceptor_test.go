@@ -244,6 +244,10 @@ func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, host string) (a
 	return &mockInstance{}, nil
 }
 
+func (m *mockInstanceVerifier) InstanceByID(context.Context) (authz.Instance, error) {
+	return nil, nil
+}
+
 type mockInstance struct{}
 
 func (m *mockInstance) InstanceID() string {
@@ -276,4 +280,8 @@ func (m *mockInstance) RequestedDomain() string {
 
 func (m *mockInstance) RequestedHost() string {
 	return "zitadel.cloud:443"
+}
+
+func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
+	return nil
 }

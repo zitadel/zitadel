@@ -290,17 +290,18 @@
           }
         }
 
-        .adv-container {
+        .behavior-exapandable {
           display: flex;
           flex-direction: column;
           padding-bottom: 50px;
 
-          .info {
-            margin-bottom: 0.5rem;
-          }
+          .checkbox-info-section {
+            display: flex;
+            flex-direction: column;
 
-          .toggle {
-            margin-bottom: 1rem;
+            .label {
+              margin-top: 0.5rem;
+            }
           }
         }
       }

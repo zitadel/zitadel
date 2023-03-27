@@ -2,61 +2,58 @@
 title: Flutter
 ---
 
-This guide demonstrates how you integrate **ZITADEL** as an idendity provider to a Flutter app.
+This guide demonstrates how you integrate **ZITADEL** into a Flutter app. It refers to our example on [GitHub](https://github.com/zitadel/zitadel_flutter)
 
-At the end of the guide you have a mobile application on Android and iOS with the ability
-to authenticate users via ZITADEL.
+At the end of the guide you have a mobile application for **Android**, **iOS** and **Web** with the ability to authenticate users via ZITADEL.
 
 If you need any other information about Flutter, head over to the [documentation](https://flutter.dev/).
 
-## Prerequisites
+## Setup Application
+
+Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
+You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
+Select **Native** application type and continue.
+
+![Create app in console](/img/flutter/nativeapp.png)
+
+### Redirect URIs
+
+With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication.
+As our application will also support web, we have to make sure to set redirects for http and https, as well as a **custom-scheme** for our native Android and IOS Setup.
+
+For our local web development, add a redirectURI for `http://localhost:4444/auth.html` with your custom port. For Android and IOS, add your **custom scheme**. In our case it is `com.example.zitadelflutter`.
+
+:::caution Use Custom Redirect URI!
+
+Your custom scheme has to be compliant with the OAuth 2.0
+authentication for mobile devices ([RFC 8252 specification](https://tools.ietf.org/html/rfc8252)).
+Otherwise your app might get rejected.
+
+:::
+
+For development, you need to set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+
+If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.
+
+Continue and create the application.
+
+After creation, go to **token settings** and check the refresh token checkbox. This allows us to request a refresh_token via `offline_access` scope.
+Make sure to save the application.
+
+### Client ID
+
+After successful app creation, a pop-up will appear, showing the app's client ID. Copy the client ID, as you will need it to configure your Flutter application.
+
+## Flutter Prerequisites
 
 To move further in this quickstart, you'll need the following things prepared:
 
 - Have Flutter (and Dart) installed ([how-to](https://flutter.dev/docs/get-started/install))
 - Have an IDE set up for developing Flutter ([how-to](https://flutter.dev/docs/get-started/editor))
 - Create a basic Flutter app ([how-to](https://flutter.dev/docs/get-started/codelab))
-- Create a "Native" application in a ZITADEL project
+- Create a "Native" application in ZITADEL
 
-## Flutter with ZITADEL
-
-In your native application on ZITADEL, you need to add a callback (redirect) uri
-which matches the selected custom url scheme. As an example, if you intend to
-use `ch.myexample.app://sign-me-in` as redirect URI on ZITADEL and in your app,
-you need to register the `ch.myexample.app://` custom url scheme within Android and iOS.
-
-:::caution Use Custom Redirect URI!
-
-You'll need the custom redirect url to be compliant with the OAuth 2.0
-authentication for mobile devices ([RFC 8252 specification](https://tools.ietf.org/html/rfc8252)).
-Otherwise your app might get rejected.
-
-:::
-
-### Hello World
-
-After you created the basic Flutter app, the app will show the following screen:
-
-<div style={{'text-align': 'center', 'margin-bottom': '1rem'}}>
-  <img src="/img/flutter/hello-world.png" alt="Flutter Hello World" height="500px" />
-</div>
-
-You may want to change the Flutter SDK version in `pubspec.yaml` from
-
-```yaml
-environment:
-  sdk: ">=2.7.0 <3.0.0"
-```
-
-to
-
-```yaml
-environment:
-  sdk: ">=2.12.0 <3.0.0"
-```
-
-With this, you'll enable "nullable by default" mode in Flutter, as well as new language features.
-For this quickstart, the minimal Flutter SDK version is set to the default: `sdk: ">=2.7.0 <3.0.0"`.
+After you created the starter Flutter app, the app will show a simple, templated Flutter app.
 
 ### Install Dependencies
 
@@ -69,345 +66,112 @@ Basically, there are two major points in this specification:
 2. It does not allow third party apps to open the browser for the login process,
    the app must open the login page within the embedded browser view
 
-Install the [`appauth`](https://appauth.io/) package and a secure storage (to store the auth / refresh tokens):
+First install [http](https://pub.dev/packages/http) a library for making HTTP calls,
+then [`flutter_web_auth_2`](https://pub.dev/packages/flutter_web_auth_2) and a secure storage to store the auth / refresh tokens [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage).
+
+To install run:
 
 ```bash
 flutter pub add http
-flutter pub add flutter_appauth
+flutter pub add flutter_web_auth_2
 flutter pub add flutter_secure_storage
 ```
 
-#### Important on Android
+#### Setup for Android
 
-To use this app auth method on Android 11, you'll need to add a `query` to the `AndroidManifest.xml`.
-Go to `<projectRoot>/android/app/src/main/AndroidManifest.xml` and add to the `<manifest>` root:
+Navigate to your `AndroidManifest.xml` at `<projectRoot>/android/app/src/main/AndroidManifest.xml` and add the following activity with your custom scheme.
 
-```xml title="<projectRoot>/android/app/src/main/AndroidManifest.xml"
-<queries>
-    <intent>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="https" />
-    </intent>
-    <intent>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.APP_BROWSER" />
-        <data android:scheme="https" />
-    </intent>
-</queries>
+```xml reference
+https://github.com/zitadel/zitadel_flutter/blob/main/android/app/src/main/AndroidManifest.xml#L29-L38
 ```
-
-This allows the app to query for internal browser activities.
 
 Furthermore, for `secure_storage`, you need to set the minimum SDK version to 18
-in `<projectRoot>/android/app/src/build.gradle`. Then, add the manifest placeholder
-for your redirect url (the custom url scheme). In the end, the `defaultConfig`
-section of the `build.gradle` file should look like this:
-
-```groovy title="<projectRoot>/android/app/src/build.gradle"
-defaultConfig {
-    applicationId "<<YOUR APPLICATION ID, for example ch.myexample.my_fancy_app>>"
-    minSdkVersion 18
-    targetSdkVersion 30
-    versionCode flutterVersionCode.toInteger()
-    versionName flutterVersionName
-    manifestPlaceholders = [
-            'appAuthRedirectScheme': '<<YOUR CUSTOM URL SCHEME, for example ch.myexample.app>>'
-    ]
-}
-```
-
-#### Important on iOS
-
-In a similar way to Android, you need to register the custom url scheme within iOS to
-be able to use custom redirect schemes. In the `Info.plist` file of the Runner
-project, you can add the `CFBundleTypeRole` and the `CFBundleUrlSchemes`.
-
-```xml title="<projectRoot>/ios/Runner/Info.plist"
-<key>CFBundleURLTypes</key>
-<array>
-    <dict>
-        <key>CFBundleTypeRole</key>
-        <string>Editor</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-            <string>YOUR CUSTOM URL SCHEME, for example ch.myexample.app</string>
-        </array>
-    </dict>
-</array>
-```
+in `<projectRoot>/android/app/src/build.gradle`.
 
 ### Add Authentication
-
-:::note
-
-The auth redirect scheme "`ch.myexample.app`" does register all auth urls with the given
-scheme for the app. So an url pointing to `ch.myexample.app://signin` and another one
-for `ch.myexample.app://logout` will work with the same registration.
-
-:::
 
 To reduce the commented default code, we will modify the `main.dart` file.
 
 First, the `MyApp` class: it remains a stateless widget:
 
-```dart
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter ZITADEL',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter ZITADEL Quickstart'),
-    );
-  }
-}
+```dart reference
+https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L14-L28
 ```
 
 Second, the `MyHomePage` class will remain a stateful widget with
 its title, we don't change any code here.
 
-```dart
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
+```dart reference
+https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L30-L37
 ```
 
 What we'll change now, is the `_MyHomePageState` class to enable
-authentication via ZITADEL and remove the counter button of the hello
-world application. We'll show the username of the authenticated user.
+authentication via ZITADEL and remove the counter button of the starter application. We'll show the username of the authenticated user.
 
 We define the needed elements for our state:
 
 ```dart
-final _appAuth = FlutterAppAuth();
-final _secureStorage = const FlutterSecureStorage();
-
 var _busy = false;
 var _authenticated = false;
 var _username = '';
+final storage = const FlutterSecureStorage();
 ```
 
 Then the builder method, which does show the login button if you're not
 authenticated, a loading bar if the login process is going on and
 your name if you are authenticated:
 
-```dart
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text(widget.title),
-    ),
-    body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (!_authenticated && !_busy)
-            Text(
-              'You are not authenticated.',
-            ),
-          if (!_authenticated && !_busy)
-            ElevatedButton.icon(
-                icon: Icon(Icons.fingerprint),
-                label: Text('login'),
-                onPressed: _authenticate),
-          if (_busy)
-            Stack(
-              children: [
-                Center(child: Text("Busy, logging in.")),
-                Opacity(
-                  opacity: 0.5,
-                  child: Container(
-                    color: Colors.black,
-                  ),
-                ),
-                Center(child: CircularProgressIndicator()),
-              ],
-            ),
-          if (_authenticated && !_busy)
-            Text(
-              'Hello $_username!',
-            ),
-        ],
-      ),
-    ),
-  );
-}
+```dart reference
+https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L119-L159
 ```
 
 And finally the `_authenticate` method which calls the authorization endpoint,
 then fetches the user info and stores the tokens into the secure storage.
 
-```dart
-Future<void> _authenticate() async {
-  setState(() {
-    _busy = true;
-  });
-
-  try {
-    final result = await _appAuth.authorizeAndExchangeCode(
-      AuthorizationTokenRequest(
-        '<<CLIENT_ID>>', // Client ID of the native application
-        '<<CALLBACK_URL>>', // The registered url from zitadel (e.g. ch.myexample.app://signin)
-        issuer: '<<ISSUER>>', // most of the cases: https:/[your-domain]-[random-string].zitadel.cloud
-        scopes: [
-          'openid',
-          'profile',
-          'email',
-          'offline_access',
-        ],
-      ),
-    );
-
-    final userInfoResponse = await get(
-      Uri.parse('https://[your-instance].zitadel.cloud/oidc/v1/userinfo'),
-      headers: {
-        HttpHeaders.authorizationHeader: 'Bearer ${result.accessToken}',
-        HttpHeaders.acceptHeader: 'application/json; charset=UTF-8'
-      },
-    );
-    final userJson = jsonDecode(utf8.decode(userInfoResponse.bodyBytes));
-
-    await _secureStorage.write(
-        key: 'auth_access_token', value: result?.accessToken);
-    await _secureStorage.write(
-        key: 'refresh_token', value: result?.refreshToken);
-    await _secureStorage.write(key: 'id_token', value: result?.idToken);
-
-    setState(() {
-      _busy = false;
-      _authenticated = true;
-      _username = '${userJson['given_name']} ${userJson['family_name']}';
-    });
-  } catch (e, s) {
-    print('error on authorizeAndExchangeCode token: $e - stack: $s');
-    setState(() {
-      _busy = false;
-      _authenticated = false;
-    });
-  }
-}
+```dart reference
+https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L45-L117
 ```
 
-Now, you should be able to login with a valid ZITADEL user.
+Note that we have to use our http redirect URL for web applications or otherwise use our custom scheme for Android and iOS devices.
+To setup other platforms, read the documentation of the [Flutter Web Auth](https://pub.dev/packages/flutter_web_auth_2).
 
-#### Result
+To ensure our application catches the callback URL, you have to create a `auth.html` file in the `/web`
+folder with the following content:
 
-In the end, our state class looks like:
-
-```dart
-class _MyHomePageState extends State<MyHomePage> {
-  final _appAuth = FlutterAppAuth();
-  final _secureStorage = const FlutterSecureStorage();
-
-  var _busy = false;
-  var _authenticated = false;
-  var _username = '';
-
-  Future<void> _authenticate() async {
-    setState(() {
-      _busy = true;
-    });
-
-    try {
-      final result = await _appAuth.authorizeAndExchangeCode(
-        AuthorizationTokenRequest(
-          'CLIENT_ID',
-          'CALLBACK_URL',
-          issuer: 'ISSUER',
-          scopes: [
-            'openid',
-            'profile',
-            'email',
-            'offline_access',
-          ],
-        ),
-      );
-
-      final userInfoResponse = await get(
-        Uri.parse('https:/[your-domain]-[random-string].zitadel.cloud/oidc/v1/userinfo'), // replace with your instance
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer ${result.accessToken}',
-          HttpHeaders.acceptHeader: 'application/json; charset=UTF-8'
-        },
-      );
-      final userJson = jsonDecode(utf8.decode(userInfoResponse.bodyBytes));
-
-      await _secureStorage.write(
-          key: 'auth_access_token', value: result?.accessToken);
-      await _secureStorage.write(
-          key: 'refresh_token', value: result?.refreshToken);
-      await _secureStorage.write(key: 'id_token', value: result?.idToken);
-
-      setState(() {
-        _busy = false;
-        _authenticated = true;
-        _username = '${userJson['given_name']} ${userJson['family_name']}';
-      });
-    } catch (e, s) {
-      print('error on authorizeAndExchangeCode token: $e - stack: $s');
-      setState(() {
-        _busy = false;
-        _authenticated = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (!_authenticated && !_busy)
-              Text(
-                'You are not authenticated.',
-              ),
-            if (!_authenticated && !_busy)
-              ElevatedButton.icon(
-                  icon: Icon(Icons.fingerprint),
-                  label: Text('login'),
-                  onPressed: _authenticate),
-            if (_busy)
-              Stack(
-                children: [
-                  Center(child: Text("Busy, logging in.")),
-                  Opacity(
-                    opacity: 0.5,
-                    child: Container(
-                      color: Colors.black,
-                    ),
-                  ),
-                  Center(child: CircularProgressIndicator()),
-                ],
-              ),
-            if (_authenticated && !_busy)
-              Text(
-                'Hello $_username!',
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+```html reference
+https://github.com/zitadel/zitadel_flutter/blob/main/web/auth.html
 ```
 
-If you run this application, you can authenticate with a valid ZITADEL user.
+Now, you can run your application for iOS and Android devices with
 
-<div style={{display: 'grid', 'grid-column-gap': '1rem', 'grid-template-columns': '1fr 1fr'}}>
-    <img src="/img/flutter/not-authed.png" alt="Unauthenticated" height="500px" />
-    <img src="/img/flutter/authed.png" alt="Flutter Authenticated" height="500px" />
+```bash
+flutter run
+```
+
+or by directly selecting your device
+
+```bash
+flutter run -d iphone
+```
+
+For Web make sure you run the application on your fixed port such that it matches your redirect URI in your ZITADEL application. We used 4444 as port before so the command would look like this:
+
+```bash
+flutter run -d chrome --web-port=4444
+```
+
+Our Android and iOS Application opens ZITADEL's login within a custom tab, on Web a new tab is opened.
+
+### Result
+
+If everything works out correctly, your applications should look like this:
+
+<div style={{display: 'grid', 'gridColumnGap': '1rem', 'gridTemplateColumns': '1fr 1fr', 'maxWidth': '500px', 'margin': '0 auto'}}>
+    <img src="/docs/img/flutter/not-authed.png" alt="Unauthenticated" height="500px" />
+    <img src="/docs/img/flutter/authed.png" alt="Flutter Authenticated" height="500px" />
+</div>
+
+<div style={{display: 'grid', 'gridColumnGap': '1rem', 'gridTemplateColumns': '1fr 1fr', 'maxWidth': '800px', 'margin': '0 auto'}}>
+    <img src="/docs/img/flutter/web-not-authed.png" alt="Unauthenticated" height="500px" />
+    <img src="/docs/img/flutter/web-authed.png" alt="Flutter Authenticated" height="500px" />
 </div>

@@ -52,6 +52,7 @@ const (
 	IDPConfigSearchKeyIdpConfigID
 	IDPConfigSearchKeyIdpProviderType
 	IDPConfigSearchKeyInstanceID
+	IDPConfigSearchKeyOwnerRemoved
 )
 
 type IDPConfigSearchQuery struct {

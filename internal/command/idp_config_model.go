@@ -62,3 +62,7 @@ func (rm *IDPConfigWriteModel) reduceConfigChangedEvent(e *idpconfig.IDPConfigCh
 func (rm *IDPConfigWriteModel) reduceConfigStateChanged(configID string, state domain.IDPConfigState) {
 	rm.State = state
 }
+
+func (rm *IDPConfigWriteModel) Exists() bool {
+	return rm.State.Exists()
+}

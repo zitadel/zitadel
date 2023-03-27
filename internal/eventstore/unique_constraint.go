@@ -18,6 +18,7 @@ type UniqueConstraintAction int32
 const (
 	UniqueConstraintAdd UniqueConstraintAction = iota
 	UniqueConstraintRemove
+	UniqueConstraintInstanceRemove
 )
 
 func NewAddEventUniqueConstraint(
@@ -39,6 +40,12 @@ func NewRemoveEventUniqueConstraint(
 		UniqueType:  uniqueType,
 		UniqueField: uniqueField,
 		Action:      UniqueConstraintRemove,
+	}
+}
+
+func NewRemoveInstanceUniqueConstraints() *EventUniqueConstraint {
+	return &EventUniqueConstraint{
+		Action: UniqueConstraintInstanceRemove,
 	}
 }
 

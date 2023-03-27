@@ -1,26 +1,6 @@
 <div class="contact-method-col" *ngIf="human">
   <div class="contact-method-row">
     <div class="left">
-      <span class="label cnsl-secondary-text">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
-      <span class="name">*********</span>
-
-      <ng-content select="[pwdAction]"></ng-content>
-    </div>
-
-    <div class="right">
-      <a
-        matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
-        [disabled]="!canWrite"
-        [routerLink]="['password']"
-        mat-icon-button
-      >
-        <i class="las la-pen"></i>
-      </a>
-    </div>
-  </div>
-
-  <div class="contact-method-row">
-    <div class="left">
       <span class="label cnsl-secondary-text">{{ 'USER.EMAIL' | translate }}</span>
       <span class="name">{{ human.email?.email }}</span>
       <span *ngIf="human.email?.isEmailVerified" class="contact-state verified">{{ 'USER.EMAILVERIFIED' | translate }}</span>
@@ -44,7 +24,7 @@
     <div class="right">
       <button
         matTooltip="{{ 'ACTIONS.EDIT' | translate }}"
-        [disabled]="!canWrite || state === UserState.USER_STATE_INITIAL"
+        [disabled]="!canWrite"
         (click)="openEditDialog(EditDialogType.EMAIL)"
         mat-icon-button
       >
@@ -56,7 +36,7 @@
   <div class="contact-method-row">
     <div class="left">
       <span class="label cnsl-secondary-text">{{ 'USER.PHONE' | translate }}</span>
-      <span class="name">{{ human.phone?.phone ? human.phone?.phone : ('USER.PHONEEMPTY' | translate) }}</span>
+      <cnsl-phone-detail [phone]="human.phone?.phone"></cnsl-phone-detail>
       <span *ngIf="human.phone?.isPhoneVerified" class="contact-state verified">{{ 'USER.PHONEVERIFIED' | translate }}</span>
       <div *ngIf="human.phone?.phone && !human.phone?.isPhoneVerified" class="block">
         <span class="contact-state notverified">{{ 'USER.NOTVERIFIED' | translate }}</span>

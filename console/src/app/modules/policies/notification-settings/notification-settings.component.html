@@ -27,9 +27,9 @@
     {{ 'SETTING.SMTP.TLS' | translate }}
   </mat-checkbox>
 
-  <cnsl-form-field class="smtp-form-field" label="Host" required="true">
-    <cnsl-label>{{ 'SETTING.SMTP.HOST' | translate }}</cnsl-label>
-    <input cnslInput name="host" formControlName="host" />
+  <cnsl-form-field class="smtp-form-field" label="Host And Port" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</cnsl-label>
+    <input cnslInput name="hostAndPort" formControlName="hostAndPort" placeholder="smtp.mailtrap.io:2525" />
   </cnsl-form-field>
 
   <cnsl-form-field class="smtp-form-field" label="User" required="true">

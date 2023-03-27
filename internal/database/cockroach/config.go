@@ -2,6 +2,7 @@ package cockroach
 
 import (
 	"database/sql"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ type Config struct {
 	Port            uint16
 	Database        string
 	MaxOpenConns    uint32
+	MaxIdleConns    uint32
 	MaxConnLifetime time.Duration
 	MaxConnIdleTime time.Duration
 	User            User
@@ -65,6 +67,7 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
 	}
 
 	client.SetMaxOpenConns(int(c.MaxOpenConns))
+	client.SetMaxIdleConns(int(c.MaxIdleConns))
 	client.SetConnMaxLifetime(c.MaxConnLifetime)
 	client.SetConnMaxIdleTime(c.MaxConnIdleTime)
 
@@ -85,6 +88,15 @@ func (c *Config) Password() string {
 
 func (c *Config) Type() string {
 	return "cockroach"
+}
+
+func (c *Config) Timetravel(d time.Duration) string {
+	// verify that it is at least 1 micro second
+	if d < time.Microsecond {
+		d = time.Microsecond
+	}
+
+	return fmt.Sprintf(" AS OF SYSTEM TIME '-%d µs' ", d.Microseconds())
 }
 
 type User struct {

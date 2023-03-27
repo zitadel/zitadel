@@ -36,6 +36,8 @@ func UserQueryToQuery(query *user_pb.SearchQuery) (query.SearchQuery, error) {
 		return StateQueryToQuery(q.StateQuery)
 	case *user_pb.SearchQuery_TypeQuery:
 		return TypeQueryToQuery(q.TypeQuery)
+	case *user_pb.SearchQuery_LoginNameQuery:
+		return LoginNameQueryToQuery(q.LoginNameQuery)
 	case *user_pb.SearchQuery_ResourceOwner:
 		return ResourceOwnerQueryToQuery(q.ResourceOwner)
 	default:
@@ -73,6 +75,10 @@ func StateQueryToQuery(q *user_pb.StateQuery) (query.SearchQuery, error) {
 
 func TypeQueryToQuery(q *user_pb.TypeQuery) (query.SearchQuery, error) {
 	return query.NewUserTypeSearchQuery(int32(q.Type))
+}
+
+func LoginNameQueryToQuery(q *user_pb.LoginNameQuery) (query.SearchQuery, error) {
+	return query.NewUserLoginNameExistsQuery(q.LoginName, object.TextMethodToQuery(q.Method))
 }
 
 func ResourceOwnerQueryToQuery(q *user_pb.ResourceOwnerQuery) (query.SearchQuery, error) {

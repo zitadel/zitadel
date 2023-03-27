@@ -1,5 +1,3 @@
-import { debug } from 'console';
-
 export enum User {
   OrgOwner = 'org_owner',
   OrgOwnerViewer = 'org_owner_viewer',
@@ -60,7 +58,7 @@ export function login(
           times: 1,
         }).as('password');
 
-        cy.visit(loginUrl, { retryOnNetworkFailure: true });
+        cy.visit(Cypress.config('baseUrl'), { retryOnNetworkFailure: true });
 
         onUsernameScreen ? onUsernameScreen() : null;
         cy.get('#loginName').type(creds.username);
@@ -71,16 +69,11 @@ export function login(
         cy.get('#submit-button').click();
 
         cy.wait('@password').then((interception) => {
-          if (interception.response.body.indexOf('Multifactor Setup') === -1) {
+          if (interception.response.body.indexOf(`${loginUrl}/mfa/prompt`) === -1) {
             return;
           }
 
           cy.contains('button', 'skip').click();
-          cy.get('#change-old-password').type(creds.password);
-          cy.get('#change-new-password').type(creds.password);
-          cy.get('#change-password-confirmation').type(creds.password);
-          cy.contains('button', 'next').click();
-          cy.contains('button', 'next').click();
         });
 
         cy.wait('@token').then(() => {
@@ -89,7 +82,11 @@ export function login(
 
         onAuthenticated ? onAuthenticated() : null;
 
-        cy.get('[data-e2e=authenticated-welcome]');
+        cy.visit('/');
+
+        cy.get('[data-e2e=authenticated-welcome]', {
+          timeout: 50_000,
+        });
       },
       {
         validate: () => {

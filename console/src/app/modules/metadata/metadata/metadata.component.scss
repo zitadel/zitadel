@@ -1,0 +1,69 @@
+.metadata-details {
+  padding-bottom: 1rem;
+
+  .refresh {
+    margin-left: 0.5rem;
+    font-size: 1.2rem;
+
+    i {
+      font-size: 1.2rem;
+    }
+  }
+
+  .edit {
+    font-size: 14px;
+  }
+
+  .meta-row {
+    display: flex;
+    margin-bottom: 0.5rem;
+    align-items: center;
+
+    .first {
+      flex: 1;
+      font-size: 13px;
+      margin-right: 0.5rem;
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .second {
+      font-size: 13px;
+    }
+  }
+
+  .metadata-set {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+
+    .first {
+      font-size: 14px;
+    }
+  }
+}
+
+.border-t {
+  border-top: 1px solid #81868a40;
+}
+
+.edit {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.empty-desc {
+  margin: 0;
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+}
+
+.refresh-btn {
+  float: left;
+
+  .icon {
+    font-size: 1.2rem;
+  }
+}

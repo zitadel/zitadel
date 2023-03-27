@@ -9,16 +9,17 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/query/projection"
-
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
 	smtpConfigsTable = table{
-		name: projection.SMTPConfigProjectionTable,
+		name:          projection.SMTPConfigProjectionTable,
+		instanceIDCol: projection.SMTPConfigColumnInstanceID,
 	}
 	SMTPConfigColumnAggregateID = Column{
 		name:  projection.SMTPConfigColumnAggregateID,
@@ -90,8 +91,11 @@ type SMTPConfig struct {
 	Password      *crypto.CryptoValue
 }
 
-func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (*SMTPConfig, error) {
-	stmt, scan := prepareSMTPConfigQuery()
+func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (_ *SMTPConfig, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnAggregateID.identifier(): aggregateID,
 		SMTPConfigColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
@@ -104,7 +108,7 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID strin
 	return scan(row)
 }
 
-func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, error)) {
+func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, error)) {
 	password := new(crypto.CryptoValue)
 
 	return sq.Select(
@@ -119,7 +123,8 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 			SMTPConfigColumnSMTPHost.identifier(),
 			SMTPConfigColumnSMTPUser.identifier(),
 			SMTPConfigColumnSMTPPassword.identifier()).
-			From(smtpConfigsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SMTPConfig, error) {
 			config := new(SMTPConfig)
 			err := row.Scan(

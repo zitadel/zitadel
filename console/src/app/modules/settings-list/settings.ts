@@ -25,6 +25,14 @@ export const SECRETS: SidenavSetting = {
   },
 };
 
+export const SECURITY: SidenavSetting = {
+  id: 'security',
+  i18nKey: 'SETTINGS.LIST.SECURITY',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
 export const LOGIN: SidenavSetting = {
   id: 'login',
   i18nKey: 'SETTINGS.LIST.LOGIN',
@@ -81,6 +89,15 @@ export const NOTIFICATIONS: SidenavSetting = {
   groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
   requiredRoles: {
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
+export const NOTIFICATION_POLICY: SidenavSetting = {
+  id: 'notifications',
+  i18nKey: 'SETTINGS.LIST.NOTIFICATIONS',
+  groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
+  requiredRoles: {
+    [PolicyComponentServiceType.MGMT]: ['policy.read'],
   },
 };
 

@@ -19,6 +19,7 @@ profile.cov
 __debug_bin
 debug
 sandbox.go
+/cmd/dev/
 
 # IDE
 .idea
@@ -43,11 +44,9 @@ cmd/zitadel/zitadel
 /zitadelctl
 /zitadel
 
-# buildfolders and generated js
+# buildfolders and generated files
 tmp/
 console/src/app/proto/generated/
-
-#generated filed
 **.pb.go
 **.proto.mock.go
 **.pb.*.go
@@ -56,6 +55,10 @@ openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
 /internal/api/ui/console/static/*
+docs/docs/apis/auth
+docs/docs/apis/admin
+docs/docs/apis/mgmt
+docs/docs/apis/system
 
 # local
 build/local/*.env
@@ -67,3 +70,5 @@ migrations/cockroach/migrate_cloud.go
 
 go.work
 go.work.sum
+# Local Netlify folder
+.netlify

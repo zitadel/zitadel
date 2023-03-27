@@ -1,23 +1,28 @@
-@import 'input_base';
+@import "input_base";
 
-input:not([type=radio]):not([type=checkbox]),
+input:not([type="radio"]):not([type="checkbox"]),
 .lgn-input {
   @include lgn-input-base;
 }
 
 // use seme base styling for select as input
-select, .lgn-select {
-    @include lgn-input-base;
+select,
+.lgn-select {
+  @include lgn-input-base;
 }
 
 .lgn-suffix-wrapper {
-    position: relative;
+  position: relative;
 
-    [lgnSuffix] {
-        position: absolute;
-        right: .5rem;
-        top: 9px;
-        height: inherit;
-        vertical-align: middle;
-    }
+  [lgnSuffix] {
+    position: absolute;
+    right: 0.5rem;
+    top: 9px;
+    height: inherit;
+    vertical-align: middle;
+    max-width: 150px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

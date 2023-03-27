@@ -1,5 +1,8 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+} from '@angular/material/legacy-dialog';
 
 @Component({
   selector: 'cnsl-resend-email-dialog',
@@ -8,7 +11,11 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 })
 export class ResendEmailDialogComponent {
   public email: string = '';
-  constructor(public dialogRef: MatDialogRef<ResendEmailDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
+  constructor(public dialogRef: MatDialogRef<ResendEmailDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
+    if (data.email) {
+      this.email = data.email;
+    }
+  }
 
   closeDialog(email: string = ''): void {
     this.dialogRef.close(email);

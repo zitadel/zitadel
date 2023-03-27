@@ -36,6 +36,14 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 	if data.MFAType == domain.MFATypeOTP {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Code, userAgentID, domain.BrowserInfoFromRequest(r))
+
+		metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodOTP, err)
+		if err == nil && actionErr == nil && len(metadata) > 0 {
+			_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+		} else if actionErr != nil && err == nil {
+			err = actionErr
+		}
+
 		if err != nil {
 			l.renderMFAVerifySelected(w, r, authReq, step, domain.MFATypeOTP, err)
 			return
@@ -58,23 +66,29 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "MFA Verify", errID, errMessage)
+	data := l.getUserData(r, authReq, "", "", errID, errMessage)
 	if verificationStep == nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	translator := l.getTranslator(r.Context(), authReq)
+
 	switch selectedProvider {
 	case domain.MFATypeU2F:
+		data.Title = translator.LocalizeWithoutArgs("VerifyMFAU2F.Title")
+		data.Description = translator.LocalizeWithoutArgs("VerifyMFAU2F.Description")
 		l.renderU2FVerification(w, r, authReq, removeSelectedProviderFromList(verificationStep.MFAProviders, domain.MFATypeU2F), nil)
 		return
 	case domain.MFATypeOTP:
 		data.MFAProviders = removeSelectedProviderFromList(verificationStep.MFAProviders, domain.MFATypeOTP)
 		data.SelectedMFAProvider = domain.MFATypeOTP
+		data.Title = translator.LocalizeWithoutArgs("VerifyMFAOTP.Title")
+		data.Description = translator.LocalizeWithoutArgs("VerifyMFAOTP.Description")
 	default:
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplMFAVerify], data, nil)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFAVerify], data, nil)
 }
 
 func removeSelectedProviderFromList(providers []domain.MFAType, selected domain.MFAType) []domain.MFAType {

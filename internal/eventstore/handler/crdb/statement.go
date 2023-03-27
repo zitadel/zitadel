@@ -123,7 +123,7 @@ func getUpdateCols(cols, conflictTarget []string) (updateCols, updateVals []stri
 
 func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditions []handler.Condition, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
-	wheres, whereArgs := conditionsToWhere(conditions, len(params))
+	wheres, whereArgs := conditionsToWhere(conditions, len(args))
 	args = append(args, whereArgs...)
 
 	config := execConfig{
@@ -278,6 +278,13 @@ func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 	}
 }
 
+func NewCopyCol(column, from string) handler.Column {
+	return handler.Column{
+		Name:  column,
+		Value: handler.NewCol(from, nil),
+	}
+}
+
 // NewCopyStatement creates a new upsert statement which updates a column from an existing row
 // cols represent the columns which are objective to change.
 // if the value of a col is empty the data will be copied from the selected row
@@ -359,15 +366,22 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 	names = make([]string, len(cols))
 	values = make([]interface{}, len(cols))
 	parameters = make([]string, len(cols))
+	var parameterIndex int
 	for i, col := range cols {
 		names[i] = col.Name
-		values[i] = col.Value
-		parameters[i] = "$" + strconv.Itoa(i+1)
+		if c, ok := col.Value.(handler.Column); ok {
+			parameters[i] = c.Name
+			continue
+		} else {
+			values[parameterIndex] = col.Value
+		}
+		parameters[i] = "$" + strconv.Itoa(parameterIndex+1)
 		if col.ParameterOpt != nil {
 			parameters[i] = col.ParameterOpt(parameters[i])
 		}
+		parameterIndex++
 	}
-	return names, parameters, values
+	return names, parameters, values[:parameterIndex]
 }
 
 func conditionsToWhere(cols []handler.Condition, paramOffset int) (wheres []string, values []interface{}) {

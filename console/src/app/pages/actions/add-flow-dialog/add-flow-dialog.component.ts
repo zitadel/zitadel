@@ -1,6 +1,10 @@
 import { Component, Inject } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import {
+  MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+} from '@angular/material/legacy-dialog';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Action, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
 import { SetTriggerActionsRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -12,13 +16,10 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./add-flow-dialog.component.scss'],
 })
 export class AddFlowDialogComponent {
+  public flowType?: FlowType.AsObject;
   public actions: Action.AsObject[] = [];
-  public typesForSelection: FlowType[] = [FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION];
-  public triggerTypesForSelection: TriggerType[] = [
-    TriggerType.TRIGGER_TYPE_POST_AUTHENTICATION,
-    TriggerType.TRIGGER_TYPE_POST_CREATION,
-    TriggerType.TRIGGER_TYPE_PRE_CREATION,
-  ];
+  public typesForSelection: FlowType.AsObject[] = [];
+  public triggerTypesForSelection: TriggerType.AsObject[] = [];
 
   public form!: UntypedFormGroup;
   constructor(
@@ -28,12 +29,28 @@ export class AddFlowDialogComponent {
     public dialogRef: MatDialogRef<AddFlowDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
+    if (data.flowType) {
+      this.flowType = data.flowType as FlowType.AsObject;
+      this.getTriggerTypes((data.flowType as FlowType.AsObject).id);
+    }
+
     this.form = this.fb.group({
-      flowType: [data.flowType ? data.flowType : '', [Validators.required]],
-      triggerType: [data.triggerType ? data.triggerType : '', [Validators.required]],
-      actionIdsList: [data.actions ? (data.actions as Action.AsObject[]).map((a) => a.id) : [], [Validators.required]],
+      triggerType: [data.triggerType ? data.triggerType : '', [requiredValidator]],
+      actionIdsList: [data.actions ? (data.actions as Action.AsObject[]).map((a) => a.id) : [], [requiredValidator]],
     });
+
     this.getActionIds();
+  }
+
+  private getTriggerTypes(id: string): Promise<void> {
+    return this.mgmtService
+      .listFlowTriggerTypes(id)
+      .then((resp) => {
+        this.triggerTypesForSelection = resp.resultList;
+      })
+      .catch((error: any) => {
+        this.toast.showError(error);
+      });
   }
 
   private getActionIds(): Promise<void> {
@@ -52,11 +69,13 @@ export class AddFlowDialogComponent {
   }
 
   public closeDialogWithSuccess(): void {
-    const req = new SetTriggerActionsRequest();
-    req.setActionIdsList(this.form.get('actionIdsList')?.value);
-    req.setFlowType(this.form.get('flowType')?.value);
-    req.setTriggerType(this.form.get('triggerType')?.value);
+    if (this.flowType) {
+      const req = new SetTriggerActionsRequest();
+      req.setActionIdsList(this.form.get('actionIdsList')?.value);
+      req.setFlowType(this.flowType.id);
+      req.setTriggerType((this.form.get('triggerType')?.value as TriggerType.AsObject).id);
 
-    this.dialogRef.close(req);
+      this.dialogRef.close(req);
+    }
   }
 }

@@ -1,10 +1,14 @@
 package idp
 
 import (
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 )
 
@@ -83,13 +87,11 @@ func IDPUserLinkToPb(link *query.IDPUserLink) *idp_pb.IDPUserLink {
 	}
 }
 
-func IDPTypeToPb(idpType domain.IDPConfigType) idp_pb.IDPType {
+func IDPTypeToPb(idpType domain.IDPType) idp_pb.IDPType {
 	switch idpType {
-	case domain.IDPConfigTypeOIDC:
+	case domain.IDPTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
-	case domain.IDPConfigTypeSAML:
-		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
-	case domain.IDPConfigTypeJWT:
+	case domain.IDPTypeJWT:
 		return idp_pb.IDPType_IDP_TYPE_JWT
 	default:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
@@ -294,5 +296,327 @@ func ownerTypeToPB(typ domain.IdentityProviderType) idp_pb.IDPOwnerType {
 		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
 	default:
 		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
+	}
+}
+
+func OptionsToCommand(options *idp_pb.Options) idp.Options {
+	if options == nil {
+		return idp.Options{}
+	}
+	return idp.Options{
+		IsCreationAllowed: options.IsCreationAllowed,
+		IsLinkingAllowed:  options.IsLinkingAllowed,
+		IsAutoCreation:    options.IsAutoCreation,
+		IsAutoUpdate:      options.IsAutoUpdate,
+	}
+}
+
+func LDAPAttributesToCommand(attributes *idp_pb.LDAPAttributes) idp.LDAPAttributes {
+	if attributes == nil {
+		return idp.LDAPAttributes{}
+	}
+	return idp.LDAPAttributes{
+		IDAttribute:                attributes.IdAttribute,
+		FirstNameAttribute:         attributes.FirstNameAttribute,
+		LastNameAttribute:          attributes.LastNameAttribute,
+		DisplayNameAttribute:       attributes.DisplayNameAttribute,
+		NickNameAttribute:          attributes.NickNameAttribute,
+		PreferredUsernameAttribute: attributes.PreferredUsernameAttribute,
+		EmailAttribute:             attributes.EmailAttribute,
+		EmailVerifiedAttribute:     attributes.EmailVerifiedAttribute,
+		PhoneAttribute:             attributes.PhoneAttribute,
+		PhoneVerifiedAttribute:     attributes.PhoneVerifiedAttribute,
+		PreferredLanguageAttribute: attributes.PreferredLanguageAttribute,
+		AvatarURLAttribute:         attributes.AvatarUrlAttribute,
+		ProfileAttribute:           attributes.ProfileAttribute,
+	}
+}
+
+func AzureADTenantToCommand(tenant *idp_pb.AzureADTenant) string {
+	if tenant == nil {
+		return string(azuread.CommonTenant)
+	}
+	switch t := tenant.Type.(type) {
+	case *idp_pb.AzureADTenant_TenantType:
+		return string(azureADTenantTypeToCommand(t.TenantType))
+	case *idp_pb.AzureADTenant_TenantId:
+		return t.TenantId
+	default:
+		return string(azuread.CommonTenant)
+	}
+}
+
+func azureADTenantTypeToCommand(tenantType idp_pb.AzureADTenantType) azuread.TenantType {
+	switch tenantType {
+	case idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_COMMON:
+		return azuread.CommonTenant
+	case idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_ORGANISATIONS:
+		return azuread.OrganizationsTenant
+	case idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_CONSUMERS:
+		return azuread.ConsumersTenant
+	default:
+		return azuread.CommonTenant
+	}
+}
+
+func ProvidersToPb(providers []*query.IDPTemplate) []*idp_pb.Provider {
+	list := make([]*idp_pb.Provider, len(providers))
+	for i, provider := range providers {
+		list[i] = ProviderToPb(provider)
+	}
+	return list
+}
+
+func ProviderToPb(provider *query.IDPTemplate) *idp_pb.Provider {
+	return &idp_pb.Provider{
+		Id:      provider.ID,
+		Details: obj_grpc.ToViewDetailsPb(provider.Sequence, provider.CreationDate, provider.ChangeDate, provider.ResourceOwner),
+		State:   providerStateToPb(provider.State),
+		Name:    provider.Name,
+		Owner:   ownerTypeToPB(provider.OwnerType),
+		Type:    providerTypeToPb(provider.Type),
+		Config:  configToPb(provider),
+	}
+}
+
+func providerStateToPb(state domain.IDPState) idp_pb.IDPState {
+	switch state { //nolint:exhaustive
+	case domain.IDPStateActive:
+		return idp_pb.IDPState_IDP_STATE_ACTIVE
+	case domain.IDPStateInactive:
+		return idp_pb.IDPState_IDP_STATE_INACTIVE
+	case domain.IDPStateUnspecified:
+		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
+	default:
+		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
+	}
+}
+
+func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
+	switch idpType {
+	case domain.IDPTypeOIDC:
+		return idp_pb.ProviderType_PROVIDER_TYPE_OIDC
+	case domain.IDPTypeJWT:
+		return idp_pb.ProviderType_PROVIDER_TYPE_JWT
+	case domain.IDPTypeOAuth:
+		return idp_pb.ProviderType_PROVIDER_TYPE_OAUTH
+	case domain.IDPTypeLDAP:
+		return idp_pb.ProviderType_PROVIDER_TYPE_LDAP
+	case domain.IDPTypeAzureAD:
+		return idp_pb.ProviderType_PROVIDER_TYPE_AZURE_AD
+	case domain.IDPTypeGitHub:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB
+	case domain.IDPTypeGitHubEnterprise:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB_ES
+	case domain.IDPTypeGitLab:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITLAB
+	case domain.IDPTypeGitLabSelfHosted:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITLAB_SELF_HOSTED
+	case domain.IDPTypeGoogle:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GOOGLE
+	case domain.IDPTypeUnspecified:
+		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
+	default:
+		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
+	}
+}
+
+func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
+	providerConfig := &idp_pb.ProviderConfig{
+		Options: &idp_pb.Options{
+			IsLinkingAllowed:  config.IsLinkingAllowed,
+			IsCreationAllowed: config.IsCreationAllowed,
+			IsAutoCreation:    config.IsAutoCreation,
+			IsAutoUpdate:      config.IsAutoUpdate,
+		},
+	}
+	if config.OAuthIDPTemplate != nil {
+		oauthConfigToPb(providerConfig, config.OAuthIDPTemplate)
+		return providerConfig
+	}
+	if config.OIDCIDPTemplate != nil {
+		oidcConfigToPb(providerConfig, config.OIDCIDPTemplate)
+		return providerConfig
+	}
+	if config.JWTIDPTemplate != nil {
+		jwtConfigToPb(providerConfig, config.JWTIDPTemplate)
+		return providerConfig
+	}
+	if config.AzureADIDPTemplate != nil {
+		azureConfigToPb(providerConfig, config.AzureADIDPTemplate)
+		return providerConfig
+	}
+	if config.GitHubIDPTemplate != nil {
+		githubConfigToPb(providerConfig, config.GitHubIDPTemplate)
+		return providerConfig
+	}
+	if config.GitHubEnterpriseIDPTemplate != nil {
+		githubEnterpriseConfigToPb(providerConfig, config.GitHubEnterpriseIDPTemplate)
+		return providerConfig
+	}
+	if config.GitLabIDPTemplate != nil {
+		gitlabConfigToPb(providerConfig, config.GitLabIDPTemplate)
+		return providerConfig
+	}
+	if config.GitLabSelfHostedIDPTemplate != nil {
+		gitlabSelfHostedConfigToPb(providerConfig, config.GitLabSelfHostedIDPTemplate)
+		return providerConfig
+	}
+	if config.GoogleIDPTemplate != nil {
+		googleConfigToPb(providerConfig, config.GoogleIDPTemplate)
+		return providerConfig
+	}
+	if config.LDAPIDPTemplate != nil {
+		ldapConfigToPb(providerConfig, config.LDAPIDPTemplate)
+		return providerConfig
+	}
+	return providerConfig
+}
+
+func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAuthIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Oauth{
+		Oauth: &idp_pb.OAuthConfig{
+			ClientId:              template.ClientID,
+			AuthorizationEndpoint: template.AuthorizationEndpoint,
+			TokenEndpoint:         template.TokenEndpoint,
+			UserEndpoint:          template.UserEndpoint,
+			Scopes:                template.Scopes,
+			IdAttribute:           template.IDAttribute,
+		},
+	}
+}
+
+func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Oidc{
+		Oidc: &idp_pb.GenericOIDCConfig{
+			ClientId:         template.ClientID,
+			Issuer:           template.Issuer,
+			Scopes:           template.Scopes,
+			IsIdTokenMapping: template.IsIDTokenMapping,
+		},
+	}
+}
+
+func jwtConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.JWTIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Jwt{
+		Jwt: &idp_pb.JWTConfig{
+			JwtEndpoint:  template.Endpoint,
+			Issuer:       template.Issuer,
+			KeysEndpoint: template.KeysEndpoint,
+			HeaderName:   template.HeaderName,
+		},
+	}
+}
+
+func azureConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.AzureADIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_AzureAd{
+		AzureAd: &idp_pb.AzureADConfig{
+			ClientId:      template.ClientID,
+			Tenant:        azureTenantToPb(template.Tenant),
+			EmailVerified: template.IsEmailVerified,
+			Scopes:        template.Scopes,
+		},
+	}
+}
+
+func azureTenantToPb(tenant string) *idp_pb.AzureADTenant {
+	var tenantType idp_pb.IsAzureADTenantType
+	switch azuread.TenantType(tenant) {
+	case azuread.CommonTenant:
+		tenantType = &idp_pb.AzureADTenant_TenantType{TenantType: idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_COMMON}
+	case azuread.OrganizationsTenant:
+		tenantType = &idp_pb.AzureADTenant_TenantType{TenantType: idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_ORGANISATIONS}
+	case azuread.ConsumersTenant:
+		tenantType = &idp_pb.AzureADTenant_TenantType{TenantType: idp_pb.AzureADTenantType_AZURE_AD_TENANT_TYPE_CONSUMERS}
+	default:
+		tenantType = &idp_pb.AzureADTenant_TenantId{TenantId: tenant}
+	}
+	return &idp_pb.AzureADTenant{Type: tenantType}
+}
+
+func githubConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitHubIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Github{
+		Github: &idp_pb.GitHubConfig{
+			ClientId: template.ClientID,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func githubEnterpriseConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitHubEnterpriseIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_GithubEs{
+		GithubEs: &idp_pb.GitHubEnterpriseServerConfig{
+			ClientId:              template.ClientID,
+			AuthorizationEndpoint: template.AuthorizationEndpoint,
+			TokenEndpoint:         template.TokenEndpoint,
+			UserEndpoint:          template.UserEndpoint,
+			Scopes:                template.Scopes,
+		},
+	}
+}
+
+func gitlabConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitLabIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Gitlab{
+		Gitlab: &idp_pb.GitLabConfig{
+			ClientId: template.ClientID,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func gitlabSelfHostedConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitLabSelfHostedIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_GitlabSelfHosted{
+		GitlabSelfHosted: &idp_pb.GitLabSelfHostedConfig{
+			ClientId: template.ClientID,
+			Issuer:   template.Issuer,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func googleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GoogleIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Google{
+		Google: &idp_pb.GoogleConfig{
+			ClientId: template.ClientID,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func ldapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPIDPTemplate) {
+	var timeout *durationpb.Duration
+	if template.Timeout != 0 {
+		timeout = durationpb.New(template.Timeout)
+	}
+	providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
+		Ldap: &idp_pb.LDAPConfig{
+			Servers:           template.Servers,
+			StartTls:          template.StartTLS,
+			BaseDn:            template.BaseDN,
+			BindDn:            template.BindDN,
+			UserBase:          template.UserBase,
+			UserObjectClasses: template.UserObjectClasses,
+			UserFilters:       template.UserFilters,
+			Timeout:           timeout,
+			Attributes:        ldapAttributesToPb(template.LDAPAttributes),
+		},
+	}
+}
+
+func ldapAttributesToPb(attributes idp.LDAPAttributes) *idp_pb.LDAPAttributes {
+	return &idp_pb.LDAPAttributes{
+		IdAttribute:                attributes.IDAttribute,
+		FirstNameAttribute:         attributes.FirstNameAttribute,
+		LastNameAttribute:          attributes.LastNameAttribute,
+		DisplayNameAttribute:       attributes.DisplayNameAttribute,
+		NickNameAttribute:          attributes.NickNameAttribute,
+		PreferredUsernameAttribute: attributes.PreferredUsernameAttribute,
+		EmailAttribute:             attributes.EmailAttribute,
+		EmailVerifiedAttribute:     attributes.EmailVerifiedAttribute,
+		PhoneAttribute:             attributes.PhoneAttribute,
+		PhoneVerifiedAttribute:     attributes.PhoneVerifiedAttribute,
+		PreferredLanguageAttribute: attributes.PreferredLanguageAttribute,
+		AvatarUrlAttribute:         attributes.AvatarURLAttribute,
+		ProfileAttribute:           attributes.ProfileAttribute,
 	}
 }

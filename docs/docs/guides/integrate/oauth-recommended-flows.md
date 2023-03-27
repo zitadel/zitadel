@@ -2,7 +2,8 @@
 title: Recommended authorization flows
 ---
 
-<table class="table-wrapper">
+<table className="table-wrapper">
+<tbody>
     <tr>
         <td>Description</td>
         <td>Learn about the different authentication flows and which flow we recommend you should use for your application.</td>
@@ -24,8 +25,8 @@ title: Recommended authorization flows
             Basic knowledge about federated identities
         </td>
     </tr>
+    </tbody>
 </table>
-
 
 ## Introduction
 
@@ -43,21 +44,22 @@ Although Federated Identities are not a new concept ([RFC 6749](https://tools.ie
 
 The aforementioned RFC provides us with some [problems and limitations](https://tools.ietf.org/html/rfc6749#section-1) of the client-server authentication, where a client requests a protected resource on the server by authenticating with the user’s credentials:
 
-* Applications need to store users credentials (eg, password) for future use; compromise of any application results in compromise of the end-users credentials
-* Servers are required to support password authentication
-* Without means of limiting scope when providing the user’s credentials, the application gains overly broad access to protected resources
-* Users cannot revoke access for a single application, but only for all by changing credentials
+- Applications need to store users credentials (eg, password) for future use; compromise of any application results in compromise of the end-users credentials
+- Servers are required to support password authentication
+- Without means of limiting scope when providing the user’s credentials, the application gains overly broad access to protected resources
+- Users cannot revoke access for a single application, but only for all by changing credentials
 
 So what do we want to achieve with delegated authentication?
 
-* Instead of implementing authentication on each server and trusting each server
-  * Users only **authenticate** with a trusted server (ie. ZITADEL), that validates the user’s identity through a challenge (eg, multiple authentication factors) and issues an **ID token** (OpenID Connect 1.x)
-  * Applications have means of **validating the integrity** of presented access and ID tokens
+- Instead of implementing authentication on each server and trusting each server
 
-* Instead of sending around the user’s credentials
-  * Clients may access protected resources with an **access token** that is only valid for specific scope and limited lifetime (OAuth 2.x)
-  * Users have to **authorize** applications to access certain [**scopes**](../../apis/openidoauth/scopes) (eg, email address or custom roles). Applications can request [**claims**](../../apis/openidoauth/claims) (key:value pairs, eg email address) for the authorized scopes with the access token or ID token from ZITADEL
-  * Access tokens are bearer tokens, meaning that possession of the token provides access to a resource. But the tokens expire frequently and the application must request a new access token via **refresh token** or the user must reauthenticate
+  - Users only **authenticate** with a trusted server (ie. ZITADEL), that validates the user’s identity through a challenge (eg, multiple authentication factors) and issues an **ID token** (OpenID Connect 1.x)
+  - Applications have means of **validating the integrity** of presented access and ID tokens
+
+- Instead of sending around the user’s credentials
+  - Clients may access protected resources with an **access token** that is only valid for specific scope and limited lifetime (OAuth 2.x)
+  - Users have to **authorize** applications to access certain [**scopes**](/apis/openidoauth/scopes) (eg, email address or custom roles). Applications can request [**claims**](/apis/openidoauth/claims) (key:value pairs, eg email address) for the authorized scopes with the access token or ID token from ZITADEL
+  - Access tokens are bearer tokens, meaning that possession of the token provides access to a resource. But the tokens expire frequently and the application must request a new access token via **refresh token** or the user must reauthenticate
 
 ![Overview federated identities](/img/guides/consulting_federated_identities_basics.png)
 
@@ -74,19 +76,20 @@ As mentioned in the beginning of this module, there are two main determinants fo
 
 OAuth 2.x defines two [client types](https://tools.ietf.org/html/rfc6749#section-2.1) based on their ability to maintain the confidentiality of their client credentials:
 
-* Confidential: Clients capable of maintaining the confidentiality of their credentials (e.g., client implemented on a secure server with restricted access to the client credentials), or capable of secure client authentication using other means.
-* Public: Clients incapable of maintaining the confidentiality of their credentials (e.g., clients executing on the device used by the resource owner, such as an installed native application or a web browser-based application), and incapable of secure client authentication via any other means.
+- Confidential: Clients capable of maintaining the confidentiality of their credentials (e.g., client implemented on a secure server with restricted access to the client credentials), or capable of secure client authentication using other means.
+- Public: Clients incapable of maintaining the confidentiality of their credentials (e.g., clients executing on the device used by the resource owner, such as an installed native application or a web browser-based application), and incapable of secure client authentication via any other means.
 
 The following table gives you a brief overview of different client profiles.
 
-<table class="table-wrapper">
+<table className="table-wrapper">
+    <tbody>
 	<tr>
 		<th>Confidentiality of client credentials</th>
 		<th>Client profile</th>
 		<th>Examples of clients</th>
     </tr>
 	<tr>
-		<td rowspan="2">Public</td>
+		<td rowSpan="2">Public</td>
 		<td>User-Agent</td>
 		<td>Single-page web applications (SPA), generally JavaScript executed in Browser</td>
 	</tr>
@@ -95,7 +98,7 @@ The following table gives you a brief overview of different client profiles.
 		<td>Native, Mobile, or Desktop applications</td>
 	</tr>
 	<tr>
-		<td rowspan="2">Confidential</td>
+		<td rowSpan="2">Confidential</td>
 		<td>Web</td>
 		<td>Server-side web applications such as java, .net, …</td>
 	</tr>
@@ -103,6 +106,7 @@ The following table gives you a brief overview of different client profiles.
 		<td>Machine-to-Machine</td>
 		<td>APIs, generally services without direct user-interaction at the authorization server</td>
 	</tr>
+    </tbody>
 </table>
 
 ## Our recommended authorization flows
@@ -111,11 +115,11 @@ We recommend using the flow **“Authorization Code with Proof Key of Code Excha
 
 If you don’t have any technical limitations, you should favor the flow Authorization Code with PKCE over other methods. The PKCE part makes the flow resistant against authorization code interception attack as described well in RFC7636.
 
-*So what about APIs?*
+_So what about APIs?_
 
 We recommend using **“JWT bearer token with private key”** ([RFC7523](https://tools.ietf.org/html/rfc7523)) for Machine-to-Machine clients.
 
-What this means is that you have to send an JWT token, containing the [standard claims for access tokens](../../apis/openidoauth/claims) and that is signed with your private key, to the token endpoint to request the access token. We will see how this works in another module about Service Accounts.
+What this means is that you have to send an JWT token, containing the [standard claims for access tokens](/apis/openidoauth/claims) and that is signed with your private key, to the token endpoint to request the access token. We will see how this works in another module about Service Accounts.
 
 If you don’t have any technical limitations, you should prefer this method over other methods.
 
@@ -125,13 +129,13 @@ In case you need alternative flows and their advantages and drawbacks, there wil
 
 ## Summary (3)
 
-* Federated Identities solve key problems and challenges with traditional server-client architecture
-* Use “Authorization Code with Proof Key of Code Exchange (PKCE)” for User-Agent, Native, and Web clients
-* “JWT bearer token with private key” for Machine-to-Machine clients
-* There are alternative flows and fallback strategies supported by ZITADEL, if these flows are technically not possible
+- Federated Identities solve key problems and challenges with traditional server-client architecture
+- Use “Authorization Code with Proof Key of Code Exchange (PKCE)” for User-Agent, Native, and Web clients
+- “JWT bearer token with private key” for Machine-to-Machine clients
+- There are alternative flows and fallback strategies supported by ZITADEL, if these flows are technically not possible
 
 ### Where to go from here
 
-* Applications
-* Service Accounts
-* Alternative authentication flows (aka. "The Zoo")
+- Applications
+- Service Accounts
+- Alternative authentication flows (aka. "The Zoo")

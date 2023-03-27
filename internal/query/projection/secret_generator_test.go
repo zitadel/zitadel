@@ -33,17 +33,17 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorRemoved,
 			want: wantReduce{
-				projection:       SecretGeneratorProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.secret_generators2 WHERE (aggregate_id = $1) AND (generator_type = $2)",
+							expectedStmt: "DELETE FROM projections.secret_generators2 WHERE (aggregate_id = $1) AND (generator_type = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.SecretGeneratorTypeInitCode,
+								"instance-id",
 							},
 						},
 					},
@@ -61,14 +61,13 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorChanged,
 			want: wantReduce{
-				projection:       SecretGeneratorProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.secret_generators2 SET (change_date, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (generator_type = $10)",
+							expectedStmt: "UPDATE projections.secret_generators2 SET (change_date, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (generator_type = $10) AND (instance_id = $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -80,6 +79,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 								true,
 								"agg-id",
 								domain.SecretGeneratorTypeInitCode,
+								"instance-id",
 							},
 						},
 					},
@@ -97,7 +97,6 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorAdded,
 			want: wantReduce{
-				projection:       SecretGeneratorProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -125,6 +124,32 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.secret_generators2 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -136,7 +161,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, SecretGeneratorProjectionTable, tt.want)
 		})
 	}
 }

@@ -5,8 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -19,7 +17,7 @@ func (s *Server) GetDomainPolicy(ctx context.Context, _ *admin_pb.GetDomainPolic
 }
 
 func (s *Server) GetCustomDomainPolicy(ctx context.Context, req *admin_pb.GetCustomDomainPolicyRequest) (*admin_pb.GetCustomDomainPolicyResponse, error) {
-	policy, err := s.query.DomainPolicyByOrg(ctx, true, req.OrgId)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, req.OrgId, false)
 	if err != nil {
 		return nil, err
 	}
@@ -27,44 +25,32 @@ func (s *Server) GetCustomDomainPolicy(ctx context.Context, req *admin_pb.GetCus
 }
 
 func (s *Server) AddCustomDomainPolicy(ctx context.Context, req *admin_pb.AddCustomDomainPolicyRequest) (*admin_pb.AddCustomDomainPolicyResponse, error) {
-	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, DomainPolicyToDomain(req.UserLoginMustBeDomain, req.ValidateOrgDomains, req.SmtpSenderAddressMatchesInstanceDomain))
+	details, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, req.UserLoginMustBeDomain, req.ValidateOrgDomains, req.SmtpSenderAddressMatchesInstanceDomain)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.AddCustomDomainPolicyResponse{
-		Details: object.AddToDetailsPb(
-			policy.Sequence,
-			policy.ChangeDate,
-			policy.ResourceOwner,
-		),
+		Details: object.DomainToAddDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) UpdateDomainPolicy(ctx context.Context, req *admin_pb.UpdateDomainPolicyRequest) (*admin_pb.UpdateDomainPolicyResponse, error) {
-	config, err := s.command.ChangeDefaultDomainPolicy(ctx, updateDomainPolicyToDomain(req))
+	details, err := s.command.ChangeDefaultDomainPolicy(ctx, req.UserLoginMustBeDomain, req.ValidateOrgDomains, req.SmtpSenderAddressMatchesInstanceDomain)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateDomainPolicyResponse{
-		Details: object.ChangeToDetailsPb(
-			config.Sequence,
-			config.ChangeDate,
-			config.ResourceOwner,
-		),
+		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) UpdateCustomDomainPolicy(ctx context.Context, req *admin_pb.UpdateCustomDomainPolicyRequest) (*admin_pb.UpdateCustomDomainPolicyResponse, error) {
-	config, err := s.command.ChangeOrgDomainPolicy(ctx, req.OrgId, updateCustomDomainPolicyToDomain(req))
+	details, err := s.command.ChangeOrgDomainPolicy(ctx, req.OrgId, req.UserLoginMustBeDomain, req.ValidateOrgDomains, req.SmtpSenderAddressMatchesInstanceDomain)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateCustomDomainPolicyResponse{
-		Details: object.ChangeToDetailsPb(
-			config.Sequence,
-			config.ChangeDate,
-			config.ResourceOwner,
-		),
+		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -76,72 +62,37 @@ func (s *Server) ResetCustomDomainPolicyToDefault(ctx context.Context, req *admi
 	return &admin_pb.ResetCustomDomainPolicyToDefaultResponse{Details: object.DomainToChangeDetailsPb(details)}, nil
 }
 
-func DomainPolicyToDomain(userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) *domain.DomainPolicy {
-	return &domain.DomainPolicy{
-		UserLoginMustBeDomain:                  userLoginMustBeDomain,
-		ValidateOrgDomains:                     validateOrgDomains,
-		SMTPSenderAddressMatchesInstanceDomain: smtpSenderAddressMatchesInstanceDomain,
-	}
-}
-
-func updateDomainPolicyToDomain(req *admin_pb.UpdateDomainPolicyRequest) *domain.DomainPolicy {
-	return &domain.DomainPolicy{
-		UserLoginMustBeDomain:                  req.UserLoginMustBeDomain,
-		ValidateOrgDomains:                     req.ValidateOrgDomains,
-		SMTPSenderAddressMatchesInstanceDomain: req.SmtpSenderAddressMatchesInstanceDomain,
-	}
-}
-
-func updateCustomDomainPolicyToDomain(req *admin_pb.UpdateCustomDomainPolicyRequest) *domain.DomainPolicy {
-	return &domain.DomainPolicy{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.OrgId,
-		},
-		UserLoginMustBeDomain:                  req.UserLoginMustBeDomain,
-		ValidateOrgDomains:                     req.ValidateOrgDomains,
-		SMTPSenderAddressMatchesInstanceDomain: req.SmtpSenderAddressMatchesInstanceDomain,
-	}
-}
+// the following requests only exist for backwards compatibility
+// OrgIAMPolicy has been replaced by DomainPolicy, which also extends it with validateOrgDomains and smtpSenderAddressMatchesInstanceDomain
+// Add and Update requests will therefore set the previous default (true)
 
 func (s *Server) AddCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.AddCustomOrgIAMPolicyRequest) (*admin_pb.AddCustomOrgIAMPolicyResponse, error) {
-	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, DomainPolicyToDomain(req.UserLoginMustBeDomain, true, true))
+	details, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, req.UserLoginMustBeDomain, true, true)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.AddCustomOrgIAMPolicyResponse{
-		Details: object.AddToDetailsPb(
-			policy.Sequence,
-			policy.ChangeDate,
-			policy.ResourceOwner,
-		),
+		Details: object.DomainToAddDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) UpdateOrgIAMPolicy(ctx context.Context, req *admin_pb.UpdateOrgIAMPolicyRequest) (*admin_pb.UpdateOrgIAMPolicyResponse, error) {
-	config, err := s.command.ChangeDefaultDomainPolicy(ctx, updateOrgIAMPolicyToDomain(req))
+	details, err := s.command.ChangeDefaultDomainPolicy(ctx, req.UserLoginMustBeDomain, true, true)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateOrgIAMPolicyResponse{
-		Details: object.ChangeToDetailsPb(
-			config.Sequence,
-			config.ChangeDate,
-			config.ResourceOwner,
-		),
+		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) UpdateCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.UpdateCustomOrgIAMPolicyRequest) (*admin_pb.UpdateCustomOrgIAMPolicyResponse, error) {
-	config, err := s.command.ChangeOrgDomainPolicy(ctx, req.OrgId, updateCustomOrgIAMPolicyToDomain(req))
+	details, err := s.command.ChangeOrgDomainPolicy(ctx, req.OrgId, req.UserLoginMustBeDomain, true, true)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateCustomOrgIAMPolicyResponse{
-		Details: object.ChangeToDetailsPb(
-			config.Sequence,
-			config.ChangeDate,
-			config.ResourceOwner,
-		),
+		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
@@ -154,7 +105,7 @@ func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *admin_pb.GetOrgIAMPolic
 }
 
 func (s *Server) GetCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.GetCustomOrgIAMPolicyRequest) (*admin_pb.GetCustomOrgIAMPolicyResponse, error) {
-	policy, err := s.query.DomainPolicyByOrg(ctx, true, req.OrgId)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, req.OrgId, false)
 	if err != nil {
 		return nil, err
 	}
@@ -167,23 +118,4 @@ func (s *Server) ResetCustomOrgIAMPolicyToDefault(ctx context.Context, req *admi
 		return nil, err
 	}
 	return &admin_pb.ResetCustomOrgIAMPolicyToDefaultResponse{Details: object.DomainToChangeDetailsPb(details)}, nil
-}
-
-func updateOrgIAMPolicyToDomain(req *admin_pb.UpdateOrgIAMPolicyRequest) *domain.DomainPolicy {
-	return &domain.DomainPolicy{
-		UserLoginMustBeDomain:                  req.UserLoginMustBeDomain,
-		ValidateOrgDomains:                     true,
-		SMTPSenderAddressMatchesInstanceDomain: true,
-	}
-}
-
-func updateCustomOrgIAMPolicyToDomain(req *admin_pb.UpdateCustomOrgIAMPolicyRequest) *domain.DomainPolicy {
-	return &domain.DomainPolicy{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.OrgId,
-		},
-		UserLoginMustBeDomain:                  req.UserLoginMustBeDomain,
-		ValidateOrgDomains:                     true,
-		SMTPSenderAddressMatchesInstanceDomain: true,
-	}
 }

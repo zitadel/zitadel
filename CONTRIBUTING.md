@@ -25,7 +25,7 @@ Help shaping the future of ZITADEL:
 [Contribute](#how-to-contribute)
 
 - [Contribute code](#contribute)
-- If you found a mistake on our [docs page](https://docs.zitadel.com) or something is missing please read [the docs section](#contribute-docs)
+- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](#contribute-docs)
 - [Translate](#contribute-internationalization) and improve texts
 
 Follow [@zitadel](https://twitter.com/zitadel) on twitter
@@ -41,19 +41,19 @@ We accept contributions through pull requests. You need a github account for tha
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
 
-`git checkout -b my-fix-branch main`
+    `git checkout -b my-fix-branch main`
 
 3. Make your changes following the [guidelines](#contribute) in this guide. Make sure that all tests pass.
 
 4. Commit the changes on the new branch
 
-`git commit --all`
+    `git commit --all`
 
 5. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the latest commit of the `main`-branch
 
 6. Push the changes to your branch on Github
 
-`git push origin my-fix-branch`
+    `git push origin my-fix-branch`
 
 7. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request [correct tagging](#commit-messages) is required and will be requested by the reviewers.
 
@@ -110,10 +110,12 @@ We add the label "good first issue" for problems we think are a good starting po
 ### Backend / Login
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run a [CockroachDB](https://www.cockroachlabs.com/docs/v22.1/start-a-local-cluster-in-docker-mac.html) on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run a [CockroachDB](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker-mac.html) on your local machine.
 With [goreleaser](https://opencollective.com/goreleaser), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
+
+ZITADEL uses [golangci-lint](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend to set golangci-lint as linter in your IDE.
 
 The commands in this section are tested against the following software versions:
 
@@ -121,8 +123,6 @@ The commands in this section are tested against the following software versions:
 - [Goreleaser version v1.8.3](https://goreleaser.com/install/)
 - [Go version 1.19](https://go.dev/doc/install)
 - [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
-
-<!-- TODO: Describe linting (@adlerhurst) -->
 
 Make some changes to the source code, then run the database locally.
 
@@ -142,7 +142,7 @@ goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifac
 > For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.  
 > Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`  
 > Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`  
-> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . -t zitadel-npm-console --target angular-export -o internal/api/ui/console/static/`  
+> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . --target angular-export -o internal/api/ui/console/static/`  
 > Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
@@ -151,6 +151,10 @@ Also, you can verify the data by running `cockroach sql --database zitadel --ins
 
 As soon as you are ready to battle test your changes, run the end-to-end tests.
 
+#### Running the tests with docker
+
+Running the tests with docker doesn't require you to take care of other dependencies than docker and goreleaser.
+
 ```bash
 # Build the production binary (unit tests are executed, too)
 goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
@@ -158,21 +162,47 @@ goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifa
 # Pack the binary into a docker image
 DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zitadel:local
 
+# If you made changes in the e2e directory, make sure you reformat the files
+(cd ./e2e && npm run lint:fix)
+
 # Run the tests
-ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/docker-compose.yaml run e2e
+ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml run --service-ports e2e
 ```
 
 When you are happy with your changes, you can cleanup your environment.
 
 ```bash
 # Stop and remove the docker containers for zitadel and the database
-docker compose --file ./e2e/docker-compose.yaml down
+docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
+```
+
+#### Running the tests without docker
+
+If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
+But you will have to install the relevant node dependencies.
+
+```bash
+# Install dependencies
+(cd ./e2e && npm install)
+
+# Run the tests interactively
+(cd ./e2e && npm run open:golangangular)
+
+# Run the tests non-interactively
+(cd ./e2e && npm run e2e:golangangular)
+```
+
+When you are happy with your changes, you can cleanup your environment.
+
+```bash
+# Stop and remove the docker containers for zitadel and the database
+docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ```
 
 ### Console
 
 By executing the commands from this section, you run everything you need to develop the console locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](https://www.cockroachlabs.com/docs/v22.1/start-a-local-cluster-in-docker-mac.html) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker-mac.html) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
 
@@ -205,14 +235,14 @@ Run the database and the latest backend locally.
 cd ./console
 
 # You just need the db and the zitadel services to develop the console against.
-docker compose --file ../e2e/docker-compose.yaml up --detach db zitadel
+docker compose --file ../e2e/docker-compose.yaml up --detach zitadel
 ```
 
 When the backend is ready, you have the latest zitadel exposed at http://localhost:8080.
 You can now run a local development server with live code reloading at http://localhost:4200.
 To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
 
-1. Navigate to http://localhost:8080/ui/console/projects.
+1. Navigate to <http://localhost:8080/ui/console/projects>.
 2. When prompted, login with _zitadel-admin@<span because="breaks the mailto"></span>zitadel.localhost_ and _Password1!_
 3. Select the _ZITADEL_ project.
 4. Select the _Console_ application.
@@ -244,24 +274,37 @@ After making changes to the code, you should run the end-to-end-tests.
 Open another shell.
 
 ```bash
+# Reformat your console code
+npm run lint:fix
+
 # Change to the e2e directory
 cd .. && cd e2e/
+
+# If you made changes in the e2e directory, make sure you reformat the files here too
+npm run lint:fix
 
 # Install npm dependencies
 npm install
 
-# Run all tests in a headless browser
-npm run e2e:dev
+# Run all e2e tests
+npm run e2e:angular -- --headed
 ```
 
-You can also open the test suite interactively for fast success feedback on specific tests.
+You can also open the test suite interactively for fast feedback on specific tests.
 
 ```bash
-# Run all tests in a headless browser
-npm run open:dev
+# Run tests interactively
+npm run open:angular
 ```
 
-When you are happy with your changes, you can cleanup your environment
+If you also make [changes to the backend code](#backend--login), you can run the test against your locally built backend code and frontend server
+
+```bash
+npm run open:golangangular
+npm run e2e:golangangular
+```
+
+When you are happy with your changes, you can format your code and cleanup your environment
 
 ```bash
 # Stop and remove the docker containers for zitadel and the database
@@ -271,8 +314,16 @@ docker compose down
 ## Contribute Docs
 
 Project documentation is made with docusaurus and is located under [./docs](./docs).
+
+### Local Testing
 Please refer to the [README](./docs/README.md) for more information and local testing.
 
+### Style Guide
+
+- **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
+- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
+
+### Docs Pull Request
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
 Scope can be left empty (omit the brackets) or refer to the top navigation sections.
 
@@ -290,8 +341,85 @@ You may edit the texts in these files or create a new file for additional langua
 ## Want to start ZITADEL?
 
 You can find an installation guide for all the different environments here:
-[https://docs.zitadel.com/docs/guides/installation](https://docs.zitadel.com/docs/guides/installation)
+[https://zitadel.com/docs/self-hosting/deploy/overview](https://zitadel.com/docs/self-hosting/deploy/overview)
 
 ## **Did you find a security flaw?**
 
 - Please read [Security Policy](./SECURITY.md).
+
+## Product Management
+
+The ZITADEL Team works with an agile product management methodology.
+You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/2/views/1).
+
+### Sprint
+
+We want to deliver a new release every second week. So we plan everything in two-week sprints.
+Each Tuesday we estimate new issues and on Wednesday the last sprint will be reviewed and the next one will be planned.
+After a sprint ends a new version of ZITADEL will be released, and publish to [ZITADEL Cloud](https://zitadel.cloud) the following Monday.
+
+If there are some critical or urgent issues we will have a look at it earlier, than the two weeks.
+To show the community the needed information, each issue gets attributes and labels.
+
+### About the attributes
+
+You can find the attributes on the project "Product Management".
+
+#### State
+
+The state should reflect the progress of the issue and what is going on right now.
+
+- **No status**: Issue just got added and has to be looked at.
+- **🧐 Investigating**: We are currently investigating to find out what the problem is, which priority it should have and what has to be implemented. Or we need some more information from the author.
+- **📨 Product Backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be worked on in the future. Issues with this state do not have to be completely defined yet.
+- **📝 Prioritized Product Backlog**: An issue with the state "Prioritized Backlog" is ready for the refinement from the perspective of the product owner (PO) to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
+- **🔖 Ready**: The issue is ready to take into a sprint. Difference to "prioritized..." is that the complexity is defined by the team.
+- **📋 Sprint Backlog**: The issue is scheduled for the current sprint.
+- **🏗 In progress**: Someone is working on this issue right now. The issue will get an assignee as soon as it is in progress.
+- **👀 In review**: The issue is in review. Please add someone to review your issue or let us know that it is ready to review with a comment on your pull request.
+- **✅ Done**: The issue is implemented and merged to main.
+
+#### Priority
+
+Priority shows you the priority the ZITADEL team has given this issue. In general the higher the demand from customers and community for the feature, the higher the priority.
+
+- **🌋 Critical**: This is a security issue or something that has to be fixed urgently, because the software is not usable or highly vulnerable.
+- **🏔 High**: These are the issues the ZITADEL team is currently focusing on and will be implemented as soon as possible.
+- **🏕 Medium**: After all the high issues are done these will be next.
+- **🏝 Low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
+
+
+#### Complexity
+
+This should give you an indication how complex the issue is. It's not about the hours or effort it takes.
+Everything that is higher than 8 should be split in smaller parts.
+
+**1**, **2**, **3**, **5**, **8**, **13**
+
+### About the Labels
+
+There are a few general labels that don't belong to a specific category.
+
+- **good first issue**: This label shows contributors, that it is an easy entry point to start developing on ZITADEL.
+- **help wanted**: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors.
+
+#### Category
+
+The category shows which part of ZITADEL is affected.
+
+- **category: backend**: The backend includes the APIs, event store, command and query side. This is developed in golang.
+- **category: ci**: ci is all about continues integration and pipelines.
+- **category: design**: All about the ux/ui of ZITADEL
+- **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
+- **category: frontend**: The frontend concerns on the one hand the ZITADEL management console (Angular) and on the other hand the login (gohtml)
+- **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
+- **category: translation**: Everything concerning translations or new languages
+
+#### Language
+
+The language shows you in which programming language the affected part is written
+
+- **lang: angular**
+- **lang: go**
+- **lang: javascript**
+

@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -71,6 +72,9 @@ type InstanceSetup struct {
 		ForceMFA                   bool
 		HidePasswordReset          bool
 		IgnoreUnknownUsername      bool
+		AllowDomainDiscovery       bool
+		DisableLoginWithEmail      bool
+		DisableLoginWithPhone      bool
 		PasswordlessType           domain.PasswordlessType
 		DefaultRedirectURI         string
 		PasswordCheckLifetime      time.Duration
@@ -78,6 +82,9 @@ type InstanceSetup struct {
 		MfaInitSkipLifetime        time.Duration
 		SecondFactorCheckLifetime  time.Duration
 		MultiFactorCheckLifetime   time.Duration
+	}
+	NotificationPolicy struct {
+		PasswordChange bool
 	}
 	PrivacyPolicy struct {
 		TOSLink     string
@@ -103,7 +110,16 @@ type InstanceSetup struct {
 	}
 	EmailTemplate     []byte
 	MessageTexts      []*domain.CustomMessageText
-	SMTPConfiguration *smtp.EmailConfig
+	SMTPConfiguration *smtp.Config
+	OIDCSettings      *struct {
+		AccessTokenLifetime        time.Duration
+		IdTokenLifetime            time.Duration
+		RefreshTokenIdleExpiration time.Duration
+		RefreshTokenExpiration     time.Duration
+	}
+	Quotas *struct {
+		Items []*AddQuota
+	}
 }
 
 type ZitadelConfig struct {
@@ -142,30 +158,30 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	return nil
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	if err = c.eventstore.NewInstance(ctx, instanceID); err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	userID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	if err = setup.generateIDs(c.idGenerator); err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 	ctx = authz.WithConsole(ctx, setup.zitadel.projectID, setup.zitadel.consoleAppID)
 
@@ -211,6 +227,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.HidePasswordReset,
 			setup.LoginPolicy.IgnoreUnknownUsername,
+			setup.LoginPolicy.AllowDomainDiscovery,
+			setup.LoginPolicy.DisableLoginWithEmail,
+			setup.LoginPolicy.DisableLoginWithPhone,
 			setup.LoginPolicy.PasswordlessType,
 			setup.LoginPolicy.DefaultRedirectURI,
 			setup.LoginPolicy.PasswordCheckLifetime,
@@ -224,6 +243,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
 		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
 		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
 		prepareAddDefaultLabelPolicy(
@@ -243,6 +263,19 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareActivateDefaultLabelPolicy(instanceAgg),
 
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
+	}
+
+	if setup.Quotas != nil {
+		for _, q := range setup.Quotas.Items {
+			quotaId, err := c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+
+			quotaAggregate := quota.NewAggregate(quotaId, instanceID, instanceID)
+
+			validations = append(validations, c.AddQuotaCommand(quotaAggregate, q))
+		}
 	}
 
 	for _, msg := range setup.MessageTexts {
@@ -273,10 +306,40 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	validations = append(validations,
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		c.prepareSetDefaultOrg(instanceAgg, orgAgg.ID),
-		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+	)
+
+	var pat *PersonalAccessToken
+	var machineKey *MachineKey
+	// only a human or a machine user should be created as owner
+	if setup.Org.Machine != nil && setup.Org.Machine.Machine != nil && !setup.Org.Machine.Machine.IsZero() {
+		validations = append(validations,
+			AddMachineCommand(userAgg, setup.Org.Machine.Machine),
+		)
+		if setup.Org.Machine.Pat != nil {
+			pat = NewPersonalAccessToken(orgID, userID, setup.Org.Machine.Pat.ExpirationDate, setup.Org.Machine.Pat.Scopes, domain.UserTypeMachine)
+			pat.TokenID, err = c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			validations = append(validations, prepareAddPersonalAccessToken(pat, c.keyAlgorithm))
+		}
+		if setup.Org.Machine.MachineKey != nil {
+			machineKey = NewMachineKey(orgID, userID, setup.Org.Machine.MachineKey.ExpirationDate, setup.Org.Machine.MachineKey.Type)
+			machineKey.KeyID, err = c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			validations = append(validations, prepareAddUserMachineKey(machineKey, c.machineKeySize))
+		}
+	} else if setup.Org.Human != nil {
+		validations = append(validations,
+			AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+		)
+	}
+
+	validations = append(validations,
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 		c.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
-
 		AddProjectCommand(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
@@ -322,7 +385,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	addGeneratedDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 	validations = append(validations, addGeneratedDomain...)
 	if setup.CustomDomain != "" {
@@ -346,20 +409,52 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
+	if setup.OIDCSettings != nil {
+		validations = append(validations,
+			c.prepareAddOIDCSettings(
+				instanceAgg,
+				setup.OIDCSettings.AccessTokenLifetime,
+				setup.OIDCSettings.IdTokenLifetime,
+				setup.OIDCSettings.RefreshTokenIdleExpiration,
+				setup.OIDCSettings.RefreshTokenExpiration,
+			),
+		)
+	}
+
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
-	return instanceID, &domain.ObjectDetails{
+
+	var token string
+	if pat != nil {
+		token = pat.Token
+	}
+
+	return instanceID, token, machineKey, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
 	}, nil
+}
+
+func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	validation := c.prepareUpdateInstance(instanceAgg, name)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
@@ -373,11 +468,7 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
@@ -391,11 +482,7 @@ func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string, externalPort uint16, externalSecure bool) error {
@@ -498,6 +585,27 @@ func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggrega
 	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
 }
 
+func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if name == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-092mid", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := getInstanceWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, errors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
+			}
+			if writeModel.Name == name {
+				return nil, errors.ThrowPreconditionFailed(nil, "INST-alpxism", "Errors.Instance.NotChanged")
+			}
+			return []eventstore.Command{instance.NewInstanceChangedEvent(ctx, &a.Aggregate, name)}, nil
+		}, nil
+	}
+}
+
 func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if defaultLanguage == language.Und {
@@ -542,4 +650,51 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
 	return writeModel, err
+}
+
+func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
+func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := c.getInstanceWriteModelByID(ctx, a.ID)
+			if err != nil {
+				return nil, errors.ThrowNotFound(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
+			}
+			if !writeModel.State.Exists() {
+				return nil, errors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
+			}
+			return []eventstore.Command{instance.NewInstanceRemovedEvent(ctx,
+					&a.Aggregate,
+					writeModel.Name,
+					writeModel.Domains)},
+				nil
+		}, nil
+	}
+}
+
+func (c *Commands) getInstanceWriteModelByID(ctx context.Context, orgID string) (*InstanceWriteModel, error) {
+	instanceWriteModel := NewInstanceWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, instanceWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return instanceWriteModel, nil
 }

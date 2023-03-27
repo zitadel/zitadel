@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { take } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -19,6 +19,7 @@ import {
   OIDC,
   PRIVACYPOLICY,
   SECRETS,
+  SECURITY,
 } from '../../modules/settings-list/settings';
 
 @Component({
@@ -26,7 +27,7 @@ import {
   templateUrl: './instance-settings.component.html',
   styleUrls: ['./instance-settings.component.scss'],
 })
-export class InstanceSettingsComponent {
+export class InstanceSettingsComponent implements OnDestroy {
   public id: string = '';
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public settingsList: SidenavSetting[] = [
@@ -49,7 +50,10 @@ export class InstanceSettingsComponent {
     PRIVACYPOLICY,
     OIDC,
     SECRETS,
+    SECURITY,
   ];
+
+  private destroy$: Subject<void> = new Subject();
   constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute) {
     const breadcrumbs = [
       new Breadcrumb({
@@ -60,11 +64,16 @@ export class InstanceSettingsComponent {
     ];
     breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
+    activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
       const { id } = params;
       if (id) {
         this.id = id;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

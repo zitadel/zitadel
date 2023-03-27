@@ -4,8 +4,11 @@ import "zitadel/user.proto";
 import "zitadel/idp.proto";
 import "zitadel/org.proto";
 import "zitadel/management.proto";
+import "zitadel/auth_n_key.proto";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "google/protobuf/timestamp.proto";
 
 import "validate/validate.proto";
 
@@ -30,9 +33,9 @@ message AddCustomOrgIAMPolicyRequest {
   ];
   bool user_login_must_be_domain = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the username has to end with the domain of it's organisation"
+      description: "the username has to end with the domain of its organization"
     }
-  ]; // the username has to end with the domain of it's organisation (uniqueness is organisation based)
+  ]; // the username has to end with the domain of its organization (uniqueness is organization based)
 }
 message ImportDataOrg {
   repeated DataOrg orgs = 1;
@@ -54,7 +57,7 @@ message DataOrg {
   repeated DataOIDCApplication oidc_apps = 13;
   repeated DataHumanUser human_users = 14;
   repeated DataMachineUser machine_users = 15;
-  repeated zitadel.management.v1.SetTriggerActionsRequest  trigger_actions = 16;
+  repeated SetTriggerActionsRequest  trigger_actions = 16;
   repeated DataAction actions = 17;
 
   repeated DataProjectGrant project_grants = 18;
@@ -84,7 +87,11 @@ message DataOrg {
 
   repeated zitadel.idp.v1.IDPUserLink user_links = 36;
   repeated zitadel.org.v1.Domain domains = 37;
+
+  repeated DataAppKey app_keys = 38;
+  repeated DataMachineKey machine_keys = 39;
 }
+
 message DataOIDCIDP{
   string idp_id = 1;
   zitadel.management.v1.AddOrgOIDCIDPRequest idp = 2;
@@ -130,6 +137,23 @@ message ExportHumanUser {
   string otp_code = 9;
 }
 
+message DataAppKey {
+  string id = 1;
+  string project_id = 2;
+  string app_id = 3;
+  string client_id = 4;
+  zitadel.authn.v1.KeyType type = 5;
+  google.protobuf.Timestamp expiration_date = 6;
+  bytes public_key = 7;
+}
+
+message DataMachineKey {
+  string key_id = 1;
+  string user_id = 2;
+  zitadel.authn.v1.KeyType type = 3;
+  google.protobuf.Timestamp expiration_date = 4;
+  bytes public_key = 5;
+}
 
 message DataProject {
   string project_id = 1;
@@ -158,4 +182,22 @@ message DataAction {
 message DataProjectGrant {
   string grant_id = 1;
   zitadel.management.v1.AddProjectGrantRequest project_grant = 2;
+}
+
+message SetTriggerActionsRequest {
+  FlowType flow_type = 1;
+  TriggerType trigger_type = 2;
+  repeated string action_ids = 3;
+}
+
+enum FlowType {
+  FLOW_TYPE_UNSPECIFIED = 0;
+  FLOW_TYPE_EXTERNAL_AUTHENTICATION = 1;
+}
+
+enum TriggerType {
+  TRIGGER_TYPE_UNSPECIFIED = 0;
+  TRIGGER_TYPE_POST_AUTHENTICATION = 1;
+  TRIGGER_TYPE_PRE_CREATION = 2;
+  TRIGGER_TYPE_POST_CREATION = 3;
 }

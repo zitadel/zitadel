@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CreateLayoutModule } from 'src/app/modules/create-layout/create-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -26,4 +26,4 @@ import { ProjectRoleCreateComponent } from './project-role-create.component';
     TranslateModule,
   ],
 })
-export class ProjectRoleCreateModule {}
+export default class ProjectRoleCreateModule {}

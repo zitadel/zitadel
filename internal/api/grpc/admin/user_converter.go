@@ -6,14 +6,15 @@ import (
 
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	admin_grpc "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func setUpOrgHumanToCommand(human *admin_grpc.SetUpOrgRequest_Human) command.AddHuman {
+func setUpOrgHumanToCommand(human *admin_grpc.SetUpOrgRequest_Human) *command.AddHuman {
 	var lang language.Tag
 	lang, err := language.Parse(human.Profile.PreferredLanguage)
 	logging.OnError(err).Debug("unable to parse language")
-	return command.AddHuman{
+	return &command.AddHuman{
 		Username:          human.UserName,
 		FirstName:         human.Profile.FirstName,
 		LastName:          human.Profile.LastName,
@@ -29,7 +30,7 @@ func setUpOrgHumanToCommand(human *admin_grpc.SetUpOrgRequest_Human) command.Add
 
 func setUpOrgHumanEmailToDomain(email *admin_grpc.SetUpOrgRequest_Human_Email) command.Email {
 	return command.Email{
-		Address:  email.Email,
+		Address:  domain.EmailAddress(email.Email),
 		Verified: email.IsEmailVerified,
 	}
 }
@@ -39,7 +40,7 @@ func setUpOrgHumanPhoneToDomain(phone *admin_grpc.SetUpOrgRequest_Human_Phone) c
 		return command.Phone{}
 	}
 	return command.Phone{
-		Number:   phone.Phone,
+		Number:   domain.PhoneNumber(phone.Phone),
 		Verified: phone.IsPhoneVerified,
 	}
 }

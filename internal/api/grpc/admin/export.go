@@ -2,12 +2,16 @@ package admin
 
 import (
 	"context"
+
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -17,7 +21,6 @@ import (
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	v1_pb "github.com/zitadel/zitadel/pkg/grpc/v1"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
@@ -81,13 +84,20 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		if err != nil {
 			return nil, err
 		}
+		orgIDPs := make([]string, 0)
+		for _, idp := range org.OidcIdps {
+			orgIDPs = append(orgIDPs, idp.GetIdpId())
+		}
+		for _, idp := range org.JwtIdps {
+			orgIDPs = append(orgIDPs, idp.GetIdpId())
+		}
 
 		org.LabelPolicy, err = s.getLabelPolicy(ctx, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
 
-		org.LoginPolicy, err = s.getLoginPolicy(ctx, org.GetOrgId())
+		org.LoginPolicy, err = s.getLoginPolicy(ctx, org.GetOrgId(), orgIDPs)
 		if err != nil {
 			return nil, err
 		}
@@ -155,7 +165,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Users
 		******************************************************************************************************************/
-		org.HumanUsers, org.MachineUsers, org.UserMetadata, err = s.getUsers(ctx, org.GetOrgId(), req.WithPasswords, req.WithOtp)
+		org.HumanUsers, org.MachineUsers, org.UserMetadata, org.MachineKeys, err = s.getUsers(ctx, org.GetOrgId(), req.WithPasswords, req.WithOtp)
 		if err != nil {
 			return nil, err
 		}
@@ -169,7 +179,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Project and Applications
 		******************************************************************************************************************/
-		org.Projects, org.ProjectRoles, org.OidcApps, org.ApiApps, err = s.getProjectsAndApps(ctx, org.GetOrgId())
+		org.Projects, org.ProjectRoles, org.OidcApps, org.ApiApps, org.AppKeys, err = s.getProjectsAndApps(ctx, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
@@ -244,7 +254,7 @@ func (s *Server) getDomainPolicy(ctx context.Context, orgID string) (_ *admin_pb
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedDomain, err := s.query.DomainPolicyByOrg(ctx, true, orgID)
+	queriedDomain, err := s.query.DomainPolicyByOrg(ctx, true, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -267,7 +277,7 @@ func (s *Server) getDomains(ctx context.Context, orgID string) (_ []*org_pb.Doma
 	if err != nil {
 		return nil, err
 	}
-	orgDomainsQuery, err := s.query.SearchOrgDomains(ctx, &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{orgDomainOrgIDQuery}})
+	orgDomainsQuery, err := s.query.SearchOrgDomains(ctx, &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{orgDomainOrgIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -296,7 +306,7 @@ func (s *Server) getIDPs(ctx context.Context, orgID string) (_ []*v1_pb.DataOIDC
 	if err != nil {
 		return nil, nil, err
 	}
-	idps, err := s.query.IDPs(ctx, &query.IDPSearchQueries{Queries: []query.SearchQuery{idpQuery, ownerType}})
+	idps, err := s.query.IDPs(ctx, &query.IDPSearchQueries{Queries: []query.SearchQuery{idpQuery, ownerType}}, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -304,7 +314,7 @@ func (s *Server) getIDPs(ctx context.Context, orgID string) (_ []*v1_pb.DataOIDC
 	jwtIdps := make([]*v1_pb.DataJWTIDP, 0)
 	for _, idp := range idps.IDPs {
 		if idp.OIDCIDP != nil {
-			clientSecret, err := s.query.GetOIDCIDPClientSecret(ctx, false, orgID, idp.ID)
+			clientSecret, err := s.query.GetOIDCIDPClientSecret(ctx, false, orgID, idp.ID, false)
 			if err != nil && !caos_errors.IsNotFound(err) {
 				return nil, nil, err
 			}
@@ -344,7 +354,7 @@ func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (_ *managemen
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedLabel, err := s.query.ActiveLabelPolicyByOrg(ctx, orgID)
+	queriedLabel, err := s.query.ActiveLabelPolicyByOrg(ctx, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -365,11 +375,11 @@ func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (_ *managemen
 	return nil, nil
 }
 
-func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomLoginPolicyRequest, err error) {
+func (s *Server) getLoginPolicy(ctx context.Context, orgID string, orgIDPs []string) (_ *management_pb.AddCustomLoginPolicyRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedLogin, err := s.query.LoginPolicyByID(ctx, false, orgID)
+	queriedLogin, err := s.query.LoginPolicyByID(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -390,18 +400,29 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (_ *managemen
 			multiFactors = append(multiFactors, policy_pb.MultiFactorType(factor))
 		}
 
-		idpLinksQuery, err := s.query.IDPLoginPolicyLinks(ctx, orgID, &query.IDPLoginPolicyLinksSearchQuery{})
-		if err != nil && !caos_errors.IsNotFound(err) {
+		idpLinksQuery, err := s.query.IDPLoginPolicyLinks(ctx, orgID, &query.IDPLoginPolicyLinksSearchQuery{}, false)
+		if err != nil {
 			return nil, err
 		}
 		idpLinks := make([]*management_pb.AddCustomLoginPolicyRequest_IDP, 0)
-		if !caos_errors.IsNotFound(err) && idpLinksQuery != nil {
-			for _, idpLink := range idpLinksQuery.Links {
-				idpLinks = append(idpLinks, &management_pb.AddCustomLoginPolicyRequest_IDP{
-					IdpId:     idpLink.IDPID,
-					OwnerType: idp_pb.IDPOwnerType(idpLink.IDPType),
-				})
+		for _, idpLink := range idpLinksQuery.Links {
+			found := false
+			for _, orgIDP := range orgIDPs {
+				if orgIDP == idpLink.IDPID {
+					found = true
+					break
+				}
 			}
+			ownerType := idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
+			if found {
+				ownerType = idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG
+			} else {
+				ownerType = idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
+			}
+			idpLinks = append(idpLinks, &management_pb.AddCustomLoginPolicyRequest_IDP{
+				IdpId:     idpLink.IDPID,
+				OwnerType: ownerType,
+			})
 		}
 
 		return &management_pb.AddCustomLoginPolicyRequest{
@@ -435,22 +456,20 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) (_ []*idp_pb.ID
 	if err != nil {
 		return nil, err
 	}
-	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}})
-	if err != nil && !caos_errors.IsNotFound(err) {
+	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}}, false)
+	if err != nil {
 		return nil, err
 	}
 	userLinks := make([]*idp_pb.IDPUserLink, 0)
-	if !caos_errors.IsNotFound(err) && idpUserLinks != nil {
-		for _, idpUserLink := range idpUserLinks.Links {
-			userLinks = append(userLinks, &idp_pb.IDPUserLink{
-				UserId:           idpUserLink.UserID,
-				IdpId:            idpUserLink.IDPID,
-				IdpName:          idpUserLink.IDPName,
-				ProvidedUserId:   idpUserLink.ProvidedUserID,
-				ProvidedUserName: idpUserLink.ProvidedUsername,
-				IdpType:          idp_pb.IDPType(idpUserLink.IDPType),
-			})
-		}
+	for _, idpUserLink := range idpUserLinks.Links {
+		userLinks = append(userLinks, &idp_pb.IDPUserLink{
+			UserId:           idpUserLink.UserID,
+			IdpId:            idpUserLink.IDPID,
+			IdpName:          idpUserLink.IDPName,
+			ProvidedUserId:   idpUserLink.ProvidedUserID,
+			ProvidedUserName: idpUserLink.ProvidedUsername,
+			IdpType:          idp_pb.IDPType(idpUserLink.IDPType),
+		})
 	}
 
 	return userLinks, nil
@@ -460,7 +479,7 @@ func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (_ *managem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID)
+	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -476,7 +495,7 @@ func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, false, orgID)
+	queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -496,7 +515,7 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *managem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, false, orgID)
+	queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -510,24 +529,22 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *managem
 	return nil, nil
 }
 
-func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, withOTP bool) (_ []*v1_pb.DataHumanUser, _ []*v1_pb.DataMachineUser, _ []*management_pb.SetUserMetadataRequest, err error) {
+func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, withOTP bool) (_ []*v1_pb.DataHumanUser, _ []*v1_pb.DataMachineUser, _ []*management_pb.SetUserMetadataRequest, _ []*v1_pb.DataMachineKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	orgSearch, err := query.NewUserResourceOwnerSearchQuery(org, query.TextEquals)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}})
-	if err != nil && !caos_errors.IsNotFound(err) {
-		return nil, nil, nil, err
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}}, false)
+	if err != nil {
+		return nil, nil, nil, nil, err
 	}
 	humanUsers := make([]*v1_pb.DataHumanUser, 0)
 	machineUsers := make([]*v1_pb.DataMachineUser, 0)
 	userMetadata := make([]*management_pb.SetUserMetadataRequest, 0)
-	if err != nil && caos_errors.IsNotFound(err) {
-		return humanUsers, machineUsers, userMetadata, nil
-	}
+	machineKeys := make([]*v1_pb.DataMachineKey, 0)
 	for _, user := range users.Users {
 		switch user.Type {
 		case domain.UserTypeHuman:
@@ -547,13 +564,13 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			}
 			if user.Human.Email != "" {
 				dataUser.User.Email = &management_pb.ImportHumanUserRequest_Email{
-					Email:           user.Human.Email,
+					Email:           string(user.Human.Email),
 					IsEmailVerified: user.Human.IsEmailVerified,
 				}
 			}
 			if user.Human.Phone != "" {
 				dataUser.User.Phone = &management_pb.ImportHumanUserRequest_Phone{
-					Phone:           user.Human.Phone,
+					Phone:           string(user.Human.Phone),
 					IsPhoneVerified: user.Human.IsPhoneVerified,
 				}
 			}
@@ -562,7 +579,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				hashedPassword, hashAlgorithm, err := s.query.GetHumanPassword(ctx, org, user.ID)
 				pwspan.EndWithError(err)
 				if err != nil && !caos_errors.IsNotFound(err) {
-					return nil, nil, nil, err
+					return nil, nil, nil, nil, err
 				}
 				if err == nil && hashedPassword != nil {
 					dataUser.User.HashedPassword = &management_pb.ImportHumanUserRequest_HashedPassword{
@@ -576,7 +593,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				code, err := s.query.GetHumanOTPSecret(ctx, user.ID, org)
 				otpspan.EndWithError(err)
 				if err != nil && !caos_errors.IsNotFound(err) {
-					return nil, nil, nil, err
+					return nil, nil, nil, nil, err
 				}
 				if err == nil && code != "" {
 					dataUser.User.OtpCode = code
@@ -593,17 +610,40 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 					Description: user.Machine.Description,
 				},
 			})
+			userIDQuery, err := query.NewAuthNKeyAggregateIDQuery(user.ID)
+			if err != nil {
+				return nil, nil, nil, nil, err
+			}
+			orgIDQuery, err := query.NewAuthNKeyResourceOwnerQuery(org)
+			if err != nil {
+				return nil, nil, nil, nil, err
+			}
+
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}}, false)
+			if err != nil {
+				return nil, nil, nil, nil, err
+			}
+			for _, key := range keys.AuthNKeysData {
+				machineKeys = append(machineKeys, &v1_pb.DataMachineKey{
+					KeyId:          key.ID,
+					UserId:         user.ID,
+					Type:           authn_grpc.KeyTypeToPb(key.Type),
+					ExpirationDate: timestamppb.New(key.Expiration),
+					PublicKey:      key.PublicKey,
+				})
+
+			}
 		}
 
 		ctx, metaspan := tracing.NewSpan(ctx)
 		metadataOrgSearch, err := query.NewUserMetadataResourceOwnerSearchQuery(org)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
-		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}})
+		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}}, false)
 		metaspan.EndWithError(err)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		for _, metadata := range metadataList.Metadata {
 			userMetadata = append(userMetadata, &management_pb.SetUserMetadataRequest{
@@ -613,17 +653,17 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			})
 		}
 	}
-	return humanUsers, machineUsers, userMetadata, nil
+	return humanUsers, machineUsers, userMetadata, machineKeys, nil
 }
 
 func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) (_ []*management_pb.SetTriggerActionsRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	flowTypes := []domain.FlowType{domain.FlowTypeExternalAuthentication}
+	flowTypes := []domain.FlowType{domain.FlowTypeExternalAuthentication, domain.FlowTypeInternalAuthentication}
 	triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
 
 	for _, flowType := range flowTypes {
-		flow, err := s.query.GetFlow(ctx, flowType, org)
+		flow, err := s.query.GetFlow(ctx, flowType, org, false)
 		if err != nil {
 			return nil, err
 		}
@@ -639,8 +679,8 @@ func (s *Server) getTriggerActions(ctx context.Context, org string, processedAct
 			}
 
 			triggerActions = append(triggerActions, &management_pb.SetTriggerActionsRequest{
-				FlowType:    action_pb.FlowType(flowType),
-				TriggerType: action_pb.TriggerType(triggerType),
+				FlowType:    flowType.ID(),
+				TriggerType: triggerType.ID(),
 				ActionIds:   actions,
 			})
 		}
@@ -653,16 +693,13 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*v1_pb.DataActio
 	if err != nil {
 		return nil, err
 	}
-	queriedActions, err := s.query.SearchActions(ctx, &query.ActionSearchQueries{Queries: []query.SearchQuery{actionSearch}})
-	if err != nil && !caos_errors.IsNotFound(err) {
+	queriedActions, err := s.query.SearchActions(ctx, &query.ActionSearchQueries{Queries: []query.SearchQuery{actionSearch}}, false)
+	if err != nil {
 		return nil, err
 	}
 	actions := make([]*v1_pb.DataAction, len(queriedActions.Actions))
-	if err != nil && caos_errors.IsNotFound(err) {
-		return actions, nil
-	}
 	for i, action := range queriedActions.Actions {
-		timeout := durationpb.New(action.Timeout)
+		timeout := durationpb.New(action.Timeout())
 
 		actions[i] = &v1_pb.DataAction{
 			ActionId: action.ID,
@@ -678,23 +715,21 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*v1_pb.DataActio
 	return actions, nil
 }
 
-func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.DataProject, []*management_pb.AddProjectRoleRequest, []*v1_pb.DataOIDCApplication, []*v1_pb.DataAPIApplication, error) {
+func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.DataProject, []*management_pb.AddProjectRoleRequest, []*v1_pb.DataOIDCApplication, []*v1_pb.DataAPIApplication, []*v1_pb.DataAppKey, error) {
 	projectSearch, err := query.NewProjectResourceOwnerSearchQuery(org)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
-	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}})
-	if err != nil && !caos_errors.IsNotFound(err) {
-		return nil, nil, nil, nil, err
+	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}}, false)
+	if err != nil {
+		return nil, nil, nil, nil, nil, err
 	}
 
 	projects := make([]*v1_pb.DataProject, len(queriedProjects.Projects))
 	orgProjectRoles := make([]*management_pb.AddProjectRoleRequest, 0)
 	oidcApps := make([]*v1_pb.DataOIDCApplication, 0)
 	apiApps := make([]*v1_pb.DataAPIApplication, 0)
-	if err != nil && caos_errors.IsNotFound(err) {
-		return projects, orgProjectRoles, oidcApps, apiApps, nil
-	}
+	appKeys := make([]*v1_pb.DataAppKey, 0)
 	for i, queriedProject := range queriedProjects.Projects {
 		projects[i] = &v1_pb.DataProject{
 			ProjectId: queriedProject.ID,
@@ -709,81 +744,104 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 
 		projectRoleSearch, err := query.NewProjectRoleProjectIDSearchQuery(queriedProject.ID)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, nil, err
 		}
 
-		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
-		if err != nil && !caos_errors.IsNotFound(err) {
-			return nil, nil, nil, nil, err
+		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}}, false)
+		if err != nil {
+			return nil, nil, nil, nil, nil, err
 		}
-		if queriedProjectRoles != nil {
-			for _, role := range queriedProjectRoles.ProjectRoles {
-				orgProjectRoles = append(orgProjectRoles, &management_pb.AddProjectRoleRequest{
-					ProjectId:   role.ProjectID,
-					RoleKey:     role.Key,
-					DisplayName: role.DisplayName,
-					Group:       role.Group,
-				})
-			}
+		for _, role := range queriedProjectRoles.ProjectRoles {
+			orgProjectRoles = append(orgProjectRoles, &management_pb.AddProjectRoleRequest{
+				ProjectId:   role.ProjectID,
+				RoleKey:     role.Key,
+				DisplayName: role.DisplayName,
+				Group:       role.Group,
+			})
 		}
 
 		appSearch, err := query.NewAppProjectIDSearchQuery(queriedProject.ID)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, nil, err
 		}
-		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}})
-		if err != nil && !caos_errors.IsNotFound(err) {
-			return nil, nil, nil, nil, err
+		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}}, false)
+		if err != nil {
+			return nil, nil, nil, nil, nil, err
 		}
-		if apps != nil {
-			for _, app := range apps.Apps {
-				if app.OIDCConfig != nil {
-					responseTypes := make([]app_pb.OIDCResponseType, 0)
-					for _, ty := range app.OIDCConfig.ResponseTypes {
-						responseTypes = append(responseTypes, app_pb.OIDCResponseType(ty))
-					}
-
-					grantTypes := make([]app_pb.OIDCGrantType, 0)
-					for _, ty := range app.OIDCConfig.GrantTypes {
-						grantTypes = append(grantTypes, app_pb.OIDCGrantType(ty))
-					}
-
-					oidcApps = append(oidcApps, &v1_pb.DataOIDCApplication{
-						AppId: app.ID,
-						App: &management_pb.AddOIDCAppRequest{
-							ProjectId:                app.ProjectID,
-							Name:                     app.Name,
-							RedirectUris:             app.OIDCConfig.RedirectURIs,
-							ResponseTypes:            responseTypes,
-							GrantTypes:               grantTypes,
-							AppType:                  app_pb.OIDCAppType(app.OIDCConfig.AppType),
-							AuthMethodType:           app_pb.OIDCAuthMethodType(app.OIDCConfig.AuthMethodType),
-							PostLogoutRedirectUris:   app.OIDCConfig.PostLogoutRedirectURIs,
-							Version:                  app_pb.OIDCVersion(app.OIDCConfig.Version),
-							DevMode:                  app.OIDCConfig.IsDevMode,
-							AccessTokenType:          app_pb.OIDCTokenType(app.OIDCConfig.AccessTokenType),
-							AccessTokenRoleAssertion: app.OIDCConfig.AssertAccessTokenRole,
-							IdTokenRoleAssertion:     app.OIDCConfig.AssertIDTokenRole,
-							IdTokenUserinfoAssertion: app.OIDCConfig.AssertIDTokenUserinfo,
-							ClockSkew:                durationpb.New(app.OIDCConfig.ClockSkew),
-							AdditionalOrigins:        app.OIDCConfig.AdditionalOrigins,
-						},
-					})
+		for _, app := range apps.Apps {
+			if app.OIDCConfig != nil {
+				responseTypes := make([]app_pb.OIDCResponseType, 0)
+				for _, ty := range app.OIDCConfig.ResponseTypes {
+					responseTypes = append(responseTypes, app_pb.OIDCResponseType(ty))
 				}
-				if app.APIConfig != nil {
-					apiApps = append(apiApps, &v1_pb.DataAPIApplication{
-						AppId: app.ID,
-						App: &management_pb.AddAPIAppRequest{
-							ProjectId:      app.ProjectID,
-							Name:           app.Name,
-							AuthMethodType: app_pb.APIAuthMethodType(app.APIConfig.AuthMethodType),
-						},
-					})
+
+				grantTypes := make([]app_pb.OIDCGrantType, 0)
+				for _, ty := range app.OIDCConfig.GrantTypes {
+					grantTypes = append(grantTypes, app_pb.OIDCGrantType(ty))
 				}
+
+				oidcApps = append(oidcApps, &v1_pb.DataOIDCApplication{
+					AppId: app.ID,
+					App: &management_pb.AddOIDCAppRequest{
+						ProjectId:                app.ProjectID,
+						Name:                     app.Name,
+						RedirectUris:             app.OIDCConfig.RedirectURIs,
+						ResponseTypes:            responseTypes,
+						GrantTypes:               grantTypes,
+						AppType:                  app_pb.OIDCAppType(app.OIDCConfig.AppType),
+						AuthMethodType:           app_pb.OIDCAuthMethodType(app.OIDCConfig.AuthMethodType),
+						PostLogoutRedirectUris:   app.OIDCConfig.PostLogoutRedirectURIs,
+						Version:                  app_pb.OIDCVersion(app.OIDCConfig.Version),
+						DevMode:                  app.OIDCConfig.IsDevMode,
+						AccessTokenType:          app_pb.OIDCTokenType(app.OIDCConfig.AccessTokenType),
+						AccessTokenRoleAssertion: app.OIDCConfig.AssertAccessTokenRole,
+						IdTokenRoleAssertion:     app.OIDCConfig.AssertIDTokenRole,
+						IdTokenUserinfoAssertion: app.OIDCConfig.AssertIDTokenUserinfo,
+						ClockSkew:                durationpb.New(app.OIDCConfig.ClockSkew),
+						AdditionalOrigins:        app.OIDCConfig.AdditionalOrigins,
+					},
+				})
+			}
+			if app.APIConfig != nil {
+				apiApps = append(apiApps, &v1_pb.DataAPIApplication{
+					AppId: app.ID,
+					App: &management_pb.AddAPIAppRequest{
+						ProjectId:      app.ProjectID,
+						Name:           app.Name,
+						AuthMethodType: app_pb.APIAuthMethodType(app.APIConfig.AuthMethodType),
+					},
+				})
+			}
+			appIDQuery, err := query.NewAuthNKeyObjectIDQuery(app.ID)
+			if err != nil {
+				return nil, nil, nil, nil, nil, err
+			}
+			projectIDQuery, err := query.NewAuthNKeyAggregateIDQuery(app.ProjectID)
+			if err != nil {
+				return nil, nil, nil, nil, nil, err
+			}
+			orgIDQuery, err := query.NewAuthNKeyResourceOwnerQuery(org)
+			if err != nil {
+				return nil, nil, nil, nil, nil, err
+			}
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}}, false)
+			if err != nil {
+				return nil, nil, nil, nil, nil, err
+			}
+			for _, key := range keys.AuthNKeysData {
+				appKeys = append(appKeys, &v1_pb.DataAppKey{
+					Id:             key.ID,
+					ProjectId:      app.ProjectID,
+					AppId:          app.ID,
+					Type:           authn_grpc.KeyTypeToPb(key.Type),
+					ExpirationDate: timestamppb.New(key.Expiration),
+					ClientId:       key.Identifier,
+					PublicKey:      key.PublicKey,
+				})
 			}
 		}
 	}
-	return projects, orgProjectRoles, oidcApps, apiApps, nil
+	return projects, orgProjectRoles, oidcApps, apiApps, appKeys, nil
 }
 
 func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org string, processedProjects []string, processedGrants []string, processedUsers []string) ([]*management_pb.AddProjectGrantMemberRequest, error) {
@@ -796,7 +854,7 @@ func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org 
 				return nil, err
 			}
 
-			queriedProjectMembers, err := s.query.ProjectGrantMembers(ctx, &query.ProjectGrantMembersQuery{ProjectID: projectID, OrgID: org, GrantID: grantID, MembersQuery: query.MembersQuery{Queries: []query.SearchQuery{search}}})
+			queriedProjectMembers, err := s.query.ProjectGrantMembers(ctx, &query.ProjectGrantMembersQuery{ProjectID: projectID, OrgID: org, GrantID: grantID, MembersQuery: query.MembersQuery{Queries: []query.SearchQuery{search}}}, false)
 			if err != nil {
 				return nil, err
 			}
@@ -824,7 +882,7 @@ func (s *Server) getNecessaryProjectMembersForOrg(ctx context.Context, processed
 	projectMembers := make([]*management_pb.AddProjectMemberRequest, 0)
 
 	for _, projectID := range processedProjects {
-		queriedProjectMembers, err := s.query.ProjectMembers(ctx, &query.ProjectMembersQuery{ProjectID: projectID})
+		queriedProjectMembers, err := s.query.ProjectMembers(ctx, &query.ProjectMembersQuery{ProjectID: projectID}, false)
 		if err != nil {
 			return nil, err
 		}
@@ -845,7 +903,7 @@ func (s *Server) getNecessaryProjectMembersForOrg(ctx context.Context, processed
 }
 
 func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, processedUsers []string) ([]*management_pb.AddOrgMemberRequest, error) {
-	queriedOrgMembers, err := s.query.OrgMembers(ctx, &query.OrgMembersQuery{OrgID: org})
+	queriedOrgMembers, err := s.query.OrgMembers(ctx, &query.OrgMembersQuery{OrgID: org}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -870,7 +928,7 @@ func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string
 	if err != nil {
 		return nil, err
 	}
-	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}})
+	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -908,7 +966,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 		return nil, err
 	}
 
-	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}})
+	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}}, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -989,7 +1047,7 @@ func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages 
 				ExternalRegistrationUserOverviewText: text_grpc.ExternalRegistrationUserOverviewScreenTextToPb(text.ExternalRegistrationUserOverview),
 				RegistrationOrgText:                  text_grpc.RegistrationOrgScreenTextToPb(text.RegistrationOrg),
 				LinkingUserDoneText:                  text_grpc.LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
-				ExternalUserNotFoundText:             text_grpc.ExternalUserNotFoundScreenTextToPb(text.ExternalNotFoundOption),
+				ExternalUserNotFoundText:             text_grpc.ExternalUserNotFoundScreenTextToPb(text.ExternalNotFound),
 				SuccessLoginText:                     text_grpc.SuccessLoginScreenTextToPb(text.LoginSuccess),
 				LogoutText:                           text_grpc.LogoutDoneScreenTextToPb(text.LogoutDone),
 				FooterText:                           text_grpc.FooterTextToPb(text.Footer),
@@ -1003,7 +1061,7 @@ func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages 
 func (s *Server) getCustomInitMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomInitMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomInitMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.InitCodeMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.InitCodeMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1028,7 +1086,7 @@ func (s *Server) getCustomInitMessageTexts(ctx context.Context, org string, lang
 func (s *Server) getCustomPasswordResetMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomPasswordResetMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomPasswordResetMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.PasswordResetMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.PasswordResetMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1053,7 +1111,7 @@ func (s *Server) getCustomPasswordResetMessageTexts(ctx context.Context, org str
 func (s *Server) getCustomVerifyEmailMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifyEmailMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomVerifyEmailMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyEmailMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyEmailMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1078,7 +1136,7 @@ func (s *Server) getCustomVerifyEmailMessageTexts(ctx context.Context, org strin
 func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifyPhoneMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomVerifyPhoneMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyPhoneMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyPhoneMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1103,7 +1161,7 @@ func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org strin
 func (s *Server) getCustomDomainClaimedMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomDomainClaimedMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomDomainClaimedMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1128,7 +1186,7 @@ func (s *Server) getCustomDomainClaimedMessageTexts(ctx context.Context, org str
 func (s *Server) getCustomPasswordlessRegistrationMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomPasswordlessRegistrationMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomPasswordlessRegistrationMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}

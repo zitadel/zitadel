@@ -17,7 +17,7 @@ message Project {
     zitadel.v1.ObjectDetails details = 2;
     string name = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADEL\""
+            example: "\"MyProject\""
         }
     ];
     ProjectState state = 4 [
@@ -25,11 +25,11 @@ message Project {
             description: "current state of the project";
         }
     ];
-    // describes if roles of user should be added in token
+    // describes if the roles of the user should be added to the token
     bool project_role_assertion = 5;
     // ZITADEL checks if the user has at least one on this project
     bool project_role_check = 6;
-    // ZITADEL checks if the org of the user has permission to this project
+    // ZITADEL checks if the org of the user has permission for this project
     bool has_project_check = 7;
     // Defines from where the private labeling should be triggered
     PrivateLabelingSetting private_labeling_setting = 8;
@@ -79,7 +79,7 @@ message GrantedProject {
     ];
     string project_owner_name = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"CAOS AG\""
+            example: "\"ZITADEL\""
         }
     ];
 

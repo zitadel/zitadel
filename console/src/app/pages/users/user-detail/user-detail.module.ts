@@ -1,18 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
+import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
+import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
+import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs';
+import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { QrCodeModule } from 'ng-qrcode';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
@@ -38,6 +37,10 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
+import { QRCodeModule } from 'angularx-qrcode';
+import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
+import { CountryCallingCodesService } from 'src/app/services/country-calling-codes.service';
 import { InfoRowModule } from '../../../modules/info-row/info-row.module';
 import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
@@ -52,9 +55,9 @@ import { ContactComponent } from './contact/contact.component';
 import { DetailFormMachineModule } from './detail-form-machine/detail-form-machine.module';
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { ExternalIdpsComponent } from './external-idps/external-idps.component';
-import { MetadataDialogComponent } from './metadata-dialog/metadata-dialog.component';
-import { MetadataComponent } from './metadata/metadata.component';
 import { PasswordComponent } from './password/password.component';
+import { PhoneDetailComponent } from './phone-detail/phone-detail.component';
+import { MachineSecretDialogComponent } from './user-detail/machine-secret-dialog/machine-secret-dialog.component';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
@@ -76,9 +79,10 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     DialogU2FComponent,
     DialogPasswordlessComponent,
     AuthFactorDialogComponent,
-    MetadataDialogComponent,
-    MetadataComponent,
+    PhoneDetailComponent,
+    MachineSecretDialogComponent,
   ],
+  providers: [CountryCallingCodesService],
   imports: [
     ChangesModule,
     CommonModule,
@@ -91,10 +95,11 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     DetailFormMachineModule,
     WarnDialogModule,
     MatDialogModule,
-    QrCodeModule,
+    QRCodeModule,
     ShowTokenDialogModule,
     MetaLayoutModule,
     MatCheckboxModule,
+    MetadataModule,
     TopViewModule,
     HasRolePipeModule,
     UserGrantsModule,
@@ -122,6 +127,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     InputModule,
     MachineKeysModule,
     InfoSectionModule,
+    MatSelectModule,
   ],
 })
 export class UserDetailModule {}

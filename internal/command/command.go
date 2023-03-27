@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/static"
@@ -110,6 +111,7 @@ func StartCommands(es *eventstore.Eventstore,
 	proj_repo.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
+	quota.RegisterEventMappers(repo.eventstore)
 
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
@@ -129,10 +131,36 @@ func StartCommands(es *eventstore.Eventstore,
 
 func AppendAndReduce(object interface {
 	AppendEvents(...eventstore.Event)
+	// TODO: Why is it allowed to return an error here?
 	Reduce() error
 }, events ...eventstore.Event) error {
 	object.AppendEvents(events...)
 	return object.Reduce()
+}
+
+func queryAndReduce(ctx context.Context, filter preparation.FilterToQueryReducer, wm eventstore.QueryReducer) error {
+	events, err := filter(ctx, wm.Query())
+	if err != nil {
+		return err
+	}
+	if len(events) == 0 {
+		return nil
+	}
+	wm.AppendEvents(events...)
+	return wm.Reduce()
+}
+
+type existsWriteModel interface {
+	Exists() bool
+	eventstore.QueryReducer
+}
+
+func exists(ctx context.Context, filter preparation.FilterToQueryReducer, wm existsWriteModel) (bool, error) {
+	err := queryAndReduce(ctx, filter, wm)
+	if err != nil {
+		return false, err
+	}
+	return wm.Exists(), nil
 }
 
 func (c *Commands) processWithLast(ctx context.Context, validation preparation.Validation) (*domain.ObjectDetails, error) {
@@ -150,7 +178,6 @@ func (c *Commands) processWithLast(ctx context.Context, validation preparation.V
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
-
 func (c *Commands) processWithFirst(ctx context.Context, validation preparation.Validation) (*domain.ObjectDetails, error) {
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
@@ -166,7 +193,6 @@ func (c *Commands) processWithFirst(ctx context.Context, validation preparation.
 		ResourceOwner: events[0].Aggregate().ResourceOwner,
 	}, nil
 }
-
 func (c *Commands) processWithID(ctx context.Context, validation preparation.Validation) (string, *domain.ObjectDetails, error) {
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {

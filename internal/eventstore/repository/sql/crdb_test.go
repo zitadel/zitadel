@@ -379,24 +379,28 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				}},
 		},
 		{
-			name: "push 1 event and add asset",
+			name: "push 1 event and remove instance unique constraints",
 			args: args{
 				ctx: context.Background(),
 				events: []*repository.Event{
 					generateEvent(t, "12"),
 				},
+				uniqueConstraints:    generateRemoveInstanceUniqueConstraints(t, "instanceID"),
+				uniqueDataType:       "usernames",
+				uniqueDataField:      "testremove",
+				uniqueDataInstanceID: "instanceID",
 			},
 			res: res{
 				wantErr: false,
 				eventsRes: eventsRes{
 					pushedEventsCount: 1,
-					assetCount:        1,
+					uniqueCount:       0,
 					aggID:             []string{"12"},
 					aggType:           repository.AggregateType(t.Name()),
 				}},
 		},
 		{
-			name: "push 1 event and remove asset",
+			name: "push 1 event and add asset",
 			args: args{
 				ctx: context.Background(),
 				events: []*repository.Event{
@@ -407,8 +411,25 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				wantErr: false,
 				eventsRes: eventsRes{
 					pushedEventsCount: 1,
-					assetCount:        0,
+					assetCount:        1,
 					aggID:             []string{"13"},
+					aggType:           repository.AggregateType(t.Name()),
+				}},
+		},
+		{
+			name: "push 1 event and remove asset",
+			args: args{
+				ctx: context.Background(),
+				events: []*repository.Event{
+					generateEvent(t, "14"),
+				},
+			},
+			res: res{
+				wantErr: false,
+				eventsRes: eventsRes{
+					pushedEventsCount: 1,
+					assetCount:        0,
+					aggID:             []string{"14"},
 					aggType:           repository.AggregateType(t.Name()),
 				}},
 		},
@@ -416,7 +437,10 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{
+					DB:       testCRDBClient,
+					Database: new(testDB),
+				},
 			}
 			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
 				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField, tt.args.uniqueDataInstanceID)
@@ -540,7 +564,10 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{
+					DB:       testCRDBClient,
+					Database: new(testDB),
+				},
 			}
 			if err := db.Push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
@@ -617,7 +644,7 @@ func TestCRDB_CreateInstance(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{DB: testCRDBClient},
 			}
 
 			if err := db.CreateInstance(context.Background(), tt.args.instanceID); (err != nil) != tt.res.wantErr {
@@ -755,7 +782,10 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{
+					DB:       testCRDBClient,
+					Database: new(testDB),
+				},
 			}
 			wg := sync.WaitGroup{}
 
@@ -876,7 +906,10 @@ func TestCRDB_Filter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{
+					DB:       testCRDBClient,
+					Database: new(testDB),
+				},
 			}
 
 			// setup initial data for query
@@ -966,7 +999,10 @@ func TestCRDB_LatestSequence(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{
+					DB:       testCRDBClient,
+					Database: new(testDB),
+				},
 			}
 
 			// setup initial data for query
@@ -1110,7 +1146,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{
+					DB:       testCRDBClient,
+					Database: new(testDB),
+				},
 			}
 			if err := db.Push(context.Background(), tt.args.events); err != nil {
 				t.Errorf("CRDB.Push() error = %v", err)
@@ -1197,6 +1236,16 @@ func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *re
 		UniqueField: uniqueField,
 		InstanceID:  "",
 		Action:      repository.UniqueConstraintRemoved,
+	}
+
+	return e
+}
+
+func generateRemoveInstanceUniqueConstraints(t *testing.T, instanceID string) *repository.UniqueConstraint {
+	t.Helper()
+	e := &repository.UniqueConstraint{
+		InstanceID: instanceID,
+		Action:     repository.UniqueConstraintInstanceRemoved,
 	}
 
 	return e

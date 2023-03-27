@@ -7,27 +7,65 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
+	message_pb "github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
-func FlowTypeToDomain(flowType action_pb.FlowType) domain.FlowType {
+// for backward compatability: old enum identifiers are mapped as well
+func FlowTypeToDomain(flowType string) domain.FlowType {
 	switch flowType {
-	case action_pb.FlowType_FLOW_TYPE_EXTERNAL_AUTHENTICATION:
+	case "FLOW_TYPE_EXTERNAL_AUTHENTICATION", domain.FlowTypeExternalAuthentication.ID():
 		return domain.FlowTypeExternalAuthentication
+	case domain.FlowTypeCustomiseToken.ID():
+		return domain.FlowTypeCustomiseToken
+	case domain.FlowTypeInternalAuthentication.ID():
+		return domain.FlowTypeInternalAuthentication
 	default:
 		return domain.FlowTypeUnspecified
 	}
 }
 
-func TriggerTypeToDomain(triggerType action_pb.TriggerType) domain.TriggerType {
+func FlowTypeToPb(typ domain.FlowType) *action_pb.FlowType {
+	return &action_pb.FlowType{
+		Id: typ.ID(),
+		Name: &message_pb.LocalizedMessage{
+			Key: typ.LocalizationKey(),
+		},
+	}
+}
+
+// TriggerTypeToDomain maps the pb type to domain
+// for backward compatability: old enum identifiers are mapped as well
+func TriggerTypeToDomain(triggerType string) domain.TriggerType {
 	switch triggerType {
-	case action_pb.TriggerType_TRIGGER_TYPE_POST_AUTHENTICATION:
+	case "TRIGGER_TYPE_POST_AUTHENTICATION", domain.TriggerTypePostAuthentication.ID():
 		return domain.TriggerTypePostAuthentication
-	case action_pb.TriggerType_TRIGGER_TYPE_PRE_CREATION:
+	case "TRIGGER_TYPE_PRE_CREATION", domain.TriggerTypePreCreation.ID():
 		return domain.TriggerTypePreCreation
-	case action_pb.TriggerType_TRIGGER_TYPE_POST_CREATION:
+	case "TRIGGER_TYPE_POST_CREATION", domain.TriggerTypePostCreation.ID():
 		return domain.TriggerTypePostCreation
+	case domain.TriggerTypePreAccessTokenCreation.ID():
+		return domain.TriggerTypePreAccessTokenCreation
+	case domain.TriggerTypePreUserinfoCreation.ID():
+		return domain.TriggerTypePreUserinfoCreation
 	default:
 		return domain.TriggerTypeUnspecified
+	}
+}
+
+func TriggerTypesToPb(types []domain.TriggerType) []*action_pb.TriggerType {
+	list := make([]*action_pb.TriggerType, len(types))
+	for i, typ := range types {
+		list[i] = TriggerTypeToPb(typ)
+	}
+	return list
+}
+
+func TriggerTypeToPb(typ domain.TriggerType) *action_pb.TriggerType {
+	return &action_pb.TriggerType{
+		Id: typ.ID(),
+		Name: &message_pb.LocalizedMessage{
+			Key: typ.LocalizationKey(),
+		},
 	}
 }
 
@@ -44,28 +82,6 @@ func TriggerActionToPb(trigger domain.TriggerType, actions []*query.Action) *act
 	return &action_pb.TriggerAction{
 		TriggerType: TriggerTypeToPb(trigger),
 		Actions:     ActionsToPb(actions),
-	}
-}
-
-func FlowTypeToPb(flowType domain.FlowType) action_pb.FlowType {
-	switch flowType {
-	case domain.FlowTypeExternalAuthentication:
-		return action_pb.FlowType_FLOW_TYPE_EXTERNAL_AUTHENTICATION
-	default:
-		return action_pb.FlowType_FLOW_TYPE_UNSPECIFIED
-	}
-}
-
-func TriggerTypeToPb(triggerType domain.TriggerType) action_pb.TriggerType {
-	switch triggerType {
-	case domain.TriggerTypePostAuthentication:
-		return action_pb.TriggerType_TRIGGER_TYPE_POST_AUTHENTICATION
-	case domain.TriggerTypePreCreation:
-		return action_pb.TriggerType_TRIGGER_TYPE_PRE_CREATION
-	case domain.TriggerTypePostCreation:
-		return action_pb.TriggerType_TRIGGER_TYPE_POST_CREATION
-	default:
-		return action_pb.TriggerType_TRIGGER_TYPE_UNSPECIFIED
 	}
 }
 
@@ -92,7 +108,7 @@ func ActionToPb(action *query.Action) *action_pb.Action {
 		State:         ActionStateToPb(action.State),
 		Name:          action.Name,
 		Script:        action.Script,
-		Timeout:       durationpb.New(action.Timeout),
+		Timeout:       durationpb.New(action.Timeout()),
 		AllowedToFail: action.AllowedToFail,
 	}
 }

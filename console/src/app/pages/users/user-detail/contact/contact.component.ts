@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Human, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 
@@ -15,6 +15,7 @@ export class ContactComponent {
   @Input() disablePhoneCode: boolean = false;
   @Input() canWrite: boolean | null = false;
   @Input() human?: Human.AsObject;
+  @Input() username: string = '';
   @Input() state!: UserState;
   @Output() editType: EventEmitter<EditDialogType> = new EventEmitter<EditDialogType>();
   @Output() resendEmailVerification: EventEmitter<void> = new EventEmitter<void>();

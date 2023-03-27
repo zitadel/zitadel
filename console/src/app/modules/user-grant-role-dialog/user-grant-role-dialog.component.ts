@@ -1,6 +1,8 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Role } from 'src/app/proto/generated/zitadel/project_pb';
+import {
+  MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+} from '@angular/material/legacy-dialog';
 
 @Component({
   selector: 'cnsl-user-grant-role-dialog',
@@ -12,7 +14,7 @@ export class UserGrantRoleDialogComponent {
   public grantId: string = '';
   public selectedRoleKeysList: string[] = [];
 
-  public selectedRoles: Role.AsObject[] = [];
+  public selectedRoleKeys: string[] = [];
 
   constructor(public dialogRef: MatDialogRef<UserGrantRoleDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.projectId = data.projectId;
@@ -20,8 +22,8 @@ export class UserGrantRoleDialogComponent {
     this.selectedRoleKeysList = data.selectedRoleKeysList;
   }
 
-  public selectRoles(selected: any): void {
-    this.selectedRoles = selected;
+  public selectRoles(selected: string[]): void {
+    this.selectedRoleKeys = selected;
   }
 
   public closeDialog(): void {
@@ -29,6 +31,6 @@ export class UserGrantRoleDialogComponent {
   }
 
   public closeDialogWithSuccess(): void {
-    this.dialogRef.close({ roles: this.selectedRoles.map((r) => r.key) });
+    this.dialogRef.close({ roles: this.selectedRoleKeys });
   }
 }

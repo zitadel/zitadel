@@ -17,6 +17,10 @@ import (
 	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
+var (
+	testNow = time.Now()
+)
+
 type testHandler struct {
 	cycleDuration time.Duration
 	processSleep  time.Duration
@@ -47,7 +51,7 @@ func (h *testHandler) Subscription() *v1.Subscription {
 	return nil
 }
 
-func (h *testHandler) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
+func (h *testHandler) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
 	if h.queryError != nil {
 		return nil, h.queryError
 	}
@@ -67,7 +71,7 @@ func (h *testHandler) OnError(event *models.Event, err error) error {
 	return err
 }
 
-func (h *testHandler) OnSuccess() error {
+func (h *testHandler) OnSuccess([]string) error {
 	return nil
 }
 
@@ -123,8 +127,9 @@ func TestSpooler_process(t *testing.T) {
 		currentHandler *testHandler
 	}
 	type args struct {
-		timeout time.Duration
-		events  []*models.Event
+		timeout     time.Duration
+		events      []*models.Event
+		instanceIDs []string
 	}
 	tests := []struct {
 		name        string
@@ -180,7 +185,7 @@ func TestSpooler_process(t *testing.T) {
 				start = time.Now()
 			}
 
-			if err := s.process(ctx, tt.args.events, "test"); (err != nil) != tt.wantErr {
+			if err := s.process(ctx, tt.args.events, "test", tt.args.instanceIDs); (err != nil) != tt.wantErr {
 				t.Errorf("Spooler.process() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.fields.currentHandler.maxErrCount != tt.wantRetries {
@@ -429,6 +434,7 @@ func TestHandleError(t *testing.T) {
 						FailureCount:   6,
 						ViewName:       "super.table",
 						InstanceID:     instanceID,
+						LastFailed:     testNow,
 					}, nil
 				},
 				errorCountUntilSkip: 5,
@@ -449,6 +455,7 @@ func TestHandleError(t *testing.T) {
 						FailureCount:   5,
 						ViewName:       "super.table",
 						InstanceID:     instanceID,
+						LastFailed:     testNow,
 					}, nil
 				},
 				errorCountUntilSkip: 6,
@@ -469,6 +476,7 @@ func TestHandleError(t *testing.T) {
 						FailureCount:   3,
 						ViewName:       "super.table",
 						InstanceID:     instanceID,
+						LastFailed:     testNow,
 					}, nil
 				},
 				errorCountUntilSkip: 5,

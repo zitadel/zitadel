@@ -37,6 +37,7 @@ type AuthRequest struct {
 	RequestedOrgID           string
 	RequestedOrgName         string
 	RequestedPrimaryDomain   string
+	RequestedOrgDomain       bool
 	ApplicationResourceOwner string
 	PrivateLabelingSetting   PrivateLabelingSetting
 	SelectedIDPConfigID      string
@@ -64,10 +65,10 @@ type ExternalUser struct {
 	FirstName         string
 	LastName          string
 	NickName          string
-	Email             string
+	Email             EmailAddress
 	IsEmailVerified   bool
 	PreferredLanguage language.Tag
-	Phone             string
+	Phone             PhoneNumber
 	IsPhoneVerified   bool
 	Metadatas         []*Metadata
 }
@@ -139,6 +140,13 @@ func (a *AuthRequest) SetUserInfo(userID, userName, loginName, displayName, avat
 	a.UserOrgID = userOrgID
 }
 
+func (a *AuthRequest) SetOrgInformation(id, name, primaryDomain string, requestedByDomain bool) {
+	a.RequestedOrgID = id
+	a.RequestedOrgName = name
+	a.RequestedPrimaryDomain = primaryDomain
+	a.RequestedOrgDomain = requestedByDomain
+}
+
 func (a *AuthRequest) MFALevel() MFALevel {
 	return -1
 	//PLANNED: check a.PossibleLOAs (and Prompt Login?)
@@ -159,6 +167,18 @@ func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
 		for _, scope := range request.Scopes {
 			if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
 				return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
+			}
+		}
+	}
+	return ""
+}
+
+func (a *AuthRequest) GetScopeOrgID() string {
+	switch request := a.Request.(type) {
+	case *AuthRequestOIDC:
+		for _, scope := range request.Scopes {
+			if strings.HasPrefix(scope, OrgIDScope) {
+				return strings.TrimPrefix(scope, OrgIDScope)
 			}
 		}
 	}

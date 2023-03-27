@@ -58,11 +58,11 @@ func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 			AvatarUrl:         domain.AvatarURL(assetPrefix, owner, view.AvatarKey),
 		},
 		Email: &user_pb.Email{
-			Email:           view.Email,
+			Email:           string(view.Email),
 			IsEmailVerified: view.IsEmailVerified,
 		},
 		Phone: &user_pb.Phone{
-			Phone:           view.Phone,
+			Phone:           string(view.Phone),
 			IsPhoneVerified: view.IsPhoneVerified,
 		},
 	}
@@ -70,8 +70,10 @@ func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 
 func MachineToPb(view *query.Machine) *user_pb.Machine {
 	return &user_pb.Machine{
-		Name:        view.Name,
-		Description: view.Description,
+		Name:            view.Name,
+		Description:     view.Description,
+		HasSecret:       view.HasSecret,
+		AccessTokenType: AccessTokenTypeToPb(view.AccessTokenType),
 	}
 }
 
@@ -89,7 +91,7 @@ func ProfileToPb(profile *query.Profile, assetPrefix string) *user_pb.Profile {
 
 func EmailToPb(email *query.Email) *user_pb.Email {
 	return &user_pb.Email{
-		Email:           email.Email,
+		Email:           string(email.Email),
 		IsEmailVerified: email.IsVerified,
 	}
 }
@@ -103,7 +105,7 @@ func PhoneToPb(phone *query.Phone) *user_pb.Phone {
 
 func ModelEmailToPb(email *query.Email) *user_pb.Email {
 	return &user_pb.Email{
-		Email:           email.Email,
+		Email:           string(email.Email),
 		IsEmailVerified: email.IsVerified,
 	}
 }
@@ -123,6 +125,17 @@ func GenderToDomain(gender user_pb.Gender) domain.Gender {
 		return domain.GenderMale
 	case user_pb.Gender_GENDER_FEMALE:
 		return domain.GenderFemale
+	default:
+		return -1
+	}
+}
+
+func AccessTokenTypeToDomain(accessTokenType user_pb.AccessTokenType) domain.OIDCTokenType {
+	switch accessTokenType {
+	case user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER:
+		return domain.OIDCTokenTypeBearer
+	case user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_JWT:
+		return domain.OIDCTokenTypeJWT
 	default:
 		return -1
 	}
@@ -157,6 +170,17 @@ func GenderToPb(gender domain.Gender) user_pb.Gender {
 		return user_pb.Gender_GENDER_MALE
 	default:
 		return user_pb.Gender_GENDER_UNSPECIFIED
+	}
+}
+
+func AccessTokenTypeToPb(accessTokenType domain.OIDCTokenType) user_pb.AccessTokenType {
+	switch accessTokenType {
+	case domain.OIDCTokenTypeBearer:
+		return user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER
+	case domain.OIDCTokenTypeJWT:
+		return user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_JWT
+	default:
+		return user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER
 	}
 }
 

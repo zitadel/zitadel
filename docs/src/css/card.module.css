@@ -1,17 +1,19 @@
 .card {
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
   min-width: 200px;
   background: var(--card-background);
   padding: 1rem;
   text-decoration: none;
-  transition: all .2 ease-in-out;
+  transition: all 0.2 ease-in-out;
+  border: 1px solid var(--card-border);
 }
 
 .card:hover {
   text-decoration: none;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .card p {
@@ -25,8 +27,9 @@
   background-size: cover;
   object-fit: contain;
   background-position: center;
-  padding: .5rem 0;
+  padding: 0.5rem 0;
   pointer-events: none;
+  box-shadow: none !important;
 }
 
 .fillspace {
@@ -40,7 +43,7 @@
 
 .bottomicon {
   width: 24px;
-  margin-right: .5rem;
+  margin-right: 0.5rem;
   color: var(--ifm-font-color-base);
 }
 

@@ -31,7 +31,7 @@ func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant
 
 func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (command eventstore.Command, _ *UserGrantWriteModel, err error) {
 	if !userGrant.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0fs", "Errors.UserGrant.Invalid")
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-kVfMa", "Errors.UserGrant.Invalid")
 	}
 	err = c.checkUserGrantPreCondition(ctx, userGrant, resourceOwner)
 	if err != nil {

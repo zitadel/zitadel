@@ -3,7 +3,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
-import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -89,8 +88,8 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  public selectRoles(roles: Role.AsObject[]): void {
-    this.rolesKeyList = roles.map((role) => role.key);
+  public selectRoles(roles: string[]): void {
+    this.rolesKeyList = roles;
   }
 
   public next(): void {

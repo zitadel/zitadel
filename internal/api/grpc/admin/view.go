@@ -3,17 +3,25 @@ package admin
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func (s *Server) ListViews(ctx context.Context, _ *admin_pb.ListViewsRequest) (*admin_pb.ListViewsResponse, error) {
-	currentSequences, err := s.query.SearchCurrentSequences(ctx, new(query.CurrentSequencesSearchQueries))
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceIDQuery, err := query.NewCurrentSequencesInstanceIDSearchQuery(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	currentSequences, err := s.query.SearchCurrentSequences(ctx, &query.CurrentSequencesSearchQueries{
+		Queries: []query.SearchQuery{instanceIDQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
 	convertedCurrentSequences := CurrentSequencesToPb(s.database, currentSequences)
-	views, err := s.administrator.GetViews()
+	views, err := s.administrator.GetViews(instanceID)
 	if err != nil {
 		return nil, err
 	}

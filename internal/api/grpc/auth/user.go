@@ -11,13 +11,15 @@ import (
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*auth_pb.GetMyUserResponse, error) {
-	user, err := s.query.GetUserByID(ctx, true, authz.GetCtxData(ctx).UserID)
+	user, err := s.query.GetUserByID(ctx, true, authz.GetCtxData(ctx).UserID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +33,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID}}
-	grants, err := s.query.UserGrants(ctx, queries)
+	grants, err := s.query.UserGrants(ctx, queries, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +44,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 	}
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{userQuery},
-	})
+	}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -56,13 +58,38 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 }
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
-	sequence, limit, asc := change.ChangeQueryToQuery(req.Query)
-	changes, err := s.query.UserChanges(ctx, authz.GetCtxData(ctx).UserID, sequence, limit, asc, s.auditLogRetention)
+	var (
+		limit    uint64
+		sequence uint64
+		asc      bool
+	)
+	if req.Query != nil {
+		limit = uint64(req.Query.Limit)
+		sequence = req.Query.Sequence
+		asc = req.Query.Asc
+	}
+
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AllowTimeTravel().
+		Limit(limit).
+		OrderDesc().
+		ResourceOwner(authz.GetCtxData(ctx).ResourceOwner).
+		AddQuery().
+		SequenceGreater(sequence).
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(authz.GetCtxData(ctx).UserID).
+		Builder()
+	if asc {
+		query.OrderAsc()
+	}
+
+	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
+
 	return &auth_pb.ListMyUserChangesResponse{
-		Result: change.ChangesToPb(changes.Changes, s.assetsAPIDomain(ctx)),
+		Result: change.EventsToChangesPb(changes, s.assetsAPIDomain(ctx)),
 	}, nil
 }
 
@@ -71,7 +98,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, authz.GetCtxData(ctx).UserID, queries)
+	res, err := s.query.SearchUserMetadata(ctx, true, authz.GetCtxData(ctx).UserID, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +109,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 }
 
 func (s *Server) GetMyMetadata(ctx context.Context, req *auth_pb.GetMyMetadataRequest) (*auth_pb.GetMyMetadataResponse, error) {
-	data, err := s.query.GetUserMetadataByKey(ctx, true, authz.GetCtxData(ctx).UserID, req.Key)
+	data, err := s.query.GetUserMetadataByKey(ctx, true, authz.GetCtxData(ctx).UserID, req.Key, false)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +152,7 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.UserGrants(ctx, queries)
+	res, err := s.query.UserGrants(ctx, queries, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +181,7 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 			return nil, err
 		}
 
-		grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantProjectID, userGrantUserID}})
+		grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantProjectID, userGrantUserID}}, false, false)
 		if err != nil {
 			return nil, err
 		}
@@ -210,7 +237,7 @@ func (s *Server) myOrgsQuery(ctx context.Context, ctxData authz.CtxData) (*query
 	}
 	return s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{userQuery},
-	})
+	}, false)
 }
 
 func isIAMAdmin(memberships []*query.Membership) bool {

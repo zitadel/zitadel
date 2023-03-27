@@ -3,6 +3,7 @@ package setup
 import (
 	"bytes"
 	"strings"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
@@ -15,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 type Config struct {
@@ -28,6 +30,7 @@ type Config struct {
 	EncryptionKeys  *encryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
+	Projections     projection.Config
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -37,6 +40,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 		)),
@@ -52,10 +56,15 @@ func MustNewConfig(v *viper.Viper) *Config {
 }
 
 type Steps struct {
-	s1ProjectionTable   *ProjectionTable
-	s2AssetsTable       *AssetTable
-	FirstInstance       *FirstInstance
-	s4EventstoreIndexes *EventstoreIndexes
+	s1ProjectionTable    *ProjectionTable
+	s2AssetsTable        *AssetTable
+	FirstInstance        *FirstInstance
+	s4EventstoreIndexes  *EventstoreIndexesNew
+	s5LastFailed         *LastFailed
+	s6OwnerRemoveColumns *OwnerRemoveColumns
+	s7LogstoreTables     *LogstoreTables
+	s8AuthTokens         *AuthTokenIndexes
+	s9EventstoreIndexes2 *EventstoreIndexesNew
 }
 
 type encryptionKeyConfig struct {
@@ -83,6 +92,7 @@ func MustNewSteps(v *viper.Viper) *Steps {
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 		)),
 	)

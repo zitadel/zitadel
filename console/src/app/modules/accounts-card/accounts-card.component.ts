@@ -51,7 +51,6 @@ export class AccountsCardComponent implements OnInit {
         login_hint: loginHint,
       },
     };
-    (configWithPrompt as any).customQueryParams['login_hint'] = loginHint;
     this.authService.authenticate(configWithPrompt);
   }
 
@@ -65,6 +64,9 @@ export class AccountsCardComponent implements OnInit {
   }
 
   public logout(): void {
+    const lP = JSON.stringify(this.userService.labelpolicy.getValue());
+    localStorage.setItem('labelPolicyOnSignout', lP);
+
     this.authService.signout();
     this.closedCard.emit();
   }

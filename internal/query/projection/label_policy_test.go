@@ -23,7 +23,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.reduceAdded",
+			name: "org reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyAddedEventType),
@@ -36,11 +36,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
+							expectedStmt: "INSERT INTO projections.label_policies2 (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -68,7 +67,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceChanged",
+			name: "org reduceChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyChangedEventType),
@@ -81,11 +80,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (state = $8)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (state = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -95,6 +93,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 								"#ffffff",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -102,7 +101,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceRemoved",
+			name: "org reduceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyRemovedEventType),
@@ -115,11 +114,37 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.label_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.label_policies2 WHERE (id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(LabelPolicyInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.label_policies2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -129,7 +154,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceActivated",
+			name: "org reduceActivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyActivatedEventType),
@@ -142,11 +167,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5 AND copy_table.instance_id = $6 ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url)",
+							expectedStmt: "INSERT INTO projections.label_policies2 (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies2 AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5 AND copy_table.instance_id = $6 ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -161,7 +185,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceLogoAdded light",
+			name: "org reduceLogoAdded light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyLogoAddedEventType),
@@ -174,17 +198,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/logo.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -192,7 +216,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceLogoAdded dark",
+			name: "org reduceLogoAdded dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyLogoDarkAddedEventType),
@@ -205,17 +229,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/logo.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -223,7 +247,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceIconAdded light",
+			name: "org reduceIconAdded light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyIconAddedEventType),
@@ -236,17 +260,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/icon.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -254,7 +278,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceIconAdded dark",
+			name: "org reduceIconAdded dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyIconDarkAddedEventType),
@@ -267,17 +291,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/icon.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -285,7 +309,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceLogoRemoved light",
+			name: "org reduceLogoRemoved light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyLogoRemovedEventType),
@@ -298,17 +322,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -316,7 +340,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceLogoRemoved dark",
+			name: "org reduceLogoRemoved dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyLogoDarkRemovedEventType),
@@ -329,17 +353,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -347,7 +371,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceIconRemoved light",
+			name: "org reduceIconRemoved light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyIconRemovedEventType),
@@ -360,17 +384,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -378,7 +402,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceIconRemoved dark",
+			name: "org reduceIconRemoved dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyIconDarkRemovedEventType),
@@ -391,17 +415,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -409,7 +433,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceFontAdded",
+			name: "org reduceFontAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyFontAddedEventType),
@@ -422,17 +446,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/font.ttf",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -440,7 +464,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceFontRemoved",
+			name: "org reduceFontRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyFontRemovedEventType),
@@ -453,17 +477,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -471,7 +495,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceAssetsRemoved",
+			name: "org reduceAssetsRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LabelPolicyAssetsRemovedEventType),
@@ -484,11 +508,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9) AND (instance_id = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -499,6 +522,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -506,7 +530,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceAdded",
+			name: "instance reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyAddedEventType),
@@ -519,11 +543,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
+							expectedStmt: "INSERT INTO projections.label_policies2 (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -551,7 +574,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceChanged",
+			name: "instance reduceChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyChangedEventType),
@@ -564,11 +587,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (id = $14) AND (state = $15)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (id = $14) AND (state = $15) AND (instance_id = $16)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -585,6 +607,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 								true,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -592,7 +615,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceActivated",
+			name: "instance reduceActivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyActivatedEventType),
@@ -605,11 +628,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5 AND copy_table.instance_id = $6 ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url)",
+							expectedStmt: "INSERT INTO projections.label_policies2 (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies2 AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5 AND copy_table.instance_id = $6 ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -624,7 +646,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceLogoAdded light",
+			name: "instance reduceLogoAdded light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyLogoAddedEventType),
@@ -637,17 +659,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/logo.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -655,7 +677,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceLogoAdded dark",
+			name: "instance reduceLogoAdded dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyLogoDarkAddedEventType),
@@ -668,17 +690,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/logo.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -686,7 +708,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceIconAdded light",
+			name: "instance reduceIconAdded light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyIconAddedEventType),
@@ -699,17 +721,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/icon.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -717,7 +739,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceIconAdded dark",
+			name: "instance reduceIconAdded dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyIconDarkAddedEventType),
@@ -730,17 +752,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/icon.png",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -748,7 +770,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceLogoRemoved light",
+			name: "instance reduceLogoRemoved light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyLogoRemovedEventType),
@@ -761,17 +783,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -779,7 +801,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceLogoRemoved dark",
+			name: "instance reduceLogoRemoved dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyLogoDarkRemovedEventType),
@@ -792,17 +814,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -810,7 +832,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceIconRemoved light",
+			name: "instance reduceIconRemoved light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyIconRemovedEventType),
@@ -823,17 +845,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -841,7 +863,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceIconRemoved dark",
+			name: "instance reduceIconRemoved dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyIconDarkRemovedEventType),
@@ -854,17 +876,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -872,7 +894,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceFontAdded",
+			name: "instance reduceFontAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyFontAddedEventType),
@@ -885,17 +907,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"/path/to/font.ttf",
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -903,7 +925,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceFontRemoved",
+			name: "instance reduceFontRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyFontRemovedEventType),
@@ -916,17 +938,17 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -934,7 +956,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceAssetsRemoved",
+			name: "instance reduceAssetsRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyAssetsRemovedEventType),
@@ -947,11 +969,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9)",
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9) AND (instance_id = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -962,6 +983,37 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&labelPolicyProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.label_policies2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -979,7 +1031,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, LabelPolicyTable, tt.want)
 		})
 	}
 }

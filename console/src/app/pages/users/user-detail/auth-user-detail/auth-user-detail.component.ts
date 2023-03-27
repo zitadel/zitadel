@@ -1,20 +1,28 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Validators } from '@angular/forms';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Buffer } from 'buffer';
 import { Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
+import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
+import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
+import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
+import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
 @Component({
@@ -25,29 +33,36 @@ import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.c
 export class AuthUserDetailComponent implements OnDestroy {
   public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'fr', 'it', 'zh'];
+  public languages: string[] = ['de', 'en', 'fr', 'it', 'ja', 'pl', 'zh'];
 
   private subscription: Subscription = new Subscription();
 
   public loading: boolean = false;
+  public loadingMetadata: boolean = false;
 
   public ChangeType: any = ChangeType;
   public userLoginMustBeDomain: boolean = false;
   public UserState: any = UserState;
 
-  public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
+  public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.AUTHUSER;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
+
+  public metadata: Metadata.AsObject[] = [];
 
   public settingsList: SidenavSetting[] = [
     { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
+    { id: 'security', i18nKey: 'USER.SETTINGS.SECURITY' },
     { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' },
-    { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS' },
-    { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA' },
     { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' },
     { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' },
-    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA' },
+    {
+      id: 'metadata',
+      i18nKey: 'USER.SETTINGS.METADATA',
+      requiredRoles: { [PolicyComponentServiceType.MGMT]: ['user.read'] },
+    },
   ];
   public currentSetting: string | undefined = this.settingsList[0].id;
+  public loginPolicy?: LoginPolicy.AsObject;
 
   constructor(
     public translate: TranslateService,
@@ -55,6 +70,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public userService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
+    private mgmt: ManagementService,
     private breadcrumbService: BreadcrumbService,
     private mediaMatcher: MediaMatcher,
     private _location: Location,
@@ -82,6 +98,12 @@ export class AuthUserDetailComponent implements OnDestroy {
     this.userService.getSupportedLanguages().then((lang) => {
       this.languages = lang.languagesList;
     });
+
+    this.userService.getMyLoginPolicy().then((policy) => {
+      if (policy.policy) {
+        this.loginPolicy = policy.policy;
+      }
+    });
   }
 
   private changeSelection(small: boolean): void {
@@ -103,6 +125,8 @@ export class AuthUserDetailComponent implements OnDestroy {
       .then((resp) => {
         if (resp.user) {
           this.user = resp.user;
+
+          this.loadMetadata();
 
           this.breadcrumbService.setBreadcrumb([
             new Breadcrumb({
@@ -250,6 +274,9 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public savePhone(phone: string): void {
     if (this.user?.human) {
+      // Format phone before save (add +)
+      phone = formatPhone(phone).phone;
+
       this.userService
         .setMyPhone(phone)
         .then(() => {
@@ -279,6 +306,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user?.human?.phone?.phone,
             type: type,
+            validator: Validators.compose([phoneValidator, requiredValidator]),
           },
           width: '400px',
         });
@@ -336,5 +364,50 @@ export class AuthUserDetailComponent implements OnDestroy {
           });
       }
     });
+  }
+
+  public loadMetadata(): void {
+    if (this.user) {
+      this.userService.isAllowed(['user.read']).subscribe((allowed) => {
+        if (allowed) {
+          this.loadingMetadata = true;
+          this.mgmt
+            .listUserMetadata(this.user?.id ?? '')
+            .then((resp) => {
+              this.loadingMetadata = false;
+              this.metadata = resp.resultList.map((md) => {
+                return {
+                  key: md.key,
+                  value: Buffer.from(md.value as string, 'base64').toString('ascii'),
+                };
+              });
+            })
+            .catch((error) => {
+              this.loadingMetadata = false;
+              this.toast.showError(error);
+            });
+        }
+      });
+    }
+  }
+
+  public editMetadata(): void {
+    if (this.user && this.user.id) {
+      const setFcn = (key: string, value: string): Promise<any> =>
+        this.mgmt.setUserMetadata(key, Buffer.from(value).toString('base64'), this.user?.id ?? '');
+      const removeFcn = (key: string): Promise<any> => this.mgmt.removeUserMetadata(key, this.user?.id ?? '');
+
+      const dialogRef = this.dialog.open(MetadataDialogComponent, {
+        data: {
+          metadata: this.metadata,
+          setFcn: setFcn,
+          removeFcn: removeFcn,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.loadMetadata();
+      });
+    }
   }
 }

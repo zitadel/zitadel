@@ -12,37 +12,44 @@ message MessageCustomText {
     zitadel.v1.ObjectDetails details = 1;
     string title = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email title"
+            description: "custom text for email title";
+            example: "\"ZITADEL - Message Title\"";
         }
     ];
     string pre_header = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email pre header"
+            description: "custom text for email pre-header";
+            example: "\"User Message\"";
         }
     ];
     string subject = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email subject"
+            description: "custom text for email subject";
+            example: "\"Message Subject\"";
         }
     ];
     string greeting = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "custom text for email greeting"
+            example: "\"Hello {{.FirstName}} {{.LastName}},\"";
         }
     ];
     string text = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "custom text for email text"
+            example: "\"This is my custom message Text. I can also include some fields, depending on the message type I want to send. {{.FirstName}} {{.LastName}},\"";
         }
     ];
     string button_text = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email button_text"
+            description: "custom text for email button_text";
+            example: "\"Call to action\"";
         }
     ];
     string footer_text = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "custom text for email footer_text"
+            description: "custom text for email footer_text";
+            example: "\"\"";
         }
     ];
     bool is_default = 9;
@@ -283,11 +290,12 @@ message RegistrationOptionScreenText {
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string user_name_button_text = 3 [(validate.rules).string = {max_len: 200}];
     string external_login_description = 4 [(validate.rules).string = {max_len: 500}];
+    string login_button_text = 5 [(validate.rules).string = {max_len: 200}];
 }
 
 message RegistrationUserScreenText {
-    reserved 14, 16, 17, 19;
-    reserved "tos_link", "privacy_confirm", "privacy_link", "external_login_description";
+    reserved 14, 17, 19, 22;
+    reserved "tos_link", "privacy_link", "external_login_description", "tos_confirm_and";
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string description_org_register = 3 [(validate.rules).string = {max_len: 500}];
@@ -302,13 +310,15 @@ message RegistrationUserScreenText {
     string tos_and_privacy_label = 12 [(validate.rules).string = {max_len: 200}];
     string tos_confirm = 13 [(validate.rules).string = {max_len: 200}];
     string tos_link_text = 15 [(validate.rules).string = {max_len: 200}];
+    string privacy_confirm = 16 [(validate.rules).string = {max_len: 200}];
     string privacy_link_text = 18 [(validate.rules).string = {max_len: 200}];
     string next_button_text = 20 [(validate.rules).string = {max_len: 200}];
     string back_button_text = 21 [(validate.rules).string = {max_len: 200}];
-    string tos_confirm_and = 22 [(validate.rules).string = {max_len: 200}];
 }
 
 message ExternalRegistrationUserOverviewScreenText {
+    reserved 13;
+    reserved "tos_confirm_and";
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string email_label = 3 [(validate.rules).string = {max_len: 200}];
@@ -321,15 +331,15 @@ message ExternalRegistrationUserOverviewScreenText {
     string tos_and_privacy_label = 10 [(validate.rules).string = {max_len: 200}];
     string tos_confirm = 11 [(validate.rules).string = {max_len: 200}];
     string tos_link_text = 12 [(validate.rules).string = {max_len: 200}];
-    string tos_confirm_and = 13 [(validate.rules).string = {max_len: 200}];
     string privacy_link_text = 14 [(validate.rules).string = {max_len: 200}];
     string back_button_text = 15 [(validate.rules).string = {max_len: 200}];
     string next_button_text = 16 [(validate.rules).string = {max_len: 200}];
+    string privacy_confirm = 17 [(validate.rules).string = {max_len: 200}];
 }
 
 message RegistrationOrgScreenText {
-    reserved 13, 15, 16, 18;
-    reserved "tos_link", "privacy_confirm", "privacy_link", "external_login_description";
+    reserved 13, 16, 18, 20;
+    reserved "tos_link", "privacy_link", "external_login_description", "tos_confirm_and";
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string orgname_label = 3 [(validate.rules).string = {max_len: 200}];
@@ -342,9 +352,9 @@ message RegistrationOrgScreenText {
     string tos_and_privacy_label = 11 [(validate.rules).string = {max_len: 200}];
     string tos_confirm = 12 [(validate.rules).string = {max_len: 200}];
     string tos_link_text = 14 [(validate.rules).string = {max_len: 200}];
+    string privacy_confirm = 15 [(validate.rules).string = {max_len: 200}];
     string privacy_link_text = 17 [(validate.rules).string = {max_len: 200}];
     string save_button_text = 19 [(validate.rules).string = {max_len: 200}];
-    string tos_confirm_and = 20 [(validate.rules).string = {max_len: 200}];
 }
 
 message LinkingUserDoneScreenText {
@@ -355,6 +365,8 @@ message LinkingUserDoneScreenText {
 }
 
 message ExternalUserNotFoundScreenText {
+    reserved 9;
+    reserved "tos_confirm_and";
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
     string link_button_text = 3 [(validate.rules).string = {max_len: 100}];
@@ -363,12 +375,12 @@ message ExternalUserNotFoundScreenText {
     string tos_confirm = 6 [(validate.rules).string = {max_len: 200}];
     string tos_link_text = 7 [(validate.rules).string = {max_len: 200}];
     string privacy_link_text = 8 [(validate.rules).string = {max_len: 200}];
-    string tos_confirm_and = 9 [(validate.rules).string = {max_len: 200}];
+    string privacy_confirm = 10 [(validate.rules).string = {max_len: 200}];
 }
 
 message SuccessLoginScreenText {
     string title = 1 [(validate.rules).string = {max_len: 200}];
-    // Text to describe that auto redirect should happen after successful login
+    // Text to describe that auto-redirect should happen after successful login
     string auto_redirect_description = 2 [(validate.rules).string = {max_len: 500}];
     // Text to describe that the window can be closed after redirect
     string redirected_description = 3 [(validate.rules).string = {max_len: 100}];

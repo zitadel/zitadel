@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Subscription } from 'rxjs';
 import {
   AddCustomDomainPolicyRequest,
@@ -79,7 +79,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
       case PolicyComponentServiceType.MGMT:
         return this.managementService.getDomainPolicy();
       case PolicyComponentServiceType.ADMIN:
-        return this.adminService.getCustomDomainPolicy(this.org.id);
+        return this.adminService.getDomainPolicy();
       default:
         return Promise.reject();
     }

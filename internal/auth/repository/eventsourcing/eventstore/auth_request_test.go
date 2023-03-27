@@ -132,7 +132,7 @@ type mockLoginPolicy struct {
 	policy *query.LoginPolicy
 }
 
-func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, _ bool, id string) (*query.LoginPolicy, error) {
+func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, _ bool, id string, _ bool) (*query.LoginPolicy, error) {
 	return m.policy, nil
 }
 
@@ -140,7 +140,7 @@ type mockLockoutPolicy struct {
 	policy *query.LockoutPolicy
 }
 
-func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error) {
+func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string, bool) (*query.LockoutPolicy, error) {
 	return m.policy, nil
 }
 
@@ -174,7 +174,7 @@ func (m *mockViewOrg) OrgByID(context.Context, bool, string) (*query.Org, error)
 	}, nil
 }
 
-func (m *mockViewOrg) OrgByDomainGlobal(context.Context, string) (*query.Org, error) {
+func (m *mockViewOrg) OrgByPrimaryDomain(context.Context, string) (*query.Org, error) {
 	return &query.Org{
 		State: m.State,
 	}, nil
@@ -186,7 +186,7 @@ func (m *mockViewErrOrg) OrgByID(context.Context, bool, string) (*query.Org, err
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
-func (m *mockViewErrOrg) OrgByDomainGlobal(context.Context, string) (*query.Org, error) {
+func (m *mockViewErrOrg) OrgByPrimaryDomain(context.Context, string) (*query.Org, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
@@ -195,7 +195,7 @@ type mockUserGrants struct {
 	userGrants int
 }
 
-func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
+func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string, _ bool) (*query.Project, error) {
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
@@ -212,7 +212,7 @@ type mockProject struct {
 	projectCheck bool
 }
 
-func (m *mockProject) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
+func (m *mockProject) ProjectByClientID(ctx context.Context, s string, _ bool) (*query.Project, error) {
 	return &query.Project{HasProjectCheck: m.projectCheck}, nil
 }
 
@@ -227,11 +227,19 @@ type mockApp struct {
 	app *query.App
 }
 
-func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string) (*query.App, error) {
+func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string, _ bool) (*query.App, error) {
 	if m.app != nil {
 		return m.app, nil
 	}
 	return nil, errors.ThrowNotFound(nil, "ERROR", "error")
+}
+
+type mockIDPUserLinks struct {
+	idps []*query.IDPUserLink
+}
+
+func (m *mockIDPUserLinks) IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery, withOwnerRemoved bool) (*query.IDPUserLinks, error) {
+	return &query.IDPUserLinks{Links: m.idps}, nil
 }
 
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
@@ -247,6 +255,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		applicationProvider     applicationProvider
 		loginPolicyProvider     loginPolicyViewProvider
 		lockoutPolicyProvider   lockoutPolicyViewProvider
+		idpUserLinksProvider    idpUserLinksProvider
 	}
 	type args struct {
 		request       *domain.AuthRequest
@@ -498,6 +507,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			[]domain.NextStep{&domain.PasswordStep{}},
@@ -515,6 +525,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
@@ -535,6 +546,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			[]domain.NextStep{&domain.InitUserStep{
@@ -561,6 +573,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						MultiFactorCheckLifetime: 10 * time.Hour,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
 			[]domain.NextStep{&domain.PasswordlessRegistrationPromptStep{}},
@@ -585,6 +598,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						MultiFactorCheckLifetime: 10 * time.Hour,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
 			[]domain.NextStep{&domain.PasswordlessStep{}},
@@ -610,6 +624,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						MultiFactorCheckLifetime: 10 * time.Hour,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
 			[]domain.NextStep{&domain.PasswordlessStep{PasswordSet: true}},
@@ -635,7 +650,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID: "UserID",
@@ -661,14 +677,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			[]domain.NextStep{&domain.InitPasswordStep{}},
 			nil,
 		},
 		{
-			"external user (no external verification), external login step",
+			"external user (idp selected, no external verification), external login step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
 					SecondFactorVerification: testNow.Add(-5 * time.Minute),
@@ -689,10 +706,45 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						SecondFactorCheckLifetime: 18 * time.Hour,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID:              "UserID",
 				SelectedIDPConfigID: "IDPConfigID",
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				}}, false},
+			[]domain.NextStep{&domain.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
+			nil,
+		},
+		{
+			"external user (only idp available, no external verification), external login step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						SecondFactorCheckLifetime: 18 * time.Hour,
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					idps: []*query.IDPUserLink{{IDPID: "IDPConfigID"}},
+				},
+			},
+			args{&domain.AuthRequest{
+				UserID: "UserID",
 				LoginPolicy: &domain.LoginPolicy{
 					SecondFactorCheckLifetime: 18 * time.Hour,
 				}}, false},
@@ -720,6 +772,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{
 				&domain.AuthRequest{
@@ -754,6 +807,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						PasswordCheckLifetime: 10 * 24 * time.Hour,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			[]domain.NextStep{&domain.PasswordStep{}},
@@ -781,6 +835,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{
 				&domain.AuthRequest{
@@ -814,6 +869,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{
 				&domain.AuthRequest{
@@ -847,6 +903,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{
 				&domain.AuthRequest{
@@ -881,6 +938,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{
 				&domain.AuthRequest{
@@ -918,6 +976,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{
 				&domain.AuthRequest{
@@ -949,6 +1008,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID: "UserID",
@@ -980,6 +1040,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID: "UserID",
@@ -1014,6 +1075,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
@@ -1049,6 +1111,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
@@ -1085,6 +1148,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
@@ -1123,6 +1187,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
@@ -1162,6 +1227,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
@@ -1200,6 +1266,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
@@ -1239,6 +1306,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
@@ -1274,8 +1342,9 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						SecondFactorCheckLifetime: 18 * time.Hour,
 					},
 				},
-				userEventProvider: &mockEventUser{},
-				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				userEventProvider:    &mockEventUser{},
+				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{
 				&domain.AuthRequest{
@@ -1306,6 +1375,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
 			args{
 				&domain.AuthRequest{
@@ -1336,6 +1406,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				ApplicationProvider:       tt.fields.applicationProvider,
 				LoginPolicyViewProvider:   tt.fields.loginPolicyProvider,
 				LockoutPolicyViewProvider: tt.fields.lockoutPolicyProvider,
+				IDPUserLinksProvider:      tt.fields.idpUserLinksProvider,
 			}
 			got, err := repo.nextSteps(context.Background(), tt.args.request, tt.args.checkLoggedIn)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {

@@ -43,22 +43,10 @@ If you like to trigger your settings for your applications you have different po
 
 ### 1. Primary Domain Scope
 
-Send a [primary domain scope](../../../apis/openidoauth/scopes) with your [authorization request](../../integrate/login-users#auth-request) to trigger your organization.
+Send a [reserved scope](/apis/openidoauth/scopes) with your [authorization request](../../integrate/login-users#auth-request) to trigger your organization.
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login.
 
-See the following link as an example. Users will be able to register and login to the organization that verified the @caos.ch domain only.
-
-```
-https://{your_domain.zitadel.cloud}/oauth/v2/authorize?client_id=69234247558357051%40zitadel&scope=openid%20profile%20urn%3Azitadel%3Aiam%3Aorg%3Adomain%3Aprimary%3Acaos.ch&redirect_uri=https%3A%2F%2Fconsole.zitadel.cloud%2Fauth%2Fcallback&state=testd&response_type=code&nonce=test&code_challenge=UY30LKMy4bZFwF7Oyk6BpJemzVblLRf0qmFT8rskUW0
-```
-
-:::info
-Make sure to replace the domain `caos.ch` with your own domain to trigger the correct branding.
-:::
-
-:::caution
-This example uses the ZITADEL Cloud Application for demonstration. You need to create your own auth request with your applications parameters. Please see the docs to construct an [Auth Request]../integrate/login-users#auth-request).
-:::
+You can use our [OpenID Authentication Request Playground](/apis/openidoauth/authrequest) to learn more about how to trigger an [organization's policies and branding](/apis/openidoauth/authrequest#organization-policies-and-branding).
 
 ### 2. Setting on your Project
 

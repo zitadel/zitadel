@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatLegacyTable as MatTable, MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { AuthFactorState, WebAuthNToken } from 'src/app/proto/generated/zitadel/user_pb';
@@ -73,7 +73,9 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
             });
 
             dialogRef.afterClosed().subscribe((done) => {
-              this.getPasswordless();
+              setTimeout(() => {
+                this.getPasswordless();
+              }, 1000);
             });
           }
         }

@@ -1,10 +1,11 @@
 package system
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/view/model"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func ViewsToPb(views []*model.View) []*system_pb.View {
@@ -35,9 +36,9 @@ func CurrentSequencesToPb(database string, currentSequences *query.CurrentSequen
 
 func CurrentSequenceToPb(database string, currentSequence *query.CurrentSequence) *system_pb.View {
 	return &system_pb.View{
-		Database:          database,
-		ViewName:          currentSequence.ProjectionName,
-		ProcessedSequence: currentSequence.CurrentSequence,
-		EventTimestamp:    timestamppb.New(currentSequence.Timestamp),
+		Database:                 database,
+		ViewName:                 currentSequence.ProjectionName,
+		ProcessedSequence:        currentSequence.CurrentSequence,
+		LastSuccessfulSpoolerRun: timestamppb.New(currentSequence.Timestamp),
 	}
 }

@@ -15,6 +15,8 @@ const (
 	EndpointExternalLoginCallback    = "/login/externalidp/callback"
 	EndpointJWTAuthorize             = "/login/jwt/authorize"
 	EndpointJWTCallback              = "/login/jwt/callback"
+	EndpointLDAPLogin                = "/login/ldap"
+	EndpointLDAPCallback             = "/login/ldap/callback"
 	EndpointPasswordlessLogin        = "/login/passwordless"
 	EndpointPasswordlessRegistration = "/login/passwordless/init"
 	EndpointPasswordlessPrompt       = "/login/passwordless/prompt"
@@ -95,14 +97,15 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointRegister, login.handleRegister).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegister, login.handleRegisterCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointExternalRegister, login.handleExternalRegister).Methods(http.MethodGet)
-	router.HandleFunc(EndpointExternalRegister, login.handleExternalRegisterCheck).Methods(http.MethodPost)
-	router.HandleFunc(EndpointExternalRegisterCallback, login.handleExternalRegisterCallback).Methods(http.MethodGet)
+	router.HandleFunc(EndpointExternalRegisterCallback, login.handleExternalLoginCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLogoutDone, login.handleLogoutDone).Methods(http.MethodGet)
 	router.HandleFunc(EndpointDynamicResources, login.handleDynamicResources).Methods(http.MethodGet)
 	router.PathPrefix(EndpointResources).Handler(login.handleResources(staticDir)).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrg).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrgCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLoginSuccess, login.handleLoginSuccess).Methods(http.MethodGet)
+	router.HandleFunc(EndpointLDAPLogin, login.handleLDAP).Methods(http.MethodGet)
+	router.HandleFunc(EndpointLDAPCallback, login.handleLDAPCallback).Methods(http.MethodPost)
 	router.SkipClean(true).Handle("", http.RedirectHandler(HandlerPrefix+"/", http.StatusMovedPermanently))
 	return router
 }

@@ -35,6 +35,8 @@ const (
 		" WHERE asset_type = $1" +
 		" AND instance_id = $2" +
 		" AND resource_owner = $3"
+	removeInstanceObjectsStmt = "DELETE FROM system.assets" +
+		" WHERE instance_id = $1"
 )
 
 func Test_crdbStorage_CreateObject(t *testing.T) {
@@ -219,6 +221,50 @@ func Test_crdbStorage_RemoveObjects(t *testing.T) {
 			err := c.RemoveObjects(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.objectType)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("RemoveObjects() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
+func Test_crdbStorage_RemoveInstanceObjects(t *testing.T) {
+	type fields struct {
+		client db
+	}
+	type args struct {
+		ctx        context.Context
+		instanceID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			"remove ok",
+			fields{
+				client: prepareDB(t,
+					expectExec(
+						removeInstanceObjectsStmt,
+						nil,
+						"instanceID",
+					)),
+			},
+			args{
+				ctx:        context.Background(),
+				instanceID: "instanceID",
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &crdbStorage{
+				client: tt.fields.client.db,
+			}
+			err := c.RemoveInstanceObjects(tt.args.ctx, tt.args.instanceID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RemoveInstanceObjects() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 		})

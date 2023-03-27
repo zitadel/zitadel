@@ -69,7 +69,6 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplChangePasswordDone:           "change_password_done.html",
 		tmplRegisterOption:               "register_option.html",
 		tmplRegister:                     "register.html",
-		tmplExternalRegisterOverview:     "external_register_overview.html",
 		tmplLogoutDone:                   "logout_done.html",
 		tmplRegisterOrg:                  "register_org.html",
 		tmplChangeUsername:               "change_username.html",
@@ -77,6 +76,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplLinkUsersDone:                "link_users_done.html",
 		tmplExternalNotFoundOption:       "external_not_found_option.html",
 		tmplLoginSuccess:                 "login_success.html",
+		tmplLDAPLogin:                    "ldap_login.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -99,6 +99,16 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			fileName := policy.LogoURL
 			if darkMode && policy.LogoDarkURL != "" {
 				fileName = policy.LogoDarkURL
+			}
+			if fileName == "" {
+				return ""
+			}
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
+		},
+		"customIconResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
+			fileName := policy.IconURL
+			if darkMode && policy.IconDarkURL != "" {
+				fileName = policy.IconDarkURL
 			}
 			if fileName == "" {
 				return ""
@@ -183,9 +193,6 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"orgRegistrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointRegisterOrg)
 		},
-		"externalRegistrationUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointExternalRegister)
-		},
 		"changeUsernameUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangeUsername)
 		},
@@ -210,8 +217,11 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"hasRegistration": func() bool {
 			return true
 		},
-		"idpProviderClass": func(stylingType domain.IDPConfigStylingType) string {
-			return stylingType.GetCSSClass()
+		"idpProviderClass": func(idpType domain.IDPType) string {
+			return idpType.GetCSSClass()
+		},
+		"ldapUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointLDAPCallback)
 		},
 	}
 	var err error
@@ -292,7 +302,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.MFAPromptStep:
 		l.renderMFAPrompt(w, r, authReq, step, err)
 	case *domain.InitUserStep:
-		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
+		l.renderInitUser(w, r, authReq, "", "", "", step.PasswordSet, nil)
 	case *domain.ChangeUsernameStep:
 		l.renderChangeUsername(w, r, authReq, nil)
 	case *domain.LinkUsersStep:
@@ -315,13 +325,13 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	if err != nil {
 		_, msg = l.getErrorMessage(r, err)
 	}
-	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
+	data := l.getBaseData(r, authReq, "Errors.Internal", "", "Internal", msg)
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) userData {
+func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) userData {
 	userData := userData{
-		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, titleI18nKey, descriptionI18nKey, errType, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq != nil && authReq.LinkingUsers != nil {
@@ -330,8 +340,20 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
-	lang, _ := l.renderer.ReqLang(l.getTranslator(r.Context(), authReq), r).Base()
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) baseData {
+	translator := l.getTranslator(r.Context(), authReq)
+
+	title := ""
+	if titleI18nKey != "" {
+		title = translator.LocalizeWithoutArgs(titleI18nKey)
+	}
+
+	description := ""
+	if descriptionI18nKey != "" {
+		description = translator.LocalizeWithoutArgs(descriptionI18nKey)
+	}
+
+	lang, _ := l.renderer.ReqLang(translator, r).Base()
 	baseData := baseData{
 		errorData: errorData{
 			ErrID:      errType,
@@ -339,6 +361,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		},
 		Lang:                   lang.String(),
 		Title:                  title,
+		Description:            description,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
@@ -361,7 +384,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		}
 		privacyPolicy = authReq.PrivacyPolicy
 	} else {
-		labelPolicy, _ := l.query.ActiveLabelPolicyByOrg(r.Context(), baseData.PrivateLabelingOrgID)
+		labelPolicy, _ := l.query.ActiveLabelPolicyByOrg(r.Context(), baseData.PrivateLabelingOrgID, false)
 		if labelPolicy != nil {
 			baseData.LabelPolicy = labelPolicy.ToDomain()
 		}
@@ -507,7 +530,7 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	if authReq == nil {
 		return false
 	}
-	if authReq.RequestedOrgID == "" {
+	if authReq.RequestedOrgID == "" || !authReq.RequestedOrgDomain {
 		return false
 	}
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
@@ -526,7 +549,7 @@ func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []
 
 func (l *Login) customTexts(ctx context.Context, translator *i18n.Translator, orgID string) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	instanceTexts, err := l.query.CustomTextListByTemplate(ctx, instanceID, domain.LoginCustomText)
+	instanceTexts, err := l.query.CustomTextListByTemplate(ctx, instanceID, domain.LoginCustomText, false)
 	if err != nil {
 		logging.WithFields("instanceID", instanceID).Warn("unable to load custom texts for instance")
 		return
@@ -535,7 +558,7 @@ func (l *Login) customTexts(ctx context.Context, translator *i18n.Translator, or
 	if orgID == "" {
 		return
 	}
-	orgTexts, err := l.query.CustomTextListByTemplate(ctx, orgID, domain.LoginCustomText)
+	orgTexts, err := l.query.CustomTextListByTemplate(ctx, orgID, domain.LoginCustomText, false)
 	if err != nil {
 		logging.WithFields("instanceID", instanceID, "org", orgID).Warn("unable to load custom texts for org")
 		return
@@ -567,6 +590,7 @@ type baseData struct {
 	errorData
 	Lang                   string
 	Title                  string
+	Description            string
 	Theme                  string
 	ThemeMode              string
 	DarkMode               bool

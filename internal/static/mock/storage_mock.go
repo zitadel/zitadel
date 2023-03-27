@@ -82,6 +82,20 @@ func (mr *MockStorageMockRecorder) PutObject(ctx, instanceID, location, resource
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutObject", reflect.TypeOf((*MockStorage)(nil).PutObject), ctx, instanceID, location, resourceOwner, name, contentType, objectType, object, objectSize)
 }
 
+// RemoveInstanceObjects mocks base method.
+func (m *MockStorage) RemoveInstanceObjects(ctx context.Context, instanceID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveInstanceObjects", ctx, instanceID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveInstanceObjects indicates an expected call of RemoveInstanceObjects.
+func (mr *MockStorageMockRecorder) RemoveInstanceObjects(ctx, instanceID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveInstanceObjects", reflect.TypeOf((*MockStorage)(nil).RemoveInstanceObjects), ctx, instanceID)
+}
+
 // RemoveObject mocks base method.
 func (m *MockStorage) RemoveObject(ctx context.Context, instanceID, resourceOwner, name string) error {
 	m.ctrl.T.Helper()

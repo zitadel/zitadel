@@ -9,11 +9,13 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
-	AppProjectionTable = "projections.apps3"
+	AppProjectionTable = "projections.apps4"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
@@ -27,6 +29,7 @@ const (
 	AppColumnInstanceID    = "instance_id"
 	AppColumnState         = "state"
 	AppColumnSequence      = "sequence"
+	AppColumnOwnerRemoved  = "owner_removed"
 
 	appAPITableSuffix              = "api_configs"
 	AppAPIConfigColumnAppID        = "app_id"
@@ -82,10 +85,11 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(AppColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
-			crdb.WithIndex(crdb.NewIndex("app3_project_id_idx", []string{AppColumnProjectID})),
-			crdb.WithConstraint(crdb.NewConstraint("app3_id_unique", []string{AppColumnID})),
+			crdb.WithIndex(crdb.NewIndex("project_id", []string{AppColumnProjectID})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{AppColumnOwnerRemoved})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText),
@@ -96,8 +100,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppAPIConfigColumnInstanceID, AppAPIConfigColumnAppID),
 			appAPITableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_api_ref_apps3")),
-			crdb.WithIndex(crdb.NewIndex("api_client_id3_idx", []string{AppAPIConfigColumnClientID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			crdb.WithIndex(crdb.NewIndex("client_id", []string{AppAPIConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText),
@@ -121,8 +125,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_apps3")),
-			crdb.WithIndex(crdb.NewIndex("oidc_client_id_idx3", []string{AppOIDCConfigColumnClientID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			crdb.WithIndex(crdb.NewIndex("client_id", []string{AppOIDCConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppSAMLConfigColumnAppID, crdb.ColumnTypeText),
@@ -133,8 +137,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppSAMLConfigColumnInstanceID, AppSAMLConfigColumnAppID),
 			appSAMLTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_saml_ref_apps3")),
-			crdb.WithIndex(crdb.NewIndex("saml_entity_id_idx3", []string{AppSAMLConfigColumnEntityID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			crdb.WithIndex(crdb.NewIndex("entity_id", []string{AppSAMLConfigColumnEntityID})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -201,6 +205,24 @@ func (p *appProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.SAMLConfigChangedType,
 					Reduce: p.reduceSAMLConfigChanged,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(AppColumnInstanceID),
 				},
 			},
 		},
@@ -561,6 +583,26 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
+	), nil
+}
+
+func (p *appProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
+			handler.NewCol(AppColumnSequence, e.Sequence()),
+			handler.NewCol(AppColumnOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(AppColumnResourceOwner, e.Aggregate().ID),
+		},
 	), nil
 }
 

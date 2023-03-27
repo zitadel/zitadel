@@ -49,6 +49,7 @@ const (
 	LabelPolicySearchKeyAggregateID
 	LabelPolicySearchKeyState
 	LabelPolicySearchKeyInstanceID
+	LabelPolicySearchKeyOwnerRemoved
 )
 
 type LabelPolicySearchQuery struct {

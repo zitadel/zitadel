@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"net"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -9,13 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
@@ -33,7 +33,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.EmailConfig) 
 	}, nil
 }
 
-func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.SMTP.Host, config.SMTP.User, config.Tls)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
@@ -58,7 +58,7 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 		return nil, err
 	}
 	if smtpConfigWriteModel.State != domain.SMTPConfigStateActive {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
+		return nil, errors.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
 	}
 	var smtpPassword *crypto.CryptoValue
 	if password != "" {
@@ -99,13 +99,14 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context) (*domain.ObjectDetails,
 	}, nil
 }
 
-func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, host, user string, password []byte, tls bool) preparation.Validation {
+func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, hostAndPort, user string, password []byte, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
 		}
-		if host = strings.TrimSpace(host); host == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-SF3g1", "Errors.Invalid.Argument")
+		hostAndPort = strings.TrimSpace(hostAndPort)
+		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			fromSplitted := strings.Split(from, "@")
@@ -135,7 +136,7 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, host,
 					tls,
 					from,
 					name,
-					host,
+					hostAndPort,
 					user,
 					smtpPassword,
 				),
@@ -144,15 +145,15 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, host,
 	}
 }
 
-func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, host, user string, tls bool) preparation.Validation {
+func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, hostAndPort, user string, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
 		}
-		if host = strings.TrimSpace(host); host == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-VDwvq", "Errors.Invalid.Argument")
+		hostAndPort = strings.TrimSpace(hostAndPort)
+		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-Kv875", "Errors.Invalid.Argument")
 		}
-
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			fromSplitted := strings.Split(from, "@")
 			senderDomain := fromSplitted[len(fromSplitted)-1]
@@ -173,14 +174,14 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, ho
 				tls,
 				from,
 				name,
-				host,
+				hostAndPort,
 				user,
 			)
 			if err != nil {
 				return nil, err
 			}
 			if !hasChanged {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
+				return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
 			}
 			return []eventstore.Command{
 				changedEvent,

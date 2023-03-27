@@ -7,7 +7,7 @@
         </a>
         <div class="cnsl-title-row-wrapper">
           <div class="cnsl-title-row">
-            <h2 class="cnsl-title">{{ title }}</h2>
+            <h2 data-e2e="top-view-title" class="cnsl-title">{{ title }}</h2>
             <div
               class="cnsl-state-dot"
               *ngIf="isActive || isInactive"
@@ -28,6 +28,7 @@
 
       <ng-container *ngIf="hasActions">
         <button
+          data-e2e="actions"
           class="cnsl-actions-trigger-desk cnsl-action-button"
           mat-raised-button
           color="primary"

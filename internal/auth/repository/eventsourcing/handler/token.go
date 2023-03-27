@@ -16,6 +16,8 @@ import (
 	proj_model "github.com/zitadel/zitadel/internal/project/model"
 	project_es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/zitadel/zitadel/internal/project/repository/view"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
@@ -32,22 +34,23 @@ type Token struct {
 }
 
 func newToken(
+	ctx context.Context,
 	handler handler,
 ) *Token {
 	h := &Token{
 		handler: handler,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (t *Token) subscribe() {
+func (t *Token) subscribe(ctx context.Context) {
 	t.subscription = t.es.Subscribe(t.AggregateTypes()...)
 	go func() {
 		for event := range t.subscription.Events {
-			query.ReduceEvent(t, event)
+			query.ReduceEvent(ctx, t, event)
 		}
 	}()
 }
@@ -61,19 +64,19 @@ func (t *Token) Subscription() *v1.Subscription {
 }
 
 func (_ *Token) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{user.AggregateType, project.AggregateType}
+	return []es_models.AggregateType{user.AggregateType, project.AggregateType, instance.AggregateType}
 }
 
-func (p *Token) CurrentSequence(instanceID string) (uint64, error) {
-	sequence, err := p.view.GetLatestTokenSequence(instanceID)
+func (t *Token) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := t.view.GetLatestTokenSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (t *Token) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
-	sequences, err := t.view.GetLatestTokenSequences(instanceIDs...)
+func (t *Token) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := t.view.GetLatestTokenSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +96,10 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 	case user.UserV1ProfileChangedType,
 		user.HumanProfileChangedType:
 		user := new(view_model.UserView)
-		user.AppendEvent(event)
+		err := user.AppendEvent(event)
+		if err != nil {
+			return err
+		}
 		tokens, err := t.view.TokensByUserID(event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
@@ -144,20 +150,27 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 			applicationsIDs = append(applicationsIDs, app.AppID)
 		}
 		return t.view.DeleteApplicationTokens(event, applicationsIDs...)
+	case instance.InstanceRemovedEventType:
+		return t.view.DeleteInstanceTokens(event)
+	case org.OrgRemovedEventType:
+		// deletes all tokens including PATs, which is expected for now
+		// if there is an undo of the org deletion in the future,
+		// we will need to have a look on how to handle the deleted PATs
+		return t.view.DeleteOrgTokens(event)
 	default:
 		return t.view.ProcessedTokenSequence(event)
 	}
 }
 
 func (t *Token) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-3jkl4", "id", event.AggregateID).WithError(err).Warn("something went wrong in token handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in token handler")
 	return spooler.HandleError(event, err, t.view.GetLatestTokenFailedEvent, t.view.ProcessedTokenFailedEvent, t.view.ProcessedTokenSequence, t.errorCountUntilSkip)
 }
 
 func agentIDFromSession(event *es_models.Event) (string, error) {
 	session := make(map[string]interface{})
 	if err := json.Unmarshal(event.Data, &session); err != nil {
-		logging.Log("EVEN-s3bq9").WithError(err).Error("could not unmarshal event data")
+		logging.WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
 	return session["userAgentID"].(string), nil
@@ -166,7 +179,7 @@ func agentIDFromSession(event *es_models.Event) (string, error) {
 func applicationFromSession(event *es_models.Event) (*project_es_model.Application, error) {
 	application := new(project_es_model.Application)
 	if err := json.Unmarshal(event.Data, &application); err != nil {
-		logging.Log("EVEN-GRE2q").WithError(err).Error("could not unmarshal event data")
+		logging.WithError(err).Error("could not unmarshal event data")
 		return nil, caos_errs.ThrowInternal(nil, "MODEL-Hrw1q", "could not unmarshal data")
 	}
 	return application, nil
@@ -175,7 +188,7 @@ func applicationFromSession(event *es_models.Event) (*project_es_model.Applicati
 func tokenIDFromRemovedEvent(event *es_models.Event) (string, error) {
 	removed := make(map[string]interface{})
 	if err := json.Unmarshal(event.Data, &removed); err != nil {
-		logging.Log("EVEN-Sdff3").WithError(err).Error("could not unmarshal event data")
+		logging.WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-Sff32", "could not unmarshal data")
 	}
 	return removed["tokenId"].(string), nil
@@ -184,14 +197,14 @@ func tokenIDFromRemovedEvent(event *es_models.Event) (string, error) {
 func refreshTokenIDFromRemovedEvent(event *es_models.Event) (string, error) {
 	removed := make(map[string]interface{})
 	if err := json.Unmarshal(event.Data, &removed); err != nil {
-		logging.Log("EVEN-Ff23g").WithError(err).Error("could not unmarshal event data")
+		logging.WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-Dfb3w", "could not unmarshal data")
 	}
 	return removed["tokenId"].(string), nil
 }
 
-func (t *Token) OnSuccess() error {
-	return spooler.HandleSuccess(t.view.UpdateTokenSpoolerRunTimestamp)
+func (t *Token) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(t.view.UpdateTokenSpoolerRunTimestamp, instanceIDs)
 }
 
 func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (*proj_model.Project, error) {

@@ -4,6 +4,7 @@
 </p>
 
 <p align="center">
+    <a href="https://bestpractices.coreinfrastructure.org/projects/6662"><img src="https://bestpractices.coreinfrastructure.org/projects/6662/badge"></a>
     <a href="https://github.com/zitadel/zitadel/graphs/contributors" alt="Release">
         <img src="https://badgen.net/github/contributors/zitadel/zitadel" /></a>
     <a href="https://github.com/semantic-release/semantic-release" alt="semantic-release">
@@ -27,81 +28,84 @@
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
 
-You want auth that's quickly set up like Auth0 but open source like Keycloak? Look no further — ZITADEL combines the ease of Auth0 and the versatility of Keycloak.
+Do you look for a user management that's quickly set up like Auth0 and open source like Keycloak?
 
-We provide a wide range of out of the box features like secure login, self-service, OpenID Connect, OAuth2.x, SAML2, branding, Passwordless with FIDO2, OTP, U2F, and an unlimited audit trail to improve the life of developers. Especially noteworthy is that ZITADEL supports not only B2C and B2E scenarios but also B2B. This is super useful for people who build B2B Solutions, as ZITADEL can handle all the delegated user and access management.
+Do you have project that requires a multi-tenant user management with self-service for your customers?
 
-With ZITADEL you rely on a battle tested, hardened and extensible turnkey solution to solve all of your authentication and authorization needs. With the unique way of how ZITADEL stores data it gives you an unlimited audit trail which provides a peace of mind for even the harshest audit and analytics requirements.
+Look no further — ZITADEL combines the ease of Auth0 with the versatility of Keycloak.
 
-<!-- TODO: Insert Video here-->
+We provide you with a wide range of out of the box features to accelerate your project.
+Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
+
+With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs.
 
 ---
 
-**[🏡 Website](https://zitadel.com) [💬 Chat](https://zitadel.com/chat) [📋 Docs](https://docs.zitadel.com/) [🧑‍💻 Blog](https://zitadel.com/blog) [📞 Contact](https://zitadel.com/contact/)**
+**[🏡 Website](https://zitadel.com) [💬 Chat](https://zitadel.com/chat) [📋 Docs](https://zitadel.com/docs/) [🧑‍💻 Blog](https://zitadel.com/blog) [📞 Contact](https://zitadel.com/contact/)**
 
 ## Get started
 
-### ZITADEL Cloud (SaaS)
+👉 [Quick Start Guide](https://zitadel.com/docs/guides/start/quickstart)
 
-The easiest way to get started with [ZITADEL Cloud](https://zitadel.cloud).
+### Deploy ZITADEL (Self-Hosted)
 
-It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
+Deploying ZITADEL locally takes less than 3 minutes. So go ahead and give it a try!
 
-### Install ZITADEL
+* [Linux](https://zitadel.com/docs/self-hosting/deploy/linux)
+* [MacOS](https://zitadel.com/docs/self-hosting/deploy/macos)
+* [Docker compose](https://zitadel.com/docs/self-hosting/deploy/compose)
+* [Knative](https://zitadel.com/docs/self-hosting/deploy/knative)
+* [Kubernetes](https://zitadel.com/docs/self-hosting/deploy/kubernetes)
 
-- [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/deploy/overview)
+See all guides [here](https://zitadel.com/docs/self-hosting/deploy/overview)
 
-### Quickstarts - Integrate your app
+> If you are interested to get professional support for your self-hosted ZITADEL [please reach out to us](https://zitadel.com/contact)!
 
-[Multiple Examples can be found here](https://docs.zitadel.com/docs/examples/introduction)
+### Setup ZITADEL Cloud (SaaS)
 
-> If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
+If you want to experience a hands-free ZITADEL, you should use [ZITADEL Cloud](https://zitadel.cloud).
 
-## Why ZITADEL
+It is free for up to 25'000 authenticated requests and provides you all the features that make ZITADEL great.
+Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
-- [API-first](https://docs.zitadel.com/docs/apis/introduction)
-- Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview)
-- [Actions](https://docs.zitadel.com/docs/concepts/features/actions) to react on events with custom code
-- [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience
-- [CockroachDB](https://www.cockroachlabs.com/) or a Postgres database is the only dependency
+### Example applications
+
+Clone one of our [example applications](https://zitadel.com/docs/examples/introduction#clone-a-sample-project) or deploy them directly to Vercel.
+
+### SDKs
+
+Use our [SDKs](https://zitadel.com/docs/examples/sdks) for your favorite language and framework.
+
+## Why choose ZITADEL
+
+We built ZITADEL with a complex multi-tenancy architecture in mind and provide the best solution to handle [B2B customers and partners](https://zitadel.com/docs/guides/solution-scenarios/b2b).
+Yet it offers everything you need for a customer identity ([CIAM](https://zitadel.com/docs/guides/solution-scenarios/b2c)) use case.
+
+- [API-first approach](https://zitadel.com/docs/apis/introduction)
+- Strong audit trail thanks to [event sourcing](https://zitadel.com/docs/concepts/eventstore/overview) as storage pattern
+- [Actions](https://zitadel.com/docs/apis/actions/introduction) to react on events with custom code and extended ZITADEL for you needs
+- [Branding](https://zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
+- [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
+- [CockroachDB](https://www.cockroachlabs.com/) or a [Postgres](https://www.postgresql.org/) database as reliable and widespread storage option
 
 ## Features
 
 - Single Sign On (SSO)
-- Passwordless with FIDO2 support
+- Passwordless with FIDO2 support (Including Passkeys)
 - Username / Password
 - Multifactor authentication with OTP, U2F
-- [Identity Brokering](https://docs.zitadel.com/docs/guides/integrate/identity-brokering)
-- [Machine-to-machine (JWT profile)](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
+- [Identity Brokering](https://zitadel.com/docs/guides/integrate/identity-brokering)
+- [Machine-to-machine (JWT profile)](https://zitadel.com/docs/guides/integrate/serviceusers)
 - Personal Access Tokens (PAT)
 - Role Based Access Control (RBAC)
-- [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/manage/console/projects)
-- Self-registration including verification
-- User self service
-- [Service Accounts](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
-- [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://docs.zitadel.com/docs/apis/openidoauth/endpoints),  [OIDC Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-oidc)
-- [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://docs.zitadel.com/docs/apis/saml/endpoints), [SAML Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-saml)
-- [Postgres](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#postgres) (version >= 14) or [CockroachDB](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#cockroach) (version >= 22.0)
+- [Delegate role management to third-parties](https://zitadel.com/docs/guides/manage/console/projects)
+- [Self-registration](https://zitadel.com/docs/concepts/features/selfservice#registration) including verification
+- [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
+- [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
+- [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
+- [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14) or [CockroachDB](https://zitadel.com/docs/self-hosting/manage/database#cockroach) (version >= 22.0)
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
-
-## Client libraries
-
-<!-- TODO: check other libraries -->
-
-| Language | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
-|----------|--------|--------------|----------|---------|---------------------------|
-| .NET     | [zitadel-net](https://github.com/zitadel/zitadel-net) | GRPC | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
-| Dart     | [zitadel-dart](https://github.com/zitadel/zitadel-dart) | GRPC | ✔️ | ❌ | [buehler 👑](https://github.com/buehler) |
-| Elixir   | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | GRPC | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
-| Go       | [zitadel-go](https://github.com/zitadel/zitadel-go) | GRPC | ✔️ | ✔️ | ZITADEL |
-| Rust     | [zitadel-rust](https://crates.io/crates/zitadel) | GRPC | ✔️ | ❌ | [buehler 👑](https://github.com/buehler) |
-| JVM      | 🚧 [WIP](https://github.com/zitadel/zitadel/discussions/3650) | ❓ | ❓ | | TBD |
-| Python   | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675) | ❓ | ❓ | | TBD |
-| Javascript | ❓ | ❓ | ❓ | | Maybe you? |
-
-(\*) Automatically authenticate service accounts with [JWT Profile](https://docs.zitadel.com/docs/apis/openidoauth/grant-types#json-web-token-jwt-profile).  
-(\*\*) Automatically check if the access token is valid and claims match
 
 ## How To Contribute
 
@@ -117,31 +121,23 @@ Made with [contrib.rocks](https://contrib.rocks).
 
 ## Showcase
 
-<!-- TODO: Replace Images-->
+### Quick Start Guide
 
-### Passwordless Login
+Secure a React Application using OpenID Connect Authorization Code with PKCE
 
-Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
+[![Quick Start Guide](https://user-images.githubusercontent.com/1366906/223662449-f17b734d-405c-4945-a8a1-200440c459e5.gif)](http://www.youtube.com/watch?v=5THbQljoPKg "Quick Start Guide")
 
-- works on all modern platforms, devices, and browsers
-- phishing resistant alternative
-- requires only one gesture by the user
-- easy [enrollment](https://docs.zitadel.com/docs/manuals/user-profile) of the device during registration
+### Login with Passkeys
 
-![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
+Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of Passkeys (FIDO 2 / WebAuthN):
+
+[![Passkeys](https://user-images.githubusercontent.com/1366906/223664178-4132faef-4832-4014-b9ab-90c2a8d15436.gif)](https://www.youtube.com/watch?v=cZjHQYurSjw&list=PLTDa7jTlOyRLdABgD2zL0LGM7rx5GZ1IR&index=2 "Passkeys")
 
 ### Admin Console
 
-Use [Console](https://docs.zitadel.com/docs/manuals/introduction) or our [APIs](https://docs.zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
+Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
 
-Register new applications
-![OIDC-Client-Register](https://user-images.githubusercontent.com/1366906/118765446-62064b80-b87b-11eb-8b24-4f4c365b8c58.gif)
-
-Delegate the right to assign roles to another organization
-![projects_create_org_grant](https://user-images.githubusercontent.com/1366906/118766069-39cb1c80-b87c-11eb-84cf-f5becce4e9b6.gif)
-
-Customize login and console with your design  
-![private_labeling](https://user-images.githubusercontent.com/1366906/123089110-d148ff80-d426-11eb-9598-32b506f6d4fd.gif)
+[![Console Showcase](https://user-images.githubusercontent.com/1366906/223663344-67038d5f-4415-4285-ab20-9a4d397e2138.gif)](http://www.youtube.com/watch?v=RPpHktAcCtk "Console Showcase")
 
 ## Security
 
@@ -151,4 +147,5 @@ See the policy [here](./SECURITY.md)
 
 See the exact licensing terms [here](./LICENSE)
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and limitations under the License.

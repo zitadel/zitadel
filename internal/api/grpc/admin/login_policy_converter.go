@@ -3,13 +3,13 @@ package admin
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func updateLoginPolicyToDomain(p *admin_pb.UpdateLoginPolicyRequest) *domain.LoginPolicy {
-	return &domain.LoginPolicy{
+func updateLoginPolicyToCommand(p *admin_pb.UpdateLoginPolicyRequest) *command.ChangeLoginPolicy {
+	return &command.ChangeLoginPolicy{
 		AllowUsernamePassword:      p.AllowUsernamePassword,
 		AllowRegister:              p.AllowRegister,
 		AllowExternalIDP:           p.AllowExternalIdp,
@@ -17,6 +17,9 @@ func updateLoginPolicyToDomain(p *admin_pb.UpdateLoginPolicyRequest) *domain.Log
 		PasswordlessType:           policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
 		HidePasswordReset:          p.HidePasswordReset,
 		IgnoreUnknownUsernames:     p.IgnoreUnknownUsernames,
+		AllowDomainDiscovery:       p.AllowDomainDiscovery,
+		DisableLoginWithEmail:      p.DisableLoginWithEmail,
+		DisableLoginWithPhone:      p.DisableLoginWithPhone,
 		DefaultRedirectURI:         p.DefaultRedirectUri,
 		PasswordCheckLifetime:      p.PasswordCheckLifetime.AsDuration(),
 		ExternalLoginCheckLifetime: p.ExternalLoginCheckLifetime.AsDuration(),

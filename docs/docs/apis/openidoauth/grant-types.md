@@ -8,14 +8,14 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 |:------------------------------------------------------|:--------------------|
 | Authorization Code                                    | yes                 |
 | Authorization Code with PKCE                          | yes                 |
-| Client Credentials                                    | no                  |
+| Client Credentials                                    | yes                 |
 | Device Authorization                                  | under consideration |
 | Implicit                                              | yes                 |
 | JSON Web Token (JWT) Profile                          | yes                 |
 | Refresh Token                                         | yes                 |
 | Resource Owner Password Credentials                   | no                  |
 | Security Assertion Markup Language (SAML) 2.0 Profile | no                  |
-| Token Exchange                                        | no    |
+| Token Exchange                                        | no                  |
 
 ## Authorization Code
 
@@ -120,6 +120,11 @@ Find out how to use it on the [token endpoint](endpoints#token_endpoint) or the 
 
 **Link to spec.** [OAuth 2.0 Device Authorization Grant](https://tools.ietf.org/html/rfc8628)
 
+## Security Assertion Markup Language (SAML) 2.0 Profile
+
+**Link to spec.** [Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7522)
+
+
 ## Not Supported Grant Types
 
 ### Resource Owner Password Credentials
@@ -127,7 +132,3 @@ Find out how to use it on the [token endpoint](endpoints#token_endpoint) or the 
 > Due to growing security concerns we do not support this grant type. With OAuth 2.1 it looks like this grant will be removed.
 
 **Link to spec.** [OThe OAuth 2.0 Authorization Framework Section 1.3.3](https://tools.ietf.org/html/rfc6749#section-1.3.3)
-
-### Security Assertion Markup Language (SAML) 2.0 Profile
-
-**Link to spec.** [Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7522)

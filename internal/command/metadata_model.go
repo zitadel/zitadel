@@ -24,6 +24,9 @@ func (wm *MetadataWriteModel) Reduce() error {
 			wm.Value = e.Value
 			wm.State = domain.MetadataStateActive
 		case *metadata.RemovedEvent:
+			if wm.Key != e.Key {
+				continue
+			}
 			wm.State = domain.MetadataStateRemoved
 		case *metadata.RemovedAllEvent:
 			wm.State = domain.MetadataStateRemoved

@@ -15,15 +15,16 @@ import (
 
 var (
 	personalAccessTokenStmt = regexp.QuoteMeta(
-		"SELECT projections.personal_access_tokens2.id," +
-			" projections.personal_access_tokens2.creation_date," +
-			" projections.personal_access_tokens2.change_date," +
-			" projections.personal_access_tokens2.resource_owner," +
-			" projections.personal_access_tokens2.sequence," +
-			" projections.personal_access_tokens2.user_id," +
-			" projections.personal_access_tokens2.expiration," +
-			" projections.personal_access_tokens2.scopes" +
-			" FROM projections.personal_access_tokens2")
+		"SELECT projections.personal_access_tokens3.id," +
+			" projections.personal_access_tokens3.creation_date," +
+			" projections.personal_access_tokens3.change_date," +
+			" projections.personal_access_tokens3.resource_owner," +
+			" projections.personal_access_tokens3.sequence," +
+			" projections.personal_access_tokens3.user_id," +
+			" projections.personal_access_tokens3.expiration," +
+			" projections.personal_access_tokens3.scopes" +
+			" FROM projections.personal_access_tokens3" +
+			` AS OF SYSTEM TIME '-1 ms'`)
 	personalAccessTokenCols = []string{
 		"id",
 		"creation_date",
@@ -35,16 +36,17 @@ var (
 		"scopes",
 	}
 	personalAccessTokensStmt = regexp.QuoteMeta(
-		"SELECT projections.personal_access_tokens2.id," +
-			" projections.personal_access_tokens2.creation_date," +
-			" projections.personal_access_tokens2.change_date," +
-			" projections.personal_access_tokens2.resource_owner," +
-			" projections.personal_access_tokens2.sequence," +
-			" projections.personal_access_tokens2.user_id," +
-			" projections.personal_access_tokens2.expiration," +
-			" projections.personal_access_tokens2.scopes," +
+		"SELECT projections.personal_access_tokens3.id," +
+			" projections.personal_access_tokens3.creation_date," +
+			" projections.personal_access_tokens3.change_date," +
+			" projections.personal_access_tokens3.resource_owner," +
+			" projections.personal_access_tokens3.sequence," +
+			" projections.personal_access_tokens3.user_id," +
+			" projections.personal_access_tokens3.expiration," +
+			" projections.personal_access_tokens3.scopes," +
 			" COUNT(*) OVER ()" +
-			" FROM projections.personal_access_tokens2")
+			" FROM projections.personal_access_tokens3" +
+			" AS OF SYSTEM TIME '-1 ms'")
 	personalAccessTokensCols = []string{
 		"id",
 		"creation_date",
@@ -264,7 +266,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

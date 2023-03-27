@@ -27,7 +27,8 @@ import {
   GetMyEmailRequest,
   GetMyEmailResponse,
   GetMyLabelPolicyRequest,
-  GetMyLabelPolicyResponse,
+  GetMyLoginPolicyRequest,
+  GetMyLoginPolicyResponse,
   GetMyPasswordComplexityPolicyRequest,
   GetMyPasswordComplexityPolicyResponse,
   GetMyPhoneRequest,
@@ -103,15 +104,17 @@ import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
+import { LabelPolicy } from '../proto/generated/zitadel/policy_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
+import { ThemeService } from './theme.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GrpcAuthService {
-  private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
+  private _activeOrgChanged: Subject<Org.AsObject | undefined> = new Subject();
   public user!: Observable<User.AsObject | undefined>;
   public userSubject: BehaviorSubject<User.AsObject | undefined> = new BehaviorSubject<User.AsObject | undefined>(undefined);
   private triggerPermissionsRefresh: Subject<void> = new Subject();
@@ -132,17 +135,46 @@ export class GrpcAuthService {
       ),
     ),
   );
-  private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+
+  public labelpolicy$!: Observable<LabelPolicy.AsObject>;
+  public labelpolicy: BehaviorSubject<LabelPolicy.AsObject | undefined> = new BehaviorSubject<
+    LabelPolicy.AsObject | undefined
+  >(undefined);
+  labelPolicyLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+
+  public zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private cachedOrgs: Org.AsObject[] = [];
+  private cachedLabelPolicies: { [orgId: string]: LabelPolicy.AsObject } = {};
 
   constructor(
     private readonly grpcService: GrpcService,
     private oauthService: OAuthService,
     private storage: StorageService,
+    themeService: ThemeService,
   ) {
     this.zitadelPermissions$.subscribe(this.zitadelPermissions);
+
+    this.labelpolicy$ = this.activeOrgChanged.pipe(
+      switchMap((org) => {
+        this.labelPolicyLoading$.next(true);
+        return from(this.getMyLabelPolicy(org ? org.id : ''));
+      }),
+      filter((policy) => !!policy),
+    );
+
+    this.labelpolicy$.subscribe({
+      next: (policy) => {
+        themeService.applyLabelPolicy(policy);
+        this.labelpolicy.next(policy);
+        this.labelPolicyLoading$.next(false);
+      },
+      error: (error) => {
+        console.error(error);
+        this.labelPolicyLoading$.next(false);
+      },
+    });
 
     this.user = merge(
       of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
@@ -225,10 +257,12 @@ export class GrpcAuthService {
       const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
       if (org && orgs.find((tmp) => tmp.id === org.id)) {
         this.storage.setItem(StorageKey.organization, org, StorageLocation.session);
-        return org;
+        this.setActiveOrg(org);
+        return Promise.resolve(org);
       }
 
       if (orgs.length === 0) {
+        this._activeOrgChanged.next(undefined);
         return Promise.reject(new Error('No organizations found!'));
       }
       const orgToSet = orgs.find((element) => element.id !== '0' && element.name !== '');
@@ -241,7 +275,7 @@ export class GrpcAuthService {
     }
   }
 
-  public get activeOrgChanged(): Observable<Org.AsObject> {
+  public get activeOrgChanged(): Observable<Org.AsObject | undefined> {
     return this._activeOrgChanged;
   }
 
@@ -389,11 +423,7 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyUserSessions(req, null).then((resp) => resp.toObject());
   }
 
-  public listMyUserGrants(
-    limit?: number,
-    offset?: number,
-    queryList?: ListQuery[],
-  ): Promise<ListMyUserGrantsResponse.AsObject> {
+  public listMyUserGrants(limit?: number, offset?: number, asc?: boolean): Promise<ListMyUserGrantsResponse.AsObject> {
     const req = new ListMyUserGrantsRequest();
     const query = new ListQuery();
     if (limit) {
@@ -401,6 +431,9 @@ export class GrpcAuthService {
     }
     if (offset) {
       query.setOffset(offset);
+    }
+    if (asc !== undefined) {
+      query.setAsc(asc);
     }
     req.setQuery(query);
     return this.grpcService.auth.listMyUserGrants(req, null).then((resp) => resp.toObject());
@@ -450,6 +483,11 @@ export class GrpcAuthService {
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
     return this.grpcService.auth.getSupportedLanguages(req, null).then((resp) => resp.toObject());
+  }
+
+  public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse.AsObject> {
+    const req = new GetMyLoginPolicyRequest();
+    return this.grpcService.auth.getMyLoginPolicy(req, null).then((resp) => resp.toObject());
   }
 
   public removeMyPhone(): Promise<RemoveMyPhoneResponse.AsObject> {
@@ -605,8 +643,24 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyUserChanges(req, null).then((resp) => resp.toObject());
   }
 
-  public getMyLabelPolicy(): Promise<GetMyLabelPolicyResponse.AsObject> {
-    return this.grpcService.auth.getMyLabelPolicy(new GetMyLabelPolicyRequest(), null).then((resp) => resp.toObject());
+  public getMyLabelPolicy(orgIdForCache?: string): Promise<LabelPolicy.AsObject> {
+    if (orgIdForCache && this.cachedLabelPolicies[orgIdForCache]) {
+      return Promise.resolve(this.cachedLabelPolicies[orgIdForCache]);
+    } else {
+      return this.grpcService.auth
+        .getMyLabelPolicy(new GetMyLabelPolicyRequest(), null)
+        .then((resp) => resp.toObject())
+        .then((resp) => {
+          if (resp.policy) {
+            if (orgIdForCache) {
+              this.cachedLabelPolicies[orgIdForCache] = resp.policy;
+            }
+            return Promise.resolve(resp.policy);
+          } else {
+            return Promise.reject();
+          }
+        });
+    }
   }
 
   public getMyPrivacyPolicy(): Promise<GetMyPrivacyPolicyResponse.AsObject> {

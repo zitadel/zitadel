@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
+import "zitadel/message.proto";
 import "validate/validate.proto";
 import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -73,7 +74,7 @@ message ActionNameQuery {
     ];
 }
 
-//ActionStateQuery is always equals
+//ActionStateQuery always equals
 message ActionStateQuery {
     ActionState state = 1 [
         (validate.rules).enum.defined_only = true,
@@ -91,6 +92,7 @@ enum ActionFieldName {
 }
 
 message Flow {
+    // id of the flow type
     FlowType type = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "\"the type of the flow\"";
@@ -105,9 +107,11 @@ message Flow {
     repeated TriggerAction trigger_actions = 4;
 }
 
-enum FlowType {
-    FLOW_TYPE_UNSPECIFIED = 0;
-    FLOW_TYPE_EXTERNAL_AUTHENTICATION = 1;
+message FlowType {
+    // identifier of the type
+    string id = 1;
+    // key and name of the type
+    zitadel.v1.LocalizedMessage name = 2;
 }
 
 enum FlowState {
@@ -116,40 +120,15 @@ enum FlowState {
     FLOW_STATE_ACTIVE = 2;
 }
 
-enum TriggerType {
-    TRIGGER_TYPE_UNSPECIFIED = 0;
-    TRIGGER_TYPE_POST_AUTHENTICATION = 1;
-    TRIGGER_TYPE_PRE_CREATION = 2;
-    TRIGGER_TYPE_POST_CREATION = 3;
+message TriggerType {
+    // identifier of the type
+    string id = 1;
+    // key and name of the type
+    zitadel.v1.LocalizedMessage name = 2;
 }
 
 message TriggerAction {
+    // id of the trigger type
     TriggerType trigger_type = 1;
     repeated Action actions = 2;
-}
-
-enum FlowFieldName {
-    FLOW_FIELD_NAME_UNSPECIFIED = 0;
-    FLOW_FIELD_NAME_TYPE = 1;
-    FLOW_FIELD_NAME_STATE = 2;
-}
-
-//FlowTypeQuery is always equals
-message FlowTypeQuery {
-    FlowType state = 1 [
-        (validate.rules).enum.defined_only = true,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "type of the flow";
-        }
-    ];
-}
-
-//FlowStateQuery is always equals
-message FlowStateQuery {
-    FlowState state = 1 [
-        (validate.rules).enum.defined_only = true,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "current state of the flow";
-        }
-    ];
 }

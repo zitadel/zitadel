@@ -76,7 +76,7 @@ func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 		return nil, err
 	}
 	if existingAPI.State != domain.AppStateUnspecified {
-		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-mabu12", "Errors.Application.AlreadyExisting")
+		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-mabu12", "Errors.Project.App.AlreadyExisting")
 	}
 	project, err := c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
 	if err != nil {
@@ -88,7 +88,7 @@ func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 
 func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
 	if apiApp == nil || apiApp.AggregateID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Application.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Project.App.Invalid")
 	}
 	project, err := c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
 	if err != nil {
@@ -96,7 +96,7 @@ func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp,
 	}
 
 	if !apiApp.IsValid() {
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Project.App.Invalid")
 	}
 
 	appID, err := c.idGenerator.Next()

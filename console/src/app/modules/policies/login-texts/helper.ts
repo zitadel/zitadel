@@ -64,7 +64,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r2.setTitle(map.externalUserNotFoundText?.title ?? '');
   r2.setTosAndPrivacyLabel(map.externalUserNotFoundText?.tosAndPrivacyLabel ?? '');
   r2.setTosConfirm(map.externalUserNotFoundText?.tosConfirm ?? '');
-  r2.setTosConfirmAnd(map.externalUserNotFoundText?.tosConfirmAnd ?? '');
+  r2.setPrivacyConfirm(map.externalUserNotFoundText?.privacyConfirm ?? '');
   r2.setTosLinkText(map.externalUserNotFoundText?.tosLinkText ?? '');
   r2.setPrivacyLinkText(map.externalUserNotFoundText?.privacyLinkText ?? '');
   req.setExternalUserNotFoundText(r2);
@@ -98,7 +98,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r6.setOtpOption(map.initMfaPromptText?.otpOption ?? '');
   r6.setSkipButtonText(map.initMfaPromptText?.skipButtonText ?? '');
   r6.setTitle(map.initMfaPromptText?.title ?? '');
-  r6.setU2fOption(map.initMfaPromptText?.otpOption ?? '');
+  r6.setU2fOption(map.initMfaPromptText?.u2fOption ?? '');
   req.setInitMfaPromptText(r6);
 
   const r7 = new InitMFAU2FScreenText();
@@ -118,7 +118,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   req.setInitPasswordDoneText(r8);
 
   const r9 = new InitPasswordScreenText();
-  r9.setCodeLabel(map.initPasswordText?.description ?? '');
+  r9.setCodeLabel(map.initPasswordText?.codeLabel ?? '');
   r9.setDescription(map.initPasswordText?.description ?? '');
   r9.setNewPasswordConfirmLabel(map.initPasswordText?.newPasswordConfirmLabel ?? '');
   r9.setNewPasswordLabel(map.initPasswordText?.newPasswordLabel ?? '');
@@ -229,6 +229,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r21.setExternalLoginDescription(map.registrationOptionText?.externalLoginDescription ?? '');
   r21.setTitle(map.registrationOptionText?.title ?? '');
   r21.setUserNameButtonText(map.registrationOptionText?.userNameButtonText ?? '');
+  r21.setLoginButtonText(map.registrationOptionText?.loginButtonText ?? '');
   req.setRegistrationOptionText(r21);
 
   const r22 = new RegistrationOrgScreenText();
@@ -239,13 +240,13 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r22.setOrgnameLabel(map.registrationOrgText?.orgnameLabel ?? '');
   r22.setPasswordConfirmLabel(map.registrationOrgText?.passwordConfirmLabel ?? '');
   r22.setPasswordLabel(map.registrationOrgText?.passwordLabel ?? '');
-  r22.setTosConfirmAnd(map.registrationOrgText?.tosConfirm ?? '');
+  r22.setPrivacyConfirm(map.registrationOrgText?.privacyConfirm ?? '');
   r22.setPrivacyLinkText(map.registrationOrgText?.privacyLinkText ?? '');
   r22.setSaveButtonText(map.registrationOrgText?.saveButtonText ?? '');
   r22.setTitle(map.registrationOrgText?.title ?? '');
   r22.setTosAndPrivacyLabel(map.registrationOrgText?.tosAndPrivacyLabel ?? '');
   r22.setTosConfirm(map.registrationOrgText?.tosConfirm ?? '');
-  r22.setTosConfirmAnd(map.registrationOrgText?.tosConfirmAnd ?? '');
+  r22.setPrivacyConfirm(map.registrationOrgText?.privacyConfirm ?? '');
   r22.setTosLinkText(map.registrationOrgText?.tosLinkText ?? '');
   r22.setUsernameLabel(map.registrationOrgText?.usernameLabel ?? '');
   req.setRegistrationOrgText(r22);
@@ -263,7 +264,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r23.setPasswordConfirmLabel(map.registrationUserText?.passwordConfirmLabel ?? '');
   r23.setPasswordLabel(map.registrationUserText?.passwordLabel ?? '');
   r23.setTosConfirm(map.registrationUserText?.tosConfirm ?? '');
-  r23.setTosConfirmAnd(map.registrationUserText?.tosConfirmAnd ?? '');
+  r23.setPrivacyConfirm(map.registrationUserText?.privacyConfirm ?? '');
   r23.setTosLinkText(map.registrationUserText?.tosLinkText ?? '');
   r23.setPrivacyLinkText(map.registrationUserText?.privacyLinkText ?? '');
   r23.setTitle(map.registrationUserText?.title ?? '');
@@ -333,7 +334,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r31.setDescriptionClose(map.passwordlessRegistrationDoneText?.descriptionClose ?? '');
   r31.setNextButtonText(map.passwordlessRegistrationDoneText?.nextButtonText ?? '');
   r31.setTitle(map.passwordlessRegistrationDoneText?.title ?? '');
-  r31.setNextButtonText(map.passwordlessRegistrationDoneText?.cancelButtonText ?? '');
+  r31.setCancelButtonText(map.passwordlessRegistrationDoneText?.cancelButtonText ?? '');
   req.setPasswordlessRegistrationDoneText(r31);
 
   const r32 = new PasswordlessRegistrationScreenText();
@@ -368,7 +369,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r34.setTitle(map.externalRegistrationUserOverviewText?.title ?? '');
   r34.setTosAndPrivacyLabel(map.externalRegistrationUserOverviewText?.tosAndPrivacyLabel ?? '');
   r34.setTosConfirm(map.externalRegistrationUserOverviewText?.tosConfirm ?? '');
-  r34.setTosConfirmAnd(map.externalRegistrationUserOverviewText?.tosConfirmAnd ?? '');
+  r34.setPrivacyConfirm(map.externalRegistrationUserOverviewText?.privacyConfirm ?? '');
   r34.setTosLinkText(map.externalRegistrationUserOverviewText?.tosLinkText ?? '');
   r34.setUsernameLabel(map.externalRegistrationUserOverviewText?.usernameLabel ?? '');
   req.setExternalRegistrationUserOverviewText(r34);

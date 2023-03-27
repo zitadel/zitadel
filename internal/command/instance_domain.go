@@ -187,3 +187,12 @@ func containsURI(uris []string, uri string) bool {
 	}
 	return false
 }
+
+func (c *Commands) getInstanceDomainsWriteModel(ctx context.Context, instanceID string) (*InstanceDomainsWriteModel, error) {
+	domainsWriteModel := NewInstanceDomainsWriteModel(instanceID)
+	err := c.eventstore.FilterToQueryReducer(ctx, domainsWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return domainsWriteModel, nil
+}

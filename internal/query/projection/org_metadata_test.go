@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -37,11 +38,10 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_metadata (instance_id, org_id, key, resource_owner, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, org_id, key) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, value) = (EXCLUDED.resource_owner, EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
+							expectedStmt: "INSERT INTO projections.org_metadata2 (instance_id, org_id, key, resource_owner, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, org_id, key) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, value) = (EXCLUDED.resource_owner, EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
@@ -73,14 +73,14 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1) AND (key = $2)",
+							expectedStmt: "DELETE FROM projections.org_metadata2 WHERE (org_id = $1) AND (key = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"key",
+								"instance-id",
 							},
 						},
 					},
@@ -101,12 +101,42 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_metadata2 WHERE (org_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceOwnerRemoved(org removed)",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&orgMetadataProjection{}).reduceOwnerRemoved,
+			want: wantReduce{
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.org_metadata2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -115,24 +145,23 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceMetadataRemovedAll (org removed)",
+			name: "reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
 					nil,
-				), org.OrgRemovedEventMapper),
+				), instance.InstanceRemovedEventMapper),
 			},
-			reduce: (&orgMetadataProjection{}).reduceMetadataRemovedAll,
+			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_metadata2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -152,7 +181,7 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, OrgMetadataProjectionTable, tt.want)
 		})
 	}
 }

@@ -2,14 +2,16 @@ package domain
 
 const (
 	OrgDomainPrimaryScope = "urn:zitadel:iam:org:domain:primary:"
+	OrgIDScope            = "urn:zitadel:iam:org:id:"
 	OrgDomainPrimaryClaim = "urn:zitadel:iam:org:domain:primary"
+	OrgIDClaim            = "urn:zitadel:iam:org:id"
 	ProjectIDScope        = "urn:zitadel:iam:org:project:id:"
 	ProjectIDScopeZITADEL = "zitadel"
 	AudSuffix             = ":aud"
 	SelectIDPScope        = "urn:zitadel:iam:org:idp:id:"
 )
 
-//TODO: Change AuthRequest to interface and let oidcauthreqesut implement it
+// TODO: Change AuthRequest to interface and let oidcauthreqesut implement it
 type Request interface {
 	Type() AuthRequestType
 	IsValid() bool
@@ -40,7 +42,6 @@ func (a *AuthRequestOIDC) IsValid() bool {
 
 type AuthRequestSAML struct {
 	ID          string
-	RequestID   string
 	BindingType string
 	Code        string
 	Issuer      string

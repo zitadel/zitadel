@@ -5,6 +5,7 @@ const (
 	OrgProjectMappingKeyOrgID          = "org_id"
 	OrgProjectMappingKeyProjectGrantID = "project_grant_id"
 	OrgProjectMappingKeyInstanceID     = "instance_id"
+	OrgProjectMappingOwnerRemoved      = "owner_removed"
 )
 
 type OrgProjectMapping struct {

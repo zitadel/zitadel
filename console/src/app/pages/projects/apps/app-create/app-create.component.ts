@@ -2,20 +2,20 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Buffer } from 'buffer';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import {
   APIAuthMethodType,
   OIDCAppType,
   OIDCAuthMethodType,
   OIDCGrantType,
   OIDCResponseType,
-  SAMLConfig,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
   AddAPIAppRequest,
@@ -34,8 +34,8 @@ import {
   CODE_METHOD,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
-  PK_JWT_METHOD,
   PKCE_METHOD,
+  PK_JWT_METHOD,
   POST_METHOD,
 } from '../authmethods';
 import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
@@ -111,8 +111,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   }[] = [
     { type: OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT, checked: false, disabled: true },
-    // { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false, disabled: true },
-    // TODO show when implemented
+    { type: OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, checked: false, disabled: true },
   ];
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -129,8 +128,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     private breadcrumbService: BreadcrumbService,
   ) {
     this.form = this.fb.group({
-      name: ['', [Validators.required]],
-      appType: ['', [Validators.required]],
+      name: ['', [requiredValidator]],
+      appType: ['', [requiredValidator]],
       // apptype OIDC
       responseTypesList: ['', []],
       grantTypesList: ['', []],
@@ -142,8 +141,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     this.initForm();
 
     this.firstFormGroup = this.fb.group({
-      name: ['', [Validators.required]],
-      appType: [WEB_TYPE, [Validators.required]],
+      name: ['', [requiredValidator]],
+      appType: [WEB_TYPE, [requiredValidator]],
     });
 
     this.samlConfigForm = this.fb.group({
@@ -194,7 +193,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     });
 
     this.secondFormGroup = this.fb.group({
-      authMethod: [this.authMethods[0].key, [Validators.required]],
+      authMethod: [this.authMethods[0].key, [requiredValidator]],
     });
 
     this.secondFormGroup.valueChanges.subscribe((form) => {
@@ -278,8 +277,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public setDevFormValidators(): void {
     if (this.isDevOIDC) {
-      const grantTypesControl = new UntypedFormControl('', [Validators.required]);
-      const responseTypesControl = new UntypedFormControl('', [Validators.required]);
+      const grantTypesControl = new UntypedFormControl('', [requiredValidator]);
+      const responseTypesControl = new UntypedFormControl('', [requiredValidator]);
 
       this.form.addControl('grantTypesList', grantTypesControl);
       this.form.addControl('responseTypesList', responseTypesControl);

@@ -8,13 +8,21 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <link rel="stylesheet" href="{{ resourceThemeUrl "css/zitadel.css" .Theme }}" type="text/css">
-    <link rel="icon" type="image/x-icon" href="{{ resourceThemeUrl "favicon.ico" .Theme }}">
+    
     {{ if hasCustomPolicy .LabelPolicy }}
-    <link rel="stylesheet" href="{{ variablesCssFileUrl .PrivateLabelingOrgID .LabelPolicy}}" type="text/css">
-    {{ end}}
+        <link rel="stylesheet" href="{{ variablesCssFileUrl .PrivateLabelingOrgID .LabelPolicy}}" type="text/css">
+        {{ $icon := customIconResource .PrivateLabelingOrgID .LabelPolicy .DarkMode }}
+        {{if $icon}}
+            <link rel="icon" type="image" href="{{$icon}}">
+        {{end}}
+    {{ else }}
+        <link rel="icon" type="image/x-icon" href="{{ resourceThemeUrl "favicon.ico" .Theme }}">
+    {{ end }}
+
     <link rel="stylesheet" href="{{ resourceThemeUrl "../../fonts/lgn-icons/css/lgn-icon-font.css" .Theme }}">
 
     <title>{{ .Title }}</title>
+    <meta name="description" content="{{ .Description }}"/>
 
     <script src="{{ resourceUrl "scripts/theme.js" }}"></script>
 </head>

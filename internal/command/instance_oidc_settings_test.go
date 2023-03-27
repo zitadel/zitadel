@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -34,7 +35,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "oidc config, error already exists",
+			name: "oidc settings, error already exists",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -52,7 +53,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        1 * time.Hour,
 					IdTokenLifetime:            1 * time.Hour,
@@ -65,7 +66,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "add secret generator, ok",
+			name: "add oidc settings, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -100,6 +101,86 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "INSTANCE",
 				},
+			},
+		},
+		{
+			name: "add oidc settings, invalid argument 1",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				oidcConfig: &domain.OIDCSettings{
+					AccessTokenLifetime:        0 * time.Hour,
+					IdTokenLifetime:            1 * time.Hour,
+					RefreshTokenIdleExpiration: 1 * time.Hour,
+					RefreshTokenExpiration:     1 * time.Hour,
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add oidc settings, invalid argument 2",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				oidcConfig: &domain.OIDCSettings{
+					AccessTokenLifetime:        1 * time.Hour,
+					IdTokenLifetime:            0 * time.Hour,
+					RefreshTokenIdleExpiration: 1 * time.Hour,
+					RefreshTokenExpiration:     1 * time.Hour,
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add oidc settings, invalid argument 3",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				oidcConfig: &domain.OIDCSettings{
+					AccessTokenLifetime:        1 * time.Hour,
+					IdTokenLifetime:            1 * time.Hour,
+					RefreshTokenIdleExpiration: 0 * time.Hour,
+					RefreshTokenExpiration:     1 * time.Hour,
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add oidc settings, invalid argument 4",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				oidcConfig: &domain.OIDCSettings{
+					AccessTokenLifetime:        1 * time.Hour,
+					IdTokenLifetime:            1 * time.Hour,
+					RefreshTokenIdleExpiration: 1 * time.Hour,
+					RefreshTokenExpiration:     0 * time.Hour,
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -141,7 +222,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "oidc config not existing, not found error",
+			name: "oidc settings not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -150,9 +231,95 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
+				oidcConfig: &domain.OIDCSettings{
+					AccessTokenLifetime:        1 * time.Hour,
+					IdTokenLifetime:            1 * time.Hour,
+					RefreshTokenIdleExpiration: 1 * time.Hour,
+					RefreshTokenExpiration:     1 * time.Hour,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "no changes, invalid argument error 1",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				oidcConfig: &domain.OIDCSettings{
+					AccessTokenLifetime:        0 * time.Hour,
+					IdTokenLifetime:            1 * time.Hour,
+					RefreshTokenIdleExpiration: 1 * time.Hour,
+					RefreshTokenExpiration:     1 * time.Hour,
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "no changes, invalid argument error 2",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				oidcConfig: &domain.OIDCSettings{
+					AccessTokenLifetime:        1 * time.Hour,
+					IdTokenLifetime:            0 * time.Hour,
+					RefreshTokenIdleExpiration: 1 * time.Hour,
+					RefreshTokenExpiration:     1 * time.Hour,
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "no changes, invalid argument error 3",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				oidcConfig: &domain.OIDCSettings{
+					AccessTokenLifetime:        1 * time.Hour,
+					IdTokenLifetime:            1 * time.Hour,
+					RefreshTokenIdleExpiration: 0 * time.Hour,
+					RefreshTokenExpiration:     1 * time.Hour,
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "no changes, invalid argument error 4",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				oidcConfig: &domain.OIDCSettings{
+					AccessTokenLifetime:        1 * time.Hour,
+					IdTokenLifetime:            1 * time.Hour,
+					RefreshTokenIdleExpiration: 1 * time.Hour,
+					RefreshTokenExpiration:     0 * time.Hour,
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -175,7 +342,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        1 * time.Hour,
 					IdTokenLifetime:            1 * time.Hour,
@@ -188,7 +355,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "secret generator change, ok",
+			name: "oidc settings change, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -206,8 +373,9 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
-								newOIDCConfigChangedEvent(context.Background(),
+							eventFromEventPusherWithInstanceID("INSTANCE",
+								newOIDCConfigChangedEvent(
+									context.Background(),
 									time.Hour*2,
 									time.Hour*2,
 									time.Hour*2,
@@ -218,7 +386,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        2 * time.Hour,
 					IdTokenLifetime:            2 * time.Hour,

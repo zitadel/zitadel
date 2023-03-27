@@ -8,10 +8,12 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Certificate interface {
@@ -47,7 +49,8 @@ func (c *rsaCertificate) Certificate() []byte {
 
 var (
 	certificateTable = table{
-		name: projection.CertificateTable,
+		name:          projection.CertificateTable,
+		instanceIDCol: projection.CertificateColumnInstanceID,
 	}
 	CertificateColID = Column{
 		name:  projection.CertificateColumnID,
@@ -63,8 +66,11 @@ var (
 	}
 )
 
-func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (*Certificates, error) {
-	query, scan := prepareCertificateQuery()
+func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (_ *Certificates, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareCertificateQuery(ctx, q.client)
 	if t.IsZero() {
 		t = time.Now()
 	}
@@ -74,13 +80,10 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				KeyColUse.identifier():        usage,
 			},
-			sq.Gt{
-				CertificateColExpiry.identifier(): t,
-			},
-			sq.Gt{
-				KeyPrivateColExpiry.identifier(): t,
-			},
-		}).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
+			sq.Gt{CertificateColExpiry.identifier(): t},
+			sq.Gt{KeyPrivateColExpiry.identifier(): t},
+		},
+	).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
 	}
@@ -100,7 +103,7 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 	return keys, nil
 }
 
-func prepareCertificateQuery() (sq.SelectBuilder, func(*sql.Rows) (*Certificates, error)) {
+func prepareCertificateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Certificates, error)) {
 	return sq.Select(
 			KeyColID.identifier(),
 			KeyColCreationDate.identifier(),
@@ -115,7 +118,7 @@ func prepareCertificateQuery() (sq.SelectBuilder, func(*sql.Rows) (*Certificates
 			countColumn.identifier(),
 		).From(keyTable.identifier()).
 			LeftJoin(join(CertificateColID, KeyColID)).
-			LeftJoin(join(KeyPrivateColID, KeyColID)).
+			LeftJoin(join(KeyPrivateColID, KeyColID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Certificates, error) {
 			certificates := make([]Certificate, 0)

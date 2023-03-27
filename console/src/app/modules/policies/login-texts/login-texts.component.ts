@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
 import { map, pairwise, startWith, takeUntil } from 'rxjs/operators';
@@ -109,7 +109,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public KeyNamesArray: string[] = KeyNamesArray;
-  public LOCALES: string[] = ['en', 'de', 'it'];
+  public LOCALES: string[] = ['de', 'en', 'fr', 'it', 'ja', 'pl', 'zh'];
 
   private sub: Subscription = new Subscription();
 

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/errors"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
@@ -60,8 +61,22 @@ func (f Gender) Specified() bool {
 	return f > GenderUnspecified && f < genderCount
 }
 
-func (u *Human) IsValid() bool {
-	return u.Username != "" && u.Profile != nil && u.Profile.IsValid() && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
+func (u *Human) Normalize() error {
+	if u.Username == "" {
+		return errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Username.Empty")
+	}
+	if err := u.Profile.Validate(); err != nil {
+		return err
+	}
+	if err := u.Email.Validate(); err != nil {
+		return err
+	}
+	if u.Phone != nil && u.Phone.PhoneNumber != "" {
+		if err := u.Phone.Normalize(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {
@@ -69,7 +84,7 @@ func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {
 		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-zSH7j", "Errors.Users.DomainPolicyNil")
 	}
 	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.Username == "" && u.Email != nil {
-		u.Username = u.EmailAddress
+		u.Username = string(u.EmailAddress)
 	}
 	return nil
 }
@@ -89,7 +104,10 @@ func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, passwor
 }
 
 func (u *Human) IsInitialState(passwordless, externalIDPs bool) bool {
-	return u.Email == nil || !u.IsEmailVerified || !externalIDPs && !passwordless && (u.Password == nil || u.Password.SecretString == "") && (u.HashedPassword == nil || u.HashedPassword.SecretString == "")
+	if externalIDPs {
+		return false
+	}
+	return u.Email == nil || !u.IsEmailVerified || !passwordless && (u.Password == nil || u.Password.SecretString == "") && (u.HashedPassword == nil || u.HashedPassword.SecretString == "")
 }
 
 func NewInitUserCode(generator crypto.Generator) (*InitUserCode, error) {

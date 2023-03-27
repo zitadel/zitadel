@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: 注册
   NextButtonText: 继续
 
+LDAP:
+  Title: 注册
+  Description: 输入您的登录数据。
+  LoginNameLabel: 登录名
+  PasswordLabel: 密码
+  NextButtonText: 继续
+
 SelectAccount:
   Title: 选择账户
   Description: 使用您的 ZITADEL 帐户
@@ -47,13 +54,13 @@ UsernameChangeDone:
   Description: 您的用户名已成功更改。
   NextButtonText: 继续
 
-InitPassword: 
+InitPassword:
   Title: 设置密码
   Description: 您将到一个验证码，您必须在下面输入该验证码以设置您的新密码。
   CodeLabel: 验证码
   NewPasswordLabel: 新密码
   NewPasswordConfirmLabel: 确认密码
-  ResendButtonText: 重新发送
+  ResendButtonText: 重发代码
   NextButtonText: 继续
 
 InitPasswordDone:
@@ -64,12 +71,12 @@ InitPasswordDone:
 
 InitUser:
   Title: 激活用户
-  Description: 您将收到一个验证码，您必须在下面输入该验证码，以验证您的电子邮件并设置您的新密码。
+  Description: 请在下面输入您收到的验证码，以验证您的电子邮件并设置您的密码。
   CodeLabel: 验证码
   NewPasswordLabel: 新密码
-  NewPasswordConfirmLabel: 确认密码
+  NewPasswordConfirm: 确认密码
   NextButtonText: 继续
-  ResendButtonText: 重新发送
+  ResendButtonText: 重发代码
 
 InitUserDone:
   Title: 用户已激活
@@ -78,16 +85,16 @@ InitUserDone:
   CancelButtonText: 取消
 
 InitMFAPrompt:
-  Title: 多因素身份认证设置
-  Description: 您想设置多因素身份认证吗？
-  Provider0: OTP（一次性密码）
-  Provider1: U2F（通用两步验证）
+  Title: 两步验证设置
+  Description: 两步验证为您的账户提供了额外的安全保障。这确保只有你能访问你的账户。
+  Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
+  Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
   NextButtonText: 继续
   SkipButtonText: 跳过
 
 InitMFAOTP:
-  Title: 多因素验证
-  Description: 验证您的多因素身份认证。
+  Title: 双因素验证
+  Description: 创建你的双因素。如果你还没有，请下载一个认证器应用程序。
   OTPDescription: 使用您的身份验证器应用程序（例如 Google Authenticator）扫描代码或复制密码并在下方插入生成的代码。
   SecretLabel: 秘钥
   CodeLabel: 验证码
@@ -95,48 +102,48 @@ InitMFAOTP:
   CancelButtonText: 取消
 
 InitMFAU2F:
-  Title: 多因素身份认证设置 U2F / WebAuthN
-  Description: 通过提供名称添加您的令牌，然后单击下面的“注册令牌”按钮。
-  TokenNameLabel: 令牌/机器的名称
+  Title: 添加安全密钥
+  Description: 安全密钥是一种验证方法，可以内置在手机中、使用蓝牙或直接插入计算机的 USB 端口。
+  TokenNameLabel: 双因素/设备的名称
   NotSupported: 您的浏览器不支持 WebAuthN。请确保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
-  RegisterTokenButtonText: 注册令牌
+  RegisterTokenButtonText: 注册双因素
   ErrorRetry: 重试、创建新挑战码或选择不同的方法。
 
 InitMFADone:
-  Title: 多因素身份认证验证完成
-  Description: 多因素验证成功完成。必须在每次登录时输入多因素身份认证。
+  Title: 2-Factor设置完成
+  Description: 真棒！你刚刚成功地设置了你的双因素，使你的账户更加安全。你刚刚成功地设置了你的双因素，使你的账户更加安全。第二次因素必须在每次登录时输入。
   NextButtonText: 继续
   CancelButtonText: 取消
 
 MFAProvider:
-  Provider0: OTP（一次性密码）
-  Provider1: U2F（通用第二因素身份认证）
+  Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
+  Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
   ChooseOther: 或选择其他选项
 
 VerifyMFAOTP:
-  Title: 验证多因素
-  Description: 验证您的多因素
+  Title: 验证2-Factor
+  Description: 验证你的第二个因素
   CodeLabel: 验证码
   NextButtonText: 继续
 
 VerifyMFAU2F:
-  Title: 多因素验证
-  Description: 验证您的多因素 U2F / WebAuthN 令牌
+  Title: 验证2-Factor
+  Description: 用注册的设备验证你的2-Factor（如FaceID、Windows Hello、Fingerprint）。
   NotSupported: 您的浏览器不支持 WebAuthN。确保您使用的是最新版本或将您的浏览器更改为受支持的版本（Chrome、Safari、Firefox）
   ErrorRetry: 重试、创建新请求或选择其他方法。
-  ValidateTokenButtonText: 验证令牌
+  ValidateTokenButtonText: 验证2-Factor
 
 Passwordless:
   Title: 无密码登录
-  Description: 验证您的令牌
+  Description: 用你的设备提供的认证方法登录，如FaceID、Windows Hello或指纹。
   NotSupported: 您的浏览器不支持 WebAuthN。请确保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
   ErrorRetry: 重试、创建新挑战码或选择不同的方法。
   LoginWithPwButtonText: 使用密码登录
-  ValidateTokenButtonText: 验证令牌
+  ValidateTokenButtonText: 使用无密码登录
 
 PasswordlessPrompt:
   Title: 无密码登录设置
-  Description: 您想设置无密码登录吗？
+  Description: 您想设置无密码登录吗？你的设备的认证方法，如FaceID、Windows Hello或指纹。
   DescriptionInit: 您需要设置无密码登录，使用您提供的链接来注册您的设备。
   PasswordlessButtonText: 去设置无密码登录
   NextButtonText: 继续
@@ -144,15 +151,15 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: 无密码设置
-  Description: 通过提供名称添加您的令牌，然后单击下面的“注册令牌”按钮。
-  TokenNameLabel: 令牌/机器的名称
+  Description: 通过提供一个名称（如 MyMobilePhone、MacBook等），然后点击下面的 "注册无密码" 按钮，添加你的认证。
+  TokenNameLabel: 设备的名称
   NotSupported: 您的浏览器不支持 WebAuthN。请确保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
-  RegisterTokenButtonText: 注册令牌
+  RegisterTokenButtonText: 注册无密码
   ErrorRetry: 重试、创建新挑战码或选择不同的方法。
 
 PasswordlessRegistrationDone:
   Title: 无密码登录设置完成
-  Description: 已成功添加无密码令牌。
+  Description: 成功添加无密码的设备。
   DescriptionClose: 您现在可以关闭此窗口
   NextButtonText: 继续
   CancelButtonText: 取消
@@ -172,7 +179,7 @@ PasswordChangeDone:
   NextButtonText: 继续
 
 PasswordResetDone:
-  Title: 重置链
+  Title: 发送密码重置链接
   Description: 请检查您的电子邮件以重置您的密码。
   NextButtonText: 继续
 
@@ -181,7 +188,7 @@ EmailVerification:
   Description: 我们已向您发送一封电子邮件以验证您的地址。请在下面的表格中输入验证码。
   CodeLabel: 验证码
   NextButtonText: 继续
-  ResendButtonText: 重新发送
+  ResendButtonText: 重发代码
 
 EmailVerificationDone:
   Title: 电子邮件验证
@@ -195,6 +202,7 @@ RegisterOption:
   Description: 选择您的注册方式
   RegisterUsernamePasswordButtonText: 使用用户名密码
   ExternalLoginDescription: 或使用外部身份提供者
+  LoginButtonText: 登录
 
 RegistrationUser:
   Title: 注册
@@ -210,6 +218,8 @@ RegistrationUser:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -219,10 +229,10 @@ RegistrationUser:
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
-  TosConfirmAnd: 和
+  PrivacyConfirm: 我接受
   PrivacyLinkText: 隐私政策
   ExternalLogin: 使用外部身份提供者注册
-  BackButtonText: 返回
+  BackButtonText: 登录
   NextButtonText: 继续
 
 ExternalRegistrationUserOverview:
@@ -235,15 +245,17 @@ ExternalRegistrationUserOverview:
   NicknameLabel: 昵称
   PhoneLabel: 手机号码
   LanguageLabel: 语言
-  German: 德语
-  English: 英语
-  Italian: 意大利语
-  French: 法语
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
-  TosConfirmAnd: 和
+  PrivacyConfirm: 我接受
   PrivacyLinkText: 隐私政策
   ExternalLogin: 使用外部身份提供者注册
   BackButtonText: 返回
@@ -262,7 +274,7 @@ RegistrationOrg:
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
-  TosConfirmAnd: 和
+  PrivacyConfirm: 我接受
   PrivacyLinkText: 隐私政策
   SaveButtonText: 创建组织
 
@@ -283,21 +295,23 @@ LinkingUsersDone:
   CancelButtonText: 取消
   NextButtonText: 继续
 
-ExternalNotFoundOption:
-  Title: 外部用户
+ExternalNotFound:
+  Title: 未找到外部用户
   Description: 未找到外部用户。你想绑定你已存在的用户还是自动注册一个新用户。
   LinkButtonText: 绑定
   AutoRegisterButtonText: 注册
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
-  TosConfirmAnd: 和
+  PrivacyConfirm: 我接受
   PrivacyLinkText: 隐私政策
-  German: 德语
-  English: 英语
-  Italian: 意大利语
-  French: 法语
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Powered By
@@ -316,6 +330,7 @@ Errors:
     MissingParameters: 缺少必需的参数
   User:
     NotFound: 找不到用户
+    AlreadyExists: 用户已存在
     Inactive: 用户处于停用状态
     NotFoundOnOrg: 在所选组织中找不到用户
     NotAllowedOrg: 用户不是所需组织的成员
@@ -324,6 +339,33 @@ Errors:
     Invalid: 无效的用户数据
     DomainNotAllowedAsUsername: 域名已存在，但无法使用
     NotAllowedToLink: 不允许用户使用外部身份提供者注册
+    Profile:
+      NotFound: 未找到个人资料
+      NotChanged: 个人资料未更改
+      Empty: 简介是空的
+      FirstNameEmpty: 简介中的名字是空的
+      LastNameEmpty: 简介中的姓氏是空的
+      IDMissing: 简介ID丢失
+    Email:
+      NotFound: 电子邮件没有找到
+      Invalid: 电子邮件无效
+      AlreadyVerified: 电子邮件已经过验证
+      NotChanged: 电子邮件未更改
+      Empty: 电子邮件是空的
+      IDMissing: 电子邮件ID丢失
+    Phone:
+      NotFound: 手机号码未找到
+      Invalid: 手机号码无效
+      AlreadyVerified: 手机号码已经验证
+      Empty: 电话号码是空的
+      NotChanged: 电话号码没有改变
+    Address:
+      NotFound: 找不到地址
+      NotChanged: 地址没有改变
+    Username:
+      AlreadyExists: 用户名已被使用
+      Reserved: 用户名已被使用
+      Empty: 用户名是空的
     Password:
       ConfirmationWrong: 密码不一致
       Empty: 密码为空
@@ -366,6 +408,8 @@ Errors:
       ExternalUserIDEmpty: 外部用户 ID 为空
       UserDisplayNameEmpty: 用户显示名称为空
       NoExternalUserData: 未收到外部用户数据
+      CreationNotAllowed: 不允许在该供应商上创建新用户
+      LinkingNotAllowed: 在此提供者上不允许链接一个用户
     GrantRequired: 无法登录，用户需要在应用程序上拥有至少一项授权，请联系您的管理员。
     ProjectRequired: 无法登录，用户的组织必须授予项目，请联系您的管理员。
   IdentityProvider:
@@ -373,5 +417,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: 用户锁定政策不存在
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: 不允许注册
 
 optional: (可选)

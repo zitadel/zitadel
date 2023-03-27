@@ -2,6 +2,7 @@ package repository
 
 import (
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 
@@ -11,11 +12,47 @@ import (
 )
 
 type FailedEvent struct {
-	ViewName       string `gorm:"column:view_name;primary_key"`
-	FailedSequence uint64 `gorm:"column:failed_sequence;primary_key"`
-	FailureCount   uint64 `gorm:"column:failure_count"`
-	ErrMsg         string `gorm:"column:err_msg"`
-	InstanceID     string `gorm:"column:instance_id"`
+	ViewName       string    `gorm:"column:view_name;primary_key"`
+	FailedSequence uint64    `gorm:"column:failed_sequence;primary_key"`
+	FailureCount   uint64    `gorm:"column:failure_count"`
+	ErrMsg         string    `gorm:"column:err_msg"`
+	InstanceID     string    `gorm:"column:instance_id"`
+	LastFailed     time.Time `gorm:"column:last_failed"`
+}
+
+type failedEventSearchRequest struct {
+	Offset        uint64
+	Limit         uint64
+	SortingColumn failedEventSearchKey
+	Asc           bool
+	Queries       []*FailedEventSearchQuery
+}
+
+func (f failedEventSearchRequest) GetLimit() uint64 {
+	return f.Limit
+}
+
+func (f failedEventSearchRequest) GetOffset() uint64 {
+	return f.Offset
+}
+
+func (f failedEventSearchRequest) GetSortingColumn() ColumnKey {
+	if f.SortingColumn == failedEventSearchKey(FailedEventKeyUndefined) {
+		return nil
+	}
+	return f.SortingColumn
+}
+
+func (f failedEventSearchRequest) GetAsc() bool {
+	return f.Asc
+}
+
+func (f failedEventSearchRequest) GetQueries() []SearchQuery {
+	result := make([]SearchQuery, len(f.Queries))
+	for i, q := range f.Queries {
+		result[i] = q
+	}
+	return result
 }
 
 type FailedEventSearchQuery struct {
@@ -43,6 +80,7 @@ const (
 	FailedEventKeyViewName
 	FailedEventKeyFailedSequence
 	FailedEventKeyInstanceID
+	FailedEventKeyLastFailed
 )
 
 type failedEventSearchKey FailedEventSearchKey
@@ -55,6 +93,8 @@ func (key failedEventSearchKey) ToColumnName() string {
 		return "failed_sequence"
 	case FailedEventKeyInstanceID:
 		return "instance_id"
+	case FailedEventKeyLastFailed:
+		return "last_failed"
 	default:
 		return ""
 	}
@@ -65,6 +105,7 @@ func FailedEventFromModel(failedEvent *view_model.FailedEvent) *FailedEvent {
 		ViewName:       failedEvent.Database + "." + failedEvent.ViewName,
 		FailureCount:   failedEvent.FailureCount,
 		FailedSequence: failedEvent.FailedSequence,
+		InstanceID:     failedEvent.InstanceID,
 		ErrMsg:         failedEvent.ErrMsg,
 	}
 }
@@ -76,6 +117,7 @@ func FailedEventToModel(failedEvent *FailedEvent) *view_model.FailedEvent {
 		FailureCount:   failedEvent.FailureCount,
 		FailedSequence: failedEvent.FailedSequence,
 		ErrMsg:         failedEvent.ErrMsg,
+		LastFailed:     failedEvent.LastFailed,
 	}
 }
 
@@ -123,9 +165,13 @@ func LatestFailedEvent(db *gorm.DB, table, viewName, instanceID string, sequence
 
 }
 
-func AllFailedEvents(db *gorm.DB, table string) ([]*FailedEvent, error) {
+func AllFailedEvents(db *gorm.DB, table, instanceID string) ([]*FailedEvent, error) {
+	queries := make([]*FailedEventSearchQuery, 0, 1)
+	if instanceID != "" {
+		queries = append(queries, &FailedEventSearchQuery{Key: FailedEventKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID})
+	}
 	failedEvents := make([]*FailedEvent, 0)
-	query := PrepareSearchQuery(table, GeneralSearchRequest{})
+	query := PrepareSearchQuery(table, &failedEventSearchRequest{SortingColumn: failedEventSearchKey(FailedEventKeyLastFailed), Queries: queries})
 	_, err := query(db, &failedEvents)
 	if err != nil {
 		return nil, err

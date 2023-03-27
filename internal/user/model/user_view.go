@@ -94,6 +94,7 @@ const (
 	UserSearchKeyType
 	UserSearchKeyPreferredLoginName
 	UserSearchKeyInstanceID
+	UserSearchOwnerRemoved
 )
 
 type UserSearchQuery struct {

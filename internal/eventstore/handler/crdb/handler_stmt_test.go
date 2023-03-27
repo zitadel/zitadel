@@ -12,6 +12,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -114,6 +115,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				SearchQueryBuilder: eventstore.
 					NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AllowTimeTravel().
 					AddQuery().
 					AggregateTypes("testAgg").
 					SequenceGreater(5).
@@ -143,6 +145,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				SearchQueryBuilder: eventstore.
 					NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AllowTimeTravel().
 					AddQuery().
 					AggregateTypes("testAgg").
 					SequenceGreater(5).
@@ -171,7 +174,9 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				SequenceTable: tt.fields.sequenceTable,
 				BulkLimit:     tt.fields.bulkLimit,
-				Client:        client,
+				Client: &database.DB{
+					DB: client,
+				},
 			})
 
 			h.aggregates = tt.fields.aggregates
@@ -269,9 +274,10 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "fetch previous fails",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).
 						ExpectFilterEventsError(errFilter),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -301,8 +307,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "no successful stmts",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -339,8 +346,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "update current sequence fails",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"agg"},
 			},
@@ -381,8 +389,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "commit fails",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"agg"},
 			},
@@ -423,8 +432,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "correct",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -455,8 +465,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "fetch previous stmts no additional stmts",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -486,7 +497,7 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "fetch previous stmts additional events",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							AggregateType:             "testAgg",
@@ -495,6 +506,7 @@ func TestStatementHandler_Update(t *testing.T) {
 							InstanceID:                "instanceID",
 						},
 					),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -542,7 +554,9 @@ func TestStatementHandler_Update(t *testing.T) {
 				sequenceTable:           "my_sequences",
 				currentSequenceStmt:     fmt.Sprintf(currentSequenceStmtFormat, "my_sequences"),
 				updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, "my_sequences"),
-				client:                  client,
+				client: &database.DB{
+					DB: client,
+				},
 			}
 
 			h.aggregates = tt.fields.aggregates
@@ -617,8 +631,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				stmtSeq: 6,
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEventsError(errFilter),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -642,8 +657,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				stmtSeq: 6,
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -666,7 +682,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				stmtSeq: 10,
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							ID:                        "id",
@@ -690,6 +706,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 						},
 					),
 				),
+				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
 			want: want{
@@ -712,7 +729,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				stmtSeq: 10,
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							ID:                        "id",
@@ -725,6 +742,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 							AggregateType:             "testAgg",
 						},
 					),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -1110,7 +1128,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 						ProjectionName: tt.fields.projectionName,
 						RequeueEvery:   0,
 					},
-					Client:            client,
+					Client: &database.DB{
+						DB: client,
+					},
 					FailedEventsTable: tt.fields.failedEventsTable,
 					MaxFailureCount:   tt.fields.maxFailureCount,
 				},

@@ -8,11 +8,10 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
-	OIDCSettingsProjectionTable = "projections.oidc_settings"
+	OIDCSettingsProjectionTable = "projections.oidc_settings2"
 
 	OIDCSettingsColumnAggregateID                = "aggregate_id"
 	OIDCSettingsColumnCreationDate               = "creation_date"
@@ -43,7 +42,6 @@ func newOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(OIDCSettingsColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(OIDCSettingsColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OIDCSettingsColumnAccessTokenLifetime, crdb.ColumnTypeInt64),
-			crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OIDCSettingsColumnIdTokenLifetime, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OIDCSettingsColumnRefreshTokenIdleExpiration, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OIDCSettingsColumnRefreshTokenExpiration, crdb.ColumnTypeInt64),
@@ -58,7 +56,7 @@ func newOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandler
 func (p *oidcSettingsProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: project.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.OIDCSettingsAddedEventType,
@@ -67,6 +65,10 @@ func (p *oidcSettingsProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.OIDCSettingsChangedEventType,
 					Reduce: p.reduceOIDCSettingsChanged,
+				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(OIDCSettingsColumnInstanceID),
 				},
 			},
 		},
@@ -123,6 +125,7 @@ func (p *oidcSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Even
 		columns,
 		[]handler.Condition{
 			handler.NewCond(OIDCSettingsColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(OIDCSettingsColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

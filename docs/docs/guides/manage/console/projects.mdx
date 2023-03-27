@@ -4,63 +4,101 @@ title: Projects
 
 ## What is a project?
 
-import ProjectDescription from '../../../concepts/structure/_project_description.mdx';
+import ProjectDescription from "../../../concepts/structure/_project_description.mdx";
 
 <ProjectDescription name="ProjectDescription" />
 
-The goal of this module is to give you an overview, but not dive too deep into details around managing access rights and delegating management of roles to third parties. So let’s create a straightforward example project first.
+### Example
+
+If you'd build a Point of Sales Platform, you would have one Project (maybe called `POS`) and all your applications (one Webapplication for administration, and your mobile applications for your users iOS and Android), would be part of it.
+You would have to create roles for administration and your clients in this very project, and then create authorizations based on them.
+
+![POS Project](/img/guides/console/posproject.png)
 
 ## Create a project
 
-Visit <https://{your_domain}.zitadel.cloud/ui/console/projects> or select “Projects” within your organization, then click the button to create a new project.
+To create a project, navigate to your organization, then projects or directly via <https://{your_domain}.zitadel.cloud/ui/console/projects>, and then click the button to create a new project.
 
-![Empty Project](/img/console_projects_empty.png)
+<img alt="Empty Project" src="/docs/img/console_projects_empty.png" width="270px" />
 
-Enter the name “ My first project” and continue.
-
-Let’s make this more interesting and add some basic roles and authorizations to your project and then confirm the scope of the roles and authorizations.
-
-Jump to the section ROLES and create two new roles with the following values
-
-* Key: reader
-* Display Name: Reader
-* Group: user
-
-and
-
-* Key: editor
-* Display Name: Editor
-* Group: user
-
-![Add New Roles](/img/console_projects_add_new_roles.gif)
-
-Now, you can add roles to your own user, or you can create a new user. To create a new user, go to Users and click “New”. Enter the required contact details and save by clicking “Create”.
-
-![Create new user](/img/console_users_create_new_user.gif)
-
-To grant users certain roles, you need to create authorizations. Go back to the project, and jump to the section AUTHORIZATIONS.
-
-![Verify your authorization](/img/console_projects_create_authorization.gif)
-
-You can verify the role grant on the user. Select Users from the navigation menu and click on the user Coyote. Scroll down to the section AUTHORIZATION, there you should be able to verify that the user has the role ‘reader’ for your project ‘My first project’.
-
-![Organization grant](/img/console_projects_authorization_created.png)
-
-Now create another project (eg. “My second project”) and verify that there are no roles or authorizations on your second project.
+then enter your project name and continue.
 
 ## What is a granted project?
 
-import GrantedProjectDescription from '../../../concepts/structure/_granted_project_description.mdx';
+Now imagine you could use the POS platform from the example not only for yourself but sell it to other business partners too.
+Those partners would maybe have the need to have their own domain, their own branding and add additional social login options.
+Setting this up in ZITADEL is very easy since all organizations can overwrite their settings.
+You would only need a method to grant them access.
 
-<GrantedProjectDescription name="GrantedProjectDescription" />
+To add a grant to another organization is done from the project itself. Navigate to grants and hit the new button.
+Now, enter the domain of the partner organization (if you can't remember it, navigate to the organization and pick it up from the detail page), hit search and then continue.
+
+Now select the roles you want this organization to use and save.
+This enables you to lock a certain organization out of a feature if you don't want their users to use it.
+You can learn more about roles [here](./roles).
+
+Organizations can then create authorizations for their users on their own. The project is shown them seperated from their own projects.
+
+<img
+  alt="Granted project"
+  src="/docs/img/guides/console/grantedprojectgrid.png"
+  width="320px"
+/>
 
 ## Grant a project
 
-1. Visit the project that you have created before, then in the section GRANTED ORGANIZATIONS click New.
-2. Enter the domain ‘acme.caos.ch’, search the organization and continue to the next step.
-3. Select some roles you would like to grant to the organization ACME and confirm.
-4. You should now see ACME-CAOS in the section GRANTED ORGANIZATIONS
+1. Visit the project `POS` that you have created before, then in the section **Grants** click **New**.
 
-![Grant a project](/img/projects_create_org_grant.gif)
+<img src="/docs/img/guides/console/grantsmenu.png" alt="Grants" width="170px" />
 
-<!-- //TODO Add whats next again -->
+2. Enter the domain of the organization you want to grant (go to the organization detail page if you can't remember it), hit the search button and continue.
+3. Select some roles you would like to grant to the organization and confirm.
+4. You should now see the granted organization in the section **grants**.
+
+## Project Settings
+
+### Branding
+
+If you have different designs for your organizations or probably and use project grants, you can define the login behaviour on the project detail page.
+
+<img
+  src="/docs/img/guides/console/projectbranding.png"
+  alt="Project branding"
+  width="400px"
+/>
+
+You can choose from
+
+| Setting                                | Description                                                                                                                                                                                                                                                  |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Unspecified                            | If nothing is specified the default will trigger. (System settings)                                                                                                                                                                                          |
+| Enforce project resource owner policy  | This setting will enforce the private labeling of the organization (resource owner) of the project through the whole login process.                                                                                                                          |
+| Allow Login User resource owner policy | With this setting first the private labeling of the organization (resource owner) of the project will trigger. As soon as the user and its organization (resource owner) is identified by ZITADEL, the settings will change to the organization of the user. |
+
+In a B2B use case, you would typically use the organization setting. If you want to omit organization detection, you can preselect an organization with the [primary domain scope](/apis/openidoauth/scopes#reserved-scopes) (ex. `urn:zitadel:iam:org:domain:primary:{domainname}`).
+
+### Role settings
+
+Below the branding settings, you can check different checkboxes to get even more custom behaviour on authentication.
+
+- **Assert Roles on Authentication**:
+  Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.
+- **Check authorization on Authentication**: If set, users are only allowed to authenticate if any role is assigned to their account.
+- **Check for Project on Authentication**:
+  It is checked whether the user's organization has this project. If not, the user cannot be authenticated.
+
+<img
+  src="/docs/img/guides/console/rolesettings.png"
+  width="700px"
+  alt="Role settings"
+/>
+
+If you want to have roles in your token, this has to be set in your applications as this is dependent on your application type. Navigate to your application and check this setting if you want so.
+
+<img
+  src="/docs/img/guides/console/tokenroles.png"
+  width="700px"
+  alt="Roles in token"
+/>
+
+You can learn more about [Application and Token settings](./applications#token-settings) in the next section.

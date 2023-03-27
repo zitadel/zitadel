@@ -16,6 +16,7 @@ import (
 	"github.com/drone/envsubst"
 	"github.com/jarcoal/jpath"
 	"github.com/sony/sonyflake"
+	"github.com/zitadel/logging"
 )
 
 type sonyflakeGenerator struct {
@@ -31,10 +32,12 @@ func (s *sonyflakeGenerator) Next() (string, error) {
 }
 
 var (
-	GeneratorConfig    *Config    = nil
-	sonyFlakeGenerator *Generator = nil
+	GeneratorConfig    *Config   = nil
+	sonyFlakeGenerator Generator = nil
 )
 
+// SonyFlakeGenerator creates a new id generator
+// the function panics if the generator cannot be created
 func SonyFlakeGenerator() Generator {
 	if sonyFlakeGenerator == nil {
 		sfg := Generator(&sonyflakeGenerator{
@@ -44,10 +47,10 @@ func SonyFlakeGenerator() Generator {
 			}),
 		})
 
-		sonyFlakeGenerator = &sfg
+		sonyFlakeGenerator = sfg
 	}
 
-	return *sonyFlakeGenerator
+	return sonyFlakeGenerator
 }
 
 // the following is a copy of sonyflake (https://github.com/sony/sonyflake/blob/master/sonyflake.go)
@@ -88,40 +91,41 @@ func isPrivateIPv4(ip net.IP) bool {
 
 func machineID() (uint16, error) {
 	if GeneratorConfig == nil {
-		return 0, errors.New("cannot create a unique id for the machine, generator has not been configured")
+		logging.Panic("cannot create a unique id for the machine, generator has not been configured")
 	}
 
 	errors := []string{}
 	if GeneratorConfig.Identification.PrivateIp.Enabled {
-		ip, ipErr := lower16BitPrivateIP()
-		if ipErr == nil {
+		ip, err := lower16BitPrivateIP()
+		if err == nil {
 			return ip, nil
 		}
-		errors = append(errors, fmt.Sprintf("failed to get Private IP address %s", ipErr))
+		errors = append(errors, fmt.Sprintf("failed to get Private IP address %s", err))
 	}
 
 	if GeneratorConfig.Identification.Hostname.Enabled {
-		hn, hostErr := hostname()
-		if hostErr == nil {
+		hn, err := hostname()
+		if err == nil {
 			return hn, nil
 		}
-		errors = append(errors, fmt.Sprintf("failed to get Hostname %s", hostErr))
+		errors = append(errors, fmt.Sprintf("failed to get Hostname %s", err))
 	}
 
 	if GeneratorConfig.Identification.Webhook.Enabled {
-		cid, cidErr := metadataWebhookID()
-		if cidErr == nil {
+		cid, err := metadataWebhookID()
+		if err == nil {
 			return cid, nil
 		}
-
-		errors = append(errors, fmt.Sprintf("failed to query metadata webhook %s", cidErr))
+		errors = append(errors, fmt.Sprintf("failed to query metadata webhook %s", err))
 	}
 
 	if len(errors) == 0 {
 		errors = append(errors, "No machine identification method enabled.")
 	}
 
-	return 0, fmt.Errorf("none of the enabled methods for identifying the machine succeeded: %s", strings.Join(errors, ". "))
+	logging.WithFields("errors", strings.Join(errors, ", ")).Panic("none of the enabled methods for identifying the machine succeeded")
+	//this return will never happen because of panic one line before
+	return 0, nil
 }
 
 func lower16BitPrivateIP() (uint16, error) {

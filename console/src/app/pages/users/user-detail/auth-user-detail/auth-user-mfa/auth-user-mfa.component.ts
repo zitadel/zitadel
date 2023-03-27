@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatLegacyTable as MatTable, MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { AuthFactor, AuthFactorState } from 'src/app/proto/generated/zitadel/user_pb';
@@ -37,7 +37,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
 
   public error: string = '';
-  public otpAvailable: boolean = false;
+  public otpDisabled$ = new BehaviorSubject<boolean>(true);
 
   constructor(private service: GrpcAuthService, private toast: ToastService, private dialog: MatDialog) {}
 
@@ -52,7 +52,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public addAuthFactor(): void {
     const dialogRef = this.dialog.open(AuthFactorDialogComponent, {
       data: {
-        otpDisabled: !this.otpAvailable,
+        otpDisabled$: this.otpDisabled$,
       },
     });
 
@@ -71,7 +71,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
         const index = list.findIndex((mfa) => mfa.otp);
         if (index === -1) {
-          this.otpAvailable = true;
+          this.otpDisabled$.next(false);
         }
       })
       .catch((error) => {

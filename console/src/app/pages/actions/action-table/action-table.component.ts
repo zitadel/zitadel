@@ -1,8 +1,8 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator';
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
@@ -84,7 +84,8 @@ export class ActionTableComponent implements OnInit {
           .deleteAction(action.id)
           .then(() => {
             this.toast.showInfo('FLOWS.DIALOG.DELETEACTION.DELETE_SUCCESS', true);
-            this.getData(20, 0);
+
+            this.refreshPage();
           })
           .catch((error: any) => {
             this.toast.showError(error);
@@ -152,7 +153,9 @@ export class ActionTableComponent implements OnInit {
   }
 
   public refreshPage(): void {
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    setTimeout(() => {
+      this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    }, 1000);
   }
 
   public deactivateSelection(): Promise<void> {

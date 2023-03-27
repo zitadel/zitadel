@@ -9,8 +9,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type OrgMetadataList struct {
@@ -34,7 +36,8 @@ type OrgMetadataSearchQueries struct {
 
 var (
 	orgMetadataTable = table{
-		name: projection.OrgMetadataProjectionTable,
+		name:          projection.OrgMetadataProjectionTable,
+		instanceIDCol: projection.OrgMetadataColumnInstanceID,
 	}
 	OrgMetadataOrgIDCol = Column{
 		name:  projection.OrgMetadataColumnOrgID,
@@ -68,23 +71,33 @@ var (
 		name:  projection.OrgMetadataColumnValue,
 		table: orgMetadataTable,
 	}
+	OrgMetadataOwnerRemovedCol = Column{
+		name:  projection.OrgMetadataColumnOwnerRemoved,
+		table: orgMetadataTable,
+	}
 )
 
-func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk bool, orgID string, key string, queries ...SearchQuery) (*OrgMetadata, error) {
+func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk bool, orgID string, key string, withOwnerRemoved bool, queries ...SearchQuery) (_ *OrgMetadata, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.OrgMetadataProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareOrgMetadataQuery()
+	query, scan := prepareOrgMetadataQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			OrgMetadataOrgIDCol.identifier():      orgID,
-			OrgMetadataKeyCol.identifier():        key,
-			OrgMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		OrgMetadataOrgIDCol.identifier():      orgID,
+		OrgMetadataKeyCol.identifier():        key,
+		OrgMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[OrgMetadataOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-aDaG2", "Errors.Query.SQLStatment")
 	}
@@ -93,18 +106,22 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	return scan(row)
 }
 
-func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool, orgID string, queries *OrgMetadataSearchQueries) (*OrgMetadataList, error) {
+func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool, orgID string, queries *OrgMetadataSearchQueries, withOwnerRemoved bool) (_ *OrgMetadataList, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.OrgMetadataProjection.Trigger(ctx)
 	}
-
-	query, scan := prepareOrgMetadataListQuery()
-	stmt, args, err := queries.toQuery(query).Where(
-		sq.Eq{
-			OrgMetadataOrgIDCol.identifier():      orgID,
-			OrgMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).
-		ToSql()
+	eq := sq.Eq{
+		OrgMetadataOrgIDCol.identifier():      orgID,
+		OrgMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[OrgMetadataOwnerRemovedCol.identifier()] = false
+	}
+	query, scan := prepareOrgMetadataListQuery(ctx, q.client)
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatment")
 	}
@@ -146,7 +163,7 @@ func NewOrgMetadataKeySearchQuery(value string, comparison TextComparison) (Sear
 	return NewTextQuery(OrgMetadataKeyCol, value, comparison)
 }
 
-func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, error)) {
+func prepareOrgMetadataQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, error)) {
 	return sq.Select(
 			OrgMetadataCreationDateCol.identifier(),
 			OrgMetadataChangeDateCol.identifier(),
@@ -155,7 +172,7 @@ func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, 
 			OrgMetadataKeyCol.identifier(),
 			OrgMetadataValueCol.identifier(),
 		).
-			From(orgMetadataTable.identifier()).
+			From(orgMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*OrgMetadata, error) {
 			m := new(OrgMetadata)
@@ -178,7 +195,7 @@ func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, 
 		}
 }
 
-func prepareOrgMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrgMetadataList, error)) {
+func prepareOrgMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*OrgMetadataList, error)) {
 	return sq.Select(
 			OrgMetadataCreationDateCol.identifier(),
 			OrgMetadataChangeDateCol.identifier(),
@@ -187,7 +204,7 @@ func prepareOrgMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrgMetad
 			OrgMetadataKeyCol.identifier(),
 			OrgMetadataValueCol.identifier(),
 			countColumn.identifier()).
-			From(orgMetadataTable.identifier()).
+			From(orgMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*OrgMetadataList, error) {
 			metadata := make([]*OrgMetadata, 0)

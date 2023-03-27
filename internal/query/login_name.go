@@ -4,10 +4,11 @@ import "github.com/zitadel/zitadel/internal/query/projection"
 
 var (
 	loginNameTable = table{
-		name: projection.LoginNameProjectionTable,
+		name:          projection.LoginNameProjectionTable,
+		instanceIDCol: projection.LoginNameUserInstanceIDCol,
 	}
 	LoginNameUserIDCol = Column{
-		name:  "user_id",
+		name:  projection.LoginNameUserCol,
 		table: loginNameTable,
 	}
 	LoginNameNameCol = Column{
@@ -15,11 +16,29 @@ var (
 		table: loginNameTable,
 	}
 	LoginNameIsPrimaryCol = Column{
-		name:  projection.LoginNameDomainIsPrimaryCol,
+		name:  projection.LoginNameIsPrimaryCol,
 		table: loginNameTable,
 	}
 	LoginNameInstanceIDCol = Column{
-		name:  projection.LoginNameUserInstanceIDCol,
+		name:  projection.LoginNameInstanceIDCol,
+		table: loginNameTable,
+	}
+	LoginNameOwnerRemovedDomainCol = Column{
+		name:  projection.LoginNameOwnerRemovedDomainCol,
+		table: loginNameTable,
+	}
+	LoginNameOwnerRemovedUserCol = Column{
+		name:  projection.LoginNameOwnerRemovedUserCol,
+		table: loginNameTable,
+	}
+	LoginNameOwnerRemovedPolicyCol = Column{
+		name:  projection.LoginNameOwnerRemovedPolicyCol,
 		table: loginNameTable,
 	}
 )
+
+func addLoginNameWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[LoginNameOwnerRemovedDomainCol.identifier()] = false
+	eq[LoginNameOwnerRemovedUserCol.identifier()] = false
+	eq[LoginNameOwnerRemovedPolicyCol.identifier()] = false
+}

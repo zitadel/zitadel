@@ -12,17 +12,31 @@
 
   <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-  <div class="fields">
+  <div class="lgn-mfa-options">
     {{ range $provider := .MFAProviders}} {{ $providerName := (t (printf
     "InitMFAPrompt.Provider%v" $provider)) }}
-    <div class="lgn-radio block">
-      <input
-        id="{{ $provider }}"
-        type="radio"
-        name="provider"
-        value="{{ $provider }}"
-      />
-      <label for="{{ $provider }}">{{ $providerName }}</label>
+    <div class="mfa">
+      <label>
+        <input
+          id="{{ $provider }}"
+          type="radio"
+          name="provider"
+          value="{{ $provider }}"
+          required
+        />
+        {{ if eq $provider 0 }}
+        <div class="mfa-img">
+          <img width="100px" height="100px" alt="OTP" src="{{ resourceUrl
+          "images/mfa/mfa-otp.svg" }}" />
+        </div>
+        {{ end }} {{ if eq $provider 1 }}
+        <div class="mfa-img">
+          <img width="100px" height="100px" alt="OTP" src="{{ resourceUrl
+          "images/mfa/mfa-u2f.svg" }}" />
+        </div>
+        {{ end }}
+        <span>{{ $providerName }} </span>
+      </label>
     </div>
     {{ end }}
   </div>
@@ -50,5 +64,7 @@
     </button>
   </div>
 </form>
+
+<script src="{{ resourceUrl "scripts/mfa.js" }}"></script>
 
 {{template "main-bottom" .}}

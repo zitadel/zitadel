@@ -17,14 +17,14 @@ import styles from "./styles.module.css";
 
 const features = [
   {
-    title: "Guides",
+    title: "Documentation", // TODO: Plausible
     darkImageUrl: "img/index/Guides-dark.svg",
     lightImageUrl: "img/index/Guides-light.svg",
-    link: "docs/guides/overview",
+    link: "guides/overview",
     description: (
       <>
-        Read our guides on how to manage your data and role associations in
-        ZITADEL and on what we recommend.
+        Read our documentation and learn how you can setup, customize, and
+        integrate authentication and authorization to your project.
       </>
     ),
     content: (
@@ -32,55 +32,67 @@ const features = [
         <Column>
           <div>
             <ListElement
-              link="docs/guides/start/quickstart"
+              link="/docs/guides/start/quickstart"
               type={ICONTYPE.START}
               title="Get started"
               description=""
             />
             <ListElement
-              link="docs/guides/manage/cloud/overview"
-              type={ICONTYPE.LOGIN}
-              title="ZITADEL Cloud"
-              description=""
-            />
-            <ListElement
-              link="docs/guides/integrate/login-users"
-              type={ICONTYPE.LOGIN}
-              title="Login Users"
-              description=""
-            />
-            <ListElement
-              link="docs/guides/integrate/access-zitadel-apis"
+              link="/docs/examples/sdks"
               type={ICONTYPE.APIS}
-              title="Access APIs"
+              title="SDKs"
               description=""
+            />
+            <ListElement
+              link="/docs/examples/introduction"
+              type={ICONTYPE.APIS}
+              title="Example Apps"
+              description=""
+            />
+            <ListElement
+              link="/docs/guides/manage/console/overview"
+              type={ICONTYPE.LOGIN}
+              title="Manage"
+              description="All about Console"
+            />
+            <ListElement
+              link="/docs/guides/integrate"
+              type={ICONTYPE.LOGIN}
+              title="Integrate"
+              description="Access our APIs and configure services and tools"
             />
           </div>
           <div>
             <ListElement
-              link="docs/guides/solution-scenarios/introduction"
+              link="/docs/guides/solution-scenarios/introduction"
               iconClasses="las la-paragraph"
-              roundClasses="rounded rounded-split"
+              roundClasses="custom-rounded custom-rounded-split"
               label="B2C"
               title="Solution Scenarios"
               description=""
             />
             <ListElement
-              link="docs/guides/manage/customize/branding"
+              link="/docs/concepts/introduction"
+              type={ICONTYPE.TASKS}
+              title="Concepts"
+              description=""
+            />
+            <ListElement
+              link="/docs/concepts/architecture/software"
+              type={ICONTYPE.ARCHITECTURE}
+              title="Architecture"
+              description=""
+            />
+            <ListElement
+              link="/docs/guides/manage/customize/branding"
               type={ICONTYPE.PRIVATELABELING}
               title="Customization"
               description=""
             />
             <ListElement
-              link="docs/guides/deploy/overview"
-              type={ICONTYPE.SYSTEM}
-              title="Deploy"
-              description=""
-            />
-            <ListElement
-              link="docs/guides/trainings/introduction"
-              type={ICONTYPE.STORAGE}
-              title="Trainings"
+              link="/docs/support/troubleshooting"
+              type={ICONTYPE.HELP}
+              title="Support"
               description=""
             />
           </div>
@@ -89,51 +101,52 @@ const features = [
     ),
   },
   {
-    title: "Quickstarts",
-    darkImageUrl: "img/index/Quickstarts-dark.svg",
+    title: "Get Started",
+    darkImageUrl: "/docs/img/index/Quickstarts-dark.svg",
     lightImageUrl: "img/index/Quickstarts-light.svg",
-    link: "docs/examples/introduction",
+    link: "examples/introduction",
     description: (
       <>
         Learn how to integrate your applications and build secure workflows and
-        APIs with ZITADEL
+        APIs with ZITADEL.
       </>
     ),
     content: (
-      <div className={styles.quickstartcontainer}>
-        <QuickstartLink
-          link="/docs/examples/login/angular"
-          imageSource="/img/tech/angular.svg"
-          title="Angular"
-          description="Add the user login to your application and query some data from the userinfo endpoint"
-        />
-        <QuickstartLink
-          link="/docs/examples/login/react"
-          imageSource="/img/tech/react.png"
-          title="React"
-          description="Logs into your application and queries some data from the userinfo endpoint"
-        />
-        <QuickstartLink
-          link="/docs/examples/login/flutter"
-          imageSource="/img/tech/flutter.svg"
-          title="Flutter"
-          description="Mobile Application working for iOS and Android that authenticates your user."
-        />
-        <QuickstartLink
-          link="/docs/examples/login/nextjs"
-          imageSource="/img/tech/nextjslight.svg"
-          lightImageSource="/img/tech/nextjs.svg"
-          title="NextJS"
-          description="A simple application to log into your user account and query some data from User endpoint."
-        />
+      <div className={styles.apilinks}>
+        <ListWrapper>
+          <ListElement
+            link="/docs/guides/start/quickstart"
+            type={ICONTYPE.START}
+            title="Quick Start Guide"
+            description="The ultimate guide to get started with ZITADEL."
+          />
+          <ListElement
+            link="/docs/examples/login/angular"
+            type={ICONTYPE.APIS}
+            title="Frontend Quickstart Guides"
+            description=""
+          />
+          <ListElement
+            link="/docs/examples/secure-api/go"
+            type={ICONTYPE.APIS}
+            title="Backend Quickstart Guides"
+            description=""
+          />
+          <ListElement
+            link="/docs/examples/introduction"
+            type={ICONTYPE.APIS}
+            title="Examples"
+            description="Clone an existing example application."
+          />
+        </ListWrapper>
       </div>
     ),
   },
   {
     title: "APIs",
-    darkImageUrl: "img/index/APIs-dark.svg",
-    lightImageUrl: "img/index/APIs-light.svg",
-    link: "/docs/apis/introduction",
+    darkImageUrl: "/docs/img/index/APIs-dark.svg",
+    lightImageUrl: "/docs/img/index/APIs-light.svg",
+    link: "/apis/introduction",
     description: (
       <>Learn more about our APIs and how to integrate them in your apps.</>
     ),
@@ -141,51 +154,76 @@ const features = [
       <div className={styles.apilinks}>
         <ListWrapper>
           <ListElement
-            link="./docs/apis/proto/auth"
+            link="/docs/apis/auth/authentication-api-aka-auth"
             type={ICONTYPE.APIS}
-            title="Proto Definitions"
+            title="Authenticated User"
+            description="All operations on the currently authenticated user."
+          />
+          <ListElement
+            link="/docs/apis/mgmt/management-api"
+            type={ICONTYPE.APIS}
+            title="Organization Objects"
+            description="Mutate IAM objects like organizations, projects, clients, users etc."
+          />
+          <ListElement
+            link="/docs/apis/admin/administration-api-aka-admin"
+            type={ICONTYPE.APIS}
+            title="Instance Objects"
+            description="Configure and manage the IAM instance."
+          />
+          <ListElement
+            link="/docs/apis/openidoauth/endpoints"
+            type={ICONTYPE.APIS}
+            title="OIDC Endpoints"
             description=""
           />
           <ListElement
-            link="./docs/apis/openidoauth/endpoints"
+            link="/docs/apis/saml/endpoints"
             type={ICONTYPE.APIS}
-            title="OpenID Connect and OAuth"
-            description="Scopes, Claims, Authentication Methods, Grant Types"
+            title="SAML Endpoints"
+            description=""
+          />
+          <ListElement
+            link="/docs/apis/actions/introduction"
+            type={ICONTYPE.APIS}
+            title="Actions"
+            description="Customize and integrate ZITADEL into your landscape"
           />
         </ListWrapper>
       </div>
     ),
   },
   {
-    title: "Concepts",
+    title: "Self-hosting",
     darkImageUrl: "img/index/Concepts-dark.svg",
     lightImageUrl: "img/index/Concepts-light.svg",
-    link: "docs/concepts/introduction",
-    description: (
-      <>
-        Learn more about engineering and design principles, ZITADELs
-        architecture and used technologies.
-      </>
-    ),
+    link: "/docs/self-hosting/deploy/overview",
+    description: <>Everything you need to know about self-hosting ZITADEL.</>,
     content: (
       <ListWrapper>
         <ListElement
-          link="./docs/concepts/principles"
+          link="/docs/self-hosting/deploy/overview"
+          type={ICONTYPE.SYSTEM}
+          title="Deploy"
+          description=""
+        />
+        <ListElement
+          link="/docs/self-hosting/manage/production"
           type={ICONTYPE.TASKS}
-          title="Principles"
-          description="Design and engineering principles"
+          title="Production Setup"
+          description=""
         />
         <ListElement
-          link="./docs/concepts/architecture/software"
-          type={ICONTYPE.ARCHITECTURE}
-          title="Architecture"
-          description="Sotware-, Cluster- and Multi Cluster Architecture"
+          link="/docs/self-hosting/manage/configure"
+          type={ICONTYPE.APIS}
+          title="Configuration"
+          description=""
         />
         <ListElement
-          link="./docs/concepts/structure/overview"
-          type={ICONTYPE.ARCHITECTURE}
-          title="Structure"
-          description="Object structure of ZITADEL"
+          link="/docs/self-hosting/manage/updating_scaling"
+          type={ICONTYPE.APIS}
+          title="Update and Scaling"
+          description=""
         />
       </ListWrapper>
     ),
@@ -255,14 +293,12 @@ function Feature({
 
 const Gigi = () => {
   return (
-    
-      <div className={styles.gigiwrapper}>
-        <div className={styles.gigiwrapperrelative}>
-          <img height="151px" width="256px" src="/img/gigi.svg" />
-          <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
-        </div>
+    <div className={styles.gigiwrapper}>
+      <div className={styles.gigiwrapperrelative}>
+        <img height="151px" width="256px" src="/docs/img/gigi.svg" />
+        <div className={styles.gigibanner}>Try ZITADEL Cloud for FREE 🚀</div>
       </div>
-    
+    </div>
   );
 };
 
@@ -270,10 +306,7 @@ export default function Home() {
   const context = useDocusaurusContext();
   const { siteConfig = {} } = context;
   return (
-    <Layout
-      title={`${siteConfig.title}`}
-      description="This site bundles ZITADELs Documentations"
-    >
+    <Layout description={`${siteConfig.customFields.description}`}>
       <header className={clsx("hero", styles.heroBanner)}>
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>
@@ -284,7 +317,7 @@ export default function Home() {
                 "button button--outline button--lg get-started",
                 styles.getStarted
               )}
-              to={useBaseUrl("docs/guides/start/quickstart")}
+              to={useBaseUrl("guides/start/quickstart")}
             >
               Get Started
             </Link>

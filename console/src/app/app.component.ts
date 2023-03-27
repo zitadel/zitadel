@@ -8,11 +8,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject } from 'rxjs';
-import { map, take, takeUntil } from 'rxjs/operators';
+import { filter, map, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org } from './proto/generated/zitadel/org_pb';
-import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
+import { PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard-shortcuts.service';
@@ -47,7 +47,6 @@ export class AppComponent implements OnDestroy {
   public showProjectSection: boolean = false;
 
   private destroy$: Subject<void> = new Subject();
-  public labelpolicy!: LabelPolicy.AsObject;
 
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
@@ -69,7 +68,6 @@ export class AppComponent implements OnDestroy {
     private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
   ) {
-    this.themeService.loadPrivateLabelling(true);
     console.log(
       '%cWait!',
       'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px',
@@ -168,6 +166,16 @@ export class AppComponent implements OnDestroy {
     );
 
     this.matIconRegistry.addSvgIcon(
+      'mdi_shield_check',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/shield-check.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_arrow_expand',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-expand.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
       'mdi_numeric',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/numeric.svg'),
     );
@@ -187,18 +195,23 @@ export class AppComponent implements OnDestroy {
     this.getProjectCount();
 
     this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
-      this.org = org;
-      this.getProjectCount();
+      if (org) {
+        this.org = org;
+        this.getProjectCount();
+      }
+    });
+
+    this.activatedRoute.queryParams.pipe(filter((params) => !!params.org)).subscribe((params) => {
+      const { org } = params;
+      this.authService.getActiveOrg(org);
     });
 
     this.authenticationService.authenticationChanged.pipe(takeUntil(this.destroy$)).subscribe((authenticated) => {
       if (authenticated) {
         this.authService
           .getActiveOrg()
-          .then((org) => {
+          .then(async (org) => {
             this.org = org;
-            this.themeService.loadPrivateLabelling();
-
             // TODO add when console storage is implemented
             // this.startIntroWorkflow();
           })
@@ -250,20 +263,19 @@ export class AppComponent implements OnDestroy {
   }
 
   public changedOrg(org: Org.AsObject): void {
-    this.themeService.loadPrivateLabelling();
     this.router.navigate(['/org']);
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['en', 'de', 'zh']);
+    this.translate.addLangs(['de', 'en', 'fr', 'it', 'ja', 'pl', 'zh']);
     this.translate.setDefaultLang('en');
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de|it|zh/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/de|en|fr|it|ja|pl|zh/) ? cropped : 'en';
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it|zh/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/de|en|fr|it|ja|pl|zh/)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);

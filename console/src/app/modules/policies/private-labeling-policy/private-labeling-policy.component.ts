@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
@@ -20,7 +20,15 @@ import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
-import { ThemeService } from 'src/app/services/theme.service';
+import {
+  BACKGROUND,
+  DARK_BACKGROUND,
+  DARK_PRIMARY,
+  DARK_WARN,
+  PRIMARY,
+  ThemeService,
+  WARN,
+} from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -60,8 +68,8 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
-  public previewData!: LabelPolicy.AsObject;
-  public data!: LabelPolicy.AsObject;
+  public previewData?: LabelPolicy.AsObject;
+  public data?: LabelPolicy.AsObject;
 
   public panelOpenState: boolean = false;
   public isHoveringOverDarkLogo: boolean = false;
@@ -176,7 +184,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           case PolicyComponentServiceType.MGMT:
             return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
           case PolicyComponentServiceType.ADMIN:
-            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData, this.org.id));
+            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData));
         }
       }
     }
@@ -238,17 +246,38 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         }
         break;
       case PolicyComponentServiceType.MGMT:
-        if (type === AssetType.LOGO) {
-          if (theme === Theme.DARK) {
-            return previewHandler(this.service.removeLabelPolicyLogoDark());
-          } else if (theme === Theme.LIGHT) {
-            return previewHandler(this.service.removeLabelPolicyLogo());
-          }
-        } else if (type === AssetType.ICON) {
-          if (theme === Theme.DARK) {
-            return previewHandler(this.service.removeLabelPolicyIconDark());
-          } else if (theme === Theme.LIGHT) {
-            return previewHandler(this.service.removeLabelPolicyIcon());
+        if ((this.previewData as LabelPolicy.AsObject).isDefault) {
+          const req0 = new AddCustomLabelPolicyRequest();
+          this.overwriteValues(req0);
+
+          return (this.service as ManagementService)
+            .addCustomLabelPolicy(req0)
+            .then(() => {
+              if (this.previewData) {
+                this.previewData.isDefault = false;
+              }
+              this.toast.showInfo('POLICY.TOAST.SET', true);
+
+              setTimeout(() => {
+                this.fetchData();
+              }, 1000);
+            })
+            .catch((error: HttpErrorResponse) => {
+              this.toast.showError(error);
+            });
+        } else {
+          if (type === AssetType.LOGO) {
+            if (theme === Theme.DARK) {
+              return previewHandler(this.service.removeLabelPolicyLogoDark());
+            } else if (theme === Theme.LIGHT) {
+              return previewHandler(this.service.removeLabelPolicyLogo());
+            }
+          } else if (type === AssetType.ICON) {
+            if (theme === Theme.DARK) {
+              return previewHandler(this.service.removeLabelPolicyIconDark());
+            } else if (theme === Theme.LIGHT) {
+              return previewHandler(this.service.removeLabelPolicyIcon());
+            }
           }
         }
         break;
@@ -447,6 +476,9 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           return (this.service as ManagementService)
             .addCustomLabelPolicy(req0)
             .then(() => {
+              if (this.previewData) {
+                this.previewData.isDefault = false;
+              }
               this.toast.showInfo('POLICY.TOAST.SET', true);
 
               reloadPolicy();
@@ -493,60 +525,78 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   }
 
   public setDarkBackgroundColorAndSave($event: string): void {
-    this.previewData.backgroundColorDark = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.backgroundColorDark = $event;
+      this.savePolicy();
+    }
   }
 
   public setDarkPrimaryColorAndSave($event: string): void {
-    this.previewData.primaryColorDark = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.primaryColorDark = $event;
+      this.savePolicy();
+    }
   }
 
   public setDarkWarnColorAndSave($event: string): void {
-    this.previewData.warnColorDark = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.warnColorDark = $event;
+      this.savePolicy();
+    }
   }
 
   public setDarkFontColorAndSave($event: string): void {
-    this.previewData.fontColorDark = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.fontColorDark = $event;
+      this.savePolicy();
+    }
   }
 
   public setBackgroundColorAndSave($event: string): void {
-    this.previewData.backgroundColor = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.backgroundColor = $event;
+      this.savePolicy();
+    }
   }
 
   public setPrimaryColorAndSave($event: string): void {
-    this.previewData.primaryColor = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.primaryColor = $event;
+      this.savePolicy();
+    }
   }
 
   public setWarnColorAndSave($event: string): void {
-    this.previewData.warnColor = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.warnColor = $event;
+      this.savePolicy();
+    }
   }
 
   public setFontColorAndSave($event: string): void {
-    this.previewData.fontColor = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.fontColor = $event;
+      this.savePolicy();
+    }
   }
 
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
-    req.setBackgroundColorDark(this.previewData.backgroundColorDark);
-    req.setBackgroundColor(this.previewData.backgroundColor);
+    if (this.previewData) {
+      req.setBackgroundColorDark(this.previewData.backgroundColorDark);
+      req.setBackgroundColor(this.previewData.backgroundColor);
 
-    req.setFontColorDark(this.previewData.fontColorDark);
-    req.setFontColor(this.previewData.fontColor);
+      req.setFontColorDark(this.previewData.fontColorDark);
+      req.setFontColor(this.previewData.fontColor);
 
-    req.setPrimaryColorDark(this.previewData.primaryColorDark);
-    req.setPrimaryColor(this.previewData.primaryColor);
+      req.setPrimaryColorDark(this.previewData.primaryColorDark);
+      req.setPrimaryColor(this.previewData.primaryColor);
 
-    req.setWarnColorDark(this.previewData.warnColorDark);
-    req.setWarnColor(this.previewData.warnColor);
+      req.setWarnColorDark(this.previewData.warnColorDark);
+      req.setWarnColor(this.previewData.warnColor);
 
-    req.setDisableWatermark(this.previewData.disableWatermark);
-    req.setHideLoginNameSuffix(this.previewData.hideLoginNameSuffix);
+      req.setDisableWatermark(this.previewData.disableWatermark);
+      req.setHideLoginNameSuffix(this.previewData.hideLoginNameSuffix);
+    }
   }
 
   public activatePolicy(): Promise<any> {
@@ -595,14 +645,14 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   }
 
   private applyToConsole(labelpolicy: LabelPolicy.AsObject): void {
-    const darkPrimary = labelpolicy?.primaryColorDark || '#bbbafa';
-    const lightPrimary = labelpolicy?.primaryColor || '#5469d4';
+    const darkPrimary = labelpolicy?.primaryColorDark || DARK_PRIMARY;
+    const lightPrimary = labelpolicy?.primaryColor || PRIMARY;
 
-    const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
-    const lightWarn = labelpolicy?.warnColor || '#cd3d56';
+    const darkWarn = labelpolicy?.warnColorDark || DARK_WARN;
+    const lightWarn = labelpolicy?.warnColor || WARN;
 
-    const darkBackground = labelpolicy?.backgroundColorDark || '#111827';
-    const lightBackground = labelpolicy?.backgroundColor || '#fafafa';
+    const darkBackground = labelpolicy?.backgroundColorDark || DARK_BACKGROUND;
+    const lightBackground = labelpolicy?.backgroundColor || BACKGROUND;
 
     this.themeService.savePrimaryColor(darkPrimary, true);
     this.themeService.savePrimaryColor(lightPrimary, false);

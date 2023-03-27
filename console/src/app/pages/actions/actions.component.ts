@@ -1,7 +1,8 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { Subject, takeUntil } from 'rxjs';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -18,13 +19,12 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
   templateUrl: './actions.component.html',
   styleUrls: ['./actions.component.scss'],
 })
-export class ActionsComponent {
+export class ActionsComponent implements OnDestroy {
   public flow!: Flow.AsObject;
-  public flowType: FlowType = FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION;
 
-  public typeControl: UntypedFormControl = new UntypedFormControl(FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION);
+  public typeControl: UntypedFormControl = new UntypedFormControl();
 
-  public typesForSelection: FlowType[] = [FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION];
+  public typesForSelection: FlowType.AsObject[] = [];
 
   public selection: Action.AsObject[] = [];
   public InfoSectionType: any = InfoSectionType;
@@ -32,7 +32,7 @@ export class ActionsComponent {
 
   public maxActions: number | null = null;
   public ActionState: any = ActionState;
-
+  private destroy$: Subject<void> = new Subject();
   constructor(
     private mgmtService: ManagementService,
     breadcrumbService: BreadcrumbService,
@@ -45,16 +45,42 @@ export class ActionsComponent {
     };
     breadcrumbService.setBreadcrumb([bread]);
 
-    this.loadFlow();
-  }
+    this.getFlowTypes();
 
-  private loadFlow() {
-    this.mgmtService.getFlow(this.flowType).then((flowResponse) => {
-      if (flowResponse.flow) this.flow = flowResponse.flow;
+    this.typeControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
+      this.loadFlow((value as FlowType.AsObject).id);
     });
   }
 
-  public clearFlow(): void {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private getFlowTypes(): Promise<void> {
+    return this.mgmtService
+      .listFlowTypes()
+      .then((resp) => {
+        this.typesForSelection = resp.resultList;
+        if (!this.flow && resp.resultList[0]) {
+          const type = resp.resultList[0];
+          this.typeControl.setValue(type);
+        }
+      })
+      .catch((error: any) => {
+        this.toast.showError(error);
+      });
+  }
+
+  private loadFlow(id: string) {
+    this.mgmtService.getFlow(id).then((flowResponse) => {
+      if (flowResponse.flow) {
+        this.flow = flowResponse.flow;
+      }
+    });
+  }
+
+  public clearFlow(id: string): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.CLEAR',
@@ -68,10 +94,10 @@ export class ActionsComponent {
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         this.mgmtService
-          .clearFlow(this.flowType)
-          .then((resp) => {
+          .clearFlow(id)
+          .then(() => {
             this.toast.showInfo('FLOWS.FLOWCLEARED', true);
-            this.loadFlow();
+            this.loadFlow(id);
           })
           .catch((error: any) => {
             this.toast.showError(error);
@@ -80,11 +106,10 @@ export class ActionsComponent {
     });
   }
 
-  public openAddTrigger(): void {
+  public openAddTrigger(flow: FlowType.AsObject, trigger?: TriggerType.AsObject): void {
     const dialogRef = this.dialog.open(AddFlowDialogComponent, {
       data: {
-        flowType: this.flowType,
-        triggerType: TriggerType.TRIGGER_TYPE_POST_AUTHENTICATION,
+        flowType: flow,
         actions: this.selection && this.selection.length ? this.selection : [],
       },
       width: '400px',
@@ -96,7 +121,7 @@ export class ActionsComponent {
           .setTriggerActions(req.getActionIdsList(), req.getFlowType(), req.getTriggerType())
           .then((resp) => {
             this.toast.showInfo('FLOWS.FLOWCHANGED', true);
-            this.loadFlow();
+            this.loadFlow(flow.id);
           })
           .catch((error: any) => {
             this.toast.showError(error);
@@ -111,17 +136,52 @@ export class ActionsComponent {
   }
 
   saveFlow(index: number) {
-    this.mgmtService
-      .setTriggerActions(
-        this.flow.triggerActionsList[index].actionsList.map((action) => action.id),
-        this.flowType,
-        this.flow.triggerActionsList[index].triggerType,
-      )
-      .then((updateResponse) => {
-        this.toast.showInfo('FLOWS.TOAST.ACTIONSSET', true);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
+    if (
+      this.flow.type &&
+      this.flow.triggerActionsList &&
+      this.flow.triggerActionsList[index] &&
+      this.flow.triggerActionsList[index]?.triggerType
+    ) {
+      this.mgmtService
+        .setTriggerActions(
+          this.flow.triggerActionsList[index].actionsList.map((action) => action.id),
+          this.flow.type.id,
+          this.flow.triggerActionsList[index].triggerType?.id ?? '',
+        )
+        .then(() => {
+          this.toast.showInfo('FLOWS.TOAST.ACTIONSSET', true);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
+  }
+
+  public removeTriggerActionsList(index: number) {
+    if (this.flow.type && this.flow.triggerActionsList && this.flow.triggerActionsList[index]) {
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.CLEAR',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'FLOWS.DIALOG.REMOVEACTIONSLIST.TITLE',
+          descriptionKey: 'FLOWS.DIALOG.REMOVEACTIONSLIST.DESCRIPTION',
+        },
+        width: '400px',
       });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          this.mgmtService
+            .setTriggerActions([], this.flow?.type?.id ?? '', this.flow.triggerActionsList[index].triggerType?.id ?? '')
+            .then(() => {
+              this.toast.showInfo('FLOWS.TOAST.ACTIONSSET', true);
+              this.loadFlow(this.flow?.type?.id ?? '');
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
+    }
   }
 }

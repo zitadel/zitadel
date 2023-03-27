@@ -1,7 +1,7 @@
 <cnsl-top-view
   *ngIf="user"
   title="{{ user.human ? user.human.profile?.displayName : user.machine?.name }}"
-  docLink="https://docs.zitadel.com/docs/guides/basics/projects"
+  docLink="https://zitadel.com/docs/guides/manage/console/users"
   sub="{{ user.preferredLoginName }}"
   [isActive]="user.state === UserState.USER_STATE_ACTIVE"
   [isInactive]="user.state === UserState.USER_STATE_INACTIVE"
@@ -10,6 +10,12 @@
   [hasActions]="['user.write$', 'user.write:' + user.id] | hasRole | async"
 >
   <ng-template topActions cnslHasRole [hasRole]="['user.write$', 'user.write:' + user.id]">
+    <button mat-menu-item color="warn" *ngIf="user?.machine" (click)="generateMachineSecret()">
+      {{ 'USER.PAGES.GENERATESECRET' | translate }}
+    </button>
+    <button mat-menu-item color="warn" *ngIf="user?.machine?.hasSecret" (click)="removeMachineSecret()">
+      {{ 'USER.PAGES.REMOVESECRET' | translate }}
+    </button>
     <button mat-menu-item color="warn" *ngIf="user?.state === UserState.USER_STATE_LOCKED" (click)="unlockUser()">
       {{ 'USER.PAGES.UNLOCK' | translate }}
     </button>
@@ -33,7 +39,7 @@
       </button>
     </ng-template>
   </ng-template>
-  <cnsl-info-row topContent *ngIf="user" [user]="user"></cnsl-info-row>
+  <cnsl-info-row topContent *ngIf="user" [user]="user" [loginPolicy]="loginPolicy"></cnsl-info-row>
 </cnsl-top-view>
 
 <div *ngIf="loading" class="max-width-container">
@@ -58,6 +64,17 @@
           {{ 'USER.PAGES.LOCKEDDESCRIPTION' | translate }}</cnsl-info-section
         >
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
+
+        <div *ngIf="user && user.state === UserState.USER_STATE_INITIAL">
+          <cnsl-info-section class="is-initial-info-section" [type]="InfoSectionType.ALERT">
+            <div class="is-initial-row">
+              <span>{{ 'USER.ISINITIAL' | translate }}</span>
+              <button [disabled]="(canWrite$ | async) === false" mat-stroked-button (click)="resendInitEmail()">
+                {{ 'USER.RESENDINITIALEMAIL' | translate }}
+              </button>
+            </div>
+          </cnsl-info-section>
+        </div>
 
         <ng-container *ngIf="currentSetting === 'general'">
           <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user.id]">
@@ -92,10 +109,15 @@
               <cnsl-contact
                 [disablePhoneCode]="true"
                 [state]="user.state"
+                [username]="user.preferredLoginName"
                 [canWrite]="['user.write:' + user.id, 'user.write$'] | hasRole | async"
                 *ngIf="user?.human"
                 [human]="user.human"
-                (editType)="openEditDialog($event)"
+                (editType)="
+                  user.state === UserState.USER_STATE_INITIAL && $event === EditDialogType.EMAIL
+                    ? resendInitEmail()
+                    : openEditDialog($event)
+                "
                 (deletedPhone)="deletePhone()"
                 (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()"
@@ -112,16 +134,6 @@
                   "
                 >
                   {{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}
-                </button>
-                <button
-                  emailAction
-                  [disabled]="(canWrite$ | async) === false"
-                  class="resendemail"
-                  *ngIf="user.state === UserState.USER_STATE_INITIAL"
-                  mat-stroked-button
-                  (click)="resendInitEmail()"
-                >
-                  {{ 'USER.RESENDINITIALEMAIL' | translate }}
                 </button>
               </cnsl-contact>
             </cnsl-card>
@@ -169,12 +181,35 @@
           </ng-template>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting && currentSetting === 'passwordless'">
+        <ng-container *ngIf="currentSetting && currentSetting === 'security'">
+          <cnsl-card *ngIf="user.human" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
+            <div class="contact-method-col">
+              <div class="contact-method-row">
+                <div class="left">
+                  <span class="label cnsl-secondary-text">{{ 'USER.PASSWORD.LABEL' | translate }}</span>
+                  <span>*********</span>
+
+                  <ng-content select="[pwdAction]"></ng-content>
+                </div>
+
+                <div class="right">
+                  <a
+                    matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
+                    [disabled]="(['user.write:' + user.id, 'user.write$'] | hasRole | async) === false"
+                    [routerLink]="['password']"
+                    [queryParams]="{ username: user.preferredLoginName }"
+                    mat-icon-button
+                  >
+                    <i class="las la-pen"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </cnsl-card>
+
           <cnsl-passwordless *ngIf="user && !!user.human" [user]="user" [disabled]="(canWrite$ | async) === false">
           </cnsl-passwordless>
-        </ng-container>
 
-        <ng-container *ngIf="currentSetting && currentSetting === 'mfa'">
           <cnsl-user-mfa *ngIf="user && user.human" [user]="user"></cnsl-user-mfa>
         </ng-container>
 
@@ -206,7 +241,13 @@
         </ng-container>
 
         <ng-container *ngIf="currentSetting && currentSetting === 'metadata'">
-          <cnsl-metadata *ngIf="user" [userId]="user.id"></cnsl-metadata>
+          <cnsl-metadata
+            [metadata]="metadata"
+            [disabled]="(['user.write:' + user.id, 'user.write'] | hasRole | async) === false"
+            *ngIf="user && user.id"
+            (editClicked)="editMetadata()"
+            (refresh)="loadMetadata(user.id)"
+          ></cnsl-metadata>
         </ng-container>
       </div>
     </cnsl-sidenav>

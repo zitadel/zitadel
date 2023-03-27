@@ -27,7 +27,7 @@ The user provided by flags needs priviledge to
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
 
-			err := initialise(config.Database, VerifyDatabase(config.Database.Database()))
+			err := initialise(config.Database, VerifyDatabase(config.Database.DatabaseName()))
 			logging.OnError(err).Fatal("unable to initialize the database")
 		},
 	}

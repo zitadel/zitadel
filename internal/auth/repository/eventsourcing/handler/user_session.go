@@ -17,6 +17,7 @@ import (
 	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/zitadel/zitadel/internal/org/repository/view"
 	query2 "github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
@@ -32,22 +33,22 @@ type UserSession struct {
 	queries      *query2.Queries
 }
 
-func newUserSession(handler handler, queries *query2.Queries) *UserSession {
+func newUserSession(ctx context.Context, handler handler, queries *query2.Queries) *UserSession {
 	h := &UserSession{
 		handler: handler,
 		queries: queries,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (k *UserSession) subscribe() {
-	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+func (u *UserSession) subscribe(ctx context.Context) {
+	u.subscription = u.es.Subscribe(u.AggregateTypes()...)
 	go func() {
-		for event := range k.subscription.Events {
-			query.ReduceEvent(k, event)
+		for event := range u.subscription.Events {
+			query.ReduceEvent(ctx, u, event)
 		}
 	}()
 }
@@ -61,7 +62,7 @@ func (u *UserSession) Subscription() *v1.Subscription {
 }
 
 func (_ *UserSession) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{user.AggregateType, org.AggregateType}
+	return []models.AggregateType{user.AggregateType, org.AggregateType, instance.AggregateType}
 }
 
 func (u *UserSession) CurrentSequence(instanceID string) (uint64, error) {
@@ -72,8 +73,8 @@ func (u *UserSession) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (u *UserSession) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
-	sequences, err := u.view.GetLatestUserSessionSequences(instanceIDs...)
+func (u *UserSession) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
+	sequences, err := u.view.GetLatestUserSessionSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -153,18 +154,22 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		return u.fillLoginNamesOnOrgUsers(event)
 	case user.UserRemovedType:
 		return u.view.DeleteUserSessions(event.AggregateID, event.InstanceID, event)
+	case instance.InstanceRemovedEventType:
+		return u.view.DeleteInstanceUserSessions(event)
+	case org.OrgRemovedEventType:
+		return u.view.DeleteOrgUserSessions(event)
 	default:
 		return u.view.ProcessedUserSessionSequence(event)
 	}
 }
 
 func (u *UserSession) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-sdfw3s", "id", event.AggregateID).WithError(err).Warn("something went wrong in user session handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in user session handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserSessionFailedEvent, u.view.ProcessedUserSessionFailedEvent, u.view.ProcessedUserSessionSequence, u.errorCountUntilSkip)
 }
 
-func (u *UserSession) OnSuccess() error {
-	return spooler.HandleSuccess(u.view.UpdateUserSessionSpoolerRunTimestamp)
+func (u *UserSession) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(u.view.UpdateUserSessionSpoolerRunTimestamp, instanceIDs)
 }
 
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event *models.Event) error {
@@ -215,14 +220,14 @@ func (u *UserSession) loginNameInformation(ctx context.Context, orgID string, in
 	if err != nil {
 		return false, "", err
 	}
-	if org.DomainPolicy == nil {
-		policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
-		if err != nil {
-			return false, "", err
-		}
-		userLoginMustBeDomain = policy.UserLoginMustBeDomain
+	if org.DomainPolicy != nil {
+		return org.DomainPolicy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, nil
 	}
-	return userLoginMustBeDomain, org.GetPrimaryDomain().Domain, nil
+	policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
+	if err != nil {
+		return false, "", err
+	}
+	return policy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, nil
 }
 
 func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {

@@ -1,13 +1,14 @@
 <cnsl-top-view
+  *ngIf="['org.write:' + org?.id, 'org.write$'] | hasRole as hasWrite$"
   [hasBackButton]="false"
   title="{{ org?.name }}"
   [isActive]="org?.state === OrgState.ORG_STATE_ACTIVE"
   [isInactive]="org?.state === OrgState.ORG_STATE_INACTIVE"
   [hasContributors]="true"
   stateTooltip="{{ 'ORG.STATE.' + org?.state | translate }}"
-  [hasActions]="['org.write:' + org?.id, 'org.write$'] | hasRole | async"
+  [hasActions]="hasWrite$ | async"
 >
-  <ng-template topActions cnslHasRole [hasRole]="['org.write:' + org?.id, 'org.write$']">
+  <ng-container topActions *ngIf="hasWrite$ | async">
     <button
       mat-menu-item
       *ngIf="org?.state === OrgState.ORG_STATE_ACTIVE"
@@ -23,7 +24,15 @@
     >
       {{ 'ORG.PAGES.REACTIVATE' | translate }}
     </button>
-  </ng-template>
+
+    <button data-e2e="rename" mat-menu-item (click)="renameOrg()">
+      {{ 'ORG.PAGES.RENAME.ACTION' | translate }}
+    </button>
+
+    <button data-e2e="delete" mat-menu-item (click)="deleteOrg()">
+      {{ 'ORG.PAGES.DELETE' | translate }}
+    </button>
+  </ng-container>
   <cnsl-contributors
     topContributors
     [totalResult]="totalMemberResult"
@@ -45,6 +54,13 @@
     <ng-container *ngIf="['policy.read'] | hasRole | async; else nopolicyreadpermission">
       <cnsl-settings-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-settings-grid>
     </ng-container>
+
+    <cnsl-metadata
+      [metadata]="metadata"
+      [disabled]="(['org.write'] | hasRole | async) === false"
+      (editClicked)="editMetadata()"
+      (refresh)="loadMetadata()"
+    ></cnsl-metadata>
 
     <ng-template #nopolicyreadpermission>
       <div class="no-permission-warn-wrapper">

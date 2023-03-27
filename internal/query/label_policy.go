@@ -9,9 +9,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type LabelPolicy struct {
@@ -40,22 +42,25 @@ type Theme struct {
 	IconURL         string
 }
 
-func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*LabelPolicy, error) {
-	stmt, scan := prepareLabelPolicyQuery()
+func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (_ *LabelPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareLabelPolicyQuery(ctx, q.client)
+	eq := sq.Eq{
+		LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
+		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[LabelPolicyOwnerRemoved.identifier()] = false
+	}
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Or{
-				sq.Eq{
-					LabelPolicyColID.identifier(): orgID,
-				},
-				sq.Eq{
-					LabelPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{LabelPolicyColID.identifier(): orgID},
+				sq.Eq{LabelPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
-			sq.Eq{
-				LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
-				LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 		}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
@@ -67,8 +72,11 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*La
 	return scan(row)
 }
 
-func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*LabelPolicy, error) {
-	stmt, scan := prepareLabelPolicyQuery()
+func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (_ *LabelPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareLabelPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Or{
@@ -94,8 +102,11 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*L
 	return scan(row)
 }
 
-func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
-	stmt, scan := prepareLabelPolicyQuery()
+func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (_ *LabelPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareLabelPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		LabelPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
@@ -111,8 +122,11 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, e
 	return scan(row)
 }
 
-func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
-	stmt, scan := prepareLabelPolicyQuery()
+func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (_ *LabelPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareLabelPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		LabelPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		LabelPolicyColState.identifier():      domain.LabelPolicyStatePreview,
@@ -130,7 +144,8 @@ func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (*LabelPolicy, 
 
 var (
 	labelPolicyTable = table{
-		name: projection.LabelPolicyTable,
+		name:          projection.LabelPolicyTable,
+		instanceIDCol: projection.LabelPolicyInstanceIDCol,
 	}
 	LabelPolicyColCreationDate = Column{
 		name: projection.LabelPolicyCreationDateCol,
@@ -204,9 +219,12 @@ var (
 	LabelPolicyColDarkIconURL = Column{
 		name: projection.LabelPolicyDarkIconURLCol,
 	}
+	LabelPolicyOwnerRemoved = Column{
+		name: projection.LabelPolicyOwnerRemovedCol,
+	}
 )
 
-func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, error)) {
+func prepareLabelPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, error)) {
 	return sq.Select(
 			LabelPolicyColCreationDate.identifier(),
 			LabelPolicyColChangeDate.identifier(),
@@ -235,7 +253,8 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 			LabelPolicyColDarkLogoURL.identifier(),
 			LabelPolicyColDarkIconURL.identifier(),
 		).
-			From(labelPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(labelPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LabelPolicy, error) {
 			policy := new(LabelPolicy)
 

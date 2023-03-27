@@ -17,6 +17,9 @@ type LoginPolicyWriteModel struct {
 	ForceMFA                   bool
 	HidePasswordReset          bool
 	IgnoreUnknownUsernames     bool
+	AllowDomainDiscovery       bool
+	DisableLoginWithEmail      bool
+	DisableLoginWithPhone      bool
 	PasswordlessType           domain.PasswordlessType
 	DefaultRedirectURI         string
 	PasswordCheckLifetime      time.Duration
@@ -38,6 +41,9 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			wm.PasswordlessType = e.PasswordlessType
 			wm.HidePasswordReset = e.HidePasswordReset
 			wm.IgnoreUnknownUsernames = e.IgnoreUnknownUsernames
+			wm.AllowDomainDiscovery = e.AllowDomainDiscovery
+			wm.DisableLoginWithEmail = e.DisableLoginWithEmail
+			wm.DisableLoginWithPhone = e.DisableLoginWithPhone
 			wm.DefaultRedirectURI = e.DefaultRedirectURI
 			wm.PasswordCheckLifetime = e.PasswordCheckLifetime
 			wm.ExternalLoginCheckLifetime = e.ExternalLoginCheckLifetime
@@ -64,6 +70,9 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			if e.IgnoreUnknownUsernames != nil {
 				wm.IgnoreUnknownUsernames = *e.IgnoreUnknownUsernames
 			}
+			if e.AllowDomainDiscovery != nil {
+				wm.AllowDomainDiscovery = *e.AllowDomainDiscovery
+			}
 			if e.PasswordlessType != nil {
 				wm.PasswordlessType = *e.PasswordlessType
 			}
@@ -85,9 +94,19 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			if e.MultiFactorCheckLifetime != nil {
 				wm.MultiFactorCheckLifetime = *e.MultiFactorCheckLifetime
 			}
+			if e.DisableLoginWithEmail != nil {
+				wm.DisableLoginWithEmail = *e.DisableLoginWithEmail
+			}
+			if e.DisableLoginWithPhone != nil {
+				wm.DisableLoginWithPhone = *e.DisableLoginWithPhone
+			}
 		case *policy.LoginPolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
+}
+
+func (wm *LoginPolicyWriteModel) Exists() bool {
+	return wm.State.Exists()
 }

@@ -14,10 +14,10 @@ type AdministratorRepo struct {
 	View *view.View
 }
 
-func (repo *AdministratorRepo) GetFailedEvents(ctx context.Context) ([]*view_model.FailedEvent, error) {
+func (repo *AdministratorRepo) GetFailedEvents(ctx context.Context, instanceID string) ([]*view_model.FailedEvent, error) {
 	allFailedEvents := make([]*view_model.FailedEvent, 0)
 	for _, db := range dbList {
-		failedEvents, err := repo.View.AllFailedEvents(db)
+		failedEvents, err := repo.View.AllFailedEvents(db, instanceID)
 		if err != nil {
 			return nil, err
 		}
@@ -32,10 +32,10 @@ func (repo *AdministratorRepo) RemoveFailedEvent(ctx context.Context, failedEven
 	return repo.View.RemoveFailedEvent(failedEvent.Database, repository.FailedEventFromModel(failedEvent))
 }
 
-func (repo *AdministratorRepo) GetViews() ([]*view_model.View, error) {
+func (repo *AdministratorRepo) GetViews(instanceID string) ([]*view_model.View, error) {
 	views := make([]*view_model.View, 0)
 	for _, db := range dbList {
-		sequences, err := repo.View.AllCurrentSequences(db)
+		sequences, err := repo.View.AllCurrentSequences(db, instanceID)
 		if err != nil {
 			return nil, err
 		}

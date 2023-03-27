@@ -1,6 +1,4 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/b82a23f7-d8c7-4025-af18-a46586e89ed0/deploy-status)](https://app.netlify.com/sites/zitadel-docs/deploys)
-
-# Website
+# ZITADEL-Docs
 
 This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
 
@@ -10,27 +8,25 @@ To add a new site to the already existing structure simply save the `md` file in
 
 ## Installation
 
-```console
+```
 yarn install
 ```
 
 ## Local Development
 
-```console
+```
 yarn start
 ```
 
-This command starts a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
+## Container Image
 
-## Build
+If you just want to start docusaurus locally without installing node you can fallback to our container image.
+Execute the following commands from the repository root to build and start a local version of ZITADEL 
 
-```console
-yarn build
+```shell
+docker build -f docs/Dockerfile . -t zitadel-docs
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-## Deployment
-
-Each PR will be automatically built with a preview link from cloudflare pages.
-Visit the checks / comments on the PR for the link.
+```shell
+docker run -p 8080:8080 zitadel-docs
+```

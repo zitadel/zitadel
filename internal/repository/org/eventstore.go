@@ -5,82 +5,107 @@ import (
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(OrgAddedEventType, OrgAddedEventMapper).
-		RegisterFilterEventMapper(OrgChangedEventType, OrgChangedEventMapper).
-		RegisterFilterEventMapper(OrgDeactivatedEventType, OrgDeactivatedEventMapper).
-		RegisterFilterEventMapper(OrgReactivatedEventType, OrgReactivatedEventMapper).
-		RegisterFilterEventMapper(OrgDomainAddedEventType, DomainAddedEventMapper).
-		RegisterFilterEventMapper(OrgDomainVerificationAddedEventType, DomainVerificationAddedEventMapper).
-		RegisterFilterEventMapper(OrgDomainVerificationFailedEventType, DomainVerificationFailedEventMapper).
-		RegisterFilterEventMapper(OrgDomainVerifiedEventType, DomainVerifiedEventMapper).
-		RegisterFilterEventMapper(OrgDomainPrimarySetEventType, DomainPrimarySetEventMapper).
-		RegisterFilterEventMapper(OrgDomainRemovedEventType, DomainRemovedEventMapper).
-		RegisterFilterEventMapper(MemberAddedEventType, MemberAddedEventMapper).
-		RegisterFilterEventMapper(MemberChangedEventType, MemberChangedEventMapper).
-		RegisterFilterEventMapper(MemberRemovedEventType, MemberRemovedEventMapper).
-		RegisterFilterEventMapper(MemberCascadeRemovedEventType, MemberCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyAddedEventType, LabelPolicyAddedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyChangedEventType, LabelPolicyChangedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyActivatedEventType, LabelPolicyActivatedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyRemovedEventType, LabelPolicyRemovedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyLogoAddedEventType, LabelPolicyLogoAddedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyLogoRemovedEventType, LabelPolicyLogoRemovedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyIconAddedEventType, LabelPolicyIconAddedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyIconRemovedEventType, LabelPolicyIconRemovedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyLogoDarkAddedEventType, LabelPolicyLogoDarkAddedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyLogoDarkRemovedEventType, LabelPolicyLogoDarkRemovedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyIconDarkAddedEventType, LabelPolicyIconDarkAddedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyIconDarkRemovedEventType, LabelPolicyIconDarkRemovedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyFontAddedEventType, LabelPolicyFontAddedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyFontRemovedEventType, LabelPolicyFontRemovedEventMapper).
-		RegisterFilterEventMapper(LabelPolicyAssetsRemovedEventType, LabelPolicyAssetsRemovedEventMapper).
-		RegisterFilterEventMapper(LoginPolicyAddedEventType, LoginPolicyAddedEventMapper).
-		RegisterFilterEventMapper(LoginPolicyChangedEventType, LoginPolicyChangedEventMapper).
-		RegisterFilterEventMapper(LoginPolicyRemovedEventType, LoginPolicyRemovedEventMapper).
-		RegisterFilterEventMapper(LoginPolicySecondFactorAddedEventType, SecondFactorAddedEventEventMapper).
-		RegisterFilterEventMapper(LoginPolicySecondFactorRemovedEventType, SecondFactorRemovedEventEventMapper).
-		RegisterFilterEventMapper(LoginPolicyMultiFactorAddedEventType, MultiFactorAddedEventEventMapper).
-		RegisterFilterEventMapper(LoginPolicyMultiFactorRemovedEventType, MultiFactorRemovedEventEventMapper).
-		RegisterFilterEventMapper(LoginPolicyIDPProviderAddedEventType, IdentityProviderAddedEventMapper).
-		RegisterFilterEventMapper(LoginPolicyIDPProviderRemovedEventType, IdentityProviderRemovedEventMapper).
-		RegisterFilterEventMapper(LoginPolicyIDPProviderCascadeRemovedEventType, IdentityProviderCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(DomainPolicyAddedEventType, DomainPolicyAddedEventMapper).
-		RegisterFilterEventMapper(DomainPolicyChangedEventType, DomainPolicyChangedEventMapper).
-		RegisterFilterEventMapper(DomainPolicyRemovedEventType, DomainPolicyRemovedEventMapper).
-		RegisterFilterEventMapper(PasswordAgePolicyAddedEventType, PasswordAgePolicyAddedEventMapper).
-		RegisterFilterEventMapper(PasswordAgePolicyChangedEventType, PasswordAgePolicyChangedEventMapper).
-		RegisterFilterEventMapper(PasswordAgePolicyRemovedEventType, PasswordAgePolicyRemovedEventMapper).
-		RegisterFilterEventMapper(PasswordComplexityPolicyAddedEventType, PasswordComplexityPolicyAddedEventMapper).
-		RegisterFilterEventMapper(PasswordComplexityPolicyChangedEventType, PasswordComplexityPolicyChangedEventMapper).
-		RegisterFilterEventMapper(PasswordComplexityPolicyRemovedEventType, PasswordComplexityPolicyRemovedEventMapper).
-		RegisterFilterEventMapper(LockoutPolicyAddedEventType, LockoutPolicyAddedEventMapper).
-		RegisterFilterEventMapper(LockoutPolicyChangedEventType, LockoutPolicyChangedEventMapper).
-		RegisterFilterEventMapper(LockoutPolicyRemovedEventType, LockoutPolicyRemovedEventMapper).
-		RegisterFilterEventMapper(PrivacyPolicyAddedEventType, PrivacyPolicyAddedEventMapper).
-		RegisterFilterEventMapper(PrivacyPolicyChangedEventType, PrivacyPolicyChangedEventMapper).
-		RegisterFilterEventMapper(PrivacyPolicyRemovedEventType, PrivacyPolicyRemovedEventMapper).
-		RegisterFilterEventMapper(MailTemplateAddedEventType, MailTemplateAddedEventMapper).
-		RegisterFilterEventMapper(MailTemplateChangedEventType, MailTemplateChangedEventMapper).
-		RegisterFilterEventMapper(MailTemplateRemovedEventType, MailTemplateRemovedEventMapper).
-		RegisterFilterEventMapper(MailTextAddedEventType, MailTextAddedEventMapper).
-		RegisterFilterEventMapper(MailTextChangedEventType, MailTextChangedEventMapper).
-		RegisterFilterEventMapper(MailTextRemovedEventType, MailTextRemovedEventMapper).
-		RegisterFilterEventMapper(CustomTextSetEventType, CustomTextSetEventMapper).
-		RegisterFilterEventMapper(CustomTextRemovedEventType, CustomTextRemovedEventMapper).
-		RegisterFilterEventMapper(CustomTextTemplateRemovedEventType, CustomTextTemplateRemovedEventMapper).
-		RegisterFilterEventMapper(IDPConfigAddedEventType, IDPConfigAddedEventMapper).
-		RegisterFilterEventMapper(IDPConfigChangedEventType, IDPConfigChangedEventMapper).
-		RegisterFilterEventMapper(IDPConfigRemovedEventType, IDPConfigRemovedEventMapper).
-		RegisterFilterEventMapper(IDPConfigDeactivatedEventType, IDPConfigDeactivatedEventMapper).
-		RegisterFilterEventMapper(IDPConfigReactivatedEventType, IDPConfigReactivatedEventMapper).
-		RegisterFilterEventMapper(IDPOIDCConfigAddedEventType, IDPOIDCConfigAddedEventMapper).
-		RegisterFilterEventMapper(IDPOIDCConfigChangedEventType, IDPOIDCConfigChangedEventMapper).
-		RegisterFilterEventMapper(IDPJWTConfigAddedEventType, IDPJWTConfigAddedEventMapper).
-		RegisterFilterEventMapper(IDPJWTConfigChangedEventType, IDPJWTConfigChangedEventMapper).
-		RegisterFilterEventMapper(TriggerActionsSetEventType, TriggerActionsSetEventMapper).
-		RegisterFilterEventMapper(TriggerActionsCascadeRemovedEventType, TriggerActionsCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(FlowClearedEventType, FlowClearedEventMapper).
-		RegisterFilterEventMapper(MetadataSetType, MetadataSetEventMapper).
-		RegisterFilterEventMapper(MetadataRemovedType, MetadataRemovedEventMapper).
-		RegisterFilterEventMapper(MetadataRemovedAllType, MetadataRemovedAllEventMapper)
+	es.RegisterFilterEventMapper(AggregateType, OrgAddedEventType, OrgAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgChangedEventType, OrgChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgDeactivatedEventType, OrgDeactivatedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgReactivatedEventType, OrgReactivatedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgRemovedEventType, OrgRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgDomainAddedEventType, DomainAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgDomainVerificationAddedEventType, DomainVerificationAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgDomainVerificationFailedEventType, DomainVerificationFailedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgDomainVerifiedEventType, DomainVerifiedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgDomainPrimarySetEventType, DomainPrimarySetEventMapper).
+		RegisterFilterEventMapper(AggregateType, OrgDomainRemovedEventType, DomainRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MemberAddedEventType, MemberAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MemberChangedEventType, MemberChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MemberRemovedEventType, MemberRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MemberCascadeRemovedEventType, MemberCascadeRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyAddedEventType, LabelPolicyAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyChangedEventType, LabelPolicyChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyActivatedEventType, LabelPolicyActivatedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyRemovedEventType, LabelPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyLogoAddedEventType, LabelPolicyLogoAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyLogoRemovedEventType, LabelPolicyLogoRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyIconAddedEventType, LabelPolicyIconAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyIconRemovedEventType, LabelPolicyIconRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyLogoDarkAddedEventType, LabelPolicyLogoDarkAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyLogoDarkRemovedEventType, LabelPolicyLogoDarkRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyIconDarkAddedEventType, LabelPolicyIconDarkAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyIconDarkRemovedEventType, LabelPolicyIconDarkRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyFontAddedEventType, LabelPolicyFontAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyFontRemovedEventType, LabelPolicyFontRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LabelPolicyAssetsRemovedEventType, LabelPolicyAssetsRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicyAddedEventType, LoginPolicyAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicyChangedEventType, LoginPolicyChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicyRemovedEventType, LoginPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicySecondFactorAddedEventType, SecondFactorAddedEventEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicySecondFactorRemovedEventType, SecondFactorRemovedEventEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicyMultiFactorAddedEventType, MultiFactorAddedEventEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicyMultiFactorRemovedEventType, MultiFactorRemovedEventEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicyIDPProviderAddedEventType, IdentityProviderAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicyIDPProviderRemovedEventType, IdentityProviderRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LoginPolicyIDPProviderCascadeRemovedEventType, IdentityProviderCascadeRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, DomainPolicyAddedEventType, DomainPolicyAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, DomainPolicyChangedEventType, DomainPolicyChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, DomainPolicyRemovedEventType, DomainPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PasswordAgePolicyAddedEventType, PasswordAgePolicyAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PasswordAgePolicyChangedEventType, PasswordAgePolicyChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PasswordAgePolicyRemovedEventType, PasswordAgePolicyRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PasswordComplexityPolicyAddedEventType, PasswordComplexityPolicyAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PasswordComplexityPolicyChangedEventType, PasswordComplexityPolicyChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PasswordComplexityPolicyRemovedEventType, PasswordComplexityPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LockoutPolicyAddedEventType, LockoutPolicyAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LockoutPolicyChangedEventType, LockoutPolicyChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LockoutPolicyRemovedEventType, LockoutPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PrivacyPolicyAddedEventType, PrivacyPolicyAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PrivacyPolicyChangedEventType, PrivacyPolicyChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PrivacyPolicyRemovedEventType, PrivacyPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MailTemplateAddedEventType, MailTemplateAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MailTemplateChangedEventType, MailTemplateChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MailTemplateRemovedEventType, MailTemplateRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MailTextAddedEventType, MailTextAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MailTextChangedEventType, MailTextChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MailTextRemovedEventType, MailTextRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, CustomTextSetEventType, CustomTextSetEventMapper).
+		RegisterFilterEventMapper(AggregateType, CustomTextRemovedEventType, CustomTextRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, CustomTextTemplateRemovedEventType, CustomTextTemplateRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPConfigAddedEventType, IDPConfigAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPConfigChangedEventType, IDPConfigChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPConfigRemovedEventType, IDPConfigRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPConfigDeactivatedEventType, IDPConfigDeactivatedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPConfigReactivatedEventType, IDPConfigReactivatedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPOIDCConfigAddedEventType, IDPOIDCConfigAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPOIDCConfigChangedEventType, IDPOIDCConfigChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPJWTConfigAddedEventType, IDPJWTConfigAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPJWTConfigChangedEventType, IDPJWTConfigChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OAuthIDPAddedEventType, OAuthIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OAuthIDPChangedEventType, OAuthIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OIDCIDPAddedEventType, OIDCIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OIDCIDPChangedEventType, OIDCIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, JWTIDPAddedEventType, JWTIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, JWTIDPChangedEventType, JWTIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, AzureADIDPAddedEventType, AzureADIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, AzureADIDPChangedEventType, AzureADIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubIDPAddedEventType, GitHubIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubIDPChangedEventType, GitHubIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubEnterpriseIDPAddedEventType, GitHubEnterpriseIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubEnterpriseIDPChangedEventType, GitHubEnterpriseIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitLabIDPAddedEventType, GitLabIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitLabIDPChangedEventType, GitLabIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitLabSelfHostedIDPAddedEventType, GitLabSelfHostedIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitLabSelfHostedIDPChangedEventType, GitLabSelfHostedIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GoogleIDPAddedEventType, GoogleIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GoogleIDPChangedEventType, GoogleIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LDAPIDPAddedEventType, LDAPIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, LDAPIDPChangedEventType, LDAPIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, IDPRemovedEventType, IDPRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, TriggerActionsSetEventType, TriggerActionsSetEventMapper).
+		RegisterFilterEventMapper(AggregateType, TriggerActionsCascadeRemovedEventType, TriggerActionsCascadeRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, FlowClearedEventType, FlowClearedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MetadataSetType, MetadataSetEventMapper).
+		RegisterFilterEventMapper(AggregateType, MetadataRemovedType, MetadataRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MetadataRemovedAllType, MetadataRemovedAllEventMapper).
+		RegisterFilterEventMapper(AggregateType, NotificationPolicyAddedEventType, NotificationPolicyAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, NotificationPolicyChangedEventType, NotificationPolicyChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, NotificationPolicyRemovedEventType, NotificationPolicyRemovedEventMapper)
 }

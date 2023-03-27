@@ -35,10 +35,6 @@ func (wm *UserMetadataWriteModel) AppendEvents(events ...eventstore.Event) {
 	}
 }
 
-func (wm *UserMetadataWriteModel) Reduce() error {
-	return wm.MetadataWriteModel.Reduce()
-}
-
 func (wm *UserMetadataWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
@@ -141,9 +137,7 @@ func (wm *UserMetadataByOrgListWriteModel) Reduce() error {
 				delete(val, e.Key)
 			}
 		case *metadata.RemovedAllEvent:
-			if _, ok := wm.UserMetadata[e.Aggregate().ID]; ok {
-				delete(wm.UserMetadata, e.Aggregate().ID)
-			}
+			delete(wm.UserMetadata, e.Aggregate().ID)
 		}
 	}
 	return wm.WriteModel.Reduce()
