@@ -20,7 +20,7 @@ func (f *filterMatcher) String() string {
 	if err != nil {
 		panic(err)
 	}
-	return fmt.Sprintf("%s %s (content=%+v,type=%T,json=%s)", f.Field, f.Operation, f.Value, f.Value, string(jsonValue))
+	return fmt.Sprintf("%d %d (content=%+v,type=%T,json=%s)", f.Field, f.Operation, f.Value, f.Value, string(jsonValue))
 }
 
 func (f *filterMatcher) Matches(x interface{}) bool {

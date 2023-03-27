@@ -946,7 +946,7 @@ func TestProjection_schedule(t *testing.T) {
 				concurrentInstances:     1,
 				handleInactiveInstances: tt.fields.handleInactiveInstances,
 				retries:                 0,
-				clock:                   NowFunc(now),
+				nowFunc:                 now,
 			}
 			ctx, cancel := context.WithCancel(tt.args.ctx)
 			go func() {
