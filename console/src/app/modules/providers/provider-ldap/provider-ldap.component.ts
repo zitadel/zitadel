@@ -1,4 +1,3 @@
-import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
@@ -38,8 +37,6 @@ export class ProviderLDAPComponent {
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
-
-  public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
   public form!: FormGroup;
 
