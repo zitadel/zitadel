@@ -18,6 +18,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
@@ -47,6 +48,7 @@ export class ProviderLDAPComponent {
   public provider?: Provider.AsObject;
 
   constructor(
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -65,6 +67,23 @@ export class ProviderLDAPComponent {
       timeout: new FormControl<number>(0),
       startTls: new FormControl(false),
     });
+
+    this.authService
+      .isAllowed(
+        this.serviceType === PolicyComponentServiceType.ADMIN
+          ? ['iam.idp.write']
+          : this.serviceType === PolicyComponentServiceType.MGMT
+          ? ['org.idp.write']
+          : [],
+      )
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        if (allowed) {
+          this.form.enable();
+        } else {
+          this.form.disable();
+        }
+      });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;

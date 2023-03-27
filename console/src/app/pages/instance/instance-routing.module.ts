@@ -28,7 +28,7 @@ const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     loadChildren: () => import('src/app/modules/providers/providers.module'),
     data: {
-      roles: ['org.idp.write'],
+      roles: ['iam.idp.read'],
       serviceType: PolicyComponentServiceType.ADMIN,
     },
   },
