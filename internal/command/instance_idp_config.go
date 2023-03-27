@@ -5,14 +5,13 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (string, *domain.ObjectDetails, error) {
@@ -202,8 +201,10 @@ func (c *Commands) prepareRemoveDefaultIDPConfig(a *instance.Aggregate, idpID st
 			if err != nil {
 				return nil, err
 			}
-			err = AppendAndReduce(existingIDP, pushedEvents...)
 
+			if err = AppendAndReduce(existingIDP, pushedEvents...); err != nil {
+				return nil, err
+			}
 			return events, nil
 		}, nil
 	}
