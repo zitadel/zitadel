@@ -28,9 +28,7 @@
           "cp .artifacts/grpc/zitadel/admin.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/admin",
           "cp .artifacts/grpc/zitadel/management.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/management",
           "cp .artifacts/grpc/zitadel/system.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/system",
-          "cp -R .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc",
-          "mkdir -p openapi/v2/zitadel",
-          "cp .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel"
+          "cp -R .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc"
         ],
         "parallel": false,
         "cwd": ""
@@ -71,6 +69,8 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
+          "mkdir -p openapi/v2/zitadel",
+          "cp .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel",
           "export PATH=$(go env GOPATH)/bin:$PATH && go install github.com/rakyll/statik@v0.1.7",
           "export PATH=$(go env GOPATH)/bin:$PATH && go generate openapi/statik/generate.go",
           "mkdir -p docs/apis/assets/",
@@ -79,6 +79,7 @@
         "cwd": "",
         "parallel": false
       },
+      "dependsOn": ["generate_grpc"],
       "inputs": [
         "!{workspaceRoot}/**/*",
         "{workspaceRoot}/internal/api/assets/**/*"
