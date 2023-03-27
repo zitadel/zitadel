@@ -76,16 +76,36 @@ Database:
 You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
 ```yaml
+# The Projections section defines the behaviour for the scheduled and synchronous events projections.
 Projections:
+  # Time interval between scheduled projections
   RequeueEvery: 60s
+  # Time between retried database statements resulting from projected events
   RetryFailedAfter: 1s
+  # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5
+  # Number of concurrent projection routines
   ConcurrentInstances: 1
+  # Limit of returned events per query
   BulkLimit: 200
-  MaxIterators: 1
+  # If HandleInactiveInstances this is false, only instances are projected,
+  # for which at least a projection relevant event exists withing the timeframe
+  # from twice the RequeueEvery time in the past until the projections current time
+  HandleInactiveInstances: false
+  # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
-    projects:
+    Projects:
       BulkLimit: 2000
+    # The Notifications projection is used for sending emails and SMS to users
+    Notifications:
+      # As notification projections don't result in database statements, retries don't have an effect
+      MaxFailureCount: 0
+    # The NotificationsQuotas projection is used for calling quota webhooks
+    NotificationsQuotas:
+      # Delivery guarantee requirements are probably higher for quota webhooks
+      HandleInactiveInstances: true
+      # As quota notification projections don't result in database statements, retries don't have an effect
+      MaxFailureCount: 0
 ```
 
 ### Manage your Data
