@@ -89,7 +89,7 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 		e,
 		u.metricSuccessfulDeliveriesJSON,
 		u.metricFailedDeliveriesJSON,
-	).Naked()
+	).WithoutTemplate()
 	if err != nil {
 		return nil, err
 	}
