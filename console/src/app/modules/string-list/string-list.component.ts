@@ -76,7 +76,8 @@ export class StringListComponent implements ControlValueAccessor, OnInit, OnDest
 
   public add(input: any): void {
     if (this.control.valid) {
-      if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
+      const trimmed = input.value.trim();
+      if (trimmed) {
         this.val ? this.val.push(input.value) : (this.val = [input.value]);
         this.onChange(this.val);
         this.onTouch(this.val);
