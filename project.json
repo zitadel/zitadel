@@ -6,10 +6,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "go mod download",
-          "go build -o=zitadel"
-        ],
+        "commands": ["go mod download", "go build -o=zitadel"],
         "cwd": ""
       },
       "inputs": ["!{workspaceRoot}/console/**/*", "!{workspaceRoot}/docs/**/*"],
