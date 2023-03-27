@@ -226,14 +226,6 @@ export class ProviderLDAPComponent {
     return this.form.get('name');
   }
 
-  //   public get avatarUrlAttribute(): AbstractControl | null {
-  //     return this.form.get('avatarUrlAttribute');
-  //   }
-
-  //   public get displayNameAttribute(): AbstractControl | null {
-  //     return this.form.get('displayNameAttribute');
-  //   }
-
   public get baseDn(): AbstractControl | null {
     return this.form.get('baseDn');
   }
