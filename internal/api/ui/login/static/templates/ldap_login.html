@@ -1,0 +1,40 @@
+{{template "main-top" .}}
+
+<div class="lgn-head">
+    <h1>{{t "LDAP.Title"}}</h1>
+    <p>{{t "LDAP.Description"}}</p>
+</div>
+
+
+<form action="{{ ldapUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}"/>
+
+    <div class="fields">
+        <label class="lgn-label" for="ldapusername">{{t "LDAP.LoginNameLabel"}}</label>
+        <input class="lgn-input" type="text" id="ldapusername" name="ldapusername" autocomplete="username" autofocus required>
+    </div>
+    <div class="fields">
+        <label class="lgn-label" for="ldappassword">{{t "LDAP.PasswordLabel"}}</label>
+        <input class="lgn-input" type="password" id="ldappassword" name="ldappassword" autocomplete="current-password" required>
+    </div>
+
+    {{template "error-message" .}}
+
+    <div class="lgn-actions lgn-reverse-order">
+        <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">
+            {{t "LDAP.NextButtonText"}}
+        </button>
+        <span class="fill-space"></span>
+        <button class="lgn-icon-button lgn-left-action" name="resetexternalidp" value="true" formnovalidate>
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </button>
+    </div>
+</form>
+
+<script src="{{ resourceUrl " scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl " scripts/default_form_validation.js" }}"></script>
+
+{{template "main-bottom" .}}
