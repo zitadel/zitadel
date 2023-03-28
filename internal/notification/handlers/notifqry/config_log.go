@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 )
 
-// Read iam log provider config
+// GetLogProvider reads the iam log provider config
 func (n *NotificationQueries) GetLogProvider(ctx context.Context) (*log.Config, error) {
 	config, err := n.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeLog)
 	if err != nil {

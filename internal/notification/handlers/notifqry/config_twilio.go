@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-// Read iam twilio config
+// GetTwilioConfig reads the iam Twilio provider config
 func (n *NotificationQueries) GetTwilioConfig(ctx context.Context) (*twilio.Config, error) {
 	active, err := query.NewSMSProviderStateQuery(domain.SMSConfigStateActive)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 )
 
+// GetSMTPConfig reads the iam SMTP provider config
 func (n *NotificationQueries) GetSMTPConfig(ctx context.Context) (*smtp.Config, error) {
 	config, err := n.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {

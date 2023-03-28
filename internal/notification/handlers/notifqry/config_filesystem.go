@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 )
 
-// Read iam filesystem provider config
+// GetFileSystemProvider reads the iam filesystem provider config
 func (n *NotificationQueries) GetFileSystemProvider(ctx context.Context) (*fs.Config, error) {
 	config, err := n.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeFile)
 	if err != nil {
