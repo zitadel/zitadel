@@ -1,3 +1,6 @@
+Log:
+  Level: debug
+
 ExternalDomain: host.docker.internal
 ExternalSecure: false
 
@@ -31,6 +34,11 @@ Quotas:
   Access:
     ExhaustedCookieKey: "zitadel.quota.limiting"
     ExhaustedCookieMaxAge: "60s"
+
+Projections:
+  Customizations:
+    NotificationsQuotas:
+      RequeueEvery: 1s
 
 DefaultInstance:
   LoginPolicy:

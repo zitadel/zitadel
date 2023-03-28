@@ -106,6 +106,8 @@ Projections:
       HandleInactiveInstances: true
       # As quota notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 0
+      # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
+      RequeueEvery: 300s
 ```
 
 ### Manage your Data
