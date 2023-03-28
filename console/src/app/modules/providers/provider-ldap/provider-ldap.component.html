@@ -71,8 +71,8 @@
           <h2>{{ 'IDP.LDAPATTRIBUTES' | translate }}</h2>
 
           <button (click)="showAttributes = !showAttributes" type="button" mat-icon-button>
-            <mat-icon *ngIf="showAttributes">keyboard_arrow_up</mat-icon
-            ><mat-icon *ngIf="!showAttributes">keyboard_arrow_down</mat-icon>
+            <mat-icon *ngIf="showAttributes">keyboard_arrow_up</mat-icon>
+            <mat-icon *ngIf="!showAttributes">keyboard_arrow_down</mat-icon>
           </button>
 
           <span *ngIf="!provider?.config?.ldap?.attributes?.idAttribute" class="state error">{{
