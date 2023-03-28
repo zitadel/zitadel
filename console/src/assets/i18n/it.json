@@ -9,8 +9,8 @@
   "FOOTER": {
     "LINKS": {
       "CONTACT": "Contatto",
-      "TOS": "Terms of Service",
-      "PP": "Privacy Policy"
+      "TOS": "Termini di servizio",
+      "PP": "Informativa sulla privacy"
     },
     "THEME": {
       "DARK": "Scuro",
@@ -43,8 +43,8 @@
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "Your onboarding process",
-    "COMPLETED": "completed",
+    "DESCRIPTION": "Il tuo processo di onboarding",
+    "COMPLETED": "completato",
     "DISMISS": "chiudi",
     "CARD": {
       "TITLE": "Fate funzionare il vostro ZITADEL",
@@ -258,7 +258,7 @@
     "SETTINGS": {
       "TITLE": "Impostazioni",
       "GENERAL": "Generale",
-      "IDP": "Identity Providers",
+      "IDP": "Fornitori di identità",
       "SECURITY": "Password e sicurezza",
       "KEYS": "Chiavi",
       "PAT": "Personal Access Tokens",
@@ -426,7 +426,7 @@
       "EMPTY": "Nessun IDP esterno trovato",
       "DIALOG": {
         "DELETE_TITLE": "Rimuovere l'IDP",
-        "DELETE_DESCRIPTION": "Stai per eliminare un Identity Provider da un utente. Vuoi continuare?"
+        "DELETE_DESCRIPTION": "Stai per eliminare un fornitore di identità da un utente. Vuoi continuare?"
       }
     },
     "CREATE": {
@@ -990,7 +990,7 @@
       "NOTIFICATIONS": "Impostazioni di notifica",
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
-      "IDP": "Identity Providers",
+      "IDP": "Fornitori di identità",
       "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
@@ -1004,7 +1004,7 @@
       "LOGIN": "Accesso e login",
       "DOMAIN": "Dominio",
       "TEXTS": "Testi e lingue",
-      "APPEARANCE": "Aussehen",
+      "APPEARANCE": "Aspetto",
       "OTHER": "Altro"
     }
   },
@@ -1142,6 +1142,10 @@
       "MAXSIZEEXCEEDED": "Dimensione massima di 524kB superata.",
       "NOSVGSUPPORTED": "SVG non sono supportati",
       "FONTINLOGINONLY": "Il carattere \u00e8 attualmente visualizzato solo nell'interfaccia di accesso.",
+      "BACKGROUNDCOLOR": "Colore di sfondo",
+      "PRIMARYCOLOR": "Colore primario",
+      "WARNCOLOR": "Colore di avviso",
+      "FONTCOLOR": "Colore del testo",
       "VIEWS": {
         "PREVIEW": "Anteprima",
         "CURRENT": "Configurazione attuale"
@@ -1173,7 +1177,7 @@
     },
     "LOGIN_POLICY": {
       "TITLE": "Impostazioni di accesso",
-      "DESCRIPTION": "Definisci come gli utenti possono essere autenticati e configura gli Identity Provider",
+      "DESCRIPTION": "Definisci come gli utenti possono essere autenticati e configura i fornitori di identità",
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
       "ADVANCED": "Impostazioni avanzate",
@@ -1394,10 +1398,10 @@
         "GRANTED_SINGULAR": "Progetto delegato"
       },
       "PRIVATELABEL": {
-        "TITLE": "Impostazione Branding",
+        "TITLE": "Impostazione branding",
         "0": {
           "TITLE": "Non specificato",
-          "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione Branding dell'organizzazione, prima che venga mostrato il default del sistema."
+          "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione branding dell'organizzazione, prima che venga mostrato il default del sistema."
         },
         "1": {
           "TITLE": "Applica l'impostazione del progetto",
@@ -1405,10 +1409,10 @@
         },
         "2": {
           "TITLE": "Applica l'impostazione dell' organizzazione dell' utente",
-          "DESC": "Verr\u00e0 mostrata l'impostazione Branding dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
+          "DESC": "Verr\u00e0 mostrata l'impostazione branding dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
         },
         "DIALOG": {
-          "TITLE": "Impostazione Branding",
+          "TITLE": "Impostazione branding",
           "DESCRIPTION": "Seleziona il comportamento del login, quando usi il progetto."
         }
       },
@@ -1611,9 +1615,9 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Identity Providers",
-      "DESCRIPTION": "Definisci ulteriori Identity Provider, che possono essere utilizzati per l'autenticazione nelle tue organizzazioni.",
-      "ACTIVETITLE": "Identity Providers"
+      "TITLE": "Fornitori di identità",
+      "DESCRIPTION": "Definisci ulteriori fornitori di identità, che possono essere utilizzati per l'autenticazione nelle tue organizzazioni.",
+      "ACTIVETITLE": "Fornitori di identità"
     },
     "CREATE": {
       "TITLE": "Aggiungi provider",
@@ -1661,8 +1665,8 @@
       }
     },
     "DETAIL": {
-      "TITLE": "Identity Provider",
-      "DESCRIPTION": "Aggiorna la configurazione del tuo provider",
+      "TITLE": "Fornitore di identità",
+      "DESCRIPTION": "Aggiorna la configurazione del tuo fornitore di identit\u00e0.",
       "DATECREATED": "Creato",
       "DATECHANGED": "Cambiato"
     },
@@ -1695,6 +1699,7 @@
       "1": "Organizations",
       "2": "Customers"
     },
+    "ADD": "Aggiungi fornitore di identità",
     "AZUREADTENANTTYPE": "Tipo tenant",
     "AZUREADTENANTID": "tenant ID",
     "EMAILVERIFIED": "Email verificata",
@@ -1703,7 +1708,6 @@
     "LDAPATTRIBUTES": "Attributi LDAP",
     "UPDATEBINDPASSWORD": "aggiorna Bind Password",
     "UPDATECLIENTSECRET": "Aggiorna secret",
-    "ADD": "Aggiungi Identity Provider",
     "TYPE": "Tipo",
     "OWNER": "Owner",
     "ID": "ID",
@@ -1821,11 +1825,11 @@
       "TITLE": "Impostazioni di accesso",
       "DESCRIPTION": "Definisci come i tuoi utenti possono essere autenticati nella tua organizzazione."
     },
-    "IDPS": "Identity Providers",
+    "IDPS": "Fornitori di identità",
     "ADDIDP": {
       "TITLE": "Aggiungi un IDP",
       "DESCRIPTION": "\u00c8 possibile selezionare IDPs dell'organizzazione o del sistema.",
-      "SELECTIDPS": "Identity Providers"
+      "SELECTIDPS": "Fornitori di identità"
     },
     "PASSWORDLESS": "Autenticazione passwordless",
     "PASSWORDLESSTYPE": {
