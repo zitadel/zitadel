@@ -19,14 +19,15 @@ To be able to use Google to authenticate your users you need an OIDC Client in G
 
 1. Go to the Google Cloud Platform and choose your project: <https://console.cloud.google.com/apis/credentials>
 2. Click on "+ CREATE CREDENTIALS" and choose "OAuth client ID"
-3. Choose Web application as application type and give a name
+3. Choose "Web application" as application type and give a name
 4. Add the redirect uris
  - {your-domain}/ui/login/login/externalidp/callback
  - Example redirect url for the domain `https://acme-gzoe4x.zitadel.cloud` would look like this:  `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
-5. Save clientid and client secret
+5. Save the Client ID and Client secret
 
+![Google OAuth App Registration](/img/guides/google_oauth_app_registration.png)
 
-![Add new oAuth credentials in Google Console](/img/google_add_credentials.gif)
+![Google Client ID and Secret](/img/guides/google_client_id_secret.png)
 
 ## ZITADEL Configuration
 
@@ -57,7 +58,7 @@ Either account creation or account linking have to be enabled. Otherwise, the pr
 
 Once you created the IdP you need to activate it, to make it usable for your users.
 
-![Activate the GitHub](/img/guides/zitadel_activate_github.png)
+![Activate the GitHub](/img/guides/zitadel_activate_google.png)
 
 ## Test the setup
 
@@ -66,10 +67,4 @@ If you succeeded you should see a new button which should redirect you to your G
 
 ![GitHub Button](/img/guides/zitadel_login_github.png)
 
-![GitHub Login](/img/guides/github_login.png)
-
-If the user is not yet linked in ZITADEL the user will see the screen below.
-Because GitHub is an OAuth provider and oAuth does not provide a standardized way to get the user data not all of the data can be taken over. First and Lastname are not filled.
-The user has to enter the rest of the data himself.
-
-![GitHub Login](/img/guides/zitadel_login_external_not_found_registration.png)
+![GitHub Login](/img/guides/google_login.png)
