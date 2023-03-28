@@ -144,7 +144,7 @@ describe('quotas', () => {
 
       const amount = 100;
       const percent = 10;
-      const usage = 25;
+      const usage = 35;
 
       describe('without repetition', () => {
         beforeEach(() => {
@@ -274,7 +274,7 @@ describe('quotas', () => {
           });
           cy.waitUntil(() =>
             cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-              if (events.length != 2) {
+              if (events.length != 3) {
                 return false;
               }
               for (let i = 0; i < events.length; i++) {
