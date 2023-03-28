@@ -274,7 +274,7 @@ describe('quotas', () => {
           });
           cy.waitUntil(() =>
             cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-              if (events.length != 1) {
+              if (events.length != 2) {
                 return false;
               }
               for (let i = 0; i < events.length; i++) {

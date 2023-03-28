@@ -30,7 +30,7 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, config *quota.Ad
 
 		threshold := notification.Percent
 		if notification.Repeat {
-			threshold = uint16(math.Min(1, math.Floor(float64(usedRel)/float64(notification.Percent)))) * notification.Percent
+			threshold = uint16(math.Max(1, math.Floor(float64(usedRel)/float64(notification.Percent)))) * notification.Percent
 		}
 
 		if wm.latestDueThresholds[notification.ID] < threshold {
