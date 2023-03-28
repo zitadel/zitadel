@@ -1141,6 +1141,10 @@
       "MAXSIZEEXCEEDED": "La taille maximale de 524kB est dépassée.",
       "NOSVGSUPPORTED": "SVG n'est pas pris en charge",
       "FONTINLOGINONLY": "La police n'est actuellement affichée que dans l'interface de connexion.",
+      "BACKGROUNDCOLOR": "Couleur de l'arrière plan",
+      "PRIMARYCOLOR": "Couleur primaire",
+      "WARNCOLOR": "Couleur d'avertissement",
+      "FONTCOLOR": "Couleur de la police",
       "VIEWS": {
         "PREVIEW": "Aperçu",
         "CURRENT": "Configuration actuelle"
