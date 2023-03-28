@@ -275,9 +275,9 @@ describe('quotas', () => {
           });
           cy.waitUntil(() =>
             cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-              let foundExpected = 0
+              let foundExpected = 0;
               for (let i = 0; i < events.length; i++) {
-                for (let expect = 10; expect <= 30; expect+=10) {
+                for (let expect = 10; expect <= 30; expect += 10) {
                   if (
                     Cypress._.matches(<ZITADELWebhookEvent>{
                       sentStatus: 200,
@@ -289,7 +289,7 @@ describe('quotas', () => {
                       },
                     })(events[i])
                   ) {
-                    foundExpected++
+                    foundExpected++;
                   }
                 }
               }
