@@ -8,14 +8,14 @@
     matTooltip="{{ 'ACTIONS.ADD' | translate }}"
     type="submit"
     mat-icon-button
-    [disabled]="redirectControl.invalid || !canWrite"
+    [disabled]="redirectControl.invalid || redirectControl.disabled"
   >
     <mat-icon>add</mat-icon>
   </button>
 </form>
 
 <div class="redirect-uris-list">
-  <div *ngFor="let uri of urisList" class="uri-line" [ngClass]="{ alert: !devMode && !(uri | redirect : isNative) }">
+  <div *ngFor="let uri of value" class="uri-line" [ngClass]="{ alert: !devMode && !(uri | redirect : isNative) }">
     <span
       class="uri"
       [ngClass]="{ green: !devMode && uri?.startsWith('https://'), red: !devMode && !uri?.startsWith('https://') }"
@@ -29,7 +29,13 @@
       "
     ></i>
 
-    <button matTooltip="{{ 'ACTIONS.DELETE' | translate }}" mat-icon-button (click)="remove(uri)" class="icon-button">
+    <button
+      type="button"
+      matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+      mat-icon-button
+      (click)="remove(uri)"
+      class="icon-button"
+    >
       <mat-icon class="icon">cancel</mat-icon>
     </button>
   </div>
