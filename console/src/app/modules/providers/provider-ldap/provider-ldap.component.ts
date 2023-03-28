@@ -1,20 +1,19 @@
-import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { take } from 'rxjs';
 import {
-  AddGitHubEnterpriseServerProviderRequest as AdminAddGitHubEnterpriseServerProviderRequest,
+  AddLDAPProviderRequest as AdminAddLDAPProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
-  UpdateGitHubEnterpriseServerProviderRequest as AdminUpdateGitHubEnterpriseServerProviderRequest,
+  UpdateLDAPProviderRequest as AdminUpdateLDAPProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { LDAPAttributes, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  AddGitHubEnterpriseServerProviderRequest as MgmtAddGitHubEnterpriseServerProviderRequest,
+  AddLDAPProviderRequest as MgmtAddLDAPProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
-  UpdateGitHubEnterpriseServerProviderRequest as MgmtUpdateGitHubEnterpriseServerProviderRequest,
+  UpdateLDAPProviderRequest as MgmtUpdateLDAPProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -26,19 +25,20 @@ import { requiredValidator } from '../../form-field/validators/validators';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Component({
-  selector: 'cnsl-provider-github-es',
-  templateUrl: './provider-github-es.component.html',
+  selector: 'cnsl-provider-ldap',
+  templateUrl: './provider-ldap.component.html',
 })
-export class ProviderGithubESComponent {
+export class ProviderLDAPComponent {
+  public updateBindPassword: boolean = false;
+  public showAttributes: boolean = false;
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
-
+  public attributes: LDAPAttributes = new LDAPAttributes();
   public id: string | null = '';
-  public updateClientSecret: boolean = false;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
-  public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  public form!: UntypedFormGroup;
+
+  public form!: FormGroup;
 
   public loading: boolean = false;
 
@@ -50,16 +50,19 @@ export class ProviderGithubESComponent {
     private toast: ToastService,
     private injector: Injector,
     private _location: Location,
-    breadcrumbService: BreadcrumbService,
+    private breadcrumbService: BreadcrumbService,
   ) {
-    this.form = new UntypedFormGroup({
-      name: new UntypedFormControl('', [requiredValidator]),
-      clientId: new UntypedFormControl('', [requiredValidator]),
-      clientSecret: new UntypedFormControl('', [requiredValidator]),
-      authorizationEndpoint: new UntypedFormControl('', [requiredValidator]),
-      tokenEndpoint: new UntypedFormControl('', [requiredValidator]),
-      userEndpoint: new UntypedFormControl('', [requiredValidator]),
-      scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
+    this.form = new FormGroup({
+      name: new FormControl('', [requiredValidator]),
+      serversList: new FormControl('', [requiredValidator]),
+      baseDn: new FormControl('', [requiredValidator]),
+      bindDn: new FormControl('', [requiredValidator]),
+      bindPassword: new FormControl('', [requiredValidator]),
+      userBase: new FormControl('', [requiredValidator]),
+      userFiltersList: new FormControl('', [requiredValidator]),
+      userObjectClassesList: new FormControl('', [requiredValidator]),
+      timeout: new FormControl<number>(0),
+      startTls: new FormControl(false),
     });
 
     this.authService
@@ -91,7 +94,7 @@ export class ProviderGithubESComponent {
             routerLink: ['/org'],
           };
 
-          breadcrumbService.setBreadcrumb([bread]);
+          this.breadcrumbService.setBreadcrumb([bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
@@ -101,20 +104,19 @@ export class ProviderGithubESComponent {
             name: 'Instance',
             routerLink: ['/instance'],
           });
-          breadcrumbService.setBreadcrumb([iamBread]);
+          this.breadcrumbService.setBreadcrumb([iamBread]);
           break;
       }
 
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
-        this.clientSecret?.setValidators([]);
         this.getData(this.id);
+        this.bindPassword?.setValidators([]);
       }
     });
   }
 
   private getData(id: string): void {
-    this.loading = true;
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
         ? new AdminGetProviderByIDRequest()
@@ -125,9 +127,10 @@ export class ProviderGithubESComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        if (this.provider?.config?.githubEs) {
-          this.form.patchValue(this.provider.config.githubEs);
+        if (this.provider?.config?.ldap) {
+          this.form.patchValue(this.provider.config.ldap);
           this.name?.setValue(this.provider.name);
+          this.timeout?.setValue(this.provider.config.ldap.timeout?.seconds);
         }
       })
       .catch((error) => {
@@ -137,26 +140,32 @@ export class ProviderGithubESComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGenericOAuthProvider() : this.addGenericOAuthProvider();
+    this.provider ? this.updateLDAPProvider() : this.addLDAPProvider();
   }
 
-  public addGenericOAuthProvider(): void {
+  public addLDAPProvider(): void {
     const req =
       this.serviceType === PolicyComponentServiceType.MGMT
-        ? new MgmtAddGitHubEnterpriseServerProviderRequest()
-        : new AdminAddGitHubEnterpriseServerProviderRequest();
+        ? new MgmtAddLDAPProviderRequest()
+        : new AdminAddLDAPProviderRequest();
 
     req.setName(this.name?.value);
-    req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-    req.setTokenEndpoint(this.tokenEndpoint?.value);
-    req.setUserEndpoint(this.userEndpoint?.value);
-    req.setClientId(this.clientId?.value);
-    req.setClientSecret(this.clientSecret?.value);
-    req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
+    req.setAttributes(this.attributes);
+
+    req.setBaseDn(this.baseDn?.value);
+    req.setBindDn(this.bindDn?.value);
+    req.setBindPassword(this.bindPassword?.value);
+    req.setServersList(this.serversList?.value); // list
+    req.setStartTls(this.startTls?.value);
+    req.setTimeout(new Duration().setSeconds(this.timeout?.value ?? 0));
+    req.setUserBase(this.userBase?.value);
+    req.setUserFiltersList(this.userFiltersList?.value); // list
+    req.setUserObjectClassesList(this.userObjectClassesList?.value); // list
 
     this.loading = true;
-    this.service
-      .addGitHubEnterpriseServerProvider(req)
+    (this.service as ManagementService)
+      .addLDAPProvider(req)
       .then((idp) => {
         setTimeout(() => {
           this.loading = false;
@@ -169,24 +178,33 @@ export class ProviderGithubESComponent {
       });
   }
 
-  public updateGenericOAuthProvider(): void {
+  public updateLDAPProvider(): void {
     if (this.provider) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
-          ? new MgmtUpdateGitHubEnterpriseServerProviderRequest()
-          : new AdminUpdateGitHubEnterpriseServerProviderRequest();
+          ? new MgmtUpdateLDAPProviderRequest()
+          : new AdminUpdateLDAPProviderRequest();
       req.setId(this.provider.id);
       req.setName(this.name?.value);
-      req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
-      req.setTokenEndpoint(this.tokenEndpoint?.value);
-      req.setUserEndpoint(this.userEndpoint?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
+
+      req.setAttributes(this.attributes);
+
+      req.setBaseDn(this.baseDn?.value);
+      req.setBindDn(this.bindDn?.value);
+      if (this.updateBindPassword) {
+        req.setBindPassword(this.bindPassword?.value);
+      }
+      req.setServersList(this.serversList?.value);
+      req.setStartTls(this.startTls?.value);
+      req.setTimeout(new Duration().setSeconds(this.timeout?.value ?? 0));
+      req.setUserBase(this.userBase?.value);
+      req.setUserFiltersList(this.userFiltersList?.value);
+      req.setUserObjectClassesList(this.userObjectClassesList?.value);
 
       this.loading = true;
-      this.service
-        .updateGitHubEnterpriseServerProvider(req)
+      (this.service as ManagementService)
+        .updateLDAPProvider(req)
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
@@ -204,59 +222,43 @@ export class ProviderGithubESComponent {
     this._location.back();
   }
 
-  public addScope(event: MatChipInputEvent): void {
-    const input = event.chipInput?.inputElement;
-    const value = event.value.trim();
-
-    if (value !== '') {
-      if (this.scopesList?.value) {
-        this.scopesList.value.push(value);
-        if (input) {
-          input.value = '';
-        }
-      }
-    }
-  }
-
-  public removeScope(uri: string): void {
-    if (this.scopesList?.value) {
-      const index = this.scopesList.value.indexOf(uri);
-
-      if (index !== undefined && index >= 0) {
-        this.scopesList.value.splice(index, 1);
-      }
-    }
-  }
-
   public get name(): AbstractControl | null {
     return this.form.get('name');
   }
 
-  public get authorizationEndpoint(): AbstractControl | null {
-    return this.form.get('authorizationEndpoint');
+  public get baseDn(): AbstractControl | null {
+    return this.form.get('baseDn');
   }
 
-  public get tokenEndpoint(): AbstractControl | null {
-    return this.form.get('tokenEndpoint');
+  public get bindDn(): AbstractControl | null {
+    return this.form.get('bindDn');
   }
 
-  public get userEndpoint(): AbstractControl | null {
-    return this.form.get('userEndpoint');
+  public get bindPassword(): AbstractControl | null {
+    return this.form.get('bindPassword');
   }
 
-  public get clientId(): AbstractControl | null {
-    return this.form.get('clientId');
+  public get serversList(): AbstractControl | null {
+    return this.form.get('serversList');
   }
 
-  public get clientSecret(): AbstractControl | null {
-    return this.form.get('clientSecret');
+  public get startTls(): AbstractControl | null {
+    return this.form.get('startTls');
   }
 
-  public get issuer(): AbstractControl | null {
-    return this.form.get('issuer');
+  public get timeout(): AbstractControl | null {
+    return this.form.get('timeout');
   }
 
-  public get scopesList(): AbstractControl | null {
-    return this.form.get('scopesList');
+  public get userBase(): AbstractControl | null {
+    return this.form.get('userBase');
+  }
+
+  public get userFiltersList(): AbstractControl | null {
+    return this.form.get('userFiltersList');
+  }
+
+  public get userObjectClassesList(): AbstractControl | null {
+    return this.form.get('userObjectClassesList');
   }
 }
