@@ -29,6 +29,14 @@ func (c *Commands) orgPrivacyPolicyWriteModelByID(ctx context.Context, orgID str
 }
 
 func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
+
+	if policy.SupportEmail != "" {
+		if err := policy.SupportEmail.Validate(); err != nil {
+			return nil, err
+		}
+		policy.SupportEmail = policy.SupportEmail.Normalize()
+	}
+
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-MMk9fs", "Errors.ResourceOwnerMissing")
 	}
@@ -49,7 +57,8 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 			orgAgg,
 			policy.TOSLink,
 			policy.PrivacyLink,
-			policy.HelpLink))
+			policy.HelpLink,
+			policy.SupportEmail))
 	if err != nil {
 		return nil, err
 	}
@@ -61,12 +70,19 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 }
 
 func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
+
+	if policy.SupportEmail != "" {
+		if err := policy.SupportEmail.Validate(); err != nil {
+			return nil, err
+		}
+		policy.SupportEmail = policy.SupportEmail.Normalize()
+	}
+
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-22N89f", "Errors.ResourceOwnerMissing")
 	}
 
-	existingPolicy := NewOrgPrivacyPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
+	existingPolicy, err := c.orgPrivacyPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +91,7 @@ func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4N9fs", "Errors.Org.PrivacyPolicy.NotChanged")
 	}
