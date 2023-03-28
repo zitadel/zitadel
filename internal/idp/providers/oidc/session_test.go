@@ -29,11 +29,11 @@ func TestSession_FetchUser(t *testing.T) {
 		clientSecret string
 		redirectURI  string
 		scopes       []string
-		userMapper   func(oidc.UserInfo) idp.User
+		userMapper   func(*oidc.UserInfo) idp.User
 		httpMock     func(issuer string)
 		authURL      string
 		code         string
-		tokens       *oidc.Tokens
+		tokens       *oidc.Tokens[*oidc.IDTokenClaims]
 	}
 	type want struct {
 		err               error
@@ -114,7 +114,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,
@@ -163,7 +163,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,
@@ -294,20 +294,28 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 }
 
-func userinfo() oidc.UserInfoSetter {
-	info := oidc.NewUserInfo()
-	info.SetSubject("sub")
-	info.SetGivenName("firstname")
-	info.SetFamilyName("lastname")
-	info.SetName("firstname lastname")
-	info.SetNickname("nickname")
-	info.SetPreferredUsername("username")
-	info.SetEmail("email", true)
-	info.SetPhone("phone", true)
-	info.SetLocale(language.English)
-	info.SetPicture("picture")
-	info.SetProfile("profile")
-	return info
+func userinfo() *oidc.UserInfo {
+	return &oidc.UserInfo{
+		Subject: "sub",
+		UserInfoProfile: oidc.UserInfoProfile{
+			GivenName:         "firstname",
+			FamilyName:        "lastname",
+			Name:              "firstname lastname",
+			Nickname:          "nickname",
+			PreferredUsername: "username",
+			Locale:            oidc.NewLocale(language.English),
+			Picture:           "picture",
+			Profile:           "profile",
+		},
+		UserInfoEmail: oidc.UserInfoEmail{
+			Email:         "email",
+			EmailVerified: oidc.Bool(true),
+		},
+		UserInfoPhone: oidc.UserInfoPhone{
+			PhoneNumber:         "phone",
+			PhoneNumberVerified: true,
+		},
+	}
 }
 
 func tokenResponse(t *testing.T, issuer string) *oidc.AccessTokenResponse {
