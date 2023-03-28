@@ -8,7 +8,7 @@
   },
   "FOOTER": {
     "LINKS": {
-      "CONTACT": "Kontakt",
+      "CONTACT": "Contatto",
       "TOS": "Termini di servizio",
       "PP": "Informativa sulla privacy"
     },
@@ -1190,6 +1190,7 @@
       "TOSLINK": "Link ai termini di servizio",
       "POLICYLINK": "Link all'informativa sulla privacy",
       "HELPLINK": "link per l'aiuto",
+      "SUPPORTEMAIL": "e-mail di supporto",
       "SAVED": "Salvato con successo!",
       "RESET_TITLE": "Ripristina i valori predefiniti",
       "RESET_DESCRIPTION": "Stai per ripristinare i link predefiniti per i TOS e l'informativa sulla privacy. Vuoi davvero continuare?"
