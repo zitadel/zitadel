@@ -199,7 +199,7 @@ export class InputDirective
   protected _type: string = 'text';
 
   /** An object used to control when error messages are shown. */
-  @Input() errorStateMatcher!: ErrorStateMatcher;
+  @Input() override errorStateMatcher!: ErrorStateMatcher;
 
   /**
    * Implemented as part of MatFormFieldControl.
@@ -241,7 +241,7 @@ export class InputDirective
     protected _elementRef: ElementRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     protected _platform: Platform,
     /** @docs-private */
-    @Optional() @Self() public ngControl: NgControl,
+    @Optional() @Self() public override ngControl: NgControl,
     @Optional() _parentForm: NgForm,
     @Optional() _parentFormGroup: FormGroupDirective,
     _defaultErrorStateMatcher: ErrorStateMatcher,

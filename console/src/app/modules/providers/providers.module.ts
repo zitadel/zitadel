@@ -27,6 +27,7 @@ import { ProviderJWTComponent } from './provider-jwt/provider-jwt.component';
 import { ProviderLDAPComponent } from './provider-ldap/provider-ldap.component';
 import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.component';
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
+import { ProviderService } from './provider.service';
 import { ProvidersRoutingModule } from './providers-routing.module';
 
 @NgModule({
@@ -64,5 +65,6 @@ import { ProvidersRoutingModule } from './providers-routing.module';
     ProviderOptionsModule,
     MatLegacyProgressSpinnerModule,
   ],
+  providers: [ProviderService],
 })
 export default class ProvidersModule {}

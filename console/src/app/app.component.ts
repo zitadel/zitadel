@@ -201,7 +201,7 @@ export class AppComponent implements OnDestroy {
       }
     });
 
-    this.activatedRoute.queryParams.pipe(filter((params) => !!params.org)).subscribe((params) => {
+    this.activatedRoute.queryParams.pipe(filter((params) => !!params['org'])).subscribe((params) => {
       const { org } = params;
       this.authService.getActiveOrg(org);
     });
@@ -252,7 +252,7 @@ export class AppComponent implements OnDestroy {
   }
 
   public prepareRoute(outlet: RouterOutlet): boolean {
-    return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
+    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
   }
 
   public onSetTheme(theme: string): void {
