@@ -92,7 +92,7 @@ func (p *Provider) Name() string {
 // It will create a [Session] with an AuthURL, pointing to the jwtEndpoint
 // with the authRequest and encrypted userAgent ids.
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
-	if len(params) != 1 {
+	if len(params) < 1 {
 		return nil, ErrMissingUserAgentID
 	}
 	userAgentID, ok := params[0].(string)

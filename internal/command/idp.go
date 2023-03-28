@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -21,12 +22,13 @@ type GenericOAuthProvider struct {
 }
 
 type GenericOIDCProvider struct {
-	Name         string
-	Issuer       string
-	ClientID     string
-	ClientSecret string
-	Scopes       []string
-	IDPOptions   idp.Options
+	Name             string
+	Issuer           string
+	ClientID         string
+	ClientSecret     string
+	Scopes           []string
+	IsIDTokenMapping bool
+	IDPOptions       idp.Options
 }
 
 type JWTProvider struct {
@@ -36,6 +38,16 @@ type JWTProvider struct {
 	KeyEndpoint string
 	HeaderName  string
 	IDPOptions  idp.Options
+}
+
+type AzureADProvider struct {
+	Name          string
+	ClientID      string
+	ClientSecret  string
+	Scopes        []string
+	Tenant        string
+	EmailVerified bool
+	IDPOptions    idp.Options
 }
 
 type GitHubProvider struct {
@@ -57,6 +69,23 @@ type GitHubEnterpriseProvider struct {
 	IDPOptions            idp.Options
 }
 
+type GitLabProvider struct {
+	Name         string
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
+type GitLabSelfHostedProvider struct {
+	Name         string
+	Issuer       string
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
 type GoogleProvider struct {
 	Name         string
 	ClientID     string
@@ -66,17 +95,18 @@ type GoogleProvider struct {
 }
 
 type LDAPProvider struct {
-	Name                string
-	Host                string
-	Port                string
-	TLS                 bool
-	BaseDN              string
-	UserObjectClass     string
-	UserUniqueAttribute string
-	Admin               string
-	Password            string
-	LDAPAttributes      idp.LDAPAttributes
-	IDPOptions          idp.Options
+	Name              string
+	Servers           []string
+	StartTLS          bool
+	BaseDN            string
+	BindDN            string
+	BindPassword      string
+	UserBase          string
+	UserObjectClasses []string
+	UserFilters       []string
+	Timeout           time.Duration
+	LDAPAttributes    idp.LDAPAttributes
+	IDPOptions        idp.Options
 }
 
 func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {

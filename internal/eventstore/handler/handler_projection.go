@@ -20,11 +20,12 @@ const (
 
 type ProjectionHandlerConfig struct {
 	HandlerConfig
-	ProjectionName      string
-	RequeueEvery        time.Duration
-	RetryFailedAfter    time.Duration
-	Retries             uint
-	ConcurrentInstances uint
+	ProjectionName          string
+	RequeueEvery            time.Duration
+	RetryFailedAfter        time.Duration
+	Retries                 uint
+	ConcurrentInstances     uint
+	HandleInactiveInstances bool
 }
 
 // Update updates the projection with the given statements
@@ -43,19 +44,24 @@ type Lock func(context.Context, time.Duration, ...string) <-chan error
 // Unlock releases the mutex of the projection
 type Unlock func(...string) error
 
+// NowFunc makes time.Now() mockable
+type NowFunc func() time.Time
+
 type ProjectionHandler struct {
 	Handler
-	ProjectionName      string
-	reduce              Reduce
-	update              Update
-	searchQuery         SearchQuery
-	triggerProjection   *time.Timer
-	lock                Lock
-	unlock              Unlock
-	requeueAfter        time.Duration
-	retryFailedAfter    time.Duration
-	retries             int
-	concurrentInstances int
+	ProjectionName          string
+	reduce                  Reduce
+	update                  Update
+	searchQuery             SearchQuery
+	triggerProjection       *time.Timer
+	lock                    Lock
+	unlock                  Unlock
+	requeueAfter            time.Duration
+	retryFailedAfter        time.Duration
+	retries                 int
+	concurrentInstances     int
+	handleInactiveInstances bool
+	nowFunc                 NowFunc
 }
 
 func NewProjectionHandler(
@@ -73,18 +79,20 @@ func NewProjectionHandler(
 		concurrentInstances = 1
 	}
 	h := &ProjectionHandler{
-		Handler:             NewHandler(config.HandlerConfig),
-		ProjectionName:      config.ProjectionName,
-		reduce:              reduce,
-		update:              update,
-		searchQuery:         query,
-		lock:                lock,
-		unlock:              unlock,
-		requeueAfter:        config.RequeueEvery,
-		triggerProjection:   time.NewTimer(0), // first trigger is instant on startup
-		retryFailedAfter:    config.RetryFailedAfter,
-		retries:             int(config.Retries),
-		concurrentInstances: concurrentInstances,
+		Handler:                 NewHandler(config.HandlerConfig),
+		ProjectionName:          config.ProjectionName,
+		reduce:                  reduce,
+		update:                  update,
+		searchQuery:             query,
+		lock:                    lock,
+		unlock:                  unlock,
+		requeueAfter:            config.RequeueEvery,
+		triggerProjection:       time.NewTimer(0), // first trigger is instant on startup
+		retryFailedAfter:        config.RetryFailedAfter,
+		retries:                 int(config.Retries),
+		concurrentInstances:     concurrentInstances,
+		handleInactiveInstances: config.HandleInactiveInstances,
+		nowFunc:                 time.Now,
 	}
 
 	go func() {
@@ -221,10 +229,11 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			}
 			go h.cancelOnErr(lockCtx, errs, cancelLock)
 		}
-		if succeededOnce {
+		if succeededOnce && !h.handleInactiveInstances {
 			// since we have at least one successful run, we can restrict it to events not older than
 			// twice the requeue time (just to be sure not to miss an event)
-			query = query.CreationDateAfter(time.Now().Add(-2 * h.requeueAfter))
+			// This ensures that only instances with recent events on the handler are projected
+			query = query.CreationDateAfter(h.nowFunc().Add(-2 * h.requeueAfter))
 		}
 		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
 		if err != nil {

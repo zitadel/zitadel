@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDebugNotificationProviderLog(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDebugNotificationProviderLog(ctx context.Context, fileSystemProvider *fs.Config) (*domain.ObjectDetails, error) {
 	writeModel := NewInstanceDebugNotificationLogWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	events, err := c.addDefaultDebugNotificationLog(ctx, instanceAgg, writeModel, fileSystemProvider)
@@ -29,7 +29,7 @@ func (c *Commands) AddDebugNotificationProviderLog(ctx context.Context, fileSyst
 	return writeModelToObjectDetails(&writeModel.DebugNotificationWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addDefaultDebugNotificationLog(ctx context.Context, instanceAgg *eventstore.Aggregate, addedWriteModel *InstanceDebugNotificationLogWriteModel, fileSystemProvider *fs.FSConfig) ([]eventstore.Command, error) {
+func (c *Commands) addDefaultDebugNotificationLog(ctx context.Context, instanceAgg *eventstore.Aggregate, addedWriteModel *InstanceDebugNotificationLogWriteModel, fileSystemProvider *fs.Config) ([]eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedWriteModel)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (c *Commands) addDefaultDebugNotificationLog(ctx context.Context, instanceA
 	return events, nil
 }
 
-func (c *Commands) ChangeDefaultNotificationLog(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeDefaultNotificationLog(ctx context.Context, fileSystemProvider *fs.Config) (*domain.ObjectDetails, error) {
 	writeModel := NewInstanceDebugNotificationLogWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	event, err := c.changeDefaultDebugNotificationProviderLog(ctx, instanceAgg, writeModel, fileSystemProvider)
@@ -64,7 +64,7 @@ func (c *Commands) ChangeDefaultNotificationLog(ctx context.Context, fileSystemP
 	return writeModelToObjectDetails(&writeModel.DebugNotificationWriteModel.WriteModel), nil
 }
 
-func (c *Commands) changeDefaultDebugNotificationProviderLog(ctx context.Context, instanceAgg *eventstore.Aggregate, existingProvider *InstanceDebugNotificationLogWriteModel, fileSystemProvider *fs.FSConfig) (eventstore.Command, error) {
+func (c *Commands) changeDefaultDebugNotificationProviderLog(ctx context.Context, instanceAgg *eventstore.Aggregate, existingProvider *InstanceDebugNotificationLogWriteModel, fileSystemProvider *fs.Config) (eventstore.Command, error) {
 	err := c.defaultDebugNotificationProviderLogWriteModelByID(ctx, existingProvider)
 	if err != nil {
 		return nil, err

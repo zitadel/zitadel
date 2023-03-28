@@ -241,6 +241,27 @@ func (s *Server) UpdateJWTProvider(ctx context.Context, req *admin_pb.UpdateJWTP
 	}, nil
 }
 
+func (s *Server) AddAzureADProvider(ctx context.Context, req *admin_pb.AddAzureADProviderRequest) (*admin_pb.AddAzureADProviderResponse, error) {
+	id, details, err := s.command.AddInstanceAzureADProvider(ctx, addAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddAzureADProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateAzureADProvider(ctx context.Context, req *admin_pb.UpdateAzureADProviderRequest) (*admin_pb.UpdateAzureADProviderResponse, error) {
+	details, err := s.command.UpdateInstanceAzureADProvider(ctx, req.Id, updateAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateAzureADProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddGitHubProvider(ctx context.Context, req *admin_pb.AddGitHubProviderRequest) (*admin_pb.AddGitHubProviderResponse, error) {
 	id, details, err := s.command.AddInstanceGitHubProvider(ctx, addGitHubProviderToCommand(req))
 	if err != nil {
@@ -279,6 +300,48 @@ func (s *Server) UpdateGitHubEnterpriseServerProvider(ctx context.Context, req *
 		return nil, err
 	}
 	return &admin_pb.UpdateGitHubEnterpriseServerProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitLabProvider(ctx context.Context, req *admin_pb.AddGitLabProviderRequest) (*admin_pb.AddGitLabProviderResponse, error) {
+	id, details, err := s.command.AddInstanceGitLabProvider(ctx, addGitLabProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGitLabProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitLabProvider(ctx context.Context, req *admin_pb.UpdateGitLabProviderRequest) (*admin_pb.UpdateGitLabProviderResponse, error) {
+	details, err := s.command.UpdateInstanceGitLabProvider(ctx, req.Id, updateGitLabProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGitLabProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitLabSelfHostedProvider(ctx context.Context, req *admin_pb.AddGitLabSelfHostedProviderRequest) (*admin_pb.AddGitLabSelfHostedProviderResponse, error) {
+	id, details, err := s.command.AddInstanceGitLabSelfHostedProvider(ctx, addGitLabSelfHostedProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGitLabSelfHostedProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitLabSelfHostedProvider(ctx context.Context, req *admin_pb.UpdateGitLabSelfHostedProviderRequest) (*admin_pb.UpdateGitLabSelfHostedProviderResponse, error) {
+	details, err := s.command.UpdateInstanceGitLabSelfHostedProvider(ctx, req.Id, updateGitLabSelfHostedProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGitLabSelfHostedProviderResponse{
 		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }

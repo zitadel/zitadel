@@ -36,12 +36,22 @@ const (
 )
 
 func (t IDPType) GetCSSClass() string {
-	switch t { //nolint:exhaustive
+	switch t {
 	case IDPTypeGoogle:
 		return "google"
 	case IDPTypeGitHub,
 		IDPTypeGitHubEnterprise:
 		return "github"
+	case IDPTypeGitLab,
+		IDPTypeGitLabSelfHosted:
+		return "gitlab"
+	case IDPTypeUnspecified,
+		IDPTypeOIDC,
+		IDPTypeJWT,
+		IDPTypeOAuth,
+		IDPTypeLDAP,
+		IDPTypeAzureAD:
+		fallthrough
 	default:
 		return ""
 	}

@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: zarejestruj
   NextButtonText: dalej
 
+LDAP:
+  Title: Rejestracja
+  Description: Wprowadź swoje dane logowania.
+  LoginNameLabel: Nazwa użytkownika
+  PasswordLabel: Hasło
+  NextButtonText: dalej
+
 SelectAccount:
   Title: Wybierz konto
   Description: Użyj swojego konta ZITADEL
@@ -212,6 +219,7 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -243,6 +251,7 @@ ExternalRegistrationUserOverview:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -302,6 +311,7 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Obsługiwane przez
@@ -320,6 +330,7 @@ Errors:
     MissingParameters: Brakujące wymagane parametry
   User:
     NotFound: Nie znaleziono użytkownika
+    AlreadyExists: Użytkownik już istnieje
     Inactive: Użytkownik jest nieaktywny
     NotFoundOnOrg: Nie znaleziono użytkownika w wybranej organizacji
     NotAllowedOrg: Użytkownik nie jest członkiem wymaganej organizacji
@@ -328,6 +339,33 @@ Errors:
     Invalid: Nieprawidłowe dane użytkownika
     DomainNotAllowedAsUsername: Domena jest już zarezerwowana i nie może być użyta
     NotAllowedToLink: Użytkownik nie jest upoważniony do łączenia z zewnętrznym dostawcą logowania
+    Profile:
+      NotFound: Profil nie znaleziony
+      NotChanged: Profil nie zmieniony
+      Empty: Profil jest pusty
+      FirstNameEmpty: Imię w profilu jest puste
+      LastNameEmpty: Nazwisko w profilu jest puste
+      IDMissing: Profil ID brakuje
+    Email:
+      NotFound: Adres e-mail nie znaleziony
+      Invalid: Adres e-mail jest nieprawidłowy
+      AlreadyVerified: Adres e-mail jest już zweryfikowany
+      NotChanged: Adres e-mail nie zmieniony
+      Empty: Adres e-mail jest pusty
+      IDMissing: Adres e-mail ID brakuje
+    Phone:
+      NotFound: Numer telefonu nie znaleziony
+      Invalid: Numer telefonu jest nieprawidłowy
+      AlreadyVerified: Numer telefonu już zweryfikowany
+      Empty: Numer telefonu jest pusty
+      NotChanged: Numer telefonu nie zmieniony
+    Address:
+      NotFound: Adres nie znaleziony
+      NotChanged: Adres nie zmieniony
+    Username:
+      AlreadyExists: Nazwa użytkownika jest już zajęta
+      Reserved: Nazwa użytkownika jest już zajęta
+      Empty: Nazwa użytkownika jest pusty
     Password:
       ConfirmationWrong: Potwierdzenie hasła jest niepoprawne
       Empty: Hasło jest puste
@@ -379,5 +417,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Nie istnieje polityka blokady
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Rejestracja nie jest dozwolona
 
 optional: (opcjonalny)

@@ -38,9 +38,9 @@ type HumanAddedEvent struct {
 	PreferredLanguage language.Tag  `json:"preferredLanguage,omitempty"`
 	Gender            domain.Gender `json:"gender,omitempty"`
 
-	EmailAddress string `json:"email,omitempty"`
+	EmailAddress domain.EmailAddress `json:"email,omitempty"`
 
-	PhoneNumber string `json:"phone,omitempty"`
+	PhoneNumber domain.PhoneNumber `json:"phone,omitempty"`
 
 	Country       string `json:"country,omitempty"`
 	Locality      string `json:"locality,omitempty"`
@@ -75,7 +75,7 @@ func (e *HumanAddedEvent) AddAddressData(
 }
 
 func (e *HumanAddedEvent) AddPhoneData(
-	phoneNumber string,
+	phoneNumber domain.PhoneNumber,
 ) {
 	e.PhoneNumber = phoneNumber
 }
@@ -99,7 +99,7 @@ func NewHumanAddedEvent(
 	displayName string,
 	preferredLanguage language.Tag,
 	gender domain.Gender,
-	emailAddress string,
+	emailAddress domain.EmailAddress,
 	userLoginMustBeDomain bool,
 ) *HumanAddedEvent {
 	return &HumanAddedEvent{
@@ -133,30 +133,24 @@ func HumanAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 }
 
 type HumanRegisteredEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
+	eventstore.BaseEvent  `json:"-"`
 	UserName              string `json:"userName"`
 	userLoginMustBeDomain bool
-
-	FirstName         string        `json:"firstName,omitempty"`
-	LastName          string        `json:"lastName,omitempty"`
-	NickName          string        `json:"nickName,omitempty"`
-	DisplayName       string        `json:"displayName,omitempty"`
-	PreferredLanguage language.Tag  `json:"preferredLanguage,omitempty"`
-	Gender            domain.Gender `json:"gender,omitempty"`
-
-	EmailAddress string `json:"email,omitempty"`
-
-	PhoneNumber string `json:"phone,omitempty"`
-
-	Country       string `json:"country,omitempty"`
-	Locality      string `json:"locality,omitempty"`
-	PostalCode    string `json:"postalCode,omitempty"`
-	Region        string `json:"region,omitempty"`
-	StreetAddress string `json:"streetAddress,omitempty"`
-
-	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
-	ChangeRequired bool                `json:"changeRequired,omitempty"`
+	FirstName             string              `json:"firstName,omitempty"`
+	LastName              string              `json:"lastName,omitempty"`
+	NickName              string              `json:"nickName,omitempty"`
+	DisplayName           string              `json:"displayName,omitempty"`
+	PreferredLanguage     language.Tag        `json:"preferredLanguage,omitempty"`
+	Gender                domain.Gender       `json:"gender,omitempty"`
+	EmailAddress          domain.EmailAddress `json:"email,omitempty"`
+	PhoneNumber           domain.PhoneNumber  `json:"phone,omitempty"`
+	Country               string              `json:"country,omitempty"`
+	Locality              string              `json:"locality,omitempty"`
+	PostalCode            string              `json:"postalCode,omitempty"`
+	Region                string              `json:"region,omitempty"`
+	StreetAddress         string              `json:"streetAddress,omitempty"`
+	Secret                *crypto.CryptoValue `json:"secret,omitempty"`
+	ChangeRequired        bool                `json:"changeRequired,omitempty"`
 }
 
 func (e *HumanRegisteredEvent) Data() interface{} {
@@ -182,7 +176,7 @@ func (e *HumanRegisteredEvent) AddAddressData(
 }
 
 func (e *HumanRegisteredEvent) AddPhoneData(
-	phoneNumber string,
+	phoneNumber domain.PhoneNumber,
 ) {
 	e.PhoneNumber = phoneNumber
 }
@@ -206,7 +200,7 @@ func NewHumanRegisteredEvent(
 	displayName string,
 	preferredLanguage language.Tag,
 	gender domain.Gender,
-	emailAddress string,
+	emailAddress domain.EmailAddress,
 	userLoginMustBeDomain bool,
 ) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{

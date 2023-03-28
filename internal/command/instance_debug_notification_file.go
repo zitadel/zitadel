@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDebugNotificationProviderFile(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDebugNotificationProviderFile(ctx context.Context, fileSystemProvider *fs.Config) (*domain.ObjectDetails, error) {
 	writeModel := NewInstanceDebugNotificationFileWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	events, err := c.addDefaultDebugNotificationFile(ctx, instanceAgg, writeModel, fileSystemProvider)
@@ -29,7 +29,7 @@ func (c *Commands) AddDebugNotificationProviderFile(ctx context.Context, fileSys
 	return writeModelToObjectDetails(&writeModel.DebugNotificationWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addDefaultDebugNotificationFile(ctx context.Context, instanceAgg *eventstore.Aggregate, addedWriteModel *InstanceDebugNotificationFileWriteModel, fileSystemProvider *fs.FSConfig) ([]eventstore.Command, error) {
+func (c *Commands) addDefaultDebugNotificationFile(ctx context.Context, instanceAgg *eventstore.Aggregate, addedWriteModel *InstanceDebugNotificationFileWriteModel, fileSystemProvider *fs.Config) ([]eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedWriteModel)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (c *Commands) addDefaultDebugNotificationFile(ctx context.Context, instance
 	return events, nil
 }
 
-func (c *Commands) ChangeDefaultNotificationFile(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeDefaultNotificationFile(ctx context.Context, fileSystemProvider *fs.Config) (*domain.ObjectDetails, error) {
 	writeModel := NewInstanceDebugNotificationFileWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	events, err := c.changeDefaultDebugNotificationProviderFile(ctx, instanceAgg, writeModel, fileSystemProvider)
@@ -64,7 +64,7 @@ func (c *Commands) ChangeDefaultNotificationFile(ctx context.Context, fileSystem
 	return writeModelToObjectDetails(&writeModel.DebugNotificationWriteModel.WriteModel), nil
 }
 
-func (c *Commands) changeDefaultDebugNotificationProviderFile(ctx context.Context, instanceAgg *eventstore.Aggregate, existingProvider *InstanceDebugNotificationFileWriteModel, fileSystemProvider *fs.FSConfig) ([]eventstore.Command, error) {
+func (c *Commands) changeDefaultDebugNotificationProviderFile(ctx context.Context, instanceAgg *eventstore.Aggregate, existingProvider *InstanceDebugNotificationFileWriteModel, fileSystemProvider *fs.Config) ([]eventstore.Command, error) {
 	err := c.defaultDebugNotificationProviderFileWriteModelByID(ctx, existingProvider)
 	if err != nil {
 		return nil, err

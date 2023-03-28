@@ -239,11 +239,20 @@
     "NOROWS": "没有数据"
   },
   "ERRORS": {
-    "REQUIRED": "缺少一些必填字段。",
+    "REQUIRED": "请填写此栏",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
-    }
+    },
+    "INVALID_FORMAT": "格式是无效的。",
+    "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
+    "MINLENGTH": "长度必须至少是{{requiredLength}}字符。",
+    "UPPERCASEMISSING": "密码必须包含大写字符。",
+    "LOWERCASEMISSING": "密码必须包含小写字符。",
+    "SYMBOLERROR": "密码必须包含符号或标点符号。",
+    "NUMBERERROR": "密码必须包含数字。",
+    "PWNOTEQUAL": "提供的密码不匹配。",
+    "PHONE": "电话号码必须以00或+开头。"
   },
   "USER": {
     "SETTINGS": {
@@ -524,8 +533,7 @@
       "SET": "设置新密码",
       "RESENDNOTIFICATION": "发送重置密码链接",
       "REQUIRED": "缺少必填字段。",
-      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
-      "NOTEQUAL": "提供的密码不匹配。"
+      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。"
     },
     "ID": "ID",
     "EMAIL": "电子邮件",
@@ -535,7 +543,7 @@
     "EMAILVERIFIED": "电子邮件已验证",
     "NOTVERIFIED": "未验证",
     "PREFERRED_LOGINNAME": "首选登录名",
-    "ISINITIAL": "此用户电子邮件尚未验证。",
+    "ISINITIAL": "用户尚未激活。",
     "LOGINMETHODS": {
       "TITLE": "联系信息",
       "DESCRIPTION": "提供的信息用于向您发送重要信息，例如密码重置电子邮件。",
@@ -579,17 +587,6 @@
         "3": "过滤角色名称"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "密码不符合定义的规则。",
-      "NOTANEMAIL": "给定的值不是合法电子邮件地址",
-      "REQUIRED": "输入字段为空。",
-      "MINLENGTH": "密码长度必须至少为 {{requiredLength}} 个字符。",
-      "NOEMAIL": "用户名不能是电子邮件地址。",
-      "UPPERCASEMISSING": "密码必须包含大写字符。",
-      "LOWERCASEMISSING": "密码必须包含小写字符。",
-      "SYMBOLERROR": "密码必须包含符号或标点符号。",
-      "NUMBERERROR": "密码必须包含数字。"
-    },
     "STATE": {
       "0": "未知",
       "1": "启用",
@@ -612,7 +609,7 @@
     "SIGNEDOUT_BTN": "登录",
     "EDITACCOUNT": "编辑账户",
     "ADDACCOUNT": "登录其他账户",
-    "RESENDINITIALEMAIL": "发送新的初始化邮件",
+    "RESENDINITIALEMAIL": "重新发送激活邮件",
     "RESENDEMAILNOTIFICATION": "重新发送电子邮件通知",
     "TOAST": {
       "CREATED": "用户创建成功。",
@@ -1014,11 +1011,12 @@
     "DEFAULTLANGUAGE": "默认语言",
     "LANGUAGE": {
       "de": "Deutsch",
-      "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1206,10 +1204,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1621,13 +1620,41 @@
         "TITLE": "OIDC供应商",
         "DESCRIPTION": "输入你的OIDC供应商的必要数据。"
       },
+      "OAUTH": {
+        "TITLE": "OAuth供应商",
+        "DESCRIPTION": "输入你的OAuth供应商的必要数据。"
+      },
       "JWT": {
         "TITLE": "JWT供应商",
         "DESCRIPTION": "输入你的JWT供应商所需的数据。"
       },
       "GOOGLE": {
-        "TITLE": "谷歌供应商",
-        "DESCRIPTION": "输入你的谷歌身份提供者的凭证"
+        "TITLE": "Google 身份提供者",
+        "DESCRIPTION": "输入您的 Google 身份提供商的凭据"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab身份提供商",
+        "DESCRIPTION": "输入您的Gitlab身份提供者的凭据"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab自我托管供应商",
+        "DESCRIPTION": "输入您的Gitlab自我托管身份提供商的凭据"
+      },
+      "GITHUBES": {
+        "TITLE": "Github Enterprise Server 身份提供者",
+        "DESCRIPTION": "输入您的GitHubEnterpriseServer身份提供者的凭据"
+      },
+      "GITHUB": {
+        "TITLE": "Github 身份提供者",
+        "DESCRIPTION": "输入您的 Github 身份提供商的凭据"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft 身份提供者",
+        "DESCRIPTION": "输入您的 Microsoft 身份提供商的凭据"
+      },
+      "LDAP": {
+        "TITLE": "LDAP 身份提供者",
+        "DESCRIPTION": "输入您的 LDAP 身份提供商的凭据"
       }
     },
     "DETAIL": {
@@ -1660,14 +1687,28 @@
       "1": "启用",
       "2": "停用"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "租户类型",
+    "AZUREADTENANTID": "租户编号",
+    "EMAILVERIFIED": "电子邮件已验证",
     "NAMEHINT": "如果指定，它将显示在登录界面。",
     "OPTIONAL": "可选",
+    "LDAPATTRIBUTES": "LDAP 属性",
+    "UPDATEBINDPASSWORD": "更新绑定密码",
     "UPDATECLIENTSECRET": "更新客户秘密",
     "ADD": "添加身份提供者",
     "TYPE": "类型",
     "OWNER": "所有者",
     "ID": "ID",
     "NAME": "名称",
+    "AUTHORIZATIONENDPOINT": "授权端点",
+    "TOKENENDPOINT": "令牌端点",
+    "USERENDPOINT": "用户端点",
+    "IDATTRIBUTE": "标识属性",
     "AVAILABILITY": "可用性",
     "AVAILABLE": "可用的",
     "AVAILABLEBUTINACTIVE": "可用但已停用",
@@ -1679,6 +1720,31 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "联系",
+    "LDAPUSERBINDING": "用户绑定",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "必需的",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP 展示名称映射",
     "USERNAMEMAPPING": "用户名映射",
     "DATES": "日期",
@@ -1986,10 +2052,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "添加管理者",

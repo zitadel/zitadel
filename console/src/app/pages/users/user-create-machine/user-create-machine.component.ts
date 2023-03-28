@@ -1,8 +1,9 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { minLengthValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { AddMachineUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AccessTokenType } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -45,8 +46,8 @@ export class UserCreateMachineComponent implements OnDestroy {
 
   private initForm(): void {
     this.userForm = this.fb.group({
-      userName: ['', [Validators.required, Validators.minLength(2)]],
-      name: ['', [Validators.required]],
+      userName: ['', [requiredValidator, minLengthValidator(2)]],
+      name: ['', [requiredValidator]],
       description: ['', []],
       accessTokenType: [AccessTokenType.ACCESS_TOKEN_TYPE_BEARER, []],
     });

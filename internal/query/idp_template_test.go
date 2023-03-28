@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -15,89 +16,112 @@ import (
 )
 
 var (
-	idpTemplateQuery = `SELECT projections.idp_templates3.id,` +
-		` projections.idp_templates3.resource_owner,` +
-		` projections.idp_templates3.creation_date,` +
-		` projections.idp_templates3.change_date,` +
-		` projections.idp_templates3.sequence,` +
-		` projections.idp_templates3.state,` +
-		` projections.idp_templates3.name,` +
-		` projections.idp_templates3.type,` +
-		` projections.idp_templates3.owner_type,` +
-		` projections.idp_templates3.is_creation_allowed,` +
-		` projections.idp_templates3.is_linking_allowed,` +
-		` projections.idp_templates3.is_auto_creation,` +
-		` projections.idp_templates3.is_auto_update,` +
+	idpTemplateQuery = `SELECT projections.idp_templates4.id,` +
+		` projections.idp_templates4.resource_owner,` +
+		` projections.idp_templates4.creation_date,` +
+		` projections.idp_templates4.change_date,` +
+		` projections.idp_templates4.sequence,` +
+		` projections.idp_templates4.state,` +
+		` projections.idp_templates4.name,` +
+		` projections.idp_templates4.type,` +
+		` projections.idp_templates4.owner_type,` +
+		` projections.idp_templates4.is_creation_allowed,` +
+		` projections.idp_templates4.is_linking_allowed,` +
+		` projections.idp_templates4.is_auto_creation,` +
+		` projections.idp_templates4.is_auto_update,` +
 		// oauth
-		` projections.idp_templates3_oauth2.idp_id,` +
-		` projections.idp_templates3_oauth2.client_id,` +
-		` projections.idp_templates3_oauth2.client_secret,` +
-		` projections.idp_templates3_oauth2.authorization_endpoint,` +
-		` projections.idp_templates3_oauth2.token_endpoint,` +
-		` projections.idp_templates3_oauth2.user_endpoint,` +
-		` projections.idp_templates3_oauth2.scopes,` +
-		` projections.idp_templates3_oauth2.id_attribute,` +
+		` projections.idp_templates4_oauth2.idp_id,` +
+		` projections.idp_templates4_oauth2.client_id,` +
+		` projections.idp_templates4_oauth2.client_secret,` +
+		` projections.idp_templates4_oauth2.authorization_endpoint,` +
+		` projections.idp_templates4_oauth2.token_endpoint,` +
+		` projections.idp_templates4_oauth2.user_endpoint,` +
+		` projections.idp_templates4_oauth2.scopes,` +
+		` projections.idp_templates4_oauth2.id_attribute,` +
 		// oidc
-		` projections.idp_templates3_oidc.idp_id,` +
-		` projections.idp_templates3_oidc.issuer,` +
-		` projections.idp_templates3_oidc.client_id,` +
-		` projections.idp_templates3_oidc.client_secret,` +
-		` projections.idp_templates3_oidc.scopes,` +
+		` projections.idp_templates4_oidc.idp_id,` +
+		` projections.idp_templates4_oidc.issuer,` +
+		` projections.idp_templates4_oidc.client_id,` +
+		` projections.idp_templates4_oidc.client_secret,` +
+		` projections.idp_templates4_oidc.scopes,` +
+		` projections.idp_templates4_oidc.id_token_mapping,` +
 		// jwt
-		` projections.idp_templates3_jwt.idp_id,` +
-		` projections.idp_templates3_jwt.issuer,` +
-		` projections.idp_templates3_jwt.jwt_endpoint,` +
-		` projections.idp_templates3_jwt.keys_endpoint,` +
-		` projections.idp_templates3_jwt.header_name,` +
+		` projections.idp_templates4_jwt.idp_id,` +
+		` projections.idp_templates4_jwt.issuer,` +
+		` projections.idp_templates4_jwt.jwt_endpoint,` +
+		` projections.idp_templates4_jwt.keys_endpoint,` +
+		` projections.idp_templates4_jwt.header_name,` +
+		// azure
+		` projections.idp_templates4_azure.idp_id,` +
+		` projections.idp_templates4_azure.client_id,` +
+		` projections.idp_templates4_azure.client_secret,` +
+		` projections.idp_templates4_azure.scopes,` +
+		` projections.idp_templates4_azure.tenant,` +
+		` projections.idp_templates4_azure.is_email_verified,` +
 		// github
-		` projections.idp_templates3_github.idp_id,` +
-		` projections.idp_templates3_github.client_id,` +
-		` projections.idp_templates3_github.client_secret,` +
-		` projections.idp_templates3_github.scopes,` +
+		` projections.idp_templates4_github.idp_id,` +
+		` projections.idp_templates4_github.client_id,` +
+		` projections.idp_templates4_github.client_secret,` +
+		` projections.idp_templates4_github.scopes,` +
 		// github enterprise
-		` projections.idp_templates3_github_enterprise.idp_id,` +
-		` projections.idp_templates3_github_enterprise.client_id,` +
-		` projections.idp_templates3_github_enterprise.client_secret,` +
-		` projections.idp_templates3_github_enterprise.authorization_endpoint,` +
-		` projections.idp_templates3_github_enterprise.token_endpoint,` +
-		` projections.idp_templates3_github_enterprise.user_endpoint,` +
-		` projections.idp_templates3_github_enterprise.scopes,` +
+		` projections.idp_templates4_github_enterprise.idp_id,` +
+		` projections.idp_templates4_github_enterprise.client_id,` +
+		` projections.idp_templates4_github_enterprise.client_secret,` +
+		` projections.idp_templates4_github_enterprise.authorization_endpoint,` +
+		` projections.idp_templates4_github_enterprise.token_endpoint,` +
+		` projections.idp_templates4_github_enterprise.user_endpoint,` +
+		` projections.idp_templates4_github_enterprise.scopes,` +
+		// gitlab
+		` projections.idp_templates4_gitlab.idp_id,` +
+		` projections.idp_templates4_gitlab.client_id,` +
+		` projections.idp_templates4_gitlab.client_secret,` +
+		` projections.idp_templates4_gitlab.scopes,` +
+		// gitlab self hosted
+		` projections.idp_templates4_gitlab_self_hosted.idp_id,` +
+		` projections.idp_templates4_gitlab_self_hosted.issuer,` +
+		` projections.idp_templates4_gitlab_self_hosted.client_id,` +
+		` projections.idp_templates4_gitlab_self_hosted.client_secret,` +
+		` projections.idp_templates4_gitlab_self_hosted.scopes,` +
 		// google
-		` projections.idp_templates3_google.idp_id,` +
-		` projections.idp_templates3_google.client_id,` +
-		` projections.idp_templates3_google.client_secret,` +
-		` projections.idp_templates3_google.scopes,` +
+		` projections.idp_templates4_google.idp_id,` +
+		` projections.idp_templates4_google.client_id,` +
+		` projections.idp_templates4_google.client_secret,` +
+		` projections.idp_templates4_google.scopes,` +
 		// ldap
-		` projections.idp_templates3_ldap.idp_id,` +
-		` projections.idp_templates3_ldap.host,` +
-		` projections.idp_templates3_ldap.port,` +
-		` projections.idp_templates3_ldap.tls,` +
-		` projections.idp_templates3_ldap.base_dn,` +
-		` projections.idp_templates3_ldap.user_object_class,` +
-		` projections.idp_templates3_ldap.user_unique_attribute,` +
-		` projections.idp_templates3_ldap.admin,` +
-		` projections.idp_templates3_ldap.password,` +
-		` projections.idp_templates3_ldap.id_attribute,` +
-		` projections.idp_templates3_ldap.first_name_attribute,` +
-		` projections.idp_templates3_ldap.last_name_attribute,` +
-		` projections.idp_templates3_ldap.display_name_attribute,` +
-		` projections.idp_templates3_ldap.nick_name_attribute,` +
-		` projections.idp_templates3_ldap.preferred_username_attribute,` +
-		` projections.idp_templates3_ldap.email_attribute,` +
-		` projections.idp_templates3_ldap.email_verified,` +
-		` projections.idp_templates3_ldap.phone_attribute,` +
-		` projections.idp_templates3_ldap.phone_verified_attribute,` +
-		` projections.idp_templates3_ldap.preferred_language_attribute,` +
-		` projections.idp_templates3_ldap.avatar_url_attribute,` +
-		` projections.idp_templates3_ldap.profile_attribute` +
-		` FROM projections.idp_templates3` +
-		` LEFT JOIN projections.idp_templates3_oauth2 ON projections.idp_templates3.id = projections.idp_templates3_oauth2.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_oauth2.instance_id` +
-		` LEFT JOIN projections.idp_templates3_oidc ON projections.idp_templates3.id = projections.idp_templates3_oidc.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_oidc.instance_id` +
-		` LEFT JOIN projections.idp_templates3_jwt ON projections.idp_templates3.id = projections.idp_templates3_jwt.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_jwt.instance_id` +
-		` LEFT JOIN projections.idp_templates3_github ON projections.idp_templates3.id = projections.idp_templates3_github.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github.instance_id` +
-		` LEFT JOIN projections.idp_templates3_github_enterprise ON projections.idp_templates3.id = projections.idp_templates3_github_enterprise.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github_enterprise.instance_id` +
-		` LEFT JOIN projections.idp_templates3_google ON projections.idp_templates3.id = projections.idp_templates3_google.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_google.instance_id` +
-		` LEFT JOIN projections.idp_templates3_ldap ON projections.idp_templates3.id = projections.idp_templates3_ldap.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_ldap.instance_id` +
+		` projections.idp_templates4_ldap2.idp_id,` +
+		` projections.idp_templates4_ldap2.servers,` +
+		` projections.idp_templates4_ldap2.start_tls,` +
+		` projections.idp_templates4_ldap2.base_dn,` +
+		` projections.idp_templates4_ldap2.bind_dn,` +
+		` projections.idp_templates4_ldap2.bind_password,` +
+		` projections.idp_templates4_ldap2.user_base,` +
+		` projections.idp_templates4_ldap2.user_object_classes,` +
+		` projections.idp_templates4_ldap2.user_filters,` +
+		` projections.idp_templates4_ldap2.timeout,` +
+		` projections.idp_templates4_ldap2.id_attribute,` +
+		` projections.idp_templates4_ldap2.first_name_attribute,` +
+		` projections.idp_templates4_ldap2.last_name_attribute,` +
+		` projections.idp_templates4_ldap2.display_name_attribute,` +
+		` projections.idp_templates4_ldap2.nick_name_attribute,` +
+		` projections.idp_templates4_ldap2.preferred_username_attribute,` +
+		` projections.idp_templates4_ldap2.email_attribute,` +
+		` projections.idp_templates4_ldap2.email_verified,` +
+		` projections.idp_templates4_ldap2.phone_attribute,` +
+		` projections.idp_templates4_ldap2.phone_verified_attribute,` +
+		` projections.idp_templates4_ldap2.preferred_language_attribute,` +
+		` projections.idp_templates4_ldap2.avatar_url_attribute,` +
+		` projections.idp_templates4_ldap2.profile_attribute` +
+		` FROM projections.idp_templates4` +
+		` LEFT JOIN projections.idp_templates4_oauth2 ON projections.idp_templates4.id = projections.idp_templates4_oauth2.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_oauth2.instance_id` +
+		` LEFT JOIN projections.idp_templates4_oidc ON projections.idp_templates4.id = projections.idp_templates4_oidc.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_oidc.instance_id` +
+		` LEFT JOIN projections.idp_templates4_jwt ON projections.idp_templates4.id = projections.idp_templates4_jwt.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_jwt.instance_id` +
+		` LEFT JOIN projections.idp_templates4_azure ON projections.idp_templates4.id = projections.idp_templates4_azure.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_azure.instance_id` +
+		` LEFT JOIN projections.idp_templates4_github ON projections.idp_templates4.id = projections.idp_templates4_github.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_github.instance_id` +
+		` LEFT JOIN projections.idp_templates4_github_enterprise ON projections.idp_templates4.id = projections.idp_templates4_github_enterprise.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_github_enterprise.instance_id` +
+		` LEFT JOIN projections.idp_templates4_gitlab ON projections.idp_templates4.id = projections.idp_templates4_gitlab.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_gitlab.instance_id` +
+		` LEFT JOIN projections.idp_templates4_gitlab_self_hosted ON projections.idp_templates4.id = projections.idp_templates4_gitlab_self_hosted.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_gitlab_self_hosted.instance_id` +
+		` LEFT JOIN projections.idp_templates4_google ON projections.idp_templates4.id = projections.idp_templates4_google.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_google.instance_id` +
+		` LEFT JOIN projections.idp_templates4_ldap2 ON projections.idp_templates4.id = projections.idp_templates4_ldap2.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_ldap2.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplateCols = []string{
 		"id",
@@ -128,12 +152,20 @@ var (
 		"client_id",
 		"client_secret",
 		"scopes",
+		"id_token_mapping",
 		// jwt
 		"idp_id",
 		"issuer",
 		"jwt_endpoint",
 		"keys_endpoint",
 		"header_name",
+		// azure
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"tenant",
+		"is_email_verified",
 		// github config
 		"idp_id",
 		"client_id",
@@ -147,6 +179,17 @@ var (
 		"token_endpoint",
 		"user_endpoint",
 		"scopes",
+		// gitlab config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// gitlab self hosted config
+		"idp_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
 		// google config
 		"idp_id",
 		"client_id",
@@ -154,14 +197,15 @@ var (
 		"scopes",
 		// ldap config
 		"idp_id",
-		"host",
-		"port",
-		"tls",
+		"servers",
+		"start_tls",
 		"base_dn",
-		"user_object_class",
-		"user_unique_attribute",
-		"admin",
-		"password",
+		"bind_dn",
+		"bind_password",
+		"user_base",
+		"user_object_classes",
+		"user_filters",
+		"timeout",
 		"id_attribute",
 		"first_name_attribute",
 		"last_name_attribute",
@@ -176,90 +220,113 @@ var (
 		"avatar_url_attribute",
 		"profile_attribute",
 	}
-	idpTemplatesQuery = `SELECT projections.idp_templates3.id,` +
-		` projections.idp_templates3.resource_owner,` +
-		` projections.idp_templates3.creation_date,` +
-		` projections.idp_templates3.change_date,` +
-		` projections.idp_templates3.sequence,` +
-		` projections.idp_templates3.state,` +
-		` projections.idp_templates3.name,` +
-		` projections.idp_templates3.type,` +
-		` projections.idp_templates3.owner_type,` +
-		` projections.idp_templates3.is_creation_allowed,` +
-		` projections.idp_templates3.is_linking_allowed,` +
-		` projections.idp_templates3.is_auto_creation,` +
-		` projections.idp_templates3.is_auto_update,` +
+	idpTemplatesQuery = `SELECT projections.idp_templates4.id,` +
+		` projections.idp_templates4.resource_owner,` +
+		` projections.idp_templates4.creation_date,` +
+		` projections.idp_templates4.change_date,` +
+		` projections.idp_templates4.sequence,` +
+		` projections.idp_templates4.state,` +
+		` projections.idp_templates4.name,` +
+		` projections.idp_templates4.type,` +
+		` projections.idp_templates4.owner_type,` +
+		` projections.idp_templates4.is_creation_allowed,` +
+		` projections.idp_templates4.is_linking_allowed,` +
+		` projections.idp_templates4.is_auto_creation,` +
+		` projections.idp_templates4.is_auto_update,` +
 		// oauth
-		` projections.idp_templates3_oauth2.idp_id,` +
-		` projections.idp_templates3_oauth2.client_id,` +
-		` projections.idp_templates3_oauth2.client_secret,` +
-		` projections.idp_templates3_oauth2.authorization_endpoint,` +
-		` projections.idp_templates3_oauth2.token_endpoint,` +
-		` projections.idp_templates3_oauth2.user_endpoint,` +
-		` projections.idp_templates3_oauth2.scopes,` +
-		` projections.idp_templates3_oauth2.id_attribute,` +
+		` projections.idp_templates4_oauth2.idp_id,` +
+		` projections.idp_templates4_oauth2.client_id,` +
+		` projections.idp_templates4_oauth2.client_secret,` +
+		` projections.idp_templates4_oauth2.authorization_endpoint,` +
+		` projections.idp_templates4_oauth2.token_endpoint,` +
+		` projections.idp_templates4_oauth2.user_endpoint,` +
+		` projections.idp_templates4_oauth2.scopes,` +
+		` projections.idp_templates4_oauth2.id_attribute,` +
 		// oidc
-		` projections.idp_templates3_oidc.idp_id,` +
-		` projections.idp_templates3_oidc.issuer,` +
-		` projections.idp_templates3_oidc.client_id,` +
-		` projections.idp_templates3_oidc.client_secret,` +
-		` projections.idp_templates3_oidc.scopes,` +
+		` projections.idp_templates4_oidc.idp_id,` +
+		` projections.idp_templates4_oidc.issuer,` +
+		` projections.idp_templates4_oidc.client_id,` +
+		` projections.idp_templates4_oidc.client_secret,` +
+		` projections.idp_templates4_oidc.scopes,` +
+		` projections.idp_templates4_oidc.id_token_mapping,` +
 		// jwt
-		` projections.idp_templates3_jwt.idp_id,` +
-		` projections.idp_templates3_jwt.issuer,` +
-		` projections.idp_templates3_jwt.jwt_endpoint,` +
-		` projections.idp_templates3_jwt.keys_endpoint,` +
-		` projections.idp_templates3_jwt.header_name,` +
+		` projections.idp_templates4_jwt.idp_id,` +
+		` projections.idp_templates4_jwt.issuer,` +
+		` projections.idp_templates4_jwt.jwt_endpoint,` +
+		` projections.idp_templates4_jwt.keys_endpoint,` +
+		` projections.idp_templates4_jwt.header_name,` +
+		// azure
+		` projections.idp_templates4_azure.idp_id,` +
+		` projections.idp_templates4_azure.client_id,` +
+		` projections.idp_templates4_azure.client_secret,` +
+		` projections.idp_templates4_azure.scopes,` +
+		` projections.idp_templates4_azure.tenant,` +
+		` projections.idp_templates4_azure.is_email_verified,` +
 		// github
-		` projections.idp_templates3_github.idp_id,` +
-		` projections.idp_templates3_github.client_id,` +
-		` projections.idp_templates3_github.client_secret,` +
-		` projections.idp_templates3_github.scopes,` +
+		` projections.idp_templates4_github.idp_id,` +
+		` projections.idp_templates4_github.client_id,` +
+		` projections.idp_templates4_github.client_secret,` +
+		` projections.idp_templates4_github.scopes,` +
 		// github enterprise
-		` projections.idp_templates3_github_enterprise.idp_id,` +
-		` projections.idp_templates3_github_enterprise.client_id,` +
-		` projections.idp_templates3_github_enterprise.client_secret,` +
-		` projections.idp_templates3_github_enterprise.authorization_endpoint,` +
-		` projections.idp_templates3_github_enterprise.token_endpoint,` +
-		` projections.idp_templates3_github_enterprise.user_endpoint,` +
-		` projections.idp_templates3_github_enterprise.scopes,` +
+		` projections.idp_templates4_github_enterprise.idp_id,` +
+		` projections.idp_templates4_github_enterprise.client_id,` +
+		` projections.idp_templates4_github_enterprise.client_secret,` +
+		` projections.idp_templates4_github_enterprise.authorization_endpoint,` +
+		` projections.idp_templates4_github_enterprise.token_endpoint,` +
+		` projections.idp_templates4_github_enterprise.user_endpoint,` +
+		` projections.idp_templates4_github_enterprise.scopes,` +
+		// gitlab
+		` projections.idp_templates4_gitlab.idp_id,` +
+		` projections.idp_templates4_gitlab.client_id,` +
+		` projections.idp_templates4_gitlab.client_secret,` +
+		` projections.idp_templates4_gitlab.scopes,` +
+		// gitlab self hosted
+		` projections.idp_templates4_gitlab_self_hosted.idp_id,` +
+		` projections.idp_templates4_gitlab_self_hosted.issuer,` +
+		` projections.idp_templates4_gitlab_self_hosted.client_id,` +
+		` projections.idp_templates4_gitlab_self_hosted.client_secret,` +
+		` projections.idp_templates4_gitlab_self_hosted.scopes,` +
 		// google
-		` projections.idp_templates3_google.idp_id,` +
-		` projections.idp_templates3_google.client_id,` +
-		` projections.idp_templates3_google.client_secret,` +
-		` projections.idp_templates3_google.scopes,` +
+		` projections.idp_templates4_google.idp_id,` +
+		` projections.idp_templates4_google.client_id,` +
+		` projections.idp_templates4_google.client_secret,` +
+		` projections.idp_templates4_google.scopes,` +
 		// ldap
-		` projections.idp_templates3_ldap.idp_id,` +
-		` projections.idp_templates3_ldap.host,` +
-		` projections.idp_templates3_ldap.port,` +
-		` projections.idp_templates3_ldap.tls,` +
-		` projections.idp_templates3_ldap.base_dn,` +
-		` projections.idp_templates3_ldap.user_object_class,` +
-		` projections.idp_templates3_ldap.user_unique_attribute,` +
-		` projections.idp_templates3_ldap.admin,` +
-		` projections.idp_templates3_ldap.password,` +
-		` projections.idp_templates3_ldap.id_attribute,` +
-		` projections.idp_templates3_ldap.first_name_attribute,` +
-		` projections.idp_templates3_ldap.last_name_attribute,` +
-		` projections.idp_templates3_ldap.display_name_attribute,` +
-		` projections.idp_templates3_ldap.nick_name_attribute,` +
-		` projections.idp_templates3_ldap.preferred_username_attribute,` +
-		` projections.idp_templates3_ldap.email_attribute,` +
-		` projections.idp_templates3_ldap.email_verified,` +
-		` projections.idp_templates3_ldap.phone_attribute,` +
-		` projections.idp_templates3_ldap.phone_verified_attribute,` +
-		` projections.idp_templates3_ldap.preferred_language_attribute,` +
-		` projections.idp_templates3_ldap.avatar_url_attribute,` +
-		` projections.idp_templates3_ldap.profile_attribute,` +
+		` projections.idp_templates4_ldap2.idp_id,` +
+		` projections.idp_templates4_ldap2.servers,` +
+		` projections.idp_templates4_ldap2.start_tls,` +
+		` projections.idp_templates4_ldap2.base_dn,` +
+		` projections.idp_templates4_ldap2.bind_dn,` +
+		` projections.idp_templates4_ldap2.bind_password,` +
+		` projections.idp_templates4_ldap2.user_base,` +
+		` projections.idp_templates4_ldap2.user_object_classes,` +
+		` projections.idp_templates4_ldap2.user_filters,` +
+		` projections.idp_templates4_ldap2.timeout,` +
+		` projections.idp_templates4_ldap2.id_attribute,` +
+		` projections.idp_templates4_ldap2.first_name_attribute,` +
+		` projections.idp_templates4_ldap2.last_name_attribute,` +
+		` projections.idp_templates4_ldap2.display_name_attribute,` +
+		` projections.idp_templates4_ldap2.nick_name_attribute,` +
+		` projections.idp_templates4_ldap2.preferred_username_attribute,` +
+		` projections.idp_templates4_ldap2.email_attribute,` +
+		` projections.idp_templates4_ldap2.email_verified,` +
+		` projections.idp_templates4_ldap2.phone_attribute,` +
+		` projections.idp_templates4_ldap2.phone_verified_attribute,` +
+		` projections.idp_templates4_ldap2.preferred_language_attribute,` +
+		` projections.idp_templates4_ldap2.avatar_url_attribute,` +
+		` projections.idp_templates4_ldap2.profile_attribute,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.idp_templates3` +
-		` LEFT JOIN projections.idp_templates3_oauth2 ON projections.idp_templates3.id = projections.idp_templates3_oauth2.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_oauth2.instance_id` +
-		` LEFT JOIN projections.idp_templates3_oidc ON projections.idp_templates3.id = projections.idp_templates3_oidc.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_oidc.instance_id` +
-		` LEFT JOIN projections.idp_templates3_jwt ON projections.idp_templates3.id = projections.idp_templates3_jwt.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_jwt.instance_id` +
-		` LEFT JOIN projections.idp_templates3_github ON projections.idp_templates3.id = projections.idp_templates3_github.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github.instance_id` +
-		` LEFT JOIN projections.idp_templates3_github_enterprise ON projections.idp_templates3.id = projections.idp_templates3_github_enterprise.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_github_enterprise.instance_id` +
-		` LEFT JOIN projections.idp_templates3_google ON projections.idp_templates3.id = projections.idp_templates3_google.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_google.instance_id` +
-		` LEFT JOIN projections.idp_templates3_ldap ON projections.idp_templates3.id = projections.idp_templates3_ldap.idp_id AND projections.idp_templates3.instance_id = projections.idp_templates3_ldap.instance_id` +
+		` FROM projections.idp_templates4` +
+		` LEFT JOIN projections.idp_templates4_oauth2 ON projections.idp_templates4.id = projections.idp_templates4_oauth2.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_oauth2.instance_id` +
+		` LEFT JOIN projections.idp_templates4_oidc ON projections.idp_templates4.id = projections.idp_templates4_oidc.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_oidc.instance_id` +
+		` LEFT JOIN projections.idp_templates4_jwt ON projections.idp_templates4.id = projections.idp_templates4_jwt.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_jwt.instance_id` +
+		` LEFT JOIN projections.idp_templates4_azure ON projections.idp_templates4.id = projections.idp_templates4_azure.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_azure.instance_id` +
+		` LEFT JOIN projections.idp_templates4_github ON projections.idp_templates4.id = projections.idp_templates4_github.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_github.instance_id` +
+		` LEFT JOIN projections.idp_templates4_github_enterprise ON projections.idp_templates4.id = projections.idp_templates4_github_enterprise.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_github_enterprise.instance_id` +
+		` LEFT JOIN projections.idp_templates4_gitlab ON projections.idp_templates4.id = projections.idp_templates4_gitlab.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_gitlab.instance_id` +
+		` LEFT JOIN projections.idp_templates4_gitlab_self_hosted ON projections.idp_templates4.id = projections.idp_templates4_gitlab_self_hosted.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_gitlab_self_hosted.instance_id` +
+		` LEFT JOIN projections.idp_templates4_google ON projections.idp_templates4.id = projections.idp_templates4_google.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_google.instance_id` +
+		` LEFT JOIN projections.idp_templates4_ldap2 ON projections.idp_templates4.id = projections.idp_templates4_ldap2.idp_id AND projections.idp_templates4.instance_id = projections.idp_templates4_ldap2.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	idpTemplatesCols = []string{
 		"id",
@@ -290,12 +357,20 @@ var (
 		"client_id",
 		"client_secret",
 		"scopes",
+		"id_token_mapping",
 		// jwt
 		"idp_id",
 		"issuer",
 		"jwt_endpoint",
 		"keys_endpoint",
 		"header_name",
+		// azure
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		"tenant",
+		"is_email_verified",
 		// github config
 		"idp_id",
 		"client_id",
@@ -309,6 +384,17 @@ var (
 		"token_endpoint",
 		"user_endpoint",
 		"scopes",
+		// gitlab config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// gitlab self hosted config
+		"idp_id",
+		"issuer",
+		"client_id",
+		"client_secret",
+		"scopes",
 		// google config
 		"idp_id",
 		"client_id",
@@ -316,14 +402,15 @@ var (
 		"scopes",
 		// ldap config
 		"idp_id",
-		"host",
-		"port",
-		"tls",
+		"servers",
+		"start_tls",
 		"base_dn",
-		"user_object_class",
-		"user_unique_attribute",
-		"admin",
-		"password",
+		"bind_dn",
+		"bind_password",
+		"user_base",
+		"user_object_classes",
+		"user_filters",
+		"timeout",
 		"id_attribute",
 		"first_name_attribute",
 		"last_name_attribute",
@@ -406,7 +493,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -425,12 +520,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						nil,
 						nil,
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -518,7 +625,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"client_id",
 						nil,
 						database.StringArray{"profile"},
+						true,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -537,12 +652,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						nil,
 						nil,
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -583,11 +710,12 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
 				OIDCIDPTemplate: &OIDCIDPTemplate{
-					IDPID:        "idp-id",
-					Issuer:       "issuer",
-					ClientID:     "client_id",
-					ClientSecret: nil,
-					Scopes:       []string{"profile"},
+					IDPID:            "idp-id",
+					Issuer:           "issuer",
+					ClientID:         "client_id",
+					ClientSecret:     nil,
+					Scopes:           []string{"profile"},
+					IsIDTokenMapping: true,
 				},
 			},
 		},
@@ -627,12 +755,20 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// jwt
 						"idp-id",
 						"issuer",
 						"jwt",
 						"keys",
 						"header",
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// github
 						nil,
 						nil,
@@ -646,12 +782,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						nil,
 						nil,
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -736,7 +884,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -755,12 +911,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						nil,
 						nil,
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -809,6 +977,263 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 			},
 		},
 		{
+			name:    "prepareIDPTemplateByIDQuery gitlab idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeGitLab,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab
+						"idp-id",
+						"client_id",
+						nil,
+						database.StringArray{"profile"},
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeGitLab,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				GitLabIDPTemplate: &GitLabIDPTemplate{
+					IDPID:        "idp-id",
+					ClientID:     "client_id",
+					ClientSecret: nil,
+					Scopes:       []string{"profile"},
+				},
+			},
+		},
+		{
+			name:    "prepareIDPTemplateByIDQuery gitlab self hosted idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeGitLabSelfHosted,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// oidc
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						"idp-id",
+						"issuer",
+						"client_id",
+						nil,
+						database.StringArray{"profile"},
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeGitLabSelfHosted,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				GitLabSelfHostedIDPTemplate: &GitLabSelfHostedIDPTemplate{
+					IDPID:        "idp-id",
+					Issuer:       "issuer",
+					ClientID:     "client_id",
+					ClientSecret: nil,
+					Scopes:       []string{"profile"},
+				},
+			},
+		},
+		{
 			name:    "prepareIDPTemplateByIDQuery google idp",
 			prepare: prepareIDPTemplateByIDQuery,
 			want: want{
@@ -844,7 +1269,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -863,12 +1296,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						"idp-id",
 						"client_id",
 						nil,
 						database.StringArray{"profile"},
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -952,7 +1397,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -971,6 +1424,17 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						nil,
 						nil,
@@ -978,14 +1442,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						// ldap config
 						"idp-id",
-						"host",
-						"port",
+						database.StringArray{"server"},
 						true,
 						"base",
-						"user",
-						"uid",
-						"admin",
+						"dn",
 						nil,
+						"user",
+						database.StringArray{"object"},
+						database.StringArray{"filter"},
+						time.Duration(30000000000),
 						"id",
 						"first",
 						"last",
@@ -1017,14 +1482,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
 				LDAPIDPTemplate: &LDAPIDPTemplate{
-					IDPID:               "idp-id",
-					Host:                "host",
-					Port:                "port",
-					TLS:                 true,
-					BaseDN:              "base",
-					UserObjectClass:     "user",
-					UserUniqueAttribute: "uid",
-					Admin:               "admin",
+					IDPID:             "idp-id",
+					Servers:           []string{"server"},
+					StartTLS:          true,
+					BaseDN:            "base",
+					BindDN:            "dn",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					Timeout:           time.Duration(30000000000),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "first",
@@ -1079,7 +1545,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// jwt
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// azure
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1098,12 +1572,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// gitlab
+						nil,
+						nil,
+						nil,
+						nil,
+						// gitlab self hosted
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google config
 						nil,
 						nil,
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1217,7 +1703,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1236,6 +1730,17 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -1243,14 +1748,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							// ldap config
 							"idp-id",
-							"host",
-							"port",
+							database.StringArray{"server"},
 							true,
 							"base",
-							"user",
-							"uid",
-							"admin",
+							"dn",
 							nil,
+							"user",
+							database.StringArray{"object"},
+							database.StringArray{"filter"},
+							time.Duration(30000000000),
 							"id",
 							"first",
 							"last",
@@ -1288,14 +1794,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
 						LDAPIDPTemplate: &LDAPIDPTemplate{
-							IDPID:               "idp-id",
-							Host:                "host",
-							Port:                "port",
-							TLS:                 true,
-							BaseDN:              "base",
-							UserObjectClass:     "user",
-							UserUniqueAttribute: "uid",
-							Admin:               "admin",
+							IDPID:             "idp-id",
+							Servers:           []string{"server"},
+							StartTLS:          true,
+							BaseDN:            "base",
+							BindDN:            "dn",
+							UserBase:          "user",
+							UserObjectClasses: []string{"object"},
+							UserFilters:       []string{"filter"},
+							Timeout:           time.Duration(30000000000),
 							LDAPAttributes: idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "first",
@@ -1353,7 +1860,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1372,12 +1887,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
 							nil,
 							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1464,7 +1991,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1483,6 +2018,17 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -1490,14 +2036,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							// ldap config
 							"idp-id-ldap",
-							"host",
-							"port",
+							database.StringArray{"server"},
 							true,
 							"base",
-							"user",
-							"uid",
-							"admin",
+							"dn",
 							nil,
+							"user",
+							database.StringArray{"object"},
+							database.StringArray{"filter"},
+							time.Duration(30000000000),
 							"id",
 							"first",
 							"last",
@@ -1541,7 +2088,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1560,12 +2115,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google
 							"idp-id-google",
 							"client_id",
 							nil,
 							database.StringArray{"profile"},
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1618,7 +2185,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1637,12 +2212,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google
 							nil,
 							nil,
 							nil,
 							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1695,7 +2282,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"client_id",
 							nil,
 							database.StringArray{"profile"},
+							true,
 							// jwt
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// azure
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1714,12 +2309,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google
 							nil,
 							nil,
 							nil,
 							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1772,12 +2379,20 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// jwt
 							"idp-id-jwt",
 							"issuer",
 							"jwt",
 							"keys",
 							"header",
+							// azure
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// github
 							nil,
 							nil,
@@ -1791,12 +2406,24 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// gitlab
+							nil,
+							nil,
+							nil,
+							nil,
+							// gitlab self hosted
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google
 							nil,
 							nil,
 							nil,
 							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1843,14 +2470,15 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
 						LDAPIDPTemplate: &LDAPIDPTemplate{
-							IDPID:               "idp-id-ldap",
-							Host:                "host",
-							Port:                "port",
-							TLS:                 true,
-							BaseDN:              "base",
-							UserObjectClass:     "user",
-							UserUniqueAttribute: "uid",
-							Admin:               "admin",
+							IDPID:             "idp-id-ldap",
+							Servers:           []string{"server"},
+							StartTLS:          true,
+							BaseDN:            "base",
+							BindDN:            "dn",
+							UserBase:          "user",
+							UserObjectClasses: []string{"object"},
+							UserFilters:       []string{"filter"},
+							Timeout:           time.Duration(30000000000),
 							LDAPAttributes: idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "first",
@@ -1930,11 +2558,12 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
 						OIDCIDPTemplate: &OIDCIDPTemplate{
-							IDPID:        "idp-id-oidc",
-							Issuer:       "issuer",
-							ClientID:     "client_id",
-							ClientSecret: nil,
-							Scopes:       []string{"profile"},
+							IDPID:            "idp-id-oidc",
+							Issuer:           "issuer",
+							ClientID:         "client_id",
+							ClientSecret:     nil,
+							Scopes:           []string{"profile"},
+							IsIDTokenMapping: true,
 						},
 					},
 					{

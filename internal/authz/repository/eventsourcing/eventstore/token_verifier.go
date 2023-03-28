@@ -153,11 +153,11 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 	tokenIDSubject, err := repo.decryptAccessToken(accessToken)
 	if err != nil {
 		// if decryption did not work, it might be a JWT
-		accessTokenClaims, err := op.VerifyAccessToken(ctx, accessToken, repo.jwtTokenVerifier(ctx))
+		accessTokenClaims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, accessToken, repo.jwtTokenVerifier(ctx))
 		if err != nil {
 			return "", "", false
 		}
-		return accessTokenClaims.GetTokenID(), accessTokenClaims.GetSubject(), true
+		return accessTokenClaims.JWTID, accessTokenClaims.Subject, true
 	}
 	splitToken := strings.Split(tokenIDSubject, ":")
 	if len(splitToken) != 2 {

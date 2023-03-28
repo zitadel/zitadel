@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func generateEmail(ctx context.Context, user *query.NotifyUser, subject, content string, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastEmail bool) error {
+func generateEmail(ctx context.Context, user *query.NotifyUser, subject, content string, smtpConfig func(ctx context.Context) (*smtp.Config, error), getFileSystemProvider func(ctx context.Context) (*fs.Config, error), getLogProvider func(ctx context.Context) (*log.Config, error), lastEmail bool) error {
 	content = html.UnescapeString(content)
 	message := &messages.Email{
 		Recipients: []string{user.VerifiedEmail},

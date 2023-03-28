@@ -19,7 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
-func InitFSChannel(config FSConfig) (channels.NotificationChannel, error) {
+func InitFSChannel(config Config) (channels.NotificationChannel, error) {
 	if err := os.MkdirAll(config.Path, os.ModePerm); err != nil {
 		return nil, err
 	}

@@ -18,9 +18,12 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
+	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
@@ -59,28 +62,28 @@ type externalNotFoundOptionData struct {
 	ShowUsername               bool
 	ShowUsernameSuffix         bool
 	OrgRegister                bool
-	ExternalEmail              string
+	ExternalEmail              domain.EmailAddress
 	ExternalEmailVerified      bool
-	ExternalPhone              string
+	ExternalPhone              domain.PhoneNumber
 	ExternalPhoneVerified      bool
 }
 
 type externalRegisterFormData struct {
-	ExternalIDPConfigID    string `schema:"external-idp-config-id"`
-	ExternalIDPExtUserID   string `schema:"external-idp-ext-user-id"`
-	ExternalIDPDisplayName string `schema:"external-idp-display-name"`
-	ExternalEmail          string `schema:"external-email"`
-	ExternalEmailVerified  bool   `schema:"external-email-verified"`
-	Email                  string `schema:"email"`
-	Username               string `schema:"username"`
-	Firstname              string `schema:"firstname"`
-	Lastname               string `schema:"lastname"`
-	Nickname               string `schema:"nickname"`
-	ExternalPhone          string `schema:"external-phone"`
-	ExternalPhoneVerified  bool   `schema:"external-phone-verified"`
-	Phone                  string `schema:"phone"`
-	Language               string `schema:"language"`
-	TermsConfirm           bool   `schema:"terms-confirm"`
+	ExternalIDPConfigID    string              `schema:"external-idp-config-id"`
+	ExternalIDPExtUserID   string              `schema:"external-idp-ext-user-id"`
+	ExternalIDPDisplayName string              `schema:"external-idp-display-name"`
+	ExternalEmail          domain.EmailAddress `schema:"external-email"`
+	ExternalEmailVerified  bool                `schema:"external-email-verified"`
+	Email                  domain.EmailAddress `schema:"email"`
+	Username               string              `schema:"username"`
+	Firstname              string              `schema:"firstname"`
+	Lastname               string              `schema:"lastname"`
+	Nickname               string              `schema:"nickname"`
+	ExternalPhone          domain.PhoneNumber  `schema:"external-phone"`
+	ExternalPhoneVerified  bool                `schema:"external-phone-verified"`
+	Phone                  domain.PhoneNumber  `schema:"phone"`
+	Language               string              `schema:"language"`
+	TermsConfirm           bool                `schema:"terms-confirm"`
 }
 
 // handleExternalLoginStep is called as nextStep
@@ -135,6 +138,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 	var provider idp.Provider
+
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
@@ -142,17 +146,21 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.oidcProvider(r.Context(), identityProvider)
 	case domain.IDPTypeJWT:
 		provider, err = l.jwtProvider(identityProvider)
+	case domain.IDPTypeAzureAD:
+		provider, err = l.azureProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGitHubEnterprise:
 		provider, err = l.githubEnterpriseProvider(r.Context(), identityProvider)
+	case domain.IDPTypeGitLab:
+		provider, err = l.gitlabProvider(r.Context(), identityProvider)
+	case domain.IDPTypeGitLabSelfHosted:
+		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
-	case domain.IDPTypeLDAP,
-		domain.IDPTypeAzureAD,
-		domain.IDPTypeGitLab,
-		domain.IDPTypeGitLabSelfHosted,
-		domain.IDPTypeUnspecified:
+	case domain.IDPTypeLDAP:
+		provider, err = l.ldapProvider(r.Context(), identityProvider)
+	case domain.IDPTypeUnspecified:
 		fallthrough
 	default:
 		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented"))
@@ -162,7 +170,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	session, err := provider.BeginAuth(r.Context(), authReq.ID, authReq.AgentID)
+	params := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
+	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -207,6 +216,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
+	case domain.IDPTypeAzureAD:
+		provider, err = l.azureProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &oauth.Session{Provider: provider.(*azuread.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -221,6 +237,20 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+	case domain.IDPTypeGitLab:
+		provider, err = l.gitlabProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+	case domain.IDPTypeGitLabSelfHosted:
+		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -230,9 +260,6 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
-		domain.IDPTypeAzureAD,
-		domain.IDPTypeGitLab,
-		domain.IDPTypeGitLabSelfHosted,
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
@@ -259,7 +286,7 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
-	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
+	externalUser, externalUserChange, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -273,7 +300,7 @@ func (l *Login) handleExternalUserAuthenticated(
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser)
 		return
 	}
-	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 {
+	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 || externalUserChange {
 		// read current auth request state (incl. authorized user)
 		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 		if err != nil {
@@ -281,7 +308,7 @@ func (l *Login) handleExternalUserAuthenticated(
 			return
 		}
 	}
-	if provider.IsAutoUpdate {
+	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
@@ -531,7 +558,7 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "LOGIN-WLTce", "Errors.User.NotHuman")
 	}
-	if externalUser.Email != "" && externalUser.Email != user.Human.Email && externalUser.IsEmailVerified != user.Human.IsEmailVerified {
+	if externalUser.Email != "" && (externalUser.Email != user.Human.Email || externalUser.IsEmailVerified != user.Human.IsEmailVerified) {
 		emailCodeGenerator, err := l.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
 		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update email")
 		if err == nil {
@@ -545,7 +572,7 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 			logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update email")
 		}
 	}
-	if externalUser.Phone != "" && externalUser.Phone != user.Human.Phone && externalUser.IsPhoneVerified != user.Human.IsPhoneVerified {
+	if externalUser.Phone != "" && (externalUser.Phone != user.Human.Phone || externalUser.IsPhoneVerified != user.Human.IsPhoneVerified) {
 		phoneCodeGenerator, err := l.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
 		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update phone")
 		if err == nil {
@@ -579,6 +606,69 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 	return nil
 }
 
+func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*ldap.Provider, error) {
+	password, err := crypto.DecryptString(identityProvider.LDAPIDPTemplate.BindPassword, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	var opts []ldap.ProviderOpts
+	if !identityProvider.LDAPIDPTemplate.StartTLS {
+		opts = append(opts, ldap.WithoutStartTLS())
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.IDAttribute != "" {
+		opts = append(opts, ldap.WithCustomIDAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.IDAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.FirstNameAttribute != "" {
+		opts = append(opts, ldap.WithFirstNameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.FirstNameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.LastNameAttribute != "" {
+		opts = append(opts, ldap.WithLastNameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.LastNameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.DisplayNameAttribute != "" {
+		opts = append(opts, ldap.WithDisplayNameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.DisplayNameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.NickNameAttribute != "" {
+		opts = append(opts, ldap.WithNickNameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.NickNameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.PreferredUsernameAttribute != "" {
+		opts = append(opts, ldap.WithPreferredUsernameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.PreferredUsernameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.EmailAttribute != "" {
+		opts = append(opts, ldap.WithEmailAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.EmailAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.EmailVerifiedAttribute != "" {
+		opts = append(opts, ldap.WithEmailVerifiedAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.EmailVerifiedAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.PhoneAttribute != "" {
+		opts = append(opts, ldap.WithPhoneAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.PhoneAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.PhoneVerifiedAttribute != "" {
+		opts = append(opts, ldap.WithPhoneVerifiedAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.PhoneVerifiedAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.PreferredLanguageAttribute != "" {
+		opts = append(opts, ldap.WithPreferredLanguageAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.PreferredLanguageAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.AvatarURLAttribute != "" {
+		opts = append(opts, ldap.WithAvatarURLAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.AvatarURLAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.ProfileAttribute != "" {
+		opts = append(opts, ldap.WithProfileAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.ProfileAttribute))
+	}
+	return ldap.New(
+		identityProvider.Name,
+		identityProvider.Servers,
+		identityProvider.BaseDN,
+		identityProvider.BindDN,
+		password,
+		identityProvider.UserBase,
+		identityProvider.UserObjectClasses,
+		identityProvider.UserFilters,
+		identityProvider.Timeout,
+		l.baseURL(ctx)+EndpointLDAPLogin+"?"+QueryAuthRequestID+"=",
+		opts...,
+	), nil
+}
+
 func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*google.Provider, error) {
 	errorHandler := func(w http.ResponseWriter, r *http.Request, errorType string, errorDesc string, state string) {
 		logging.Errorf("token exchanged failed: %s - %s (state: %s)", errorType, errorType, state)
@@ -602,6 +692,11 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
+	opts := make([]openid.ProviderOpts, 1, 2)
+	opts[0] = openid.WithSelectAccount()
+	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
+		opts = append(opts, openid.WithIDTokenMapping())
+	}
 	return openid.New(identityProvider.Name,
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
@@ -609,6 +704,7 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.OIDCIDPTemplate.Scopes,
 		openid.DefaultMapper,
+		opts...,
 	)
 }
 
@@ -648,6 +744,28 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 	)
 }
 
+func (l *Login) azureProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*azuread.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.AzureADIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]azuread.ProviderOptions, 0, 2)
+	if identityProvider.AzureADIDPTemplate.IsEmailVerified {
+		opts = append(opts, azuread.WithEmailVerified())
+	}
+	if identityProvider.AzureADIDPTemplate.Tenant != "" {
+		opts = append(opts, azuread.WithTenant(azuread.TenantType(identityProvider.AzureADIDPTemplate.Tenant)))
+	}
+	return azuread.New(
+		identityProvider.Name,
+		identityProvider.AzureADIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.AzureADIDPTemplate.Scopes,
+		opts...,
+	)
+}
+
 func (l *Login) githubProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*github.Provider, error) {
 	secret, err := crypto.DecryptString(identityProvider.GitHubIDPTemplate.ClientSecret, l.idpConfigAlg)
 	if err != nil {
@@ -678,6 +796,34 @@ func (l *Login) githubEnterpriseProvider(ctx context.Context, identityProvider *
 	)
 }
 
+func (l *Login) gitlabProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*gitlab.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.GitLabIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return gitlab.New(
+		identityProvider.GitLabIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.GitLabIDPTemplate.Scopes,
+	)
+}
+
+func (l *Login) gitlabSelfHostedProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*gitlab.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.GitLabSelfHostedIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return gitlab.NewCustomIssuer(
+		identityProvider.Name,
+		identityProvider.GitLabSelfHostedIDPTemplate.Issuer,
+		identityProvider.GitLabSelfHostedIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.GitLabSelfHostedIDPTemplate.Scopes,
+	)
+}
+
 func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserGrant, resourceOwner string) error {
 	if len(userGrants) == 0 {
 		return nil
@@ -691,15 +837,15 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 	return nil
 }
 
-func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens, user idp.User, err error) {
-	if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, user, err); actionErr != nil {
+func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens[*oidc.IDTokenClaims], user idp.User, err error) {
+	if _, _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, user, err); actionErr != nil {
 		logging.WithError(err).Error("both external user authentication and action post authentication failed")
 	}
 	l.renderLogin(w, r, authReq, err)
 }
 
 // tokens extracts the oidc.Tokens for backwards compatibility of PostExternalAuthenticationActions
-func tokens(session idp.Session) *oidc.Tokens {
+func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 	switch s := session.(type) {
 	case *openid.Session:
 		return s.Tokens
@@ -757,7 +903,7 @@ func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain 
 	externalIDP := &domain.UserIDPLink{
 		IDPConfigID:    externalUser.IDPConfigID,
 		ExternalUserID: externalUser.ExternalUserID,
-		DisplayName:    externalUser.DisplayName,
+		DisplayName:    externalUser.PreferredUsername,
 	}
 	return human, externalIDP, externalUser.Metadatas
 }
@@ -769,7 +915,7 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 		IDPConfigID:       formData.ExternalIDPConfigID,
 		ExternalUserID:    formData.ExternalIDPExtUserID,
 		PreferredUsername: formData.Username,
-		DisplayName:       formData.Email,
+		DisplayName:       string(formData.Email),
 		FirstName:         formData.Firstname,
 		LastName:          formData.Lastname,
 		NickName:          formData.Nickname,
@@ -779,4 +925,54 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 		IsPhoneVerified:   isPhoneVerified,
 		PreferredLanguage: language.Make(formData.Language),
 	}
+}
+
+func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []any {
+	params := []any{authReq.AgentID}
+
+	if authReq.UserID != "" && identityProviderID != "" {
+		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
+		if err != nil {
+			logging.WithFields("authReqID", authReq.ID, "userID", authReq.UserID, "providerID", identityProviderID).WithError(err).Warn("failed to get user links for")
+			return params
+		}
+		if len(links.Links) == 1 {
+			return append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername))
+		}
+	}
+	if authReq.UserName != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName))
+	}
+	if authReq.LoginName != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName))
+	}
+	if authReq.LoginHint != "" {
+		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint))
+	}
+	return params
+}
+
+func keyAndValueToAuthURLOpt(key, value string) rp.AuthURLOpt {
+	return func() []oauth2.AuthCodeOption {
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
+	}
+}
+
+func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.IDPUserLinks, error) {
+	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpID)
+	if err != nil {
+		return nil, err
+	}
+	return l.query.IDPUserLinks(ctx,
+		&query.IDPUserLinksSearchQuery{
+			Queries: []query.SearchQuery{
+				userIDQuery,
+				idpIDQuery,
+			},
+		}, false,
+	)
 }

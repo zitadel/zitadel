@@ -1,0 +1,30 @@
+<form class="string-list-form" (ngSubmit)="add(redInput)">
+  <cnsl-form-field class="formfield">
+    <cnsl-label>{{ title }}</cnsl-label>
+    <input #redInput cnslInput [formControl]="control" />
+  </cnsl-form-field>
+  <button
+    matTooltip="{{ 'ACTIONS.ADD' | translate }}"
+    type="submit"
+    mat-icon-button
+    [disabled]="control.invalid || control.disabled"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+</form>
+
+<div class="string-list">
+  <div *ngFor="let str of value" class="value-line">
+    <span>{{ str }}</span>
+    <span class="fill-space"></span>
+    <button
+      type="button"
+      matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+      mat-icon-button
+      (click)="remove(str)"
+      class="icon-button"
+    >
+      <mat-icon class="icon">cancel</mat-icon>
+    </button>
+  </div>
+</div>

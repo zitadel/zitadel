@@ -84,7 +84,6 @@ func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI st
 		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
 	provider, err := op.NewDynamicOpenIDProvider(
-		ctx,
 		"",
 		opConfig,
 		storage,

@@ -26,51 +26,11 @@ const routes: Routes = [
   {
     path: 'provider',
     canActivate: [AuthGuard, RoleGuard],
+    loadChildren: () => import('src/app/modules/providers/providers.module'),
     data: {
-      roles: ['iam.idp.write'],
+      roles: ['iam.idp.read'],
       serviceType: PolicyComponentServiceType.ADMIN,
     },
-    children: [
-      {
-        path: 'oidc',
-        children: [
-          {
-            path: 'create',
-            loadChildren: () => import('src/app/modules/providers/provider-oidc/provider-oidc.module'),
-          },
-          {
-            path: ':id',
-            loadChildren: () => import('src/app/modules/providers/provider-oidc/provider-oidc.module'),
-          },
-        ],
-      },
-      {
-        path: 'jwt',
-        children: [
-          {
-            path: 'create',
-            loadChildren: () => import('src/app/modules/providers/provider-jwt/provider-jwt.module'),
-          },
-          {
-            path: ':id',
-            loadChildren: () => import('src/app/modules/providers/provider-jwt/provider-jwt.module'),
-          },
-        ],
-      },
-      {
-        path: 'google',
-        children: [
-          {
-            path: 'create',
-            loadChildren: () => import('src/app/modules/providers/provider-google/provider-google.module'),
-          },
-          {
-            path: ':id',
-            loadChildren: () => import('src/app/modules/providers/provider-google/provider-google.module'),
-          },
-        ],
-      },
-    ],
   },
 ];
 

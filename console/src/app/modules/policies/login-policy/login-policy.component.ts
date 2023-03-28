@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { take } from 'rxjs';
@@ -18,6 +18,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
@@ -45,11 +46,11 @@ export class LoginPolicyComponent implements OnInit {
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
   public lifetimeForm: UntypedFormGroup = this.fb.group({
-    passwordCheckLifetime: [{ disabled: true }, [Validators.required]],
-    externalLoginCheckLifetime: [{ disabled: true }, [Validators.required]],
-    mfaInitSkipLifetime: [{ disabled: true }, [Validators.required]],
-    secondFactorCheckLifetime: [{ disabled: true }, [Validators.required]],
-    multiFactorCheckLifetime: [{ disabled: true }, [Validators.required]],
+    passwordCheckLifetime: [{ disabled: true }, [requiredValidator]],
+    externalLoginCheckLifetime: [{ disabled: true }, [requiredValidator]],
+    mfaInitSkipLifetime: [{ disabled: true }, [requiredValidator]],
+    secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
+    multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
   });
   constructor(
     private toast: ToastService,

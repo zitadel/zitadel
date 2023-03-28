@@ -239,11 +239,20 @@
     "NOROWS": "Nessun dato"
   },
   "ERRORS": {
-    "REQUIRED": "Mancano alcuni campi obbligatori.",
+    "REQUIRED": "Compilare questo campo.",
     "TOKENINVALID": {
       "TITLE": "Il tuo Access Token \u00e8 scaduto.",
       "DESCRIPTION": "Clicca il pulsante per richiedere una nuova sessione."
-    }
+    },
+    "INVALID_FORMAT": "Il formato non è valido.",
+    "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail.",
+    "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
+    "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
+    "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
+    "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
+    "NUMBERERROR": "Deve includere una cifra.",
+    "PWNOTEQUAL": "Le password fornite non corrispondono.",
+    "PHONE": "Il numero di telefono deve iniziare con 00 o +."
   },
   "USER": {
     "SETTINGS": {
@@ -524,8 +533,7 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
-      "NOTEQUAL": "Le password fornite non corrispondono."
+      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -535,7 +543,7 @@
     "EMAILVERIFIED": "Email verificata",
     "NOTVERIFIED": "non verificato",
     "PREFERRED_LOGINNAME": "Loginname preferito",
-    "ISINITIAL": "L'e-mail di questo utente non è ancora stata verificata.",
+    "ISINITIAL": "L'utente non è ancora attivo.",
     "LOGINMETHODS": {
       "TITLE": "Informazioni di contatto",
       "DESCRIPTION": "Le informazioni fornite sono utilizzate per inviare informazioni importanti, come le e-mail di reset della password.",
@@ -579,17 +587,6 @@
         "3": "filtro per rolename"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "La password non soddisfa le regole definite.",
-      "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail",
-      "REQUIRED": "Il campo di input \u00e8 vuoto.",
-      "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
-      "NOEMAIL": "Il nome utente non pu\u00f2 essere un indirizzo e-mail.",
-      "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
-      "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
-      "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
-      "NUMBERERROR": "Deve includere una cifra."
-    },
     "STATE": {
       "0": "Sconosciuto",
       "1": "Attivo",
@@ -612,7 +609,7 @@
     "SIGNEDOUT_BTN": "Accedi",
     "EDITACCOUNT": "Modifica account",
     "ADDACCOUNT": "Accedi con un altro account",
-    "RESENDINITIALEMAIL": "Invia una nuova mail di inizializzazione",
+    "RESENDINITIALEMAIL": "Invia nuovamente la mail di attivazione",
     "RESENDEMAILNOTIFICATION": "Invia di nuovo la notifica via e-mail",
     "TOAST": {
       "CREATED": "Utente creato con successo.",
@@ -1016,10 +1013,11 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
-      "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1208,10 +1206,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1623,6 +1622,10 @@
         "TITLE": "OIDC Provider",
         "DESCRIPTION": "Inserisci i dati necessari per il tuo provider OIDC."
       },
+      "OAuth": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider OAuth."
+      },
       "JWT": {
         "TITLE": "JWT Provider",
         "DESCRIPTION": "Inserisci i dati necessari per il tuo provider JWT."
@@ -1630,6 +1633,30 @@
       "GOOGLE": {
         "TITLE": "Google Provider",
         "DESCRIPTION": "Inserisci i dati necessari per il tuo Google provider."
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Gitlab provider."
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Gitlab Self Hosted provider."
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo GitHub Enterprise Server provider."
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Github provider."
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Microsoft provider."
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider LDAP."
       }
     },
     "DETAIL": {
@@ -1662,14 +1689,28 @@
       "1": "attivo",
       "2": "inattivo"
     },
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
+    },
+    "AZUREADTENANTTYPE": "Tipo tenant",
+    "AZUREADTENANTID": "tenant ID",
+    "EMAILVERIFIED": "Email verificata",
     "NAMEHINT": "Se specificato, verrà mostrato nell'interfaccia di accesso.",
     "OPTIONAL": "opzionale",
+    "LDAPATTRIBUTES": "Attributi LDAP",
+    "UPDATEBINDPASSWORD": "aggiorna Bind Password",
     "UPDATECLIENTSECRET": "Aggiorna secret",
     "ADD": "Aggiungi Identity Provider",
     "TYPE": "Tipo",
     "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Nome",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "Attributo ID",
     "AVAILABILITY": "Disponibilità",
     "AVAILABLE": "disponibile",
     "AVAILABLEBUTINACTIVE": "disponible ma inattivo",
@@ -1681,6 +1722,31 @@
     "SCOPESLIST": "Scope list",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "Connessione",
+    "LDAPUSERBINDING": "User binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "necessario",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "Mapping del nome di visualizzazione IDP",
     "USERNAMEMAPPING": "Mapping del nome utente",
     "DATES": "Date",
@@ -2000,10 +2066,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",
