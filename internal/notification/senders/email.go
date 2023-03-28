@@ -3,6 +3,9 @@ package senders
 import (
 	"context"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
@@ -22,7 +25,9 @@ func EmailChannels(
 ) (chain *Chain, err error) {
 	channels := make([]channels.NotificationChannel, 0, 3)
 	p, err := smtp.InitChannel(ctx, emailConfig)
-	// TODO: Why is this error not handled?
+	logging.WithFields(
+		"instance", authz.GetInstance(ctx).InstanceID(),
+	).OnError(err).Debug("initializing SMTP channel failed")
 	if err == nil {
 		channels = append(
 			channels,

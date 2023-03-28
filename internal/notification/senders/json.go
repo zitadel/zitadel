@@ -3,6 +3,9 @@ package senders
 import (
 	"context"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
@@ -25,7 +28,10 @@ func JSONChannels(
 	}
 	channels := make([]channels.NotificationChannel, 0, 3)
 	webhookChannel, err := webhook.InitChannel(ctx, webhookConfig)
-	// TODO: Handle this error?
+	logging.WithFields(
+		"instance", authz.GetInstance(ctx).InstanceID(),
+		"callurl", webhookConfig.CallURL,
+	).OnError(err).Debug("initializing JSON channel failed")
 	if err == nil {
 		channels = append(
 			channels,
