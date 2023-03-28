@@ -507,6 +507,7 @@ DefaultInstance:
     TOSLink: https://zitadel.com/docs/legal/terms-of-service
     PrivacyLink: https://zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
+    SupportEmail: ""
   NotificationPolicy:
     PasswordChange: true
   LabelPolicy:

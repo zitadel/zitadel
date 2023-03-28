@@ -60,6 +60,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
       tosLink: ['', []],
       privacyLink: ['', []],
       helpLink: ['', []],
+      supportEmail: ['', []],
     });
 
     this.canWrite$.pipe(take(1)).subscribe((canWrite) => {
@@ -105,6 +106,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
             tosLink: '',
             privacyLink: '',
             helpLink: '',
+            supportEmail: '',
           });
         }
       })
@@ -114,6 +116,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
           tosLink: '',
           privacyLink: '',
           helpLink: '',
+          supportEmail: '',
         });
       });
   }
@@ -125,6 +128,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
         req.setPrivacyLink(this.form.get('privacyLink')?.value);
         req.setTosLink(this.form.get('tosLink')?.value);
         req.setHelpLink(this.form.get('helpLink')?.value);
+        req.setSupportEmail(this.form.get('supportEmail')?.value);
         (this.service as ManagementService)
           .addCustomPrivacyPolicy(req)
           .then(() => {
@@ -137,6 +141,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
         req.setPrivacyLink(this.form.get('privacyLink')?.value);
         req.setTosLink(this.form.get('tosLink')?.value);
         req.setHelpLink(this.form.get('helpLink')?.value);
+        req.setSupportEmail(this.form.get('supportEmail')?.value);
 
         (this.service as ManagementService)
           .updateCustomPrivacyPolicy(req)
@@ -151,6 +156,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
       req.setPrivacyLink(this.form.get('privacyLink')?.value);
       req.setTosLink(this.form.get('tosLink')?.value);
       req.setHelpLink(this.form.get('helpLink')?.value);
+      req.setSupportEmail(this.form.get('supportEmail')?.value);
 
       (this.service as AdminService)
         .updatePrivacyPolicy(req)
