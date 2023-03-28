@@ -30,7 +30,7 @@ func TestSession_FetchUser(t *testing.T) {
 		options      []ProviderOptions
 		authURL      string
 		code         string
-		tokens       *oidc.Tokens
+		tokens       *oidc.Tokens[*oidc.IDTokenClaims]
 	}
 	type want struct {
 		err               func(error) bool
@@ -87,7 +87,7 @@ func TestSession_FetchUser(t *testing.T) {
 						Reply(http.StatusInternalServerError)
 				},
 				authURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,
@@ -125,7 +125,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,
@@ -189,7 +189,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,

@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: register
   NextButtonText: next
 
+LDAP:
+  Title: Login
+  Description: Enter your login data.
+  LoginNameLabel: Loginname
+  PasswordLabel: Password
+  NextButtonText: next
+
 SelectAccount:
   Title: Select account
   Description: Use your ZITADEL-Account
@@ -212,6 +219,7 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -242,6 +250,7 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Japanese: 日本語
   Polish: Polski
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
@@ -302,6 +311,7 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Powered By
@@ -407,5 +417,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy not existing
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registration is not allowed
 
 optional: (optional)

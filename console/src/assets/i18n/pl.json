@@ -1011,11 +1011,12 @@
     "DEFAULTLANGUAGE": "Domyślny język",
     "LANGUAGE": {
       "de": "Deutsch",
-      "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
@@ -1204,10 +1205,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -1650,6 +1652,10 @@
       "AZUREAD": {
         "TITLE": "Microsoft Provider",
         "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości Microsoft"
+      },
+      "LDAP": {
+        "TITLE": "LDAP Provider",
+        "DESCRIPTION": "Wprowadź dane dla swojego dostawcy tożsamości LDAP"
       }
     },
     "DETAIL": {
@@ -1692,6 +1698,8 @@
     "EMAILVERIFIED": "Email zweryfikowany",
     "NAMEHINT": "Jeśli zostanie podany, będzie widoczny w interfejsie logowania.",
     "OPTIONAL": "opcjonalnie",
+    "LDAPATTRIBUTES": "LDAP Atrybuty",
+    "UPDATEBINDPASSWORD": "aktualizacja bind password",
     "UPDATECLIENTSECRET": "aktualizacja tajemnicy klienta",
     "ADD": "Dodaj dostawcę tożsamości",
     "TYPE": "Typ",
@@ -1713,6 +1721,31 @@
     "SCOPESLIST": "Lista zakresów",
     "CLIENTID": "Identyfikator klienta",
     "CLIENTSECRET": "Tajne klienta",
+    "LDAPCONNECTION": "Połączenie",
+    "LDAPUSERBINDING": "Wiązanie użytkownika",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "wymagany",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "Mapowanie wyświetlanej nazwy IDP",
     "USERNAMEMAPPING": "Mapowanie nazwy użytkownika",
     "DATES": "Daty",
@@ -2032,10 +2065,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",
