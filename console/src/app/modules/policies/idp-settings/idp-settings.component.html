@@ -161,4 +161,22 @@
       <span class="title">Generic JWT</span>
     </div>
   </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'ldap', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'ldap', 'create']
+        : []
+    "
+  >
+    <div class="idp-icon">
+      <i class="icon las la-building" svgIcon="mdi_jwt" alt="jwt"></i>
+    </div>
+    <div class="text-container">
+      <span class="title">Active Directory / LDAP</span>
+    </div>
+  </a>
 </div>
