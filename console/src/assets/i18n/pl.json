@@ -992,7 +992,7 @@
       "IDP": "Dostawcy tożsamości",
       "DOMAIN": "Ustawienia domeny",
       "LOGINTEXTS": "Teksty interfejsu logowania",
-      "BRANDING": "Branding",
+      "BRANDING": "Marka",
       "PRIVACYPOLICY": "Polityka prywatności",
       "OIDC": "Czas trwania tokenów OIDC i wygaśnięcie",
       "SECRETS": "Wygląd sekretów",
@@ -1118,7 +1118,7 @@
       "PASSWORDCHANGE": "Zmiana hasła"
     },
     "PRIVATELABELING": {
-      "TITLE": "Branding",
+      "TITLE": "Marka",
       "DESCRIPTION": "Nadaj logowaniu swój indywidualny styl i modyfikuj jego zachowanie.",
       "PREVIEW_DESCRIPTION": "Zmiany polityki zostaną automatycznie wdrożone do środowiska podglądu.",
       "BTN": "Wybierz plik",
@@ -1141,6 +1141,10 @@
       "MAXSIZEEXCEEDED": "Przekroczony maksymalny rozmiar 524kB.",
       "NOSVGSUPPORTED": "SVG nie są obsługiwane!",
       "FONTINLOGINONLY": "Czcionka jest obecnie wyświetlana tylko w interfejsie logowania.",
+      "BACKGROUNDCOLOR": "Kolor tła",
+      "PRIMARYCOLOR": "Kolor podstawowy",
+      "WARNCOLOR": "Ostrzegawczy kolor",
+      "FONTCOLOR": "Kolor czcionki",
       "VIEWS": {
         "PREVIEW": "Podgląd",
         "CURRENT": "Bieżąca konfiguracja"
@@ -1165,7 +1169,7 @@
       "TITLE": "Ustawienia domeny"
     },
     "PRIVATELABELING_POLICY": {
-      "TITLE": "Branding",
+      "TITLE": "Marka",
       "BTN": "Wybierz plik",
       "DESCRIPTION": "Dostosuj wygląd logowania",
       "ACTIVATEPREVIEW": "Aktywuj konfigurację"
@@ -1393,7 +1397,7 @@
         "GRANTED_SINGULAR": "Udzielony Projekt"
       },
       "PRIVATELABEL": {
-        "TITLE": "Ustawienia Brandingu",
+        "TITLE": "Ustawienia marka",
         "0": {
           "TITLE": "Nieokreślony",
           "DESC": "Jak tylko użytkownik zostanie zidentyfikowany, zostanie pokazana marka organizacji zidentyfikowanego użytkownika, przed pokazaniem domyślnej marki systemu."
@@ -1407,7 +1411,7 @@
           "DESC": "Będzie pokazywana marka organizacji projektu, ale jak tylko użytkownik zostanie zidentyfikowany, zostanie pokazane ustawienie marki organizacji zidentyfikowanego użytkownika."
         },
         "DIALOG": {
-          "TITLE": "Ustawienia Brandingu",
+          "TITLE": "Ustawienia marka",
           "DESCRIPTION": "Wybierz zachowanie logowania przy używaniu projektu."
         }
       },
