@@ -32,6 +32,9 @@ func (r *RefreshTokenRepo) RefreshTokenByToken(ctx context.Context, refreshToken
 		return nil, err
 	}
 	tokenView, err := r.RefreshTokenByID(ctx, tokenID, userID)
+	if err != nil {
+		return nil, err
+	}
 	if tokenView.Token != token {
 		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
 	}
