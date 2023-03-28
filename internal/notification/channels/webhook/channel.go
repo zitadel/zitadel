@@ -9,7 +9,7 @@ import (
 
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
@@ -27,7 +27,7 @@ func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel,
 
 		msg, ok := message.(*messages.JSON)
 		if !ok {
-			return caos_errs.ThrowInternal(nil, "WEBH-K686U", "message is not JSON")
+			return errors.ThrowInternal(nil, "WEBH-K686U", "message is not JSON")
 		}
 		payload, err := msg.GetContent()
 		if err != nil {
@@ -51,7 +51,7 @@ func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel,
 		}
 
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-			return caos_errs.ThrowUnknown(fmt.Errorf("calling url %s returned %s", cfg.CallURL, resp.Status), "WEBH-LBxU0", "webhook didn't return a success status")
+			return errors.ThrowUnknown(fmt.Errorf("calling url %s returned %s", cfg.CallURL, resp.Status), "WEBH-LBxU0", "webhook didn't return a success status")
 		}
 
 		logging.WithFields("calling_url", cfg.CallURL, "method", cfg.Method).Debug("webhook called")
