@@ -26,7 +26,7 @@ func TestProvider_FetchUser(t *testing.T) {
 		userMapper   func() idp.User
 		authURL      string
 		code         string
-		tokens       *oidc.Tokens
+		tokens       *oidc.Tokens[*oidc.IDTokenClaims]
 	}
 	type want struct {
 		err               func(error) bool
@@ -97,7 +97,7 @@ func TestProvider_FetchUser(t *testing.T) {
 					return NewUserMapper("userID")
 				},
 				authURL: "https://oauth2.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,
@@ -137,7 +137,7 @@ func TestProvider_FetchUser(t *testing.T) {
 					return NewUserMapper("userID")
 				},
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,

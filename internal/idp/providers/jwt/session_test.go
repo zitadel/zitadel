@@ -30,7 +30,7 @@ func TestSession_FetchUser(t *testing.T) {
 		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
 		httpMock      func(issuer string)
 		authURL       string
-		tokens        *oidc.Tokens
+		tokens        *oidc.Tokens[*oidc.IDTokenClaims]
 	}
 	type want struct {
 		err               func(error) bool
@@ -93,7 +93,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(keys(t))
 				},
 				authURL: "https://auth.com/jwt?authRequestID=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token:   &oauth2.Token{},
 					IDToken: "invalidToken",
 				},
@@ -121,26 +121,32 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(keys(t))
 				},
 				authURL: "https://auth.com/jwt?authRequestID=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token:   &oauth2.Token{},
 					IDToken: idToken(t, "https://jwt.com"),
-					IDTokenClaims: func() oidc.IDTokenClaims {
-						claims := oidc.EmptyIDTokenClaims()
-						userinfo := oidc.NewUserInfo()
-						userinfo.SetSubject("sub")
-						userinfo.SetPicture("picture")
-						userinfo.SetName("firstname lastname")
-						userinfo.SetEmail("email", true)
-						userinfo.SetGivenName("firstname")
-						userinfo.SetFamilyName("lastname")
-						userinfo.SetNickname("nickname")
-						userinfo.SetPreferredUsername("username")
-						userinfo.SetProfile("profile")
-						userinfo.SetPhone("phone", true)
-						userinfo.SetLocale(language.English)
-						claims.SetUserinfo(userinfo)
-						return claims
-					}(),
+					IDTokenClaims: &oidc.IDTokenClaims{
+						TokenClaims: oidc.TokenClaims{
+							Subject: "sub",
+						},
+						UserInfoProfile: oidc.UserInfoProfile{
+							Picture:           "picture",
+							Name:              "firstname lastname",
+							GivenName:         "firstname",
+							FamilyName:        "lastname",
+							Nickname:          "nickname",
+							PreferredUsername: "username",
+							Profile:           "profile",
+							Locale:            oidc.NewLocale(language.English),
+						},
+						UserInfoEmail: oidc.UserInfoEmail{
+							Email:         "email",
+							EmailVerified: oidc.Bool(true),
+						},
+						UserInfoPhone: oidc.UserInfoPhone{
+							PhoneNumber:         "phone",
+							PhoneNumberVerified: true,
+						},
+					},
 				},
 			},
 			want: want{
@@ -219,19 +225,25 @@ func idToken(t *testing.T, issuer string) string {
 		"clientID",
 		0,
 	)
-	info := oidc.NewUserInfo()
-	info.SetSubject("sub")
-	info.SetGivenName("firstname")
-	info.SetFamilyName("lastname")
-	info.SetName("firstname lastname")
-	info.SetNickname("nickname")
-	info.SetPreferredUsername("username")
-	info.SetEmail("email", true)
-	info.SetPhone("phone", true)
-	info.SetLocale(language.English)
-	info.SetPicture("picture")
-	info.SetProfile("profile")
-	claims.SetUserinfo(info)
+	claims.UserInfoProfile = oidc.UserInfoProfile{
+		GivenName:         "firstname",
+		FamilyName:        "lastname",
+		Name:              "firstname lastname",
+		Nickname:          "nickname",
+		PreferredUsername: "username",
+		Locale:            oidc.NewLocale(language.English),
+		Picture:           "picture",
+		Profile:           "profile",
+	}
+	claims.UserInfoEmail = oidc.UserInfoEmail{
+		Email:         "email",
+		EmailVerified: oidc.Bool(true),
+	}
+	claims.UserInfoPhone = oidc.UserInfoPhone{
+		PhoneNumber:         "phone",
+		PhoneNumberVerified: true,
+	}
+
 	privateKey, err := crypto.BytesToPrivateKey([]byte(`-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAs38btwb3c7r0tMaQpGvBmY+mPwMU/LpfuPoC0k2t4RsKp0fv
 40SMl50CRrHgk395wch8PMPYbl3+8TtYAJuyrFALIj3Ff1UcKIk0hOH5DDsfh7/q
