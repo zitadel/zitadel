@@ -1,4 +1,4 @@
-package notifqry
+package handlers
 
 import (
 	"net/http"
@@ -21,7 +21,7 @@ type NotificationQueries struct {
 	statikDir          http.FileSystem
 }
 
-func New(
+func NewNotificationQueries(
 	baseQueries *query.Queries,
 	es *eventstore.Eventstore,
 	externalPort uint16,

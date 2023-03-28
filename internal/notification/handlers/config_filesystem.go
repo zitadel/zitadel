@@ -1,4 +1,4 @@
-package notifqry
+package handlers
 
 import (
 	"context"

@@ -3,15 +3,14 @@ package notification
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/notification/handlers"
+
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/notification/handlers/notifqry"
-	"github.com/zitadel/zitadel/internal/notification/handlers/quotanotifier"
-	"github.com/zitadel/zitadel/internal/notification/handlers/usernotifier"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -56,8 +55,8 @@ func Start(
 	logging.WithFields("metric", metricSuccessfulDeliveriesJSON).OnError(err).Panic("unable to register counter")
 	err = metrics.RegisterCounter(metricFailedDeliveriesJSON, "Failed JSON message deliveries")
 	logging.WithFields("metric", metricFailedDeliveriesJSON).OnError(err).Panic("unable to register counter")
-	q := notifqry.New(queries, es, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
-	usernotifier.NewUserNotifier(
+	q := handlers.NewNotificationQueries(queries, es, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
+	handlers.NewUserNotifier(
 		ctx,
 		projection.ApplyCustomConfig(userHandlerCustomConfig),
 		commands,
@@ -68,7 +67,7 @@ func Start(
 		metricSuccessfulDeliveriesSMS,
 		metricFailedDeliveriesSMS,
 	).Start()
-	quotanotifier.NewQuotaNotifier(
+	handlers.NewQuotaNotifier(
 		ctx,
 		projection.ApplyCustomConfig(quotaHandlerCustomConfig),
 		commands,

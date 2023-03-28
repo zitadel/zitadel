@@ -1,4 +1,4 @@
-package usernotifier
+package handlers
 
 import (
 	"context"
@@ -11,21 +11,19 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
-	"github.com/zitadel/zitadel/internal/notification/handlers/notifctx"
-	"github.com/zitadel/zitadel/internal/notification/handlers/notifqry"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	NotificationsProjectionTable = "projections.notifications"
+	UserNotificationsProjectionTable = "projections.notifications"
 )
 
 type userNotifier struct {
 	crdb.StatementHandler
 	commands     *command.Commands
-	queries      *notifqry.NotificationQueries
+	queries      *NotificationQueries
 	assetsPrefix func(context.Context) string
 	metricSuccessfulDeliveriesEmail,
 	metricFailedDeliveriesEmail,
@@ -37,7 +35,7 @@ func NewUserNotifier(
 	ctx context.Context,
 	config crdb.StatementHandlerConfig,
 	commands *command.Commands,
-	queries *notifqry.NotificationQueries,
+	queries *NotificationQueries,
 	assetsPrefix func(context.Context) string,
 	metricSuccessfulDeliveriesEmail,
 	metricFailedDeliveriesEmail,
@@ -45,7 +43,7 @@ func NewUserNotifier(
 	metricFailedDeliveriesSMS string,
 ) *userNotifier {
 	p := new(userNotifier)
-	config.ProjectionName = NotificationsProjectionTable
+	config.ProjectionName = UserNotificationsProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.commands = commands
@@ -118,7 +116,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-EFe2f", "reduce.wrong.event.type %s", user.HumanInitialCodeAddedType)
 	}
-	ctx := notifctx.New(event.Aggregate())
+	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1InitialCodeAddedType, user.UserV1InitialCodeSentType,
 		user.HumanInitialCodeAddedType, user.HumanInitialCodeSentType)
@@ -184,7 +182,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SWf3g", "reduce.wrong.event.type %s", user.HumanEmailCodeAddedType)
 	}
-	ctx := notifctx.New(event.Aggregate())
+	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1EmailCodeAddedType, user.UserV1EmailCodeSentType,
 		user.HumanEmailCodeAddedType, user.HumanEmailCodeSentType)
@@ -250,7 +248,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Eeg3s", "reduce.wrong.event.type %s", user.HumanPasswordCodeAddedType)
 	}
-	ctx := notifctx.New(event.Aggregate())
+	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1PasswordCodeAddedType, user.UserV1PasswordCodeSentType,
 		user.HumanPasswordCodeAddedType, user.HumanPasswordCodeSentType)
@@ -332,7 +330,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Drh5w", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
-	ctx := notifctx.New(event.Aggregate())
+	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil,
 		user.UserDomainClaimedType, user.UserDomainClaimedSentType)
 	if err != nil {
@@ -393,7 +391,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-EDtjd", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeAddedType)
 	}
-	ctx := notifctx.New(event.Aggregate())
+	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, map[string]interface{}{"id": e.ID}, user.HumanPasswordlessInitCodeSentType)
 	if err != nil {
 		return nil, err
@@ -457,7 +455,7 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Yko2z8", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
-	ctx := notifctx.New(event.Aggregate())
+	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.HumanPasswordChangeSentType)
 	if err != nil {
 		return nil, err
@@ -528,7 +526,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-He83g", "reduce.wrong.event.type %s", user.HumanPhoneCodeAddedType)
 	}
-	ctx := notifctx.New(event.Aggregate())
+	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1PhoneCodeAddedType, user.UserV1PhoneCodeSentType,
 		user.HumanPhoneCodeAddedType, user.HumanPhoneCodeSentType)

@@ -1,4 +1,4 @@
-package quotanotifier
+package handlers
 
 import (
 	"context"
@@ -10,8 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
-	"github.com/zitadel/zitadel/internal/notification/handlers/notifctx"
-	"github.com/zitadel/zitadel/internal/notification/handlers/notifqry"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -19,13 +17,13 @@ import (
 )
 
 const (
-	NotificationsProjectionTable = "projections.notifications_quota"
+	QuotaNotificationsProjectionTable = "projections.notifications_quota"
 )
 
 type quotaNotifier struct {
 	crdb.StatementHandler
 	commands                       *command.Commands
-	queries                        *notifqry.NotificationQueries
+	queries                        *NotificationQueries
 	metricSuccessfulDeliveriesJSON string
 	metricFailedDeliveriesJSON     string
 }
@@ -34,12 +32,12 @@ func NewQuotaNotifier(
 	ctx context.Context,
 	config crdb.StatementHandlerConfig,
 	commands *command.Commands,
-	queries *notifqry.NotificationQueries,
+	queries *NotificationQueries,
 	metricSuccessfulDeliveriesJSON,
 	metricFailedDeliveriesJSON string,
 ) *quotaNotifier {
 	p := new(quotaNotifier)
-	config.ProjectionName = NotificationsProjectionTable
+	config.ProjectionName = QuotaNotificationsProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.commands = commands
@@ -69,7 +67,7 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DLxdE", "reduce.wrong.event.type %s", quota.NotificationDueEventType)
 	}
-	ctx := notifctx.New(event.Aggregate())
+	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"dueEventID": e.ID}, quota.NotifiedEventType)
 	if err != nil {
 		return nil, err

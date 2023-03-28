@@ -1,4 +1,4 @@
-package notifctx
+package handlers
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 const NotifyUserID = "NOTIFICATION" //TODO: system?
 
-func New(event eventstore.Aggregate) context.Context {
+func HandlerContext(event eventstore.Aggregate) context.Context {
 	ctx := authz.WithInstanceID(context.Background(), event.InstanceID)
 	return authz.SetCtxData(ctx, authz.CtxData{UserID: NotifyUserID, OrgID: event.ResourceOwner})
 }
