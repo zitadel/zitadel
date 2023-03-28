@@ -1,33 +1,37 @@
-import { Component, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, forwardRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, Subject, takeUntil } from 'rxjs';
+import { requiredValidator } from '../form-field/validators/validators';
 
 @Component({
-  selector: 'cnsl-redirect-uris',
-  templateUrl: './redirect-uris.component.html',
-  styleUrls: ['./redirect-uris.component.scss'],
+  selector: 'cnsl-string-list',
+  templateUrl: './string-list.component.html',
+  styleUrls: ['./string-list.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => RedirectUrisComponent),
+      useExisting: forwardRef(() => StringListComponent),
       multi: true,
     },
   ],
 })
-export class RedirectUrisComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class StringListComponent implements ControlValueAccessor, OnInit, OnDestroy {
   @Input() title: string = '';
-  @Input() devMode: boolean = false;
-  @Input() isNative!: boolean;
+  @Input() required: boolean = false;
   @Input() public getValues: Observable<void> = new Observable(); // adds formfieldinput to array on emission
 
-  public redirectControl: FormControl = new FormControl<string>({ value: '', disabled: true });
+  @Input() public control: FormControl = new FormControl<string>({ value: '', disabled: true });
   private destroy$: Subject<void> = new Subject();
   @ViewChild('redInput') input!: any;
+  private val: string[] = [];
 
   ngOnInit(): void {
     this.getValues.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.add(this.input.nativeElement);
     });
+
+    this.required ? this.control.setValidators([requiredValidator]) : this.control.setValidators([]);
   }
 
   ngOnDestroy(): void {
@@ -37,8 +41,6 @@ export class RedirectUrisComponent implements ControlValueAccessor, OnInit, OnDe
 
   onChange: any = () => {};
   onTouch: any = () => {};
-
-  private val: string[] = [];
 
   set value(val: string[]) {
     if (val !== undefined && this.val !== val) {
@@ -66,16 +68,17 @@ export class RedirectUrisComponent implements ControlValueAccessor, OnInit, OnDe
 
   public setDisabledState(isDisabled: boolean): void {
     if (isDisabled) {
-      this.redirectControl.disable();
+      this.control.disable();
     } else {
-      this.redirectControl.enable();
+      this.control.enable();
     }
   }
 
   public add(input: any): void {
-    if (this.redirectControl.valid) {
-      if (input.value !== '' && input.value !== ' ' && input.value !== '/') {
-        this.val.push(input.value);
+    if (this.control.valid) {
+      const trimmed = input.value.trim();
+      if (trimmed) {
+        this.val ? this.val.push(input.value) : (this.val = [input.value]);
         this.onChange(this.val);
         this.onTouch(this.val);
       }
@@ -85,8 +88,8 @@ export class RedirectUrisComponent implements ControlValueAccessor, OnInit, OnDe
     }
   }
 
-  public remove(redirect: any): void {
-    const index = this.value.indexOf(redirect);
+  public remove(str: string): void {
+    const index = this.value.indexOf(str);
 
     if (index >= 0) {
       this.value.splice(index, 1);
