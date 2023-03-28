@@ -1,0 +1,26 @@
+<form [formGroup]="form" class="option-form">
+  <cnsl-info-section class="auto-reg-info">
+    <div>
+      <p class="checkbox-desc">{{ 'IDP.OPTIONS.ISAUTOCREATION_DESC' | translate }}</p>
+      <mat-checkbox formControlName="isAutoCreation">{{ 'IDP.OPTIONS.ISAUTOCREATION' | translate }}</mat-checkbox>
+    </div>
+  </cnsl-info-section>
+  <cnsl-info-section class="auto-reg-info">
+    <div>
+      <p class="checkbox-desc">{{ 'IDP.OPTIONS.ISAUTOUPDATE_DESC' | translate }}</p>
+      <mat-checkbox formControlName="isAutoUpdate">{{ 'IDP.OPTIONS.ISAUTOUPDATE' | translate }}</mat-checkbox>
+    </div>
+  </cnsl-info-section>
+  <cnsl-info-section class="auto-reg-info">
+    <div>
+      <p class="checkbox-desc">{{ 'IDP.OPTIONS.ISCREATIONALLOWED_DESC' | translate }}</p>
+      <mat-checkbox formControlName="isCreationAllowed">{{ 'IDP.OPTIONS.ISCREATIONALLOWED' | translate }}</mat-checkbox>
+    </div>
+  </cnsl-info-section>
+  <cnsl-info-section class="auto-reg-info">
+    <div>
+      <p class="checkbox-desc">{{ 'IDP.OPTIONS.ISLINKINGALLOWED_DESC' | translate }}</p>
+      <mat-checkbox formControlName="isLinkingAllowed">{{ 'IDP.OPTIONS.ISLINKINGALLOWED' | translate }}</mat-checkbox>
+    </div>
+  </cnsl-info-section>
+</form>

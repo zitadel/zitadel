@@ -14,17 +14,16 @@ At the end of the guide, your application has login functionality and has access
 Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select **User Agent** application type and continue.
-We recommend you use [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
+We recommend you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
 
 ![Create app in console](/img/angular/app-create.png)
 
 ### Redirect URIs
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+The Post logout redirect send the users back to a route on your application after they have logged out.
 
-> If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.
-
-If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.
+> If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set dev mode to `true`, the Redirect URIs to <http://localhost:4200/auth/callback> and Post redirect URI to <http://localhost:4200/signedout>.
 
 Continue and create the application.
 
@@ -148,6 +147,17 @@ And in your HTML file:
 https://github.com/zitadel/zitadel-angular/blob/main/src/app/components/user/user.component.html
 ```
 
+### Refresh token
+
+If you want to add a refresh token to your application you have to navigate to the console application and tick the checkbox in the configuration section.
+Then add `offline_access` to the scopes and add the line
+
+```
+this.oauthService.setupAutomaticSilentRefresh();
+```
+
+this will automatically refresh a token before it expires.
+
 ## Completion
 
 You have successfully integrated your Angular application with ZITADEL!
@@ -158,6 +168,6 @@ If you get stuck, consider checking out our [example](https://github.com/zitadel
 
 ### What's next?
 
-Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs. Refer to the [docs](../../apis/introduction) or check out our ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which is using gRPC to access data.
+Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs. Refer to the [docs](/apis/introduction) or check out our ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which is using gRPC to access data.
 
 For more information about creating an Angular application, refer to [Angular](https://angular.io/start) and for more information about the OAuth/OIDC library used above, consider reading their docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).

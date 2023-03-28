@@ -6,20 +6,36 @@ import {
   ActivateLabelPolicyResponse,
   ActivateSMSProviderRequest,
   ActivateSMSProviderResponse,
+  AddAzureADProviderRequest,
+  AddAzureADProviderResponse,
   AddCustomDomainPolicyRequest,
   AddCustomOrgIAMPolicyResponse,
+  AddGenericOAuthProviderRequest,
+  AddGenericOAuthProviderResponse,
+  AddGenericOIDCProviderRequest,
+  AddGenericOIDCProviderResponse,
+  AddGitHubEnterpriseServerProviderRequest,
+  AddGitHubEnterpriseServerProviderResponse,
+  AddGitHubProviderRequest,
+  AddGitHubProviderResponse,
+  AddGitLabProviderRequest,
+  AddGitLabProviderResponse,
+  AddGitLabSelfHostedProviderRequest,
+  AddGitLabSelfHostedProviderResponse,
+  AddGoogleProviderRequest,
+  AddGoogleProviderResponse,
   AddIAMMemberRequest,
   AddIAMMemberResponse,
   AddIDPToLoginPolicyRequest,
   AddIDPToLoginPolicyResponse,
-  AddJWTIDPRequest,
-  AddJWTIDPResponse,
+  AddJWTProviderRequest,
+  AddJWTProviderResponse,
+  AddLDAPProviderRequest,
+  AddLDAPProviderResponse,
   AddMultiFactorToLoginPolicyRequest,
   AddMultiFactorToLoginPolicyResponse,
   AddNotificationPolicyRequest,
   AddNotificationPolicyResponse,
-  AddOIDCIDPRequest,
-  AddOIDCIDPResponse,
   AddOIDCSettingsRequest,
   AddOIDCSettingsResponse,
   AddSecondFactorToLoginPolicyRequest,
@@ -32,6 +48,8 @@ import {
   DeactivateIDPResponse,
   DeactivateSMSProviderRequest,
   DeactivateSMSProviderResponse,
+  DeleteProviderRequest,
+  DeleteProviderResponse,
   GetCustomDomainClaimedMessageTextRequest,
   GetCustomDomainClaimedMessageTextResponse,
   GetCustomDomainPolicyRequest,
@@ -72,8 +90,6 @@ import {
   GetDomainPolicyResponse,
   GetFileSystemNotificationProviderRequest,
   GetFileSystemNotificationProviderResponse,
-  GetIDPByIDRequest,
-  GetIDPByIDResponse,
   GetLabelPolicyRequest,
   GetLabelPolicyResponse,
   GetLockoutPolicyRequest,
@@ -96,6 +112,8 @@ import {
   GetPreviewLabelPolicyResponse,
   GetPrivacyPolicyRequest,
   GetPrivacyPolicyResponse,
+  GetProviderByIDRequest,
+  GetProviderByIDResponse,
   GetSecretGeneratorRequest,
   GetSecretGeneratorResponse,
   GetSecurityPolicyRequest,
@@ -106,7 +124,6 @@ import {
   GetSMTPConfigResponse,
   GetSupportedLanguagesRequest,
   GetSupportedLanguagesResponse,
-  IDPQuery,
   ListAggregateTypesRequest,
   ListAggregateTypesResponse,
   ListEventsRequest,
@@ -119,14 +136,14 @@ import {
   ListIAMMemberRolesResponse,
   ListIAMMembersRequest,
   ListIAMMembersResponse,
-  ListIDPsRequest,
-  ListIDPsResponse,
   ListLoginPolicyIDPsRequest,
   ListLoginPolicyIDPsResponse,
   ListLoginPolicyMultiFactorsRequest,
   ListLoginPolicyMultiFactorsResponse,
   ListLoginPolicySecondFactorsRequest,
   ListLoginPolicySecondFactorsResponse,
+  ListProvidersRequest,
+  ListProvidersResponse,
   ListSecretGeneratorsRequest,
   ListSecretGeneratorsResponse,
   ListSMSProvidersRequest,
@@ -141,8 +158,6 @@ import {
   RemoveIAMMemberResponse,
   RemoveIDPFromLoginPolicyRequest,
   RemoveIDPFromLoginPolicyResponse,
-  RemoveIDPRequest,
-  RemoveIDPResponse,
   RemoveLabelPolicyFontRequest,
   RemoveLabelPolicyFontResponse,
   RemoveLabelPolicyIconDarkRequest,
@@ -187,20 +202,34 @@ import {
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
   SetUpOrgResponse,
+  UpdateAzureADProviderRequest,
+  UpdateAzureADProviderResponse,
   UpdateCustomDomainPolicyRequest,
   UpdateCustomDomainPolicyResponse,
   UpdateDomainPolicyRequest,
   UpdateDomainPolicyResponse,
+  UpdateGenericOAuthProviderRequest,
+  UpdateGenericOAuthProviderResponse,
+  UpdateGenericOIDCProviderRequest,
+  UpdateGenericOIDCProviderResponse,
+  UpdateGitHubEnterpriseServerProviderRequest,
+  UpdateGitHubEnterpriseServerProviderResponse,
+  UpdateGitHubProviderRequest,
+  UpdateGitHubProviderResponse,
+  UpdateGitLabProviderRequest,
+  UpdateGitLabProviderResponse,
+  UpdateGitLabSelfHostedProviderRequest,
+  UpdateGitLabSelfHostedProviderResponse,
+  UpdateGoogleProviderRequest,
+  UpdateGoogleProviderResponse,
   UpdateIAMMemberRequest,
   UpdateIAMMemberResponse,
-  UpdateIDPJWTConfigRequest,
-  UpdateIDPJWTConfigResponse,
-  UpdateIDPOIDCConfigRequest,
-  UpdateIDPOIDCConfigResponse,
-  UpdateIDPRequest,
-  UpdateIDPResponse,
+  UpdateJWTProviderRequest,
+  UpdateJWTProviderResponse,
   UpdateLabelPolicyRequest,
   UpdateLabelPolicyResponse,
+  UpdateLDAPProviderRequest,
+  UpdateLDAPProviderResponse,
   UpdateLockoutPolicyRequest,
   UpdateLockoutPolicyResponse,
   UpdateLoginPolicyRequest,
@@ -871,47 +900,6 @@ export class AdminService {
     return this.grpcService.admin.listLoginPolicyIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public listIDPs(limit?: number, offset?: number, queriesList?: IDPQuery[]): Promise<ListIDPsResponse.AsObject> {
-    const req = new ListIDPsRequest();
-    const query = new ListQuery();
-
-    if (limit) {
-      query.setLimit(limit);
-    }
-    if (offset) {
-      query.setOffset(offset);
-    }
-    if (queriesList) {
-      req.setQueriesList(queriesList);
-    }
-    req.setQuery(query);
-    return this.grpcService.admin.listIDPs(req, null).then((resp) => resp.toObject());
-  }
-
-  public getIDPByID(id: string): Promise<GetIDPByIDResponse.AsObject> {
-    const req = new GetIDPByIDRequest();
-    req.setId(id);
-    return this.grpcService.admin.getIDPByID(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateIDP(req: UpdateIDPRequest): Promise<UpdateIDPResponse.AsObject> {
-    return this.grpcService.admin.updateIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public addOIDCIDP(req: AddOIDCIDPRequest): Promise<AddOIDCIDPResponse.AsObject> {
-    return this.grpcService.admin.addOIDCIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateIDPOIDCConfig(req: UpdateIDPOIDCConfigRequest): Promise<UpdateIDPOIDCConfigResponse.AsObject> {
-    return this.grpcService.admin.updateIDPOIDCConfig(req, null).then((resp) => resp.toObject());
-  }
-
-  public removeIDP(id: string): Promise<RemoveIDPResponse.AsObject> {
-    const req = new RemoveIDPRequest();
-    req.setIdpId(id);
-    return this.grpcService.admin.removeIDP(req, null).then((resp) => resp.toObject());
-  }
-
   public deactivateIDP(id: string): Promise<DeactivateIDPResponse.AsObject> {
     const req = new DeactivateIDPRequest();
     req.setIdpId(id);
@@ -924,12 +912,112 @@ export class AdminService {
     return this.grpcService.admin.reactivateIDP(req, null).then((resp) => resp.toObject());
   }
 
-  public addJWTIDP(req: AddJWTIDPRequest): Promise<AddJWTIDPResponse.AsObject> {
-    return this.grpcService.admin.addJWTIDP(req, null).then((resp) => resp.toObject());
+  //   idp templates
+
+  public addAzureADProvider(req: AddAzureADProviderRequest): Promise<AddAzureADProviderResponse.AsObject> {
+    return this.grpcService.admin.addAzureADProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public updateIDPJWTConfig(req: UpdateIDPJWTConfigRequest): Promise<UpdateIDPJWTConfigResponse.AsObject> {
-    return this.grpcService.admin.updateIDPJWTConfig(req, null).then((resp) => resp.toObject());
+  public updateAzureADProvider(req: UpdateAzureADProviderRequest): Promise<UpdateAzureADProviderResponse.AsObject> {
+    return this.grpcService.admin.updateAzureADProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGoogleProvider(req: AddGoogleProviderRequest): Promise<AddGoogleProviderResponse.AsObject> {
+    return this.grpcService.admin.addGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addLDAPProvider(req: AddLDAPProviderRequest): Promise<AddLDAPProviderResponse.AsObject> {
+    return this.grpcService.admin.addLDAPProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateLDAPProvider(req: UpdateLDAPProviderRequest): Promise<UpdateLDAPProviderResponse.AsObject> {
+    return this.grpcService.admin.updateLDAPProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitLabProvider(req: AddGitLabProviderRequest): Promise<AddGitLabProviderResponse.AsObject> {
+    return this.grpcService.admin.addGitLabProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitLabProvider(req: UpdateGitLabProviderRequest): Promise<UpdateGitLabProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGitLabProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitLabSelfHostedProvider(
+    req: AddGitLabSelfHostedProviderRequest,
+  ): Promise<AddGitLabSelfHostedProviderResponse.AsObject> {
+    return this.grpcService.admin.addGitLabSelfHostedProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitLabSelfHostedProvider(
+    req: UpdateGitLabSelfHostedProviderRequest,
+  ): Promise<UpdateGitLabSelfHostedProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGitLabSelfHostedProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitHubProvider(req: AddGitHubProviderRequest): Promise<AddGitHubProviderResponse.AsObject> {
+    return this.grpcService.admin.addGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitHubProvider(req: UpdateGitHubProviderRequest): Promise<UpdateGitHubProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.admin.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOIDCProvider(
+    req: UpdateGenericOIDCProviderRequest,
+  ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGenericOAuthProvider(req: AddGenericOAuthProviderRequest): Promise<AddGenericOAuthProviderResponse.AsObject> {
+    return this.grpcService.admin.addGenericOAuthProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOAuthProvider(
+    req: UpdateGenericOAuthProviderRequest,
+  ): Promise<UpdateGenericOAuthProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGenericOAuthProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addJWTProvider(req: AddJWTProviderRequest): Promise<AddJWTProviderResponse.AsObject> {
+    return this.grpcService.admin.addJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
+    return this.grpcService.admin.updateJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitHubEnterpriseServerProvider(
+    req: AddGitHubEnterpriseServerProviderRequest,
+  ): Promise<AddGitHubEnterpriseServerProviderResponse.AsObject> {
+    return this.grpcService.admin.addGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitHubEnterpriseServerProvider(
+    req: UpdateGitHubEnterpriseServerProviderRequest,
+  ): Promise<UpdateGitHubEnterpriseServerProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public deleteProvider(id: string): Promise<DeleteProviderResponse.AsObject> {
+    const req = new DeleteProviderRequest();
+    req.setId(id);
+    return this.grpcService.admin.deleteProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public listProviders(req: ListProvidersRequest): Promise<ListProvidersResponse.AsObject> {
+    return this.grpcService.admin.listProviders(req, null).then((resp) => resp.toObject());
+  }
+
+  public getProviderByID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse.AsObject> {
+    return this.grpcService.admin.getProviderByID(req, null).then((resp) => resp.toObject());
   }
 
   public listIAMMembers(

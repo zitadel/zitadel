@@ -1,3 +1,44 @@
+@mixin idp-table-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  .idp-table-provider-type {
+    display: flex;
+    align-items: center;
+
+    .idp-logo {
+      margin-right: 1rem;
+      height: 28px;
+      width: 28px;
+      flex-shrink: 0;
+
+      &.dark {
+        display: if($is-dark-theme, block, none);
+      }
+
+      &.light {
+        display: if($is-dark-theme, none, block);
+      }
+    }
+
+    .idp-icon {
+      font-size: 1.75rem;
+      height: 1.75rem;
+      width: 1.75rem;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+  }
+}
 .idp-margin-right {
   margin-right: 0.5rem;
 }

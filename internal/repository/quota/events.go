@@ -101,7 +101,7 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal quota added")
+		return nil, errors.ThrowInternal(err, "QUOTA-4n8vs", "unable to unmarshal quota added")
 	}
 
 	return e, nil
@@ -157,7 +157,7 @@ func NotifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal quota notified")
+		return nil, errors.ThrowInternal(err, "QUOTA-4n8vs", "unable to unmarshal quota notified")
 	}
 
 	return e, nil
@@ -198,7 +198,7 @@ func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ACTION-4bReE", "unable to unmarshal quota removed")
+		return nil, errors.ThrowInternal(err, "QUOTA-4bReE", "unable to unmarshal quota removed")
 	}
 
 	return e, nil

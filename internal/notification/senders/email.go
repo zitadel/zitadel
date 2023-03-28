@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 )
 
-func EmailChannels(ctx context.Context, emailConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error)) (chain *Chain, err error) {
+func EmailChannels(ctx context.Context, emailConfig func(ctx context.Context) (*smtp.Config, error), getFileSystemProvider func(ctx context.Context) (*fs.Config, error), getLogProvider func(ctx context.Context) (*log.Config, error)) (chain *Chain, err error) {
 	channels := make([]channels.NotificationChannel, 0, 3)
 	p, err := smtp.InitSMTPChannel(ctx, emailConfig)
 	if err == nil {

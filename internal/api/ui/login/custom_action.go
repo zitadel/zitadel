@@ -18,12 +18,12 @@ import (
 
 func (l *Login) runPostExternalAuthenticationActions(
 	user *domain.ExternalUser,
-	tokens *oidc.Tokens,
+	tokens *oidc.Tokens[*oidc.IDTokenClaims],
 	authRequest *domain.AuthRequest,
 	httpRequest *http.Request,
 	idpUser idp.User,
 	authenticationError error,
-) (*domain.ExternalUser, error) {
+) (_ *domain.ExternalUser, userChanged bool, err error) {
 	ctx := httpRequest.Context()
 
 	resourceOwner := authRequest.RequestedOrgID
@@ -32,42 +32,54 @@ func (l *Login) runPostExternalAuthenticationActions(
 	}
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	metadataList := object.MetadataListFromDomain(user.Metadatas)
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("setFirstName", func(firstName string) {
 			user.FirstName = firstName
+			userChanged = true
 		}),
 		actions.SetFields("setLastName", func(lastName string) {
 			user.LastName = lastName
+			userChanged = true
 		}),
 		actions.SetFields("setNickName", func(nickName string) {
 			user.NickName = nickName
+			userChanged = true
 		}),
 		actions.SetFields("setDisplayName", func(displayName string) {
 			user.DisplayName = displayName
+			userChanged = true
 		}),
 		actions.SetFields("setPreferredLanguage", func(preferredLanguage string) {
 			user.PreferredLanguage = language.Make(preferredLanguage)
+			userChanged = true
 		}),
 		actions.SetFields("setPreferredUsername", func(username string) {
 			user.PreferredUsername = username
+			userChanged = true
 		}),
-		actions.SetFields("setEmail", func(email string) {
+		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			user.Email = email
+			userChanged = true
 		}),
 		actions.SetFields("setEmailVerified", func(verified bool) {
 			user.IsEmailVerified = verified
+			userChanged = true
 		}),
-		actions.SetFields("setPhone", func(phone string) {
+		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			user.Phone = phone
+			userChanged = true
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			user.IsPhoneVerified = verified
+			userChanged = true
 		}),
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -109,11 +121,11 @@ func (l *Login) runPostExternalAuthenticationActions(
 		)
 		cancel()
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 	}
 	user.Metadatas = object.MetadataListToDomain(metadataList)
-	return user, err
+	return user, userChanged, err
 }
 
 type authMethod string
@@ -145,7 +157,9 @@ func (l *Login) runPostInternalAuthenticationActions(
 
 	metadataList := object.MetadataListFromDomain(nil)
 	apiFields := actions.WithAPIFields(
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -222,7 +236,7 @@ func (l *Login) runPreCreationActions(
 		actions.SetFields("setUsername", func(username string) {
 			user.Username = username
 		}),
-		actions.SetFields("setEmail", func(email string) {
+		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			if user.Email == nil {
 				user.Email = &domain.Email{}
 			}
@@ -234,11 +248,11 @@ func (l *Login) runPreCreationActions(
 			}
 			user.Email.IsEmailVerified = verified
 		}),
-		actions.SetFields("setPhone", func(email string) {
+		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			if user.Phone == nil {
 				user.Phone = &domain.Phone{}
 			}
-			user.Phone.PhoneNumber = email
+			user.Phone.PhoneNumber = phone
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			if user.Phone == nil {
@@ -246,7 +260,9 @@ func (l *Login) runPreCreationActions(
 			}
 			user.Phone.IsPhoneVerified = verified
 		}),
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -341,7 +357,7 @@ func (l *Login) runPostCreationActions(
 	return object.UserGrantsToDomain(userID, mutableUserGrants.UserGrants), err
 }
 
-func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
+func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOption {
 	var accessToken, idToken string
 	getClaim := func(claim string) interface{} {
 		return nil
@@ -361,7 +377,7 @@ func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
 	idToken = tokens.IDToken
 	if tokens.IDTokenClaims != nil {
 		getClaim = func(claim string) interface{} {
-			return tokens.IDTokenClaims.GetClaim(claim)
+			return tokens.IDTokenClaims.Claims[claim]
 		}
 		claimsJSON = func() (string, error) {
 			c, err := json.Marshal(tokens.IDTokenClaims)

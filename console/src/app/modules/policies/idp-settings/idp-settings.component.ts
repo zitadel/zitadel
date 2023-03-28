@@ -26,4 +26,6 @@ export class IdpSettingsComponent implements OnInit {
         break;
     }
   }
+
+  public createGoogle() {}
 }

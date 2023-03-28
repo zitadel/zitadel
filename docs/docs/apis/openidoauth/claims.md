@@ -67,11 +67,11 @@ Please check below the matrix for an overview where which scope is asserted.
 
 ## Custom Claims
 
-> This feature is not yet released
+You can add custom claims using the [complement token flow](/docs/apis/actions/complement-token) of the [actions feature](/docs/apis/actions/introduction).
 
 ## Reserved Claims
 
-ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](scopes#reserved-scopes). 
+ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](scopes#reserved-scopes).
 
 | Claims                                            | Example                                                                                              | Description                                                                                                                                                                        |
 |:--------------------------------------------------|:-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

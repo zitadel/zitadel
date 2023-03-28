@@ -160,6 +160,7 @@
     "MORE": "more",
     "STEP": "Step",
     "SETUP": "Setup",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -239,11 +240,20 @@
     "NOROWS": "No data"
   },
   "ERRORS": {
-    "REQUIRED": "Some required fields are missing.",
+    "REQUIRED": "Please fill in this field.",
     "TOKENINVALID": {
       "TITLE": "Your authorization token has expired.",
       "DESCRIPTION": "Click the button below to log in again."
-    }
+    },
+    "INVALID_FORMAT": "The formatting is invalid.",
+    "NOTANEMAIL": "The given value is not an e-mail address.",
+    "MINLENGTH": "Must be at least {{requiredLength}} characters long.",
+    "UPPERCASEMISSING": "Must include an uppercase character.",
+    "LOWERCASEMISSING": "Must include a lowercase character.",
+    "SYMBOLERROR": "Must include a symbol or punctuation mark.",
+    "NUMBERERROR": "Must include a digit.",
+    "PWNOTEQUAL": "The passwords provided do not match.",
+    "PHONE": "The phone number must start with 00 or +."
   },
   "USER": {
     "SETTINGS": {
@@ -524,8 +534,7 @@
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Send Password Reset Link",
       "REQUIRED": "Some required fields are missing.",
-      "MINLENGTHERROR": "Has to be at least {{value}} characters long.",
-      "NOTEQUAL": "The passwords provided do not match."
+      "MINLENGTHERROR": "Has to be at least {{value}} characters long."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -535,7 +544,7 @@
     "EMAILVERIFIED": "Email verified",
     "NOTVERIFIED": "not verified",
     "PREFERRED_LOGINNAME": "Preferred Loginname",
-    "ISINITIAL": "This users email is not verified yet.",
+    "ISINITIAL": "User is not active, yet.",
     "LOGINMETHODS": {
       "TITLE": "Contact Information",
       "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -579,17 +588,6 @@
         "3": "filter for rolename"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "The password does not fulfil the defined rules.",
-      "NOTANEMAIL": "The given value is not an e-mail address",
-      "REQUIRED": "The input field is empty.",
-      "MINLENGTH": "The password has to be at least {{requiredLength}} characters long.",
-      "NOEMAIL": "The user name cannot be an e-mail address.",
-      "UPPERCASEMISSING": "Must include an uppercase character.",
-      "LOWERCASEMISSING": "Must include a lowercase character.",
-      "SYMBOLERROR": "Must include a symbol or punctuation mark.",
-      "NUMBERERROR": "Must include a digit."
-    },
     "STATE": {
       "0": "Unknown",
       "1": "Active",
@@ -612,7 +610,7 @@
     "SIGNEDOUT_BTN": "Sign In",
     "EDITACCOUNT": "Edit Account",
     "ADDACCOUNT": "Log in With Another Account",
-    "RESENDINITIALEMAIL": "Send new initialization mail",
+    "RESENDINITIALEMAIL": "Resend activation mail",
     "RESENDEMAILNOTIFICATION": "Resend Email notification",
     "TOAST": {
       "CREATED": "User created successfully.",
@@ -1014,11 +1012,12 @@
     "DEFAULTLANGUAGE": "Default Language",
     "LANGUAGE": {
       "de": "Deutsch",
-      "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -1207,10 +1206,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1615,45 +1615,97 @@
       "ACTIVETITLE": "Active Identity Providers"
     },
     "CREATE": {
-      "TITLE": "New Identity Provider",
-      "DESCRIPTION": "Choose one of the following Identity Provider types."
+      "TITLE": "Add provider",
+      "DESCRIPTION": "Select one ore more of the following providers.",
+      "STEPPERTITLE": "Create Provider",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Enter the required data for your OIDC provider."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Enter the required data for your OAuth provider."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Enter the required data for your JWT provider."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Enter the credentials for your Gitlab Identity Provider"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Enter the credentials for your Gitlab Self Hosted Identity Provider"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Enter the credentials for your GitHub Enterprise Server Identity Provider"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Enter the credentials for your Github Identity Provider"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Enter the credentials for your Microsoft Identity Provider"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Enter the credentials for your LDAP Provider"
+      }
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "General Configuration of your identity provider.",
+      "DESCRIPTION": "Update your provider configuration",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatic creation",
+      "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
+      "ISAUTOUPDATE": "Automatic update",
+      "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
+      "ISCREATIONALLOWED": "Account creation allowed",
+      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
+      "ISLINKINGALLOWED": "Account linking allowed",
+      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
     },
     "OWNERTYPES": {
       "0": "unknown",
       "1": "Instance",
       "2": "Organization"
     },
-    "TYPES": {
-      "0": "unknown",
-      "1": "OIDC",
-      "3": "JWT"
-    },
     "STATES": {
       "1": "active",
       "2": "inactive"
     },
-    "MAPPINGFIELD": {
-      "1": "Preferred Username",
-      "2": "Email"
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
     },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "No Styling",
-      "1": "Google"
-    },
+    "AZUREADTENANTTYPE": "Tenant Type",
+    "AZUREADTENANTID": "Tenant ID",
+    "EMAILVERIFIED": "Email verified",
+    "NAMEHINT": "If specified it will be shown in the login interface.",
+    "OPTIONAL": "optional",
+    "LDAPATTRIBUTES": "LDAP Attributes",
+    "UPDATEBINDPASSWORD": "update Bind Password",
+    "UPDATECLIENTSECRET": "update client secret",
     "ADD": "Add Identity Provider",
-    "AUTOREGISTER": "Auto Register",
-    "AUTOREGISTER_DESC": "If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
     "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Name",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "ID Attribute",
     "AVAILABILITY": "Availability",
     "AVAILABLE": "available",
     "AVAILABLEBUTINACTIVE": "available but inactive",
@@ -1665,6 +1717,31 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "Connection",
+    "LDAPUSERBINDING": "User binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "required",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP Display Name Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Dates",
@@ -1984,10 +2061,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

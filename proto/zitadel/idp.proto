@@ -3,6 +3,7 @@ syntax = "proto3";
 import "zitadel/object.proto";
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/duration.proto";
 
 package zitadel.idp.v1;
 
@@ -253,7 +254,7 @@ enum ProviderType {
     PROVIDER_TYPE_OAUTH = 4;
     PROVIDER_TYPE_AZURE_AD = 5;
     PROVIDER_TYPE_GITHUB = 6;
-    PROVIDER_TYPE_GITHUB_EE = 7;
+    PROVIDER_TYPE_GITHUB_ES = 7;
     PROVIDER_TYPE_GITLAB = 8;
     PROVIDER_TYPE_GITLAB_SELF_HOSTED = 9;
     PROVIDER_TYPE_GOOGLE = 10;
@@ -267,8 +268,14 @@ message ProviderConfig {
         OAuthConfig oauth = 4;
         GenericOIDCConfig oidc = 5;
         JWTConfig jwt = 6;
+        GitHubConfig github = 7;
+        GitHubEnterpriseServerConfig github_es = 8;
+        GitLabConfig gitlab = 9;
+        GitLabSelfHostedConfig gitlab_self_hosted = 10;
+        AzureADConfig azure_ad = 11;
     }
 }
+
 message OAuthConfig {
     string client_id = 1;
     string authorization_endpoint = 2;
@@ -282,6 +289,20 @@ message GenericOIDCConfig {
     string issuer = 1;
     string client_id = 2;
     repeated string scopes = 3;
+    bool is_id_token_mapping = 4;
+}
+
+message GitHubConfig {
+    string client_id = 1;
+    repeated string scopes = 2;
+}
+
+message GitHubEnterpriseServerConfig {
+    string client_id = 1;
+    string authorization_endpoint = 2;
+    string token_endpoint = 3;
+    string user_endpoint = 4;
+    repeated string scopes = 5;
 }
 
 message GoogleConfig {
@@ -289,16 +310,34 @@ message GoogleConfig {
     repeated string scopes = 2;
 }
 
+message GitLabConfig {
+    string client_id = 1;
+    repeated string scopes = 2;
+}
+
+message GitLabSelfHostedConfig {
+    string issuer = 1;
+    string client_id = 2;
+    repeated string scopes = 3;
+}
+
 message LDAPConfig {
-    string host = 1;
-    string port = 2;
-    bool tls = 3;
-    string base_dn = 4;
-    string user_object_class = 5;
-    string user_unique_attribute = 6;
-    string admin = 7;
-    LDAPAttributes attributes = 8;
-    Options provider_options = 9;
+    repeated string servers = 1;
+    bool start_tls = 2;
+    string base_dn = 3;
+    string bind_dn = 4;
+    string user_base = 5;
+    repeated string user_object_classes = 6;
+    repeated string user_filters = 7;
+    google.protobuf.Duration timeout = 8;
+    LDAPAttributes attributes = 9;
+}
+
+message AzureADConfig {
+    string client_id = 1;
+    AzureADTenant tenant = 2;
+    bool email_verified = 3;
+    repeated string scopes = 4;
 }
 
 message Options {
@@ -324,3 +363,15 @@ message LDAPAttributes {
     string profile_attribute = 13 [(validate.rules).string = {max_len: 200}];
 }
 
+enum AzureADTenantType {
+    AZURE_AD_TENANT_TYPE_COMMON = 0;
+    AZURE_AD_TENANT_TYPE_ORGANISATIONS = 1;
+    AZURE_AD_TENANT_TYPE_CONSUMERS = 2;
+}
+
+message AzureADTenant {
+    oneof type {
+        AzureADTenantType tenant_type = 1;
+        string tenant_id = 2;
+    }
+}

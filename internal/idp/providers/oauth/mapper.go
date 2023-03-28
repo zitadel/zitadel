@@ -7,6 +7,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
@@ -74,7 +75,7 @@ func (u *UserMapper) GetPreferredUsername() string {
 }
 
 // GetEmail is an implementation of the [idp.User] interface.
-func (u *UserMapper) GetEmail() string {
+func (u *UserMapper) GetEmail() domain.EmailAddress {
 	return ""
 }
 
@@ -84,7 +85,7 @@ func (u *UserMapper) IsEmailVerified() bool {
 }
 
 // GetPhone is an implementation of the [idp.User] interface.
-func (u *UserMapper) GetPhone() string {
+func (u *UserMapper) GetPhone() domain.PhoneNumber {
 	return ""
 }
 

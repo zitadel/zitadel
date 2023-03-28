@@ -1,12 +1,14 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Validators } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
@@ -42,7 +44,7 @@ export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'it', 'fr', 'pl', 'zh'];
+  public languages: string[] = ['de', 'en', 'it', 'fr', 'ja', 'pl', 'zh'];
 
   public ChangeType: any = ChangeType;
 
@@ -196,7 +198,6 @@ export class UserDetailComponent implements OnInit {
       .generateMachineSecret(this.user.id)
       .then((resp) => {
         this.toast.showInfo('USER.TOAST.SECRETGENERATED', true);
-        console.log(resp.clientSecret);
         this.dialog.open(MachineSecretDialogComponent, {
           data: {
             clientId: resp.clientId,
@@ -461,6 +462,7 @@ export class UserDetailComponent implements OnInit {
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user.human?.phone?.phone,
             type: EditDialogType.PHONE,
+            validator: Validators.compose([phoneValidator, requiredValidator]),
           },
           width: '400px',
         });

@@ -1,11 +1,11 @@
 package twilio
 
-type TwilioConfig struct {
+type Config struct {
 	SID          string
 	Token        string
 	SenderNumber string
 }
 
-func (t *TwilioConfig) IsValid() bool {
+func (t *Config) IsValid() bool {
 	return t.SID != "" && t.Token != "" && t.SenderNumber != ""
 }

@@ -33,12 +33,13 @@ All your settings will be removed and the default settings of the system will tr
 
 ZITADEL is available in the following languages
 
-- English (en)
 - German (de)
-- Italian (it)
+- English (en)
 - French (fr)
-- 简体中文（zh）
+- Italian (it)
+- 日本語 (ja)
 - Polish（pl）
+- 简体中文（zh）
 
 A language is displayed based on your agent's language header. The default language is English.
 

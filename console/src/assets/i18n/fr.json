@@ -159,6 +159,7 @@
     "NEXT": "Suivant",
     "MORE": "plus",
     "STEP": "Étape",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Afficher l'utilisateur{{value}}"
     }
@@ -238,11 +239,20 @@
     "NOROWS": "Pas de données"
   },
   "ERRORS": {
-    "REQUIRED": "Certains champs obligatoires sont manquants.",
+    "REQUIRED": "Remplis ce champ s'il te plaît.",
     "TOKENINVALID": {
       "TITLE": "Votre jeton d'autorisation a expiré.",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
-    }
+    },
+    "INVALID_FORMAT": "Le format n'est pas valide",
+    "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",
+    "MINLENGTH": "Doit comporter au moins {{length}} caractères.",
+    "UPPERCASEMISSING": "Doit inclure un caractère majuscule.",
+    "LOWERCASEMISSING": "Doit inclure un caractère minuscule.",
+    "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
+    "NUMBERERROR": "Doit inclure un chiffre.",
+    "PWNOTEQUAL": "Les mots de passe fournis ne correspondent pas.",
+    "PHONE": "Le numéro de téléphone doit commencer par 00 ou +."
   },
   "USER": {
     "SETTINGS": {
@@ -523,8 +533,7 @@
       "SET": "Définir un nouveau mot de passe",
       "RESENDNOTIFICATION": "Envoyer le lien de réinitialisation du mot de passe",
       "REQUIRED": "Certains champs obligatoires sont manquants.",
-      "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères.",
-      "NOTEQUAL": "Les mots de passe fournis ne correspondent pas."
+      "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -534,7 +543,7 @@
     "EMAILVERIFIED": "Courriel vérifié",
     "NOTVERIFIED": "non vérifié",
     "PREFERRED_LOGINNAME": "Nom de connexion préféré",
-    "ISINITIAL": "Le mail de cet utilisateur n'a pas encore été vérifié.",
+    "ISINITIAL": "L'utilisateur n'est pas encore actif",
     "LOGINMETHODS": {
       "TITLE": "Informations sur le contact",
       "DESCRIPTION": "Les informations fournies sont utilisées pour vous envoyer des informations importantes, comme des e-mails de réinitialisation de mot de passe.",
@@ -578,17 +587,6 @@
         "3": "filtre pour nom de rôle"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "Le mot de passe ne répond pas aux règles définies.",
-      "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",
-      "REQUIRED": "Le champ de saisie est vide.",
-      "MINLENGTH": "Le mot de passe doit comporter au moins{{length}} caractères.",
-      "NOEMAIL": "Le nom d'utilisateur ne peut pas être une adresse électronique.",
-      "UPPERCASEMISSING": "Doit inclure un caractère majuscule.",
-      "LOWERCASEMISSING": "Doit inclure un caractère minuscule.",
-      "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
-      "NUMBERERROR": "Doit inclure un chiffre."
-    },
     "STATE": {
       "0": "Inconnu",
       "1": "Actif",
@@ -611,7 +609,7 @@
     "SIGNEDOUT_BTN": "Se connecter",
     "EDITACCOUNT": "Modifier le compte",
     "ADDACCOUNT": "Se connecter avec un autre compte",
-    "RESENDINITIALEMAIL": "Envoyer un nouveau courrier d'initialisation",
+    "RESENDINITIALEMAIL": "Renvoyer le courrier d'activation",
     "RESENDEMAILNOTIFICATION": "Renvoyer la notification par e-mail",
     "TOAST": {
       "CREATED": "Utilisateur créé avec succès.",
@@ -1014,10 +1012,11 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
-      "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1210,10 +1209,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1618,14 +1618,65 @@
       "ACTIVETITLE": "Fournisseurs d'identité actifs"
     },
     "CREATE": {
-      "TITLE": "Nouveau fournisseur d'identité",
-      "DESCRIPTION": "Choisissez l'un des types de fournisseur d'identité suivants."
+      "TITLE": "Ajouter un fournisseur",
+      "DESCRIPTION": "Sélectionnez un ou plusieurs des fournisseurs suivants.",
+      "STEPPERTITLE": "Créer un fournisseur",
+      "OIDC": {
+        "TITLE": "Fournisseur OIDC",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur OIDC."
+      },
+      "OAuth": {
+        "TITLE": "Fournisseur OAuth",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur OAuth."
+      },
+      "JWT": {
+        "TITLE": "Fournisseur JWT",
+        "DESCRIPTION": "Entrez les données requises pour votre fournisseur JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Fournisseur Google",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Google"
+      },
+      "GITLAB": {
+        "TITLE": "Fournisseur Gitlab",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Fournisseur Gitlab Self Hosted",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Gitlab Self Hosted"
+      },
+      "GITHUBES": {
+        "TITLE": "Fournisseur GitHub Enterprise Server",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Fournisseur Github",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Fournisseur Microsoft",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Microsoft"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité LDAP"
+      }
     },
     "DETAIL": {
       "TITLE": "Fournisseur d'identité",
-      "DESCRIPTION": "Configuration générale de votre fournisseur d'identité.",
+      "DESCRIPTION": "Mettez à jour la configuration de votre fournisseur",
       "DATECREATED": "Créé",
       "DATECHANGED": "Modifié"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Création automatique",
+      "ISAUTOCREATION_DESC": "Détermine si un compte sera créé s'il n'existe pas déjà.",
+      "ISAUTOUPDATE": "est mise à jour automatiquement",
+      "ISAUTOUPDATE_DESC": "Si cette option est sélectionnée, les comptes sont mis à jour lors de la réauthentification.",
+      "ISCREATIONALLOWED": "la création est-elle autorisée",
+      "ISCREATIONALLOWED_DESC": "Détermine si des comptes peuvent être créés.",
+      "ISLINKINGALLOWED": "la liaison est-elle autorisée",
+      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant."
     },
     "OWNERTYPES": {
       "0": "inconnu",
@@ -1641,22 +1692,28 @@
       "1": "actif",
       "2": "inactif"
     },
-    "MAPPINGFIELD": {
-      "1": "Nom d'utilisateur préféré",
-      "2": "Courriel"
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
     },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "Pas de style",
-      "1": "Google"
-    },
+    "AZUREADTENANTTYPE": "Type de locataire",
+    "AZUREADTENANTID": "ID du locataire",
+    "EMAILVERIFIED": "Courriel vérifié",
+    "NAMEHINT": "Si elle est spécifiée, elle sera affichée dans l'interface de connexion.",
+    "OPTIONAL": "optionnel",
+    "LDAPATTRIBUTES": "Attributs LDAP",
+    "UPDATEBINDPASSWORD": "mettre à jour le mot de bind password",
+    "UPDATECLIENTSECRET": "mise à jour du secret client",
     "ADD": "Ajouter un fournisseur d'identité",
-    "AUTOREGISTER": "Enregistrement automatique",
-    "AUTOREGISTER_DESC": "Si cette option est sélectionnée et qu'aucun compte n'existe encore, un compte sera créé.",
     "TYPE": "Type",
     "OWNER": "Propriétaire",
     "ID": "ID",
     "NAME": "Nom",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "Attribut d'identification",
     "AVAILABILITY": "Disponibilité",
     "AVAILABLE": "disponible",
     "AVAILABLEBUTINACTIVE": "disponible mais inactif",
@@ -1668,6 +1725,31 @@
     "SCOPESLIST": "Liste des champs d'application",
     "CLIENTID": "ID du client",
     "CLIENTSECRET": "Secret du client",
+    "LDAPCONNECTION": "Connexion",
+    "LDAPUSERBINDING": "Enchères utilisateur",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "requis",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "Mappage de IDP nom d'affichage",
     "USERNAMEMAPPING": "Mappage des noms d'utilisateur",
     "DATES": "Dates",
@@ -1975,10 +2057,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

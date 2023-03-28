@@ -29,8 +29,12 @@ func (m *MockRepository) ExpectFilterEventsError(err error) *MockRepository {
 	return m
 }
 
-func (m *MockRepository) ExpectInstanceIDs(instanceIDs ...string) *MockRepository {
-	m.EXPECT().InstanceIDs(gomock.Any(), gomock.Any()).Return(instanceIDs, nil)
+func (m *MockRepository) ExpectInstanceIDs(hasFilters []*repository.Filter, instanceIDs ...string) *MockRepository {
+	matcher := gomock.Any()
+	if len(hasFilters) > 0 {
+		matcher = &filterQueryMatcher{Filters: [][]*repository.Filter{hasFilters}}
+	}
+	m.EXPECT().InstanceIDs(gomock.Any(), matcher).Return(instanceIDs, nil)
 	return m
 }
 

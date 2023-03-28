@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
+
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -27,7 +28,7 @@ func externalUsersFromDomain(users []*domain.ExternalUser) []*externalUser {
 func externalUserFromDomain(user *domain.ExternalUser) *externalUser {
 	return &externalUser{
 		ExternalId:    user.ExternalUserID,
-		ExternalIdpId: user.ExternalUserID,
+		ExternalIdpId: user.IDPConfigID,
 		Human: human{
 			FirstName:         user.FirstName,
 			LastName:          user.LastName,
@@ -155,9 +156,9 @@ type human struct {
 	AvatarKey         string
 	PreferredLanguage string
 	Gender            domain.Gender
-	Email             string
+	Email             domain.EmailAddress
 	IsEmailVerified   bool
-	Phone             string
+	Phone             domain.PhoneNumber
 	IsPhoneVerified   bool
 }
 

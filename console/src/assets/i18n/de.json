@@ -159,6 +159,7 @@
     "NEXT": "Weiter",
     "MORE": "mehr",
     "STEP": "Schritt",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     }
@@ -238,11 +239,20 @@
     "NOROWS": "Keine Daten"
   },
   "ERRORS": {
-    "REQUIRED": "Bitte fülle alle benötigten Felder aus.",
+    "REQUIRED": "Bitte fülle dieses Feld aus.",
     "TOKENINVALID": {
       "TITLE": "Du bist abgemeldet",
       "DESCRIPTION": "Klicke auf \"Einloggen\", um Dich erneut anzumelden."
-    }
+    },
+    "INVALID_FORMAT": "Das Format is ungültig.",
+    "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
+    "MINLENGTH": "Muss mindestens {{requiredLength}} Zeichen lang sein.",
+    "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
+    "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
+    "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
+    "NUMBERERROR": "Muss eine Ziffer beinhalten.",
+    "PWNOTEQUAL": "Die Passwörter stimmen nicht überein.",
+    "PHONE": "Die Telefonnummer muss mit 00 oder + starten."
   },
   "USER": {
     "SETTINGS": {
@@ -523,8 +533,7 @@
       "SET": "Passwort neu setzen",
       "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
-      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
-      "NOTEQUAL": "Die Passwörter stimmen nicht überein."
+      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein."
     },
     "ID": "ID",
     "EMAIL": "E-Mail",
@@ -534,7 +543,7 @@
     "EMAILVERIFIED": "Email verifiziert",
     "NOTVERIFIED": "nicht verifiziert",
     "PREFERRED_LOGINNAME": "Bevorzugter Loginname",
-    "ISINITIAL": "Dieser Benutzer wurde noch nicht verifiziert.",
+    "ISINITIAL": "Benutzer ist noch nicht aktiv.",
     "LOGINMETHODS": {
       "TITLE": "Kontaktinformationen",
       "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
@@ -578,17 +587,6 @@
         "3": "Nach Rolle filtern"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "Das Passwort erfüllt nicht die vorgegebenen Regeln.",
-      "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
-      "REQUIRED": "Das Eingabefeld ist leer.",
-      "MINLENGTH": "Das Passwort muss mindestens {{requiredLength}} Zeichen lang sein.",
-      "NOEMAIL": "Benutzername darf keine E-Mail-Adresse sein.",
-      "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
-      "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
-      "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Muss eine Ziffer beinhalten."
-    },
     "STATE": {
       "0": "Unbekannt",
       "1": "Aktiv",
@@ -611,7 +609,7 @@
     "SIGNEDOUT_BTN": "Anmelden",
     "EDITACCOUNT": "Konto bearbeiten",
     "ADDACCOUNT": "Konto hinzufügen",
-    "RESENDINITIALEMAIL": "Neue Initialisierungsmail senden",
+    "RESENDINITIALEMAIL": "Aktivierungsmail erneut senden",
     "RESENDEMAILNOTIFICATION": "Benachrichtigungsmail senden",
     "TOAST": {
       "CREATED": "Benutzer erfolgreich erstellt.",
@@ -1014,10 +1012,11 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
-      "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1210,10 +1209,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1618,14 +1618,61 @@
       "ACTIVETITLE": "Aktive Identitäts Provider"
     },
     "CREATE": {
-      "TITLE": "Neuer Identitäts Provider",
-      "DESCRIPTION": "Wählen Sie einen der folgenden Typen von Identitäts Providern"
+      "TITLE": "Provider hinzufügen",
+      "DESCRIPTION": "Wähle einen der verfügbaren Provider.",
+      "STEPPERTITLE": "Provider hinzufügen",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren OIDC-Provider ein."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren JWT-Provider ein."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Google-Identitätsprovider ein."
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Gitlab Self Hosted Identitätsprovider ein."
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self hosted Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Gitlab Self Hosted Identitätsprovider ein."
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren GitHub Enterprise Server ein."
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Github-Identitätsprovider ein."
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Microsoft-Identitätsprovider ein."
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren LDAP Provider ein."
+      }
     },
     "DETAIL": {
       "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Generelle Konfiguration deines Identitäts Providers",
+      "DESCRIPTION": "Bearbeite deine Providerkonfiguration",
       "DATECREATED": "Erstellt",
       "DATECHANGED": "Geändert"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatisches Erstellen",
+      "ISAUTOCREATION_DESC": "Legt fest ob ein Konto erstellt wird, falls es noch nicht existiert.",
+      "ISAUTOUPDATE": "Automatisches Update",
+      "ISAUTOUPDATE_DESC": "Legt fest ob Konten bei der erneuten Authentifizierung aktualisiert werden.",
+      "ISCREATIONALLOWED": "Account erstellen erlaubt",
+      "ISCREATIONALLOWED_DESC": "Legt fest, ob Konten erstellt werden können.",
+      "ISLINKINGALLOWED": "Account linking erlaubt",
+      "ISLINKINGALLOWED_DESC": "Legt fest, ob eine Identität mit einem bestehenden Konto verknüpft werden kann."
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -1641,18 +1688,20 @@
       "1": "aktiv",
       "2": "inaktiv"
     },
-    "MAPPINGFIELD": {
-      "1": "Preferred Username",
-      "2": "Email"
-    },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "kein Styling",
-      "1": "Google"
+    "AZUREADTENANTTYPES": {
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Customers"
     },
     "ADD": "Identitätsanbieter hinzufügen",
-    "AUTOREGISTER": "Automatische Registrierung",
-    "AUTOREGISTER_DESC": "Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
+    "AZUREADTENANTTYPE": "Tenant Typ",
+    "AZUREADTENANTID": "Tenant ID",
+    "EMAILVERIFIED": "Email verifiziert",
+    "NAMEHINT": "Wenn angegeben, wir er im Login interface angezeigt.",
+    "OPTIONAL": "optional",
+    "LDAPATTRIBUTES": "LDAP Attribute",
+    "UPDATEBINDPASSWORD": "Bind Password updaten",
+    "UPDATECLIENTSECRET": "Client Secret updaten",
     "TYPE": "Typ",
     "OWNER": "Besitzer",
     "ID": "ID",
@@ -1662,12 +1711,41 @@
     "SETAVAILABLE": "verfügbar setzen",
     "SETUNAVAILABLE": "auf nicht verfügbar setzen",
     "NAME": "Name",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "ID Attribut",
     "CONFIG": "Konfiguration",
     "STATE": "Status",
     "ISSUER": "Issuer",
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "Verbindung",
+    "LDAPUSERBINDING": "User binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in Sekunden",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "erfolderlich",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Datum",
@@ -1682,9 +1760,12 @@
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
-      "GENERAL": "Generelle Information",
       "TITLE": "OIDC Konfiguration",
       "DESCRIPTION": "Geben Sie die Daten OIDC Identitätsanbieter ein."
+    },
+    "OAUTH": {
+      "TITLE": "OAuth Konfiguration",
+      "DESCRIPTION": "Geben Sie die Daten OAuth Identity Providers ein."
     },
     "JWT": {
       "TITLE": "JWT Konfiguration",
@@ -1987,10 +2068,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",
