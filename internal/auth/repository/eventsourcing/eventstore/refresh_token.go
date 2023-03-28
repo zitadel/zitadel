@@ -26,11 +26,22 @@ type RefreshTokenRepo struct {
 	KeyAlgorithm crypto.EncryptionAlgorithm
 }
 
-func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, refreshToken string) (*usr_model.RefreshTokenView, error) {
+func (r *RefreshTokenRepo) RefreshTokenByToken(ctx context.Context, refreshToken string) (*usr_model.RefreshTokenView, error) {
 	userID, tokenID, token, err := domain.FromRefreshToken(refreshToken, r.KeyAlgorithm)
 	if err != nil {
 		return nil, err
 	}
+	tokenView, err := r.RefreshTokenByID(ctx, tokenID, userID)
+	if err != nil {
+		return nil, err
+	}
+	if tokenView.Token != token {
+		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
+	}
+	return tokenView, nil
+}
+
+func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID string) (*usr_model.RefreshTokenView, error) {
 	tokenView, viewErr := r.View.RefreshTokenByID(tokenID, authz.GetInstance(ctx).InstanceID())
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
@@ -57,7 +68,7 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, refreshToken st
 			return model.RefreshTokenViewToModel(&viewToken), nil
 		}
 	}
-	if !tokenView.Expiration.After(time.Now()) || tokenView.Token != token {
+	if !tokenView.Expiration.After(time.Now()) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
 	}
 	return model.RefreshTokenViewToModel(tokenView), nil

@@ -18,7 +18,7 @@ import (
 
 func (l *Login) runPostExternalAuthenticationActions(
 	user *domain.ExternalUser,
-	tokens *oidc.Tokens,
+	tokens *oidc.Tokens[*oidc.IDTokenClaims],
 	authRequest *domain.AuthRequest,
 	httpRequest *http.Request,
 	idpUser idp.User,
@@ -357,7 +357,7 @@ func (l *Login) runPostCreationActions(
 	return object.UserGrantsToDomain(userID, mutableUserGrants.UserGrants), err
 }
 
-func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
+func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOption {
 	var accessToken, idToken string
 	getClaim := func(claim string) interface{} {
 		return nil
@@ -377,7 +377,7 @@ func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
 	idToken = tokens.IDToken
 	if tokens.IDTokenClaims != nil {
 		getClaim = func(claim string) interface{} {
-			return tokens.IDTokenClaims.GetClaim(claim)
+			return tokens.IDTokenClaims.Claims[claim]
 		}
 		claimsJSON = func() (string, error) {
 			c, err := json.Marshal(tokens.IDTokenClaims)
