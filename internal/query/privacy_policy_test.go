@@ -13,17 +13,18 @@ import (
 )
 
 var (
-	preparePrivacyPolicyStmt = `SELECT projections.privacy_policies2.id,` +
-		` projections.privacy_policies2.sequence,` +
-		` projections.privacy_policies2.creation_date,` +
-		` projections.privacy_policies2.change_date,` +
-		` projections.privacy_policies2.resource_owner,` +
-		` projections.privacy_policies2.privacy_link,` +
-		` projections.privacy_policies2.tos_link,` +
-		` projections.privacy_policies2.help_link,` +
-		` projections.privacy_policies2.is_default,` +
-		` projections.privacy_policies2.state` +
-		` FROM projections.privacy_policies2` +
+	preparePrivacyPolicyStmt = `SELECT projections.privacy_policies3.id,` +
+		` projections.privacy_policies3.sequence,` +
+		` projections.privacy_policies3.creation_date,` +
+		` projections.privacy_policies3.change_date,` +
+		` projections.privacy_policies3.resource_owner,` +
+		` projections.privacy_policies3.privacy_link,` +
+		` projections.privacy_policies3.tos_link,` +
+		` projections.privacy_policies3.help_link,` +
+		` projections.privacy_policies3.support_email,` +
+		` projections.privacy_policies3.is_default,` +
+		` projections.privacy_policies3.state` +
+		` FROM projections.privacy_policies3` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	preparePrivacyPolicyCols = []string{
 		"id",
@@ -34,6 +35,7 @@ var (
 		"privacy_link",
 		"tos_link",
 		"help_link",
+		"support_email",
 		"is_default",
 		"state",
 	}
@@ -84,6 +86,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 						"privacy.ch",
 						"tos.ch",
 						"help.ch",
+						"support@example.com",
 						true,
 						domain.PolicyStateActive,
 					},
@@ -99,6 +102,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 				PrivacyLink:   "privacy.ch",
 				TOSLink:       "tos.ch",
 				HelpLink:      "help.ch",
+				SupportEmail:  "support@example.com",
 				IsDefault:     true,
 			},
 		},
