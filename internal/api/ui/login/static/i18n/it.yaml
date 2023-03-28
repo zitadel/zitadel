@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: registrare
   NextButtonText: Avanti
 
+LDAP:
+  Title: Accesso
+  Description: Inserisci i tuoi dati di accesso.
+  LoginNameLabel: Nome di accesso
+  PasswordLabel: Password
+  NextButtonText: Avanti
+
 SelectAccount:
   Title: Seleziona l'account
   Description: Usa il tuo account ZITADEL
@@ -412,5 +419,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Impostazioni di blocco non esistenti
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: la registrazione non è consentita.
 
 optional: (opzionale)

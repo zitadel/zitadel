@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: registrieren
   NextButtonText: weiter
 
+LDAP:
+  Title: Anmeldung
+  Description: Mit Konto anmelden.
+  LoginNameLabel: Loginname
+  PasswordLabel: Passwort
+  NextButtonText: weiter
+
 SelectAccount:
   Title: Account auswählen
   Description: Wähle deinen Account aus.
@@ -412,5 +419,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy existiert nicht
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrierung ist nicht erlaubt
 
 optional: (optional)

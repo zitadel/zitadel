@@ -76,6 +76,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplLinkUsersDone:                "link_users_done.html",
 		tmplExternalNotFoundOption:       "external_not_found_option.html",
 		tmplLoginSuccess:                 "login_success.html",
+		tmplLDAPLogin:                    "ldap_login.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -218,6 +219,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		},
 		"idpProviderClass": func(idpType domain.IDPType) string {
 			return idpType.GetCSSClass()
+		},
+		"ldapUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointLDAPCallback)
 		},
 	}
 	var err error

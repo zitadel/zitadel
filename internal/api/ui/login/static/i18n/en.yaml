@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: register
   NextButtonText: next
 
+LDAP:
+  Title: Login
+  Description: Enter your login data.
+  LoginNameLabel: Loginname
+  PasswordLabel: Password
+  NextButtonText: next
+
 SelectAccount:
   Title: Select account
   Description: Use your ZITADEL-Account
@@ -412,5 +419,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy not existing
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registration is not allowed
 
 optional: (optional)

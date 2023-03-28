@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: 注册
   NextButtonText: 继续
 
+LDAP:
+  Title: 注册
+  Description: 输入您的登录数据。
+  LoginNameLabel: 登录名
+  PasswordLabel: 密码
+  NextButtonText: 继续
+
 SelectAccount:
   Title: 选择账户
   Description: 使用您的 ZITADEL 帐户
@@ -412,5 +419,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: 用户锁定政策不存在
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: 不允许注册
 
 optional: (可选)

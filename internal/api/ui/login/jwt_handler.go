@@ -66,7 +66,7 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, identityProvider *query.IDPTemplate) {
 	token, err := getToken(r, identityProvider.JWTIDPTemplate.HeaderName)
 	if err != nil {
-		if _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), nil, authReq, r, nil, err); actionErr != nil {
+		if _, _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), nil, authReq, r, nil, err); actionErr != nil {
 			logging.WithError(err).Error("both external user authentication and action post authentication failed")
 		}
 
@@ -75,16 +75,16 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 	}
 	provider, err := l.jwtProvider(identityProvider)
 	if err != nil {
-		if _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), nil, authReq, r, nil, err); actionErr != nil {
+		if _, _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), nil, authReq, r, nil, err); actionErr != nil {
 			logging.WithError(err).Error("both external user authentication and action post authentication failed")
 		}
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	session := &jwt.Session{Provider: provider, Tokens: &oidc.Tokens{IDToken: token, Token: &oauth2.Token{}}}
+	session := &jwt.Session{Provider: provider, Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{IDToken: token, Token: &oauth2.Token{}}}
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
-		if _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), tokens(session), authReq, r, user, err); actionErr != nil {
+		if _, _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), tokens(session), authReq, r, user, err); actionErr != nil {
 			logging.WithError(err).Error("both external user authentication and action post authentication failed")
 		}
 		l.renderError(w, r, authReq, err)
