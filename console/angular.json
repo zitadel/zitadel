@@ -25,7 +25,7 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets", "src/manifest.webmanifest"],
             "styles": ["src/styles.scss"],
-            "scripts": [],
+            "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],
             "allowedCommonJsDependencies": [
               "fast-sha256",
               "buffer",
@@ -63,7 +63,7 @@
               "namedChunks": true
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
