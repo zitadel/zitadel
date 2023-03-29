@@ -127,6 +127,7 @@ func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolic
 		TOSLink:     wm.TOSLink,
 		PrivacyLink: wm.PrivacyLink,
 		HelpLink:    wm.HelpLink,
+		SupportEmail: wm.SupportEmail,
 	}
 }
 

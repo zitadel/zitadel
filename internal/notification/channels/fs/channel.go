@@ -2,19 +2,16 @@ package fs
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/k3a/html2text"
 	"github.com/zitadel/logging"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
-
-	"github.com/k3a/html2text"
-
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
@@ -29,7 +26,10 @@ func InitFSChannel(config Config) (channels.NotificationChannel, error) {
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 
 		fileName := fmt.Sprintf("%d_", time.Now().Unix())
-		content := message.GetContent()
+		content, err := message.GetContent()
+		if err != nil {
+			return err
+		}
 		switch msg := message.(type) {
 		case *messages.Email:
 			recipients := make([]string, len(msg.Recipients))
@@ -41,10 +41,12 @@ func InitFSChannel(config Config) (channels.NotificationChannel, error) {
 			}
 		case *messages.SMS:
 			fileName = fileName + "sms_to_" + msg.RecipientPhoneNumber + ".txt"
+		case *messages.JSON:
+			fileName = "message.json"
 		default:
-			return caos_errors.ThrowUnimplementedf(nil, "NOTIF-6f9a1", "filesystem provider doesn't support message type %T", message)
+			return errors.ThrowUnimplementedf(nil, "NOTIF-6f9a1", "filesystem provider doesn't support message type %T", message)
 		}
 
-		return ioutil.WriteFile(filepath.Join(config.Path, fileName), []byte(content), 0666)
+		return os.WriteFile(filepath.Join(config.Path, fileName), []byte(content), 0666)
 	}), nil
 }

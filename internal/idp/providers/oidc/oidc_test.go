@@ -21,7 +21,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		clientSecret string
 		redirectURI  string
 		scopes       []string
-		userMapper   func(info oidc.UserInfo) idp.User
+		userMapper   func(info *oidc.UserInfo) idp.User
 		httpMock     func(issuer string)
 		opts         []ProviderOpts
 	}
@@ -82,7 +82,7 @@ func TestProvider_Options(t *testing.T) {
 		clientSecret string
 		redirectURI  string
 		scopes       []string
-		userMapper   func(info oidc.UserInfo) idp.User
+		userMapper   func(info *oidc.UserInfo) idp.User
 		opts         []ProviderOpts
 		httpMock     func(issuer string)
 	}
