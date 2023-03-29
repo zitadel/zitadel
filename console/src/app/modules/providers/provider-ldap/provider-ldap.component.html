@@ -44,7 +44,13 @@
           }}</mat-checkbox>
           <cnsl-form-field *ngIf="!provider || (provider && updateBindPassword)" class="formfield">
             <cnsl-label>{{ 'IDP.BINDPASSWORD' | translate }}</cnsl-label>
-            <input cnslInput formControlName="bindPassword" />
+            <input
+              cnslInput
+              name="bindpassword"
+              formControlName="bindPassword"
+              type="password"
+              autocomplete="new-password"
+            />
           </cnsl-form-field>
         </div>
 
