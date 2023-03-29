@@ -17,7 +17,7 @@ To be able to use Google to authenticate your users you need an OIDC Client in G
 
 ### Register a new client
 
-1. Go to the Google Cloud Platform and choose your project: <https://console.cloud.google.com/apis/credentials>
+1. Go to the Google Cloud Platform and choose your project: [https://console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)
 2. Click on "+ CREATE CREDENTIALS" and choose "OAuth client ID"
 3. Choose "Web application" as application type and give a name
 4. Add the redirect uris

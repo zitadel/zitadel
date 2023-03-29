@@ -90,20 +90,18 @@ The user has to enter the rest of the data himself.
 
 ![GitHub Login](/img/guides/zitadel_login_external_not_found_registration.png)
 
-[comment]: <> (### Optional: Add ZITADEL action to autofill userdata)
+### Optional: Add ZITADEL action to autofill userdata
 
-[comment]: <> (If you don't want the user to have to enter his first and lastname himself, you can add a ZITADEL action in which you specify how the data should be transferred.)
+If you don't want the user to have to enter his first and lastname himself, you can add a ZITADEL action in which you specify how the data should be transferred.
 
-[comment]: <> (1. Go to the settings of the organization where the users will be registered)
+1. Go to the settings of the organization where the users will be registered
 
-[comment]: <> (2. Add an new action with the following body. Make sure the action name is the same as in the script itself. Make sure to change the id in the script to the id of your own identity provider configuration. )
+2. Add an new action with the following body. Make sure the action name is the same as in the script itself. Make sure to change the id in the script to the id of your own identity provider configuration. 
 
-[comment]: <> (```js reference)
+```js reference
 
-[comment]: <> (https://github.com/zitadel/actions/blob/main/examples/github_identity_provider)
+https://github.com/zitadel/actions/blob/main/examples/github_identity_provider
 
-[comment]: <> (```)
-
-
-[comment]: <> (3. Add the action to the flow "External Authentication" on the trigger Post Authentication)
+```
+3. Add the action to the flow "External Authentication" on the trigger Post Authentication
   
