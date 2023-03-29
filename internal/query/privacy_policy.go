@@ -24,9 +24,10 @@ type PrivacyPolicy struct {
 	ResourceOwner string
 	State         domain.PolicyState
 
-	TOSLink     string
-	PrivacyLink string
-	HelpLink    string
+	TOSLink      string
+	PrivacyLink  string
+	HelpLink     string
+	SupportEmail domain.EmailAddress
 
 	IsDefault bool
 }
@@ -70,6 +71,10 @@ var (
 	}
 	PrivacyColHelpLink = Column{
 		name:  projection.PrivacyPolicyHelpLinkCol,
+		table: privacyTable,
+	}
+	PrivacyColSupportEmail = Column{
+		name:  projection.PrivacyPolicySupportEmailCol,
 		table: privacyTable,
 	}
 	PrivacyColIsDefault = Column{
@@ -148,6 +153,7 @@ func preparePrivacyPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 			PrivacyColPrivacyLink.identifier(),
 			PrivacyColTOSLink.identifier(),
 			PrivacyColHelpLink.identifier(),
+			PrivacyColSupportEmail.identifier(),
 			PrivacyColIsDefault.identifier(),
 			PrivacyColState.identifier(),
 		).
@@ -164,6 +170,7 @@ func preparePrivacyPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 				&policy.PrivacyLink,
 				&policy.TOSLink,
 				&policy.HelpLink,
+				&policy.SupportEmail,
 				&policy.IsDefault,
 				&policy.State,
 			)
@@ -179,9 +186,10 @@ func preparePrivacyPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 
 func (p *PrivacyPolicy) ToDomain() *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
-		TOSLink:     p.TOSLink,
-		PrivacyLink: p.PrivacyLink,
-		HelpLink:    p.HelpLink,
-		Default:     p.IsDefault,
+		TOSLink:      p.TOSLink,
+		PrivacyLink:  p.PrivacyLink,
+		HelpLink:     p.HelpLink,
+		SupportEmail: p.SupportEmail,
+		Default:      p.IsDefault,
 	}
 }

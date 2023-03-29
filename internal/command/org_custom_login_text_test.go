@@ -1161,6 +1161,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 								),
 							),
+							eventFromEventPusher(
+								org.NewCustomTextSetEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, "Support Email", language.English,
+								),
+							),
 						},
 					),
 				),
@@ -1455,6 +1460,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOS:           "TOS",
 						PrivacyPolicy: "PrivacyPolicy",
 						Help:          "Help",
+						SupportEmail:  "Support Email",
 					},
 				},
 			},
@@ -2560,6 +2566,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 							),
 						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, "Support Email", language.English,
+							),
+						),
 					),
 					expectPush(
 						[]*repository.Event{
@@ -3651,6 +3662,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
 									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, language.English,
+								),
+							),
+							eventFromEventPusher(
+								org.NewCustomTextRemovedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, language.English,
 								),
 							),
 						},
@@ -4801,6 +4817,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, "Support Email", language.English,
+							),
+						),
+						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitle, language.English,
 							),
@@ -5888,6 +5909,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, language.English,
 							),
 						),
 					),
@@ -6983,6 +7009,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 								),
 							),
+							eventFromEventPusher(
+								org.NewCustomTextSetEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterSupportEmail, "Support Email", language.English,
+								),
+							),
 						},
 					),
 				),
@@ -7277,6 +7308,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						TOS:           "TOS",
 						PrivacyPolicy: "PrivacyPolicy",
 						Help:          "Help",
+						SupportEmail:  "Support Email",
 					},
 				},
 			},

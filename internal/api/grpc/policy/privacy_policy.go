@@ -8,10 +8,11 @@ import (
 
 func ModelPrivacyPolicyToPb(policy *query.PrivacyPolicy) *policy_pb.PrivacyPolicy {
 	return &policy_pb.PrivacyPolicy{
-		IsDefault:   policy.IsDefault,
-		TosLink:     policy.TOSLink,
-		PrivacyLink: policy.PrivacyLink,
-		HelpLink:    policy.HelpLink,
+		IsDefault:    policy.IsDefault,
+		TosLink:      policy.TOSLink,
+		PrivacyLink:  policy.PrivacyLink,
+		HelpLink:     policy.HelpLink,
+		SupportEmail: string(policy.SupportEmail),
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,

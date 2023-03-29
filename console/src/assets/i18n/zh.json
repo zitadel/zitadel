@@ -1140,6 +1140,10 @@
       "EMAILNOSVG": "电子邮件不支持 SVG 文件格式。因此建议以 PNG 或其他支持的格式上传您的 Logo。",
       "MAXSIZEEXCEEDED": "文件大小超过了 524kB。",
       "FONTINLOGINONLY": "该字体仅在当前登录界面中显示。",
+      "BACKGROUNDCOLOR": "背景颜色",
+      "PRIMARYCOLOR": "原色",
+      "WARNCOLOR": "警示色",
+      "FONTCOLOR": "字体颜色",
       "VIEWS": {
         "PREVIEW": "预览",
         "CURRENT": "当前配置"
@@ -1184,6 +1188,7 @@
       "TOSLINK": "链接到服务条款",
       "POLICYLINK": "链接到隐私政策",
       "HELPLINK": "链接到帮助",
+      "SUPPORTEMAIL": "支持邮箱",
       "SAVED": "保存成功！",
       "RESET_TITLE": "恢复默认值",
       "RESET_DESCRIPTION": "您即将恢复 TOS 和隐私政策的默认链接。你真的要继续吗？"

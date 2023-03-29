@@ -34,8 +34,8 @@ YkTaa1AFLstnf348ZjuvBN3USUYZo3X3mxnS+uluVuRSGwIKsN0a
 -----END RSA PRIVATE KEY-----`
 
 let tokensCache = new Map<string,string>()
-
 let webhookEvents = new Array<ZITADELWebhookEvent>()
+let failWebhookEventsCount = 0
 
 export default defineConfig({
   reporter: 'mochawesome',
@@ -98,10 +98,15 @@ export default defineConfig({
         },
         resetWebhookEvents() {
           webhookEvents = []
+          failWebhookEventsCount = 0
           return null
         },
         handledWebhookEvents(){
           return webhookEvents
+        },
+        failWebhookEvents(count: number){
+          failWebhookEventsCount = count
+          return null
         }
       })
     },
@@ -127,11 +132,17 @@ function startWebhookEventHandler() {
     req.on("data", (chunk) => {
       chunks.push(chunk);
     });
+    const sendStatus = failWebhookEventsCount ? 500 : 200
     req.on("end", () => {
-      webhookEvents.push(JSON.parse(Buffer.concat(chunks).toString()));
+      webhookEvents.push({
+        sentStatus: sendStatus,
+        payload: JSON.parse(Buffer.concat(chunks).toString())
+      });
     });
-
-    res.writeHead(200);
+    if (failWebhookEventsCount > 0){
+      failWebhookEventsCount--
+    }
+    res.writeHead(sendStatus);
     res.end()
   });
 

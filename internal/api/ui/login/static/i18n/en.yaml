@@ -172,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Password confirmation
   CancelButtonText: cancel
   NextButtonText: next
+  Footer: Footer
 
 PasswordChangeDone:
   Title: Change Password
@@ -318,6 +319,7 @@ Footer:
   Tos: TOS
   PrivacyPolicy: Privacy policy
   Help: Help
+  SupportEmail: Support E-mail
 
 Errors:
   Internal: An internal error occurred

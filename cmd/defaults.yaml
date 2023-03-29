@@ -171,6 +171,14 @@ Projections:
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 0
+    # The NotificationsQuotas projection is used for calling quota webhooks
+    NotificationsQuotas:
+      # Delivery guarantee requirements are probably higher for quota webhooks
+      HandleInactiveInstances: true
+      # As quota notification projections don't result in database statements, retries don't have an effect
+      MaxFailureCount: 0
+      # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
+      RequeueEvery: 300s
 
 Auth:
   SearchLimit: 1000
@@ -499,6 +507,7 @@ DefaultInstance:
     TOSLink: https://zitadel.com/docs/legal/terms-of-service
     PrivacyLink: https://zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
+    SupportEmail: ""
   NotificationPolicy:
     PasswordChange: true
   LabelPolicy:
