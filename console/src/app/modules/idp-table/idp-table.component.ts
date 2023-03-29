@@ -226,6 +226,8 @@ export class IdpTableComponent implements OnInit {
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'google', row.id];
         case ProviderType.PROVIDER_TYPE_GITLAB:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'gitlab', row.id];
+        case ProviderType.PROVIDER_TYPE_LDAP:
+          return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'ldap', row.id];
         case ProviderType.PROVIDER_TYPE_GITLAB_SELF_HOSTED:
           return [
             row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org',

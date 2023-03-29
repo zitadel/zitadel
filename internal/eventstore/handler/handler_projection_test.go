@@ -11,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
@@ -658,17 +659,22 @@ func TestProjection_subscribe(t *testing.T) {
 }
 
 func TestProjection_schedule(t *testing.T) {
+
+	now := func() time.Time {
+		return time.Date(2023, 1, 31, 12, 0, 0, 0, time.UTC)
+	}
+
 	type args struct {
 		ctx context.Context
 	}
 	type fields struct {
-		reduce            Reduce
-		update            Update
-		eventstore        func(t *testing.T) *eventstore.Eventstore
-		triggerProjection *time.Timer
-		lock              *lockMock
-		unlock            *unlockMock
-		query             SearchQuery
+		reduce                  Reduce
+		update                  Update
+		eventstore              func(t *testing.T) *eventstore.Eventstore
+		lock                    *lockMock
+		unlock                  *unlockMock
+		query                   SearchQuery
+		handleInactiveInstances bool
 	}
 	type want struct {
 		locksCount   int
@@ -705,7 +711,7 @@ func TestProjection_schedule(t *testing.T) {
 					),
 					)
 				},
-				triggerProjection: time.NewTimer(0),
+				handleInactiveInstances: false,
 			},
 			want{
 				locksCount:   0,
@@ -733,7 +739,7 @@ func TestProjection_schedule(t *testing.T) {
 					),
 					)
 				},
-				triggerProjection: time.NewTimer(0),
+				handleInactiveInstances: false,
 			},
 			want{
 				locksCount:   0,
@@ -756,16 +762,16 @@ func TestProjection_schedule(t *testing.T) {
 								PreviousAggregateSequence: 5,
 								InstanceID:                "",
 								Type:                      "system.projections.scheduler.succeeded",
-							}).ExpectInstanceIDs("instanceID1"),
+							}).ExpectInstanceIDs(nil, "instanceID1"),
 					),
 					)
 				},
-				triggerProjection: time.NewTimer(0),
 				lock: &lockMock{
 					errWait:  100 * time.Millisecond,
 					firstErr: ErrLock,
 					canceled: make(chan bool, 1),
 				},
+				handleInactiveInstances: false,
 			},
 			want{
 				locksCount:   1,
@@ -788,22 +794,137 @@ func TestProjection_schedule(t *testing.T) {
 								PreviousAggregateSequence: 5,
 								InstanceID:                "",
 								Type:                      "system.projections.scheduler.succeeded",
-							}).ExpectInstanceIDs("instanceID1"),
+							}).ExpectInstanceIDs(nil, "instanceID1"),
 					),
 					)
 				},
-				triggerProjection: time.NewTimer(0),
 				lock: &lockMock{
 					canceled: make(chan bool, 1),
 					firstErr: nil,
 					errWait:  100 * time.Millisecond,
 				},
-				unlock: &unlockMock{},
-				query:  testQuery(nil, 0, ErrQuery),
+				unlock:                  &unlockMock{},
+				query:                   testQuery(nil, 0, ErrQuery),
+				handleInactiveInstances: false,
 			},
 			want{
 				locksCount:   1,
 				lockCanceled: true,
+				unlockCount:  1,
+			},
+		},
+		{
+			"only active instances are handled",
+			args{
+				ctx: context.Background(),
+			},
+			fields{
+				eventstore: func(t *testing.T) *eventstore.Eventstore {
+					return eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).
+							ExpectFilterEvents(&repository.Event{
+								AggregateType:             "system",
+								Sequence:                  6,
+								PreviousAggregateSequence: 5,
+								InstanceID:                "",
+								Type:                      "system.projections.scheduler.succeeded",
+							}).
+							ExpectInstanceIDs(
+								[]*repository.Filter{{
+									Field:     repository.FieldInstanceID,
+									Operation: repository.OperationNotIn,
+									Value:     database.StringArray{""},
+								}, {
+									Field:     repository.FieldCreationDate,
+									Operation: repository.OperationGreater,
+									Value:     now().Add(-2 * time.Hour),
+								}},
+								"206626268110651755",
+							).
+							ExpectFilterEvents(&repository.Event{
+								AggregateType:             "quota",
+								Sequence:                  6,
+								PreviousAggregateSequence: 5,
+								InstanceID:                "206626268110651755",
+								Type:                      "quota.notificationdue",
+							}),
+					))
+				},
+				lock: &lockMock{
+					canceled: make(chan bool, 1),
+					firstErr: nil,
+					errWait:  100 * time.Millisecond,
+				},
+				unlock:                  &unlockMock{},
+				handleInactiveInstances: false,
+				reduce:                  testReduce(newTestStatement("aggregate1", 1, 0)),
+				update:                  testUpdate(t, 1, 1, nil),
+				query: testQuery(
+					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+						AddQuery().
+						AggregateTypes("test").
+						Builder(),
+					2,
+					nil,
+				),
+			},
+			want{
+				locksCount:   1,
+				lockCanceled: false,
+				unlockCount:  1,
+			},
+		},
+		{
+			"all instances are handled",
+			args{
+				ctx: context.Background(),
+			},
+			fields{
+				eventstore: func(t *testing.T) *eventstore.Eventstore {
+					return eventstore.NewEventstore(eventstore.TestConfig(
+						es_repo_mock.NewRepo(t).
+							ExpectFilterEvents(&repository.Event{
+								AggregateType:             "system",
+								Sequence:                  6,
+								PreviousAggregateSequence: 5,
+								InstanceID:                "",
+								Type:                      "system.projections.scheduler.succeeded",
+							}).
+							ExpectInstanceIDs([]*repository.Filter{{
+								Field:     repository.FieldInstanceID,
+								Operation: repository.OperationNotIn,
+								Value:     database.StringArray{""},
+							}}, "206626268110651755").
+							ExpectFilterEvents(&repository.Event{
+								AggregateType:             "quota",
+								Sequence:                  6,
+								PreviousAggregateSequence: 5,
+								InstanceID:                "206626268110651755",
+								Type:                      "quota.notificationdue",
+							}),
+					))
+				},
+				lock: &lockMock{
+					canceled: make(chan bool, 1),
+					firstErr: nil,
+					errWait:  100 * time.Millisecond,
+				},
+				unlock:                  &unlockMock{},
+				handleInactiveInstances: true,
+				reduce:                  testReduce(newTestStatement("aggregate1", 1, 0)),
+				update:                  testUpdate(t, 1, 1, nil),
+				query: testQuery(
+					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+						AddQuery().
+						AggregateTypes("test").
+						Builder(),
+					2,
+					nil,
+				),
+			},
+			want{
+				locksCount:   1,
+				lockCanceled: false,
 				unlockCount:  1,
 			},
 		},
@@ -815,14 +936,17 @@ func TestProjection_schedule(t *testing.T) {
 					EventQueue: make(chan eventstore.Event, 10),
 					Eventstore: tt.fields.eventstore(t),
 				},
-				reduce:              tt.fields.reduce,
-				update:              tt.fields.update,
-				searchQuery:         tt.fields.query,
-				lock:                tt.fields.lock.lock(),
-				unlock:              tt.fields.unlock.unlock(),
-				triggerProjection:   tt.fields.triggerProjection,
-				requeueAfter:        10 * time.Second,
-				concurrentInstances: 1,
+				reduce:                  tt.fields.reduce,
+				update:                  tt.fields.update,
+				searchQuery:             tt.fields.query,
+				lock:                    tt.fields.lock.lock(),
+				unlock:                  tt.fields.unlock.unlock(),
+				triggerProjection:       time.NewTimer(0), // immediately run an iteration
+				requeueAfter:            time.Hour,        // run only one iteration
+				concurrentInstances:     1,
+				handleInactiveInstances: tt.fields.handleInactiveInstances,
+				retries:                 0,
+				nowFunc:                 now,
 			}
 			ctx, cancel := context.WithCancel(tt.args.ctx)
 			go func() {
@@ -831,14 +955,14 @@ func TestProjection_schedule(t *testing.T) {
 				h.schedule(ctx)
 			}()
 
-			time.Sleep(1 * time.Second)
+			time.Sleep(time.Second)
+			cancel()
 			if tt.fields.lock != nil {
 				tt.fields.lock.check(t, tt.want.locksCount, tt.want.lockCanceled)
 			}
 			if tt.fields.unlock != nil {
 				tt.fields.unlock.check(t, tt.want.unlockCount)
 			}
-			cancel()
 		})
 	}
 }

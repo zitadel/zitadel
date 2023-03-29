@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: s'inscrire
   NextButtonText: suivant
 
+LDAP:
+  Title: Connexion
+  Description: Entrez vos données de connexion.
+  LoginNameLabel: Identifiant
+  PasswordLabel: Mot de passe
+  NextButtonText: suivant
+
 SelectAccount:
   Title: Sélectionner un compte
   Description: Utilisez votre compte ZITADEL
@@ -165,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Confirmation du mot de passe
   CancelButtonText: annuler
   NextButtonText: suivant
+  Footer: Bas de page
 
 PasswordChangeDone:
   Title: Changer le mot de passe
@@ -311,6 +319,7 @@ Footer:
   Tos: TOS
   PrivacyPolicy: Politique de confidentialité
   Help: Aide
+  SupportEmail: E-mail d'assistance
 
 Errors:
   Internal: Une erreur interne s'est produite
@@ -401,8 +410,8 @@ Errors:
       ExternalUserIDEmpty: L'ID de l'utilisateur externe est vide
       UserDisplayNameEmpty: Le nom d'affichage de l'utilisateur est vide
       NoExternalUserData: Aucune donnée d'utilisateur externe reçue
-      CreationNotAllowed : La création d'un nouvel utilisateur n'est pas autorisée sur ce fournisseur.
-      LinkingNotAllowed : La création d'un lien vers un utilisateur n'est pas autorisée pour ce fournisseur.
+      CreationNotAllowed: La création d'un nouvel utilisateur n'est pas autorisée sur ce fournisseur.
+      LinkingNotAllowed: La création d'un lien vers un utilisateur n'est pas autorisée pour ce fournisseur.
     GrantRequired: Connexion impossible. L'utilisateur doit avoir au moins une subvention sur l'application. Veuillez contacter votre administrateur.
     ProjectRequired: Connexion impossible. L'organisation de l'utilisateur doit être accordée au projet. Veuillez contacter votre administrateur.
   IdentityProvider:

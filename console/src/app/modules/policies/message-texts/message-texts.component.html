@@ -49,7 +49,7 @@
     *ngIf="(getCustomInitMessageTextMap$ | async) && (getCustomInitMessageTextMap$ | async)?.isDefault === false"
     [disabled]="(canWrite$ | async) === false"
     (click)="resetDefault()"
-    color="warn"
+    color="message-text-warn"
     type="submit"
     mat-stroked-button
   >

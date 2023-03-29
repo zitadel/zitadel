@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: zarejestruj
   NextButtonText: dalej
 
+LDAP:
+  Title: Rejestracja
+  Description: Wprowadź swoje dane logowania.
+  LoginNameLabel: Nazwa użytkownika
+  PasswordLabel: Hasło
+  NextButtonText: dalej
+
 SelectAccount:
   Title: Wybierz konto
   Description: Użyj swojego konta ZITADEL
@@ -165,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Potwierdzenie hasła
   CancelButtonText: anuluj
   NextButtonText: dalej
+  Footer: Stopka
 
 PasswordChangeDone:
   Title: Zmiana hasła
@@ -311,6 +319,7 @@ Footer:
   Tos: TOS
   PrivacyPolicy: Polityka prywatności
   Help: Pomoc
+  SupportEmail: E-mail wsparcia
 
 Errors:
   Internal: Wewnętrzny błąd

@@ -1141,6 +1141,10 @@
       "MAXSIZEEXCEEDED": "La taille maximale de 524kB est dépassée.",
       "NOSVGSUPPORTED": "SVG n'est pas pris en charge",
       "FONTINLOGINONLY": "La police n'est actuellement affichée que dans l'interface de connexion.",
+      "BACKGROUNDCOLOR": "Couleur de l'arrière plan",
+      "PRIMARYCOLOR": "Couleur primaire",
+      "WARNCOLOR": "Couleur d'avertissement",
+      "FONTCOLOR": "Couleur de la police",
       "VIEWS": {
         "PREVIEW": "Aperçu",
         "CURRENT": "Configuration actuelle"
@@ -1185,6 +1189,7 @@
       "TOSLINK": "Lien vers les conditions d'utilisation",
       "POLICYLINK": "Lien vers la politique de confidentialité",
       "HELPLINK": "Lien vers l'aide",
+      "SUPPORTEMAIL": "E-mail d'assistance",
       "SAVED": "Enregistré avec succès !",
       "RESET_TITLE": "Restaurer les valeurs par défaut",
       "RESET_DESCRIPTION": "Vous êtes sur le point de restaurer les liens par défaut pour les CGS et la politique de confidentialité. Voulez-vous vraiment continuer ?"
@@ -1652,6 +1657,10 @@
       "AZUREAD": {
         "TITLE": "Fournisseur Microsoft",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Microsoft"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité LDAP"
       }
     },
     "DETAIL": {
@@ -1694,6 +1703,8 @@
     "EMAILVERIFIED": "Courriel vérifié",
     "NAMEHINT": "Si elle est spécifiée, elle sera affichée dans l'interface de connexion.",
     "OPTIONAL": "optionnel",
+    "LDAPATTRIBUTES": "Attributs LDAP",
+    "UPDATEBINDPASSWORD": "mettre à jour le mot de bind password",
     "UPDATECLIENTSECRET": "mise à jour du secret client",
     "ADD": "Ajouter un fournisseur d'identité",
     "TYPE": "Type",
@@ -1715,6 +1726,31 @@
     "SCOPESLIST": "Liste des champs d'application",
     "CLIENTID": "ID du client",
     "CLIENTSECRET": "Secret du client",
+    "LDAPCONNECTION": "Connexion",
+    "LDAPUSERBINDING": "Enchères utilisateur",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "requis",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "Mappage de IDP nom d'affichage",
     "USERNAMEMAPPING": "Mappage des noms d'utilisateur",
     "DATES": "Dates",

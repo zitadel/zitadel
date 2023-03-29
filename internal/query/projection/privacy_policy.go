@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	PrivacyPolicyTable = "projections.privacy_policies2"
+	PrivacyPolicyTable = "projections.privacy_policies3"
 
 	PrivacyPolicyIDCol            = "id"
 	PrivacyPolicyCreationDateCol  = "creation_date"
@@ -27,6 +27,7 @@ const (
 	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
 	PrivacyPolicyTOSLinkCol       = "tos_link"
 	PrivacyPolicyHelpLinkCol      = "help_link"
+	PrivacyPolicySupportEmailCol  = "support_email"
 	PrivacyPolicyOwnerRemovedCol  = "owner_removed"
 )
 
@@ -51,6 +52,7 @@ func newPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(PrivacyPolicyPrivacyLinkCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyTOSLinkCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyHelpLinkCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicySupportEmailCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
@@ -128,6 +130,7 @@ func (p *privacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(PrivacyPolicyPrivacyLinkCol, policyEvent.PrivacyLink),
 			handler.NewCol(PrivacyPolicyTOSLinkCol, policyEvent.TOSLink),
 			handler.NewCol(PrivacyPolicyHelpLinkCol, policyEvent.HelpLink),
+			handler.NewCol(PrivacyPolicySupportEmailCol, policyEvent.SupportEmail),
 			handler.NewCol(PrivacyPolicyIsDefaultCol, isDefault),
 			handler.NewCol(PrivacyPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 			handler.NewCol(PrivacyPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
@@ -156,6 +159,9 @@ func (p *privacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	}
 	if policyEvent.HelpLink != nil {
 		cols = append(cols, handler.NewCol(PrivacyPolicyHelpLinkCol, *policyEvent.HelpLink))
+	}
+	if policyEvent.SupportEmail != nil {
+		cols = append(cols, handler.NewCol(PrivacyPolicySupportEmailCol, *policyEvent.SupportEmail))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,

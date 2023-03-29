@@ -289,7 +289,7 @@ type CustomLoginTextReadModel struct {
 	FooterTOS           string
 	FooterPrivacyPolicy string
 	FooterHelp          string
-	FooterHelpLink      string
+	FooterSupportEmail  string
 }
 
 func (wm *CustomLoginTextReadModel) Reduce() error {
@@ -2515,6 +2515,10 @@ func (wm *CustomLoginTextReadModel) handleFooterTextSetEvent(e *policy.CustomTex
 		wm.FooterHelp = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyFooterSupportEmail {
+		wm.FooterSupportEmail = e.Text
+		return
+	}
 }
 
 func (wm *CustomLoginTextReadModel) handleFooterTextRemoveEvent(e *policy.CustomTextRemovedEvent) {
@@ -2528,6 +2532,10 @@ func (wm *CustomLoginTextReadModel) handleFooterTextRemoveEvent(e *policy.Custom
 	}
 	if e.Key == domain.LoginKeyFooterHelp {
 		wm.FooterHelp = ""
+		return
+	}
+	if e.Key == domain.LoginKeyFooterSupportEmail {
+		wm.FooterSupportEmail = ""
 		return
 	}
 }
