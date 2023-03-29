@@ -100,7 +100,7 @@ If you don't want the user to have to enter his first and lastname himself, you 
 
 ```js reference
 
-https://github.com/zitadel/actions/blob/main/examples/github_identity_provider
+https://github.com/zitadel/actions/blob/main/examples/gitlab_identity_provider
 
 ```
 3. Add the action to the flow "External Authentication" on the trigger Post Authentication
