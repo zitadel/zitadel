@@ -231,7 +231,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 		}
 		if succeededOnce {
 			// since we have at least one successful run, we can restrict it to events not older than
-			// twice the requeue time (just to be sure not to miss an event)
+			// h.handleActiveInstances (just to be sure not to miss an event)
 			// This ensures that only instances with recent events on the handler are projected
 			query = query.CreationDateAfter(h.nowFunc().Add(-1 * h.handleActiveInstances))
 		}
