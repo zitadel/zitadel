@@ -119,7 +119,7 @@
           color="primary"
           mat-raised-button
           class="continue-button"
-          [disabled]="(form.invalid && attributes.toObject().idAttribute !== '') || form.disabled"
+          [disabled]="form.invalid || attributes.toObject().idAttribute === '' || form.disabled"
           type="submit"
         >
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
