@@ -252,7 +252,7 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 
 	svc := logstore.New(
 		quotaqueriermock.NewNoopQuerier(&args.config, periodStart),
-		logstore.UsageReporterFunc(func(context.Context, []*quota.NotifiedEvent) error { return nil }),
+		logstore.UsageReporterFunc(func(context.Context, []*quota.NotificationDueEvent) error { return nil }),
 		mainEmitter,
 		secondaryEmitter)
 
