@@ -37,9 +37,9 @@ can connect to ZITADEL as a SAML2 IDP.
 3. Fill out the fields as follows, to provide AWS with all the information it needs:
    ![Configure external identity provider](/img/saml/aws/configure_idp.png)
 
-   To connect to another environment, change the domains, for example if you would use ZITADEL under the domain "
-   example.com" you would have the URLs "https://accounts.example.com/saml/SSO"
-   and "https://accounts.exmaple.com/saml/metadata".
+   To connect to another environment, change the domains, for example if you would use ZITADEL under the url "
+   https://example.com" you would have the URLs "https://example.com/saml/v2/SSO"
+   and "https://example.com/saml/v2/metadata".
 
 4. Download the ZITADEL-used certificate to sign the responses, so that AWS can validation the signature.
 
