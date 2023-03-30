@@ -159,10 +159,10 @@ Projections:
   ConcurrentInstances: 1
   # Limit of returned events per query
   BulkLimit: 200
-  # If HandleInactiveInstances this is false, only instances are projected,
-  # for which at least a projection relevant event exists withing the timeframe
-  # from twice the RequeueEvery time in the past until the projections current time
-  HandleInactiveInstances: false
+  # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+  # from HandleActiveInstances duration in the past until the projections current time
+  # Defaults to twice the RequeueEvery duration
+  HandleActiveInstances: 120s
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     Projects:
@@ -174,7 +174,8 @@ Projections:
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
       # Delivery guarantee requirements are probably higher for quota webhooks
-      HandleInactiveInstances: true
+      # Defaults to 45 days
+      HandleActiveInstances: 1080h
       # As quota notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 0
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
