@@ -22,6 +22,7 @@ type Token struct {
 	PreferredLanguage string
 }
 
+// TODO use in role claims
 func AddAudScopeToAudience(ctx context.Context, audience, scopes []string) []string {
 	for _, scope := range scopes {
 		if !(strings.HasPrefix(scope, ProjectIDScope) && strings.HasSuffix(scope, AudSuffix)) {

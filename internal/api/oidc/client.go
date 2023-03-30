@@ -25,13 +25,14 @@ import (
 )
 
 const (
-	ScopeProjectRolePrefix = "urn:zitadel:iam:org:project:role:"
-	ClaimProjectRoles      = "urn:zitadel:iam:org:project:roles"
-	ScopeUserMetaData      = "urn:zitadel:iam:user:metadata"
-	ClaimUserMetaData      = ScopeUserMetaData
-	ScopeResourceOwner     = "urn:zitadel:iam:user:resourceowner"
-	ClaimResourceOwner     = ScopeResourceOwner + ":"
-	ClaimActionLogFormat   = "urn:zitadel:iam:action:%s:log"
+	ScopeProjectRolePrefix  = "urn:zitadel:iam:org:project:role:"
+	ScopeProjectRolesPrefix = "urn:zitadel:iam:org:project:roles"
+	ClaimProjectRoles       = "urn:zitadel:iam:org:project:roles"
+	ScopeUserMetaData       = "urn:zitadel:iam:user:metadata"
+	ClaimUserMetaData       = ScopeUserMetaData
+	ScopeResourceOwner      = "urn:zitadel:iam:user:resourceowner"
+	ClaimResourceOwner      = ScopeResourceOwner + ":"
+	ClaimActionLogFormat    = "urn:zitadel:iam:action:%s:log"
 
 	oidcCtx = "oidc"
 )
@@ -261,6 +262,8 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	if err != nil {
 		return err
 	}
+	allRoles := false
+	audiences := make([]string, 0)
 	roles := make([]string, 0)
 	for _, scope := range scopes {
 		switch scope {
@@ -285,6 +288,9 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 		default:
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
+			}
+			if strings.HasPrefix(scope, ScopeProjectRolesPrefix) {
+				allRoles = true
 			}
 			if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 				userInfo.AppendClaims(domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
