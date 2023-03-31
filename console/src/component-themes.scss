@@ -66,6 +66,7 @@
 @import 'src/app/modules/policies/login-policy/factor-table/factor-table.component.scss';
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import './styles/codemirror.scss';
+@import 'src/app/pages/projects/apps/app-create/app-create.component.scss';
 
 @mixin component-themes($theme) {
   @include cnsl-color-theme($theme);
@@ -136,4 +137,5 @@
   @include action-keys-theme($theme);
   @include codemirror-theme($theme);
   @include contact-theme($theme);
+  @include app-create-theme($theme);
 }

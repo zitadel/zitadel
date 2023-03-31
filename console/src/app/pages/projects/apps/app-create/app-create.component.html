@@ -22,7 +22,7 @@
   </mat-checkbox>
 
   <mat-horizontal-stepper
-    class="stepper"
+    class="stepper {{ 'last-edited-step-' + stepper.selectedIndex }}"
     *ngIf="!devmode"
     linear
     #stepper
@@ -334,6 +334,11 @@
         </button>
       </div>
     </mat-step>
+
+    <!-- Icon override -->
+    <ng-template matStepperIcon="edit">
+      <mat-icon>check</mat-icon>
+    </ng-template>
   </mat-horizontal-stepper>
 
   <div *ngIf="devmode" class="dev">
