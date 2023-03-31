@@ -1,0 +1,15 @@
+{
+	"name": "Console",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:0-18",
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {}
+	},
+	"forwardPorts": [4200],
+	"postCreateCommand": "yarn install && yarn generate",
+
+	"workspaceMount": "source=${localWorkspaceFolder}/console,target=/zitadel/console,type=bind,consistency=cached",
+	"workspaceFolder": "/zitadel/console",
+	"mounts": [
+		"source=${localWorkspaceFolder}/proto,target=/zitadel/proto,type=bind,consistency=cached"
+	]
+}

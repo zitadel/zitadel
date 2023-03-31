@@ -1,0 +1,15 @@
+{
+	"name": "Docs",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:0-18",
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {}
+	},
+	"forwardPorts": [3000],
+	"postCreateCommand": "yarn install && yarn generate",
+
+	"workspaceMount": "source=${localWorkspaceFolder}/docs,target=/zitadel/docs,type=bind,consistency=cached",
+	"workspaceFolder": "/zitadel/docs",
+	"mounts": [
+		"source=${localWorkspaceFolder}/proto,target=/zitadel/proto,type=bind,consistency=cached"
+	]
+}
