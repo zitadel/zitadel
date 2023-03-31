@@ -81,11 +81,11 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 			HandlerConfig: handler.HandlerConfig{
 				Eventstore: es,
 			},
-			RequeueEvery:            config.RequeueEvery,
-			RetryFailedAfter:        config.RetryFailedAfter,
-			Retries:                 config.MaxFailureCount,
-			ConcurrentInstances:     config.ConcurrentInstances,
-			HandleInactiveInstances: config.HandleInactiveInstances,
+			RequeueEvery:          config.RequeueEvery,
+			RetryFailedAfter:      config.RetryFailedAfter,
+			Retries:               config.MaxFailureCount,
+			ConcurrentInstances:   config.ConcurrentInstances,
+			HandleActiveInstances: config.HandleActiveInstances,
 		},
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,
@@ -175,8 +175,8 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 	if customConfig.RetryFailedAfter != nil {
 		config.RetryFailedAfter = *customConfig.RetryFailedAfter
 	}
-	if customConfig.HandleInactiveInstances != nil {
-		config.HandleInactiveInstances = *customConfig.HandleInactiveInstances
+	if customConfig.HandleActiveInstances != nil {
+		config.HandleActiveInstances = *customConfig.HandleActiveInstances
 	}
 
 	return config
