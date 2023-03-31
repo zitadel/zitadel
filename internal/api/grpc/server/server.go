@@ -2,9 +2,11 @@ package server
 
 import (
 	"crypto/tls"
+
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
@@ -16,11 +18,16 @@ import (
 )
 
 type Server interface {
-	Gateway
 	RegisterServer(*grpc.Server)
+	RegisterGateway() RegisterGatewayFunc
 	AppName() string
 	MethodPrefix() string
 	AuthMethods() authz.MethodMapping
+}
+
+type WithGatewayPrefix interface {
+	Server
+	GatewayPathPrefix() string
 }
 
 func CreateServer(
@@ -40,7 +47,7 @@ func CreateServer(
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
 				middleware.ErrorHandler(),
-				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_MethodPrefix),
+				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_MethodPrefix, healthpb.Health_ServiceDesc.ServiceName),
 				middleware.AccessStorageInterceptor(accessSvc),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(),

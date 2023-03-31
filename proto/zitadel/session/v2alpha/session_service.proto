@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package zitadel.session.v2alpha;
+
+import "zitadel/options.proto";
+import "zitadel/session/v2alpha/session.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
+
+service SessionService {
+
+  rpc GetSession (GetSessionRequest) returns (GetSessionResponse) {
+    option (google.api.http) = {
+      get: "/v2/sessions/{id}"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+}
+
+message GetSessionRequest{
+  string id = 1;
+}
+message GetSessionResponse{
+  Session session = 1;
+}
