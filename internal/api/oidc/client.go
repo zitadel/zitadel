@@ -25,14 +25,15 @@ import (
 )
 
 const (
-	ScopeProjectRolePrefix  = "urn:zitadel:iam:org:project:role:"
-	ScopeProjectRolesPrefix = "urn:zitadel:iam:org:project:roles"
-	ClaimProjectRoles       = "urn:zitadel:iam:org:project:roles"
-	ScopeUserMetaData       = "urn:zitadel:iam:user:metadata"
-	ClaimUserMetaData       = ScopeUserMetaData
-	ScopeResourceOwner      = "urn:zitadel:iam:user:resourceowner"
-	ClaimResourceOwner      = ScopeResourceOwner + ":"
-	ClaimActionLogFormat    = "urn:zitadel:iam:action:%s:log"
+	ScopeProjectRolePrefix   = "urn:zitadel:iam:org:project:role:"
+	ScopeProjectsRolesPrefix = "urn:zitadel:iam:org:projects:roles"
+	ClaimProjectRoles        = "urn:zitadel:iam:org:project:roles"
+	ClaimProjectRolesFormat  = "urn:zitadel:iam:org:project:%s:roles"
+	ScopeUserMetaData        = "urn:zitadel:iam:user:metadata"
+	ClaimUserMetaData        = ScopeUserMetaData
+	ScopeResourceOwner       = "urn:zitadel:iam:user:resourceowner"
+	ClaimResourceOwner       = ScopeResourceOwner + ":"
+	ClaimActionLogFormat     = "urn:zitadel:iam:action:%s:log"
 
 	oidcCtx = "oidc"
 )
@@ -263,7 +264,6 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 		return err
 	}
 	allRoles := false
-	audiences := make([]string, 0)
 	roles := make([]string, 0)
 	for _, scope := range scopes {
 		switch scope {
@@ -285,12 +285,11 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 			if err := o.setUserInfoResourceOwner(ctx, userInfo, userID); err != nil {
 				return err
 			}
+		case ScopeProjectsRolesPrefix:
+			allRoles = true
 		default:
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
-			}
-			if strings.HasPrefix(scope, ScopeProjectRolesPrefix) {
-				allRoles = true
 			}
 			if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 				userInfo.AppendClaims(domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
@@ -304,13 +303,18 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 		}
 	}
 
-	userGrants, projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
+	userGrants, projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles, allRoles)
 	if err != nil {
 		return err
 	}
 
-	if len(projectRoles) > 0 {
-		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
+	if len(projectRoles.projects) > 0 {
+		if roles, ok := projectRoles.projects[projectRoles.requestProjectID]; ok {
+			userInfo.AppendClaims(ClaimProjectRoles, roles)
+		}
+		for projectID, roles := range projectRoles.projects {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
+		}
 	}
 
 	return o.userinfoFlows(ctx, user.ResourceOwner, userGrants, userInfo)
@@ -500,6 +504,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
 	roles := make([]string, 0)
+	var allRoles bool
 	for _, scope := range scopes {
 		switch scope {
 		case ScopeUserMetaData:
@@ -518,6 +523,8 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 			for claim, value := range resourceOwnerClaims {
 				claims = appendClaim(claims, claim, value)
 			}
+		case ScopeProjectsRolesPrefix:
+			allRoles = true
 		}
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
@@ -537,13 +544,18 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 	}
 
-	userGrants, projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
+	userGrants, projectRoles, err := o.assertRoles(ctx, userID, clientID, roles, allRoles)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projectRoles) > 0 {
-		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
+	if len(projectRoles.projects) > 0 {
+		if roles, ok := projectRoles.projects[projectRoles.requestProjectID]; ok {
+			claims = appendClaim(claims, ClaimProjectRoles, roles)
+		}
+		for projectID, roles := range projectRoles.projects {
+			claims = appendClaim(claims, fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
+		}
 	}
 
 	return o.privateClaimsFlows(ctx, userID, userGrants, claims)
@@ -668,35 +680,48 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 	return claims, nil
 }
 
-func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (*query.UserGrants, map[string]map[string]string, error) {
-	if applicationID == "" || len(requestedRoles) == 0 {
+func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string, allRoles bool) (*query.UserGrants, *projectsRoles, error) {
+	if (applicationID == "" || len(requestedRoles) == 0) && !allRoles {
 		return nil, nil, nil
 	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID, false)
 	if err != nil {
 		return nil, nil, err
 	}
-	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(projectID)
-	if err != nil {
-		return nil, nil, err
+	queries := make([]query.SearchQuery, 0, 2)
+	if !allRoles {
+		projectQuery, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+		if err != nil {
+			return nil, nil, err
+		}
+		queries = append(queries, projectQuery)
 	}
 	userIDQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
 		return nil, nil, err
 	}
+	queries = append(queries, userIDQuery)
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: []query.SearchQuery{projectQuery, userIDQuery},
+		Queries: queries,
 	}, true, false)
 	if err != nil {
 		return nil, nil, err
 	}
-	projectRoles := make(map[string]map[string]string)
+	roles := new(projectsRoles)
+	if allRoles {
+		for _, grant := range grants.UserGrants {
+			for _, role := range grant.Roles {
+				roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+			}
+		}
+		return grants, roles, nil
+	}
 	for _, requestedRole := range requestedRoles {
 		for _, grant := range grants.UserGrants {
-			checkGrantedRoles(projectRoles, grant, requestedRole)
+			checkGrantedRoles2(roles, grant, requestedRole, grant.ProjectID == projectID)
 		}
 	}
-	return grants, projectRoles, nil
+	return grants, roles, nil
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
@@ -728,19 +753,52 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 	}, nil
 }
 
-func checkGrantedRoles(roles map[string]map[string]string, grant *query.UserGrant, requestedRole string) {
+func checkGrantedRoles2(roles *projectsRoles, grant *query.UserGrant, requestedRole string, isRequested bool) {
 	for _, grantedRole := range grant.Roles {
 		if requestedRole == grantedRole {
-			appendRole(roles, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain)
+			roles.Add(grantedRole, grant.ProjectID, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested)
 		}
 	}
 }
 
-func appendRole(roles map[string]map[string]string, role, orgID, orgPrimaryDomain string) {
-	if roles[role] == nil {
-		roles[role] = make(map[string]string, 0)
+type projectsRoles struct {
+	// key is projectID
+	projects map[string]*projectRoles
+
+	requestProjectID string
+}
+
+func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequested bool) {
+	if p.projects == nil {
+		p.projects = make(map[string]*projectRoles, 1)
 	}
-	roles[role][orgID] = orgPrimaryDomain
+	if isRequested {
+		p.requestProjectID = projectID
+	}
+	p.projects[projectID].Add(roleKey, orgID, domain)
+}
+
+type projectRoles struct {
+	// key is the role key
+	roles map[string][]*projectRole
+}
+
+type projectRole struct {
+	orgID            string
+	orgPrimaryDomain string
+}
+
+func (p *projectRoles) Add(roleKey, orgID, domain string) {
+	if p.roles == nil {
+		p.roles = make(map[string][]*projectRole, 1)
+	}
+	if _, ok := p.roles[roleKey]; !ok {
+		p.roles[roleKey] = make([]*projectRole, 0, 1)
+	}
+	p.roles[roleKey] = append(p.roles[roleKey], &projectRole{
+		orgID:            orgID,
+		orgPrimaryDomain: domain,
+	})
 }
 
 func getGender(gender domain.Gender) oidc.Gender {
