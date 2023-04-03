@@ -1,0 +1,1 @@
+export { toSlug } from "./toSlug";

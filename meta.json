@@ -1,4 +1,4 @@
 {
-  "name": "Monorepo with Changesets",
-  "description": "Simple Next.js monorepo preconfigured to publish packages via Changesets"
+  "name": "ZITADEL typescript Monorepo with Changesets",
+  "description": "ZITADEL typescript monorepo preconfigured to publish packages via Changesets"
 }

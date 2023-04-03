@@ -6,11 +6,10 @@
     "dev": "next dev",
     "lint": "next lint",
     "lint-staged": "lint-staged",
-    "prettier": "prettier --write --ignore-unknown .",
-    "prettier:check": "prettier --check --ignore-unknown .",
     "start": "next start",
     "test": "yarn prettier:check &nexarn lint",
-    "generate": "buf generate external/zitadel/proto"
+    "generate": "buf generate external/zitadel/proto",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
   },
   "git": {
     "pre-commit": "lint-staged"
@@ -18,13 +17,10 @@
   "lint-staged": {
     "*": "prettier --write --ignore-unknown"
   },
-  "prettier": {
-    "arrowParens": "always",
-    "semi": true,
-    "trailingComma": "all",
-    "singleQuote": true
-  },
   "dependencies": {
+    "@zitadel/core": "workspace:*",
+    "@zitadel/react": "workspace:*",
+    "@zitadel/next": "workspace:*",
     "@heroicons/react": "2.0.13",
     "@next/font": "13.0.5",
     "@tailwindcss/forms": "0.5.3",
@@ -37,10 +33,11 @@
     "react-dom": "18.2.0",
     "react-hook-form": "7.39.5",
     "styled-components": "6.0.0-beta.2",
-    "tinycolor2": "1.4.2",
-    "use-count-up": "3.0.1"
+    "tinycolor2": "1.4.2"
   },
   "devDependencies": {
+    "@zitadel/tsconfig": "workspace:*",
+    "eslint-config-zitadel": "workspace:*",
     "@bufbuild/buf": "^1.14.0",
     "@types/ms": "0.7.31",
     "@types/node": "18.11.9",
@@ -50,13 +47,10 @@
     "@vercel/git-hooks": "1.0.0",
     "autoprefixer": "10.4.13",
     "del-cli": "5.0.0",
-    "eslint": "8.27.0",
-    "eslint-config-next": "13.0.3",
     "grpc-tools": "1.11.3",
     "lint-staged": "13.0.3",
     "make-dir-cli": "3.0.0",
     "postcss": "8.4.21",
-    "prettier": "2.7.1",
     "prettier-plugin-tailwindcss": "0.1.13",
     "tailwindcss": "3.2.4",
     "ts-proto": "^1.139.0",

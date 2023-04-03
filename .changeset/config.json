@@ -6,5 +6,5 @@
   "linked": [],
   "access": "public",
   "updateInternalDependencies": "patch",
-  "ignore": ["@zitadel/docs"]
+  "ignore": ["@zitadel/login"]
 }
