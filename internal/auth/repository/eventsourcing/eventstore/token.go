@@ -42,6 +42,7 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 		token = new(model.TokenView)
 		token.ID = tokenID
 		token.UserID = userID
+		token.InstanceID = authz.GetInstance(ctx).InstanceID()
 	}
 
 	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence)
