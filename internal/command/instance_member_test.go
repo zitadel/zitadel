@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
@@ -11,10 +12,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/member"
 )
@@ -30,7 +30,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 		roles  []string
 	}
 	type res struct {
-		want *domain.Member
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -50,7 +50,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -66,7 +66,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -88,7 +88,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -133,7 +133,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: errors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -158,7 +158,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "ERROR", "internal"),
+					expectPushFailed(errors.ThrowAlreadyExists(nil, "ERROR", "internal"),
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID("INSTANCE", instance.NewMemberAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
@@ -181,7 +181,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: errors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -232,15 +232,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
-				want: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						InstanceID:    "INSTANCE",
-						ResourceOwner: "INSTANCE",
-						AggregateID:   "INSTANCE",
-					},
-					UserID: "user1",
-					Roles:  []string{"IAM_OWNER"},
-				},
+				want: &domain.ObjectDetails{Sequence: 0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
 			},
 		},
 	}
@@ -275,7 +267,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 		member     *domain.Member
 	}
 	type res struct {
-		want *domain.Member
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -296,7 +288,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				member: &domain.Member{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -314,7 +306,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -338,7 +330,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -370,7 +362,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -389,11 +381,14 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewMemberChangedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"user1",
-								[]string{"IAM_OWNER", "IAM_OWNER_VIEWER"}...,
-							)),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewMemberChangedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									"user1",
+									[]string{"IAM_OWNER", "IAM_OWNER_VIEWER"}...,
+								),
+							),
 						},
 					),
 				),
@@ -407,21 +402,14 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER", "IAM_OWNER_VIEWER"},
 				},
 			},
 			res: res{
-				want: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "INSTANCE",
-						AggregateID:   "INSTANCE",
-					},
-					UserID: "user1",
-					Roles:  []string{"IAM_OWNER", "IAM_OWNER_VIEWER"},
-				},
+				want: &domain.ObjectDetails{Sequence: 0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
 			},
 		},
 	}
@@ -476,7 +464,7 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -511,17 +499,20 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewMemberRemovedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"user1",
-							)),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewMemberRemovedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									"user1",
+								),
+							),
 						},
 						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("INSTANCE", "user1")),
 					),
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
 				userID: "user1",
 			},
 			res: res{

@@ -340,7 +340,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	validations = append(validations,
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
-		c.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
+		c.PrepareAddInstanceMember(instanceAgg, userID, domain.RoleIAMOwner),
 		AddProjectCommand(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 		SetIAMProject(instanceAgg, projectAgg.ID),
 

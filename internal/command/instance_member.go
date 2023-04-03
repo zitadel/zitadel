@@ -10,10 +10,14 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddInstanceMemberCommand(a *instance.Aggregate, userID string, roles ...string) preparation.Validation {
+func (c *Commands) AddInstanceMember(ctx context.Context, userID string, roles ...string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	return c.processWithFirst(ctx, c.PrepareAddInstanceMember(instanceAgg, userID, roles...))
+}
+
+func (c *Commands) PrepareAddInstanceMember(a *instance.Aggregate, userID string, roles ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if userID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument")
@@ -69,79 +73,63 @@ func IsInstanceMember(ctx context.Context, filter preparation.FilterToQueryReduc
 	return isMember, nil
 }
 
-func (c *Commands) AddInstanceMember(ctx context.Context, userID string, roles ...string) (*domain.Member, error) {
+// ChangeInstanceMember updates an existing member
+func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Member) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddInstanceMemberCommand(instanceAgg, userID, roles...))
-	if err != nil {
-		return nil, err
-	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	addedMember := NewInstanceMemberWriteModel(ctx, userID)
-	err = AppendAndReduce(addedMember, events...)
-	if err != nil {
-		return nil, err
-	}
-	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
+	return c.processWithFirst(ctx, c.prepareChangeInstanceMember(instanceAgg, member))
 }
 
-// ChangeInstanceMember updates an existing member
-func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
-	if !member.IsIAMValid() {
-		return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IAM.MemberInvalid")
+func (c *Commands) prepareChangeInstanceMember(a *instance.Aggregate, member *domain.Member) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if !member.IsIAMValid() {
+			return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IAM.MemberInvalid")
+		}
+		if len(domain.CheckForInvalidRoles(member.Roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
+			return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-3m9fs", "Errors.IAM.MemberInvalid")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+				writeModel, err := getInstanceMemberWriteModel(ctx, filter, member.UserID)
+				if err != nil {
+					return nil, err
+				}
+				if !isMemberExisting(writeModel.State) {
+					return nil, errors.ThrowNotFound(nil, "INSTANCE-D8JxR", "Errors.NotFound")
+				}
+				if reflect.DeepEqual(writeModel.Roles, member.Roles) {
+					return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-LiaZi", "Errors.IAM.Member.RolesNotChanged")
+				}
+				return []eventstore.Command{
+					instance.NewMemberChangedEvent(ctx, &a.Aggregate, member.UserID, member.Roles...),
+				}, nil
+			},
+			nil
 	}
-	if len(domain.CheckForInvalidRoles(member.Roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-3m9fs", "Errors.IAM.MemberInvalid")
-	}
-
-	existingMember, err := c.instanceMemberWriteModelByID(ctx, member.UserID)
-	if err != nil {
-		return nil, err
-	}
-
-	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
-		return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-LiaZi", "Errors.IAM.Member.RolesNotChanged")
-	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewMemberChangedEvent(ctx, instanceAgg, member.UserID, member.Roles...))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingMember, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-
-	return memberWriteModelToMember(&existingMember.MemberWriteModel), nil
 }
 
 func (c *Commands) RemoveInstanceMember(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
-	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IDMissing")
-	}
-	memberWriteModel, err := c.instanceMemberWriteModelByID(ctx, userID)
-	if err != nil && !errors.IsNotFound(err) {
-		return nil, err
-	}
-	if errors.IsNotFound(err) {
-		// empty response because we have no data that match the request
-		return &domain.ObjectDetails{}, nil
-	}
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	return c.processWithFirst(ctx, c.prepareRemoveInstanceMember(instanceAgg, userID))
+}
 
-	instanceAgg := InstanceAggregateFromWriteModel(&memberWriteModel.MemberWriteModel.WriteModel)
-	removeEvent := c.removeInstanceMember(ctx, instanceAgg, userID, false)
-	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
-	if err != nil {
-		return nil, err
+func (c *Commands) prepareRemoveInstanceMember(a *instance.Aggregate, userID string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if userID == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IDMissing")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+				writeModel, err := getInstanceMemberWriteModel(ctx, filter, userID)
+				if err != nil {
+					return nil, err
+				}
+				if !isMemberExisting(writeModel.State) {
+					return nil, errors.ThrowNotFound(nil, "INSTANCE-98201h", "Errors.NotFound")
+				}
+				return []eventstore.Command{
+					c.removeInstanceMember(ctx, &a.Aggregate, userID, false),
+				}, nil
+			},
+			nil
 	}
-	err = AppendAndReduce(memberWriteModel, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToObjectDetails(&memberWriteModel.MemberWriteModel.WriteModel), nil
 }
 
 func (c *Commands) removeInstanceMember(ctx context.Context, instanceAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.Command {
@@ -155,19 +143,16 @@ func (c *Commands) removeInstanceMember(ctx context.Context, instanceAgg *events
 	}
 }
 
-func (c *Commands) instanceMemberWriteModelByID(ctx context.Context, userID string) (member *InstanceMemberWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
+func getInstanceMemberWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, userID string) (*InstanceMemberWriteModel, error) {
 	writeModel := NewInstanceMemberWriteModel(ctx, userID)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
 	}
-
-	if writeModel.State == domain.MemberStateUnspecified || writeModel.State == domain.MemberStateRemoved {
-		return nil, errors.ThrowNotFound(nil, "INSTANCE-D8JxR", "Errors.NotFound")
+	if len(events) == 0 {
+		return writeModel, nil
 	}
-
-	return writeModel, nil
+	writeModel.AppendEvents(events...)
+	err = writeModel.Reduce()
+	return writeModel, err
 }
