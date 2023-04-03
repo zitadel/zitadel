@@ -11,7 +11,7 @@ In ZITADEL you can connect an Identity Provider (IdP) like GitLab to your instan
 
 ## Prerequisite
 
-To be able to use GitLab to authenticate your users you need to enable OpenID Connect for OAuth applications. You can find more informations in the following link: [GitLab as OpenID Connect identity provider](https://docs.gitlab.com/ee/integration/openid_connect_provider.html)
+Make sure to read and follow the [General Guide](./general) on how to setup identity providers for your ZITADEL instance first, before you go through the specific guide here.
 
 ## GitLab Configuration
 

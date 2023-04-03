@@ -11,7 +11,7 @@ In ZITADEL you can connect an Identity Provider (IdP) like GitHub to your instan
 
 ## Prerequisite
 
-To be able to use GitHub to authenticate your users you need GitHub OAuth Apps. You can find more informations in the following link: [Authorizing Oauth Apps](https://docs.github.com/en/apps/oauth-apps/using-oauth-apps/authorizing-oauth-apps)
+Make sure to read and follow the [General Guide](./general) on how to setup identity providers for your ZITADEL instance first, before you go through the specific guide here.
 
 ## GitHub Configuration
 

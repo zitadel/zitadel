@@ -34,3 +34,8 @@ Go to the settings page of your instance or organization and choose "Identity Pr
 
 In the table you can see all the providers you have configured and below the different providers
 ![Identity Provider Overview](/img/guides/zitadel_identity_provider_overview.png)
+
+To setup your specific providers go to the configuration guide you need:
+- [Google](./google)
+- [GitHub](./github)
+- [GitLab](./gitlab)

@@ -11,7 +11,7 @@ In ZITADEL you can connect an Identity Provider (IdP) like Google to your instan
 
 ## Prerequisite
 
-To be able to use Google to authenticate your users you need an OIDC Client in Google.
+Make sure to read and follow the [General Guide](./general) on how to setup identity providers for your ZITADEL instance first, before you go through the specific guide here.
 
 ## Google Configuration
 
