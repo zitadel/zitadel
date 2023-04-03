@@ -400,6 +400,8 @@ import {
   SetCustomInitMessageTextResponse,
   SetCustomLoginTextsRequest,
   SetCustomLoginTextsResponse,
+  SetCustomPasswordChangeMessageTextRequest,
+  SetCustomPasswordChangeMessageTextResponse,
   SetCustomPasswordlessRegistrationMessageTextRequest,
   SetCustomPasswordlessRegistrationMessageTextResponse,
   SetCustomPasswordResetMessageTextRequest,
@@ -686,6 +688,12 @@ export class ManagementService {
     req: GetCustomPasswordChangeMessageTextRequest,
   ): Promise<GetCustomPasswordChangeMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getCustomPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setCustomPasswordChangeMessageText(
+    req: SetCustomPasswordChangeMessageTextRequest,
+  ): Promise<SetCustomPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomPasswordChangeMessageCustomText(req, null).then((resp) => resp.toObject());
   }
 
   public resetCustomPasswordChangeMessageTextToDefault(
