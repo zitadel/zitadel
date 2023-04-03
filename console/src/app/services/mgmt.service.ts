@@ -691,7 +691,7 @@ export class ManagementService {
   }
 
   public setCustomPasswordChangeMessageText(
-    req: SetCustomPasswordChangeMessageTextRequest
+    req: SetCustomPasswordChangeMessageTextRequest,
   ): Promise<SetCustomPasswordChangeMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.setCustomPasswordChangeMessageCustomText(req, null).then((resp) => resp.toObject());
   }
