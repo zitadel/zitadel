@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/user/model"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
@@ -242,6 +243,22 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
 	}
 	return scopes, nil
+}
+
+func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID, projectID string) error {
+	token.Audience = append(token.Audience, clientID)
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
+	if err != nil {
+		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+	}
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	if err != nil {
+		return err
+	}
+	for _, role := range roles.ProjectRoles {
+		token.Scopes = append(token.Scopes, ScopeProjectRolePrefix+role.Key)
+	}
+	return nil
 }
 
 func setContextUserSystem(ctx context.Context) context.Context {

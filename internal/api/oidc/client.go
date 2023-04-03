@@ -163,9 +163,10 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
 	if token.IsPAT {
-		// PATs are automatically valid and all possible roles are returned
-		token.Audience = append(token.Audience, clientID)
-		token.Scopes = append(token.Scopes, ScopeProjectsRoles)
+		err = o.assertClientScopesForPAT(ctx, token, clientID, projectID)
+		if err != nil {
+			return errors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
+		}
 	}
 	for _, aud := range token.Audience {
 		if aud == clientID || aud == projectID {
