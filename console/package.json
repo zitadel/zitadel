@@ -49,7 +49,7 @@
     "tinycolor2": "^1.6.0",
     "tslib": "^2.4.1",
     "uuid": "^9.0.0",
-    "zone.js": "~0.12.0"
+    "zone.js": "~0.13.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.2.2",
