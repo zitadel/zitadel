@@ -58,7 +58,7 @@
     "@angular-eslint/eslint-plugin-template": "^15.2.1",
     "@angular-eslint/schematics": "^15.2.1",
     "@angular-eslint/template-parser": "^15.2.1",
-    "@angular/cli": "^15.2.2",
+    "@angular/cli": "^15.2.4",
     "@angular/compiler-cli": "^15.2.2",
     "@angular/language-service": "^15.2.2",
     "@bufbuild/buf": "^1.14.0",
