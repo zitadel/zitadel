@@ -50,6 +50,7 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID
 		tokenView = new(model.RefreshTokenView)
 		tokenView.ID = tokenID
 		tokenView.UserID = userID
+		tokenView.InstanceID = authz.GetInstance(ctx).InstanceID()
 	}
 
 	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.Sequence)

@@ -3,9 +3,9 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"runtime/debug"
 
 	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -17,6 +17,9 @@ type Querier interface {
 }
 
 func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQueryFactory) (events []*es_models.Event, err error) {
+	if !searchQuery.InstanceFiltered {
+		logging.WithFields("stack", string(debug.Stack())).Warn("instanceid not filtered")
+	}
 	return filter(ctx, db.client, searchQuery)
 }
 
