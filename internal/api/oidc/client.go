@@ -311,15 +311,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	if err != nil {
 		return err
 	}
-
-	if projectRoles != nil && len(projectRoles.projects) > 0 {
-		if roles, ok := projectRoles.projects[projectRoles.requestProjectID]; ok {
-			userInfo.AppendClaims(ClaimProjectRoles, roles)
-		}
-		for projectID, roles := range projectRoles.projects {
-			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
-		}
-	}
+	o.setUserInfoRoleClaims(userInfo, projectRoles)
 
 	return o.userinfoFlows(ctx, user.ResourceOwner, userGrants, userInfo)
 }
@@ -379,6 +371,17 @@ func (o *OPStorage) setUserInfoResourceOwner(ctx context.Context, userInfo *oidc
 		userInfo.AppendClaims(claim, value)
 	}
 	return nil
+}
+
+func (o *OPStorage) setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
+	if roles != nil && len(roles.projects) > 0 {
+		if roles, ok := roles.projects[roles.requestProjectID]; ok {
+			userInfo.AppendClaims(ClaimProjectRoles, roles)
+		}
+		for projectID, roles := range roles.projects {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
+		}
+	}
 }
 
 func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, userGrants *query.UserGrants, userInfo *oidc.UserInfo) error {
