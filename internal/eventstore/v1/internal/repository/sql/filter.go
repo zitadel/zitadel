@@ -6,6 +6,7 @@ import (
 	"runtime/debug"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
