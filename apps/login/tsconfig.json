@@ -1,6 +1,7 @@
 {
   "extends": "@zitadel/tsconfig/nextjs.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
       "#/*": ["./*"]
     },
