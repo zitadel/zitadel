@@ -241,6 +241,9 @@ Errors:
       NotFound: Polityka powiadomień nie znaleziona
       NotChanged: Polityka powiadomień nie zmieniona
       AlreadyExists: Polityka powiadomień już istnieje
+    LabelPolicy:
+      NotFound: Nie znaleziono polityki marki własnej
+      NotChanged: Polityka dotycząca marek własnych nie została zmieniona
   Project:
     ProjectIDMissing: Identyfikator projektu brak
     AlreadyExists: Projekt już istnieje w organizacji

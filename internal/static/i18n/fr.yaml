@@ -241,6 +241,9 @@ Errors:
       NotFound: La politique notification n'a pas été trouvée
       NotChanged: La politique notification n'a pas été modifiée
       AlreadyExists: La politique notification existe déjà
+    LabelPolicy:
+      NotFound: La politique d'étiquetage privé n'a pas été trouvée
+      NotChanged: La politique en matière de marques privées n'a pas été modifiée
   Project:
     ProjectIDMissing: Id de projet manquant
     AlreadyExists: Le projet existe déjà dans l'organisation

@@ -1,0 +1,2143 @@
+{
+  "APP_NAME": "ZITADEL",
+  "PAGINATOR": {
+    "PREVIOUS": "前へ",
+    "NEXT": "次へ",
+    "COUNT": "件",
+    "MORE": "詳細"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "お問い合わせ",
+      "TOS": "利用規約",
+      "PP": "プライバシーポリシー"
+    },
+    "THEME": {
+      "DARK": "ダーク",
+      "LIGHT": "ライト"
+    }
+  },
+  "HOME": {
+    "WELCOME": "ZITADELをはじめる",
+    "DISCLAIMER": "ZITADELはあなたのデータを機密かつ安全に扱います。",
+    "DISCLAIMERLINK": "さらに詳しく",
+    "DOCUMENTATION": {
+      "TITLE": "ドキュメント",
+      "DESCRIPTION": "ZITADELをすぐにはじめる。"
+    },
+    "GETSTARTED": {
+      "TITLE": "ZITADELをはじめる",
+      "DESCRIPTION": "ZITADELをすぐにはじめる。"
+    },
+    "QUICKSTARTS": {
+      "LABEL": "最初のステップ",
+      "TITLE": "クイックスタート",
+      "DESCRIPTION": "ZITADELをすぐにはじめる。"
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "ショートカット",
+      "SETTINGS": "利用可能なショートカット",
+      "PROJECTS": "プロジェクト",
+      "REORDER": "タイルをホールド&ドラッグして移動する",
+      "ADD": "タイルをホールド&ドラッグして追加する"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "オンボーディングの手順",
+    "COMPLETED": "完了",
+    "DISMISS": "いいえ、私はプロです。",
+    "CARD": {
+      "TITLE": "ZITADELの起動",
+      "DESCRIPTION": "このチェックリストを使用して、重要な手順を確認しながらインスタンスをセットアップします。"
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "ブランドをセットアップする",
+        "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。"
+      },
+      "instance.smtp.config.added": {
+        "title": "SMTP設定をセットアップする",
+        "description": "独自のメールサーバーを設定します。"
+      },
+      "project.added": {
+        "title": "最初のプロジェクトを作成する",
+        "description": "最初のプロジェクトを追加し、ロールと認証を定義します。"
+      },
+      "project.application.added": {
+        "title": "最初のアプリケーションを作成する",
+        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。"
+      },
+      "user.human.added": {
+        "title": "ユーザーを追加する",
+        "description": "アプリケーションユーザーを追加します。"
+      },
+      "user.grant.added": {
+        "title": "ユーザーにグラントする",
+        "description": "ユーザーがアプリケーションにアクセスし、ロールをセットアップできるようにします。"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "インスタンス",
+    "DASHBOARD": "ホーム",
+    "PERSONAL_INFO": "個人情報",
+    "DOCUMENTATION": "ドキュメント",
+    "INSTANCEOVERVIEW": "インスタンス",
+    "ORGS": "組織",
+    "VIEWS": "ビュー",
+    "EVENTS": "イベント",
+    "FAILEDEVENTS": "失敗したイベント",
+    "ORGANIZATION": "組織",
+    "DOMAINS": "ドメイン",
+    "PROJECT": "プロジェクト",
+    "PROJECTOVERVIEW": "概要",
+    "PROJECTGRANTS": "グラント",
+    "ROLES": "ロール",
+    "GRANTEDPROJECT": "グラントされたプロジェクト",
+    "HUMANUSERS": "ユーザー",
+    "MACHINEUSERS": "サービスユーザー",
+    "LOGOUT": "すべてのユーザーをログアウトする",
+    "NEWORG": "新しい組織",
+    "IAMADMIN": "あなたはIAM管理者です。広範囲の権限があることに注意してください。",
+    "SHOWORGS": "すべての組織を表示する",
+    "GRANTS": "認可",
+    "ACTIONS": "アクション",
+    "PRIVACY": "プライバシー",
+    "TOS": "利用規約",
+    "OPENSHORTCUTSTOOLTIP": "「?」と入力し、キーボードショートカットを表示する",
+    "SETTINGS": "設定",
+    "CUSTOMERPORTAL": "カスタマーポータル"
+  },
+  "ACTIONS": {
+    "ACTIONS": "アクション",
+    "FILTER": "絞り込み",
+    "RENAME": "名前を変更する",
+    "SET": "設定",
+    "COPY": "クリップボードにコピーする",
+    "COPIED": "クリップボードにコピーされました。",
+    "RESET": "リセット",
+    "RESETDEFAULT": "デフォルトにリセット",
+    "RESETTO": "リセット：",
+    "RESETCURRENT": "現在の設定にリセット",
+    "SHOW": "表示",
+    "HIDE": "非表示",
+    "SAVE": "保存",
+    "SAVENOW": "今すぐ保存",
+    "NEW": "新規",
+    "ADD": "追加",
+    "CREATE": "作成",
+    "CONTINUE": "次へ",
+    "BACK": "戻る",
+    "CLOSE": "閉じる",
+    "CLEAR": "消去する",
+    "CANCEL": "キャンセル",
+    "INFO": "情報",
+    "OK": "OK",
+    "SELECT": "選択",
+    "VIEW": "閲覧",
+    "SELECTIONDELETE": "選択肢を削除",
+    "DELETE": "消去",
+    "REMOVE": "削除",
+    "VERIFY": "認証",
+    "FINISH": "終了",
+    "FINISHED": "終了",
+    "CHANGE": "変更",
+    "REACTIVATE": "アクティブ化",
+    "ACTIVATE": "アクティブ化",
+    "DEACTIVATE": "非アクティブ化",
+    "REFRESH": "リフレッシュ",
+    "LOGIN": "ログイン",
+    "EDIT": "編集",
+    "PIN": "ピン留め / ピン留めを外す",
+    "CONFIGURE": "構成",
+    "SEND": "送信",
+    "NEWVALUE": "新しい値",
+    "RESTORE": "復元",
+    "CONTINUEWITHOUTSAVE": "保存せずに続行",
+    "OF": "の",
+    "PREVIOUS": "前",
+    "NEXT": "次",
+    "MORE": "さらに",
+    "STEP": "ステップ",
+    "SETUP": "セットアップ",
+    "COMINGSOON": "近日公開",
+    "TABLE": {
+      "SHOWUSER": "ユーザー {{value}} を表示する"
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "すべての組織を含むインスタンス全体を管理する権限を持ちます",
+    "IAM_OWNER_VIEWER": "すべての組織を含むインスタンス全体を閲覧する権限を持ちます",
+    "IAM_ORG_MANAGER": "組織の作成および管理する権限を持ちます",
+    "IAM_USER_MANAGER": "ユーザーの作成および管理する権限を持ちます",
+    "ORG_OWNER": "組織全体に対する権限を持ちます",
+    "ORG_USER_MANAGER": "組織のユーザーを作成および管理する権限を持ちます",
+    "ORG_OWNER_VIEWER": "組織全体を閲覧する権限を持ちます",
+    "ORG_USER_PERMISSION_EDITOR": "ユーザーグラントを管理する権限を持ちます",
+    "ORG_PROJECT_PERMISSION_EDITOR": "プロジェクトグラントを管理する権限を持ちます",
+    "ORG_PROJECT_CREATOR": "所有するプロジェクトと配下の設定を作成する権限を持ちます",
+    "PROJECT_OWNER": "特定のプロジェクト全体を管理する権限を持ちます",
+    "PROJECT_OWNER_VIEWER": "特定のプロジェクト全体を閲覧する権限を持ちます",
+    "PROJECT_OWNER_GLOBAL": "全てのプロジェクトを管理する権限を持ちます",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "全てのプロジェクトを閲覧する権限を持ちます",
+    "PROJECT_GRANT_OWNER": "プロジェクトグラントを管理する権限を持ちます",
+    "PROJECT_GRANT_OWNER_VIEWER": "プロジェクトグラントを閲覧する権限を持ちます"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "コンソール内のすべての組織設定とテーブルは、選択した組織に基づいています。このボタンをクリックして組織を切り替えるか、新しい組織を作成してください。"
+    },
+    "INSTANCE": {
+      "TEXT": "インスタンス設定にアクセスするには、ここをクリックしてください。強力なアクセス権限を許可されている場合は、このボタンにのみアクセスできることに注意してください。"
+    },
+    "PROFILE": {
+      "TEXT": "ここでは、ユーザーアカウントを切り替えて、セッションとプロフィールを管理できます。"
+    },
+    "NAV": {
+      "TEXT": "このナビゲーションは、上記の選択した組織またはインスタンスに基づいて変更されます"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "注意！ 組織のコンテキストが変更されました。"
+    }
+  },
+  "FILTER": {
+    "TITLE": "絞り込み",
+    "STATE": "ステータス",
+    "DISPLAYNAME": "表示用ユーザー名",
+    "EMAIL": "Eメール",
+    "USERNAME": "ユーザー名",
+    "ORGNAME": "組織名",
+    "PROJECTNAME": "プロジェクト名",
+    "RESOURCEOWNER": "リソース所有者",
+    "METHODS": {
+      "1": "等しい",
+      "5": "含む",
+      "7": "で終わる"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "キーボードショートカット",
+    "UNDERORGCONTEXT": "組織ページ内",
+    "SIDEWIDE": "サイト全体のショートカット",
+    "SHORTCUTS": {
+      "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
+      "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
+      "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings",
+      "ORGSWITCHER": "組織を変更する",
+      "ME": "自分のプロフィールに移動する",
+      "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
+      "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
+      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations",
+      "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
+      "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
+    }
+  },
+  "RESOURCEID": "リソースID",
+  "NAME": "名前",
+  "VERSION": "バージョン",
+  "TABLE": {
+    "NOROWS": "データなし"
+  },
+  "ERRORS": {
+    "REQUIRED": "一部の必須項目が不足しています。",
+    "TOKENINVALID": {
+      "TITLE": "トークンが期限切れになりました。",
+      "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
+    },
+    "INVALID_FORMAT": "不正なフォーマットです",
+    "NOTANEMAIL": "入力された値がメールアドレスではありません。",
+    "MINLENGTH": "{{requiredLength}} 文字以上の文字列が必要です。",
+    "UPPERCASEMISSING": "大文字を含める必要があります。",
+    "LOWERCASEMISSING": "小文字を含める必要があります。",
+    "SYMBOLERROR": "シンボルや句読点を含める必要があります。",
+    "NUMBERERROR": "小数点を含める必要があります。",
+    "PWNOTEQUAL": "パスワードが一致しません。",
+    "PHONE": "電話番号は00か+で始まる必要があります。"
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "設定",
+      "GENERAL": "全般",
+      "IDP": "IDプロバイダー",
+      "SECURITY": "パスワードとセキュリティ",
+      "KEYS": "キー",
+      "PAT": "個人用アクセス トークン",
+      "USERGRANTS": "認可",
+      "MEMBERSHIPS": "メンバーシップ",
+      "METADATA": "メタデータ"
+    },
+    "TITLE": "個人情報",
+    "DESCRIPTION": "情報とセキュリティ設定を管理します。",
+    "PAGES": {
+      "LIST": "ユーザー",
+      "TITLE": "ユーザー",
+      "DESCRIPTION": "組織内の新しいユーザーを作成し、既存のユーザーを管理します。",
+      "LISTMACHINE": "サービスユーザー",
+      "DESCRIPTIONMACHINE": "組織のサービスユーザーを作成・管理します。",
+      "DETAIL": "詳細",
+      "CREATE": "作成",
+      "MY": "自分の情報",
+      "LOGINNAMES": "ログイン名",
+      "LOGINMETHODS": "ログイン方法",
+      "LOGINNAMESDESC": "これらはあなたのログイン名です：",
+      "NOUSER": "関連するユーザーはありません。",
+      "REACTIVATE": "アクティブ化",
+      "DEACTIVATE": "非アクティブ化",
+      "FILTER": "絞り込み",
+      "STATE": "ステータス",
+      "DELETE": "ユーザーを削除",
+      "UNLOCK": "ユーザーのロックを解除",
+      "GENERATESECRET": "クライアントシークレットを生成",
+      "REMOVESECRET": "クライアントシークレットを削除",
+      "LOCKEDDESCRIPTION": "このユーザーは、最大ログインの試行を超えるためにロックアウトされており、再び使用するにはロック解除する必要があります。",
+      "DELETEACCOUNT": "アカウントを削除",
+      "DELETEACCOUNT_DESC": "このアクションを実行すると、ログアウトされ、アカウントにアクセスできなくなります。このアクションは元に戻せないので、注意して実行してください。",
+      "DELETEACCOUNT_BTN": "アカウントを削除",
+      "DELETEACCOUNT_SUCCESS": "アカウントが正常に削除されました！"
+    },
+    "DETAILS": {
+      "DATECREATED": "作成",
+      "DATECHANGED": "変更"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "ユーザーの削除",
+      "DELETE_SELF_TITLE": "アカウントの削除",
+      "DELETE_DESCRIPTION": "ユーザーを完全に削除しようとしています。本当によろしいですか？",
+      "DELETE_SELF_DESCRIPTION": "個人アカウントを完全に削除しようとしています。これにより、対象ユーザーがログアウトされ削除されます。このアクションを元に戻すことはできません！",
+      "DELETE_AUTH_DESCRIPTION": "個人アカウントを完全に削除しようとしています。本当によろしいですか？",
+      "TYPEUSERNAME": "確認のため「{{value}}」と入力して、ユーザーを削除してください。",
+      "USERNAME": "ログイン名",
+      "DELETE_BTN": "完全に削除する"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "メール通知の送信",
+      "DESCRIPTION": "下のボタンをクリックして、現在のメールアドレスに通知を送信するか、メールアドレスを変更する。",
+      "NEWEMAIL": "新しいメールアドレス"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "クライアントシークレット",
+      "CLIENTSECRET_DESCRIPTION": "クライアントシークレットは、ダイアログを閉じた後は表示されません。安全な場所に保管してください。"
+    },
+    "TABLE": {
+      "DEACTIVATE": "無効にする",
+      "ACTIVATE": "アクティベート",
+      "CHANGEDATE": "最終更新日",
+      "CREATIONDATE": "作成日",
+      "TYPES": {
+        "HUMAN": "ユーザー",
+        "MACHINE": "サービスユーザー"
+      },
+      "FILTER": {
+        "0": "表示名で絞り込み",
+        "1": "ユーザー名で絞り込み",
+        "2": "表示名で絞り込み",
+        "3": "ユーザー名で絞り込み",
+        "4": "メールアドレスで絞り込み",
+        "5": "表示名で絞り込み",
+        "10": "組織名で絞り込み",
+        "12": "プロジェクト名で絞り込み"
+      },
+      "EMPTY": "エントリはありません"
+    },
+    "PASSWORDLESS": {
+      "SEND": "登録リンクを送信する",
+      "TABLETYPE": "タイプ",
+      "TABLESTATE": "ステータス",
+      "NAME": "名前",
+      "EMPTY": "デバイスセットはありません",
+      "TITLE": "パスワードレス認証",
+      "DESCRIPTION": "WebAuthnベースの認証方法を追加して、ZITADELにパスワードレスでログオンします。",
+      "MANAGE_DESCRIPTION": "二段階認証を管理する。",
+      "U2F": "認証方法を追加する",
+      "U2F_DIALOG_TITLE": "Authenticatorの認証",
+      "U2F_DIALOG_DESCRIPTION": "使用済みのパスワードレスログインの名前を入力する",
+      "U2F_SUCCESS": "パスワードレス認証が正常に作成されました！",
+      "U2F_ERROR": "セットアップ中のエラーが発生しました！",
+      "U2F_NAME": "認証者名",
+      "TYPE": {
+        "0": "MFAは定義されていません",
+        "1": "ワンタイムパスワード（OTP）",
+        "2": "指紋、セキュリティキー、フェイスIDなど"
+      },
+      "STATE": {
+        "0": "状態なし",
+        "1": "準備中",
+        "2": "準備完了",
+        "3": "削除"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "パスワードレス認証の削除",
+        "DELETE_DESCRIPTION": "パスワードレス認証を削除しようとしています。本当によろしいですか？",
+        "ADD_TITLE": "パスワードレス認証",
+        "ADD_DESCRIPTION": "パスワードレス認証方法を作成するための、利用可能なオプションのいずれかを選択する。",
+        "SEND_DESCRIPTION": "メールアドレスに登録リンクを送信する。",
+        "SEND": "登録リンクを送信する",
+        "SENT": "メールは正常に配信されました。セットアップを続行するには、メールボックスを確認してください。",
+        "QRCODE_DESCRIPTION": "別のデバイスでスキャンするためのQRコードを生成する。",
+        "QRCODE": "QRコードを生成する",
+        "QRCODE_SCAN": "このQRコードをスキャンして、デバイスのセットアップを続行する。",
+        "NEW_DESCRIPTION": "このデバイスを使用して、パスワードレス認証をセットアップする。",
+        "NEW": "新規追加"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "タイプ",
+      "TABLESTATE": "ステータス",
+      "NAME": "名前",
+      "EMPTY": "追加の要素はありません",
+      "TITLE": "多要素認証",
+      "DESCRIPTION": "二要素認証を追加して、アカウントに最適なセキュリティを確保します。",
+      "MANAGE_DESCRIPTION": "ユーザーの二要素認証を管理する。",
+      "ADD": "二要素認証を追加する",
+      "OTP": "OTP用認証アプリ（ワンタイム・パスワード）",
+      "OTP_DIALOG_TITLE": "OTPの追加",
+      "OTP_DIALOG_DESCRIPTION": "認証アプリでQRコードを読み取り、下記のコードを入力することで、OTP方式の確認と有効化ができます。",
+      "U2F": "指紋、セキュリティキー、フェイスIDなど",
+      "U2F_DIALOG_TITLE": "二要素認証の検証",
+      "U2F_DIALOG_DESCRIPTION": "使用済みの二要素認証の名前を入力する。",
+      "U2F_SUCCESS": "二要素認証が正常に追加されました！",
+      "U2F_ERROR": "セットアップ中にエラーが発生しました！",
+      "U2F_NAME": "認証者名",
+      "TYPE": {
+        "0": "MFAは定義されていません",
+        "1": "ワンタイムパスワード（OTP）",
+        "2": "指紋、セキュリティキー、フェイスIDなど"
+      },
+      "STATE": {
+        "0": "状態なし",
+        "1": "準備中",
+        "2": "準備完了",
+        "3": "削除"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "二要素認証の削除",
+        "MFA_DELETE_DESCRIPTION": "二要素認証を削除しようとしています。本当によろしいですか？",
+        "ADD_MFA_TITLE": "二要素認証の追加",
+        "ADD_MFA_DESCRIPTION": "次のオプションの内、いずれかを選択してください。"
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "外部IDプロバイダー",
+      "DESC": "",
+      "IDPCONFIGID": "IDP設定ID",
+      "IDPNAME": "IDP名",
+      "USERDISPLAYNAME": "外部表示名",
+      "EXTERNALUSERID": "外部ユーザーID",
+      "EMPTY": "外部IDPは見つかりません",
+      "DIALOG": {
+        "DELETE_TITLE": "IDPの削除",
+        "DELETE_DESCRIPTION": "ユーザーからIDプロバイダーを削除しようとしています。本当によろしいですか？"
+      }
+    },
+    "CREATE": {
+      "TITLE": "新しいユーザーの作成",
+      "DESCRIPTION": "必須情報を入力してください。",
+      "NAMEANDEMAILSECTION": "名前とメール",
+      "GENDERLANGSECTION": "性別と言語",
+      "PHONESECTION": "電話番号",
+      "PASSWORDSECTION": "初期パスワード",
+      "ADDRESSANDPHONESECTION": "電話番号",
+      "INITMAILDESCRIPTION": "両方のオプションが選択されている場合、初期セットアップ用のメールは送信されません。オプションのいずれかが選択されている場合、データを提供・認証するためのメールが送信されます。"
+    },
+    "CODEDIALOG": {
+      "TITLE": "電話番号の検証",
+      "DESCRIPTION": "テキストメッセージで受信したコードを入力して、電話番号を検証してください。",
+      "CODE": "コード"
+    },
+    "DATA": {
+      "STATE": "ステータス",
+      "STATE0": "不明",
+      "STATE1": "アクティブ",
+      "STATE2": "非アクティブ",
+      "STATE3": "削除",
+      "STATE4": "ロック",
+      "STATE5": "停止",
+      "STATE6": "初期化待ち"
+    },
+    "PROFILE": {
+      "TITLE": "プロフィール",
+      "EMAIL": "Eメール",
+      "PHONE": "電話番号",
+      "PHONE_HINT": "00または+マークの後に通話先の国番号を入力するか、ドロップダウンから国を選択し、最後に電話番号を入力します。",
+      "USERNAME": "ユーザー名",
+      "CHANGEUSERNAME": "変更",
+      "CHANGEUSERNAME_TITLE": "ユーザー名の変更",
+      "CHANGEUSERNAME_DESC": "以下のフィールドに新しい名前を入力してください。",
+      "FIRSTNAME": "名",
+      "LASTNAME": "姓",
+      "NICKNAME": "ニックネーム",
+      "DISPLAYNAME": "表示名",
+      "PREFERRED_LANGUAGE": "言語",
+      "GENDER": "性別",
+      "PASSWORD": "パスワード",
+      "AVATAR": {
+        "UPLOADTITLE": "プロフィール写真のアップロード",
+        "UPLOADBTN": "ファイルを選択",
+        "UPLOAD": "アップロード",
+        "CURRENT": "現在の写真",
+        "PREVIEW": "プレビュー",
+        "DELETESUCCESS": "正常に削除されました！",
+        "CROPPERERROR": "ファイルのアップロード中にエラーが発生しました。必要に応じて、別の形式とサイズを試してください。"
+      },
+      "COUNTRY": "国"
+    },
+    "MACHINE": {
+      "TITLE": "サービスユーザーの詳細",
+      "USERNAME": "ユーザー名",
+      "NAME": "名前",
+      "DESCRIPTION": "概要",
+      "KEYSTITLE": "キー",
+      "KEYSDESC": "キーを定義し、オプションの有効期限を追加する。",
+      "TOKENSTITLE": "パーソナルアクセストークン",
+      "TOKENSDESC": "パーソナルアクセストークンは、通常のOAuthアクセストークンのように機能します。",
+      "ID": "キーID",
+      "TYPE": "タイプ",
+      "EXPIRATIONDATE": "有効期限",
+      "CHOOSEDATEAFTER": "後で有効期限を入力する",
+      "CHOOSEEXPIRY": "有効期限を選択する",
+      "CREATIONDATE": "作成日",
+      "KEYDETAILS": "重要な詳細",
+      "ACCESSTOKENTYPE": "アクセストークンタイプ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "キーの追加",
+        "DESCRIPTION": "キータイプを選択し、オプションで有効期限を選択する。"
+      },
+      "ADDED": {
+        "TITLE": "キーの作成完了",
+        "DESCRIPTION": "キーをダウンロードしてください！このダイアログを閉じた後は表示されません。"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "キーの削除",
+          "DESCRIPTION": "選択したキーを削除しますか？ 一度削除すると元に戻すことはできません。"
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "パスワード",
+      "LABEL": "安全なパスワードで、アカウントを保護します。",
+      "DESCRIPTION": "以下のポリシーに従って新しいパスワードを入力してください。",
+      "OLD": "現在のパスワード",
+      "NEW": "新しいパスワード",
+      "CONFIRM": "新しいパスワードの確認",
+      "NEWINITIAL": "パスワード",
+      "CONFIRMINITIAL": "パスワードの確認",
+      "RESET": "現在のパスワードをリセットする",
+      "SET": "新しいパスワードを設定する",
+      "RESENDNOTIFICATION": "パスワードリセットのリンクを送信する",
+      "REQUIRED": "一部の必須項目が不足しています。",
+      "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。"
+    },
+    "ID": "id",
+    "EMAIL": "Eメール",
+    "PHONE": "電話番号",
+    "PHONEEMPTY": "電話番号は定義されていません",
+    "PHONEVERIFIED": "認証済みの電話番号",
+    "EMAILVERIFIED": "認証済みのメール",
+    "NOTVERIFIED": "未認証",
+    "PREFERRED_LOGINNAME": "優先ログインネーム",
+    "ISINITIAL": "ユーザーはまだアクティブではありません。",
+    "LOGINMETHODS": {
+      "TITLE": "連絡先",
+      "DESCRIPTION": "提供された情報は、パスワードリセットのメールなどの重要な情報を送信するために使用されます。",
+      "EMAIL": {
+        "TITLE": "Eメール",
+        "VALID": "認証",
+        "ISVERIFIED": "認証済みのメール",
+        "ISVERIFIEDDESC": "メールが認証済みである場合、メールの認証リクエストは送信されません。",
+        "RESEND": "認証メールを再送",
+        "EDITTITLE": "メールアドレスの変更",
+        "EDITDESC": "以下のフィールドに新しいメールアドレスを入力してください。"
+      },
+      "PHONE": {
+        "TITLE": "電話",
+        "VALID": "認証",
+        "RESEND": "認証テキストメッセージを再送信する",
+        "EDITTITLE": "電話番号の変更",
+        "EDITVALUE": "電話番号",
+        "EDITDESC": "下のフィールドに新しい電話番号を入力してください。",
+        "DELETETITLE": "電話番号の削除",
+        "DELETEDESC": "本当に電話番号を削除してよろしいですか？"
+      },
+      "RESENDCODE": "再送信コード",
+      "ENTERCODE": "認証",
+      "ENTERCODE_DESC": "コードを認証する"
+    },
+    "GRANTS": {
+      "TITLE": "ユーザーグラント",
+      "DESCRIPTION": "このユーザーに特定のプロジェクトに対するアクセス権をグラントする",
+      "CREATE": {
+        "TITLE": "ユーザーグラントの作成",
+        "DESCRIPTION": "組織、プロジェクト、および対応するプロジェクトのロールを検索する。"
+      },
+      "PROJECTNAME": "プロジェクト名",
+      "PROJECT-OWNED": "プロジェクト",
+      "PROJECT-GRANTED": "グラントされたプロジェクト",
+      "FILTER": {
+        "0": "ユーザーで絞り込み",
+        "1": "ドメインで絞り込み",
+        "2": "プロジェクト名で絞り込み",
+        "3": "ロール名で絞り込み"
+      }
+    },
+    "STATE": {
+      "0": "不明",
+      "1": "アクティブ",
+      "2": "非アクティブ",
+      "3": "削除",
+      "4": "ロック",
+      "5": "停止",
+      "6": "初期化待ち"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "ログインネーム（現在の組織）",
+      "ADDITIONAL-EXTERNAL": "ログインネーム（外部の組織）"
+    },
+    "TARGET": {
+      "SELF": "他の組織のユーザーに権限をグラントしたい場合",
+      "EXTERNAL": "組織のユーザーに権限をグラントする",
+      "CLICKHERE": "ここをクリック"
+    },
+    "SIGNEDOUT": "サインアウトされています。[サインイン]ボタンをクリックして、再度サインインする。",
+    "SIGNEDOUT_BTN": "サインイン",
+    "EDITACCOUNT": "アカウントの編集",
+    "ADDACCOUNT": "別のアカウントでログインする",
+    "RESENDINITIALEMAIL": "アクティベーションメールを再送信する",
+    "RESENDEMAILNOTIFICATION": "電子メール通知を再送信する",
+    "TOAST": {
+      "CREATED": "ユーザーが正常に作成されました。",
+      "SAVED": "プロファイルが正常に保存されました。",
+      "USERNAMECHANGED": "ユーザー名が変更されました。",
+      "EMAILSAVED": "メールアドレスは正常に保存されました。",
+      "INITEMAILSENT": "初期化メールが送信されました。",
+      "PHONESAVED": "電話番号が正常に保存されました。",
+      "PHONEREMOVED": "電話番号が削除されました。",
+      "PHONEVERIFIED": "電話番号が正常に認証されました。",
+      "PHONEVERIFICATIONSENT": "電話番号認証コードが送信されました。",
+      "EMAILVERIFICATIONSENT": "メールアドレス認証コードが送信されました。",
+      "OTPREMOVED": "OTPが削除されました",
+      "U2FREMOVED": "要素認証が削除されました。",
+      "PASSWORDLESSREMOVED": "パスワードレス認証が削除削除。",
+      "INITIALPASSWORDSET": "初期パスワードがセットされました。",
+      "PASSWORDNOTIFICATIONSENT": "パスワード変更通知が送信されました。",
+      "PASSWORDCHANGED": "パスワードは正常に変更されました。",
+      "REACTIVATED": "ユーザーがアクティブになりました。",
+      "DEACTIVATED": "ユーザーが非アクティブになりました。",
+      "SELECTEDREACTIVATED": "選択されたユーザーがアクティブになりました。",
+      "SELECTEDDEACTIVATED": "選択されたユーザー非アクティブになりました。",
+      "SELECTEDKEYSDELETED": "選択したキーが削除されました。",
+      "KEYADDED": "キーが追加されました！",
+      "MACHINEADDED": "サービスユーザーが作成されました！",
+      "DELETED": "ユーザーが正常に削除されました！",
+      "UNLOCKED": "ユーザーのロックが正常に解除されました！",
+      "PASSWORDLESSREGISTRATIONSENT": "登録リンクが正常に送信されました。",
+      "SECRETGENERATED": "シークレットが正常に生成されました！",
+      "SECRETREMOVED": "シークレットは正常に削除されました！"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "ZITADEL管理者ロール",
+      "DESCRIPTION": "ユーザーのメンバーグラント一覧です。組織、プロジェクト、IAMの詳細ページでも変更することができます。",
+      "ORGCONTEXT": "現在選択されている組織に関連するすべての組織とプロジェクトが表示されます。",
+      "USERCONTEXT": "自分が権限を持つすべての組織やプロジェクトが表示されます。他の組織も含みます。",
+      "CREATIONDATE": "作成日",
+      "CHANGEDATE": "最終更新日",
+      "DISPLAYNAME": "表示名",
+      "REMOVE": "削除",
+      "TYPE": "タイプ",
+      "ORGID": "組織ID",
+      "UPDATED": "メンバーシップが更新されました。",
+      "NOPERMISSIONTOEDIT": "ロールを編集するために必要な権限がありません！",
+      "TYPES": {
+        "UNKNOWN": "不明",
+        "ORG": "組織",
+        "PROJECT": "プロジェクト",
+        "GRANTEDPROJECT": "グラントされたプロジェクト"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "id",
+      "TOKEN": "トークン",
+      "ADD": {
+        "TITLE": "新しいパーソナルアクセストークンの生成",
+        "DESCRIPTION": "トークンのカスタム有効期限を定義する。",
+        "CHOOSEEXPIRY": "有効期限を選択する",
+        "CHOOSEDATEAFTER": "後で有効期限を入力する"
+      },
+      "ADDED": {
+        "TITLE": "パーソナルアクセストークン",
+        "DESCRIPTION": "必ずパーソナルアクセストークンをコピーしてください。再度閲覧はできません！"
+      },
+      "DELETE": {
+        "TITLE": "トークンの削除",
+        "DESCRIPTION": "パーソナルアクセストークンを削除しようとしています。本当によろしいですか？"
+      },
+      "DELETED": "トークンの削除に成功しました。"
+    }
+  },
+  "METADATA": {
+    "TITLE": "メタデータ",
+    "DESCRIPTION": "",
+    "KEY": "キー",
+    "VALUE": "値",
+    "ADD": "新しいエントリ",
+    "SAVE": "保存",
+    "EMPTY": "メタデータはありません",
+    "SETSUCCESS": "要素が正常に保存されました",
+    "REMOVESUCCESS": "要素が正常に削除されました"
+  },
+  "FLOWS": {
+    "TITLE": "アクションとフロー",
+    "DESCRIPTION": "特定のイベントで実行するスクリプトを定義します。",
+    "ACTIONSTITLE": "アクション",
+    "ACTIONSDESCRIPTION": "これらはフロー内で実行できるスクリプトです。",
+    "FLOWSTITLE": "フロー",
+    "FLOWSDESCRIPTION": "特定タイプのフローは、トリガーされるとアクションを実行します。",
+    "ID": "ID",
+    "NAME": "名前",
+    "STATE": "ステート",
+    "STATES": {
+      "0": "ステータスなし",
+      "1": "非アクティブ",
+      "2": "アクティブ"
+    },
+    "ADDTRIGGER": "トリガーを追加する",
+    "FLOWCHANGED": "フローは正常に変更されました",
+    "FLOWCLEARED": "フローは正常にリセットされました",
+    "TIMEOUT": "タイムアウト",
+    "TIMEOUTINSEC": "数秒でタイムアウト",
+    "ALLOWEDTOFAIL": "失敗を許可",
+    "SCRIPT": "スクリプトp",
+    "FLOWTYPE": "フロータイプ",
+    "TRIGGERTYPE": "トリガータイプ",
+    "ACTIONS": "アクション",
+    "ACTIONSMAX": "ティアに基づいて、限定された数のアクション（{{value}}）を利用できます。必要でないユーザーを非アクティブにするか、ティアのアップグレードを考慮してください。",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "アクションの作成"
+      },
+      "UPDATE": {
+        "TITLE": "アクションの更新"
+      },
+      "DELETEACTION": {
+        "TITLE": "アクションの削除",
+        "DESCRIPTION": "アクションを削除しようとしています。この変更は復元できません。本当によろしいですか？",
+        "DELETE_SUCCESS": "アクションが正常に削除されました。"
+      },
+      "CLEAR": {
+        "TITLE": "フローの消去",
+        "DESCRIPTION": "トリガーやアクションとともに、フローをリセットしようとしています。この変更は復元できません。本当によろしいですか？"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "選択したアクションの削除",
+        "DESCRIPTION": "フローから選択したアクションを削除してよろしいですか？"
+      }
+    },
+    "TOAST": {
+      "ACTIONSSET": "アクションセット",
+      "ACTIONREACTIVATED": "アクションが正常にアクティブになりました。",
+      "ACTIONDEACTIVATED": "アクションが正常に非アクティブになりました。"
+    }
+  },
+  "IAM": {
+    "TITLE": "インスタンス",
+    "DESCRIPTION": "インスタンスの設定と組織を管理します。",
+    "POLICIES": {
+      "TITLE": "システムポリシーとアクセス設定",
+      "DESCRIPTION": "グローバルポリシーと管理アクセス設定を管理します。"
+    },
+    "EVENTSTORE": {
+      "TITLE": "IAMストレージ管理",
+      "DESCRIPTION": "ZITADELのビューと失敗したイベントを管理します。"
+    },
+    "MEMBER": {
+      "TITLE": "マネージャー",
+      "DESCRIPTION": "これらのマネージャーは、インスタンスで変更を加えることができます。"
+    },
+    "PAGES": {
+      "STATE": "ステータス",
+      "DOMAINLIST": "ドメイン"
+    },
+    "STATE": {
+      "0": "未定義",
+      "1": "作成中",
+      "2": "稼働中",
+      "3": "停止中",
+      "4": "停止"
+    },
+    "VIEWS": {
+      "TITLE": "ビュー",
+      "DESCRIPTION": "あなたのZITADELビュー数が表示されます。",
+      "VIEWNAME": "名前",
+      "DATABASE": "データベース",
+      "SEQUENCE": "シーケンス",
+      "EVENTTIMESTAMP": "タイムスタンプ",
+      "LASTSPOOL": "成功したスプール",
+      "ACTIONS": "アクション",
+      "CLEAR": "さくよz",
+      "CLEARED": "ビューは正常に削除されました！",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "ビューの削除",
+        "VIEW_CLEAR_DESCRIPTION": "ビューを削除しようとしています。ビューをクリアすると、エンドユーザーがデータを利用できなくなる可能性があるプロセスが発生します。本当によろしいですか？"
+      }
+    },
+    "FAILEDEVENTS": {
+      "TITLE": "失敗したイベント",
+      "DESCRIPTION": "失敗したイベントが表示されます。",
+      "VIEWNAME": "名前",
+      "DATABASE": "データベース",
+      "FAILEDSEQUENCE": "失敗したシーケンス",
+      "FAILURECOUNT": "失敗カウント",
+      "LASTFAILED": "最終失敗日時",
+      "ERRORMESSAGE": "エラーメッセージ",
+      "ACTIONS": "アクション",
+      "DELETE": "削除",
+      "DELETESUCCESS": "失敗したイベントが削除されました。"
+    },
+    "EVENTS": {
+      "TITLE": "イベント",
+      "DESCRIPTION": "発生したすべてのイベントが表示されます。",
+      "EDITOR": "編集者",
+      "EDITORID": "編集者ID",
+      "AGGREGATE": "集計",
+      "AGGREGATEID": "集計ID",
+      "AGGREGATETYPE": "集計タイプ",
+      "RESOURCEOWNER": "リソース所有者",
+      "SEQUENCE": "シーケンス",
+      "CREATIONDATE": "作成日時",
+      "TYPE": "タイプ",
+      "PAYLOAD": "ペイロード",
+      "FILTERS": {
+        "BTN": "絞り込み",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "編集者で絞り込み"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "集計タイプ",
+          "IDLABEL": "ID",
+          "CHECKBOX": "集計で絞り込み"
+        },
+        "TYPE": {
+          "TYPELABEL": "タイプ",
+          "CHECKBOX": "タイプで絞り込み"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "リソース所有者で絞り込み"
+        },
+        "SEQUENCE": {
+          "LABEL": "シーケンス",
+          "CHECKBOX": "シーケンスで絞り込み",
+          "SORT": "ソート",
+          "ASC": "昇順",
+          "DESC": "降順"
+        },
+        "CREATIONDATE": {
+          "LABEL": "作成日",
+          "CHECKBOX": "作成日で絞り込み"
+        },
+        "OTHER": "その他",
+        "OTHERS": "その他"
+      },
+      "DIALOG": {
+        "TITLE": "イベントの詳細"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "マネージャーが削除されました。",
+      "MEMBERSADDED": "マネージャーが追加されました。",
+      "MEMBERADDED": "マネージャーが追加されました。",
+      "MEMBERCHANGED": "マネージャーが変更されました。",
+      "ROLEREMOVED": "ロールが削除されました。",
+      "ROLECHANGED": "ロールが変更されました。",
+      "REACTIVATED": "アクティブになりました。",
+      "DEACTIVATED": "非アクティブになりました。"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "名前",
+      "ID": "ID",
+      "CREATIONDATE": "作成日",
+      "DATECHANGED": "変更",
+      "FILTER": "絞り込み",
+      "FILTERPLACEHOLDER": "名前で絞り込み",
+      "LIST": "組織",
+      "LISTDESCRIPTION": "組織を選択してください。",
+      "ACTIVE": "アクティブ",
+      "CREATE": "組織の作成",
+      "DEACTIVATE": "組織の非アクティブ化",
+      "REACTIVATE": "組織のアクティブ化",
+      "NOPERMISSION": "組織設定にアクセスする権限がありません。",
+      "USERSELFACCOUNT": "組織の所有者として個人アカウントを使用します。",
+      "ORGDETAIL_TITLE": "新しい組織の名前とドメインを入力します。",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "新しい組織の名前を入力します。",
+      "ORGDETAILUSER_TITLE": "組織の所有者を設定します。",
+      "DELETE": "組織の削除",
+      "DEFAULTLABEL": "デフォルト",
+      "SETASDEFAULT": "デフォルトの組織として設定する",
+      "DEFAULTORGSET": "デフォルトの組織が正常に変更されました",
+      "RENAME": {
+        "ACTION": "名前の変更",
+        "TITLE": "組織名の変更",
+        "DESCRIPTION": "新しい組織名を入力してください",
+        "BTN": "名前の変更"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "組織ドメインの所有権の認証",
+        "VERIFICATION": "ドメインの所有権を確認するには、検証ファイルをダウンロードし、下記の提供されたURLにアップロードするか、提供されたURLのTXTレコードのDNSエントリーを配置する必要があります。完了するには、検証するボタンをクリックしてください。",
+        "VERIFICATION_SKIP": "認証をスキップしたまま組織を作成することはできますが、組織を使用するにはこのステップを完了する必要があります。",
+        "VERIFICATION_VALIDATION_DESC": "ユーザーがドメインの所有者であることを確認するために、トークンは定期的にチェックされます。",
+        "VERIFICATION_NEWTOKEN_TITLE": "新しいトークンをリクエストする",
+        "VERIFICATION_NEWTOKEN_DESC": "新しいトークンをリクエストする場合は、方法を選択します。永続的なトークンを認証する場合は、上のボタンをクリックします。",
+        "VERIFICATION_VALIDATION_ONGOING": "認証トークンはすでにリクエストされています。ボタンをクリックして、認証チェックをトリガーする。",
+        "VERIFICATION_VALIDATION_ONGOING_TYPE": "トークンのタイプ：",
+        "VERIFICATION_SUCCESSFUL": "ドメインは正常に認証されました！",
+        "REQUESTNEWTOKEN": "新しいトークンをリクエストする",
+        "TYPES": {
+          "1": "HTTP",
+          "2": "DNS"
+        }
+      },
+      "DOWNLOAD_FILE": "ファイルをダウンロード",
+      "SELECTORGTOOLTIP": "この組織を選択",
+      "PRIMARYDOMAIN": "プライマリドメイン",
+      "STATE": "ステート",
+      "USEPASSWORD": "初期パスワードを設定する",
+      "USEPASSWORDDESC": "ユーザーは、初期セットアップ中にパスワードを設定する必要はありません。"
+    },
+    "LIST": {
+      "TITLE": "組織",
+      "DESCRIPTION": "インスタンス内の組織"
+    },
+    "DOMAINS": {
+      "NEW": "ドメインを追加する",
+      "TITLE": "ドメイン",
+      "DESCRIPTION": "ドメインを設定します。このドメインは、ユーザーのログインで使用できます。",
+      "SETPRIMARY": "プライマリとして設定する",
+      "DELETE": {
+        "TITLE": "ドメインの削除",
+        "DESCRIPTION": "ドメインの1つを削除しようとしています。ユーザーはログインにこのドメインを使用できなくなることに注意してください。"
+      },
+      "ADD": {
+        "TITLE": "ドメインの追加",
+        "DESCRIPTION": "組織にドメインを追加します。この処理の成功後、ユーザーはこのドメインをログインに使用できます。"
+      }
+    },
+    "STATE": {
+      "0": "未定義",
+      "1": "アクティブ",
+      "2": "非アクティブ",
+      "3": "削除"
+    },
+    "MEMBER": {
+      "TITLE": "組織マネージャー",
+      "DESCRIPTION": "組織の設定を変更できるユーザーを定義します。"
+    },
+    "TOAST": {
+      "UPDATED": "組織が正常に更新されました。",
+      "DEACTIVATED": "組織が非アクティブになりました。",
+      "REACTIVATED": "組織がアクティブになりました。",
+      "DOMAINADDED": "ドメインを追加しました。",
+      "DOMAINREMOVED": "ドメインを削除しました。",
+      "MEMBERADDED": "マネージャーが追加されました。",
+      "MEMBERREMOVED": "マネージャーが削除されました。",
+      "MEMBERCHANGED": "マネージャーが変更されました。",
+      "SETPRIMARY": "プライマリドメインが設定されました。",
+      "DELETED": "組織が正常に削除されました。",
+      "ORG_WAS_DELETED": "組織が削除されました。"
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "組織の非アクティブ化",
+        "DESCRIPTION": "組織を非アクティブにしようとしています。今後はユーザーはログインすることができません。本当によろしいですか？"
+      },
+      "REACTIVATE": {
+        "TITLE": "組織のアクティブ化",
+        "DESCRIPTION": "組織をアクティブにしようとしています。ユーザーは再びログインすることができます。本当によろしいですか？"
+      },
+      "DELETE": {
+        "TITLE": "組織の削除",
+        "DESCRIPTION": "組織を削除しようとしています。これにより、すべての組織関連データが削除されるプロセスが開始されます。このアクションを元に戻すことはできません。",
+        "TYPENAME": "「{{value}}」と入力し、組織を削除する。",
+        "ORGNAME": "名前",
+        "BTN": "削除"
+      }
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "インスタンス設定",
+      "DESCRIPTION": "これらの設定は上書きされていない限り、すべての組織に適用されます。"
+    },
+    "ORG": {
+      "TITLE": "組織設定",
+      "DESCRIPTION": "これらの設定は、インスタンス設定を拡張・上書きします。"
+    },
+    "LIST": {
+      "GENERAL": "全般",
+      "LOGIN": "ログイン動作とセキュリティ",
+      "LOCKOUT": "ロックアウト",
+      "COMPLEXITY": "パスワードの複雑さ",
+      "NOTIFICATIONS": "通知設定",
+      "NOTIFICATIONS_DESC": "SMTPおよびSMS設定",
+      "MESSAGETEXTS": "メッセージテキスト",
+      "IDP": "IDプロバイダー",
+      "DOMAIN": "ドメイン設定",
+      "LOGINTEXTS": "ログイン画面のテキスト",
+      "BRANDING": "ブランディング",
+      "PRIVACYPOLICY": "プライバシーポリシー",
+      "OIDC": "OIDCトークンのライフタイムと有効期限",
+      "SECRETS": "シークレット設定",
+      "SECURITY": "セキュリティ設定"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "通知",
+      "LOGIN": "ログインとアクセス",
+      "DOMAIN": "ドメイン",
+      "TEXTS": "テキストと言語",
+      "APPEARANCE": "設定",
+      "OTHER": "その他"
+    }
+  },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "デフォルトの言語",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "en": "English",
+      "fr": "Français",
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
+    },
+    "SMTP": {
+      "TITLE": "SMTP設定",
+      "SENDERADDRESS": "送信者のメールアドレス",
+      "SENDERNAME": "送信者名",
+      "HOSTANDPORT": "ホストとポート",
+      "USER": "ユーザー",
+      "PASSWORD": "パスワード",
+      "SETPASSWORD": "SMTPパスワードを設定する",
+      "PASSWORDSET": "SMTPパスワードは正常に設定されました。",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "正常に保存されました！",
+      "REQUIREDWARN": "ドメインから通知を送信するには、SMTP情報を入力する必要があります。"
+    },
+    "SMS": {
+      "TITLE": "SMS設定",
+      "PROVIDERS": "プロバイダー",
+      "PROVIDER": "SMSプロバイダー",
+      "ADDPROVIDER": "SMSプロバイダーを追加する",
+      "ADDPROVIDERDESCRIPTION": "利用可能なプロバイダーのいずれかを選択し、必要なデータを入力する。",
+      "REMOVEPROVIDER": "プロバイダーを削除する",
+      "REMOVEPROVIDER_DESC": "プロバイダーの構成を削除しようとしています。本当によろしいですか？",
+      "SMSPROVIDERSTATE": {
+        "0": "未定義",
+        "1": "アクティブ",
+        "2": "非アクティブ"
+      },
+      "ACTIVATED": "プロバイダーがアクティブになりました。",
+      "DEACTIVATED": "プロバイダーが非アクティブになりました。",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "トークン",
+        "SENDERNUMBER": "送信者番号",
+        "ADDED": "Twilioは正常に追加されました。",
+        "REMOVED": "Twilioが削除されました",
+        "CHANGETOKEN": "トークンを変更する",
+        "SETTOKEN": "トークンを設定する",
+        "TOKENSET": "トークンは正常に設定されています。"
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC設定",
+      "ACCESSTOKENLIFETIME": "トークンのライフタイムにアクセスする",
+      "IDTOKENLIFETIME": "IDトークンのライフタイム",
+      "REFRESHTOKENEXPIRATION": "トークンの有効期限を更新する",
+      "REFRESHTOKENIDLEEXPIRATION": "トークンのアイドルの有効期限を更新する",
+      "INHOURS": "時",
+      "INDAYS": "日"
+    },
+    "SECRETS": {
+      "TITLE": "シークレットの設定",
+      "TYPES": "シークレットの種類",
+      "TYPE": {
+        "1": "初期設定メール",
+        "2": "メール認証",
+        "3": "電話番号認証",
+        "4": "パスワードのリセット",
+        "5": "パスワードレスの初期設定",
+        "6": "アプリのシークレット"
+      },
+      "ADDGENERATOR": "シークレットの設定を定義する",
+      "GENERATORTYPE": "タイプ",
+      "EXPIRY": "有効期限（時間単位）",
+      "INCLUDEDIGITS": "数字を含める",
+      "INCLUDESYMBOLS": "シンボルを含める",
+      "INCLUDELOWERLETTERS": "小文字を含める",
+      "INCLUDEUPPERLETTERS": "大文字を含める",
+      "LENGTH": "長さ",
+      "UPDATED": "設定が更新されました。"
+    },
+    "SECURITY": {
+      "DESCRIPTION": "この設定は、許可されたドメインのセットからのフレーミングを許可するように CSP を設定します。iFrameの使用を有効にすると、クリックジャッキングが許可される危険性があることに注意してください。",
+      "IFRAMEENABLED": "iFrameを許可する",
+      "ALLOWEDORIGINS": "許可されたURL"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "設定のリセット",
+        "DEFAULTDESCRIPTION": "インスタンスのデフォルト設定にリセットしようとしています。本当によろしいですか？",
+        "LOGINPOLICY_DESCRIPTION": "警告：継続する場合、IDプロバイダーの設定もインスタンス設定にリセットされます。"
+      }
+    }
+  },
+  "POLICY": {
+    "TITLE": "設定一覧",
+    "DESCRIPTION": "事前にパッケージ化された設定でセキュリティを強化できます。",
+    "APPLIEDTO": "適用先",
+    "PWD_COMPLEXITY": {
+      "TITLE": "パスワードの複雑さ",
+      "DESCRIPTION": "すべての設定されたパスワードが特定のパターンに対応することを確認する",
+      "SYMBOLANDNUMBERERROR": "数字とシンボル・句読点で構成されている必要があります。",
+      "SYMBOLERROR": "シンボル・句読点を含める必要があります。",
+      "NUMBERERROR": "数字を含める必要があります。",
+      "PATTERNERROR": "パスワードは必要なパターンを満たしていません。"
+    },
+    "NOTIFICATION": {
+      "TITLE": "通知",
+      "DESCRIPTION": "どのような変更に対して、どのような通知を行うかを決定します。",
+      "PASSWORDCHANGE": "パスワードの変更"
+    },
+    "PRIVATELABELING": {
+      "TITLE": "ブランディング",
+      "DESCRIPTION": "ログインをパーソナライズされた動作に変更します。",
+      "PREVIEW_DESCRIPTION": "ポリシーの変更は、環境をプレビューするために自動的に適用されます。",
+      "BTN": "ファイルを選択",
+      "ACTIVATEPREVIEW": "設定を適用する",
+      "DARK": "ダークモード",
+      "LIGHT": "ライトモード",
+      "CHANGEVIEW": "ビューを変更する",
+      "ACTIVATED": "ポリシーの変更が有効化されています",
+      "THEME": "テーマ",
+      "COLORS": "色",
+      "FONT": "フォント",
+      "ADVANCEDBEHAVIOR": "高度な動作",
+      "DROP": "ここに画像をドロップ",
+      "RELEASE": "リリース",
+      "DROPFONT": "ここにフォントファイルをドロップする",
+      "RELEASEFONT": "リリース",
+      "USEOFLOGO": "ロゴはログインと電子メールで使用されますが、アイコンはコンソールの組織スイッチャーのような小さなUI要素に使用されます",
+      "MAXSIZE": "最大サイズは524KBに制限されています",
+      "EMAILNOSVG": "SVGファイル形式はメールではサポートされていません。ロゴをPNGまたはその他のサポート形式でアップロードしてください。",
+      "MAXSIZEEXCEEDED": "最大サイズの524KBを超えました。",
+      "NOSVGSUPPORTED": "SVGはサポートされていません！",
+      "FONTINLOGINONLY": "フォントは現在、ログインインターフェイスにのみ表示されます。",
+      "VIEWS": {
+        "PREVIEW": "プレビュー",
+        "CURRENT": "現在の構成"
+      },
+      "PREVIEW": {
+        "TITLE": "ログイン",
+        "SECOND": "ZITADEL-Accountでログインする。",
+        "ERROR": "ユーザーは見つかりません！",
+        "PRIMARYBUTTON": "次へ",
+        "SECONDARYBUTTON": "登録"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "パスワードエージング",
+      "DESCRIPTION": "パスワードエージングに関するポリシーを設定できます。このポリシーは、特定のエージング時間が経過した後に警告を発します。"
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "ロックアウトポリシー",
+      "DESCRIPTION": "パスワードリトライの最大数を設定し、その後アカウントがブロックされます。"
+    },
+    "DOMAIN_POLICY": {
+      "TITLE": "ドメイン設定"
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "ブランディング",
+      "BTN": "ファイルの選択",
+      "DESCRIPTION": "ログインの外観をカスタマイズする",
+      "ACTIVATEPREVIEW": "設定を有効化する"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "ログイン設定",
+      "DESCRIPTION": "ユーザーを認証する方法を定義し、IDプロバイダーを構成します。",
+      "DESCRIPTIONCREATEADMIN": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。",
+      "DESCRIPTIONCREATEMGMT": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。注：システムセットプロバイダーと、組織用に設定されたプロバイダーのみを使用できます。",
+      "ADVANCED": "高度",
+      "LIFETIMEDURATIONS": "ログインライフタイム",
+      "SAVED": "正常に保存されました！"
+    },
+    "PRIVACY_POLICY": {
+      "TITLE": "プライバシーポリシーとTOS",
+      "DESCRIPTION": "プライバシーポリシーと利用規約リンクを設定します。",
+      "TOSLINK": "利用規約へのリンク",
+      "POLICYLINK": "プライバシーポリシーへのリンク",
+      "HELPLINK": "ヘルプへのリンク",
+      "SAVED": "正常に保存されました！",
+      "RESET_TITLE": "デフォルト値を復元する",
+      "RESET_DESCRIPTION": "TOSおよびプライバシーポリシーのデフォルトリンクを復元しようとしています。本当によろしいですか？"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "ログイン画面のテキスト",
+      "DESCRIPTION": "ログイン画面のテキストを定義します。テキストが空の場合、プレースホルダーとして表示されるデフォルト値が使用されます。",
+      "DESCRIPTION_SHORT": "ログインインターフェイスのテキストを定義します。",
+      "NEWERVERSIONEXISTS": "新しいバージョンが存在します。",
+      "CURRENTDATE": "現在の構成",
+      "CHANGEDATE": "新しいバージョン",
+      "KEYNAME": "ログイン画面・インターフェイス",
+      "RESET_TITLE": "デフォルト値の復元",
+      "RESET_DESCRIPTION": "すべてのデフォルト値を復元しようとしています。ユーザーが行ったすべての変更は完全に削除されます。本当によろしいですか？",
+      "UNSAVED_TITLE": "保存せずに続行しますか？",
+      "UNSAVED_DESCRIPTION": "あなたは保存せずに変更を加えました。今すぐ保存しますか？",
+      "LOCALE": "ロケールコード",
+      "LOCALES": {
+        "de": "Deutsch",
+        "en": "English",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "メール認証が完了しました",
+        "emailVerificationText": "メール認証",
+        "externalUserNotFoundText": "外部ユーザーが見つかりません",
+        "footerText": "フッター",
+        "initMfaDoneText": "MFAを初期化しました",
+        "initMfaOtpText": "MFAを初期化する",
+        "initMfaPromptText": "MFAプロンプトを初期化する",
+        "initMfaU2fText": "ユニバーサル二要素認証を初期化する",
+        "initPasswordDoneText": "パスワードの初期化が完了しました",
+        "initPasswordText": "パスワードを初期化する",
+        "initializeDoneText": "ユーザーの初期化が完了しました",
+        "initializeUserText": "ユーザーを初期化する",
+        "linkingUserDoneText": "ユーザーのリンクが完了しました",
+        "loginText": "ログイン",
+        "logoutText": "ログアウト",
+        "mfaProvidersText": "MFAプロバイダー",
+        "passwordChangeDoneText": "パスワードの変更が完了しました",
+        "passwordChangeText": "パスワードの変更",
+        "passwordResetDoneText": "パスワードのリセットが完了しました",
+        "passwordText": "パスワード",
+        "registrationOptionText": "登録オプション",
+        "registrationOrgText": "組織を登録する",
+        "registrationUserText": "ユーザーを登録する",
+        "selectAccountText": "アカウントを選択する",
+        "successLoginText": "ログインに成功しました",
+        "usernameChangeDoneText": "ユーザー名の変更が完了しました",
+        "usernameChangeText": "ユーザー名の変更",
+        "verifyMfaOtpText": "OTPを認証する",
+        "verifyMfaU2fText": "ユニバーサルの二要素認証を承認する",
+        "passwordlessPromptText": "パスワードレスプロンプト",
+        "passwordlessRegistrationDoneText": "パスワードレス登録が完了しました",
+        "passwordlessRegistrationText": "パスワードレス登録",
+        "passwordlessText": "パスワードレス",
+        "externalRegistrationUserOverviewText": "外部登録ユーザーの概要"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TITLE": "メッセージテキスト",
+      "DESCRIPTION": "通知メールのテキストを定義します。",
+      "TYPE": "通知",
+      "TYPES": {
+        "INIT": "初期セットアップ",
+        "VE": "メールの認証",
+        "VP": "電話番号の認証",
+        "PR": "パスワードのリセット",
+        "DC": "ドメインクレーム",
+        "PL": "パスワードレス",
+        "PC": "パスワードの変更"
+      },
+      "CHIPS": {
+        "firstname": "名",
+        "lastname": "姓",
+        "code": "コード",
+        "preferredLoginName": "優先ログイン名",
+        "displayName": "表示名",
+        "nickName": "ニックネーム",
+        "loginnames": "ログイン名",
+        "domain": "ドメイン",
+        "lastEmail": "直近のメールアドレス",
+        "lastPhone": "直近の電話番号",
+        "verifiedEmail": "認証済みのメールアドレス",
+        "verifiedPhone": "認証済みの電話番号",
+        "changedate": "変更日",
+        "username": "ユーザー名",
+        "tempUsername": "一時ユーザー名"
+      },
+      "TOAST": {
+        "UPDATED": "カスタムテキストが保存されました。"
+      }
+    },
+    "DEFAULTLABEL": "現在の設定は、インスタンスの標準に対応しています。",
+    "BTN_INSTALL": "セットアップ",
+    "BTN_EDIT": "変更",
+    "DATA": {
+      "DESCRIPTION": "概要",
+      "MINLENGTH": "文字列の長さ",
+      "HASNUMBER": "数字を含める",
+      "HASSYMBOL": "シンボルを含める",
+      "HASLOWERCASE": "小文字を含める",
+      "HASUPPERCASE": "大文字を含める",
+      "SHOWLOCKOUTFAILURES": "ロックアウトの失敗を表示する",
+      "MAXATTEMPTS": "パスワードの最大試行",
+      "EXPIREWARNDAYS": "有効期限の翌日以降の警告",
+      "MAXAGEDAYS": "最大有効期限",
+      "USERLOGINMUSTBEDOMAIN": "ログイン名の接尾辞として組織ドメインを追加する",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "この設定を有効にすると、すべてのログイン名が組織ドメインで接尾辞が付けられます。この設定が無効になっている場合、ユーザー名がすべての組織で一意であることを確認する必要があります。",
+      "VALIDATEORGDOMAINS": "組織ドメインを認証する",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP送信者アドレスはインスタンスドメインに一致しています",
+      "ALLOWUSERNAMEPASSWORD": "ユーザー名とパスワードを許可",
+      "ALLOWEXTERNALIDP": "外部IDPを許可",
+      "ALLOWREGISTER": "登録を許可",
+      "ALLOWUSERNAMEPASSWORD_DESC": "ユーザー名とパスワードを使用した従来のログインを許可します。",
+      "ALLOWEXTERNALIDP_DESC": "基礎となるIDプロバイダーにログインを許可します。",
+      "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",
+      "FORCEMFA": "MFAを強制する",
+      "FORCEMFA_DESC": "このオプションが選択されている場合、ユーザーはログイン用の二要素認証を構成する必要があります。",
+      "HIDEPASSWORDRESET": "パスワードリセットを非表示にする",
+      "HIDEPASSWORDRESET_DESC": "このオプションが選択されている場合、ユーザーはログイン過程ででパスワードをリセットできません。",
+      "HIDELOGINNAMESUFFIX": "ログイン名の接尾辞を非表示にする",
+      "HIDELOGINNAMESUFFIX_DESC": "ログイン画面のログイン名の接尾辞を非表示にします。",
+      "IGNOREUNKNOWNUSERNAMES": "不明なユーザー名を無視する",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "このオプションが選択されている場合、ユーザーが見つからない場合でも、パスワード画面がログインプロセスに表示されます。パスワードチェックのエラーは、ユーザー名またはパスワードが間違っているかどうかを開示しません。",
+      "ALLOWDOMAINDISCOVERY": "ドメイン検出を許可する",
+      "ALLOWDOMAINDISCOVERY_DESC": "このオプションを選択すると、ログイン画面で入力された不明なユーザー名のサフィックス（@domain.com）が組織のドメインと照合され、成功するとその組織の登録にリダイレクトされます。",
+      "DISABLELOGINWITHEMAIL": "メールアドレスでログインを無効にする",
+      "DISABLELOGINWITHPHONE": "電話番号でログインを無効にする",
+      "DEFAULTREDIRECTURI": "デフォルトのリダイレクトURI",
+      "DEFAULTREDIRECTURI_DESC": "アプリのコンテキストなしでログインが開始された場合（例：メール）、ユーザーがどこにリダイレクトされるかを定義します。",
+      "ERRORMSGPOPUP": "ダイアログにエラーを表示する",
+      "DISABLEWATERMARK": "ウォーターマークを非表示にする",
+      "DISABLEWATERMARK_DESC": "ログイン画面上のZITADELのウォーターマークを非表示にします。",
+      "PASSWORDCHECKLIFETIME": "パスワード確認ライフタイム",
+      "EXTERNALLOGINCHECKLIFETIME": "外部ログイン確認ライフタイム",
+      "MFAINITSKIPLIFETIME": "マルチファクター初期化ライフタイム",
+      "SECONDFACTORCHECKLIFETIME": "二要素認証確認ライフタイム",
+      "MULTIFACTORCHECKLIFETIME": "マルチファクター確認ライフタイム",
+      "INHOURS": "時間"
+    },
+    "RESET": "インスタンスデフォルトにリセットする",
+    "CREATECUSTOM": "カスタムポリシーを作成する",
+    "TOAST": {
+      "SET": "ポリシーが正常に設定されました！",
+      "RESETSUCCESS": "ポリシーが正常にリセットされました！",
+      "UPLOADSUCCESS": "正常にアップロードされました！",
+      "DELETESUCCESS": "正常に削除されました！",
+      "UPLOADFAILED": "アップロードに失敗しました！"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "組織",
+    "DESCRIPTION": "ここでは、組織設定の編集やメンバーを管理できます。",
+    "DETAIL": {
+      "TITLE": "詳細",
+      "NAME": "名前",
+      "DOMAIN": "ドメイン",
+      "STATE": {
+        "0": "未定義",
+        "1": "アクティブ",
+        "2": "非アクティブ"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "メンバー",
+      "USERNAME": "ユーザー名",
+      "DISPLAYNAME": "表示名",
+      "LOGINNAME": "ログイン名",
+      "EMAIL": "Eメール",
+      "ROLES": "ロール",
+      "ADD": "メンバーを追加する",
+      "ADDDESCRIPTION": "追加するユーザーの名前を入力します。"
+    },
+    "TABLE": {
+      "TOTAL": "エントリ合計",
+      "SELECTION": "選択された要素",
+      "DEACTIVATE": "ユーザーを非アクティブにする",
+      "ACTIVATE": "ユーザーをアクティブにする",
+      "DELETE": "ユーザーを削除する",
+      "CLEAR": "選択を消去する"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "プロジェクト",
+      "DESCRIPTION": "ここでは、アプリケーションの定義や、ロールの管理、他の組織にプロジェクトのグラントができます。",
+      "DELETE": "プロジェクトを削除する",
+      "LIST": "プロジェクト",
+      "LISTDESCRIPTION": "プロジェクトが見つからない場合は、プロジェクトの所有者または該当する権利を持つ人に連絡して、プロジェクトにアクセスできるようにしてください。",
+      "DETAIL": "詳細",
+      "CREATE": "プロジェクトを作成する",
+      "CREATE_DESC": "プロジェクトの名前を入力します。",
+      "ROLE": "ロール",
+      "NOITEMS": "プロジェクトはありません",
+      "ZITADELPROJECT": "これはZITADELプロジェクトに属します。注意：変更した場合、ZITADELは意図したとおりに動作しないことがあります。",
+      "TYPE": {
+        "OWNED": "所有プロジェクト",
+        "GRANTED": "グラントされたプロジェクト",
+        "OWNED_SINGULAR": "所有プロジェクト",
+        "GRANTED_SINGULAR": "グラントされたプロジェクト"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "ブランディング設定",
+        "0": {
+          "TITLE": "未定義",
+          "DESC": "ユーザーが特定されると同時に、システムデフォルトが表示される前に、特定されたユーザーの所属する組織のブランディングが表示されます。"
+        },
+        "1": {
+          "TITLE": "プロジェクト設定の使用",
+          "DESC": "プロジェクトを所有する組織のブランディングが表示されます"
+        },
+        "2": {
+          "TITLE": "ユーザー組織設定の使用",
+          "DESC": "プロジェクトの組織のブランディングが表示されますが、ユーザーが特定されると同時に、特定されたユーザーの組織の設定が表示されます。"
+        },
+        "DIALOG": {
+          "TITLE": "ブランディング設定",
+          "DESCRIPTION": "プロジェクト利用時のログイン時の動作を選択します。"
+        }
+      },
+      "PINNED": "ピン留め",
+      "ALL": "全て",
+      "CREATEDON": "作成日",
+      "LASTMODIFIED": "最終更新日",
+      "ADDNEW": "新しいプロジェクトを作成する",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "プロジェクトのアクティブ化",
+          "DESCRIPTION": "本当にプロジェクトをアクティブにしてよろしいですか？"
+        },
+        "DEACTIVATE": {
+          "TITLE": "プロジェクトの非アクティブ化",
+          "DESCRIPTION": "本当にプロジェクトを非アクティブにしてよろしいですか？"
+        },
+        "DELETE": {
+          "TITLE": "プロジェクトの削除",
+          "DESCRIPTION": "本当にプロジェクトを完全に削除してよろしいですか？",
+          "TYPENAME": "プロジェクトの名前を入力して、完全に削除する。"
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "設定",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "ステータス",
+      "0": "未定義",
+      "1": "アクティブ",
+      "2": "非アクティブ"
+    },
+    "TYPE": {
+      "TITLE": "タイプ",
+      "0": "不明",
+      "1": "所有",
+      "2": "グラント"
+    },
+    "NAME": "名前",
+    "NAMEDIALOG": {
+      "TITLE": "プロジェクト名の変更",
+      "DESCRIPTION": "新しいプロジェクト名を入力してください",
+      "NAME": "新しいプロジェクト名"
+    },
+    "MEMBER": {
+      "TITLE": "マネージャー",
+      "TITLEDESC": "マネージャーは、自分のロールに基づいてこのプロジェクトに変更を加えることができます。",
+      "DESCRIPTION": "これらのマネージャーは、プロジェクトを編集できます。",
+      "USERNAME": "ユーザー名",
+      "DISPLAYNAME": "表示名",
+      "LOGINNAME": "ログイン名",
+      "EMAIL": "メール",
+      "ROLES": "ロール",
+      "USERID": "ユーザーID"
+    },
+    "GRANT": {
+      "EMPTY": "グラントされた組織はありません。",
+      "TITLE": "プロジェクトグラント",
+      "DESCRIPTION": "他の組織にプロジェクトを使用できるようにします。",
+      "EDITTITLE": "ロールの編集",
+      "CREATE": {
+        "TITLE": "組織グラントの作成",
+        "SEL_USERS": "アクセスを許可するユーザーを選択する",
+        "SEL_PROJECT": "プロジェクトを検索する",
+        "SEL_ROLES": "許可するロールを選択する",
+        "SEL_USER": "ユーザーを選択する",
+        "SEL_ORG": "ドメインを設定する",
+        "SEL_ORG_DESC": "完全なドメインを入力して、アクセスを許可する組織を指定する。",
+        "ORG_TITLE": "組織",
+        "ORG_DESCRIPTION": "組織 {{name}} にユーザーをグラントします。",
+        "ORG_DESCRIPTION_DESC": "上記のヘッダーのコンテキストを切り替えることで、別組織のユーザーにグラントできます。",
+        "SEL_ORG_FORMFIELD": "完全なドメイン",
+        "SEL_ORG_BUTTON": "組織を検索する",
+        "FOR_ORG": "グラントが以下に対して作成されます："
+      },
+      "DETAIL": {
+        "TITLE": "プロジェクトグラント",
+        "DESC": "指定された組織で使用できるロールを選択し、マネージャーを選出します。",
+        "MEMBERTITLE": "マネージャー",
+        "MEMBERDESC": "これらは、グラントされた組織のマネージャーです。プロジェクトの設定を編集するためにアクセスできるユーザーをここに追加します。",
+        "PROJECTNAME": "プロジェクト名",
+        "GRANTEDORG": "グラントされた組織",
+        "RESOURCEOWNER": "リソース所有者"
+      },
+      "STATE": "ステータス",
+      "STATES": {
+        "1": "アクティブ",
+        "2": "非アクティブ"
+      },
+      "ALL": "全て",
+      "SHOWDETAIL": "詳細を表示",
+      "USER": "ユーザー",
+      "MEMBERS": "マネージャー",
+      "ORG": "組織",
+      "PROJECTNAME": "プロジェクト名",
+      "GRANTEDORG": "グラントされた組織",
+      "GRANTEDORGDOMAIN": "ドメイン",
+      "RESOURCEOWNER": "リソース所有者",
+      "GRANTEDORGNAME": "組織名",
+      "GRANTID": "グラントID",
+      "CREATIONDATE": "作成日",
+      "CHANGEDATE": "最終更新日",
+      "DATES": "日付",
+      "ROLENAMESLIST": "ロール",
+      "NOROLES": "ロールはありません",
+      "TYPE": "タイプ",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "プロジェクトグラントが作成されました。",
+        "PROJECTGRANTADDED": "プロジェクトグラントが作成されました。",
+        "PROJECTGRANTCHANGED": "プロジェクトグラントが変更されました。",
+        "PROJECTGRANTMEMBERADDED": "グラントマネージャーが追加されました。",
+        "PROJECTGRANTMEMBERCHANGED": "グラントマネージャーが変更されました。",
+        "PROJECTGRANTMEMBERREMOVED": "グラントマネージャーが削除されました。",
+        "PROJECTGRANTUPDATED": "プロジェクトグラントが更新されました。"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "プロジェクトグラントの削除",
+        "DELETE_DESCRIPTION": "プロジェクトグラントを削除しようとしています。本当によろしいですか？"
+      },
+      "ROLES": "プロジェクトのロール"
+    },
+    "APP": {
+      "TITLE": "アプリケーション",
+      "NAME": "名前",
+      "NAMEREQUIRED": "名前が必要です。"
+    },
+    "ROLE": {
+      "EMPTY": "まだロールは作成されていません。",
+      "ADDNEWLINE": "ロールを追加する",
+      "KEY": "キー",
+      "TITLE": "ロール",
+      "DESCRIPTION": "プロジェクトグラント時に使用するロールを定義します。",
+      "NAME": "名前",
+      "DISPLAY_NAME": "表示名",
+      "GROUP": "グループ",
+      "ACTIONS": "アクション",
+      "ADDTITLE": "ロールの作成",
+      "ADDDESCRIPTION": "新しいロールの情報を入力します。",
+      "EDITTITLE": "ロールの編集",
+      "EDITDESCRIPTION": "ロールの新しい情報を入力します。",
+      "DELETE": "ロールを削除する",
+      "CREATIONDATE": "作成日",
+      "CHANGEDATE": "最終更新日",
+      "SELECTGROUPTOOLTIP": "グループ{{group}}のすべてのロールを選択します。",
+      "OPTIONS": "オプション",
+      "ASSERTION": "認証時にロールを表明する",
+      "ASSERTION_DESCRIPTION": "ロール情報は、Userinfoエンドポイントから送信され、トークンやその他のタイプのアプリケーション設定に応じて送信されます。",
+      "CHECK": "認証時に認可を確認する",
+      "CHECK_DESCRIPTION": "設定されている場合、ユーザーはアカウントにロールが割り当てられている場合にのみ認証を許可されます。",
+      "DIALOG": {
+        "DELETE_TITLE": "ロールの削除",
+        "DELETE_DESCRIPTION": "プロジェクトのロールを削除しようとしています。本当によろしいですか？"
+      }
+    },
+    "HAS_PROJECT": "認証時にプロジェクトを確認する",
+    "HAS_PROJECT_DESCRIPTION": "ユーザーの組織がこのプロジェクトを持っているかどうかを確認します。そうでない場合、ユーザーを認証することはできません。",
+    "TABLE": {
+      "TOTAL": "エントリ合計：",
+      "SELECTION": "選択された要素",
+      "DEACTIVATE": "プロジェクトの非アクティブ化",
+      "ACTIVATE": "プロジェクトのアクティブ化",
+      "DELETE": "プロジェクトの削除",
+      "ORGNAME": "組織名",
+      "ORGDOMAIN": "組織ドメイン",
+      "STATE": "ステータス",
+      "TYPE": "タイプ",
+      "CREATIONDATE": "作成日",
+      "CHANGEDATE": "最終更新日",
+      "RESOURCEOWNER": "所有者",
+      "SHOWTABLE": "テーブルを表示する",
+      "SHOWGRID": "グリッドを表示する",
+      "EMPTY": "プロジェクトは見つかりません"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "マネージャーが削除されました。",
+      "MEMBERSADDED": "マネージャーが追加されました。",
+      "MEMBERADDED": "マネージャーが追加されました。",
+      "MEMBERCHANGED": "マネージャーが変更されました。",
+      "ROLESCREATED": "ロールが作成されました。",
+      "ROLEREMOVED": "ロールが削除されました。",
+      "ROLECHANGED": "ロールが変更されました。",
+      "REACTIVATED": "アクティブになりました。",
+      "DEACTIVATED": "非アクティブになりました。",
+      "CREATED": "プロジェクトが作成されました。",
+      "UPDATED": "プロジェクトが変更されました。",
+      "GRANTUPDATED": "グラントが変更されました。",
+      "DELETED": "プロジェクトが削除されました。"
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "ロールの削除",
+      "DELETE_DESCRIPTION": "ロールを削除しようとしています。本当によろしいですか？"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "次のステップ"
+  },
+  "IDP": {
+    "LIST": {
+      "TITLE": "IDプロバイダー",
+      "DESCRIPTION": "IDプロバイダーの構成を管理し、ログイン設定で有効にすることができます。",
+      "ACTIVETITLE": "アクティブなIDプロバイダー"
+    },
+    "CREATE": {
+      "TITLE": "プロバイダーの追加",
+      "DESCRIPTION": "以下のプロバイダーから1つ以上選択してください。",
+      "STEPPERTITLE": "プロバイダーの作成",
+      "OIDC": {
+        "TITLE": "OIDCプロバイダー",
+        "DESCRIPTION": "OIDCプロバイダーに必要なデータを入力してください。"
+      },
+      "OAUTH": {
+        "TITLE": "OAuthプロバイダー",
+        "DESCRIPTION": "OAuthプロバイダーに必要なデータを入力してください。"
+      },
+      "JWT": {
+        "TITLE": "JWTプロバイダー",
+        "DESCRIPTION": "JWTプロバイダーに必要なデータを入力してください。"
+      },
+      "GOOGLE": {
+        "TITLE": "Googleプロバイダー",
+        "DESCRIPTION": "Google Identityプロバイダーのクレデンシャルを入力してください。"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlabプロバイダー",
+        "DESCRIPTION": "Gitlabプロバイダーのクレデンシャルを入力してください。"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlabプロバイダー（セルフホスト）",
+        "DESCRIPTION": "Gitlabプロバイダー（セルフホスト）のクレデンシャルを入力してください。"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Serverプロバイダー",
+        "DESCRIPTION": "GitHub Enterprise Server IDプロバイダーのクレデンシャルを入力してください。"
+      },
+      "GITHUB": {
+        "TITLE": "Githubプロバイダー",
+        "DESCRIPTION": "GitHub IDプロバイダーのクレデンシャルを入力してください。"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoftプロバイダー",
+        "DESCRIPTION": "Microsoftプロバイダーのクレデンシャルを入力してください。"
+      },
+      "LDAP": {
+        "TITLE": "LDAPプロバイダー",
+        "DESCRIPTION": "LDAPプロバイダーのクレデンシャルを入力してください。"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "IDプロバイダー",
+      "DESCRIPTION": "プロバイダーの構成を更新する",
+      "DATECREATED": "作成日",
+      "DATECHANGED": "更新日"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "自動作成",
+      "ISAUTOCREATION_DESC": "選択した場合、アカウントがまだ存在しない場合はアカウントが作成されます。",
+      "ISAUTOUPDATE": "自動更新",
+      "ISAUTOUPDATE_DESC": "選択した場合、アカウントは再認証時に更新されます。",
+      "ISCREATIONALLOWED": "アカウント作成を許可",
+      "ISCREATIONALLOWED_DESC": "アカウントを作成できるかどうかを決めます。",
+      "ISLINKINGALLOWED": "アカウントリンクを許可",
+      "ISLINKINGALLOWED_DESC": "IDを既存のアカウントにリンクできるかどうかを決めます。"
+    },
+    "OWNERTYPES": {
+      "0": "不明",
+      "1": "インスタンス",
+      "2": "組織"
+    },
+    "STATES": {
+      "1": "アクティブ",
+      "2": "非アクティブ"
+    },
+    "AZUREADTENANTTYPES": {
+      "0": "共通",
+      "1": "組織",
+      "2": "顧客"
+    },
+    "AZUREADTENANTTYPE": "テナントタイプ",
+    "AZUREADTENANTID": "テナントID",
+    "EMAILVERIFIED": "検証済みメールアドレス",
+    "NAMEHINT": "指定されている場合、ログイン画面に表示されます。",
+    "OPTIONAL": "オプション",
+    "LDAPATTRIBUTES": "LDAP 属性",
+    "UPDATEBINDPASSWORD": "バインドパスワードの更新",
+    "UPDATECLIENTSECRET": "クライアントシークレットを更新する",
+    "ADD": "IDプロバイダーを追加する",
+    "TYPE": "タイプ",
+    "OWNER": "オーナー",
+    "ID": "ID",
+    "NAME": "名前",
+    "AUTHORIZATIONENDPOINT": "認可エンドポイント",
+    "TOKENENDPOINT": "トークンエンドポイント",
+    "USERENDPOINT": "ユーザーエンドポイント",
+    "IDATTRIBUTE": "ID要素",
+    "AVAILABILITY": "利用可能性",
+    "AVAILABLE": "利用可能",
+    "AVAILABLEBUTINACTIVE": "利用可能ですが、非アクティブです",
+    "SETAVAILABLE": "利用可能に設定する",
+    "SETUNAVAILABLE": "利用不可に設定する",
+    "CONFIG": "構成",
+    "STATE": "ステータス",
+    "ISSUER": "発行者",
+    "SCOPESLIST": "スコープリスト",
+    "CLIENTID": "クライアントID",
+    "CLIENTSECRET": "クライアントシークレット",
+    "LDAPCONNECTION": "繋がり",
+    "LDAPUSERBINDING": "ユーザーバインディング",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "必要",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
+    "IDPDISPLAYNAMMAPPING": "IDP表示名マッピング",
+    "USERNAMEMAPPING": "ユーザー名マッピング",
+    "DATES": "日付",
+    "CREATIONDATE": "作成日",
+    "CHANGEDATE": "最終更新日",
+    "DEACTIVATE": "非アクティブにする",
+    "ACTIVATE": "アクティブにする",
+    "DELETE": "削除",
+    "DELETE_TITLE": "IDPの削除",
+    "DELETE_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
+    "DELETE_SELECTION_TITLE": "IDPの削除",
+    "DELETE_SELECTION_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
+    "EMPTY": "IDPは利用できません",
+    "OIDC": {
+      "GENERAL": "一般",
+      "TITLE": "OIDC構成",
+      "DESCRIPTION": "OIDC IDプロバイダーの情報を入力します。"
+    },
+    "JWT": {
+      "TITLE": "JWT構成",
+      "DESCRIPTION": "JWT Identity Providerの情報を入力する。",
+      "HEADERNAME": "ヘッダー名",
+      "JWTENDPOINT": "JWTエンドポイント",
+      "JWTKEYSENDPOINT": "JWTキーエンドポイント"
+    },
+    "TOAST": {
+      "SAVED": "正常に保存されました。",
+      "REACTIVATED": "IDPがアクティブになりました。",
+      "DEACTIVATED": "IDPが非アクティブになりました。",
+      "SELECTEDREACTIVATED": "選択されたIDPがアクティブになりました。",
+      "SELECTEDDEACTIVATED": "選択されたIDPが非アクティブになりました。",
+      "SELECTEDKEYSDELETED": "選択されたIDPが削除されました。",
+      "DELETED": "IDPは正常に削除されました！",
+      "ADDED": "正常に追加されました。",
+      "REMOVED": "正常に削除されました。"
+    }
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "パスワードレス",
+      "MULTIFACTORDESCRIPTION": "ここでパスワードレス認証のための多要素認証を定義します。",
+      "SECONDFACTORTITLE": "多要素認証",
+      "SECONDFACTORDESCRIPTION": "パスワード認証を保護できるさらに多要素認証を定義します。"
+    },
+    "CREATE": {
+      "TITLE": "新しい要素",
+      "DESCRIPTION": "新しい要素タイプを選択する。"
+    },
+    "DELETE": {
+      "TITLE": "要素の削除",
+      "DESCRIPTION": "ログイン設定から要素を削除しようとしています。本当によろしいですか？"
+    },
+    "TOAST": {
+      "ADDED": "正常に追加されました。",
+      "SAVED": "正常に保存されました。",
+      "DELETED": "正常に削除されました"
+    },
+    "TYPE": "タイプ",
+    "MULTIFACTORTYPES": {
+      "0": "不明",
+      "1": "指紋、セキュリティキー、フェイスIDなど"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "不明",
+      "1": "ワンタイムパスワード（OTP）",
+      "2": "指紋、セキュリティキー、フェイスIDなど"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "ログイン設定",
+      "DESCRIPTION": "組織でユーザーを認証する方法を定義します。"
+    },
+    "IDPS": "IDプロバイダー",
+    "ADDIDP": {
+      "TITLE": "IDプロバイダーの追加",
+      "DESCRIPTION": "認証に使用するプロバイダーは、あらかじめ定義されたものと自分で作成したものを選択できます。",
+      "SELECTIDPS": "IDプロバイダー"
+    },
+    "PASSWORDLESS": "パスワードレスログイン",
+    "PASSWORDLESSTYPE": {
+      "0": "無効",
+      "1": "有効"
+    }
+  },
+  "APP": {
+    "LIST": "アプリケーション",
+    "COMPLIANCE": "OIDCコンプライアンス",
+    "URLS": "URL",
+    "CONFIGURATION": "構成",
+    "TOKEN": "トークン設定",
+    "PAGES": {
+      "TITLE": "アプリケーション",
+      "ID": "id",
+      "DESCRIPTION": "ここでは、アプリケーション情報とその構成を編集できます。",
+      "CREATE": "アプリケーションを作成する",
+      "CREATE_SELECT_PROJECT": "最初にプロジェクトを選択する",
+      "CREATE_NEW_PROJECT": "または <a href='{{url}}' title='Create project'>ここに</a> 新しい組織を作成する",
+      "CREATE_DESC_TITLE": "アプリケーションの詳細を段階的に入力する",
+      "CREATE_DESC_SUB": "推奨される構成が自動的に生成されます。",
+      "STATE": "ステータス",
+      "DATECREATED": "作成日",
+      "DATECHANGED": "更新日",
+      "URLS": "URL",
+      "DELETE": "アプリを削除する",
+      "DETAIL": {
+        "TITLE": "詳細",
+        "STATE": {
+          "0": "未定義",
+          "1": "アクティブ",
+          "2": "非アクティブ"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "OIDC構成の変更"
+        },
+        "DELETE": {
+          "TITLE": "アプリの削除",
+          "DESCRIPTION": "本当にこのアプリケーションを削除してよろしいですか？"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "次のステップ",
+        "0": {
+          "TITLE": "ロールの追加",
+          "DESC": "プロジェクトのロールを入力してください"
+        },
+        "1": {
+          "TITLE": "ユーザーの追加",
+          "DESC": "組織の新しいユーザーを追加する"
+        },
+        "2": {
+          "TITLE": "ヘルプサポート",
+          "DESC": "アプリケーションの作成に関するドキュメントを読むか、サポートにお問い合わせください"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "アプリ名の変更",
+      "DESCRIPTION": "新しいアプリ名を入力する",
+      "NAME": "新しいアプリ名"
+    },
+    "NAME": "名前",
+    "TYPE": "アプリケーションタイプ",
+    "AUTHMETHOD": "認証方法",
+    "AUTHMETHODSECTION": "認証方法",
+    "GRANT": "グラントタイプ",
+    "ADDITIONALORIGINS": "追加オリジン",
+    "ADDITIONALORIGINSDESC": "リダイレクトとして使用しないオリジンをアプリに追加したい場合は、ここで追加することができます。",
+    "ORIGINS": "オリジン",
+    "NOTANORIGIN": "入力された値はオリジンではありません",
+    "PROSWITCH": "私はプロです。このウィザードをスキップします。",
+    "NAMEANDTYPESECTION": "名前とタイプ",
+    "TITLEFIRST": "アプリケーションの名前",
+    "TYPETITLE": "アプリケーションのタイプ",
+    "OIDC": {
+      "WELLKNOWN": "詳細リンクは、<a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a> から取得することができます。",
+      "INFO": {
+        "ISSUER": "発行者",
+        "CLIENTID": "クライアントID"
+      },
+      "CURRENT": "現在の設定",
+      "TOKENSECTIONTITLE": "AuthToken オプション",
+      "REDIRECTSECTIONTITLE": "リダイレクト設定",
+      "REDIRECTTITLE": "ログインのリダイレクト先となるURIを指定します。",
+      "POSTREDIRECTTITLE": "ログアウト後のリダイレクトURIです。",
+      "REDIRECTDESCRIPTIONWEB": "リダイレクトURIは https:// で開始する必要があります。 http:// は、開発モードでのみ有効です。",
+      "REDIRECTDESCRIPTIONNATIVE": "リダイレクトURIは、独自のプロトコル、http://127.0.0.1、http://[::1] または http://localhost で開始する必要があります。",
+      "REDIRECTNOTVALID": "このリダイレクトURIは無効です。",
+      "COMMAORENTERSEPERATION": "↵で分離する",
+      "TYPEREQUIRED": "タイプが必要です。",
+      "TITLE": "OIDC構成",
+      "CLIENTID": "クライアントID",
+      "CLIENTSECRET": "クライアントシークレット",
+      "CLIENTSECRET_NOSECRET": "選択した認証フローでは、シークレットは必要ないため、利用できません。",
+      "CLIENTSECRET_DESCRIPTION": "クライアントシークレットは、ダイアログを閉じると消えてしまうので、安全な場所に保管してください。",
+      "REGENERATESECRET": "クライアントシークレットを再生成する",
+      "DEVMODE": "開発モード",
+      "DEVMODEDESC": "注意：開発モードを有効にすると、URIが認証されません。",
+      "REDIRECT": "リダイレクトURI",
+      "REDIRECTSECTION": "リダイレクトURI",
+      "POSTLOGOUTREDIRECT": "ログアウトURI",
+      "RESPONSESECTION": "レスポンスタイプ",
+      "GRANTSECTION": "グラントタイプ",
+      "GRANTTITLE": "グラントタイプを選択する。注：Implicitは、ブラウザベースのアプリケーションでのみ利用できます。",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "User Agent",
+        "2": "Native"
+      },
+      "RESPONSETYPE": "レスポンスタイプ",
+      "RESPONSE": {
+        "0": "Code",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "トークンを更新する",
+      "GRANTTYPE": "グラントタイプ",
+      "GRANT": {
+        "0": "Authorization Code",
+        "1": "Implicit",
+        "2": "Refresh Token"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "None",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "認証トークンタイプ",
+      "TOKENTYPE0": "Bearerトークン",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "I sure hope you know what you are doing.",
+      "OVERVIEWSECTION": "概要",
+      "OVERVIEWTITLE": "完了です。構成を確認してください。",
+      "ACCESSTOKENROLEASSERTION": "ユーザーロールをアクセストークンに追加する",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "選択した場合、認証されたユーザーの要求されたロールがアクセストークンに追加されます。",
+      "IDTOKENROLEASSERTION": "IDトークン内のユーザーロール",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "選択した場合、認証されたユーザーの要求されたロールがIDトークンに追加されます。",
+      "IDTOKENUSERINFOASSERTION": "IDトークン内のユーザー情報",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "クライアントは、IDトークンからプロフィール、メール、電話、住所のクレームを取得できます。",
+      "CLOCKSKEW": "OPとクライアントのクロックスキューをクライアントが処理できるようにします。持続時間（0～5s）は、exp claimに加算され、iats、auth_timeおよびnbfから減算されます。",
+      "RECOMMENDED": "推奨",
+      "NOTRECOMMENDED": "非推奨",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": ".NET、PHP、node.js、Javaなどの通常のWebアプリケーション。"
+          },
+          "NATIVE": {
+            "TITLE": "Native",
+            "DESCRIPTION": "モバイルアプリ、デスクトップ、スマートデバイスなど"
+          },
+          "USERAGENT": {
+            "TITLE": "User Agent",
+            "DESCRIPTION": "シングルページアプリケーション（SPA）および一般に、ブラウザで実行されるすべてのJSフレームワーク"
+          }
+        }
+      }
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "クライアントID"
+      },
+      "REGENERATESECRET": "クライアントシークレットを再再生する",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "一般的なAPI"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Private Key JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAMLアプリケーション"
+      },
+      "CONFIGSECTION": "SAML構成",
+      "URL": "メタデータファイルが配置されているURL",
+      "OR": "または",
+      "XML": "メタデータXMLをアップロードする",
+      "METADATA": "メタデータ",
+      "METADATAFROMFILE": "ファイルからのメタデータ"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Code",
+        "DESCRIPTION": "トークンの承認コードを交換する"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "クライアントシークレットの代わりにランダムハッシュを使用することで、より安全性を高めることができます。"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Formの一部としてclient_idとclient_secretを送信する"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "アプリケーションの認証に秘密鍵を使用する"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "ユーザー名とパスワードを使用した認証"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "認証エンドポイントから直接トークンを取得します。"
+      },
+      "CUSTOM": {
+        "TITLE": "Custom",
+        "DESCRIPTION": "設定は他のオプションに対応していません。"
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "アプリケーションがアクティブになりました。",
+      "DEACTIVATED": "アプリケーションが非アクティブになりました。",
+      "OIDCUPDATED": "アプリが更新されました。",
+      "APIUPDATED": "アプリが更新されました",
+      "UPDATED": "アプリが更新されました。",
+      "CREATED": "アプリが作成されました。",
+      "CLIENTSECRETREGENERATED": "クライアントシークレットが生成されました。",
+      "DELETED": "アプリが削除されました。",
+      "CONFIGCHANGED": "変更を検出しました！"
+    }
+  },
+  "GENDERS": {
+    "0": "不明",
+    "1": "女性",
+    "2": "男性",
+    "3": "その他"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
+  },
+  "MEMBER": {
+    "ADD": "マネージャーを追加する",
+    "CREATIONTYPE": "作成タイプ",
+    "CREATIONTYPES": {
+      "0": "所有プロジェクト",
+      "1": "グラントされたプロジェクト",
+      "2": "組織",
+      "3": "IAM",
+      "4": "プロジェクト"
+    },
+    "EDITROLE": "ロールを編集する",
+    "EDITFOR": "ユーザーのロールを編集する：{{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "マネージャーの削除",
+      "DELETE_DESCRIPTION": "マネージャーを削除しようとしています。本当によろしいですか？"
+    }
+  },
+  "ROLESLABEL": "ロール",
+  "GRANTS": {
+    "TITLE": "認可",
+    "DESC": "この組織のすべての認可です。",
+    "DELETE": "認可を削除する",
+    "EMPTY": "認可は見つかりません",
+    "ADD": "認可を作成する",
+    "ADD_BTN": "新規",
+    "PROJECT": {
+      "TITLE": "認可",
+      "DESCRIPTION": "指定したプロジェクトの認可を定義します。自分が権限を持つプロジェクトとユーザーのエントリしか表示されないことに注意してください。"
+    },
+    "USER": {
+      "TITLE": "認可",
+      "DESCRIPTION": "指定したユーザーの認可を定義します。自分が権限を持つプロジェクトとユーザーのエントリしか表示されないことに注意してください。"
+    },
+    "CREATE": {
+      "TITLE": "認可の作成",
+      "DESCRIPTION": "組織、プロジェクト、および対応するロールを検索する。"
+    },
+    "EDIT": {
+      "TITLE": "認可の変更"
+    },
+    "DETAIL": {
+      "TITLE": "認可の詳細",
+      "DESCRIPTION": "ここでは、認可のすべての詳細を確認できます。"
+    },
+    "TOAST": {
+      "UPDATED": "認可が更新されました。",
+      "REMOVED": "認可が削除されました",
+      "BULKREMOVED": "認可が削除されました。"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "認可の削除",
+      "DELETE_DESCRIPTION": "認可を削除しようとしています。本当によろしいですか？",
+      "BULK_DELETE_TITLE": "認可の削除",
+      "BULK_DELETE_DESCRIPTION": "複数の認可を削除しようとしています。本当によろしいですか？"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "最後の変更",
+    "BOTTOM": "リストの終わりに到達しました。",
+    "LOADMORE": "さらに読み込む",
+    "ORG": {
+      "TITLE": "アクティビティ",
+      "DESCRIPTION": "ここでは、組織の変更が発生した最新のイベントを見ることができます。"
+    },
+    "PROJECT": {
+      "TITLE": "アクティビティ",
+      "DESCRIPTION": "ここでは、プロジェクトの変更が発生した最新のイベントを見ることができます。"
+    },
+    "USER": {
+      "TITLE": "アクティビティ",
+      "DESCRIPTION": "ここでは、ユーザーの変更が発生した最新のイベントを見ることができます。"
+    }
+  }
+}

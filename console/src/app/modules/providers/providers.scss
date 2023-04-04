@@ -25,6 +25,12 @@
         }
       }
 
+      .idp-icon {
+        font-size: 36px;
+        margin-right: 1rem;
+        flex-shrink: 0;
+      }
+
       h1 {
         margin: 0 1rem 0 0;
       }
@@ -54,6 +60,20 @@
     }
 
     .identity-provider-content {
+      display: flex;
+      flex-direction: column;
+
+      .subheader {
+        margin: 2rem 0 0.5rem 0;
+      }
+
+      .identity-provider-2-col {
+        max-width: 400px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1rem;
+      }
+
       .desc {
         margin-bottom: 1rem;
       }
@@ -93,7 +113,7 @@
     align-items: center;
 
     h2 {
-      margin-right: 0.25rem;
+      margin: 1rem 0.25rem 1rem 0;
     }
   }
 }

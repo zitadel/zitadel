@@ -110,10 +110,9 @@
 
       <cnsl-redirect-uris
         class="redirect-section"
-        [canWrite]="true"
+        [disabled]="false"
         [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
-        (changedUris)="oidcAppRequest.setRedirectUrisList($any($event))"
-        [urisList]="oidcAppRequest.toObject().redirectUrisList"
+        [(ngModel)]="redirectUris"
         [getValues]="requestRedirectValuesSubject$"
         title="{{ 'APP.OIDC.REDIRECT' | translate }}"
         data-e2e="redirect-uris"
@@ -139,11 +138,10 @@
 
       <cnsl-redirect-uris
         class="redirect-section"
-        [canWrite]="true"
-        (changedUris)="oidcAppRequest.setPostLogoutRedirectUrisList($any($event))"
-        [urisList]="oidcAppRequest.toObject().postLogoutRedirectUrisList"
-        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+        [disabled]="false"
+        [(ngModel)]="postLogoutUrisList"
         [getValues]="requestRedirectValuesSubject$"
+        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
         [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
         data-e2e="postlogout-uris"
       >
@@ -431,20 +429,18 @@
         <div class="formfield full-width">
           <cnsl-redirect-uris
             class="redirect-section"
-            [canWrite]="true"
-            (changedUris)="oidcAppRequest.setRedirectUrisList($any($event))"
-            [urisList]="oidcAppRequest.toObject().redirectUrisList"
-            title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+            [disabled]="false"
+            [(ngModel)]="redirectUris"
             [getValues]="requestRedirectValuesSubject$"
+            title="{{ 'APP.OIDC.REDIRECT' | translate }}"
             [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
           >
           </cnsl-redirect-uris>
 
           <cnsl-redirect-uris
             class="redirect-section"
-            [canWrite]="true"
-            (changedUris)="oidcAppRequest.setPostLogoutRedirectUrisList($any($event))"
-            [urisList]="oidcAppRequest.toObject().postLogoutRedirectUrisList"
+            [disabled]="false"
+            [(ngModel)]="postLogoutUrisList"
             title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
             [getValues]="requestRedirectValuesSubject$"
             [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"

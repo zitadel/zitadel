@@ -13,6 +13,8 @@ type SearchQueryFactory struct {
 	limit   uint64
 	desc    bool
 	queries []*query
+
+	InstanceFiltered bool
 }
 
 type query struct {
@@ -42,11 +44,11 @@ const (
 	Columns_Event = iota
 	Columns_Max_Sequence
 	Columns_InstanceIDs
-	//insert new columns-types before this columnsCount because count is needed for validation
+	// insert new columns-types before this columnsCount because count is needed for validation
 	columnsCount
 )
 
-//FactoryFromSearchQuery is deprecated because it's for migration purposes. use NewSearchQueryFactory
+// FactoryFromSearchQuery is deprecated because it's for migration purposes. use NewSearchQueryFactory
 func FactoryFromSearchQuery(q *SearchQuery) *SearchQueryFactory {
 	factory := &SearchQueryFactory{
 		columns: q.Columns,
@@ -76,6 +78,7 @@ func FactoryFromSearchQuery(q *SearchQuery) *SearchQueryFactory {
 			case Field_ResourceOwner:
 				factory.queries[i] = factory.queries[i].ResourceOwner(filter.value.(string))
 			case Field_InstanceID:
+				factory.InstanceFiltered = true
 				if filter.operation == Operation_Equals {
 					factory.queries[i] = factory.queries[i].InstanceID(filter.value.(string))
 				} else if filter.operation == Operation_NotIn {

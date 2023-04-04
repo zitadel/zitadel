@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -94,17 +95,18 @@ type GoogleProvider struct {
 }
 
 type LDAPProvider struct {
-	Name                string
-	Host                string
-	Port                string
-	TLS                 bool
-	BaseDN              string
-	UserObjectClass     string
-	UserUniqueAttribute string
-	Admin               string
-	Password            string
-	LDAPAttributes      idp.LDAPAttributes
-	IDPOptions          idp.Options
+	Name              string
+	Servers           []string
+	StartTLS          bool
+	BaseDN            string
+	BindDN            string
+	BindPassword      string
+	UserBase          string
+	UserObjectClasses []string
+	UserFilters       []string
+	Timeout           time.Duration
+	LDAPAttributes    idp.LDAPAttributes
+	IDPOptions        idp.Options
 }
 
 func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {

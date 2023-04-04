@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
@@ -157,8 +158,9 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
-	case domain.IDPTypeLDAP,
-		domain.IDPTypeUnspecified:
+	case domain.IDPTypeLDAP:
+		provider, err = l.ldapProvider(r.Context(), identityProvider)
+	case domain.IDPTypeUnspecified:
 		fallthrough
 	default:
 		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented"))
@@ -284,7 +286,7 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
-	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
+	externalUser, externalUserChange, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -298,7 +300,7 @@ func (l *Login) handleExternalUserAuthenticated(
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser)
 		return
 	}
-	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 {
+	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 || externalUserChange {
 		// read current auth request state (incl. authorized user)
 		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 		if err != nil {
@@ -306,7 +308,7 @@ func (l *Login) handleExternalUserAuthenticated(
 			return
 		}
 	}
-	if provider.IsAutoUpdate {
+	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
@@ -556,7 +558,7 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "LOGIN-WLTce", "Errors.User.NotHuman")
 	}
-	if externalUser.Email != "" && externalUser.Email != user.Human.Email && externalUser.IsEmailVerified != user.Human.IsEmailVerified {
+	if externalUser.Email != "" && (externalUser.Email != user.Human.Email || externalUser.IsEmailVerified != user.Human.IsEmailVerified) {
 		emailCodeGenerator, err := l.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
 		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update email")
 		if err == nil {
@@ -570,7 +572,7 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 			logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update email")
 		}
 	}
-	if externalUser.Phone != "" && externalUser.Phone != user.Human.Phone && externalUser.IsPhoneVerified != user.Human.IsPhoneVerified {
+	if externalUser.Phone != "" && (externalUser.Phone != user.Human.Phone || externalUser.IsPhoneVerified != user.Human.IsPhoneVerified) {
 		phoneCodeGenerator, err := l.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
 		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update phone")
 		if err == nil {
@@ -602,6 +604,69 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update profile")
 	}
 	return nil
+}
+
+func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*ldap.Provider, error) {
+	password, err := crypto.DecryptString(identityProvider.LDAPIDPTemplate.BindPassword, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	var opts []ldap.ProviderOpts
+	if !identityProvider.LDAPIDPTemplate.StartTLS {
+		opts = append(opts, ldap.WithoutStartTLS())
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.IDAttribute != "" {
+		opts = append(opts, ldap.WithCustomIDAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.IDAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.FirstNameAttribute != "" {
+		opts = append(opts, ldap.WithFirstNameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.FirstNameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.LastNameAttribute != "" {
+		opts = append(opts, ldap.WithLastNameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.LastNameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.DisplayNameAttribute != "" {
+		opts = append(opts, ldap.WithDisplayNameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.DisplayNameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.NickNameAttribute != "" {
+		opts = append(opts, ldap.WithNickNameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.NickNameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.PreferredUsernameAttribute != "" {
+		opts = append(opts, ldap.WithPreferredUsernameAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.PreferredUsernameAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.EmailAttribute != "" {
+		opts = append(opts, ldap.WithEmailAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.EmailAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.EmailVerifiedAttribute != "" {
+		opts = append(opts, ldap.WithEmailVerifiedAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.EmailVerifiedAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.PhoneAttribute != "" {
+		opts = append(opts, ldap.WithPhoneAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.PhoneAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.PhoneVerifiedAttribute != "" {
+		opts = append(opts, ldap.WithPhoneVerifiedAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.PhoneVerifiedAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.PreferredLanguageAttribute != "" {
+		opts = append(opts, ldap.WithPreferredLanguageAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.PreferredLanguageAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.AvatarURLAttribute != "" {
+		opts = append(opts, ldap.WithAvatarURLAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.AvatarURLAttribute))
+	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.ProfileAttribute != "" {
+		opts = append(opts, ldap.WithProfileAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.ProfileAttribute))
+	}
+	return ldap.New(
+		identityProvider.Name,
+		identityProvider.Servers,
+		identityProvider.BaseDN,
+		identityProvider.BindDN,
+		password,
+		identityProvider.UserBase,
+		identityProvider.UserObjectClasses,
+		identityProvider.UserFilters,
+		identityProvider.Timeout,
+		l.baseURL(ctx)+EndpointLDAPLogin+"?"+QueryAuthRequestID+"=",
+		opts...,
+	), nil
 }
 
 func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*google.Provider, error) {
@@ -772,15 +837,15 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 	return nil
 }
 
-func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens, user idp.User, err error) {
-	if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, user, err); actionErr != nil {
+func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens[*oidc.IDTokenClaims], user idp.User, err error) {
+	if _, _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, user, err); actionErr != nil {
 		logging.WithError(err).Error("both external user authentication and action post authentication failed")
 	}
 	l.renderLogin(w, r, authReq, err)
 }
 
 // tokens extracts the oidc.Tokens for backwards compatibility of PostExternalAuthenticationActions
-func tokens(session idp.Session) *oidc.Tokens {
+func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 	switch s := session.(type) {
 	case *openid.Session:
 		return s.Tokens

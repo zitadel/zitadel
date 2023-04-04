@@ -2,27 +2,28 @@ package idp
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
 type LDAPIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID                  string              `json:"id"`
-	Name                string              `json:"name"`
-	Host                string              `json:"host"`
-	Port                string              `json:"port,omitempty"`
-	TLS                 bool                `json:"tls"`
-	BaseDN              string              `json:"baseDN"`
-	UserObjectClass     string              `json:"userObjectClass"`
-	UserUniqueAttribute string              `json:"userUniqueAttribute"`
-	Admin               string              `json:"admin"`
-	Password            *crypto.CryptoValue `json:"password"`
+	ID                string              `json:"id"`
+	Name              string              `json:"name"`
+	Servers           []string            `json:"servers"`
+	StartTLS          bool                `json:"startTLS"`
+	BaseDN            string              `json:"baseDN"`
+	BindDN            string              `json:"bindDN"`
+	BindPassword      *crypto.CryptoValue `json:"bindPassword"`
+	UserBase          string              `json:"userBase"`
+	UserObjectClasses []string            `json:"userObjectClasses"`
+	UserFilters       []string            `json:"userFilters"`
+	Timeout           time.Duration       `json:"timeout"`
 
 	LDAPAttributes
 	Options
@@ -132,33 +133,35 @@ func (o *LDAPAttributes) ReduceChanges(changes LDAPAttributeChanges) {
 
 func NewLDAPIDPAddedEvent(
 	base *eventstore.BaseEvent,
-	id,
-	name,
-	host,
-	port string,
-	tls bool,
-	baseDN,
-	userObjectClass,
-	userUniqueAttribute,
-	admin string,
-	password *crypto.CryptoValue,
+	id string,
+	name string,
+	servers []string,
+	startTLS bool,
+	baseDN string,
+	bindDN string,
+	bindPassword *crypto.CryptoValue,
+	userBase string,
+	userObjectClasses []string,
+	userFilters []string,
+	timeout time.Duration,
 	attributes LDAPAttributes,
 	options Options,
 ) *LDAPIDPAddedEvent {
 	return &LDAPIDPAddedEvent{
-		BaseEvent:           *base,
-		ID:                  id,
-		Name:                name,
-		Host:                host,
-		Port:                port,
-		TLS:                 tls,
-		BaseDN:              baseDN,
-		UserObjectClass:     userObjectClass,
-		UserUniqueAttribute: userUniqueAttribute,
-		Admin:               admin,
-		Password:            password,
-		LDAPAttributes:      attributes,
-		Options:             options,
+		BaseEvent:         *base,
+		ID:                id,
+		Name:              name,
+		Servers:           servers,
+		StartTLS:          startTLS,
+		BaseDN:            baseDN,
+		BindDN:            bindDN,
+		BindPassword:      bindPassword,
+		UserBase:          userBase,
+		UserObjectClasses: userObjectClasses,
+		UserFilters:       userFilters,
+		Timeout:           timeout,
+		LDAPAttributes:    attributes,
+		Options:           options,
 	}
 }
 
@@ -167,7 +170,7 @@ func (e *LDAPIDPAddedEvent) Data() interface{} {
 }
 
 func (e *LDAPIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	return nil
 }
 
 func LDAPIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
@@ -186,18 +189,17 @@ func LDAPIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) 
 type LDAPIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	oldName string
-
-	ID                  string              `json:"id"`
-	Name                *string             `json:"name,omitempty"`
-	Host                *string             `json:"host,omitempty"`
-	Port                *string             `json:"port,omitempty"`
-	TLS                 *bool               `json:"tls,omitempty"`
-	BaseDN              *string             `json:"baseDN,omitempty"`
-	UserObjectClass     *string             `json:"userObjectClass,omitempty"`
-	UserUniqueAttribute *string             `json:"userUniqueAttribute,omitempty"`
-	Admin               *string             `json:"admin,omitempty"`
-	Password            *crypto.CryptoValue `json:"password,omitempty"`
+	ID                string              `json:"id"`
+	Name              *string             `json:"name,omitempty"`
+	Servers           []string            `json:"servers,omitempty"`
+	StartTLS          *bool               `json:"startTLS,omitempty"`
+	BaseDN            *string             `json:"baseDN,omitempty"`
+	BindDN            *string             `json:"bindDN,omitempty"`
+	BindPassword      *crypto.CryptoValue `json:"bindPassword,omitempty"`
+	UserBase          *string             `json:"userBase,omitempty"`
+	UserObjectClasses []string            `json:"userObjectClasses,omitempty"`
+	UserFilters       []string            `json:"userFilters,omitempty"`
+	Timeout           *time.Duration      `json:"timeout,omitempty"`
 
 	LDAPAttributeChanges
 	OptionChanges
@@ -238,7 +240,6 @@ func (o LDAPAttributeChanges) IsZero() bool {
 func NewLDAPIDPChangedEvent(
 	base *eventstore.BaseEvent,
 	id string,
-	oldName string,
 	changes []LDAPIDPChanges,
 ) (*LDAPIDPChangedEvent, error) {
 	if len(changes) == 0 {
@@ -247,7 +248,6 @@ func NewLDAPIDPChangedEvent(
 	changedEvent := &LDAPIDPChangedEvent{
 		BaseEvent: *base,
 		ID:        id,
-		oldName:   oldName,
 	}
 	for _, change := range changes {
 		change(changedEvent)
@@ -263,51 +263,57 @@ func ChangeLDAPName(name string) func(*LDAPIDPChangedEvent) {
 	}
 }
 
-func ChangeLDAPHost(host string) func(*LDAPIDPChangedEvent) {
+func ChangeLDAPServers(servers []string) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {
-		e.Host = &host
+		e.Servers = servers
 	}
 }
 
-func ChangeLDAPPort(port string) func(*LDAPIDPChangedEvent) {
+func ChangeLDAPStartTLS(startTls bool) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {
-		e.Port = &port
+		e.StartTLS = &startTls
 	}
 }
 
-func ChangeLDAPTLS(tls bool) func(*LDAPIDPChangedEvent) {
+func ChangeLDAPBaseDN(baseDN string) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {
-		e.TLS = &tls
+		e.BaseDN = &baseDN
 	}
 }
 
-func ChangeLDAPBaseDN(basDN string) func(*LDAPIDPChangedEvent) {
+func ChangeLDAPBindDN(bindDN string) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {
-		e.BaseDN = &basDN
+		e.BindDN = &bindDN
 	}
 }
 
-func ChangeLDAPUserObjectClass(userObjectClass string) func(*LDAPIDPChangedEvent) {
+func ChangeLDAPBindPassword(password *crypto.CryptoValue) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {
-		e.UserObjectClass = &userObjectClass
+		e.BindPassword = password
 	}
 }
 
-func ChangeLDAPUserUniqueAttribute(userUniqueAttribute string) func(*LDAPIDPChangedEvent) {
+func ChangeLDAPUserBase(userBase string) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {
-		e.UserUniqueAttribute = &userUniqueAttribute
+		e.UserBase = &userBase
 	}
 }
 
-func ChangeLDAPAdmin(admin string) func(*LDAPIDPChangedEvent) {
+func ChangeLDAPUserObjectClasses(objectClasses []string) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {
-		e.Admin = &admin
+		e.UserObjectClasses = objectClasses
 	}
 }
 
-func ChangeLDAPPassword(password *crypto.CryptoValue) func(*LDAPIDPChangedEvent) {
+func ChangeLDAPUserFilters(userFilters []string) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {
-		e.Password = password
+		e.UserFilters = userFilters
+	}
+}
+
+func ChangeLDAPTimeout(timeout time.Duration) func(*LDAPIDPChangedEvent) {
+	return func(e *LDAPIDPChangedEvent) {
+		e.Timeout = &timeout
 	}
 }
 
@@ -328,13 +334,7 @@ func (e *LDAPIDPChangedEvent) Data() interface{} {
 }
 
 func (e *LDAPIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	if e.Name == nil || e.oldName == *e.Name { // TODO: nil check should be enough?
-		return nil
-	}
-	return []*eventstore.EventUniqueConstraint{
-		idpconfig.NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
-		idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
-	}
+	return nil
 }
 
 func LDAPIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {

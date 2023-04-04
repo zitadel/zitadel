@@ -1,7 +1,10 @@
 package channels
 
+import "github.com/zitadel/zitadel/internal/eventstore"
+
 type Message interface {
-	GetContent() string
+	GetTriggeringEvent() eventstore.Event
+	GetContent() (string, error)
 }
 
 type NotificationChannel interface {
