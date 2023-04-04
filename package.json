@@ -9,7 +9,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build --filter=docs^... && changeset publish",
-    "generate": "buf generate external/zitadel/proto"
+    "generate": "turbo run generate"
   },
   "devDependencies": {
     "@changesets/cli": "^2.22.0",

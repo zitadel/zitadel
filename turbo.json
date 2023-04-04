@@ -17,6 +17,9 @@
     },
     "clean": {
       "cache": false
+    },
+    "generate": {
+      "cache": true
     }
   }
 }

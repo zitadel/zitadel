@@ -108,12 +108,14 @@ importers:
       '@zitadel/tsconfig': workspace:*
       eslint: ^7.32.0
       eslint-config-zitadel: workspace:*
+      ts-proto: ^1.139.0
       tsup: ^5.10.1
       typescript: ^4.5.3
     devDependencies:
       '@zitadel/tsconfig': link:../zitadel-tsconfig
       eslint: 7.32.0
       eslint-config-zitadel: link:../eslint-config-zitadel
+      ts-proto: 1.146.0
       tsup: 5.12.9_typescript@4.9.3
       typescript: 4.9.3
 
