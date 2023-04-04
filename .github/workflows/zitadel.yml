@@ -62,6 +62,7 @@ jobs:
           password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
       - uses: goreleaser/goreleaser-action@v3
         name: Publish ZITADEL
+        timeout-minutes: 50
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           distribution: goreleaser
