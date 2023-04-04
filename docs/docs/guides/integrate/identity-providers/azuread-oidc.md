@@ -1,6 +1,6 @@
 ---
 title: Configure AzureAD as Identity Provider
-sidebar_label: AzureAD
+sidebar_label: AzureAD OIDC (Deprecated)
 ---
 
 ## AzureAD Tenant as Identity Provider for ZITADEL

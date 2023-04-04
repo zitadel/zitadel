@@ -65,6 +65,8 @@ Once you created the IdP you need to activate it, to make it usable for your use
 To test the setup use incognito mode and browse to your login page.
 If you succeeded you should see a new button which should redirect you to your GitHub.
 
+Per default the login of your instance will be shown, read the following section on how to trigger it for a specific organization: [Organization Scope](./general#trigger-configuration-on-the-login-for-a-specific-organization)
+
 ![GitHub Button](/img/guides/zitadel_login_github.png)
 
 ![GitHub Login](/img/guides/google_login.png)
