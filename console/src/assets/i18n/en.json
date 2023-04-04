@@ -1681,7 +1681,7 @@
     "AZUREADTENANTTYPES": {
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "Tenant Type",
     "AZUREADTENANTID": "Tenant ID",

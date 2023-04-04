@@ -6203,8 +6203,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Get Identity Provider (IDP) by ID";
-            description: "Returns an identity provider (social/enterprise login) by its ID e.g Google, AzureAD, etc that is configured on the organization."
+            summary: "Deprecated: Get Identity Provider (IDP) by ID";
+            description: "Returns an identity provider (social/enterprise login) by its ID e.g Google, AzureAD, etc that is configured on the organization.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6228,8 +6229,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Search Identity Providers (IDPs)";
-            description: "Returns a list of identity providers (social/enterprise login) configured on the organization. e.g Google, AzureAD, etc."
+            summary: "Deprecated: Search Identity Providers (IDPs)";
+            description: "Returns a list of identity providers (social/enterprise login) configured on the organization. e.g Google, AzureAD, etc.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6253,8 +6255,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Add OIDC Identity Provider (IDP)";
-            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. The provider has to be OIDC-compliant. This configuration can only be used by the organization itself."
+            summary: "Deprecated: Add OIDC Identity Provider (IDP)";
+            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. The provider has to be OIDC-compliant. This configuration can only be used by the organization itself.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6278,8 +6281,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Add JWT Identity Provider (IDP)";
-            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token."
+            summary: "Deprecated: Add JWT Identity Provider (IDP)";
+            description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6303,8 +6307,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Deactivate Identity Provider (IDP)";
-            description: "Sets the state of the provider to inactive. It can only be called for the provider with the state active. Users will not be able to log in with the given provider afterward. It might cause troubles if it is the only authentication method of the user."
+            summary: "Deprecated: Deactivate Identity Provider (IDP)";
+            description: "Sets the state of the provider to inactive. It can only be called for the provider with the state active. Users will not be able to log in with the given provider afterward. It might cause troubles if it is the only authentication method of the user.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6329,7 +6334,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Reactivate Identity Provider (IDP)";
-            description: "Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to log in again with the given provider."
+            description: "Deprecated: Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to log in again with the given provider.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6353,7 +6359,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Remove Identity Provider (IDP)";
-            description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to log in with the provider afterward. If it is their only authentication possibility it might cause problems."
+            description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to log in with the provider afterward. If it is their only authentication possibility it might cause problems.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6377,8 +6384,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Update Identity Provider (IDP)";
-            description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterward."
+            summary: "Deprecated: Update Identity Provider (IDP)";
+            description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterward.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6402,8 +6410,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Update OIDC Identity Provider (IDP)";
-            description: "Update the OIDC-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward."
+            summary: "Deprecated: Update OIDC Identity Provider (IDP)";
+            description: "Update the OIDC-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6427,8 +6436,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Update JWT Identity Provider (IDP)";
-            description: "Update the JWT-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward."
+            summary: "Deprecated: Update JWT Identity Provider (IDP)";
+            description: "Update the JWT-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward.";
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6451,6 +6461,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "List Identity Providers";
+            description: "";
+        };
     }
 
     // Returns an identity provider of the organization
@@ -6461,6 +6477,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Get Identity Provider By ID";
+            description: "";
         };
     }
 
@@ -6474,6 +6496,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add Generic OAuth Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing OAuth2 identity provider in the organization
@@ -6485,6 +6513,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update Generic OAuth Identity Provider";
+            description: "";
         };
     }
 
@@ -6498,6 +6532,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add Generic OIDC Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing OIDC identity provider in the organization
@@ -6509,6 +6549,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update Generic OIDC Identity Provider";
+            description: "";
         };
     }
 
@@ -6522,6 +6568,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add JWT Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing JWT identity provider in the organization
@@ -6533,6 +6585,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update JWT Identity Provider";
+            description: "";
         };
     }
 
@@ -6546,6 +6604,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add Azure AD Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing Azure AD identity provider in the organisation
@@ -6557,6 +6621,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update Azure AD Identity Provider";
+            description: "";
         };
     }
 
@@ -6570,6 +6640,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add GitHub Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing GitHub identity provider in the organization
@@ -6581,6 +6657,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update GitHub Identity Provider";
+            description: "";
         };
     }
 
@@ -6594,6 +6676,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add GitHub Enterprise Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing GitHub Enterprise Server identity provider in the organization
@@ -6605,6 +6693,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update GitHub Enterprise Identity Provider";
+            description: "";
         };
     }
 
@@ -6618,6 +6712,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add GitLab Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing GitLab identity provider in the organization
@@ -6629,6 +6729,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update GitLab Identity Provider";
+            description: "";
         };
     }
 
@@ -6642,6 +6748,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add GitLab Selfhosted Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing self hosted GitLab identity provider in the organization
@@ -6653,6 +6765,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update GitLab Selfhosted Identity Provider";
+            description: "";
         };
     }
 
@@ -6666,6 +6784,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add Google Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing Google identity provider in the organization
@@ -6677,6 +6801,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update Google Identity Provider";
+            description: "";
         };
     }
 
@@ -6690,6 +6820,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add LDAP Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing LDAP identity provider in the organization
@@ -6702,6 +6838,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update LDAP Identity Provider";
+            description: "";
+        };
     }
 
     // Remove an identity provider
@@ -6713,6 +6855,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Delete Identity Provider";
+            description: "";
         };
     }
 

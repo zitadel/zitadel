@@ -73,10 +73,10 @@ You can configure the following settings if you like, a useful default will be f
 
 **Email Verified**: Azure AD doesn't send the email verified claim in the token of the user, if you don't enable this setting, the user will be created with the email not verified, which results in a Email Verification Message for the user. If you want to avoid that, make sure to enable "Email verified". In that case the user will be created with a verified email address.
 
-**Tenant Type**: The tenant type should be configured according what you have choosen in the settings of your Azure Ad application previously.
-- Common: 
-- Organizations: Choose organization if you have selected 
-- Customers: 
+**Tenant Type**: The tenant type should be configured according what you have chosen in the settings of your Azure Ad application previously.
+- Common: Choose common if you want all microsoft accounts being able to login. In this case you have configured "Accounts in any organizational directory and personal Microsoft accounts" in your Azure App configuration
+- Organizations: Choose organization if you have Azure AD Tenants and no personal accounts. (You have configured either "Accounts in this organization" or "Accounts in any organizational directory" on your Azure APP)
+- Consumers: Choose this if you want to allow public accounts. (In your Azure AD App you have configured "Personal Microsoft accounts only")
 
 **Tenant ID**: If you have selected either "organizations" or "Customers" in the Tenant Type, you have to enter the Directory (Tenant) ID, copied previously in the Azure App configuration, here.
 

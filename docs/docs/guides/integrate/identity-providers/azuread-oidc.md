@@ -3,6 +3,12 @@ title: Configure AzureAD as Identity Provider
 sidebar_label: AzureAD OIDC (Deprecated)
 ---
 
+:::caution deprecated
+
+This configuration is based on the generic OIDC configuration. You can use the [Azure AD Template](./azure-ad) instead.
+
+:::
+
 ## AzureAD Tenant as Identity Provider for ZITADEL
 
 This guides shows you how to connect an AzureAD Tenant to ZITADEL.
@@ -35,7 +41,6 @@ You can leave the second field empty since we will change this in the next step.
 For this to work you need to whitelist the redirect URIs from your ZITADEL Instance.
 In this example our test instance has the domain `test-qcon0h.zitadel.cloud`. In this case we need to whitelist these two entries:
 
-- `https://test-qcon0h.zitadel.cloud/ui/login/register/externalidp/callback`
 - `https://test-qcon0h.zitadel.cloud/ui/login/login/externalidp/callback`
 
 :::info
