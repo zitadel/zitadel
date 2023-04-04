@@ -7,8 +7,9 @@ import (
 
 func UpdatePrivacyPolicyToDomain(req *admin_pb.UpdatePrivacyPolicyRequest) *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
-		TOSLink:     req.TosLink,
-		PrivacyLink: req.PrivacyLink,
-		HelpLink:    req.HelpLink,
+		TOSLink:      req.TosLink,
+		PrivacyLink:  req.PrivacyLink,
+		HelpLink:     req.HelpLink,
+		SupportEmail: domain.EmailAddress(req.SupportEmail),
 	}
 }

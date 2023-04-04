@@ -221,6 +221,22 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     });
   }
 
+  public get redirectUris() {
+    return this.oidcAppRequest.toObject().redirectUrisList;
+  }
+
+  public set redirectUris(value: string[]) {
+    this.oidcAppRequest.setRedirectUrisList(value);
+  }
+
+  public get postLogoutUrisList() {
+    return this.oidcAppRequest.toObject().postLogoutRedirectUrisList;
+  }
+
+  public set postLogoutUrisList(value: string[]) {
+    this.oidcAppRequest.setPostLogoutRedirectUrisList(value);
+  }
+
   public ngOnInit(): void {
     this.subscription = this.route.params.subscribe((params) => this.getData(params));
 

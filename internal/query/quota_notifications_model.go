@@ -9,8 +9,8 @@ import (
 
 type quotaNotificationsReadModel struct {
 	eventstore.ReadModel
-	periodStart              time.Time
-	latestNotifiedThresholds map[string]uint16
+	periodStart         time.Time
+	latestDueThresholds map[string]uint16
 }
 
 func newQuotaNotificationsReadModel(aggregateId, instanceId, resourceOwner string, periodStart time.Time) *quotaNotificationsReadModel {
@@ -20,8 +20,8 @@ func newQuotaNotificationsReadModel(aggregateId, instanceId, resourceOwner strin
 			InstanceID:    instanceId,
 			ResourceOwner: resourceOwner,
 		},
-		periodStart:              periodStart,
-		latestNotifiedThresholds: make(map[string]uint16),
+		periodStart:         periodStart,
+		latestDueThresholds: make(map[string]uint16),
 	}
 }
 
@@ -34,13 +34,13 @@ func (rm *quotaNotificationsReadModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(quota.AggregateType).
 		AggregateIDs(rm.AggregateID).
 		CreationDateAfter(rm.periodStart).
-		EventTypes(quota.NotifiedEventType).Builder()
+		EventTypes(quota.NotificationDueEventType).Builder()
 }
 
 func (rm *quotaNotificationsReadModel) Reduce() error {
 	for _, event := range rm.Events {
-		e := event.(*quota.NotifiedEvent)
-		rm.latestNotifiedThresholds[e.ID] = e.Threshold
+		e := event.(*quota.NotificationDueEvent)
+		rm.latestDueThresholds[e.ID] = e.Threshold
 	}
 	return rm.ReadModel.Reduce()
 }

@@ -4,6 +4,7 @@ import localeDe from '@angular/common/locales/de';
 import localeEn from '@angular/common/locales/en';
 import localeFr from '@angular/common/locales/fr';
 import localeIt from '@angular/common/locales/it';
+import localeJa from '@angular/common/locales/ja';
 import localePl from '@angular/common/locales/pl';
 import localeZh from '@angular/common/locales/zh';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
@@ -61,16 +62,18 @@ import { ToastService } from './services/toast.service';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
-registerLocaleData(localeZh);
-i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/zh.json'));
+registerLocaleData(localeEn);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'));
 registerLocaleData(localeFr);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/fr.json'));
 registerLocaleData(localeIt);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/it.json'));
+registerLocaleData(localeJa);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ja.json'));
 registerLocaleData(localePl);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/pl.json'));
-registerLocaleData(localeEn);
-i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'));
+registerLocaleData(localeZh);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/zh.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {

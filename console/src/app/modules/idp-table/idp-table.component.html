@@ -76,6 +76,10 @@
               <img class="idp-logo light" src="./assets/images/idp/github.svg" alt="github" />
               GitHub Enterprise Server
             </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_LDAP">
+              <i class="idp-icon las la-building"></i>
+              Active Directory / LDAP
+            </div>
             <div class="idp-table-provider-type" *ngSwitchDefault>coming soon</div>
           </div>
         </td>
@@ -162,6 +166,10 @@
             </button>
             <button
               actions
+              *ngIf="
+                (serviceType === PolicyComponentServiceType.MGMT && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
+                (serviceType === PolicyComponentServiceType.ADMIN && idp.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM)
+              "
               [disabled]="
                 (serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
                 ([

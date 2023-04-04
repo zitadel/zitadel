@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: zarejestruj
   NextButtonText: dalej
 
+LDAP:
+  Title: Rejestracja
+  Description: Wprowadź swoje dane logowania.
+  LoginNameLabel: Nazwa użytkownika
+  PasswordLabel: Hasło
+  NextButtonText: dalej
+
 SelectAccount:
   Title: Wybierz konto
   Description: Użyj swojego konta ZITADEL
@@ -165,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Potwierdzenie hasła
   CancelButtonText: anuluj
   NextButtonText: dalej
+  Footer: Stopka
 
 PasswordChangeDone:
   Title: Zmiana hasła
@@ -212,6 +220,7 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -243,6 +252,7 @@ ExternalRegistrationUserOverview:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -302,12 +312,14 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Obsługiwane przez
   Tos: TOS
   PrivacyPolicy: Polityka prywatności
   Help: Pomoc
+  SupportEmail: E-mail wsparcia
 
 Errors:
   Internal: Wewnętrzny błąd
@@ -407,5 +419,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Nie istnieje polityka blokady
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Rejestracja nie jest dozwolona
 
 optional: (opcjonalny)
