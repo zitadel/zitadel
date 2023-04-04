@@ -6,7 +6,7 @@ plugins:
   - name: ts
     strategy: all
     path: node_modules/ts-proto/protoc-gen-ts_proto
-    out: proto/src/server
+    out: src/proto/server
     opt:
       - esModuleInterop=true
       - env=node
@@ -17,7 +17,7 @@ plugins:
   #   out: src/app/proto/generated
   #   opt: import_style=commonjs,binary
   - plugin: buf.build/grpc/web
-    out: proto/src/client
+    out: src/proto/client
     opt: import_style=typescript,mode=grpcweb
   # - plugin: buf.build/grpc-ecosystem/openapiv2
   #   out: src/app/proto/generated
