@@ -8,7 +8,6 @@
     "lint-staged": "lint-staged",
     "start": "next start",
     "test": "yarn prettier:check &nexarn lint",
-    "generate": "buf generate external/zitadel/proto",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
   },
   "git": {
