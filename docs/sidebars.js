@@ -139,6 +139,8 @@ module.exports = {
             "guides/integrate/identity-providers/gitlab",
             "guides/integrate/identity-providers/google-oidc",
             "guides/integrate/identity-providers/azuread-oidc",
+            "guides/integrate/identity-providers/ldap",
+            "guides/integrate/identity-providers/openldap",
           ],
         },
         {
