@@ -20,7 +20,7 @@ Make sure to read and follow the [General Guide](./general) on how to setup iden
 1. Go to the Google Cloud Platform and choose your project: [https://console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)
 2. Click on "+ CREATE CREDENTIALS" and choose "OAuth client ID"
 3. Choose "Web application" as application type and give a name
-4. Add the redirect uris
+4. Add the redirect uri
  - {your-domain}/ui/login/login/externalidp/callback
  - Example redirect url for the domain `https://acme-gzoe4x.zitadel.cloud` would look like this:  `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
 5. Save the Client ID and Client secret
