@@ -9,6 +9,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build --filter=docs^... && changeset publish",
+    "prebuild": "turbo run generate",
     "generate": "turbo run generate"
   },
   "devDependencies": {
