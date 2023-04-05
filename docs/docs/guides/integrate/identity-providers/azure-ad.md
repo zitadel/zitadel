@@ -65,7 +65,9 @@ To be able to get all the information that ZITADEL needs, you have to configure 
 ### Create new Azure AD Provider
 
 Go to the settings of your ZITADEL instance or the organization where you like to add a new **Azure AD** provider.
-Choose the **Microsoft** provider template. This template has everything you need preconfigured. You only have to add the client ID and secret, you have created in the step before.
+Choose the **Microsoft** provider template.
+This template has everything you need preconfigured.
+You only have to add the client ID and secret, you have created in the step before.
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
