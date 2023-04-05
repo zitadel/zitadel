@@ -85,7 +85,7 @@ In this case, configure "Accounts in any organizational directory and personal M
 - Organizations: Choose organization if you have Azure AD Tenants and no personal accounts. (You have configured either "Accounts in this organization" or "Accounts in any organizational directory" on your Azure APP)
 - Consumers: Choose this if you want to allow public accounts. (In your Azure AD App you have configured "Personal Microsoft accounts only")
 
-**Tenant ID**: If you have selected either "organizations" or "Customers" in the Tenant Type, you have to enter the Directory (Tenant) ID, copied previously in the Azure App configuration, here.
+**Tenant ID**: If you have selected either the *Organizations* or *Customers* as the *Tenant Type*, you have to enter the *Directory (Tenant) ID*, copied previously in the Azure App configuration, here.
 
 **Automatic creation**: If this setting is enabled the user will be created automatically within ZITADEL, if it doesn't exist.
 
