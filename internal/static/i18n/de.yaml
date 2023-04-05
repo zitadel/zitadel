@@ -241,6 +241,9 @@ Errors:
       NotFound: Notification Policy konnte nicht gefunden werden
       NotChanged: Notification Policy wurde nicht verändert
       AlreadyExists: Notification Policy existiert bereits
+    LabelPolicy:
+      NotFound: Private Label Policy konnte nicht gefunden
+      NotChanged: Private Label Policy wurde nicht verändert
   Project:
     ProjectIDMissing: Project ID fehlt
     AlreadyExists: Project existiert bereits auf der Organisation

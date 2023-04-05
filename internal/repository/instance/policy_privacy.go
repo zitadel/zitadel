@@ -3,8 +3,8 @@ package instance
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
@@ -24,6 +24,7 @@ func NewPrivacyPolicyAddedEvent(
 	tosLink,
 	privacyLink,
 	helpLink string,
+	supportEmail domain.EmailAddress,
 ) *PrivacyPolicyAddedEvent {
 	return &PrivacyPolicyAddedEvent{
 		PrivacyPolicyAddedEvent: *policy.NewPrivacyPolicyAddedEvent(
@@ -33,7 +34,8 @@ func NewPrivacyPolicyAddedEvent(
 				PrivacyPolicyAddedEventType),
 			tosLink,
 			privacyLink,
-			helpLink),
+			helpLink,
+			supportEmail),
 	}
 }
 

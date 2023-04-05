@@ -30,7 +30,7 @@ func New(clientID, clientSecret, redirectURI string, scopes []string, opts ...oi
 	}, nil
 }
 
-var userMapper = func(info openid.UserInfo) idp.User {
+var userMapper = func(info *openid.UserInfo) idp.User {
 	return &User{oidc.DefaultMapper(info)}
 }
 

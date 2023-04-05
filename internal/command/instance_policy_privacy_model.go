@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -57,6 +58,7 @@ func (wm *InstancePrivacyPolicyWriteModel) NewChangedEvent(
 	tosLink,
 	privacyLink,
 	helpLink string,
+	supportEmail domain.EmailAddress,
 ) (*instance.PrivacyPolicyChangedEvent, bool) {
 
 	changes := make([]policy.PrivacyPolicyChanges, 0)
@@ -68,6 +70,9 @@ func (wm *InstancePrivacyPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.HelpLink != helpLink {
 		changes = append(changes, policy.ChangeHelpLink(helpLink))
+	}
+	if wm.SupportEmail != supportEmail {
+		changes = append(changes, policy.ChangeSupportEmail(supportEmail))
 	}
 	if len(changes) == 0 {
 		return nil, false

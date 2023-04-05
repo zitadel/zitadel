@@ -27,7 +27,7 @@ func TestSession_FetchUser(t *testing.T) {
 		httpMock     func()
 		authURL      string
 		code         string
-		tokens       *openid.Tokens
+		tokens       *openid.Tokens[*openid.IDTokenClaims]
 	}
 	type want struct {
 		err               error
@@ -85,7 +85,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://accounts.google.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &openid.Tokens{
+				tokens: &openid.Tokens[*openid.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   openid.BearerToken,
@@ -122,7 +122,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://accounts.google.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &openid.Tokens{
+				tokens: &openid.Tokens[*openid.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   openid.BearerToken,
@@ -201,15 +201,22 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 }
 
-func userinfo() openid.UserInfoSetter {
-	info := openid.NewUserInfo()
-	info.SetSubject("sub")
-	info.SetGivenName("firstname")
-	info.SetFamilyName("lastname")
-	info.SetName("firstname lastname")
-	info.SetEmail("email", true)
-	info.SetLocale(language.English)
-	info.SetPicture("picture")
-	info.AppendClaims("hd", "hosted domain")
-	return info
+func userinfo() *openid.UserInfo {
+	return &openid.UserInfo{
+		Subject: "sub",
+		UserInfoProfile: openid.UserInfoProfile{
+			GivenName:  "firstname",
+			FamilyName: "lastname",
+			Name:       "firstname lastname",
+			Locale:     openid.NewLocale(language.English),
+			Picture:    "picture",
+		},
+		UserInfoEmail: openid.UserInfoEmail{
+			Email:         "email",
+			EmailVerified: openid.Bool(true),
+		},
+		Claims: map[string]any{
+			"hd": "hosted domain",
+		},
+	}
 }

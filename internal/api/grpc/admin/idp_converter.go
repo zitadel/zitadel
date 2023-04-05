@@ -407,32 +407,34 @@ func updateGoogleProviderToCommand(req *admin_pb.UpdateGoogleProviderRequest) co
 
 func addLDAPProviderToCommand(req *admin_pb.AddLDAPProviderRequest) command.LDAPProvider {
 	return command.LDAPProvider{
-		Name:                req.Name,
-		Host:                req.Host,
-		Port:                req.Port,
-		TLS:                 req.Tls,
-		BaseDN:              req.BaseDn,
-		UserObjectClass:     req.UserObjectClass,
-		UserUniqueAttribute: req.UserUniqueAttribute,
-		Admin:               req.Admin,
-		Password:            req.Password,
-		LDAPAttributes:      idp_grpc.LDAPAttributesToCommand(req.Attributes),
-		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:              req.Name,
+		Servers:           req.Servers,
+		StartTLS:          req.StartTls,
+		BaseDN:            req.BaseDn,
+		BindDN:            req.BindDn,
+		BindPassword:      req.BindPassword,
+		UserBase:          req.UserBase,
+		UserObjectClasses: req.UserObjectClasses,
+		UserFilters:       req.UserFilters,
+		Timeout:           req.Timeout.AsDuration(),
+		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateLDAPProviderToCommand(req *admin_pb.UpdateLDAPProviderRequest) command.LDAPProvider {
 	return command.LDAPProvider{
-		Name:                req.Name,
-		Host:                req.Host,
-		Port:                req.Port,
-		TLS:                 req.Tls,
-		BaseDN:              req.BaseDn,
-		UserObjectClass:     req.UserObjectClass,
-		UserUniqueAttribute: req.UserUniqueAttribute,
-		Admin:               req.Admin,
-		Password:            req.Password,
-		LDAPAttributes:      idp_grpc.LDAPAttributesToCommand(req.Attributes),
-		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:              req.Name,
+		Servers:           req.Servers,
+		StartTLS:          req.StartTls,
+		BaseDN:            req.BaseDn,
+		BindDN:            req.BindDn,
+		BindPassword:      req.BindPassword,
+		UserBase:          req.UserBase,
+		UserObjectClasses: req.UserObjectClasses,
+		UserFilters:       req.UserFilters,
+		Timeout:           req.Timeout.AsDuration(),
+		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }

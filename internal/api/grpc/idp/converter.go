@@ -1,6 +1,8 @@
 package idp
 
 import (
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
@@ -582,16 +584,21 @@ func googleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.Goo
 }
 
 func ldapConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.LDAPIDPTemplate) {
+	var timeout *durationpb.Duration
+	if template.Timeout != 0 {
+		timeout = durationpb.New(template.Timeout)
+	}
 	providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
 		Ldap: &idp_pb.LDAPConfig{
-			Host:                template.Host,
-			Port:                template.Port,
-			Tls:                 template.TLS,
-			BaseDn:              template.BaseDN,
-			UserObjectClass:     template.UserObjectClass,
-			UserUniqueAttribute: template.UserUniqueAttribute,
-			Admin:               template.Admin,
-			Attributes:          ldapAttributesToPb(template.LDAPAttributes),
+			Servers:           template.Servers,
+			StartTls:          template.StartTLS,
+			BaseDn:            template.BaseDN,
+			BindDn:            template.BindDN,
+			UserBase:          template.UserBase,
+			UserObjectClasses: template.UserObjectClasses,
+			UserFilters:       template.UserFilters,
+			Timeout:           timeout,
+			Attributes:        ldapAttributesToPb(template.LDAPAttributes),
 		},
 	}
 }

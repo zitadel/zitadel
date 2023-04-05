@@ -241,6 +241,9 @@ Errors:
       NotFound: Impostazioni di notifica non trovate
       NotChanged: Impostazioni di notifica non è stato cambiato
       AlreadyExists: Impostazioni di notifica già esistente
+    LabelPolicy:
+      NotFound: Etichettatura privata non trovata
+      NotChanged: Private Labelling non è stata cambiata
   Project:
     ProjectIDMissing: ID del progetto mancante
     AlreadyExists: Il progetto è già stato creato nell'organizzazione

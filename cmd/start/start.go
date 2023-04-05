@@ -167,7 +167,7 @@ func startZitadel(config *Config, masterKey string) error {
 	}
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsquotas"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
@@ -235,7 +235,7 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, adminRepo, config.ExternalSecure, keys.User)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, adminRepo, config.ExternalSecure, keys.User, config.AuditLogRetention)); err != nil {
 		return err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {

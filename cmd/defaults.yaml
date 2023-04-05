@@ -147,16 +147,39 @@ AssetStorage:
     MaxAge: 5s
     SharedMaxAge: 168h #7d
 
+# The Projections section defines the behaviour for the scheduled and synchronous events projections.
 Projections:
+  # Time interval between scheduled projections
   RequeueEvery: 60s
+  # Time between retried database statements resulting from projected events
   RetryFailedAfter: 1s
+  # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5
+  # Number of concurrent projection routines. Values of 0 and below are overwritten to 1
   ConcurrentInstances: 1
+  # Limit of returned events per query
   BulkLimit: 200
-  MaxIterators: 1
+  # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+  # from HandleActiveInstances duration in the past until the projections current time
+  # Defaults to twice the RequeueEvery duration
+  HandleActiveInstances: 120s
+  # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
-    projects:
+    Projects:
       BulkLimit: 2000
+    # The Notifications projection is used for sending emails and SMS to users
+    Notifications:
+      # As notification projections don't result in database statements, retries don't have an effect
+      MaxFailureCount: 0
+    # The NotificationsQuotas projection is used for calling quota webhooks
+    NotificationsQuotas:
+      # Delivery guarantee requirements are probably higher for quota webhooks
+      # Defaults to 45 days
+      HandleActiveInstances: 1080h
+      # As quota notification projections don't result in database statements, retries don't have an effect
+      MaxFailureCount: 0
+      # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
+      RequeueEvery: 300s
 
 Auth:
   SearchLimit: 1000
@@ -485,6 +508,7 @@ DefaultInstance:
     TOSLink: https://zitadel.com/docs/legal/terms-of-service
     PrivacyLink: https://zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
+    SupportEmail: ""
   NotificationPolicy:
     PasswordChange: true
   LabelPolicy:
@@ -655,6 +679,8 @@ DefaultInstance:
 #            Repeat: true
 #            # CallURL is called when a relative amount of the quota is used.
 #            CallURL: "https://httpbin.org/post"
+
+AuditLogRetention: 0s
 
 InternalAuthZ:
   RolePermissionMappings:
