@@ -30,16 +30,16 @@ func NewMetrics(meterName string) (metrics.Metrics, error) {
 	if err != nil {
 		return nil, err
 	}
-	exporter, err := prometheus.New(
-		sdk_metric.WithResource(resource),
-		sdk_metric.DefaultTemporalitySelector,
-	)
+	exporter, err := prometheus.New()
 	if err != nil {
 		return &Metrics{}, err
 	}
 	return &Metrics{
 		Exporter: exporter,
-		Meter:    sdk_metric.NewMeterProvider(sdk_metric.WithReader(exporter)).Meter(meterName),
+		Meter: sdk_metric.NewMeterProvider(
+			sdk_metric.WithReader(exporter),
+			sdk_metric.WithResource(resource),
+		).Meter(meterName),
 	}, nil
 }
 
