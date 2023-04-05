@@ -189,6 +189,7 @@
     border: none;
     padding: 2px;
     border-radius: 50vw;
+    cursor: pointer;
 
     &:hover {
       background: if($is-dark-theme, #ffffff, $primary-color);
