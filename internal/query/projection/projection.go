@@ -64,6 +64,7 @@ var (
 	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
 	NotificationsQuotaProjection        interface{}
+	DeviceAuthProjection                *deviceAuthProjection
 )
 
 type projection interface {
@@ -139,6 +140,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 	KeyProjection = newKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	SecurityPolicyProjection = newSecurityPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["security_policies"]))
 	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
+	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
 	newProjectionsList()
 	return nil
 }
@@ -234,5 +236,6 @@ func newProjectionsList() {
 		KeyProjection,
 		SecurityPolicyProjection,
 		NotificationPolicyProjection,
+		DeviceAuthProjection,
 	}
 }
