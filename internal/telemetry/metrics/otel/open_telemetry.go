@@ -72,12 +72,12 @@ func (m *Metrics) AddCount(ctx context.Context, name string, value int64, labels
 	return nil
 }
 
-func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFunc instrument.int64Int64Observer) error {
+func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFunc instrument.Int64Callback) error {
 	if _, exists := m.UpDownSumObserver.Load(name); exists {
 		return nil
 	}
 
-	counter, err := m.Meter.Int64ObservableUpDownCounter(name, callbackFunc, instrument.WithDescription(description))
+	counter, err := m.Meter.Int64ObservableUpDownCounter(name, instrument.WithInt64Callback(callbackFunc), instrument.WithDescription(description))
 	if err != nil {
 		return err
 	}
@@ -86,12 +86,12 @@ func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFu
 	return nil
 }
 
-func (m *Metrics) RegisterValueObserver(name, description string, callbackFunc instrument.Int64Observer) error {
+func (m *Metrics) RegisterValueObserver(name, description string, callbackFunc instrument.Int64Callback) error {
 	if _, exists := m.UpDownSumObserver.Load(name); exists {
 		return nil
 	}
 
-	gauge, err := m.Meter.Int64ObservableGauge(name, callbackFunc, instrument.WithDescription(description))
+	gauge, err := m.Meter.Int64ObservableGauge(name, instrument.WithInt64Callback(callbackFunc), instrument.WithDescription(description))
 	if err != nil {
 		return err
 	}
