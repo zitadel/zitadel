@@ -103,7 +103,7 @@ Either account creation or account linking have to be enabled. Otherwise, the pr
 
 ### Activate IdP
 
-Once you created the IdP you need to activate it, to make it usable for your users.
+Once you created the IdP you need to activate it.
 
 ![Activate Azure AD](/img/guides/zitadel_activate_azure.png)
 
