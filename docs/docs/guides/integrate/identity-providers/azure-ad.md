@@ -79,7 +79,7 @@ The user is then created with an unverified email, which results in an email ver
 If you want to avoid that, make sure to enable "Email verified".
 In that case, the user is created with a verified email address.
 
-**Tenant Type**: The tenant type should be configured according what you have chosen in the settings of your Azure Ad application previously.
+**Tenant Type**: Configure the tenant type according to what you have chosen in the settings of your Azure AD application previously.
 - Common: Choose common if you want all microsoft accounts being able to login. In this case you have configured "Accounts in any organizational directory and personal Microsoft accounts" in your Azure App configuration
 - Organizations: Choose organization if you have Azure AD Tenants and no personal accounts. (You have configured either "Accounts in this organization" or "Accounts in any organizational directory" on your Azure APP)
 - Consumers: Choose this if you want to allow public accounts. (In your Azure AD App you have configured "Personal Microsoft accounts only")
