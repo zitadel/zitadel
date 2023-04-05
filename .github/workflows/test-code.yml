@@ -37,7 +37,7 @@ jobs:
       - name: linting
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.51
+          version: v1.52
           only-new-issues: true
           skip-pkg-cache: true
       - name: Publish go coverage
