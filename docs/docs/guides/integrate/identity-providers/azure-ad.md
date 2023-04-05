@@ -110,7 +110,7 @@ Once you created the IdP you need to activate it.
 ## Test the setup
 
 To test the setup, use incognito mode and browse to your login page.
-If you succeeded you should see a new button which should redirect you to your Microsoft Login.
+If you succeed, you see a new button which redirects you to your Microsoft Login.
 
 Per default the login of your instance will be shown, read the following section on how to trigger it for a specific organization: [Organization Scope](./general#trigger-configuration-on-the-login-for-a-specific-organization)
 
