@@ -245,12 +245,8 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	return scopes, nil
 }
 
-func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID string) error {
+func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID, projectID string) error {
 	token.Audience = append(token.Audience, clientID)
-	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
-	if err != nil {
-		return errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
-	}
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
 	if err != nil {
 		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
