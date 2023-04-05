@@ -34,18 +34,25 @@ func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQuer
 		return nil, err
 	}
 
+	if auditLogRetention != 0 {
+		events = filterAuditLogRetention(ctx, events, auditLogRetention)
+	}
+
+	return q.convertEvents(ctx, events), nil
+}
+
+func filterAuditLogRetention(ctx context.Context, events []eventstore.Event, auditLogRetention time.Duration) []eventstore.Event {
 	callTime := call.FromContext(ctx)
 	if callTime.IsZero() {
 		callTime = time.Now()
 	}
-	for i, event := range events {
-		if event.CreationDate().Before(callTime.Add(-auditLogRetention)) {
-			events = events[:i]
-			break
+	filteredEvents := make([]eventstore.Event, 0, len(events))
+	for _, event := range events {
+		if event.CreationDate().After(callTime.Add(-auditLogRetention)) {
+			filteredEvents = append(filteredEvents, event)
 		}
 	}
-
-	return q.convertEvents(ctx, events, auditLogRetention), nil
+	return filteredEvents
 }
 
 func (q *Queries) SearchEventTypes(ctx context.Context) []string {
@@ -56,7 +63,7 @@ func (q *Queries) SearchAggregateTypes(ctx context.Context) []string {
 	return q.eventstore.AggregateTypes()
 }
 
-func (q *Queries) convertEvents(ctx context.Context, events []eventstore.Event, auditLogRetention time.Duration) []*Event {
+func (q *Queries) convertEvents(ctx context.Context, events []eventstore.Event) []*Event {
 	result := make([]*Event, len(events))
 	users := make(map[string]*EventEditor)
 	for i, event := range events {
