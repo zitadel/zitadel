@@ -74,7 +74,10 @@ You can configure the following settings if you like, a useful default will be f
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
 This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`
 
-**Email Verified**: Azure AD doesn't send the email verified claim in the token of the user, if you don't enable this setting, the user will be created with the email not verified, which results in a Email Verification Message for the user. If you want to avoid that, make sure to enable "Email verified". In that case the user will be created with a verified email address.
+**Email Verified**: Azure AD doesn't send the email verified claim in the users token, if you don't enable this setting.
+The user is then created with an unverified email, which results in an email verification message.
+If you want to avoid that, make sure to enable "Email verified".
+In that case, the user is created with a verified email address.
 
 **Tenant Type**: The tenant type should be configured according what you have chosen in the settings of your Azure Ad application previously.
 - Common: Choose common if you want all microsoft accounts being able to login. In this case you have configured "Accounts in any organizational directory and personal Microsoft accounts" in your Azure App configuration
