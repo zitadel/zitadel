@@ -103,7 +103,7 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		err = p.view.DeleteOrgProjectMappingsByProjectGrantID(event.AggregateID, event.InstanceID)
+		err = p.view.DeleteOrgProjectMappingsByProjectGrantID(projectGrant.GrantID, event.InstanceID)
 		if err == nil {
 			return p.view.ProcessedOrgProjectMappingSequence(event)
 		}
