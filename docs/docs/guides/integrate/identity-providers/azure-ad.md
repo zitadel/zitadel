@@ -36,7 +36,7 @@ To be able to authenticate your Azure application you have to generate a new cli
 
 1. Click on client credentials on the detail page of the application or use the menu "Certificates & secrets"
 2. Click on "+ New client secret" and enter a description and an expiry date, add the secret afterwards
-3. Copy the value of the secret. You will not be able to see the value again afterwards 
+3. Copy the value of the secret. You will not be able to see the value again after some time 
 
 ![Azure Client Secret](/img/guides/azure_client_secret.png)
 
