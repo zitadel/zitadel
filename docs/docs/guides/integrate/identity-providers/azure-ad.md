@@ -38,7 +38,7 @@ To be able to authenticate your Azure application you have to generate a new cli
 
 1. Click on client credentials on the detail page of the application or use the menu "Certificates & secrets"
 2. Click on "+ New client secret" and enter a description and an expiry date, add the secret afterwards
-3. Copy the value of the secret. You will not be able to see the value again afterwards 
+3. Copy the value of the secret. You will not be able to see the value again after some time 
 
 ![Azure Client Secret](/img/guides/azure_client_secret.png)
 
@@ -52,7 +52,7 @@ To allow ZITADEL to get the information from the authenticating user you have to
 
 ![Azure Token configuration](/img/guides/azure_token_configuration.png)
 
-### API persmission
+### API permissions
 
 To be able to get all the information that ZITADEL needs, you have to configure the correct permissions.
 
@@ -67,20 +67,27 @@ To be able to get all the information that ZITADEL needs, you have to configure 
 ### Create new Azure AD Provider
 
 Go to the settings of your ZITADEL instance or the organization where you like to add a new **Azure AD** provider.
-Choose the **Microsoft** provider template. This template has everything you need preconfigured. You only have to add the client ID and secret, you have created in the step before.
+Choose the **Microsoft** provider template.
+This template has everything you need preconfigured.
+You only have to add the client ID and secret, you have created in the step before.
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
-**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This information will be taken to create/update the user within ZITADEL. Make sure to alswo add `User.Read`
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
+This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`
 
-**Email Verified**: Azure AD doesn't send the email verified claim in the token of the user, if you don't enable this setting, the user will be created with the email not verified, which results in a Email Verification Message for the user. If you want to avoid that, make sure to enable "Email verified". In that case the user will be created with a verified email address.
+**Email Verified**: Azure AD doesn't send the email verified claim in the users token, if you don't enable this setting.
+The user is then created with an unverified email, which results in an email verification message.
+If you want to avoid that, make sure to enable "Email verified".
+In that case, the user is created with a verified email address.
 
-**Tenant Type**: The tenant type should be configured according what you have chosen in the settings of your Azure Ad application previously.
-- Common: Choose common if you want all microsoft accounts being able to login. In this case you have configured "Accounts in any organizational directory and personal Microsoft accounts" in your Azure App configuration
+**Tenant Type**: Configure the tenant type according to what you have chosen in the settings of your Azure AD application previously.
+- Common: Choose common if you want all Microsoft accounts being able to login.
+In this case, configure "Accounts in any organizational directory and personal Microsoft accounts" in your Azure AD App.
 - Organizations: Choose organization if you have Azure AD Tenants and no personal accounts. (You have configured either "Accounts in this organization" or "Accounts in any organizational directory" on your Azure APP)
 - Consumers: Choose this if you want to allow public accounts. (In your Azure AD App you have configured "Personal Microsoft accounts only")
 
-**Tenant ID**: If you have selected either "organizations" or "Customers" in the Tenant Type, you have to enter the Directory (Tenant) ID, copied previously in the Azure App configuration, here.
+**Tenant ID**: If you have selected either the *Organizations* or *Customers* as the *Tenant Type*, you have to enter the *Directory (Tenant) ID*, copied previously in the Azure App configuration, here.
 
 <GeneralConfigDescription name="GeneralConfigDescription" />
 
@@ -88,16 +95,17 @@ You can configure the following settings if you like, a useful default will be f
 
 ### Activate IdP
 
-Once you created the IdP you need to activate it, to make it usable for your users.
+Once you created the IdP you need to activate it.
 
 ![Activate Azure AD](/img/guides/zitadel_activate_azure.png)
 
 ## Test the setup
 
-To test the setup use incognito mode and browse to your login page.
-If you succeeded you should see a new button which should redirect you to your Microsoft Login.
+To test the setup, use incognito mode and browse to your login page.
+If you succeed, you see a new button which redirects you to your Microsoft Login.
 
-Per default the login of your instance will be shown, read the following section on how to trigger it for a specific organization: [Organization Scope](./general#trigger-configuration-on-the-login-for-a-specific-organization)
+By default, your instances login is shown.
+Learn more about [how to trigger it for a specific organization](./general#trigger-configuration-on-the-login-for-a-specific-organization).
 
 ![Azure Button](/img/guides/zitadel_login_azure.png)
 
