@@ -3,6 +3,8 @@ title: Configure LDAP as Identity Provider
 sidebar_label: LDAP
 ---
 
+import GeneralConfigDescription from './_general_config_description.mdx';
+
 This guides shows you how to connect LDAP as an identity provider in ZITADEL.
 
 :::info
@@ -53,17 +55,7 @@ To configure the LDAP template please fill out the following fields:
 
 **Timeout**: If this setting is set all connection run with a set timeout, if it is 0s the default timeout of 60s is used.
 
-**Automatic creation**: If this setting is enabled the user will be created automatically within ZITADEL, if it doesn't exist.
-
-**Automatic update**: If this setting is enabled, the user will be updated within ZITADEL, if some user data are changed withing the provider. E.g if the lastname changes on the GitHub account, the information will be changed on the ZITADEL account on the next login. 
-
-**Account creation allowed**: This setting determines if account creation within ZITADEL is allowed or not.
-
-**Account linking allowed**: This setting determines if account linking is allowed. (E.g an account within ZITADEL should already be existing and the when login with GitHub an account should be linked)
-
-:::info
-Either account creation or account linking have to be enabled. Otherwise, the provider can't be used.
-:::
+<GeneralConfigDescription name="GeneralConfigDescription" />
 
 ![GitHub Provider](/img/guides/zitadel_ldap_create_provider.png)
 

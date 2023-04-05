@@ -3,6 +3,8 @@ title: Configure GitHub as Identity Provider
 sidebar_label: GitHub
 ---
 
+import GeneralConfigDescription from './_general_config_description.mdx';
+
 This guides shows you how to connect GitHub or GitHub Enterprise as an identity provider in ZITADEL.
 
 :::info
@@ -54,17 +56,7 @@ You can configure the following settings if you like, a useful default will be f
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This informations will be taken to create/update the user within ZITADEL.
 
-**Automatic creation**: If this setting is enabled the user will be created automatically within ZITADEL, if it doesn't exist.
-
-**Automatic update**: If this setting is enabled, the user will be updated within ZITADEL, if some user data are changed withing the provider. E.g if the lastname changes on the GitHub account, the information will be changed on the ZITADEL account on the next login. 
-
-**Account creation allowed**: This setting determines if account creation within ZITADEL is allowed or not.
-
-**Account linking allowed**: This setting determines if account linking is allowed. (E.g an account within ZITADEL should already be existing and the when login with GitHub an account should be linked)
-
-:::info
-Either account creation or account linking have to be enabled. Otherwise, the provider can't be used.
-:::
+<GeneralConfigDescription name="GeneralConfigDescription" />
 
 ![GitHub Provider](/img/guides/zitadel_github_create_provider.png)
 
