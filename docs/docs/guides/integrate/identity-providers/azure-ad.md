@@ -112,7 +112,8 @@ Once you created the IdP you need to activate it.
 To test the setup, use incognito mode and browse to your login page.
 If you succeed, you see a new button which redirects you to your Microsoft Login.
 
-Per default the login of your instance will be shown, read the following section on how to trigger it for a specific organization: [Organization Scope](./general#trigger-configuration-on-the-login-for-a-specific-organization)
+By default, your instances login is shown.
+Learn more about [how to trigger it for a specific organization](./general#trigger-configuration-on-the-login-for-a-specific-organization).
 
 ![Azure Button](/img/guides/zitadel_login_azure.png)
 
