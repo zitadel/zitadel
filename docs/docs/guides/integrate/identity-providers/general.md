@@ -39,3 +39,4 @@ To setup your specific providers go to the configuration guide you need:
 - [Google](./google)
 - [GitHub](./github)
 - [GitLab](./gitlab)
+- [LDAP](./ldap)

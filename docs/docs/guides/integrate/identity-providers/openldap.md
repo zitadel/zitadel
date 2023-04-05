@@ -140,6 +140,7 @@ ldapadd -x -h localhost -D "cn=admin,dc=example,dc=com" -f example.ldif -w 'Pass
 Go to the settings of your ZITADEL instance or the organization where you like to add a new LDAP provider.
 Choose the LDAP provider template.
 
+To get basic information on what is possible to configure, please refer to the [LDAP guide](./ldap).
 To configure the LDAP template to work with the before configured OpenLDAP, please fill out the following fields:
 
 **Name**: OpenLDAP
@@ -159,6 +160,10 @@ To configure the LDAP template to work with the before configured OpenLDAP, plea
 **User Object Classes**: "inetOrgPerson"
 
 **LDAP Attributes**: id attributes = "uid"
+
+**StartTLS**: For this example should be left untouched, if this setting is enabled after the initial connection ZITADEL tries to build a TLS connection.
+
+**Timeout**: Can be left empty, if this setting is set all connection run with a set timeout, if it is 0s the default timeout of 60s is used.
 
 
 <GeneralConfigDescription name="GeneralConfigDescription" />
