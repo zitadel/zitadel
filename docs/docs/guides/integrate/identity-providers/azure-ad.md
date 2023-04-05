@@ -50,7 +50,7 @@ To allow ZITADEL to get the information from the authenticating user you have to
 
 ![Azure Token configuration](/img/guides/azure_token_configuration.png)
 
-### API persmission
+### API permissions
 
 To be able to get all the information that ZITADEL needs, you have to configure the correct permissions.
 
