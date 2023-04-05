@@ -69,7 +69,8 @@ Choose the **Microsoft** provider template. This template has everything you nee
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
-**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This information will be taken to create/update the user within ZITADEL. Make sure to alswo add `User.Read`
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
+This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`
 
 **Email Verified**: Azure AD doesn't send the email verified claim in the token of the user, if you don't enable this setting, the user will be created with the email not verified, which results in a Email Verification Message for the user. If you want to avoid that, make sure to enable "Email verified". In that case the user will be created with a verified email address.
 
