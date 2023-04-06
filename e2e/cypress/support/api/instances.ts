@@ -11,17 +11,54 @@ export function instanceUnderTest(api: SystemAPI): Cypress.Chainable<string> {
     })
     .then((res) => {
       const instances = <Array<any>>res.body.result;
-      expect(instances.length).to.equal(
-        1,
-        'instanceUnderTest just supports running against an API with exactly one instance, yet',
-      );
-      return instances[0].id;
+      return instances.find(instance => api.baseURL.indexOf(instance.domain) > -1).id
     });
 }
 
 export function getInstance(api: SystemAPI, instanceId: string, failOnStatusCode = true) {
   return cy.request({
     method: 'GET',
+    url: `${api.baseURL}/instances/${instanceId}`,
+    auth: {
+      bearer: api.token,
+    },
+    failOnStatusCode: failOnStatusCode,
+  });
+}
+
+export function createInstance(api: SystemAPI, name: string, domain: string, failOnStatusCode = true) {
+  return cy.request({
+    method: 'POST',
+    url: `${api.baseURL}/instances/_create`,
+    auth: {
+      bearer: api.token,
+    },
+    body: {
+      instanceName: name,
+      custom_domain: domain,
+      human: {
+        userName: "zitadel-admin@zitadel.localhost",
+        email: {
+          email: "elio@zitadel.com",
+          isEmailVerified: true
+        },
+        password: {
+          password: "Password1!",
+          passwordChangeRequrired: false
+        },
+        profile: {
+          firstName: "elio",
+          lastName: "bischof"
+        }
+      }
+    },
+    failOnStatusCode: failOnStatusCode,
+  });
+}
+
+export function deleteInstance(api: SystemAPI, instanceId: string, failOnStatusCode = true) {
+  return cy.request({
+    method: 'DELETE',
     url: `${api.baseURL}/instances/${instanceId}`,
     auth: {
       bearer: api.token,

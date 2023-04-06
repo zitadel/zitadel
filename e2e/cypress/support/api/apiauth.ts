@@ -5,17 +5,17 @@ const authHeaderKey = 'Authorization',
   orgIdHeaderKey = 'x-zitadel-orgid',
   backendUrl = Cypress.env('BACKEND_URL');
 
-export function apiAuth(): Cypress.Chainable<API> {
-  return login(User.IAMAdminUser, 'Password1!', false, true).then((token) => {
+export function apiAuth(instanceDomain?: string): Cypress.Chainable<API> {
+  return login(User.IAMAdminUser, 'Password1!', false, true, undefined, undefined, undefined, instanceDomain).then((token) => {
     return <API>{
       token: token,
-      mgmtBaseURL: `${backendUrl}/management/v1`,
-      adminBaseURL: `${backendUrl}/admin/v1`,
-      authBaseURL: `${backendUrl}/auth/v1`,
-      assetsBaseURL: `${backendUrl}/assets/v1`,
-      oauthBaseURL: `${backendUrl}/oauth/v2`,
-      oidcBaseURL: `${backendUrl}/oidc/v1`,
-      samlBaseURL: `${backendUrl}/saml/v2`,
+      mgmtBaseURL: `${instanceDomain ? instanceDomain : backendUrl}/management/v1`,
+      adminBaseURL: `${instanceDomain ? instanceDomain : backendUrl}/admin/v1`,
+      authBaseURL: `${instanceDomain ? instanceDomain : backendUrl}/auth/v1`,
+      assetsBaseURL: `${instanceDomain ? instanceDomain : backendUrl}/assets/v1`,
+      oauthBaseURL: `${instanceDomain ? instanceDomain : backendUrl}/oauth/v2`,
+      oidcBaseURL: `${instanceDomain ? instanceDomain : backendUrl}/oidc/v1`,
+      samlBaseURL: `${instanceDomain ? instanceDomain : backendUrl}/saml/v2`,
     };
   });
 }

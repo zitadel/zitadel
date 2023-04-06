@@ -15,6 +15,7 @@ export function login(
   onUsernameScreen?: () => void,
   onPasswordScreen?: () => void,
   onAuthenticated?: () => void,
+  instanceDomain?: string
 ): Cypress.Chainable<string> {
   let creds = credentials(user, pw);
 
@@ -58,7 +59,7 @@ export function login(
           times: 1,
         }).as('password');
 
-        cy.visit(Cypress.config('baseUrl'), { retryOnNetworkFailure: true });
+        cy.visit(instanceDomain || Cypress.config('baseUrl'), { retryOnNetworkFailure: true });
 
         onUsernameScreen ? onUsernameScreen() : null;
         cy.get('#loginName').type(creds.username);
@@ -82,7 +83,7 @@ export function login(
 
         onAuthenticated ? onAuthenticated() : null;
 
-        cy.visit('/');
+        cy.visit(instanceDomain || '/');
 
         cy.get('[data-e2e=authenticated-welcome]', {
           timeout: 50_000,
