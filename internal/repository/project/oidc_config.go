@@ -40,6 +40,7 @@ type OIDCConfigAddedEvent struct {
 	IDTokenUserinfoAssertion bool                       `json:"idTokenUserinfoAssertion,omitempty"`
 	ClockSkew                time.Duration              `json:"clockSkew,omitempty"`
 	AdditionalOrigins        []string                   `json:"additionalOrigins,omitempty"`
+	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Data() interface{} {
@@ -70,6 +71,7 @@ func NewOIDCConfigAddedEvent(
 	idTokenUserinfoAssertion bool,
 	clockSkew time.Duration,
 	additionalOrigins []string,
+	skipNativeAppSuccessPage bool,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -94,6 +96,7 @@ func NewOIDCConfigAddedEvent(
 		IDTokenUserinfoAssertion: idTokenUserinfoAssertion,
 		ClockSkew:                clockSkew,
 		AdditionalOrigins:        additionalOrigins,
+		SkipNativeAppSuccessPage: skipNativeAppSuccessPage,
 	}
 }
 
@@ -179,6 +182,9 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 			return false
 		}
 	}
+	if e.SkipNativeAppSuccessPage != c.SkipNativeAppSuccessPage {
+		return false
+	}
 
 	return true
 }
@@ -214,6 +220,7 @@ type OIDCConfigChangedEvent struct {
 	IDTokenUserinfoAssertion *bool                       `json:"idTokenUserinfoAssertion,omitempty"`
 	ClockSkew                *time.Duration              `json:"clockSkew,omitempty"`
 	AdditionalOrigins        *[]string                   `json:"additionalOrigins,omitempty"`
+	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Data() interface{} {
@@ -331,6 +338,12 @@ func ChangeClockSkew(clockSkew time.Duration) func(event *OIDCConfigChangedEvent
 func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.AdditionalOrigins = &additionalOrigins
+	}
+}
+
+func ChangeSkipNativeAppSuccessPage(skipNativeAppSuccessPage bool) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.SkipNativeAppSuccessPage = &skipNativeAppSuccessPage
 	}
 }
 

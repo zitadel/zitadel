@@ -150,6 +150,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   ) {
     this.oidcForm = this.fb.group({
       devMode: [{ value: false, disabled: true }, []],
+      skipNativeAppSuccessPage: [{ value: false, disabled: true }],
       clientId: [{ value: '', disabled: true }],
       responseTypesList: [{ value: [], disabled: true }],
       grantTypesList: [{ value: [], disabled: true }],
@@ -338,6 +339,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.oidcTokenForm.controls['clockSkewSeconds'].setValue(inSecs);
               }
               if (this.app.oidcConfig) {
+                console.log(this.app.oidcConfig.skipNativeAppSuccessPage);
                 this.oidcForm.patchValue(this.app.oidcConfig);
                 this.oidcTokenForm.patchValue(this.app.oidcConfig);
               }
@@ -549,6 +551,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
         this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
         this.app.oidcConfig.devMode = this.devMode?.value;
+        this.app.oidcConfig.skipNativeAppSuccessPage = this.skipNativeAppSuccessPage?.value;
 
         const req = new UpdateOIDCAppConfigRequest();
         req.setProjectId(this.projectId);
@@ -571,6 +574,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
         req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
         req.setDevMode(this.app.oidcConfig.devMode);
+        req.setSkipNativeAppSuccessPage(this.app.oidcConfig.skipNativeAppSuccessPage);
 
         if (this.clockSkewSeconds?.value) {
           const dur = new Duration();
@@ -743,6 +747,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get devMode(): UntypedFormControl | null {
     return this.oidcForm.get('devMode') as UntypedFormControl;
+  }
+
+  public get skipNativeAppSuccessPage(): AbstractControl | null {
+    return this.oidcForm.get('skipNativeAppSuccessPage');
   }
 
   public get accessTokenType(): AbstractControl | null {
