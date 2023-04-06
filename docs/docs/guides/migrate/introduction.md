@@ -53,20 +53,6 @@ We provide some more information on migrating users and secrets in [this guide](
 
 ## Technical considerations
 
-```mermaid
-%%{init: {'theme':'dark'}}%%
-flowchart LR
-    start([Start]) --> downtime{Zero downtime?}
-    downtime -- No --> batch[[Batch Migration]]
-    downtime -- Yes --> clients{Can apps</br>switch</br>at day0?}
-    subgraph jit [Just-in-time Migration]
-        clients -- Yes --> user_api
-        user_api{User API</br>available</br>on legacy?} -- Yes --> jit_zitadel[[ZITADEL</br>orchestrates migration]]
-        user_api -- No --> jit_legacy
-        clients -- No --> jit_legacy[[Legacy system</br>orchestrates migration]]
-    end
-```
-
 ### Batch migration
 
 **Batch migration** is the easiest way, if you can afford some minimal downtime to move all users and applications over to ZITADEL.
