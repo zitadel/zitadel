@@ -331,19 +331,6 @@
               </div>
             </cnsl-info-section>
 
-            <!--            <div class="dev-col" *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">-->
-            <!--              <span>{{ 'APP.OIDC.SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION' | translate }}</span>-->
-            <!--              <mat-slide-toggle-->
-            <!--                *ngIf="skipNativeAppSuccessPage"-->
-            <!--                color="primary"-->
-            <!--                class="devmode"-->
-            <!--                [formControl]="skipNativeAppSuccessPage"-->
-            <!--                name="skipNativeAppSuccessPage"-->
-            <!--                matTooltip="{{ 'APP.OIDC.SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION' | translate }}"-->
-            <!--              >-->
-            <!--                {{ 'APP.OIDC.SKIPNATIVEAPPSUCCESSPAGE' | translate }}-->
-            <!--              </mat-slide-toggle>-->
-
             <mat-checkbox
               *ngIf="skipNativeAppSuccessPage && appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
               class="full-width"
@@ -356,7 +343,6 @@
             <cnsl-info-section *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE" class="full-width app-desc">
               <span>{{ 'APP.OIDC.SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION' | translate }}</span>
             </cnsl-info-section>
-            <!--            </div>-->
 
             <cnsl-redirect-uris
               *ngIf="appType?.value !== undefined"
