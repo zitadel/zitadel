@@ -121,5 +121,5 @@ brews:
 
 announce:
   discord:
-    enabled: true
+    enabled: false
     message_template: "ZITADEL {{ .Tag }} is ready! Check the notes: https://github.com/zitadel/zitadel/releases/tag/{{ .Tag }}"
