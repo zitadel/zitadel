@@ -267,9 +267,20 @@ export interface OnboardingActions {
   oneof: string[];
   link: string | string[];
   fragment?: string | undefined;
+  iconClasses?: string;
+  darkcolor: string;
+  lightcolor: string;
 }
 
-type OnboardingEvent = { order: number; link: string; fragment: string | undefined; event: Event.AsObject | undefined };
+type OnboardingEvent = {
+  order: number;
+  link: string;
+  fragment: string | undefined;
+  event: Event.AsObject | undefined;
+  iconClasses?: string;
+  darkcolor: string;
+  lightcolor: string;
+};
 type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
 
 @Injectable({
@@ -286,14 +297,30 @@ export class AdminService {
       const eventsReq = new ListEventsRequest().setAsc(true).setEventTypesList(searchForTypes).setAsc(false);
       return from(this.listEvents(eventsReq)).pipe(
         map((events) => {
-          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API');
+          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API' && e.editor?.userId);
 
           let obj: { [type: string]: OnboardingEvent } = {};
           actions.map((action) => {
             const filtered = el.filter((event) => event.type?.type && action.oneof.includes(event.type.type));
             (obj as any)[action.eventType] = filtered.length
-              ? { order: action.order, link: action.link, fragment: action.fragment, event: filtered[0] }
-              : { order: action.order, link: action.link, fragment: action.fragment, event: undefined };
+              ? {
+                  order: action.order,
+                  link: action.link,
+                  fragment: action.fragment,
+                  event: filtered[0],
+                  iconClasses: action.iconClasses,
+                  darkcolor: action.darkcolor,
+                  lightcolor: action.lightcolor,
+                }
+              : {
+                  order: action.order,
+                  link: action.link,
+                  fragment: action.fragment,
+                  event: undefined,
+                  iconClasses: action.iconClasses,
+                  darkcolor: action.darkcolor,
+                  lightcolor: action.lightcolor,
+                };
           });
 
           const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
