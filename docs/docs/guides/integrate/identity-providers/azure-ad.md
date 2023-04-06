@@ -34,7 +34,7 @@ You need to have access to an AzureAD Tenant. If you do not yet have one follow 
 
 ### Add client secret
 
-To be able to authenticate your Azure application you have to generate a new client secret.
+Generate a new client secret to authenticate your user.
 
 1. Click on client credentials on the detail page of the application or use the menu "Certificates & secrets"
 2. Click on "+ New client secret" and enter a description and an expiry date, add the secret afterwards

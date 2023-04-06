@@ -38,9 +38,9 @@ To adapt this for you setup just replace the domain
 
 ### Client ID and Secret
 
-After clicking "Register application" , you will see the detail page of the application you have just created.
-To be able to connect GitHub to ZITADEL you will need a client ID and a client secret. 
-The client ID you can copy directly. A secret you have to generate by clicking "Generate new client secret".
+After clicking "Register application", you will see the detail page of the application you have just created.
+Copy the client ID you can copy directly from the detail page. 
+Generate a new secret by clicking "Generate new client secret".
 Make sure to save the secret, as you will not be able to show it again.
 
 ![Client ID and Secret](/img/guides/github_oauth_client_id_secret.png)
@@ -79,7 +79,8 @@ Per default the login of your instance will be shown, read the following section
 ![GitHub Login](/img/guides/github_login.png)
 
 If the user is not yet linked in ZITADEL the user will see the screen below.
-Because GitHub is an OAuth provider and oAuth does not provide a standardized way to get the user data not all of the data can be taken over. First and Lastname are not filled.
+Because GitHub is an OAuth provider and oAuth does not provide a standardized way to get the user data not all the data can be taken over. 
+First and Lastname are not filled.
 The user has to enter the rest of the data himself.
 
 ![GitHub Login](/img/guides/zitadel_login_external_not_found_registration.png)
@@ -89,7 +90,7 @@ The user has to enter the rest of the data himself.
 If you don't want the user to have to enter his first and lastname himself, you can add a ZITADEL action in which you specify how the data should be transferred.
 
 1. Go to the settings of the organization where the users will be registered
-2. Add an new action with the following body. Make sure the action name is the same as in the script itself. Make sure to change the id in the script to the id of your own identity provider configuration. 
+2. Add a new action with the following body. Make sure the action name is the same as in the script itself. Make sure to change the id in the script to the id of your own identity provider configuration. 
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/github_identity_provider

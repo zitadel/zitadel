@@ -23,7 +23,7 @@ Make sure to read and follow the [General Guide](./general) on how to setup iden
 2. Select [Edit Profile](https://gitlab.com/-/profile)
 3. Click on [Applications](https://gitlab.com/-/profile/applications) in the side navigation
 
-For **GitLab Self-Hosted** go to your GitLab Selfhosted instanceand follow the same steps as for GitLab.
+For **GitLab Self-Hosted** go to your GitLab self-hosted instance and follow the same steps as for GitLab.
 
 Fill in the application name.
 
@@ -51,7 +51,8 @@ Save the ID and the Secret, you will not be able to copy the secret again, if yo
 ### Create new GitHub Provider
 
 Go to the settings of your ZITADEL instance or the organization where you like to add a new GitHub provider.
-Choose the GitHub provider template. This template has everything you need preconfigured. You only have to add the client ID and secret, you have created in the step before.
+Choose the GitHub provider template. This template has everything you need preconfigured. 
+Add the client ID and secret you have created in the GitHub Application.
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
@@ -79,7 +80,8 @@ Per default the login of your instance will be shown, read the following section
 ![GitHub Login](/img/guides/gitlab_login.png)
 
 If the user is not yet linked in ZITADEL the user will see the screen below.
-Because GitHub is an OAuth provider and oAuth does not provide a standardized way to get the user data not all of the data can be taken over. First and Lastname are not filled.
+Because GitHub is an OAuth provider and oAuth does not provide a standardized way to get the user data, not all the data can be taken over. 
+First and Lastname are not filled.
 The user has to enter the rest of the data himself.
 
 ![GitHub Login](/img/guides/zitadel_login_external_not_found_registration.png)
