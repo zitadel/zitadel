@@ -39,7 +39,7 @@ export function createInstance(api: SystemAPI, name: string, domain: string, fai
       human: {
         userName: "zitadel-admin@zitadel.localhost",
         email: {
-          email: "elio@zitadel.com",
+          email: "zitadel-admin@zitadel.localhost",
           isEmailVerified: true
         },
         password: {
@@ -47,8 +47,8 @@ export function createInstance(api: SystemAPI, name: string, domain: string, fai
           passwordChangeRequrired: false
         },
         profile: {
-          firstName: "elio",
-          lastName: "bischof"
+          firstName: "ZITADEL",
+          lastName: "Admin"
         }
       }
     },
