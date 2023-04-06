@@ -297,7 +297,7 @@ export class AdminService {
       const eventsReq = new ListEventsRequest().setAsc(true).setEventTypesList(searchForTypes).setAsc(false);
       return from(this.listEvents(eventsReq)).pipe(
         map((events) => {
-          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API');
+          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API' && e.editor?.userId);
 
           let obj: { [type: string]: OnboardingEvent } = {};
           actions.map((action) => {
