@@ -1,5 +1,6 @@
 ---
-title: Users
+title: Migrate Users
+sidebar_label: Users
 ---
 
 Migrating users from an existing system, while minimizing impact on said users, can be a challenging task.
