@@ -52,21 +52,21 @@ For bulk import use the [import endpoint](https://zitadel.com/docs/apis/admin/ad
       {
         "orgId": "104133391254874632",
         "org": {
-          "name": "TestFabi"
+          "name": "ACME"
         },
         "humanUsers": [
           {
             "userId": "104133391271651848",
             "user": {
-              "userName": "fabienne",
+              "userName": "test9@test9",
               "profile": {
-                "firstName": "Fabienne",
-                "lastName": "Gerschwiler",
-                "displayName": "Fabienne Gerschwiler",
-                "preferredLanguage": "und"
+                "firstName": "Road",
+                "lastName": "Runner",
+                "displayName": "Road Runner",
+                "preferredLanguage": "de"
               },
               "email": {
-                "email": "fabienne@caos.ch",
+                "email": "test@acme.tld",
                 "isEmailVerified": true
               },
               "hashedPassword": {
@@ -98,15 +98,15 @@ For bulk import use the [import endpoint](https://zitadel.com/docs/apis/admin/ad
           {
             "userId": "145195347319252359",
             "user": {
-              "userName": "test1",
+              "userName": "wile@test9",
               "profile": {
-                "firstName": "Fabienne",
-                "lastName": "Gerschwiler",
-                "displayName": "Fabienne Gerschwiler",
-                "preferredLanguage": "und"
+                "firstName": "Wile E.",
+                "lastName": "Coyote",
+                "displayName": "Wile E. Coyote",
+                "preferredLanguage": "en"
               },
               "email": {
-                "email": "fabienne@gmail.com"
+                "email": "wile.e@acme.tld"
               }
             }
           }
