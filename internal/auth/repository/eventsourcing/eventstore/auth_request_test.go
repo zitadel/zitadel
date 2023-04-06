@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	proj_view_model "github.com/zitadel/zitadel/internal/project/repository/view/model"
 	"github.com/zitadel/zitadel/internal/query"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
@@ -208,19 +207,21 @@ func (m *mockUserGrants) UserGrantsByProjectAndUserID(ctx context.Context, s str
 }
 
 type mockProject struct {
-	hasProject   bool
-	projectCheck bool
+	hasProject    bool
+	projectCheck  bool
+	resourceOwner string
 }
 
 func (m *mockProject) ProjectByClientID(ctx context.Context, s string, _ bool) (*query.Project, error) {
-	return &query.Project{HasProjectCheck: m.projectCheck}, nil
+	return &query.Project{ResourceOwner: m.resourceOwner, HasProjectCheck: m.projectCheck}, nil
 }
 
-func (m *mockProject) OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*proj_view_model.OrgProjectMapping, error) {
+func (m *mockProject) SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries, _ bool) (*query.ProjectGrants, error) {
 	if m.hasProject {
-		return &proj_view_model.OrgProjectMapping{OrgID: orgID, ProjectID: projectID}, nil
+		mockProjectGrant := new(query.ProjectGrant)
+		return &query.ProjectGrants{ProjectGrants: []*query.ProjectGrant{mockProjectGrant}}, nil
 	}
-	return nil, errors.ThrowNotFound(nil, "ERROR", "error")
+	return &query.ProjectGrants{}, nil
 }
 
 type mockApp struct {
@@ -1258,8 +1259,9 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
 				userGrantProvider: &mockUserGrants{},
 				projectProvider: &mockProject{
-					projectCheck: true,
-					hasProject:   false,
+					projectCheck:  true,
+					hasProject:    false,
+					resourceOwner: "other-org",
 				},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
@@ -1297,8 +1299,9 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
 				userGrantProvider: &mockUserGrants{},
 				projectProvider: &mockProject{
-					projectCheck: true,
-					hasProject:   true,
+					projectCheck:  true,
+					hasProject:    true,
+					resourceOwner: "other-org",
 				},
 				applicationProvider: &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeWeb}}},
 				lockoutPolicyProvider: &mockLockoutPolicy{
