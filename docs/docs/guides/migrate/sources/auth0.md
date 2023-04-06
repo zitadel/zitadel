@@ -22,12 +22,12 @@ Users will be prompted to create a new password after they login for the first t
 
 1. Go to https://support.auth0.com/tickets and click on **Open Ticket**
 2. Issue Type: **I have a question regarding my Auth0 account**
-3. What can we help you with?: **I would like to obtain an export of my tenant password hases**
+3. What can we help you with?: **I would like to obtain an export of my tenant password hashes**
 4. Fill out the form: Request password hashes as bcrypt
 5. **Submit ticket**
 
 You will receive a JSON file including the password hashes.
-See the this [community post](https://community.auth0.com/t/password-hashes-export-data-format/58730) for more information about the contents and format.
+See this [community post](https://community.auth0.com/t/password-hashes-export-data-format/58730) for more information about the contents and format.
 
 ## Export all user data
 
