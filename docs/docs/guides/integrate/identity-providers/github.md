@@ -38,7 +38,7 @@ To adapt this for you setup just replace the domain
 
 ### Client ID and Secret
 
-After clicking "Register application", you will see the detail page of the application you have just created.
+After clicking "Register application", you see the detail page of the application you have just created.
 Copy the client ID you can copy directly from the detail page. 
 Generate a new secret by clicking "Generate new client secret".
 Make sure to save the secret, as you will not be able to show it again.
@@ -54,7 +54,8 @@ Choose the GitHub provider template. This template has everything you need preco
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
-**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This informations will be taken to create/update the user within ZITADEL.
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
+This information is used to create and/or update the user within ZITADEL.
 
 <GeneralConfigDescription name="GeneralConfigDescription" />
 
@@ -79,7 +80,8 @@ Per default the login of your instance will be shown, read the following section
 ![GitHub Login](/img/guides/github_login.png)
 
 If the user is not yet linked in ZITADEL the user will see the screen below.
-Because GitHub is an OAuth provider and oAuth does not provide a standardized way to get the user data not all the data can be taken over. 
+Beware that GitHub is an OAuth provider and does not provide a standardized way to get the user data.
+This means that not all the data can be taken over.
 First and Lastname are not filled.
 The user has to enter the rest of the data himself.
 

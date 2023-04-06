@@ -51,7 +51,8 @@ Save the ID and the Secret, you will not be able to copy the secret again, if yo
 ### Create new GitHub Provider
 
 Go to the settings of your ZITADEL instance or the organization where you like to add a new GitHub provider.
-Choose the GitHub provider template. This template has everything you need preconfigured. 
+Choose the GitHub provider template.
+This template has everything you need preconfigured. 
 Add the client ID and secret you have created in the GitHub Application.
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
