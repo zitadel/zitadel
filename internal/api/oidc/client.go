@@ -804,20 +804,16 @@ func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequeste
 
 // projectRoles contains the roles of a project of multiple organisations
 //
-// key is the role key
-type projectRoles map[string][]projectRole
+// key of the first map is the role key,
+// key of the second map is the org id, value the org domain
+type projectRoles map[string]map[string]string
 
 func (p projectRoles) Add(roleKey, orgID, domain string) {
-	if len(p[roleKey]) == 0 {
-		p[roleKey] = make([]projectRole, 0, 1)
+	if p[roleKey] == nil {
+		p[roleKey] = make(map[string]string, 1)
 	}
-	p[roleKey] = append(p[roleKey], projectRole{orgID: domain})
+	p[roleKey][orgID] = domain
 }
-
-// projectRole contains all the organisations where a user is granted a certain role
-//
-// key is the org id, value the org domain
-type projectRole map[string]string
 
 func getGender(gender domain.Gender) oidc.Gender {
 	switch gender {
