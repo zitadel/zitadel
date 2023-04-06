@@ -54,7 +54,8 @@ Choose the GitHub provider template. This template has everything you need preco
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
-**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This informations will be taken to create/update the user within ZITADEL.
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
+This information is used to create and/or update the user within ZITADEL.
 
 <GeneralConfigDescription name="GeneralConfigDescription" />
 
