@@ -11,22 +11,25 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha;user";
 
 service UserService {
 
+  // TestGet simply demonstrates how the context (org, instance) could be handled in a GET request
   rpc TestGet (TestGetRequest) returns (TestGetResponse) {
     option (google.api.http) = {
-      get: "/v2/users/test"
+      get: "/v2alpha/users/test"
     };
   }
 
+  // TestPOSTt simply demonstrates how the context (org, instance) could be handled in a POST request
   rpc TestPost (TestPostRequest) returns (TestPostResponse) {
     option (google.api.http) = {
-      post: "/v2/users/test"
+      post: "/v2alpha/users/test"
       body: "*"
     };
   }
 
+  // TestAuth demonstrates how the context (org, instance) could be handled in combination of the authorized context
   rpc TestAuth (TestAuthRequest) returns (TestAuthResponse) {
     option (google.api.http) = {
-      get: "/v2/users/test_auth"
+      get: "/v2alpha/users/test_auth"
     };
 
     option (zitadel.v1.auth_option) = {
@@ -51,10 +54,13 @@ message TestPostResponse{
   string ctx = 1;
 }
 
-message TestAuthRequest{}
+message TestAuthRequest{
+  Context ctx = 1;
+}
 
 message TestAuthResponse{
   User user = 1;
+  Context ctx = 2;
 }
 
 message Context {

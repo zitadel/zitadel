@@ -25,6 +25,9 @@ type Server interface {
 	AuthMethods() authz.MethodMapping
 }
 
+// WithGatewayPrefix extends the server interface with a prefix for the grpc gateway
+//
+// it's used for the System, Admin, Mgmt and Auth API
 type WithGatewayPrefix interface {
 	Server
 	GatewayPathPrefix() string

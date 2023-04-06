@@ -11,9 +11,10 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session
 
 service SessionService {
 
+  // GetSession is to demonstrate an authenticated request, where the authenticated user (usage of another grpc package) is returned
   rpc GetSession (GetSessionRequest) returns (GetSessionResponse) {
     option (google.api.http) = {
-      get: "/v2/sessions/{id}"
+      get: "/v2alpha/sessions/{id}"
     };
 
     option (zitadel.v1.auth_option) = {

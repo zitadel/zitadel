@@ -227,7 +227,7 @@ func startAPIs(
 	accessInterceptor := middleware.NewAccessInterceptor(accessSvc, config.Quotas.Access)
 	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
 	if err != nil {
-		return fmt.Errorf("error starting creating api %w", err)
+		return fmt.Errorf("error creating api %w", err)
 	}
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {
@@ -295,7 +295,7 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(login.HandlerPrefix, l.Handler())
 
-	// handle grpc second last to be able to handle the root, because grpc and gateway require a lot of different prefixes
+	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()
 	return nil
 }
