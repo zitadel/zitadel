@@ -80,7 +80,8 @@ Per default the login of your instance will be shown, read the following section
 ![GitHub Login](/img/guides/github_login.png)
 
 If the user is not yet linked in ZITADEL the user will see the screen below.
-Because GitHub is an OAuth provider and oAuth does not provide a standardized way to get the user data not all the data can be taken over. 
+Beware that GitHub is an OAuth provider and does not provide a standardized way to get the user data.
+This means that not all the data can be taken over.
 First and Lastname are not filled.
 The user has to enter the rest of the data himself.
 
