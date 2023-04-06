@@ -11,7 +11,7 @@
           <i class="las la-camera"></i>
         </div>
         <cnsl-avatar
-          *ngIf="user && user.profile?.displayName && user.profile?.firstName && user.profile?.lastName"
+          *ngIf="user && user.profile?.displayName"
           class="avatar"
           [name]="user.profile?.displayName ?? ''"
           [avatarUrl]="user.profile?.avatarUrl || ''"
