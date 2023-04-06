@@ -72,8 +72,8 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 	if accountName == "" {
 		accountName = string(human.EmailAddress)
 	}
-	if os.Getenv("OTP_ISSUER") != "" {
-		c.multifactors.OTP.Issuer = os.Getenv("OTP_ISSUER")
+	if os.Getenv("ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER") != "" {
+		c.multifactors.OTP.Issuer = os.Getenv("ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER")
 	} else {
 		c.multifactors.OTP.Issuer = c.externalDomain
 	}

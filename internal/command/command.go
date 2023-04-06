@@ -117,8 +117,8 @@ func StartCommands(es *eventstore.Eventstore,
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
 	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
-	if os.Getenv("OTP_ISSUER") != "" {
-		defaults.Multifactors.OTP.Issuer = os.Getenv("OTP_ISSUER")
+	if os.Getenv("ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER") != "" {
+		defaults.Multifactors.OTP.Issuer = os.Getenv("ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER")
 	} else {
 		defaults.Multifactors.OTP.Issuer = externalDomain
 	}
