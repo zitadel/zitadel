@@ -2,7 +2,7 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -149,7 +149,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private http: HttpClient,
   ) {
     this.oidcForm = this.fb.group({
-      devMode: [{ value: false, disabled: true }, []],
+      devMode: [{ value: false, disabled: true }],
       skipNativeAppSuccessPage: [{ value: false, disabled: true }],
       clientId: [{ value: '', disabled: true }],
       responseTypesList: [{ value: [], disabled: true }],
@@ -550,8 +550,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
         this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
         this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
-        this.app.oidcConfig.devMode = this.devMode?.value;
-        this.app.oidcConfig.skipNativeAppSuccessPage = this.skipNativeAppSuccessPage?.value;
+        this.app.oidcConfig.devMode = !!this.devMode?.value;
+        this.app.oidcConfig.skipNativeAppSuccessPage = !!this.skipNativeAppSuccessPage?.value;
 
         const req = new UpdateOIDCAppConfigRequest();
         req.setProjectId(this.projectId);
@@ -742,15 +742,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public get apiAuthMethodType(): AbstractControl | null {
-    return this.apiForm.get('authMethodType');
+    return this.apiForm.get('authMethodType') as UntypedFormControl;
   }
 
-  public get devMode(): UntypedFormControl | null {
-    return this.oidcForm.get('devMode') as UntypedFormControl;
+  public get devMode(): FormControl<boolean> | null {
+    return this.oidcForm.get('devMode') as FormControl<boolean>;
   }
 
-  public get skipNativeAppSuccessPage(): AbstractControl | null {
-    return this.oidcForm.get('skipNativeAppSuccessPage');
+  public get skipNativeAppSuccessPage(): FormControl<boolean> | null {
+    return this.oidcForm.get('skipNativeAppSuccessPage') as FormControl<boolean>;
   }
 
   public get accessTokenType(): AbstractControl | null {
