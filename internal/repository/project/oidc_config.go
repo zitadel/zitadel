@@ -182,11 +182,7 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 			return false
 		}
 	}
-	if e.SkipNativeAppSuccessPage != c.SkipNativeAppSuccessPage {
-		return false
-	}
-
-	return true
+	return e.SkipNativeAppSuccessPage == c.SkipNativeAppSuccessPage
 }
 
 func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
