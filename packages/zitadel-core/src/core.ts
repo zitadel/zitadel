@@ -13,7 +13,9 @@ export interface ZitadelApp {
   config: ZitadelCoreProps;
 }
 
-export function initializeApp(config: ZitadelCoreProps): ZitadelApp {
+export async function initializeApp(
+  config: ZitadelCoreProps
+): Promise<ZitadelApp> {
   const app = { config };
   return app;
 }

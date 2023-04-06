@@ -26,5 +26,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "nice-grpc": "2.0.1",
+    "jose": "^4.13.1"
   }
 }
