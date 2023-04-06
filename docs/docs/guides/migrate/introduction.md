@@ -8,6 +8,7 @@ The individual guides in this section should give you an overview of things to c
 
 When moving from a previous auth solution to ZITADEL, it is important to note that some decisions and features are unique to ZITADEL.
 Without duplicating too much content here are some important features and patterns to consider in terms of solution architecture.
+You can read more about the basic structure and important concepts of ZITADEL in our [concepts section](https://zitadel.com/docs/concepts/introduction).
 
 ## Multi-Tenancy Architecture
 
