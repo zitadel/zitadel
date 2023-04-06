@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -116,6 +117,11 @@ func StartCommands(es *eventstore.Eventstore,
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
 	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
+	if os.Getenv("OTP_ISSUER") != "" {
+		defaults.Multifactors.OTP.Issuer = os.Getenv("OTP_ISSUER")
+	} else {
+		defaults.Multifactors.OTP.Issuer = externalDomain
+	}
 
 	repo.multifactors = domain.MultifactorConfigs{
 		OTP: domain.OTPConfig{
