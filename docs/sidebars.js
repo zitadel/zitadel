@@ -112,9 +112,15 @@ module.exports = {
       items: [
         "guides/migrate/introduction",
         "guides/migrate/users",
-        "guides/migrate/sources/zitadel-v1",
-        "guides/migrate/sources/auth0",
-        "guides/migrate/sources/keycloak",
+        {
+          type: "category",
+          label: "Sources",
+          collapsed: true,
+          items: [
+            "guides/migrate/sources/zitadel-v1",
+            "guides/migrate/sources/auth0",
+          ]
+        },
       ]
     },
     {
