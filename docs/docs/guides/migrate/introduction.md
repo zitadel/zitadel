@@ -49,4 +49,44 @@ Metadata can be access directly with the correct [scopes](/docs/apis/openidoauth
 ## Migrating users
 
 Migrating users with minimal impact on users can be a challenging task.
-We provide technical considerations and solution scenarios in [this guide](./users.md).
+We provide some more information on migrating users and secrets in [this guide](./users.md).
+
+## Technical considerations
+
+```mermaid
+%%{init: {'theme':'dark'}}%%
+flowchart LR
+    start([Start]) --> downtime{Zero downtime?}
+    downtime -- No --> batch[[Batch Migration]]
+    downtime -- Yes --> clients{Can apps</br>switch</br>at day0?}
+    subgraph jit [Just-in-time Migration]
+        clients -- Yes --> user_api
+        user_api{User API</br>available</br>on legacy?} -- Yes --> jit_zitadel[[ZITADEL</br>orchestrates migration]]
+        user_api -- No --> jit_legacy
+        clients -- No --> jit_legacy[[Legacy system</br>orchestrates migration]]
+    end
+```
+
+### Batch migration
+
+**Batch migration** is the easiest way, if you can afford some minimal downtime to move all users and applications over to ZITADEL.
+See the [User guide](./users.md) for batch migration of users. 
+
+### Just-in-time migration
+
+In case all your applications depend on ZITADEL after the migration date, and ZITADEL is able to retrieve the required user information, including secrets, from the legacy system, then the recommended way is to let **ZITADEL orchestrate the user migration just-in-time**:
+
+- Create an pre-authentication [Action](/docs/apis/actions/introduction) to request user data from the legacy system and create a new user in ZITADEL.
+- Optionally, create a post-authentication Action to flag migrated successfully migrated users in your legacy system
+
+For all other cases, we recommend that the **legacy system orchestrates the migration** of users to ZITADEL for more flexibility:
+
+- Update your legacy system to create a user in ZITADEL on their next login, if not already flagged as migrated, by using our APIs (you can set the password and an verified email)
+- Redirect migrated users with a login hint in the [auth request](/docs/apis/openidoauth/authrequest.mdx) to ZITADEL to pre-select the user
+
+In this case the migration can also be done as an import job or also allowing to create user session in both the legacy auth solution and ZITADEL in parallel with identity brokering: 
+
+- Setup ZITADEL to use your legacy system as external identity provider (note: you can also use JWT-IDP, if you only have a token).
+- Configure your app to use ZITADEL, which will redirect users automatically to the external identity provider to login.
+- A session will be created both on the legacy system and ZITADEL
+- If a user does not exists already in ZITADEL you can auto-register new users, and could use an Action to pull additional information (eg, Secrets) from your legacy system. Note: ZITADEL links external identity information to users, meaning you can have users use both a password and external identity providers to login with the same user.
