@@ -1932,7 +1932,7 @@
       "DEVMODE": "Tryb rozwoju",
       "DEVMODEDESC": "Uwaga: przy włączonym trybie rozwoju adresy URI przekierowania nie będą sprawdzane.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Pomiń stronę sukcesu po zalogowaniu",
-      "SKIPNATIVEAPPSUCCESSPAGEDESC": "Pomiń stronę sukcesu po zalogowaniu dla tej Natywny aplikację",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Pomiń stronę sukcesu po zalogowaniu dla tej Natywny aplikację",
       "REDIRECT": "Adresy URI przekierowania",
       "REDIRECTSECTION": "Adresy URI przekierowania",
       "POSTLOGOUTREDIRECT": "Adresy URI po wylogowaniu",

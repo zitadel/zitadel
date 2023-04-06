@@ -1924,7 +1924,7 @@
       "DEVMODE": "Development Mode",
       "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Skip Login Success Page",
-      "SKIPNATIVEAPPSUCCESSPAGEDESC": "Skip the Success Page after a Login for this Native app.",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Skip the success page after a login for this native app.",
       "REDIRECT": "Redirect URIs",
       "REDIRECTSECTION": "Redirect URIs",
       "POSTLOGOUTREDIRECT": "Post Logout URIs",

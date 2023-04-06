@@ -1933,7 +1933,7 @@
       "DEVMODE": "Modalit\u00e0 di sviluppo (DEV Mode)",
       "DEVMODEDESC": "Attenzione: Con la modalit\u00e0 di sviluppo abilitata, gli URI di reindirizzamento non saranno convalidati.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Salta la pagina di successo dopo il login",
-      "SKIPNATIVEAPPSUCCESSPAGEDESC": "Salta la pagina di successo dopo il login per questa applicazione nativa",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Salta la pagina di successo dopo il login per questa applicazione nativa",
       "REDIRECT": "URI per il reindrizzamento",
       "REDIRECTSECTION": "Reindirizzamento",
       "POSTLOGOUTREDIRECT": "URI post logout",
