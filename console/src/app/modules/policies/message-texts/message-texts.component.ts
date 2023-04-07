@@ -599,7 +599,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
             (this.service as ManagementService).setCustomPasswordlessRegistrationMessageCustomText(this.updateRequest),
           );
         case MESSAGETYPES.PASSWORDCHANGE:
-          return handler((this.service as ManagementService).getCustomPasswordChangeMessageText(this.updateRequest));
+          return handler((this.service as ManagementService).setCustomPasswordChangeMessageText(this.updateRequest));
       }
     } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       switch (this.currentType) {

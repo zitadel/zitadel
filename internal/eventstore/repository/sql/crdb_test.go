@@ -1166,7 +1166,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 				}
 			}
 
-			rows, err := testCRDBClient.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY event_sequence", tt.fields.aggregateType, tt.fields.aggregateIDs)
+			rows, err := testCRDBClient.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY creation_date, event_sequence", tt.fields.aggregateType, tt.fields.aggregateIDs)
 			if err != nil {
 				t.Error("unable to query inserted rows: ", err)
 				return
