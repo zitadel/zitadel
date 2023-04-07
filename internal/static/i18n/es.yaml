@@ -1,1170 +1,1170 @@
 Errors:
-  Internal: An internal error occurred
+  Internal: Se produjo un error interno
   NoChangesFound: Sin cambios
-  OriginNotAllowed: This "Origin" is not allowed
-  IDMissing: ID missing
-  ResourceOwnerMissing: Resource Owner Organisation missing
-  RemoveFailed: Could not be removed
+  OriginNotAllowed: Este "Origen" no está permitido
+  IDMissing: Falta el ID
+  ResourceOwnerMissing: Falta el propietario del recurso de la organización
+  RemoveFailed: No pudo eliminarse
   ProjectionName:
-    Invalid: Invalid projection name
+    Invalid: Nombre de proyecto no válido
   Assets:
-    EmptyKey: Asset key is empty
+    EmptyKey: La clave del activo está vacía
     Store:
-      NotInitialized: Assets storage not initialized
-      NotConfigured: Assets storage not configured
+      NotInitialized: Almacenamiento de activos no inicializado
+      NotConfigured: Almacenamiento de activos no configurado
     Bucket:
-      Internal: Internal error on create bucket
-      AlreadyExists: Bucket already exists
-      CreateFailed: Bucket not created
-      ListFailed: Buckets could not be read
-      RemoveFailed: Bucket not deleted
-      SetPublicFailed: Could not set bucket to public
+      Internal: Error interno al crear el cubo
+      AlreadyExists: El cubo ya existe
+      CreateFailed: El cubo no se creó
+      ListFailed: No pudieron leerse los cubos
+      RemoveFailed: El cubo no se borró
+      SetPublicFailed: No pude poner el cubo como público
     Object:
-      PutFailed: Object not created
+      PutFailed: Objeto no creado
       GetFailed: El objeto no pudo leerse
       NotFound: El objeto no pudo encontrarse
-      PresignedTokenFailed: Signed token could not be created
-      ListFailed: Objectlist could not be read
+      PresignedTokenFailed: El token firmado no pudo crearse
+      ListFailed: La lista de objetos no pudo leerse
       RemoveFailed: El objeto no pudo eliminarse
   Limit:
-    ExceedsDefault: Limit exceeds default limit
+    ExceedsDefault: El límite excede el límite por defecto
   Language:
-    NotParsed: Could not parse language
+    NotParsed: No pude analizar el idioma
   OIDCSettings:
-    NotFound: OIDC Configuration not found
-    AlreadyExists: OIDC configuration already exists
+    NotFound: Configuración OIDC no encontrada
+    AlreadyExists: La configuración OIDC ya existe
   SecretGenerator:
-    AlreadyExists: Secret generator already exists
-    TypeMissing: Secret generator type missing
-    NotFound: Secret generator not found
+    AlreadyExists: El generador del secreto ya existe
+    TypeMissing: Falta el tipo de generador del secreto
+    NotFound: El generador del secreto no se encontró
   SMSConfig:
-    NotFound: SMS configuration not found
-    AlreadyActive: SMS configuration already active
-    AlreadyDeactivated: SMS configuration already deactivated
+    NotFound: configuración SMS no encontrada
+    AlreadyActive: la configuración SMS ya está activa
+    AlreadyDeactivated: la configuracion SMS ya está desactivada
   SMTPConfig:
-    NotFound: SMTP configuration not found
-    AlreadyExists: SMTP configuration already exists
-    SenderAdressNotCustomDomain: The sender address must be configured as custom domain on the instance.
+    NotFound: configuración SMTP no encontrada
+    AlreadyExists: la configuración SMTP ya existe
+    SenderAdressNotCustomDomain: La dirección del remitente debe configurarse como un dominio personalizado en la instancia.
   Notification:
-    NoDomain: No Domain found for message
+    NoDomain: No se encontró el dominio para el mensaje
   User:
-    NotFound: User could not be found
-    AlreadyExists: User already exists
-    NotFoundOnOrg: User could not be found on chosen organization
-    NotAllowedOrg: User is no member of the required organization
-    UserIDMissing: User ID missing
-    DomainPolicyNil: Organisation Policy is empty
-    EmailAsUsernameNotAllowed: Email is not allowed as username
-    Invalid: Userdata is invalid
-    DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
-    AlreadyInactive: User already inactive
-    NotInactive: User is not inactive
-    CantDeactivateInitial: User with state initial can only be deleted not deactivated
-    ShouldBeActiveOrInitial: User is not active or initial
-    AlreadyInitialised: User is already initialized
-    NotInitialised: User is not yet initialized
-    NotLocked: User is not locked
-    NoChanges: No changes found
-    InitCodeNotFound: Initialization Code not found
-    UsernameNotChanged: Username not changed
+    NotFound: El usuario no pudo encontrarse
+    AlreadyExists: El usuario ya existe
+    NotFoundOnOrg: El usuario no pudo encontrarse en la organización elegida
+    NotAllowedOrg: El usuario no es miembro de la organización requerida
+    UserIDMissing: Falta el ID de usuario
+    DomainPolicyNil: Falta la política de la organización
+    EmailAsUsernameNotAllowed: La dirección de Email no se permite como nombre de usuario
+    Invalid: Los datos de usuario no son válidos
+    DomainNotAllowedAsUsername: El dominio ya está reservado y no pude usarse
+    AlreadyInactive: El usuario ya está inactivo
+    NotInactive: El usuario no está inactivo
+    CantDeactivateInitial: Un usuario con estado inicial solo puede borrarse pero no desactivarse
+    ShouldBeActiveOrInitial: El usuario no está activo o en el estado inicial
+    AlreadyInitialised: El usuario ya está inicializado
+    NotInitialised: El usuario aún no está inicializado
+    NotLocked: El usuario no está bloqueado
+    NoChanges: No se encontraron cambios
+    InitCodeNotFound: Código de inicialización no encontrado
+    UsernameNotChanged: El nombre de usuario no cambió
     Profile:
-      NotFound: Profile not found
-      NotChanged: Profile not changed
-      Empty: Profile is empty
-      FirstNameEmpty: First name in profile is empty
-      LastNameEmpty: Last name in profile is empty
-      IDMissing: Profile ID is missing
+      NotFound: Perfil no encontrado
+      NotChanged: El perfil no ha cambiado
+      Empty: El perfil está vacío
+      FirstNameEmpty: El nombre en el perfil está vacío
+      LastNameEmpty: Los apellidos en el perfil están vacíos
+      IDMissing: Falta el ID del perfil
     Email:
-      NotFound: Email not found
-      Invalid: Email is invalid
-      AlreadyVerified: Email is already verified
-      NotChanged: Email not changed
-      Empty: Email is empty
-      IDMissing: Email ID is missing
+      NotFound: Email no encontrado
+      Invalid: El email no es válido
+      AlreadyVerified: El email ya está verificado
+      NotChanged: El email no ha cambiado
+      Empty: El email no está vacío
+      IDMissing: Falta el ID del email
     Phone:
-      NotFound: Phone not found
-      Invalid: Phone is invalid
-      AlreadyVerified: Phone already verified
-      Empty: Phone is empty
-      NotChanged: Phone not changed
+      NotFound: Teléfono no encontrado
+      Invalid: El teléfono no es válido
+      AlreadyVerified: El teléfono ya se verificó
+      Empty: El teléfono está vacío
+      NotChanged: El teléfono no ha cambiado
     Address:
-      NotFound: Address not found
-      NotChanged: Address not changed
+      NotFound: Dirección no encontrada
+      NotChanged: La dirección no ha cambiado
     Machine:
       Key:
-        NotFound: Machine key not found
-        AlreadyExisting: Machine key already existing
+        NotFound: Clave de máquina no encontrada
+        AlreadyExisting: La clave de máquina ya existe
       Secret:
-        NotExisting: Secret doesn't exist
-        Invalid: Secret is invalid
-        CouldNotGenerate: Secret could not be generated
+        NotExisting: El secreto no existe
+        Invalid: El secret no es válido
+        CouldNotGenerate: El secreto no pudo generarse
     PAT:
-      NotFound: Personal Access Token not found
-    NotHuman: The User must be personal
-    NotMachine: The User must be technical
-    WrongType: Not allowed for this user type
-    NotAllowedToLink: User is not allowed to link with external login provider
+      NotFound: Token de acceso personal no encontrado
+    NotHuman: El usuario debe ser personal
+    NotMachine: El usuario debe ser técnico
+    WrongType: Tipo de usuario no permitido
+    NotAllowedToLink: El usuario no está autorizado para vincular con un proveedor de inicio de sesión externo
     Username:
-      AlreadyExists: Username already taken
-      Reserved: Username is already taken
-      Empty: Username is empty
+      AlreadyExists: El usuario ya existe
+      Reserved: El nombre de usuario ya está cogido
+      Empty: El nombre de usuario está vacío
     Code:
-      Empty: Code is empty
-      NotFound: Code not found
-      Expired: Code is expired
-      GeneratorAlgNotSupported: Unsupported generator algorithm
+      Empty: El código está vacío
+      NotFound: Código no encontrado
+      Expired: El código ha caducado
+      GeneratorAlgNotSupported: Algoritmo generador no soportado
     Password:
-      NotFound: Password not found
-      Empty: Password is empty
-      Invalid: Password is invalid
-      NotSet: User has not set a password
+      NotFound: Contraseña no encontrada
+      Empty: La contraseña está vacía
+      Invalid: La contraseña no es válida
+      NotSet: El usuario no ha establecido una contraseña
     PasswordComplexityPolicy:
-      NotFound: Password policy not found
-      MinLength: Password is to short
-      MinLengthNotAllowed: Given minimum length is not allowed
-      HasLower: Password must contain lower case
-      HasUpper: Password must contain upper case
-      HasNumber: Password must contain number
-      HasSymbol: Password must contain symbol
+      NotFound: Política de contraseñas no encontrada
+      MinLength: La contraseña es demasiado corta
+      MinLengthNotAllowed: La longitud mínima proporcionada no está permitida
+      HasLower: La contraseña debe contener letras minúsculas
+      HasUpper: La contraseña debe contener letras mayúsculas
+      HasNumber: La contraseña debe contener números
+      HasSymbol: La contraseña debe contener símbolos
     ExternalIDP:
-      Invalid: Externer IDP invalid
-      IDPConfigNotExisting: IDP provider invalid for this organization
-      NotAllowed: External IDP not allowed on this organization
-      MinimumExternalIDPNeeded: At least one IDP must be added
-      AlreadyExists: External IDP already taken
-      NotFound: External IDP not found
+      Invalid: IDP externo no válido
+      IDPConfigNotExisting: Proveedor IDP no válido para esta organización
+      NotAllowed: IDP externo no permitido para esta organización
+      MinimumExternalIDPNeeded: Al menos de añadirse un IDP
+      AlreadyExists: IDP externo ya cogido
+      NotFound: IDP no encontrado
     MFA:
       OTP:
-        AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
-        NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
-        NotReady: Multifactor OTP (OneTimePassword) isn't ready
-        InvalidCode: Invalid code
+        AlreadyReady: Multifactor OTP (OneTimePassword) ya está configurado
+        NotExisting: Multifactor OTP (OneTimePassword) no existe
+        NotReady: Multifactor OTP (OneTimePassword) no está listo
+        InvalidCode: Código no válido
       U2F:
-        NotExisting: U2F does not exist
+        NotExisting: U2F no existe
       Passwordless:
-        NotExisting: Passwordless does not exist
+        NotExisting: No existe inicio sin contraseña
     WebAuthN:
-      NotFound: WebAuthN Token could not be found
-      BeginRegisterFailed: WebAuthN begin registration failed
-      MarshalError: Error on marshal data
-      ErrorOnParseCredential: Error on parse credential data
-      CreateCredentialFailed: Error on create credentials
-      BeginLoginFailed: WebAuthN begin login failed
-      ValidateLoginFailed: Error on validate login credentials
-      CloneWarning: Credentials may be cloned
+      NotFound: No pude encontrarse un token WebAuthN
+      BeginRegisterFailed: El comienzo del registro WebAuthN falló
+      MarshalError: Error en la presentación de los datos
+      ErrorOnParseCredential: Error al analizar los datos de las credenciales
+      CreateCredentialFailed: Error al crear credenciales
+      BeginLoginFailed: El inicio de sesión con WebAuthN falló
+      ValidateLoginFailed: Error al validar las credenciales de inicio de sesión
+      CloneWarning: Las credenciales podrían clonarse
     RefreshToken:
-      Invalid: Refresh Token is invalid
-      NotFound: Refresh Token not found
+      Invalid: El token de refresco no es válido
+      NotFound: No se encontró el token de refresco
   Instance:
-    NotFound: Instance not found
-    AlreadyExists: Instance already exists
-    NotChanged: Instance not changed
+    NotFound: Instancia no encontrada
+    AlreadyExists: La instancia ya existe
+    NotChanged: La instancia no ha cambiado
   Org:
-    AlreadyExists: Organisation's name already taken
-    Invalid: Organisation is invalid
-    AlreadyDeactivated: Organisation is already deactivated
-    AlreadyActive: Organisation is already active
-    Empty: Organisation is empty
-    NotFound: Organisation not found
-    NotChanged: Organisation not changed
-    DefaultOrgNotDeletable: Default Organisation must not be deleted
-    ZitadelOrgNotDeletable: Organisation with ZITADEL project must not be deleted
-    InvalidDomain: Invalid domain
-    DomainMissing: Domain missing
-    DomainNotOnOrg: Domain doesn't exist on organization
-    DomainNotVerified: Domain is not verified
-    DomainAlreadyVerified: Domain is already verified
-    DomainVerificationTypeInvalid: Domain verification type is invalid
-    DomainVerificationMissing: Domain verification not yet started
-    DomainVerificationFailed: Domain verification failed
-    PrimaryDomainNotDeletable: Primary domain must not be deleted
-    DomainNotFound: Domain not found
-    MemberIDMissing: Member ID missing
-    MemberNotFound: Organisation member not found
-    InvalidMember: Organisation member is invalid
-    UserIDMissing: User ID missing
-    PolicyAlreadyExists: Policy already exists
-    PolicyNotExisting: Policy doesn't exist
-    IdpInvalid: IDP configuration is invalid
-    IdpNotExisting: IDP configuration does not exist
-    OIDCConfigInvalid: OIDC IDP configuration is invalid
-    IdpIsNotOIDC: IDP configuration is not of type oidc
+    AlreadyExists: El nombre de la organización ya está cogido
+    Invalid: El nombre de la organización no es válido
+    AlreadyDeactivated: La organización ya está desactivada
+    AlreadyActive: La organización ya está activada
+    Empty: La organización está vacía
+    NotFound: Organización no encontrada
+    NotChanged: La organización no ha cambiado
+    DefaultOrgNotDeletable: La organización por defecto no debe borrarse
+    ZitadelOrgNotDeletable: La organización que contiene el proyecto ZITADEL no debe borrarse
+    InvalidDomain: Dominio no válido
+    DomainMissing: Falta el dominio
+    DomainNotOnOrg: El dominio no existe en la organización
+    DomainNotVerified: El dominio no está verificado
+    DomainAlreadyVerified: El dominio ya está verificado
+    DomainVerificationTypeInvalid: El tipo verificación del dominio no es válido
+    DomainVerificationMissing: La verificación del dominio no ha comenzado
+    DomainVerificationFailed: La verificación del dominio falló
+    PrimaryDomainNotDeletable: El dominio primario no debe borrarse
+    DomainNotFound: Dominio no encontrado
+    MemberIDMissing: Falta el ID del miembro
+    MemberNotFound: Miembro de la organización no encontrado
+    InvalidMember: Miembro de la organización no es válido
+    UserIDMissing: Falte el ID de usuario
+    PolicyAlreadyExists: Ya existe la política
+    PolicyNotExisting: No existe la política
+    IdpInvalid: La configuración IDP no es válida
+    IdpNotExisting: La configuración IDP no existe
+    OIDCConfigInvalid: La configuración OIDC IDP no es válida
+    IdpIsNotOIDC: La configuración IDP no es del tipo OIDC
     Domain:
-      AlreadyExists: Domain already exists
-      InvalidCharacter: Only alphanumeric characters, . and - are allowed for a domain
+      AlreadyExists: El dominio ya existe
+      InvalidCharacter: Solo caracteres alfanuméricos, . y - se permiten para un dominio
     IDP:
-      InvalidSearchQuery: Invalid search query
+      InvalidSearchQuery: Consulta de búsqueda no válida
     LoginPolicy:
-      NotFound: Login Policy not found
-      Invalid: Login Policy is invalid
-      RedirectURIInvalid: Default Redirect URI is invalid
-      NotExisting: Login Policy not existing
-      AlreadyExists: Login Policy already exists
-      IdpProviderAlreadyExisting: Identity Provider already existing
-      IdpProviderNotExisting: Identity Provider not existing
-      RegistrationNotAllowed: Registration is not allowed
-      UsernamePasswordNotAllowed: Login with Username / Password is not allowed
+      NotFound: Política de inicio de sesión no encontrada
+      Invalid: Política de inicio de sesión no es válida
+      RedirectURIInvalid: La URI de redirección por defecto no es válida
+      NotExisting: Política de inicio de sesión no existente
+      AlreadyExists: La política de inicio de sesión ya existe
+      IdpProviderAlreadyExisting: El proveedor de identidad (IDP) ya existe
+      IdpProviderNotExisting: El proveedor de identidad (IDP) no existe
+      RegistrationNotAllowed: No está permitido el registro
+      UsernamePasswordNotAllowed: Inicio de sesión con nombre de usuario / contraseña no está permitido
       MFA:
-        AlreadyExists: Multifactor already exists
-        NotExisting: Multifactor not existing
-        Unspecified: Multifactor invalid
+        AlreadyExists: El Multifactor ya existe
+        NotExisting: El Multifactor no existe
+        Unspecified: Multifactor no válido
     MailTemplate:
-      NotFound: Default Mail Template not found
-      NotChanged: Default Mail Template has not been changed
-      AlreadyExists: Default Mail Template already exists
-      Invalid: Default Mail Template is invalid
+      NotFound: Plantilla de correo por defecto no encontrada
+      NotChanged: La plantilla de correo por defecto no ha cambiado
+      AlreadyExists: La plantilla de correo por defecto ya existe
+      Invalid: La plantilla de correo por defecto no es válida
     CustomMessageText:
-      NotFound: Default Message Text not found
-      NotChanged: Default Message Text has not been changed
-      AlreadyExists: Default Message Text already exists
-      Invalid: Default Message Text is invalid
+      NotFound: Texto de mensaje por defecto no encontrado
+      NotChanged: El texto de mensaje por defecto no ha cambiado
+      AlreadyExists: El texto de mensaje por defecto ya existe
+      Invalid: El texto de mensaje por defecto no es válido
     PasswordComplexityPolicy:
-      NotFound: Password Complexity Policy not found
-      Empty: Password Complexity Policy is empty
-      NotExisting: Password Complexity Policy doesn't exist
-      AlreadyExists: Password Complexity Policy already exists
+      NotFound: Política de complejidad de la contraseña no encontrada
+      Empty: La política de complejidad de la contraseña está vacía
+      NotExisting: La política de complejidad de la contraseña no existe
+      AlreadyExists: La política de complejidad de la contraseña ya existe
     PasswordLockoutPolicy:
-      NotFound: Password Lockout Policy not found
-      Empty: Password Lockout Policy is empty
-      NotExisting: Password Lockout Policy doesn't exist
-      AlreadyExists: Password Lockout Policy already exists
+      NotFound: Política de bloqueo de la contraseña no encontrada
+      Empty: La política de bloqueo de la contraseña está vacía
+      NotExisting: La política de bloqueo de la contraseña no existe
+      AlreadyExists: La política de bloqueo de la contraseña ya existe
     PasswordAgePolicy:
-      NotFound: Password Age Policy not found
-      Empty: Password Age Policy is empty
-      NotExisting: Password Age Policy doesn't exist
-      AlreadyExists: Password Age Policy already exists
+      NotFound: Política de antigüedad de la contraseña no encontrada
+      Empty: La política de antigüedad de la contraseña está vacía
+      NotExisting: La política de antigüedad de la contraseña no existe
+      AlreadyExists: La política de antigüedad de la contraseña ya existe
     OrgIAMPolicy:
-      Empty: Org IAM Policy is empty
-      NotExisting: Org IAM Policy doesn't exist
-      AlreadyExists: Org IAM Policy already exists
+      Empty: La política de IAM de la organización está vacía
+      NotExisting: La política de IAM de la organización no existe
+      AlreadyExists: La política de IAM de la organización ya existe
     NotificationPolicy:
-      NotFound: Notification Policy not found
-      NotChanged: Notification Policy not changed
-      AlreadyExists: Notification Policy already exists
+      NotFound: Política de notificación no encontrada
+      NotChanged: La política de notificación no ha cambiado
+      AlreadyExists: La política de notificación ya existe
     LabelPolicy:
-      NotFound: Private Label Policy not found
-      NotChanged: Private Label Policy has not been changed
+      NotFound: Política de etiqueta privada no encontrada
+      NotChanged: La política de etiqueta privada no ha cambiado
   Project:
-    ProjectIDMissing: Project Id missing
-    AlreadyExists: Project already exists on organization
-    OrgNotExisting: Organisation doesn't exist
-    UserNotExisting: User doesn't exist
-    CouldNotGenerateClientSecret: Could not generate client secret
-    Invalid: Project is invalid
-    NotActive: Project is not active
-    NotInactive: Project is not deactivated
-    NotFound: Project not found
-    UserIDMissing: User ID missing
+    ProjectIDMissing: Falta el Id del proyecto
+    AlreadyExists: El proyecto ya existe en la organización
+    OrgNotExisting: La organización no existe
+    UserNotExisting: El usuario no existe
+    CouldNotGenerateClientSecret: No pude generar el secreto del cliente
+    Invalid: El proyecto no es válido
+    NotActive: El proyecto no está activo
+    NotInactive: El proyecto no está desactivado
+    NotFound: El proyecto no se encontró
+    UserIDMissing: Falta el ID de usuario
     Member:
-      NotFound: Project member not found
-      Invalid: Project member is invalid
-      AlreadyExists: Project member already exists
-      NotExisting: Project member doesn't exist
-    MinimumOneRoleNeeded: At least one role must be added
+      NotFound: Miembro del proyecto no encontrado
+      Invalid: El miembro del proyecto no es válido
+      AlreadyExists: El miembro del proyecto ya existe
+      NotExisting: El miembro del proyecto no existe
+    MinimumOneRoleNeeded: Al menos debe añadirse un rol
     Role:
-      AlreadyExists: Role already exists
-      Invalid: Role is invalid
-      NotExisting: Role doesn't exist
-    IDMissing: ID missing
+      AlreadyExists: El rol ya existe
+      Invalid: El rol no es válido
+      NotExisting: El rol no existe
+    IDMissing: Falta el ID
     App:
-      AlreadyExists: Application already exists
-      NotFound: Application not found
-      Invalid: Application invalid
-      NotExisting: Application doesn't exist
-      NotActive: Application is not active
-      NotInactive: Application is not inactive
-      OIDCConfigInvalid: OIDC configuration is invalid
-      APIConfigInvalid: API configuration is invalid
-      SAMLConfigInvalid: SAML configuration is invalid
-      IsNotOIDC: Application is not type OIDC
-      IsNotAPI: Application is not type API
-      IsNotSAML: Application is not type SAML
-      SAMLMetadataMissing: SAML metadata is missing
-      SAMLMetadataFormat: SAML Metadata format error
-      SAMLEntityIDAlreadyExisting: SAML EntityID already existing
-      OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
-      APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
-      AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
-      ClientSecretInvalid: Client Secret is invalid
+      AlreadyExists: La aplicación ya existe
+      NotFound: Aplicación no encontrada
+      Invalid: Aplicación no válida
+      NotExisting: La aplicación no existe
+      NotActive: La aplicación no está activa
+      NotInactive: La aplicación no está inactiva
+      OIDCConfigInvalid: La configuración OIDC no es válida
+      APIConfigInvalid: La configuración API no es válida
+      SAMLConfigInvalid: La configuración SAML no es válida
+      IsNotOIDC: La aplicación no es del tipo OIDC
+      IsNotAPI: La aplicación no es del tipo API
+      IsNotSAML: La aplicación no es del tipo SAML
+      SAMLMetadataMissing: Faltan metadatos SAML
+      SAMLMetadataFormat: Error en el formato de los metadatos SAML
+      SAMLEntityIDAlreadyExisting: SAML EntityID ya existe
+      OIDCAuthMethodNoSecret: El método de autenticación OIDC elegido no requiere un secreto
+      APIAuthMethodNoSecret: El método de autenticación de API elegido no requiere un secreto
+      AuthMethodNoPrivateKeyJWT: El método de autenticación elegido no requiere una clave
+      ClientSecretInvalid: El secreto del cliente no es válido
       Key:
-        AlreadyExisting: Application key already existing
-        NotFound: Application key not found
-    RequiredFieldsMissing: Some required fields are missing
+        AlreadyExisting: La clave de la aplicación ya existe
+        NotFound: Clave de la aplicación no encontrada
+    RequiredFieldsMissing: Faltan algunos campos requeridos
     Grant:
-      AlreadyExists: Project grant already exists
-      NotFound: Grant not found
-      Invalid: Project grant is invalid
-      NotExisting: Project grant doesn't exist
-      HasNotExistingRole: One role doesn't exist on project
-      NotActive: Project grant is not active
-      NotInactive: Project grant is not inactive
+      AlreadyExists: La concesión del proyecto ya existe
+      NotFound: Concesión no encontrada
+      Invalid: La concesión del proyecto no es válida
+      NotExisting: La concesión del proyecto no existe
+      HasNotExistingRole: Un rol no existe en el proyecto
+      NotActive: La concesión del proyecto no está activa
+      NotInactive: La concesión del proyecto no está inactiva
   IAM:
-    NotFound: Instance not found
+    NotFound: Instancia no encontrada
     Member:
-      RolesNotChanged: Roles have not been changed
-    MemberInvalid: Member is invalid
-    MemberAlreadyExisting: Member already exists
-    MemberNotExisting: Member does not exist
-    IDMissing: Id missing
-    IAMProjectIDMissing: IAM project id missing
-    IamProjectAlreadySet: IAM project id has already been set
-    IdpInvalid: IDP configuration is invalid
-    IdpNotExisting: IDP configuration does not exist
-    OIDCConfigInvalid: OIDC IDP configuration is invalid
-    IdpIsNotOIDC: IDP configuration is not of type oidc
-    LoginPolicyInvalid: Login Policy is invalid
-    LoginPolicyNotExisting: Login Policy doesn't exist
-    IdpProviderInvalid: Identity Provider is invalid
+      RolesNotChanged: Los roles no han cambiado
+    MemberInvalid: El miembro no es válido
+    MemberAlreadyExisting: El miembro ya existe
+    MemberNotExisting: El miembro no existe
+    IDMissing: Falta Id
+    IAMProjectIDMissing: Falta id del proyecto IAM
+    IamProjectAlreadySet: El id del proyecto IAM ya se ha establecido
+    IdpInvalid: La configuración IDP no es válida
+    IdpNotExisting: La configuración IDP no existe
+    OIDCConfigInvalid: La configuración OIDC IDP no es válida
+    IdpIsNotOIDC: La configuración IDP no es del tipo OIDC
+    LoginPolicyInvalid: La política de inicio de sesión no es válida
+    LoginPolicyNotExisting: La política de inicio de sesión no existe
+    IdpProviderInvalid: El proveedor de identidad no es válido
     LoginPolicy:
-      NotFound: Default Login Policy not found
-      NotChanged: Default Login Policy has not been changed
-      NotExisting: Default Login Policy not existing
-      AlreadyExists: Default Login Policy already exists
-      RedirectURIInvalid: Default Redirect URI is invalid
+      NotFound: Política de inicio de sesión por defecto no encontrada
+      NotChanged: La política de inicio de sesión por defecto no ha cambiado
+      NotExisting: La política de inicio de sesión por defecto no existe
+      AlreadyExists: La política de inicio de sesión por defecto ya existe
+      RedirectURIInvalid: La URI de redirección no es válida
       MFA:
-        AlreadyExists: Multifactor already exists
-        NotExisting: Multifactor not existing
-        Unspecified: Multifactor invalid
+        AlreadyExists: El Multifactor ya existe
+        NotExisting: El Multifactor no existe
+        Unspecified: El Multifactor no es válido
       IDP:
-        AlreadyExists: Identity provider already exists
-        NotExisting: Identity provider doesn't exist
-        Invalid: Identity Provider invalid
+        AlreadyExists: El proveedor de identitad ya existe
+        NotExisting: El proveedor de identidad no existe
+        Invalid: El proveedor de identidad no es válido
       IDPConfig:
-        AlreadyExists: Identity Provider Configuration already exists
-        NotInactive: Identity Provider Configuration not inactive
-        NotActive: Identity Provider Configuration not active
+        AlreadyExists: La configuración del proveedor de identidad ya existe
+        NotInactive: La configuración del proveedor de identidad no está inactiva
+        NotActive: La configuración del proveedor de identidad no está activa
     LabelPolicy:
-      NotFound: Default Private Label Policy not found
-      NotChanged: Default Private Label Policy has not been changed
+      NotFound: Política de etiqueta de privacidad por defecto no encontrada
+      NotChanged: Política de etiqueta de privacidad por defecto no ha cambiado
     MailTemplate:
-      NotFound: Default Mail Template not found
-      NotChanged: Default Mail Template has not been changed
-      AlreadyExists: Default Mail Template already exists
-      Invalid: Default Mail Template is invalid
+      NotFound: Plantilla de correo por defecto no encontrada
+      NotChanged: La plantilla de correo por defecto no ha cambiado
+      AlreadyExists: La plantilla de correo por defecto ya existe
+      Invalid: La plantilla de correo por defecto no es válida
     CustomMessageText:
-      NotFound: Default Message Text not found
-      NotChanged: Default Message Text has not been changed
-      AlreadyExists: Default Message Text already exists
-      Invalid: Default Message Text is invalid
+      NotFound: Texto del mensaje por defecto no encontrado
+      NotChanged: El texto del mensaje por defecto no ha cambiado
+      AlreadyExists: El texto del mensaje por defecto ya existe
+      Invalid: El texto del mensaje por defecto no es válido
     PasswordComplexityPolicy:
-      NotFound: Default Password Complexity Policy not found
-      NotExisting: Default Password Complexity Policy not existing
-      AlreadyExists: Default Password Complexity Policy already existing
-      Empty: Default Password Complexity Policy empty
-      NotChanged: Default Password Complexity Policy has not been changed
+      NotFound: Política de complejidad de contraseña por defecto no encontrada
+      NotExisting: La política de complejidad de contraseña por defecto no existe
+      AlreadyExists: La política de complejidad de contraseña por defecto ya existe
+      Empty: La política de complejidad de contraseña por defecto está vacía
+      NotChanged: La política de complejidad de contraseña por defecto no ha cambiado
     PasswordAgePolicy:
-      NotFound: Default Password Age Policy not found
-      NotExisting: Default Password Age Policy not existing
-      AlreadyExists: Default Password Age Policy already existing
-      Empty: Default Password Age Policy empty
-      NotChanged: Default Password Age Policy has not been changed
+      NotFound: Política de antigüedad de contraseña por defecto no encontrada
+      NotExisting: La política de antigüedad de contraseña por defect no existe
+      AlreadyExists: La política de antigüedad de contraseña por defect ya existe
+      Empty: La política de antigüedad de contraseña por defect está vacía
+      NotChanged: La política de antigüedad de contraseña por defect no ha cambiado
     PasswordLockoutPolicy:
-      NotFound: Default Password Lockout Policy not found
-      NotExisting: Default Password Lockout Policy not existing
-      AlreadyExists: Default Password Lockout Policy already existing
-      Empty: Default Password Lockout Policy empty
-      NotChanged: Default Password Lockout Policy has not been changed
+      NotFound: Política de bloqueo de contraseña por defecto no encontrada
+      NotExisting: La política de bloqueo de contraseña por defecto no existe
+      AlreadyExists: La política de bloqueo de contraseña por defecto ya existe
+      Empty: La política de bloqueo de contraseña por defecto está vacía
+      NotChanged: La política de bloqueo de contraseña por defecto no ha cambiado
     DomainPolicy:
-      NotFound: Org IAM Policy not found
-      Empty: Org IAM Policy is empty
-      NotExisting: Org IAM Policy not existing
-      AlreadyExists: Org IAM Policy already exists
-      NotChanged: Org IAM Policy has not been changed
+      NotFound: Política de IAM de la organización no encontrada
+      Empty: La política de IAM de la organización está vacía
+      NotExisting: La política de IAM de la organización no existe
+      AlreadyExists: La política de IAM de la organización ya existe
+      NotChanged: La política de IAM de la organización no ha cambiado
     NotificationPolicy:
-      NotFound: Default Notification Policy not found
-      NotChanged: Default Notification Policy not changed
-      AlreadyExists: Default Notification Policy already exists
+      NotFound: Política de notificación por defecto no encontrada
+      NotChanged: La política de notificación por defecto no ha cambiado
+      AlreadyExists: La política de notificación por defecto ya existe
   Policy:
-    AlreadyExists: Policy already exists
+    AlreadyExists: La política ya existe
     Label:
       Invalid:
-        PrimaryColor: Primary color is no valid Hex color value
-        BackgroundColor: Background color is no valid Hex color value
-        WarnColor: Warn color is no valid Hex color value
-        FontColor: Font color is no valid Hex color value
-        PrimaryColorDark: Primary color (dark mode) is no valid Hex color value
-        BackgroundColorDark: Background color (dark mode) is no valid Hex color value
-        WarnColorDark: Warn color (dark mode) is no valid Hex color value
-        FontColorDark: Font color (dark mode) is no valid Hex color value
+        PrimaryColor: El color primario no es un valor de código hex válido
+        BackgroundColor: El color de fondo no es un valor de código hex válido
+        WarnColor: El color de advertencia no es un valor de código hex válido
+        FontColor: El color de fuente no es un valor de código hex válido
+        PrimaryColorDark: El color primario (modo oscuro) no es un valor de código hex válido
+        BackgroundColorDark: El color de fondo (modo oscuro) no es un valor de código hex válido
+        WarnColorDark: El color de advertencia (modo oscuro) no es un valor de código hex válido
+        FontColorDark: El color de fuente (modo oscuro) no es un valor de código hex válido
   UserGrant:
-    AlreadyExists: User grant already exists
-    NotFound: User grant not found
-    Invalid: User grant is invalid
-    NotChanged: User grant has not been changed
-    IDMissing: Id missing
-    NotActive: User grant is not active
-    NotInactive: User grant is not deactivated
-    NoPermissionForProject: User has no permissions on this project
-    RoleKeyNotFound: Role not found
+    AlreadyExists: La concesión de usuario ya existe
+    NotFound: Concesión de usuario no encontrada
+    Invalid: La concesión de usuario no es válida
+    NotChanged: La concesión de usuario no ha cambiado
+    IDMissing: Falta Id
+    NotActive: La concesión de usuario no está activa
+    NotInactive: La concesión de usuario no está inactiva
+    NoPermissionForProject: El usuario no tiene permisos en este proyecto
+    RoleKeyNotFound: Rol no encontrado
   Member:
-    AlreadyExists: Member already exists
+    AlreadyExists: El miembro ya existe
   IDPConfig:
-    AlreadyExists: IDP Configuration with this name already exists
-    NotExisting: Identity Provider Configuration doesn't exist
+    AlreadyExists: Una configuración IDP con este nombre ya existe
+    NotExisting: La configuración de proveedor de identidad (IDP) no existe
   Changes:
-    NotFound: No history found
-    AuditRetention: History is outside of the Audit Log Retention
+    NotFound: No se encontró histórico
+    AuditRetention: El histórico está fuera de la retención del registro de auditoría
   Token:
-    NotFound: Token not found
+    NotFound: Token no encontrado
   UserSession:
-    NotFound: UserSession not found
+    NotFound: UserSession no encontrado
   Key:
-    ExpireBeforeNow: The expiration date is in the past
+    ExpireBeforeNow: La fecha de caducidad está en el pasado
   Login:
     LoginPolicy:
       MFA:
-        ForceAndNotConfigured: Multifactor is configured as required, but no possible providers are configured. Please contact your system administrator.
+        ForceAndNotConfigured: El multifactor está configurado como se le ha requerido, pero no hay proveedores posibles configurados. Por favor contacta con tu administrador del sistema.
   Step:
     Started:
-      AlreadyExists: Step started already exists
+      AlreadyExists: El paso iniciado ya existe
     Done:
-      AlreadyExists: Step done already exists
+      AlreadyExists: El paso hecho ya existe
   CustomText:
-    AlreadyExists: Custom text already exists
-    Invalid: Custom text invalid
-    NotFound: Custom text not found
+    AlreadyExists: El texto personalizado ya existe
+    Invalid: El texto personalizado no es válido
+    NotFound: Texto personalizado no encontrado
   TranslationFile:
-    ReadError: Error in reading translation file
-    MergeError: Translation file could not be merged with custom translations
-    NotFound: Translation file doesn't exist
+    ReadError: Error al leer el fichero de traducciones
+    MergeError: El fichero de traducciones no se pudo fusionar con las traducciones personalizadas
+    NotFound: El fichero de traducciones no existe
   Metadata:
-    NotFound: Metadata not found
-    NoData: Metadata list is empty
-    Invalid: Metadata is invalid
-    KeyNotExisting: One or more keys do not exist
+    NotFound: Metadatos no encontrado
+    NoData: La lista de metadatos está vacía
+    Invalid: Los metadatos no son válidos
+    KeyNotExisting: Una o más claves no existen
   Action:
-    Invalid: Action is invalid
-    NotFound: Action not found
-    NotActive: Action is not active
-    NotInactive: Action is not inactive
-    MaxAllowed: No additional active Actions allowed
+    Invalid: La acción no es válida
+    NotFound: Acción no encontrada
+    NotActive: La acción no está activa
+    NotInactive: La acción no está inactiva
+    MaxAllowed: No hay acciones adicionales activas permitidas
   Flow:
-    FlowTypeMissing: FlowType missing
-    Empty: Flow is already empty
-    WrongTriggerType: TriggerType is invalid
-    NoChanges: No Changes
-    ActionIDsNotExist: ActionIDs do not exist
+    FlowTypeMissing: Falta el tipo de flujo
+    Empty: El flujo ya está vacío
+    WrongTriggerType: El tipo de disparador no es válido
+    NoChanges: Sin cambios
+    ActionIDsNotExist: No existen IDs de acciones
   Query:
-    CloseRows: SQL Statement could not be finished
-    SQLStatement: SQL Statement could not be created
-    InvalidRequest: Request is invalid
+    CloseRows: La sentencia SQL no pudo finalizarse
+    SQLStatement: La sentencia SQL no pudo crearse
+    InvalidRequest: La solicitud no es válida
   Quota:
-    AlreadyExists: Quota already exists for this unit
-    NotFound: Quota not found for this unit
+    AlreadyExists: La cuota ya existe para esta unidad
+    NotFound: Cuota no encontrada para esta unidad
     Invalid:
-      CallURL: Quota call URL is invalid
-      Percent: Quota percent is lower than 1
-      Unimplemented: Quotas are not implemented for this unit
-      Amount: Quota amount is lower than 1
-      ResetInterval: Quota reset interval is shorter than a minute
-      Noop: An unlimited quota without notifications has no effect
+      CallURL: La URL de petición de cuota no es válida
+      Percent: El porcentaje de cuota es menor que uno
+      Unimplemented: Las cuotas no se han implementado para esta unidad
+      Amount: La cantidad de cuota es menor que uno
+      ResetInterval: El intervalo de restablecimiento de la cuota es menor que un minuto
+      Noop: Una cuota ilimitada sin notificaciones no tiene efecto
     Access:
-      Exhausted: The quota for authenticated requests is exhausted
+      Exhausted: La cuota para solicitudes no autenticadas se ha superado
     Execution:
-      Exhausted: The quota for execution seconds is exhausted
+      Exhausted: La cuota de segundos de ejecución se ha superado
   LogStore:
     Access:
-      StorageFailed: Storing access log to database failed
-      ScanFailed: Querying usage for authenticated requests failed
+      StorageFailed: Ha fallado el almacenaje del registro de acceso en la base de datos
+      ScanFailed: La consulta de uso de las peticiones autenticadas ha fallado
     Execution:
-      StorageFailed: Storing action execution log to database failed
-      ScanFailed: Querying usage for action execution seconds failed
+      StorageFailed: Ha fallado el almacenaje del registro de ejecución de acciones en la base de datos
+      ScanFailed: La consulta de uso de los segundos de ejecuciónde acciones ha fallado
 
 AggregateTypes:
-  action: Action
-  instance: Instance
-  key_pair: Key Pair
-  org: Organization
-  project: Project
-  user: User
-  usergrant: User grant
-  quota: Quota
+  action: Acción
+  instance: Instancia
+  key_pair: Par de claves
+  org: Organización
+  project: Proyecto
+  user: Usuario
+  usergrant: Concesión de usuario
+  quota: Cuota
 
 EventTypes:
   user:
-    added: User added
-    selfregistered: User registered himself
+    added: Usuario añadido
+    selfregistered: El usuario se registró por sí mismo
     initialization:
       code:
-        added: Initialization code generated
-        sent: Initialization code sent
+        added: Generado código de inicialización
+        sent: Código de inicialización enviado
       check:
-        succeeded: Initialization check succeeded
-        failed: Initialization check failed
+        succeeded: Comprobación de inicialización realizada con éxito
+        failed: La comprobación de inicialización falló
     token:
-      added: Access Token created
-      removed: Access Token removed
+      added: Token de acceso creado
+      removed: Token de acceso eliminado
     username:
-      reserved: Username reserved
-      released: Username released
-      changed: Username changed
+      reserved: Nombre de usuario reservado
+      released: Nombre de usuario liberado
+      changed: Nombre de usuario cambiado
     email:
-      reserved: Email address reserved
-      released: Email address released
-      changed: Email address changed
-      verified: Email address verified
+      reserved: Dirección de email reservada
+      released: Dirección de email liberada
+      changed: Dirección de email modificada
+      verified: Dirección de email verificada
       verification:
-        failed: Email address verification failed
+        failed: Fallo en la verificación de la dirección de email
       code:
-        added: Email address verification code generated
-        sent: Email address verification code sent
+        added: Código de verificación de dirección de email generado
+        sent: Código de verificación de dirección de email enviado
     machine:
-      added: Technical user added
-      changed: Technical user changed
+      added: Usuario técnico añadido
+      changed: Usuario técnico modificado
       key:
-        added: Key added
-        removed: Key removed
+        added: Clave añadida
+        removed: Clave eliminada
       secret:
-        set: Secret set
-        removed: Secret removed
+        set: Secreto establecido
+        removed: Secreto eliminado
         check:
-          succeeded: Secret check succeeded
-          failed: Secret check failed
+          succeeded: Comprobación exitosa del secreto
+          failed: Fallo en la comprobación del secreto
     human:
-      added: Person added
-      selfregistered: Person registered himself
+      added: Persona añadida
+      selfregistered: Persona registrada por sí misma
       avatar:
-        added: Avatar added
-        removed: Avatar removed
+        added: Avatar añadido
+        removed: Avatar eliminado
       initialization:
         code:
-          added: Initialization code generated
-          sent: Initialization code sent
+          added: Código de inicialización generado
+          sent: Código de inicialización enviado
         check:
-          succeeded: Initialization check succeeded
-          failed: Initialization check failed
+          succeeded: Comprobación exitosa de la inicialización
+          failed: Fallo en la comprobación de la inicialización
       username:
-        reserved: Username reserved
-        released: Username released
+        reserved: Nombre de usuario reservado
+        released: Nombre de usuario liberado
       email:
-        changed: Email address changed
-        verified: Email address verified
+        changed: Dirección de email modificada
+        verified: Dirección de email verificada
         verification:
-          failed: Email address verification failed
+          failed: Falló la verificación de la dirección de email
         code:
-          added: Email address verification code generated
-          sent: Email address verification code sent
+          added: Código de verificación de dirección de email generado
+          sent: Código de verificación de dirección de email enviado
       password:
-        changed: Password changed
+        changed: Contraseña cambiada
         code:
-          added: Password code generated
-          sent: Password code sent
+          added: Código de contraseña generado
+          sent: Código de contraseña enviado
         check:
-          succeeded: Password check succeeded
-          failed: Password check failed
+          succeeded: Comprobación exitosa de la contraseña
+          failed: Fallo en la comprobación de la contraseña
       externallogin:
         check:
-          succeeded: External login succeeded
+          succeeded: Inicio de sesión externo con éxito
       externalidp:
-        added: Externer IDP added
-        removed: Externer IDP removed
+        added: IDP externo añadido
+        removed: IDP externo eliminado
         cascade:
-          removed: Externer IDP cascade removed
+          removed: IDP externo eliminado en cascada
       phone:
-        changed: Phone number changed
-        verified: Phone number verified
+        changed: Número de teléfono modificado
+        verified: Número de teléfono verificado
         verification:
-          failed: Phone number verification failed
+          failed: Verificación de número de teléfono fallida
         code:
-          added: Phone number code generated
-          sent: Phone number code sent
-        removed: Phone number removed
+          added: Código de número de teléfono generado
+          sent: Código de número de teléfono enviado
+        removed: Número de teléfono eliminado
       profile:
-        changed: User profile changed
+        changed: Perfil de usuario modificado
       address:
-        changed: User address changed
+        changed: Dirección de usuario modificada
       mfa:
         otp:
-          added: Multifactor OTP added
-          verified: Multifactor OTP verified
-          removed: Multifactor OTP removed
+          added: Multifactor OTP añadido
+          verified: Multifactor OTP verificado
+          removed: Multifactor OTP eliminado
           check:
-            succeeded: Multifactor OTP check succeeded
-            failed: Multifactor OTP check failed
+            succeeded: Comprobación exitosa de Multifactor OTP
+            failed: Comprobación fallida de Multifactor OTP
         u2f:
           token:
-            added: Multifactor U2F Token added
-            verified: Multifactor U2F Token verified
-            removed: Multifactor U2F Token removed
+            added: Multifactor U2F Token añadido
+            verified: Multifactor U2F Token verificado
+            removed: Multifactor U2F Token eliminado
             begin:
-              login: Multifactor U2F check started
+              login: Comprobación Multifactor U2F iniciada
             check:
-              succeeded: Multifactor U2F check succeeded
-              failed: Multifactor U2F check failed
+              succeeded: Comprobación Multifactor U2F exitosa
+              failed: Comprobación Multifactor U2F fallida
             signcount:
-              changed: Checksum of the Multifactor U2F Token has been changed
+              changed: El checksum del token Multifactor U2F Token ha sido modificado
         init:
-          skipped: Multifactor initialization skipped
+          skipped: Inicialización Multifactor omitida
       passwordless:
         token:
-          added: Token for Passwordless Login added
-          verified: Token for Passwordless Login verified
-          removed: Token for Passwordless Login removed
+          added: Token para inicio de sesión sin contraseña añadido
+          verified: Token para inicio de sesión sin contraseña verificado
+          removed: Token para inicio de sesión sin contraseña eliminado
           begin:
-            login: Passwordless Login check started
+            login: Comprobación de inicio de sesión sin contraseña iniciado
           check:
-            succeeded: Passwordless Login check succeeded
-            failed: Passwordless Login check failed
+            succeeded: Comprobación de inicio de sesión sin contraseña exitosa
+            failed: Comprobación de inicio de sesión sin contraseña fallida
           signcount:
-            changed: Checksum of the Passwordless Login Token has been changed
+            changed: El checksum del token de inicio de sesión sin contraseña ha sido modificado
         initialization:
           code:
-            added: Passwordless initialization code added
-            sent: Passwordless initialization code sent
-            requested: Passwordless initialization code requested
+            added: Código de inicialización de inicio sin contraseña añadido
+            sent: Código de inicialización de inicio sin contraseña enviado
+            requested: Solicitado código de inicialización de inicio sin contraseña
             check:
-              succeeded: Passwordless initialization code successfully checked
-              failed: Passwordless initialization code check failed
+              succeeded: Comprobación de código de inicialización de inicio sin contraseña exitosa
+              failed: Comprobación de código de inicialización de inicio sin contraseña fallida
       signed:
-        out: User signed out
+        out: El usuario cerró sesión
       refresh:
         token:
-          added: Refresh Token created
-          renewed: Refresh Token renewed
-          removed: Refresh Token removed
-    locked: User locked
-    unlocked: User unlocked
-    deactivated: User deactivated
-    reactivated: User reactivated
-    removed: User removed
+          added: Token de refresco creado
+          renewed: Token de refresco renovado
+          removed: Token de refresco eliminado
+    locked: Usuario bloqueado
+    unlocked: Usuario desbloqueado
+    deactivated: Usuario desactivado
+    reactivated: Usuario reactivado
+    removed: Usuario eliminado
     password:
-      changed: Password changed
+      changed: Contraseña modificada
       code:
-        added: Password code generated
-        sent: Password code sent
+        added: Código de contraseña generado
+        sent: Código de contraseña enviado
       check:
-        succeeded: Password check succeeded
-        failed: Password check failed
+        succeeded: Comprobación de contraseña exitosa
+        failed: Comprobación de contraseña fallida
     phone:
-      changed: Phone number changed
-      verified: Phone number verified
+      changed: Número de teléfono modificado
+      verified: Número de teléfono verificado
       verification:
-        failed: Phone number verification failed
+        failed: Verificación fallida del número de teléfono
       code:
-        added: Phone number code generated
-        sent: Phone number code sent
-      removed: Phone number removed
+        added: Código de número de teléfono generado
+        sent: Código de número de teléfono enviado
+      removed: Código de número de teléfono eliminado
     profile:
-      changed: User profile changed
+      changed: Perfil de usuario modificado
     address:
-      changed: User address changed
+      changed: Dirección de usuario modificada
     mfa:
       otp:
-        added: Multifactor OTP added
-        verified: Multifactor OTP verified
-        removed: Multifactor OTP removed
+        added: Multifactor OTP añadido
+        verified: Multifactor OTP verificado
+        removed: Multifactor OTP eliminado
         check:
-          succeeded: Multifactor OTP check succeeded
-          failed: Multifactor OTP check failed
+          succeeded: Comprobación Multifactor OTP exitosa
+          failed: Comprobación Multifactor OTP fallida
         init:
-          skipped: Multifactor OTP initialization skipped
+          skipped: Inicialización Multifactor OTP omitida
       init:
-        skipped: Multifactor initialization skipped
+        skipped: Inicialización Multifactor omitida
     signed:
-      out: User signed out
+      out: El usuario cerró sesión
     grant:
-      added: Authorization added
-      changed: Authorization changed
-      removed: Authorization removed
-      deactivated: Authorization deactivated
-      reactivated: Authorization reactivated
-      reserved: Authorization reserved
-      released: Authorization released
+      added: Autorización añadida
+      changed: Autorización modificada
+      removed: Autorización eliminada
+      deactivated: Autorización desactivada
+      reactivated: Autorización reactivada
+      reserved: Autorización reservada
+      released: Autorización liberada
       cascade:
-        removed: Authorization removed
-        changed: Authorization changed
+        removed: Autorización eliminada
+        changed: Autorización modificada
     metadata:
-      set: User metadata set
-      removed: User metadata removed
-      removed.all: All user metadata removed
+      set: Metadatos de usuario establecidos
+      removed: Metadatos de usuario eliminados
+      removed.all: Todos los metadatos de usuario eliminados
     domain:
-      claimed: Domain claimed
-      claimed.sent: Domain claimed notification sent
+      claimed: Dominio reclamado
+      claimed.sent: Notificación de reclamación de dominio enviada
     pat:
-      added: Personal Access Token added
-      removed: Personal Access Token removed
+      added: Token de acceso personal añadido
+      removed: Token de acceso personal eliminado
   org:
-    added: Organization added
-    changed: Organization changed
-    deactivated: Organization deactivated
-    reactivated: Organization reactivated
-    removed: Organization removed
+    added: Organización añadida
+    changed: Organización cambiada
+    deactivated: Organización desactivada
+    reactivated: Organización reactivada
+    removed: Organización eliminada
     domain:
-      added: Domain added
+      added: Dominio añadido
       verification:
-        added: Domain verification added
-        failed: Domain verification failed
-      verified: Domain verified
-      removed: Domain removed
+        added: Verificación del dominio añadido
+        failed: Verificación del dominio fallida
+      verified: Dominio verificado
+      removed: Dominio eliminado
       primary:
-        set: Primary domain set
-      reserved: Domain reserved
-      released: Domain released
+        set: Dominio primario establecido
+      reserved: Dominio reservado
+      released: Dominio liberado
     name:
-      reserved: Organization name reserved
-      released: Organization name released
+      reserved: Nombre de organización reservado
+      released: Nombre de organización liberado
     member:
-      added: Organization member added
-      changed: Organization member changed
-      removed: Organization member removed
+      added: Miembro de organización añadido
+      changed: Miembro de organización modificado
+      removed: Miembro de organización eliminado
       cascade:
-        removed: Organization member cascade removed
+        removed: Miembro de organización eliminado en cascada
     iam:
       policy:
-        added: System policy added
-        changed: System policy changed
-        removed: System policy removed
+        added: Política de sistema añadida
+        changed: Política de sistema modificada
+        removed: Política de sistema eliminada
     idp:
       config:
-        added: IDP configuration added
-        changed: IDP configuration changed
-        removed: IDP configuration removed
-        deactivated: IDP configuration deactivated
-        reactivated: IDP configuration reactivated
+        added: Configuración IDP añadida
+        changed: Configuración IDP modificada
+        removed: Configuración IDP eliminada
+        deactivated: Configuración IDP desactivada
+        reactivated: Configuración IDP reactivada
       oidc:
         config:
-          added: OIDC IDP configuration added
-          changed: OIDC IDP configuration changed
+          added: Configuración OIDC IDP añadida
+          changed: Configuración OIDC IDP modificada
       saml:
         config:
-          added: SAML IDP configuration added
-          changed: SAML IDP configuration changed
+          added: Configuración SAML IDP añadida
+          changed: Configuración SAML IDP modificada
       jwt:
         config:
-          added: JWT IDP configuration added
-          changed: JWT IDP configuration changed
+          added: Configuración JWT IDP añadida
+          changed: Configuración JWT IDP modificada
     customtext:
-      set: Custom text set
-      removed: Custom text removed
+      set: Texto personalizado establecido
+      removed: Texto personalizado eliminado
       template:
-        removed: Custom text template removed
+        removed: Plantilla de texto personalizado eliminada
     policy:
       login:
-        added: Login Policy added
-        changed: Login Policy changed
-        removed: Login Policy removed
+        added: Política de inicio de sesión añadida
+        changed: Política de inicio de sesión modificada
+        removed: Política de inicio de sesión eliminada
         idpprovider:
-          added: Identity Provider added to Login Policy
-          removed: Identity Provider removed from Login Policy
+          added: Proveedor de identidad añadido a la política de inicio de sesión
+          removed: Proveedor de identidad eliminado de la política de inicio de sesión
           cascade:
-            removed: Identity Provider cascade removed from Login Policy
+            removed: Proveedor de identidad eliminado en cascada de la política de inicio de sesión
         secondfactor:
-          added: Second factor added to Login Policy
-          removed: Second factor removed from Login Policy
+          added: Doble factor añadido a la política de inicio de sesión
+          removed: Doble factor eliminado de la política de inicio de sesión
         multifactor:
-          added: Multi factor added to Login Policy
-          removed: Multi factor removed from Login Policy
+          added: Multi factor añadido a la política de inicio de sesión
+          removed: Multi factor eliminado de la política de inicio de sesión
       password:
         complexity:
-          added: Password complexity policy added
-          changed: Password complexity policy changed
-          removed: Password complexity policy removed
+          added: Política de complejidad de la contraseña añadida
+          changed: Política de complejidad de la contraseña modificada
+          removed: Política de complejidad de la contraseña eliminada
         age:
-          added: Password age policy added
-          changed: Password age policy changed
-          removed: Password age policy removed
+          added: Política de antigüedad de contraseña añadida
+          changed: Política de antigüedad de contraseña modificada
+          removed: Política de antigüedad de contraseña eliminada
         lockout:
-          added: Password lockout policy added
-          changed: Password lockout policy changed
-          removed: Password lockout policy removed
+          added: Política de bloqueo de contraseña añadida
+          changed: Política de bloqueo de contraseña modificada
+          removed: Política de bloqueo de contraseña eliminada
       label:
-        added: Label Policy added
-        changed: Label Policy changed
-        activated: Label Policy activated
-        removed: Label Policy removed
+        added: Política de imagen de marca añadida
+        changed: Política de imagen de marca modificada
+        activated: Política de imagen de marca activada
+        removed: Política de imagen de marca eliminada
         logo:
-          added: Logo added to Label Policy
-          removed: Logo removed from Label Policy
+          added: Logo añadido a la política de imagen de marca
+          removed: Logo eliminado de la política de imagen de marca
           dark:
-            added: Logo (dark mode) added to Label Policy
-            removed: Logo (dark mode) removed from Label Policy
+            added: Logo (modo oscuro) añadido a la política de imagen de marca
+            removed: Logo (modo oscuro) eliminado de la política de imagen de marca
         icon:
-          added: Icon added to Label Policy
-          removed: Icon removed from Label Policy
+          added: Icono añadido a la política de imagen de marca
+          removed: Icono eliminado de la política de imagen de marca
           dark:
-            added: Icon (dark mode) added to Label Policy
-            removed: Icon (dark mode) removed from Label Policy
+            added: Icono (modo oscuro) añadido a la política de imagen de marca
+            removed: Icono (modo oscuro) eliminado de la política de imagen de marca
         font:
-          added: Font added to Label Policy
-          removed: Font removed from Label Policy
+          added: Fuente añadida a la política de imagen de marca
+          removed: Fuente eliminada de la política de imagen de marca
         assets:
-          removed: Assets removed from Label Policy
+          removed: Contenidos eliminados de la política de imagen de marca
       privacy:
-        added: Privacy policy and TOS added
-        changed: Privacy policy and TOS changed
-        removed: Privacy policy and TOS removed
+        added: Política de privacidad y TDS añadidos
+        changed: Política de privacidad y TDS modificados
+        removed: Política de privacidad y TDS eliminados
       domain:
-        added: Domain policy added
-        changed: Domain policy changed
-        removed: Domain policy removed
+        added: Política de dominio añadida
+        changed: Política de dominio modificada
+        removed: Política de dominio eliminada
       lockout:
-        added: Lockout policy added
-        changed: Lockout policy changed
-        removed: Lockout policy removed
+        added: Política de bloqueo añadida
+        changed: Política de bloqueo modificada
+        removed: Política de bloqueo eliminida
       notification:
-        added: Notification policy added
-        changed: Notification policy changed
-        removed: Notification policy removed
+        added: Política de notificación añadida
+        changed: Política de notificación modificada
+        removed: Política de notificación eliminada
     flow:
       trigger_actions:
-        set: Action set
+        set: Acción establecida
         cascade:
-          removed: Actions cascade removed
-        removed: Actions removed
-      cleared: Flow cleared
+          removed: Acciones elimininadas en cascada
+        removed: Acciones elimininadas
+      cleared: Se ha limpiado el flujo
     mail:
       template:
-        added: E-Mail template added
-        changed: E-Mail template changed
-        removed: E-Mail template removed
+        added: Plantilla de email añadida
+        changed: Plantilla de email modificada
+        removed: Plantilla de email eliminada
       text:
-        added: E-Mail text added
-        changed: E-Mail text changed
-        removed: E-Mail text removed
+        added: Texto de email añadido
+        changed: Texto de email modificado
+        removed: Texto de email eliminado
     metadata:
-      removed: Metadata removed
-      removed.all: All metadata removed
-      set: Metadata set
+      removed: Metadatos eliminados
+      removed.all: Todos los metadatas se han eliminado
+      set: Metadatos establecidos
   project:
-    added: Project added
-    changed: Project changed
-    deactivated: Project deactivated
-    reactivated: Project reactivated
-    removed: Project removed
+    added: Proyecto añadido
+    changed: Proyecto modificado
+    deactivated: Proyecto desactivado
+    reactivated: Proyecto reactivado
+    removed: Proyecto eliminado
     member:
-      added: Project member added
-      changed: Project member changed
-      removed: Project member removed
+      added: Miembro del proyecto añadido
+      changed: Miembro del proyecto modificado
+      removed: Miembro del proyecto eliminado
       cascade:
-        removed: Project member cascade removed
+        removed: Miembro del proyecto eliminado en cascada
     role:
-      added: Project role added
-      changed: Project role changed
-      removed: Project role removed
+      added: Rol de proyecto añadido
+      changed: Rol de proyecto modificado
+      removed: Rol de proyecto eliminado
     grant:
-      added: Management access added
-      changed: Management access changed
-      removed: Management access removed
-      deactivated: Management access deactivated
-      reactivated: Management access reactivated
+      added: Gestión de acceso añadida
+      changed: Gestión de acceso modificada
+      removed: Gestión de acceso eliminada
+      deactivated: Gestión de acceso desactivada
+      reactivated: Gestión de acceso reactivada
       cascade:
-        changed: Management access changed
+        changed: Gestión de acceso modificada en cascada
       member:
-        added: Management access member added
-        changed: Management access member changed
-        removed: Management access member removed
+        added: Miembro de gestión de acceso añadido
+        changed: Miembro de gestión de acceso modificado
+        removed: Miembro de gestión de acceso eliminado
         cascade:
-          removed: Management access cascade removed
+          removed: Miembro de gestión de acceso eliminado en cascada
     application:
-      added: Application added
-      changed: Application changed
-      removed: Application removed
-      deactivated: Application deactivated
-      reactivated: Application reactivated
+      added: Aplicación añadida
+      changed: Aplicación modificada
+      removed: Aplicación eliminada
+      deactivated: Aplicación desactivada
+      reactivated: Aplicación reactivada
       oidc:
         secret:
           check:
-            succeeded: OIDC Client Secret check succeeded
-            failed: OIDC Client Secret check failed
+            succeeded: Comprobación con éxito del secreto del cliente OIDC
+            failed: Comprobación fallida del secreto del cliente OIDC
         key:
-          added: Application key added
-          removed: Application key removed
+          added: Clave de aplicación añadida
+          removed: Clave de aplicación eliminada
       config:
         saml:
-          added: SAML Configuration added
-          changed: SAML Configuration changed
+          added: Configuración SAML añadida
+          changed: Configuración SAML modificada
         oidc:
-          added: OIDC Configuration added
-          changed: OIDC Configuration changed
+          added: Configuración OIDC añadida
+          changed: Configuracion OIDC modificada
           secret:
-            changed: OIDC secret changed
+            changed: Secreto OIDC modificado
         api:
-          added: API Configuration added
-          changed: API Configuration changed
+          added: Configuración API añadida
+          changed: Configuración API modificada
           secret:
-            changed: API secret changed
+            changed: Configuración de secreto API modificada
   policy:
     password:
       complexity:
-        added: Password complexity policy added
-        changed: Password complexity policy changed
+        added: Política de complejidad de contraseña añadida
+        changed: Política de complejidad de contraseña modificada
       age:
-        added: Password age policy added
-        changed: Password age policy changed
+        added: Política de antigüedad de contraseña añadida
+        changed: Política de antigüedad de contraseña modificada
       lockout:
-        added: Password lockout policy added
-        changed: Password lockout policy changed
+        added: Política de bloqueo de contraseña añadida
+        changed: Política de bloqueo de contraseña modificada
   iam:
     setup:
-      started: ZITADEL setup started
-      done: ZITADEL setup done
+      started: Conficuración de ZITADEL iniciada
+      done: Configuración de ZITADEL finalizada
     global:
       org:
-        set: Global org set
+        set: Organización global configurada
     project:
       iam:
-        set: ZITADEL project set
+        set: Proyecto ZITADEL configurado
     member:
-      added: ZITADEL member added
-      changed: ZITADEL member changed
-      removed: ZITADEL member removed
+      added: Miembro de ZITADEL añadido
+      changed: Miembro de ZITADEL modificado
+      removed: Miembro de ZITADEL eliminado
       cascade:
-        removed: ZITADEL member cascade removed
+        removed: Miembro de ZITADEL eliminado en cascada
     idp:
       config:
-        added: IDP configuration added
-        changed: IDP configuration changed
-        removed: IDP configuration removed
-        deactivated: IDP configuration deactivated
-        reactivated: IDP configuration reactivated
+        added: Configuración IDP añadida
+        changed: Configuración IDP modificada
+        removed: Configuración IDP eliminada
+        deactivated: Configuración IDP desactivada
+        reactivated: Configuración IDP reactivada
       oidc:
         config:
-          added: OIDC IDP configuration added
-          changed: OIDC IDP configuration changed
+          added: Configuración OIDC de IDP añadida
+          changed: Configuración OIDC de IDP modificada
       saml:
         config:
-          added: SAML IDP configuration added
-          changed: SAML IDP configuration changed
+          added: Configuración SAML de IDP añadida
+          changed: Configuración SAML de IDP modificada
       jwt:
         config:
-          added: JWT configuration to identity provider added
-          changed: JWT configuration from identity provider remvoed
+          added: Configuración JWT de IDP añadida
+          changed: Configuración JWT de IDP modificada
     customtext:
-      set: Text was set
-      removed: Text was removed
+      set: Texto establecido
+      removed: Texto eliminado
     policy:
       login:
-        added: Default Login Policy added
-        changed: Default Login Policy changed
+        added: Política de inicio de sesión por defecto añadida
+        changed: Política de inicio de sesión por defecto modificada
         idpprovider:
-          added: Identity Provider added to Default Login Policy
-          removed: Identity Provider removed from Default Login Policy
+          added: Proveedor de identidad añadido a la política de inicio de sesión por defecto
+          removed: Proveedor de identidad eliminado de la política de inicio de sesión por defecto
       label:
-        added: Label Policy added
-        changed: Label Policy changed
-        activated: Label Policy activated
+        added: Política de imagen de marca añadida
+        changed: Política de imagen de marca modificada
+        activated: Política de imagen de marca activada
         logo:
-          added: Logo added to Label Policy
-          removed: Logo removed from Label Policy
+          added: Logo añadido a la política de imagen de marca
+          removed: Logo eliminado de la política de imagen de marca
           dark:
-            added: Logo (dark mode) added to Label Policy
-            removed: Logo (dark mode) removed from Label Policy
+            added: Logo (modo oscuro) añadido a la política de imagen de marca
+            removed: Logo (modo oscuro) eliminado de la política de imagen de marca
         icon:
-          added: Icon added to Label Policy
-          removed: Icon removed from Label Policy
+          added: Icono añadido a la política de imagen de marca
+          removed: Icono eliminado de la política de imagen de marca
           dark:
-            added: Icon (dark mode) added to Label Policy
-            removed: Icon (dark mode) removed from Label Policy
+            added: Icono (modo oscuro) añadido a la política de imagen de marca
+            removed: Icono (modo oscuro) eliminado de la política de imagen de marca
         font:
-          added: Font added to Label Policy
-          removed: Font removed from Label Policy
+          added: Fuente añadida a la política de imagen de marca
+          removed: Fuente eliminada de la política de imagen de marca
         assets:
-          removed: Assets removed from Label Policy
+          removed: Contenidos eliminados de la política de imagen de marca
     default:
       language:
-        set: Default language set
+        set: Establacido idioma por defecto
     oidc:
       settings:
-        added: OIDC configuration added
-        changed: OIDC configuration changed
-        removed: OIDC configuration removed
+        added: Configuración OIDC añadida
+        changed: Configuración OIDC modificada
+        removed: Configuración OIDC eliminada
     secret:
       generator:
-        added: Secret generator added
-        changed: Secret generator changed
-        removed: Secret generator removed
+        added: Generador de secreto añadido
+        changed: Generador de secreto modificado
+        removed: Generador de secreto eliminado
     smtp:
       config:
-        added: SMTP configuration added
-        changed: SMTP configuration changed
+        added: Configuración SMTP añadida
+        changed: Configuración SMTP modificada
         password:
-          changed: SMTP configuration secret changed
+          changed: Configuración de secreto SMTP modificada
     sms:
       config:
         twilio:
-          added: Twilio SMS provider added
-          changed: Twilio SMS provider changed
+          added: Proveedor SMS Twilio añadido
+          changed: Proveedor SMS Twilio modificado
           token:
-            changed: Twilio SMS provider token changed
-          removed: Twilio SMS provider removed
-          activated: Twilio SMS provider activated
-          deactivated: Twilio SMS provider deactivated
+            changed: Token de proveedor SMS Twilio modificado
+          removed: Proveedor SMS Twilio eliminado
+          activated: Proveedor SMS Twilio activado
+          deactivated: Proveedor SMS Twilio desactivado
   key_pair:
-    added: Key pair added
+    added: Par de claves añadido
     certificate:
-      added: Certificate added
+      added: Certificado añadido
   action:
-    added: Action added
-    changed: Action changed
-    deactivated: Action deactivated
-    reactivated: Action reactivated
-    removed: Action removed
+    added: Acción añadida
+    changed: Acción modificada
+    deactivated: Acción desactivada
+    reactivated: Acción reactivada
+    removed: Acción eliminada
   instance:
-    added: Instance added
-    changed: Instance changed
+    added: Instancia añadida
+    changed: Instancia modificada
     customtext:
-      removed: Custom text removed
-      set: Custom text set
+      removed: Texto personalizado eliminado
+      set: Texto personalizado establecido
       template:
-        removed: Template of custom text removed
+        removed: Plantilla de texto personalizado eliminada
     default:
       language:
-        set: Default language set
+        set: Establecido el idioma por defecto
       org:
-        set: Default organisation set
+        set: Establecida la organización por defecto
     domain:
-      added: Domain added
+      added: Dominio añadido
       primary:
-        set: Primary domain set
-      removed: Domain removed
+        set: Establecido el dominio primario
+      removed: Dominio eliminado
     iam:
       console:
-        set: ZITADEL Console application set
+        set: Aplicación de consola ZITADEL configurada
       project:
-        set: ZITADEL project set
+        set: Proyecto ZITADEL configurado
     mail:
       template:
-        added: E-Mail template added
-        changed: E-Mail template changed
+        added: Plantilla de email añadida
+        changed: Plantilla de email modificada
       text:
-        added: E-Mail text added
-        changed: E-Mail text changed
+        added: Texto de email añadido
+        changed: Texto de email modificado
     member:
-      added: Instance member added
-      changed: Instance member changed
-      removed: Instance member removed
+      added: Miembro de instancia añadido
+      changed: Miembro de instancia modificado
+      removed: Miembro de instancia eliminado
       cascade:
-        removed: Instance member cascade removed
+        removed: Miembro de instancia eliminado en cascada
     notification:
       provider:
         debug:
-          fileadded: File debug notification provider added
-          filechanged: File debug notification provider changed
-          fileremoved: File debug notification provider removed
-          logadded: Log debug notification provider added
-          logchanged: Log debug notification provider changed
-          logremoved: Log debug notification provider removed
+          fileadded: Proveedor de notificación de depuración de fichero añadido
+          filechanged: Proveedor de notificación de depuración de fichero modificado
+          fileremoved: Proveedor de notificación de depuración de fichero eliminado
+          logadded: Proveedor de notificación de depuración de log añadido
+          logchanged: Proveedor de notificación de depuración de log modificado
+          logremoved: Proveedor de notificación de depuración de log eliminado
     oidc:
       settings:
-        added: OIDC settings added
-        changed: OIDC settings changed
+        added: Ajustes OIDC añadidos
+        changed: Ajustes OIDC modificados
     policy:
       domain:
-        added: Domain policy added
-        changed: Domain policy changed
+        added: Política de dominio añadida
+        changed: Política de dominio modificada
       label:
-        activated: Label policy activated
-        added: Label policy added
+        activated: Política de imagen de marca activada
+        added: Política de imagen de marca añadida
         assets:
-          removed: Asset from label policy removed
-        changed: Label policy changed
+          removed: Contenido de la política de imagen de marca eliminado
+        changed: Política de imagen de marca modificada
         font:
-          added: Font added to label policy
-          removed: Font remvoed from label policy
+          added: Fuente añadida a la política de imagen de marca
+          removed: Fuente eliminada de la política de imagen de marca
         icon:
-          added: Icon added to label policy
-          removed: Icon removed from label policy
+          added: Icono añadido a la política de imagen corporativa
+          removed: Icono eliminado de la política de imagen corporativa
           dark:
-            added: Icon added to dark label policy
-            removed: Icon removed from dark label policy
+            added: Icono (modo oscuro) añadido a la política de imagen corporativa
+            removed: Icono (modo oscuro) eliminado de la política de imagen corporativa
         logo:
-          added: Logo added to label policy
-          removed: Logo removed from label policy
+          added: Logo añadido a la política de imagen corporativa
+          removed: Logo eliminado de la política de imagen corporativa
           dark:
-            added: Logo added to dark label policy
-            removed: Logo removed from dark label policy
+            added: Logo (modo oscuro) añadido a la política de imagen corporativa
+            removed: Logo (modo oscuro) eliminado de la política de imagen corporativa
       lockout:
-        added: Lockout policy added
-        changed: Lockout policy changed
+        added: Política de bloqueo añadida
+        changed: Política de bloqueo modificada
       login:
-        added: Login policy added
-        changed: Login policy changed
+        added: Política de inicio de sesión añadida
+        changed: Política de inicio de sesión modificada
         idpprovider:
-          added: Identity Provider added to login policy
+          added: Proveedor de identidad añadido a la política de inicio de sesión
           cascade:
-            removed: Identity Provider cascade removed from login policy
-          removed: Identity Provider removed from login policy
+            removed: Proveedor de identidad eliminado en cascada de la política de inicio de sesión
+          removed: Proveedor de identidad eliminado de la política de inicio de sesión
         multifactor:
-          added: Multifactor added to login policy
-          removed: Multifactor removed from login policy
+          added: Multifactor añadido a la política de inicio de sesión
+          removed: Multifactor eliminado de la política de inicio de sesión
         secondfactor:
-          added: Secondfactor added to login policy
-          removed: Secondfactor removed from login policy
+          added: Doble factor añadido a la política de inicio de sesión
+          removed: Doble factor eliminado de la política de inicio de sesión
       password:
         age:
-          added: Password age policy added
-          changed: Password age policy changed
+          added: Política de antigüedad de contraseña añadida
+          changed: Política de antigüedad de contraseña modificada
         complexity:
-          added: Password complexity policy added
-          changed: Password complexity policy removed
+          added: Política de complejidad de contraseña añadida
+          changed: Política de complejidad de contraseña modificada
       privacy:
-        added: Privacy policy added
-        changed: Privacy policy changed
+        added: Política de privacidad añadida
+        changed: Política de privacidad modificada
       security:
-        set: Security policy set
+        set: Política de seguridad establecida
 
-    removed: Instance removed
+    removed: Instancia eliminada
     secret:
       generator:
-        added: Secret generator added
-        changed: Secret generator changed
-        removed: Secret generator removed
+        added: Generador de secreto añadido
+        changed: Generador de secreto modificado
+        removed: Generador de secreto eliminado
     sms:
       configtwilio:
-        activated: Twilio SMS configuration activated
-        added: Twilio SMS configuration added
-        changed: Twilio SMS configuration changed
-        deactivated: Twilio SMS configuration deactivated
-        removed: Twilio SMS configuration removed
+        activated: Configuración Twilio SMS activada
+        added: Configuración Twilio SMS añadida
+        changed: Configuración Twilio SMS modificada
+        deactivated: Configuración Twilio SMS desactivada
+        removed: Configuración Twilio SMS eliminada
         token:
-          changed: Token of Twilio SMS configuration changed
+          changed: Token de configuración Twilio SMS modificado
     smtp:
       config:
-        added: SMTP configuration added
-        changed: SMTP configuration changed
+        added: Configuración SMTP añadida
+        changed: Configuración SMTP modificada
         password:
-          changed: Password of SMTP configuration changed
-        removed: SMTP configuration removed
+          changed: Contraseña de configuración SMTP modificada
+        removed: Configuración SMTP eliminada
 
 Application:
   OIDC:
-    UnsupportedVersion: Your OIDC version is not supported
+    UnsupportedVersion: Tu versión de OIDC no está soportada
     V1:
-      NotCompliant: Your configuration is not compliant and differs from OIDC 1.0 standard.
-      NoRedirectUris: At least one redirect uri must be registered.
-      NotAllCombinationsAreAllowed: Configuration is compliant, but not all possible combinations are allowed.
+      NotCompliant: Tu configuración no cumple con el estándar OIDC 1.0.
+      NoRedirectUris: Al menos debe registrarse una URI de redirección.
+      NotAllCombinationsAreAllowed: La configuración cumple con el estándar, pero no todas las combinaciones posibles son permitidas.
       Code:
         RedirectUris:
-          HttpOnlyForWeb: Grant type code only allowed http redirect uris for apptype web.
-          CustomOnlyForNative: Grant type code only allows custom redirect uris for apptype native  (e.g appname:// )
+          HttpOnlyForWeb: El código de tipo de concesión solo permite URIs de redirección http para el tipo de aplicación web.
+          CustomOnlyForNative: El código de tipo de concesión solo permite URIs de redirección personalizadas para el tipo de aplicación nativo (p.e appname:// )
       Implicit:
         RedirectUris:
-          CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris
-          HttpNotAllowed: Grant type implicit doesn't allow http redirect uris
-          HttpLocalhostOnlyForNative: Http://localhost redirect uri is only allowed for native applications.
+          CustomNotAllowed: El tipo de concesión implícito no permite URIs de redirección personalizadas
+          HttpNotAllowed: El tipo de concesión implícito no permite URIs de redirección http
+          HttpLocalhostOnlyForNative: La URI de redirección http://localhost solo se permite para aplicaciones nativas.
       Native:
         AuthMethodType:
-          NotNone: Native applications should have authmethodtype none.
+          NotNone: Las aplicaciones nativas deberían tener el tipo authmethodtype configurado en none.
         RedirectUris:
           MustBeHttpLocalhost: Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost.
       UserAgent:
         AuthMethodType:
-          NotNone: User agent app should have authmethodtype none.
+          NotNone: User agent app debería tener el tipo authmethodtype configurado en none
       GrantType:
         Refresh:
-          NoAuthCode: Refresh Token only allowed in combination with Authorization Code.
+          NoAuthCode: El token de refresco sólo se permite en combinación con el código de autorización.
 
 Action:
   Flow:
     Type:
-      Unspecified: Unspecified
-      ExternalAuthentication: External Authentication
-      CustomiseToken: Complement Token
-      InternalAuthentication: Internal Authentication
+      Unspecified: No especificado
+      ExternalAuthentication: Autenticación externa
+      CustomiseToken: Token complementario
+      InternalAuthentication: Autenticación interna
   TriggerType:
-    Unspecified: Unspecified
-    PostAuthentication: Post Authentication
-    PreCreation: Pre Creation
-    PostCreation: Post Creation
-    PreUserinfoCreation: Pre Userinfo creation
-    PreAccessTokenCreation: Pre access token creation
+    Unspecified: No especificado
+    PostAuthentication: Post Autenticación
+    PreCreation: Pre Creación
+    PostCreation: Post Creación
+    PreUserinfoCreation: Pre creación de Userinfo
+    PreAccessTokenCreation: Pre creación de token de acceso

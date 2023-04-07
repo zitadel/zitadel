@@ -1203,7 +1203,7 @@
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?",
       "UNSAVED_TITLE": "Continue without saving?",
-      "UNSAVED_DESCRIPTION": "Your have made changes without saving. Do you want to save now?",
+      "UNSAVED_DESCRIPTION": "You have made changes without saving. Do you want to save now?",
       "LOCALE": "Locale Code",
       "LOCALES": {
         "de": "Deutsch",
