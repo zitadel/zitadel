@@ -46,6 +46,9 @@ const (
 
 	EndpointResources        = "/resources"
 	EndpointDynamicResources = "/resources/dynamic"
+
+	EndpointDeviceAuth        = "/device"
+	EndpointDeviceAuthConfirm = "/device/confirm"
 )
 
 var (
@@ -107,5 +110,7 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointLDAPLogin, login.handleLDAP).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLDAPCallback, login.handleLDAPCallback).Methods(http.MethodPost)
 	router.SkipClean(true).Handle("", http.RedirectHandler(HandlerPrefix+"/", http.StatusMovedPermanently))
+	router.HandleFunc(EndpointDeviceAuth, login.handleDeviceAuthUserCode).Methods(http.MethodGet, http.MethodPost)
+	router.HandleFunc(EndpointDeviceAuthConfirm, login.handleDeviceAuthConfirm).Methods(http.MethodGet, http.MethodPost)
 	return router
 }

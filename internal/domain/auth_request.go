@@ -184,3 +184,12 @@ func (a *AuthRequest) GetScopeOrgID() string {
 	}
 	return ""
 }
+
+func (a *AuthRequest) Done() bool {
+	for _, step := range a.PossibleSteps {
+		if step.Type() == NextStepRedirectToCallback {
+			return true
+		}
+	}
+	return false
+}

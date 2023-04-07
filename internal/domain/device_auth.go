@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
-type DeviceAuthorization struct {
+type DeviceAuth struct {
 	models.ObjectRoot
 
 	ClientID   string

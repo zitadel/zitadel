@@ -1,0 +1,21 @@
+{{ define "device-usercode" -}}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Device authorization</title>
+    </head>
+    <body style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+        <form method="POST" style="height: 200px; width: 200px;">
+            <h1>Device authorization</h1>
+            <div>
+                <label for="user_code">Code:</label>
+                <input id="user_code" name="user_code" style="width: 100%">
+            </div>
+            <p style="color:red; min-height: 1rem;">{{.Error}}</p>
+
+            <button type="submit">Login</button>
+        </form>
+    </body>
+</html>
+{{- end }}

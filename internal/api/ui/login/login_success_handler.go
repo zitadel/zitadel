@@ -61,6 +61,8 @@ func (l *Login) redirectToCallback(w http.ResponseWriter, r *http.Request, authR
 		callback = l.oidcAuthCallbackURL(r.Context(), authReq.ID)
 	case *domain.AuthRequestSAML:
 		callback = l.samlAuthCallbackURL(r.Context(), authReq.ID)
+	case *domain.AuthRequestDevice:
+		callback = l.deviceAuthCallbackURL(authReq.ID)
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "LOGIN-rhjQF", "Errors.AuthRequest.RequestTypeNotSupported"))
 		return

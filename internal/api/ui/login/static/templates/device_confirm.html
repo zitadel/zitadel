@@ -1,0 +1,25 @@
+{{ define "device-confirm" -}}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Confirm device authorization</title>
+        <style>
+            .green{
+                background-color: green
+            }
+            .red{
+                background-color: red
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Welcome back {{.Username}}!</h1>
+        <p>
+            You are about to grant device {{.ClientID}} access to the following scopes: {{.Scopes}}.
+        </p>
+        <button onclick="location.href='./confirm?action=allowed'" type="button" class="green">Allow</button>
+        <button onclick="location.href='./confirm?action=denied'" type="button" class="red">Deny</button>
+    </body>
+</html>
+{{- end }}

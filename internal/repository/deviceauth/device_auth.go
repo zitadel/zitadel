@@ -10,8 +10,8 @@ import (
 const (
 	eventTypePrefix   eventstore.EventType = "device.authorization."
 	AddedEventType                         = eventTypePrefix + "added"
-	DeniedEventType                        = eventTypePrefix + "denied"
 	ApprovedEventType                      = eventTypePrefix + "approved"
+	DeniedEventType                        = eventTypePrefix + "denied"
 	RemovedEventType                       = eventTypePrefix + "removed"
 )
 

@@ -146,8 +146,7 @@ func (p *deviceAuthProjection) reduceRemoved(event eventstore.Event) (*handler.S
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(DeviceAuthInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(DeviceAuthColumnDeviceCode, e.DeviceCode),
-			handler.NewCond(DeviceAuthColumnUserCode, e.UserCode),
+			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
 		},
 	), nil
 }
