@@ -7,7 +7,7 @@ Login:
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@dominio
   ExternalUserDescription: Inicia sesión con un usuario externo.
-  MustBeMemberOfOrg: El usuario debe ser miembre de la organización {{.OrgName}}.
+  MustBeMemberOfOrg: El usuario debe ser miembro de la organización {{.OrgName}}.
   RegisterButtonText: registrar
   NextButtonText: siguiente
 
@@ -21,7 +21,7 @@ LDAP:
 SelectAccount:
   Title: Seleccionar cuenta
   Description: Utiliza tu cuenta ZITADEL
-  TitleLinking: Seleccionar cuenta para vincular el usuario
+  TitleLinking: Selecciona tu cuenta para vincular el usuario
   DescriptionLinking: Selecciona tu cuenta para vincular con tu usuario externo.
   OtherUser: Otro Usuario
   SessionState0: activo
@@ -37,7 +37,7 @@ Password:
   HasLowercase: Una letra minúscula
   HasNumber: Número
   HasSymbol: Símbolo
-  Confirmation: La confirmación coincide
+  Confirmation: Las contraseñas coinciden
   ResetLinkText: restablecer contraseña
   BackButtonText: atrás
   NextButtonText: siguiente
@@ -87,8 +87,8 @@ InitUserDone:
 InitMFAPrompt:
   Title: Configuración de doble factor
   Description: La autenticación de doble factor te proporciona seguridad adicional para tu cuenta de usuario. Ésta asegura que solo tú tienes acceso a tu cuenta.
-  Provider0: App autenticadora App (p.e Google/Microsoft Authenticator, Authy)
-  Provider1: Dependiente del dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
+  Provider0: App autenticadora (p.e Google/Microsoft Authenticator, Authy)
+  Provider1: Dependiente de un dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
   NextButtonText: siguiente
   SkipButtonText: saltar
 
@@ -103,7 +103,7 @@ InitMFAOTP:
 
 InitMFAU2F:
   Title: Añadir clave de seguridad
-  Description: Una clave de seguridad es un método de verificación que puede integrarse en tu teléfono móvil, usar Bluetooth, o conectar directamente en el puerto USB de tu ordenador.
+  Description: Una clave de seguridad es un método de verificación que puede integrarse en tu teléfono móvil, con Bluetooth, o conectándolo directamente en el puerto USB de tu ordenador.
   TokenNameLabel: Nombre de la clave de seguridad / dispositivo
   NotSupported: WebAuthN no está soportado por tu navegador. Por favor asegúrate de que está actualizado o utiliza uno diferente (p.e. Chrome, Safari, Firefox)
   RegisterTokenButtonText: Añadir clave de seguridad
@@ -117,7 +117,7 @@ InitMFADone:
 
 MFAProvider:
   Provider0: App autenticadora (p.e Google/Microsoft Authenticator, Authy)
-  Provider1: Dependiente del dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
+  Provider1: Dependiente de un dispositivo (p.e FaceID, Windows Hello, Huella dactilar)
   ChooseOther: o elige otra opción
 
 VerifyMFAOTP:
@@ -159,8 +159,8 @@ PasswordlessRegistration:
 
 PasswordlessRegistrationDone:
   Title: Configuración de acceso sin contraseña
-  Description: Se añadió con éxito el dispositivo para inicio de sesión sin contraseña.
-  DescriptionClose: Puedes cerrar esta ventana ahora.
+  Description: Se añadió con éxito el dispositivo para iniciar sesión sin contraseña.
+  DescriptionClose: Ya puedes cerrar esta ventana.
   NextButtonText: siguiente
   CancelButtonText: cancelar
 
@@ -180,7 +180,7 @@ PasswordChangeDone:
   NextButtonText: siguiente
 
 PasswordResetDone:
-  Title: Enviado enlace para restablecer la contraseña
+  Title: Se ha enviado un enlace para restablecer la contraseña
   Description: Comprueba tu email para restablecer la contraseña.
   NextButtonText: siguiente
 
@@ -225,7 +225,7 @@ RegistrationUser:
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
-  Diverse: diverso / X
+  Diverse: Diverso / X
   PasswordLabel: Contraseña
   PasswordConfirmLabel: Confirmación de contraseña
   TosAndPrivacyLabel: Términos y condiciones
@@ -233,7 +233,7 @@ RegistrationUser:
   TosLinkText: TDS
   PrivacyConfirm: Acepto la
   PrivacyLinkText: política de privacidad
-  ExternalLogin: o registrarte con un usuario externo
+  ExternalLogin: o regístrate con un usuario externo
   BackButtonText: inicio de sesión
   NextButtonText: siguiente
 
@@ -260,7 +260,7 @@ ExternalRegistrationUserOverview:
   TosLinkText: TDS
   PrivacyConfirm: Acepto la
   PrivacyLinkText: política de privacidad
-  ExternalLogin: o registrarte con un usuario externo
+  ExternalLogin: o regístrate con un usuario externo
   BackButtonText: atrás
   NextButtonText: guardar
 
@@ -284,7 +284,7 @@ RegistrationOrg:
 LoginSuccess:
   Title: Se inició sesión con éxito
   AutoRedirectDescription: Se te redirigirá a tu aplicación automáticamente. Si no fuera así, haz clic en el botón siguiente. Puedes cerrar esta ventana posteriormente.
-  RedirectedDescription: Puedes cerrar esta ventana ahora.
+  RedirectedDescription: Ya puedes cerrar esta ventana.
   NextButtonText: siguiente
 
 LogoutDone:
@@ -341,7 +341,7 @@ Errors:
     NotAllowedOrg: El usuario no es miembro de la organización requerida
     NotMatchingUserID: El usuario y el usuario contenido en la petición de autenticación (authrequest) no coinciden
     UserIDMissing: El ID de usuario está vacío
-    Invalid: Datos de usuarios no válidos
+    Invalid: Datos de usuario no válidos
     DomainNotAllowedAsUsername: El dominio ya está reservado y no puede usarse
     NotAllowedToLink: El usuario no está autorizado para vincularse con un proveedor de inicio de sesión externo
     Profile:
@@ -397,12 +397,12 @@ Errors:
     ExternalData:
       CouldNotRead: Los datos externos no pudieron leerse correctamente
     MFA:
-      NoProviders: No hay proveedor multifactor disponibles
+      NoProviders: No hay proveedores multifactor disponibles
       OTP:
-        AlreadyReady: Multifactor OTP (OneTimePassword) ya está configurado
-        NotExisting: Multifactor OTP (OneTimePassword) no existe
+        AlreadyReady: El multifactor OTP (OneTimePassword) ya está configurado
+        NotExisting: El multifactor OTP (OneTimePassword) no existe
         InvalidCode: Código no válido
-        NotReady: Multifactor OTP (OneTimePassword) no está listo
+        NotReady: El multifactor OTP (OneTimePassword) no está listo
     Locked: El usuario está bloqueado
     SomethingWentWrong: Algo fue mal
     NotActive: El usuario no está activo
@@ -415,7 +415,7 @@ Errors:
       NoExternalUserData: No se recibieron datos del usuario externo
       CreationNotAllowed: La creación de un nuevo usuario no está permitida para este proveedor
       LinkingNotAllowed: La vinculación de un usuario no está permitida para este proveedor
-    GrantRequired: El inicio de sesión no es posible. El usuario se requiere que tenga al menos una concesión sobre la aplicación. Por favor contacta con tu administrador.
+    GrantRequired: El inicio de sesión no es posible. Se requiere que el usuario tenga al menos una concesión sobre la aplicación. Por favor contacta con tu administrador.
     ProjectRequired: El inicio de sesión no es posible. La organización del usuario debe tener el acceso concedido para el proyecto. Por favor contacta con tu administrador.
   IdentityProvider:
     InvalidConfig: La configuración del proveedor de identidades no es válida

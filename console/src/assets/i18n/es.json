@@ -105,7 +105,7 @@
     "PRIVACY": "Privacidad",
     "TOS": "Términos de Servicio",
     "OPENSHORTCUTSTOOLTIP": "Pulsa ? para mostrar los atajos de teclado",
-    "SETTINGS": "Configuraciones",
+    "SETTINGS": "Ajustes",
     "CUSTOMERPORTAL": "Portal del cliente"
   },
   "ACTIONS": {
@@ -644,7 +644,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "Roles de Mánager ZITADEL",
-      "DESCRIPTION": "Estas son todas las concesiones de membresía del usuario. Puedes modificarlas también en las págines de organización, proyecto o detalles IAM.",
+      "DESCRIPTION": "Estas son todas las concesiones de membresía del usuario. Puedes modificarlas también en las páginas de organización, proyecto o detalles IAM.",
       "ORGCONTEXT": "Puedes ver todas las organizaciones y proyectos que están relacionados con la organización seleccionada actualmente.",
       "USERCONTEXT": "Puedes ver todas las organizaciones y proyectos para los que estás autorizado. Incluyendo otras organizaciones.",
       "CREATIONDATE": "Fecha de creación",
@@ -713,7 +713,7 @@
     "FLOWCLEARED": "El flujo se restableció con éxito",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout en segundos",
-    "ALLOWEDTOFAIL": "Permitido que falle",
+    "ALLOWEDTOFAIL": "Permitido el fallo",
     "SCRIPT": "Script",
     "FLOWTYPE": "Tipo de flujo",
     "TRIGGERTYPE": "Tipo de disparador",
@@ -979,7 +979,7 @@
       "DESCRIPTION": "Estos ajustes se aplicará a todas tus organizaciones a menos que éstas los sobrescriban."
     },
     "ORG": {
-      "TITLE": "Configuraciones de organización",
+      "TITLE": "Ajustes de organización",
       "DESCRIPTION": "Estas configuraciones amplían y sobrescriben tus configuraciones de instancia."
     },
     "LIST": {
@@ -987,8 +987,8 @@
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",
       "COMPLEXITY": "Complejidad de contraseña",
-      "NOTIFICATIONS": "Configuraciones de notificación",
-      "NOTIFICATIONS_DESC": "Configuraciones SMTP y SMS",
+      "NOTIFICATIONS": "Ajustes de notificación",
+      "NOTIFICATIONS_DESC": "Ajustes SMTP y SMS",
       "MESSAGETEXTS": "Mensajes de texto",
       "IDP": "Proveedores de identidad",
       "DOMAIN": "Ajustes de dominio",
@@ -1103,8 +1103,8 @@
     }
   },
   "POLICY": {
-    "TITLE": "Explorar configuraciones",
-    "DESCRIPTION": "Configuraciones preparadas para mejorar tu seguridad.",
+    "TITLE": "Explorar ajustes",
+    "DESCRIPTION": "Ajustes preparados para mejorar tu seguridad.",
     "APPLIEDTO": "Se aplica a",
     "PWD_COMPLEXITY": {
       "TITLE": "Complejidad de contraseña",
@@ -1143,6 +1143,10 @@
       "MAXSIZEEXCEEDED": "Tamaño máximo de 524kB superado.",
       "NOSVGSUPPORTED": "¡SVG no está soportado!",
       "FONTINLOGINONLY": "La fuente se muestra actualmente solo en la interfaz de inicio de sesión.",
+      "BACKGROUNDCOLOR": "Color de fondo",
+      "PRIMARYCOLOR": "Color primario",
+      "WARNCOLOR": "Color de advertencia",
+      "FONTCOLOR": "Color de fuente",
       "VIEWS": {
         "PREVIEW": "Previsualizar",
         "CURRENT": "Configuración actualizada"
@@ -1164,7 +1168,7 @@
       "DESCRIPTION": "Establece un número máximo de reintentos de introducción de contraseña, después del cual las cuentas serán bloqueadas."
     },
     "DOMAIN_POLICY": {
-      "TITLE": "Configuraciones de dominio"
+      "TITLE": "Ajustes de dominio"
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Imagen de marca",
@@ -1173,7 +1177,7 @@
       "ACTIVATEPREVIEW": "Activar configuración"
     },
     "LOGIN_POLICY": {
-      "TITLE": "Configuraciones de inicio de sesión",
+      "TITLE": "Ajustes de inicio de sesión",
       "DESCRIPTION": "Define cómo los usuarios pueden autenticarse y configura proveedores de identidad",
       "DESCRIPTIONCREATEADMIN": "Los usuarios pueden elegir entre los siguientes proveedores de identidad disponibles.",
       "DESCRIPTIONCREATEMGMT": "Los usuarios pueden elegir entre los siguientes proveedores de identidad. Nota: Puedes usar los proveedores integrados en el sistema así como sólo los proveedores configurados para tu organización.",
@@ -1327,11 +1331,11 @@
       "ERRORMSGPOPUP": "Mostrar error en diálogo",
       "DISABLEWATERMARK": "Ocultar marca de agua",
       "DISABLEWATERMARK_DESC": "Ocultar la marca de agua Powered by ZITADEL en la interfaz de inicio de sesión",
-      "PASSWORDCHECKLIFETIME": "Tiempo de vida para la comprobación de contraseña",
-      "EXTERNALLOGINCHECKLIFETIME": "Tiempo de vida para la comprobación del inicio de sesión externo",
+      "PASSWORDCHECKLIFETIME": "Tiempo de vida para comprobar la contraseña",
+      "EXTERNALLOGINCHECKLIFETIME": "Tiempo de vida para comprobar el inicio externo",
       "MFAINITSKIPLIFETIME": "Tiempo de vida del inicio Multifactor",
-      "SECONDFACTORCHECKLIFETIME": "Tiempo de vida de la comprobación de doble factor",
-      "MULTIFACTORCHECKLIFETIME": "Tiempo de vida de la comprobación Multifactor",
+      "SECONDFACTORCHECKLIFETIME": "Tiempo de vida para comprobar el doble factor",
+      "MULTIFACTORCHECKLIFETIME": "Tiempo de vida para comprobar el Multifactor",
       "INHOURS": "horas"
     },
     "RESET": "Restablece los valores por defecto de la instancia",
@@ -1385,7 +1389,7 @@
       "LISTDESCRIPTION": "Si no puedes encontrar un proyecto, contacta con el propietario del proyecto o alguien con los permisos adecuados para obtener acceso al proyecto.",
       "DETAIL": "Detalle",
       "CREATE": "Crear proyecto",
-      "CREATE_DESC": "Insertar el nombre de tu proyecto.",
+      "CREATE_DESC": "Inserta el nombre de tu proyecto.",
       "ROLE": "Rol",
       "NOITEMS": "Sin proyectos",
       "ZITADELPROJECT": "Esto pertenece al proyecto ZITADEL. Cuidado: Si haces cambio puede que ZITADEL no se comporte como se espera.",
@@ -1732,19 +1736,19 @@
     "USERFILTERS": "Filtros de usuario",
     "USEROBJECTCLASSES": "User Object Classes",
     "REQUIRED": "requerido",
-    "LDAPIDATTRIBUTE": "ID attribute",
+    "LDAPIDATTRIBUTE": "Atributo ID",
     "AVATARURLATTRIBUTE": "Atributo de Url de avatar",
-    "DISPLAYNAMEATTRIBUTE": "Atributo Nombre mostrado",
-    "EMAILATTRIBUTEATTRIBUTE": "Atributo email",
-    "EMAILVERIFIEDATTRIBUTE": "Atributo email verificado",
-    "FIRSTNAMEATTRIBUTE": "Atributo nombre",
-    "LASTNAMEATTRIBUTE": "Atributo apellidos",
-    "NICKNAMEATTRIBUTE": "Atributo apodo",
-    "PHONEATTRIBUTE": "Atributo teléfono",
-    "PHONEVERIFIEDATTRIBUTE": "Atributo teléfono verificado",
-    "PREFERREDLANGUAGEATTRIBUTE": "Atributo de idioma preferido",
-    "PREFERREDUSERNAMEATTRIBUTE": "Atributo de nombre de usuario preferido",
-    "PROFILEATTRIBUTE": "Atributo perfil",
+    "DISPLAYNAMEATTRIBUTE": "Atributo Displayname",
+    "EMAILATTRIBUTEATTRIBUTE": "Atributo Email",
+    "EMAILVERIFIEDATTRIBUTE": "Atributo Email verificado",
+    "FIRSTNAMEATTRIBUTE": "Atributo Firstname",
+    "LASTNAMEATTRIBUTE": "Atributo Lastname",
+    "NICKNAMEATTRIBUTE": "Atributo Nickname",
+    "PHONEATTRIBUTE": "Atributo Phone",
+    "PHONEVERIFIEDATTRIBUTE": "Atributo phone verificado",
+    "PREFERREDLANGUAGEATTRIBUTE": "Atributo Preferred language",
+    "PREFERREDUSERNAMEATTRIBUTE": "Atributo Preferred username",
+    "PROFILEATTRIBUTE": "Atributo Profile",
     "IDPDISPLAYNAMMAPPING": "Mapeado de nombres mostrados IDP",
     "USERNAMEMAPPING": "Maperado de nombres de usuario",
     "DATES": "Fechas",
@@ -1909,7 +1913,7 @@
       },
       "CURRENT": "Configuración actual",
       "TOKENSECTIONTITLE": "Opciones de AuthToken",
-      "REDIRECTSECTIONTITLE": "Configuraciones de redirección",
+      "REDIRECTSECTIONTITLE": "Ajustes de redirección",
       "REDIRECTTITLE": "Especifica las URIs a las que redirigirá el inicio de sesión.",
       "POSTREDIRECTTITLE": "Esta es la URI a la que se redirigirá tras cerrar sesión.",
       "REDIRECTDESCRIPTIONWEB": "Las URIs de redirección deben comenzar con https://. http:// solo es válida con el modo de desarrollo activado.",
