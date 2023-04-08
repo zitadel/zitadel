@@ -27,6 +27,4 @@ jobs:
           imageName: ghcr.io/zitadel/devcontainer
           push: always
           runCmd: |
-            ( cd console ; npm ci )
-            ( cd docs ; yarn install )
-            go mod download
+            GOOS="linux" GOARCH="amd64" goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
