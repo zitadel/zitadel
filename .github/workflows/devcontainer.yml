@@ -24,6 +24,7 @@ jobs:
       - name: Build and run Dev Container task
         uses: devcontainers/ci@v0.3
         with:
+          cacheFrom: ghcr.io/zitadel/devcontainer
           imageName: ghcr.io/zitadel/devcontainer
           push: always
           runCmd: |
