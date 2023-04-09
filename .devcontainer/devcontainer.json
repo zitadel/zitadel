@@ -8,6 +8,6 @@
 		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/guiyomh/features/goreleaser:0": {}
 	},
-	"postCreateCommand": "bash .devcontainer/init.sh",
+	"onCreateCommand": "bash .devcontainer/init.sh",
 	"forwardPorts": [3000, 4200, 50001]
 }

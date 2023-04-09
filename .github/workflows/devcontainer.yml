@@ -47,7 +47,6 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           cacheFrom: ghcr.io/zitadel/devcontainer
-          imageName: ghcr.io/zitadel/devcontainer
           push: never
           runCmd: |
             (cd console ; npm run lint)
@@ -71,10 +70,9 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           cacheFrom: ghcr.io/zitadel/devcontainer
-          imageName: ghcr.io/zitadel/devcontainer
           push: never
           runCmd: |
-            golangci-lint --config .golangci.yaml --new-from-rev=origin/${{ github.base_ref }}
+            golangci-lint --new-from-rev=origin/${{ github.base_ref }}
 
   go-test:
     runs-on: ubuntu-latest
@@ -95,7 +93,6 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           cacheFrom: ghcr.io/zitadel/devcontainer
-          imageName: ghcr.io/zitadel/devcontainer
           push: never
           runCmd: |
             go test ./...
@@ -119,7 +116,6 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           cacheFrom: ghcr.io/zitadel/devcontainer
-          imageName: ghcr.io/zitadel/devcontainer
           push: never
           runCmd: |
             (cd console ; npm run build)
