@@ -2,7 +2,6 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/debian
 {
 	"name": "Debian",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {},
@@ -11,5 +10,6 @@
 		"ghcr.io/guiyomh/features/goreleaser:0": {},
 		"docker-in-docker": {}
 	},
+	"postAttachCommand": "bash .devcontainer/init.sh",
 	"forwardPorts": [3000, 4200, 50001]
 }

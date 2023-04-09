@@ -1,7 +1,0 @@
-{
-    "build": { 
-      "dockerfile": "Dockerfile",
-      "context": ".."
-    },
-    "forwardPorts": [3000, 4200, 50000]
-  }
