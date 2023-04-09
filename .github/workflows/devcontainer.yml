@@ -7,7 +7,7 @@ on: # rebuild any PRs and main branch changes
       - quickfixci
 
 jobs:
-  console-lint:
+  devcontainer:
     runs-on: ubuntu-latest
     steps:
 
@@ -27,11 +27,34 @@ jobs:
           cacheFrom: ghcr.io/zitadel/devcontainer
           imageName: ghcr.io/zitadel/devcontainer
           push: always
+
+  console-lint:
+    runs-on: ubuntu-latest
+    needs: devcontainer
+    steps:
+
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and run Dev Container task
+        uses: devcontainers/ci@v0.3
+        with:
+          cacheFrom: ghcr.io/zitadel/devcontainer
+          imageName: ghcr.io/zitadel/devcontainer
+          push: never
           runCmd: |
             (cd console ; npm run lint)
 
   go-lint:
     runs-on: ubuntu-latest
+    needs: devcontainer
     steps:
 
       - name: Checkout (GitHub)
@@ -49,12 +72,13 @@ jobs:
         with:
           cacheFrom: ghcr.io/zitadel/devcontainer
           imageName: ghcr.io/zitadel/devcontainer
-          push: always
+          push: never
           runCmd: |
-            golangci-lint run
+            golangci-lint --config .golangci.yaml --new-from-rev=origin/${{ github.base_ref }}
 
   go-test:
     runs-on: ubuntu-latest
+    needs: devcontainer
     steps:
 
       - name: Checkout (GitHub)
@@ -72,12 +96,13 @@ jobs:
         with:
           cacheFrom: ghcr.io/zitadel/devcontainer
           imageName: ghcr.io/zitadel/devcontainer
-          push: always
+          push: never
           runCmd: |
             go test ./...
 
   build:
     runs-on: ubuntu-latest
+    needs: devcontainer
     steps:
 
       - name: Checkout (GitHub)
@@ -95,7 +120,7 @@ jobs:
         with:
           cacheFrom: ghcr.io/zitadel/devcontainer
           imageName: ghcr.io/zitadel/devcontainer
-          push: always
+          push: never
           runCmd: |
             (cd console ; npm run build)
             GOOS="linux" GOARCH="amd64" goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
