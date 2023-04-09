@@ -14,6 +14,7 @@ release:
 before:
   hooks:
     - sh -c "rm -rf internal/api/ui/console/static/"
+    - sh -c "mkdir -p internal/api/ui/console/static/"
     - sh -c "cp -r console/dist/console/* internal/api/ui/console/static/"
 
 builds:
