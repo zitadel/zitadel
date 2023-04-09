@@ -73,7 +73,7 @@ jobs:
           cacheFrom: ghcr.io/zitadel/devcontainer
           push: never
           runCmd: |
-            golangci-lint run
+            golangci-lint run --new-from-rev=HEAD~1 --out-format=github-actions
 
   go-test:
     runs-on: ubuntu-latest

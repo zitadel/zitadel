@@ -1,12 +1,10 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/debian
 {
 	"name": "Debian",
 	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
 	"features": {
-		"ghcr.io/devcontainers/features/go:1": {},
-		"ghcr.io/devcontainers/features/node:1": {},
-		"ghcr.io/guiyomh/features/goreleaser:0": {}
+		"ghcr.io/devcontainers/features/go:1": {"version": "1.19", "golangciLintVersion": "v1.52.2"},
+		"ghcr.io/devcontainers/features/node:1": {"version": "1.18"},
+		"ghcr.io/guiyomh/features/goreleaser:0": {"version": "v1.11.0"}
 	},
 	"onCreateCommand": "bash .devcontainer/init.sh",
 	"forwardPorts": [3000, 4200, 50001]
