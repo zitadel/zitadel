@@ -27,6 +27,7 @@ jobs:
           cacheFrom: ghcr.io/zitadel/devcontainer
           imageName: ghcr.io/zitadel/devcontainer
           push: always
+          runCmd: echo cache ready!
 
   console-lint:
     runs-on: ubuntu-latest
@@ -72,7 +73,7 @@ jobs:
           cacheFrom: ghcr.io/zitadel/devcontainer
           push: never
           runCmd: |
-            golangci-lint --new-from-rev=origin/${{ github.base_ref }}
+            golangci-lint run
 
   go-test:
     runs-on: ubuntu-latest
