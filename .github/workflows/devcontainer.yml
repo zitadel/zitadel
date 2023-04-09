@@ -101,3 +101,26 @@ jobs:
           runCmd: |
             (cd console ; npm run build)
             goreleaser release --snapshot
+
+  build-native:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.19'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          cache-dependency-path: console/package-lock.json
+      - run: npm run generate
+      - run: npm run build
+      - uses: goreleaser/goreleaser-action@v3
+        name: Publish ZITADEL
+        with:
+          distribution: goreleaser
+          version: v1.11.0
+          args: release --snapshot
