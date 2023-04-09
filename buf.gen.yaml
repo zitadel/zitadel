@@ -1,0 +1,18 @@
+version: v1
+plugins:
+  - plugin: buf.build/protocolbuffers/go
+    out: .artifacts/grpc
+  - plugin: buf.build/grpc/go
+    out: .artifacts/grpc
+  - plugin: buf.build/grpc-ecosystem/gateway
+    out: .artifacts/grpc
+    opt:
+      - allow_delete_body=true
+  - plugin: buf.build/grpc-ecosystem/openapiv2
+    out: .artifacts/grpc
+    opt:
+      - allow_delete_body=true
+  - plugin: buf.build/bufbuild/validate-go
+    out: .artifacts/grpc
+  - plugin: authoption
+    out: .artifacts/grpc

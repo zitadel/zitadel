@@ -10,6 +10,6 @@
 		"ghcr.io/guiyomh/features/goreleaser:0": {},
 		"docker-in-docker": {}
 	},
-	"postAttachCommand": "bash .devcontainer/init.sh",
+	"postCreateCommand": "bash .devcontainer/init.sh",
 	"forwardPorts": [3000, 4200, 50001]
 }

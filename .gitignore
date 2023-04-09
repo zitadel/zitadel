@@ -47,10 +47,10 @@ cmd/zitadel/zitadel
 # buildfolders and generated files
 tmp/
 console/src/app/proto/generated/
+!**/authoption/options.pb.go
 **.pb.go
 **.proto.mock.go
 **.pb.*.go
-**.gen.go 
 openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go

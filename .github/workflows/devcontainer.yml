@@ -28,4 +28,5 @@ jobs:
           imageName: ghcr.io/zitadel/devcontainer
           push: always
           runCmd: |
+            (cd console ; npm run build)
             GOOS="linux" GOARCH="amd64" goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
