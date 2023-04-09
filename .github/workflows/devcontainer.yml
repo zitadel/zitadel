@@ -116,8 +116,8 @@ jobs:
           node-version: '18.x'
           cache: 'npm'
           cache-dependency-path: console/package-lock.json
-      - run: npm run generate
-      - run: npm run build
+      - run: (cd console ; npm run generate)
+      - run: (cd console ; npm run build)
       - uses: goreleaser/goreleaser-action@v3
         name: Publish ZITADEL
         with:
