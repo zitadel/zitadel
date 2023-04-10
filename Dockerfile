@@ -5,20 +5,20 @@ ARG GO_VERSION=1.19
 
 # -----
 
-FROM node:${NODE_VERSION} as console-base
-WORKDIR /zitadel/console
-COPY console/package.json console/package-lock.json console/buf.gen.yaml ./
-COPY proto ../proto
-RUN npm ci && npm run generate
-COPY console .
+# FROM node:${NODE_VERSION} as console-base
+# WORKDIR /zitadel/console
+# COPY console/package.json console/package-lock.json console/buf.gen.yaml ./
+# COPY proto ../proto
+# RUN npm ci && npm run generate
+# COPY console .
 
-FROM console-base as console-lint
-WORKDIR /zitadel/console
-RUN npm run lint
+# FROM console-base as console-lint
+# WORKDIR /zitadel/console
+# RUN npm run lint
 
-FROM console-base as console-build
-WORKDIR /zitadel/console
-RUN npm run build
+# FROM console-base as console-build
+# WORKDIR /zitadel/console
+# RUN npm run build
 
 # -----
 
@@ -48,3 +48,6 @@ RUN go test -race -v -coverprofile=profile.cov $(go list ./...)
 FROM core-base as core-build
 COPY --from=console-build /zitadel/console/dist/console internal/api/ui/console/static/
 RUN go build -o zitadel
+
+FROM scratch as core-export
+COPY --from=core-build zitadel/zitadel zitadel

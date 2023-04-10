@@ -9,8 +9,6 @@ jobs:
   console-lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to GitHub Container Registry
@@ -28,11 +26,29 @@ jobs:
           target: console-lint
           tags: zitadel/test:test
 
+  console-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          cache-from: type=registry,ref=ghcr.io/zitadel/buildcache
+          cache-to: type=registry,mode=max,ref=ghcr.io/zitadel/buildcache
+          target: console-build
+          tags: zitadel/test:test
+
   core-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to GitHub Container Registry
@@ -53,8 +69,6 @@ jobs:
   core-lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to GitHub Container Registry
@@ -74,6 +88,10 @@ jobs:
 
   core-build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64, arm64]
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -89,7 +107,13 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: false
+          platforms: ${{ matrix.os }}/${{ matrix.arch }}
           cache-from: type=registry,ref=ghcr.io/zitadel/buildcache
           cache-to: type=registry,mode=max,ref=ghcr.io/zitadel/buildcache
-          target: core-build
+          target: core-export
           tags: zitadel/test:test
+          outputs: .
+      - uses: actions/upload-artifact@v3
+        with:
+          name: zitadel-${{ matrix.os }}-${{ matrix.arch }}
+          path: zitadel
