@@ -19,7 +19,7 @@ FROM console-base as console-build
 WORKDIR /zitadel/console
 RUN npm run build
 
-FROM golang:${GO_VERSION} as go-dep
+FROM golang:${GO_VERSION} as build
 
 COPY --from=console-build ${CONSOLE_DIR}/dist/console ${CONSOLE_DIR}/dist/console
 
