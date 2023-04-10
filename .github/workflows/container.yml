@@ -24,10 +24,11 @@ jobs:
         with:
           push: false
           cache-from: type=registry,ref=ghcr.io/zitadel/buildcache
+          cache-to: type=registry,mode=max,ref=ghcr.io/zitadel/buildcache
           target: console-lint
           tags: zitadel/test:test
 
-  build:
+  core-test:
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
@@ -46,5 +47,49 @@ jobs:
           push: false
           cache-from: type=registry,ref=ghcr.io/zitadel/buildcache
           cache-to: type=registry,mode=max,ref=ghcr.io/zitadel/buildcache
-          target: build
+          target: core-test
+          tags: zitadel/test:test
+
+  core-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          cache-from: type=registry,ref=ghcr.io/zitadel/buildcache
+          cache-to: type=registry,mode=max,ref=ghcr.io/zitadel/buildcache
+          target: core-lint
+          tags: zitadel/test:test
+
+  core-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          cache-from: type=registry,ref=ghcr.io/zitadel/buildcache
+          cache-to: type=registry,mode=max,ref=ghcr.io/zitadel/buildcache
+          target: core-build
           tags: zitadel/test:test
