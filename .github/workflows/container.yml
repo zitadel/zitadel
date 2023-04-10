@@ -1,0 +1,23 @@
+name: container
+
+on:
+  push:
+    branches:
+      - 'quickfixci'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          cache-from: type=registry,ref=ghcr.io/zitadel/buildcache
+          cache-to: type=registry,mode=max,ref=ghcr.io/zitadel/buildcache
+          target: console-lint
+          tags: zitadel/test:test

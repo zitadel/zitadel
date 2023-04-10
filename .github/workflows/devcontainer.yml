@@ -4,7 +4,7 @@ on: # rebuild any PRs and main branch changes
   push:
     branches:
       - main
-      - quickfixci
+      #- quickfixci
 
 jobs:
   console-lint:
