@@ -1,7 +1,6 @@
 
 ARG NODE_VERSION=18
 ARG GO_VERSION=1.19
-ARG CONSOLE_DIR=/zitadel/console
 # TODO add os and platform args
 
 FROM node:${NODE_VERSION} as console-base
@@ -21,6 +20,6 @@ RUN npm run build
 
 FROM golang:${GO_VERSION} as build
 
-COPY --from=console-build ${CONSOLE_DIR}/dist/console ${CONSOLE_DIR}/dist/console
+COPY --from=console-build /zitadel/console/dist/console /zitadel/console/dist/console
 
-RUN ls -latr ${CONSOLE_DIR}/dist/console
+RUN ls -latr /zitadel/console/dist/console
