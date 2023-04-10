@@ -1,6 +1,8 @@
 
 ARG NODE_VERSION=18
 ARG GO_VERSION=1.19
+ARG OS
+ARG ARCH
 # TODO add os and platform args
 
 # -----
@@ -47,7 +49,7 @@ RUN go test -race -v -coverprofile=profile.cov $(go list ./...)
 
 FROM core-base as core-build
 COPY --from=console-build /zitadel/console/dist/console internal/api/ui/console/static/
-RUN go build -o zitadel
+RUN GOOS=${OS} GOARCH=${ARCH} go build -o zitadel 
 
 FROM scratch as core-export
 COPY --from=core-build zitadel/zitadel zitadel

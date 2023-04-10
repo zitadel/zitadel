@@ -107,7 +107,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: false
-          platforms: ${{ matrix.os }}/${{ matrix.arch }}
+          build-args: OS=${{ matrix.os }},ARCH=${{ matrix.arch }}
           cache-from: type=registry,ref=ghcr.io/zitadel/buildcache
           cache-to: type=registry,mode=max,ref=ghcr.io/zitadel/buildcache
           target: core-export
