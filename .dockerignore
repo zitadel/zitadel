@@ -11,7 +11,6 @@
 .releaserc.js
 changelog.config.js
 CONTRIBUTING.md
-LICENSE
 README.md
 SECURITY.md
 pkg/grpc/*/*.pb.*

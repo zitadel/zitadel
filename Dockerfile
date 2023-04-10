@@ -24,11 +24,18 @@ RUN npm run build
 
 FROM golang:${GO_VERSION} as core-base
 WORKDIR /zitadel
-COPY go.mod go.sum buf.gen.yaml init.sh ./
+COPY go.mod go.sum buf.gen.yaml grpc.sh ui.sh ./
+RUN go mod download
 COPY internal/protoc/ internal/protoc/
 COPY proto/ proto/
-RUN bash init.sh
-COPY . .
+RUN bash grpc.sh
+COPY internal/ internal/
+RUN bash ui.sh
+COPY cmd/ cmd/
+COPY pkg/ pkg/
+COPY statik/ statik/
+COPY openapi/ openapi/
+COPY main.go LICENSE ./
 
 FROM core-base as core-lint
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.52.2 \
@@ -40,4 +47,4 @@ RUN go test -race -v -coverprofile=profile.cov $(go list ./...)
 
 FROM core-base as core-build
 COPY --from=console-build /zitadel/console/dist/console internal/api/ui/console/static/
-RUN 
+RUN go build -o zitadel
