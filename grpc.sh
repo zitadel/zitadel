@@ -2,8 +2,8 @@
 
 set -eux
 
-go install github.com/bufbuild/buf/cmd/buf@v1.14.0
 go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption
+go install github.com/bufbuild/buf/cmd/buf@v1.14.0
 
 # This a dirty workaround for our own auth generator problem
 for i in $(find proto/zitadel -iname *.proto); do buf generate ${i}; done

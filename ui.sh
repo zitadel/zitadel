@@ -12,4 +12,5 @@ go generate internal/statik/generate.go
 mkdir -p openapi/v2/zitadel
 cp .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel
 go generate openapi/statik/generate.go
-#go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
+mkdir -p docs/apis/assets/
+go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
