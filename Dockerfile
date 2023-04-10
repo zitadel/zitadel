@@ -5,20 +5,20 @@ ARG GO_VERSION=1.19
 
 # -----
 
-# FROM node:${NODE_VERSION} as console-base
-# WORKDIR /zitadel/console
-# COPY console/package.json console/package-lock.json console/buf.gen.yaml ./
-# COPY proto ../proto
-# RUN npm ci && npm run generate
-# COPY console .
+FROM node:${NODE_VERSION} as console-base
+WORKDIR /zitadel/console
+COPY console/package.json console/package-lock.json console/buf.gen.yaml ./
+COPY proto ../proto
+RUN npm ci && npm run generate
+COPY console .
 
-# FROM console-base as console-lint
-# WORKDIR /zitadel/console
-# RUN npm run lint
+FROM console-base as console-lint
+WORKDIR /zitadel/console
+RUN npm run lint
 
-# FROM console-base as console-build
-# WORKDIR /zitadel/console
-# RUN npm run build
+FROM console-base as console-build
+WORKDIR /zitadel/console
+RUN npm run build
 
 # -----
 
