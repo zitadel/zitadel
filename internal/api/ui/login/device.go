@@ -65,7 +65,7 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 		l.renderDeviceAuthUserCode(w, err)
 		return
 	}
-	devieAuth, err := l.query.DeviceAuthByUserCode(r.Context(), userCode)
+	deviceAuth, err := l.query.DeviceAuthByUserCode(r.Context(), userCode)
 	if err != nil {
 		l.renderDeviceAuthUserCode(w, err)
 		return
@@ -77,11 +77,11 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 	}
 	authRequest, err := l.authRepo.CreateAuthRequest(r.Context(), &domain.AuthRequest{
 		AgentID:       agentID,
-		ApplicationID: devieAuth.ClientID,
+		ApplicationID: deviceAuth.ClientID,
 		Request: &domain.AuthRequestDevice{
-			DeviceCode: devieAuth.DeviceCode,
-			UserCode:   devieAuth.UserCode,
-			Scopes:     devieAuth.Scopes,
+			DeviceCode: deviceAuth.DeviceCode,
+			UserCode:   deviceAuth.UserCode,
+			Scopes:     deviceAuth.Scopes,
 		},
 	})
 	if err != nil {

@@ -37,13 +37,17 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	d, err := o.query.DeviceAuthByDeviceCode(ctx, clientID, deviceCode)
+	deviceAuth, err := o.query.DeviceAuthByDeviceCode(ctx, clientID, deviceCode)
 	if err != nil {
 		return nil, err
 	}
-	return createDeviceAuthorizationState(d), nil
+	if deviceAuth.State != domain.DeviceAuthStateInitiated || deviceAuth.Expires.Before(time.Now()) {
+		_, err = o.command.RemoveDeviceAuth(ctx, deviceAuth)
+	}
+	return createDeviceAuthorizationState(deviceAuth), nil
 }
 
+// This is actually not used, as the current implementation operates on the storage directly from the handlers.
 func (o *OPStorage) GetDeviceAuthorizationByUserCode(ctx context.Context, userCode string) (state *op.DeviceAuthorizationState, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -51,10 +55,6 @@ func (o *OPStorage) GetDeviceAuthorizationByUserCode(ctx context.Context, userCo
 	deviceAuth, err := o.query.DeviceAuthByUserCode(ctx, userCode)
 	if err != nil {
 		return nil, err
-	}
-
-	if deviceAuth.State != domain.DeviceAuthStateInitiated || deviceAuth.Expires.Before(time.Now()) {
-		_, err = o.command.RemoveDeviceAuth(ctx, deviceAuth)
 	}
 
 	return createDeviceAuthorizationState(deviceAuth), err

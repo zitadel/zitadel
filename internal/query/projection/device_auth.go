@@ -20,13 +20,14 @@ const (
 	DeviceAuthColumnDeviceCode = "device_code"
 	DeviceAuthColumnUserCode   = "user_code"
 	DeviceAuthColumnExpires    = "expires"
+	DeviceAuthColumnScopes     = "scopes"
 	DeviceAuthColumnState      = "state"
 	DeviceAuthColumnSubject    = "subject"
 
-	DeviceAuthCreationDate = "creation_date"
-	DeviceAuthChangeDate   = "change_date"
-	DeviceAuthSequence     = "sequence"
-	DeviceAuthInstanceID   = "instance_id"
+	DeviceAuthColumnCreationDate = "creation_date"
+	DeviceAuthColumnChangeDate   = "change_date"
+	DeviceAuthColumnSequence     = "sequence"
+	DeviceAuthColumnInstanceID   = "instance_id"
 )
 
 type deviceAuthProjection struct {
@@ -44,16 +45,17 @@ func newDeviceAuthProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(DeviceAuthColumnDeviceCode, crdb.ColumnTypeText),
 			crdb.NewColumn(DeviceAuthColumnUserCode, crdb.ColumnTypeText),
 			crdb.NewColumn(DeviceAuthColumnExpires, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(DeviceAuthColumnScopes, crdb.ColumnTypeTextArray),
 			crdb.NewColumn(DeviceAuthColumnState, crdb.ColumnTypeEnum, crdb.Default(domain.DeviceAuthStateInitiated)),
 			crdb.NewColumn(DeviceAuthColumnSubject, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(DeviceAuthCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DeviceAuthChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DeviceAuthSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(DeviceAuthInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(DeviceAuthColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(DeviceAuthColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(DeviceAuthColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(DeviceAuthColumnInstanceID, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(DeviceAuthInstanceID, DeviceAuthColumnID),
-			crdb.WithIndex(crdb.NewIndex("user_code", []string{DeviceAuthInstanceID, DeviceAuthColumnUserCode})),
-			crdb.WithIndex(crdb.NewIndex("device_code", []string{DeviceAuthInstanceID, DeviceAuthColumnClientID, DeviceAuthColumnDeviceCode})),
+			crdb.NewPrimaryKey(DeviceAuthColumnInstanceID, DeviceAuthColumnID),
+			crdb.WithIndex(crdb.NewIndex("user_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnUserCode})),
+			crdb.WithIndex(crdb.NewIndex("device_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnClientID, DeviceAuthColumnDeviceCode})),
 		),
 	)
 
@@ -95,7 +97,7 @@ func (p *deviceAuthProjection) reduceAdded(event eventstore.Event) (*handler.Sta
 	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(DeviceAuthInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(DeviceAuthColumnID, e.Aggregate().ID),
 			handler.NewCol(DeviceAuthColumnClientID, e.ClientID),
 			handler.NewCol(DeviceAuthColumnDeviceCode, e.DeviceCode),
@@ -115,7 +117,7 @@ func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.S
 			handler.NewCol(DeviceAuthColumnSubject, e.Subject),
 		},
 		[]handler.Condition{
-			handler.NewCond(DeviceAuthInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
 		},
 	), nil
@@ -132,7 +134,7 @@ func (p *deviceAuthProjection) reduceDenied(event eventstore.Event) (*handler.St
 			handler.NewCol(DeviceAuthColumnSubject, e.Subject),
 		},
 		[]handler.Condition{
-			handler.NewCond(DeviceAuthInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
 		},
 	), nil
@@ -145,7 +147,7 @@ func (p *deviceAuthProjection) reduceRemoved(event eventstore.Event) (*handler.S
 	}
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
-			handler.NewCond(DeviceAuthInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
 		},
 	), nil
