@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 
 	sq "github.com/Masterminds/squirrel"
@@ -60,6 +61,7 @@ type Member struct {
 	LastName           string
 	DisplayName        string
 	AvatarURL          string
+	UserType           domain.UserType
 }
 
 var (

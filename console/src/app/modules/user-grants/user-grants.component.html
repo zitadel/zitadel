@@ -77,7 +77,7 @@
             [checked]="selection.isSelected(row)"
           >
             <cnsl-avatar
-              *ngIf="row && row?.displayName && row.firstName && row.lastName; else cog"
+              *ngIf="row && row.userType === Type.TYPE_HUMAN; else cog"
               class="avatar"
               [name]="row.displayName"
               [avatarUrl]="row.avatarUrl || ''"
