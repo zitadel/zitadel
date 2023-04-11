@@ -5,23 +5,23 @@ on:
     
 jobs:
 
-  api:
-    uses: ./.github/workflows/api.yml
-    with:
-      buf_version: v1.15.1
-    secrets:
-      buf_token: ${{ secrets.buf_token }}
+  # api:
+  #   uses: ./.github/workflows/api.yml
+  #   with:
+  #     buf_version: v1.15.1
+  #   secrets:
+  #     buf_token: ${{ secrets.buf_token }}
 
   console:
     uses: ./.github/workflows/console.yml
     with:
       node_version: 18
 
-  core:
-    uses: ./.github/workflows/core.yml
-    with:
-      go_version: 1.19
-      buf_version: v1.15.1
+  # core:
+  #   uses: ./.github/workflows/core.yml
+  #   with:
+  #     go_version: 1.19
+  #     buf_version: v1.15.1
    
   # docs:
   # placeholder
