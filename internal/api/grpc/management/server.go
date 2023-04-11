@@ -70,8 +70,8 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 	return management.ManagementService_AuthMethods
 }
 
-func (s *Server) RegisterGateway() server.GatewayFunc {
-	return management.RegisterManagementServiceHandlerFromEndpoint
+func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
+	return management.RegisterManagementServiceHandler
 }
 
 func (s *Server) GatewayPathPrefix() string {
