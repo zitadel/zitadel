@@ -306,6 +306,10 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
 
+DeviceAuth:
+  Title: デバイス認証
+  Description: デバイスに表示されたユーザー コードを入力します。
+
 Footer:
   PoweredBy: Powered By
   Tos: TOS

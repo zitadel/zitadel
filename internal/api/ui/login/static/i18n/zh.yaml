@@ -314,6 +314,10 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
 
+DeviceAuth:
+  Title: 设备授权
+  Description: 输入设备上显示的用户代码。
+
 Footer:
   PoweredBy: Powered By
   Tos: 服务条款

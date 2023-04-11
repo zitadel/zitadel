@@ -77,6 +77,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplExternalNotFoundOption:       "external_not_found_option.html",
 		tmplLoginSuccess:                 "login_success.html",
 		tmplLDAPLogin:                    "ldap_login.html",
+		tmplDeviceAuthUserCode:           "device_usercode.html",
+		tmplDeviceAuthConfirm:            "device_confirm.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {

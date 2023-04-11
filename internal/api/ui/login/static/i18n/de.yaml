@@ -314,6 +314,10 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
 
+DeviceAuth:
+  Title: Geräteautorisierung
+  Description: Geben Sie den auf dem Gerät angezeigten Benutzercode ein.
+
 Footer:
   PoweredBy: Powered By
   Tos: AGB

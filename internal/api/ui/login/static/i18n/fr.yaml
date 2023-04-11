@@ -314,6 +314,10 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
 
+DeviceAuth:
+  Title: Autorisation de l'appareil
+  Description: Saisissez le code utilisateur présenté sur l'appareil.
+
 Footer:
   PoweredBy: Promulgué par
   Tos: TOS

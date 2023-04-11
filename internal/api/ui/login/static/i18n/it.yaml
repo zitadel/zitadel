@@ -314,6 +314,10 @@ ExternalNotFound:
   Polish: Polski
   Japanese: 日本語
 
+DeviceAuth:
+  Title: Autorizzazione del dispositivo
+  Description: Inserire il codice utente presentato sul dispositivo.
+
 Footer:
   PoweredBy: Alimentato da
   Tos: Termini di servizio
