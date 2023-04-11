@@ -8,6 +8,8 @@ import Intro from './_intro.mdx';
 import Prerequisites from './_prerequisites.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
+import UnlinkedOAuth from './_unlinked_oauth.mdx';
+import PrefillAction from './_prefill_action.mdx';
 
 <Intro provider="GitLab"/>
 
@@ -81,25 +83,14 @@ You can configure the following settings if you like, a useful default will be f
 
 ![GitLab Login](/img/guides/gitlab_login.png)
 
-If the user is not yet linked in ZITADEL the user will see the screen below.
-Because GitLab is an OAuth provider and oAuth does not provide a standardized way to get the user data, not all the data can be taken over.
-First and Lastname are not filled.
-The user has to enter the rest of the data himself.
+<UnlinkedOAuth provider="GitLab"/>
 
 ![GitLab Login](/img/guides/zitadel_login_external_not_found_registration.png)
 
 ### Optional: Add ZITADEL action to autofill userdata
 
-If you don't want the user to have to enter his first and lastname himself, you can add a ZITADEL action in which you specify how the data should be transferred.
-
-1. Go to the settings of the organization where the users will be registered
-
-2. Add an new action with the following body. Make sure the action name is the same as in the script itself. Make sure to change the id in the script to the id of your own identity provider configuration.
+<PrefillAction fields="firstname and lastname" provider="GitLab"/>
 
 ```js reference
-
-https://github.com/zitadel/actions/blob/main/examples/gitlab_identity_provider
-
+https://github.com/zitadel/actions/blob/main/examples/gitlab_identity_provider.js
 ```
-3. Add the action to the flow "External Authentication" on the trigger Post Authentication
-
