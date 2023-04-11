@@ -28,12 +28,12 @@ const (
 		` projections.device_authorizations.subject` +
 		` FROM projections.device_authorizations`
 	expectedDeviceAuthWhereDeviceCodeQueryC = expectedDeviceAuthQueryC +
-		` WHERE projections.device_authorizations.client_id = ?` +
-		` AND projections.device_authorizations.device_code = ?` +
-		` AND projections.device_authorizations.instance_id = ?`
+		` WHERE projections.device_authorizations.client_id = $1` +
+		` AND projections.device_authorizations.device_code = $2` +
+		` AND projections.device_authorizations.instance_id = $3`
 	expectedDeviceAuthWhereUserCodeQueryC = expectedDeviceAuthQueryC +
-		` WHERE projections.device_authorizations.instance_id = ?` +
-		` AND projections.device_authorizations.user_code = ?`
+		` WHERE projections.device_authorizations.instance_id = $1` +
+		` AND projections.device_authorizations.user_code = $2`
 )
 
 var (

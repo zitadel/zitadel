@@ -115,7 +115,7 @@ var deviceAuthSelectColumns = []string{
 }
 
 func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*domain.DeviceAuth, error)) {
-	return sq.Select(deviceAuthSelectColumns...).From(deviceAuthTable.identifier()),
+	return sq.Select(deviceAuthSelectColumns...).From(deviceAuthTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*domain.DeviceAuth, error) {
 			dst := new(domain.DeviceAuth)
 			var scopes database.StringArray
