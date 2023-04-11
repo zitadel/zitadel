@@ -67,7 +67,6 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
-    needs: console
     strategy:
       matrix:
         goos: [linux, darwin]
