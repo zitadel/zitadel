@@ -14,7 +14,7 @@ import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.componen
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
 
 const typeMap = {
-  [ProviderType.PROVIDER_TYPE_AZURE_AD]: { path: 'azure', component: ProviderAzureADComponent },
+  [ProviderType.PROVIDER_TYPE_AZURE_AD]: { path: 'azure-ad', component: ProviderAzureADComponent },
   [ProviderType.PROVIDER_TYPE_GITHUB]: { path: 'github', component: ProviderGithubComponent },
   [ProviderType.PROVIDER_TYPE_GITHUB_ES]: { path: 'github-es', component: ProviderGithubESComponent },
   [ProviderType.PROVIDER_TYPE_GITLAB]: { path: 'gitlab', component: ProviderGitlabComponent },

@@ -48,7 +48,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 
 	authReq := cache.Start(dbClient)
 
-	spool := spooler.StartSpooler(ctx, conf.Spooler, es, esV2, view, dbClient, systemDefaults, queries)
+	spool := spooler.StartSpooler(ctx, conf.Spooler, es, esV2, view, dbClient, queries)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,

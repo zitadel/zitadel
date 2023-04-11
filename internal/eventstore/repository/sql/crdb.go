@@ -255,10 +255,10 @@ func (db *CRDB) db() *sql.DB {
 
 func (db *CRDB) orderByEventSequence(desc bool) string {
 	if desc {
-		return " ORDER BY event_sequence DESC"
+		return " ORDER BY creation_date DESC, event_sequence DESC"
 	}
 
-	return " ORDER BY event_sequence"
+	return " ORDER BY creation_date, event_sequence"
 }
 
 func (db *CRDB) eventQuery() string {

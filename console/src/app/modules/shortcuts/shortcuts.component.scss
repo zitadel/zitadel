@@ -28,6 +28,11 @@
       display: flex;
       align-items: center;
 
+      h2 {
+        text-transform: uppercase;
+        font-size: 1.2rem;
+      }
+
       .shortcut-btn {
         margin-left: 0.5rem;
       }
