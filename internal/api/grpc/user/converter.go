@@ -254,3 +254,16 @@ func ExternalIDPViewsToExternalIDPs(externalIDPs []*query.IDPUserLink) []*domain
 	}
 	return idps
 }
+
+func TypeToPb(userType domain.UserType) user_pb.Type {
+	switch userType {
+	case domain.UserTypeHuman:
+		return user_pb.Type_TYPE_HUMAN
+	case domain.UserTypeMachine:
+		return user_pb.Type_TYPE_MACHINE
+	case domain.UserTypeUnspecified:
+		return user_pb.Type_TYPE_UNSPECIFIED
+	default:
+		return user_pb.Type_TYPE_UNSPECIFIED
+	}
+}
