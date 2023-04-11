@@ -58,7 +58,7 @@ jobs:
       with:
         path: console/dist/console
         key: console-dist-${{ hashFiles('console/**') }}
-    - run: cp -r .artifacts/console/* internal/api/ui/console/static/
+    - run: cp -r console/dist/console/ internal/api/ui/console/static/
     - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
     - uses: actions/upload-artifact@v3
       with:

@@ -29,4 +29,4 @@ clean:
 	rm -rf .artifacts/grpc
 
 test:
-	go test -race -v -coverprofile=profile.cov ./...
+	go test -race -v -coverprofile=profile.cov $(go list ./...)
