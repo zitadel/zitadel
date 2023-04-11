@@ -1,7 +1,7 @@
 <div class="accounts-card">
   <cnsl-avatar
     (click)="editUserProfile()"
-    *ngIf="user && user.human?.profile && user.human?.profile?.displayName"
+    *ngIf="user"
     class="avatar"
     [ngClass]="{ 'iam-user': iamuser }"
     [forColor]="user.preferredLoginName"
