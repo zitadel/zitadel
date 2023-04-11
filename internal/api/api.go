@@ -62,6 +62,12 @@ func New(
 	return api
 }
 
+// HandleFunc allows registering a http.HandlerFunc on an exact
+// path, instead of prefix like RegisterHandler.
+func (a *API) HandleFunc(path string, f http.HandlerFunc) {
+	a.router.HandleFunc(path, f)
+}
+
 func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) error {
 	grpcServer.RegisterServer(a.grpcServer)
 	handler, prefix, err := server.CreateGateway(ctx, grpcServer, a.port, a.http1HostName)

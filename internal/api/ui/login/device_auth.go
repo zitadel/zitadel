@@ -170,7 +170,10 @@ func (l *Login) deviceAuthCallbackURL(authRequestID string) string {
 	return l.renderer.pathPrefix + EndpointDeviceAuthConfirm + "?authRequestID=" + authRequestID
 }
 
-func redirectDeviceAuthToPrefix(w http.ResponseWriter, r *http.Request) {
+// RedirectDeviceAuthToPrefix allows users to use https://domain.com/device without the /ui/login prefix
+// and redirects them to the prefixed endpoint.
+// https://www.rfc-editor.org/rfc/rfc8628#section-3.2 recommends the URL to be as short as possible.
+func RedirectDeviceAuthToPrefix(w http.ResponseWriter, r *http.Request) {
 	target := gu.PtrCopy(r.URL)
 	target.Path = HandlerPrefix + EndpointDeviceAuth
 	http.Redirect(w, r, target.String(), http.StatusFound)

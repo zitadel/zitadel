@@ -1141,8 +1141,8 @@ github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5t
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 github.com/zitadel/logging v0.3.4 h1:9hZsTjMMTE3X2LUi0xcF9Q9EdLo+FAezeu52ireBbHM=
 github.com/zitadel/logging v0.3.4/go.mod h1:aPpLQhE+v6ocNK0TWrBrd363hZ95KcI17Q1ixAQwZF0=
-github.com/zitadel/oidc/v2 v2.2.7-0.20230411174820-1dec50a79a95 h1:d8GFb9xAY40fbhLstqxSnrtEbO9EZaUsyX/oo0jDh6g=
-github.com/zitadel/oidc/v2 v2.2.7-0.20230411174820-1dec50a79a95/go.mod h1:wBOrfB0m/tGXo6isym1F5k3VeXSUinGsAt2H8V/+Uks=
+github.com/zitadel/oidc/v2 v2.3.0 h1:NOqsDURQ4OGYkL7Rr70DXNnC62THq1n7LKpvn9fH7Ts=
+github.com/zitadel/oidc/v2 v2.3.0/go.mod h1:wBOrfB0m/tGXo6isym1F5k3VeXSUinGsAt2H8V/+Uks=
 github.com/zitadel/saml v0.0.10 h1:cyKd78Vat9vz55S74lggJrXMSqbAPsnJDrPFTPScNYY=
 github.com/zitadel/saml v0.0.10/go.mod h1:Hze1/zRN9j1uh7U+89vweP/OwLNO8BLHg3zU1Jtycdg=
 github.com/ziutek/mymysql v1.5.4/go.mod h1:LMSpPZ6DbqWFxNCHW77HeMg9I646SAhApZ/wKdgO/C0=

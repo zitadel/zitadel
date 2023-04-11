@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/sirupsen/logrus"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -93,6 +95,7 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 
 	deviceAuth, err := o.query.DeviceAuthByDeviceCode(ctx, clientID, deviceCode)
 	if err != nil {
+		logging.WithError(err).WithFields(logrus.Fields{"client_id": clientID, "device_code": deviceCode}).Error()
 		return nil, err
 	}
 
