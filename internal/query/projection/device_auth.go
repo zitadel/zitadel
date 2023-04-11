@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
-	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
@@ -92,17 +91,21 @@ func (p *deviceAuthProjection) reducers() []handler.AggregateReducer {
 func (p *deviceAuthProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.AddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-< TODO: CODE >", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-chu6O", "reduce.wrong.event.type %T != %s", event, deviceauth.AddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(DeviceAuthColumnID, e.Aggregate().ID),
 			handler.NewCol(DeviceAuthColumnClientID, e.ClientID),
 			handler.NewCol(DeviceAuthColumnDeviceCode, e.DeviceCode),
 			handler.NewCol(DeviceAuthColumnUserCode, e.UserCode),
 			handler.NewCol(DeviceAuthColumnExpires, e.Expires),
+			handler.NewCol(DeviceAuthColumnScopes, e.Scopes),
+			handler.NewCol(DeviceAuthColumnCreationDate, e.CreationDate()),
+			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
+			handler.NewCol(DeviceAuthColumnSequence, e.Sequence()),
+			handler.NewCol(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -110,11 +113,13 @@ func (p *deviceAuthProjection) reduceAdded(event eventstore.Event) (*handler.Sta
 func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.ApprovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-< TODO: CODE >", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-kei0A", "reduce.wrong.event.type %T != %s", event, deviceauth.ApprovedEventType)
 	}
 	return crdb.NewUpdateStatement(e,
 		[]handler.Column{
 			handler.NewCol(DeviceAuthColumnSubject, e.Subject),
+			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
+			handler.NewCol(DeviceAuthColumnSequence, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
@@ -126,12 +131,14 @@ func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.S
 func (p *deviceAuthProjection) reduceDenied(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.ApprovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-< TODO: CODE >", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eeS8d", "reduce.wrong.event.type %T != %s", event, deviceauth.DeniedEventType)
 	}
 	return crdb.NewUpdateStatement(e,
 		[]handler.Column{
 			handler.NewCol(DeviceAuthColumnState, domain.DeviceAuthStateUserDenied),
 			handler.NewCol(DeviceAuthColumnSubject, e.Subject),
+			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
+			handler.NewCol(DeviceAuthColumnSequence, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
@@ -143,7 +150,7 @@ func (p *deviceAuthProjection) reduceDenied(event eventstore.Event) (*handler.St
 func (p *deviceAuthProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.RemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-< TODO: CODE >", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AJi1u", "reduce.wrong.event.type %T != %s", event, deviceauth.RemovedEventType)
 	}
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{

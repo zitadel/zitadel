@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -11,20 +12,15 @@ import (
 )
 
 func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes []string) (string, *domain.ObjectDetails, error) {
-	// is this required? user input check is already part of the framework
-	/*
-		if !ada.IsValid() {
-			return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
-		}
-	*/
-
 	aggrID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
+
 	model := &DeviceAuthWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: aggrID,
+			ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+			AggregateID:   aggrID,
 		},
 	}
 	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
@@ -55,7 +51,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, id, subject string) (*
 		return nil, err
 	}
 	if !model.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Sfg2t", "Errors.Action.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
 	}
 	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
 
@@ -77,7 +73,7 @@ func (c *Commands) DenyDeviceAuth(ctx context.Context, id string) (*domain.Objec
 		return nil, err
 	}
 	if !model.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Sfg2t", "Errors.Action.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound")
 	}
 	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
 
@@ -99,7 +95,7 @@ func (c *Commands) RemoveDeviceAuth(ctx context.Context, deviceAuth *domain.Devi
 		return nil, err
 	}
 	if !model.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Sfg2t", "Errors.Action.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-yo9Ie", "Errors.DeviceAuth.NotFound")
 	}
 	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
 

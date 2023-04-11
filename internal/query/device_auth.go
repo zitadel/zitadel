@@ -6,6 +6,7 @@ import (
 	errs "errors"
 
 	sq "github.com/Masterminds/squirrel"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -81,7 +82,7 @@ func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, clientID, deviceCo
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-JgUop", "Errors.Query.SQLStatement")
+		return nil, errors.ThrowInternal(err, "QUERY-uk1Oh", "Errors.Query.SQLStatement")
 	}
 
 	return scan(q.client.QueryRowContext(ctx, query, args...))
@@ -98,7 +99,7 @@ func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (_ 
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-JgUop", "Errors.Query.SQLStatement")
+		return nil, errors.ThrowInternal(err, "QUERY-Axu7l", "Errors.Query.SQLStatement")
 	}
 
 	return scan(q.client.QueryRowContext(ctx, query, args...))
@@ -128,10 +129,10 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&dst.Subject,
 			)
 			if errs.Is(err, sql.ErrNoRows) {
-				return nil, errors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
+				return nil, errors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotExisting")
 			}
 			if err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+				return nil, errors.ThrowInternal(err, "QUERY-Voo3o", "Errors.Internal")
 			}
 
 			dst.Scopes = scopes

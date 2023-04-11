@@ -108,6 +108,12 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 		GrantTypeRefreshToken:    config.GrantTypeRefreshToken,
 		RequestObjectSupported:   config.RequestObjectSupported,
 		SupportedUILocales:       supportedLanguages,
+		DeviceAuthorization: op.DeviceAuthorizationConfig{
+			Lifetime:     5 * time.Minute,
+			PollInterval: 5 * time.Second,
+			UserFormURL:  "http://loalhost:8080/device",
+			UserCode:     op.UserCodeBase20,
+		},
 	}
 	if cryptoLength := len(cryptoKey); cryptoLength != 32 {
 		return nil, caos_errs.ThrowInternalf(nil, "OIDC-D43gf", "crypto key must be 32 bytes, but is %d", cryptoLength)

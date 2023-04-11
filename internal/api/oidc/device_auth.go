@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/oidc/v2/pkg/op"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -16,7 +17,7 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 
 	scopes, err = o.assertProjectRoleScopes(ctx, clientID, scopes)
 	if err != nil {
-		return errors.ThrowPreconditionFailed(err, "OIDC-< TODO: code>", "Errors.Internal")
+		return errors.ThrowPreconditionFailed(err, "OIDC-She4t", "Errors.Internal")
 	}
 	_, _, err = o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, expires, scopes)
 	return err
@@ -41,9 +42,13 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 	if err != nil {
 		return nil, err
 	}
-	if deviceAuth.State != domain.DeviceAuthStateInitiated || deviceAuth.Expires.Before(time.Now()) {
-		_, err = o.command.RemoveDeviceAuth(ctx, deviceAuth)
-	}
+
+	/*
+		if deviceAuth.State != domain.DeviceAuthStateInitiated || deviceAuth.Expires.Before(time.Now()) {
+			_, err = o.command.RemoveDeviceAuth(ctx, deviceAuth)
+		}
+	*/
+
 	return createDeviceAuthorizationState(deviceAuth), nil
 }
 

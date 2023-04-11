@@ -2,6 +2,7 @@ package org
 
 import (
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
@@ -107,5 +108,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, MetadataRemovedAllType, MetadataRemovedAllEventMapper).
 		RegisterFilterEventMapper(AggregateType, NotificationPolicyAddedEventType, NotificationPolicyAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, NotificationPolicyChangedEventType, NotificationPolicyChangedEventMapper).
-		RegisterFilterEventMapper(AggregateType, NotificationPolicyRemovedEventType, NotificationPolicyRemovedEventMapper)
+		RegisterFilterEventMapper(AggregateType, NotificationPolicyRemovedEventType, NotificationPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, deviceauth.AddedEventType, eventstore.GenericEventMapper[deviceauth.AddedEvent]).
+		RegisterFilterEventMapper(AggregateType, deviceauth.ApprovedEventType, eventstore.GenericEventMapper[deviceauth.ApprovedEvent]).
+		RegisterFilterEventMapper(AggregateType, deviceauth.DeniedEventType, eventstore.GenericEventMapper[deviceauth.DeniedEvent]).
+		RegisterFilterEventMapper(AggregateType, deviceauth.RemovedEventType, eventstore.GenericEventMapper[deviceauth.RemovedEvent])
 }

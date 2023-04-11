@@ -25,6 +25,10 @@ type AddedEvent struct {
 	Scopes     []string
 }
 
+func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
 func (e *AddedEvent) Data() any {
 	return e
 }
@@ -55,6 +59,10 @@ type ApprovedEvent struct {
 	Subject string
 }
 
+func (e *ApprovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
 func (e *ApprovedEvent) Data() any {
 	return e
 }
@@ -80,6 +88,10 @@ type DeniedEvent struct {
 	*eventstore.BaseEvent
 }
 
+func (e *DeniedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
 func (e *DeniedEvent) Data() any {
 	return e
 }
@@ -98,6 +110,10 @@ type RemovedEvent struct {
 	ClientID   string
 	DeviceCode string
 	UserCode   string
+}
+
+func (e *RemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
 }
 
 func (e *RemovedEvent) Data() any {
