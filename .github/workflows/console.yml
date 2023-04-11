@@ -69,5 +69,8 @@ jobs:
     - run: ls -la src/app/proto/generated
     - run: yarn install --frozen-lockfile
     - run: yarn build
-
-
+    - uses: actions/cache/save@v3
+      if: always()
+      with:
+        path: console/dist/console
+        key: console-dist-${{ hashFiles('console/**') }}
