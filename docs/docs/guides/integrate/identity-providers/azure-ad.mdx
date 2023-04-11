@@ -4,16 +4,20 @@ sidebar_label: Azure AD
 ---
 
 import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import Prerequisites from './_prerequisites.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
 
-This guides shows you how to connect Azure AD as an identity provider in ZITADEL.
+<Intro provider="Azure AD"/>
 
-:::info
-In ZITADEL you can connect an Identity Provider (IdP) like Azure AD to your instance and provide it as default to all organizations or you can register the IdP to a specific organization only. This can also be done through your customers in a self-service fashion.
-:::
+<!--
+    Docusaurus bug: imported headings are not shown in the content tables
+    https://docusaurus.io/docs/markdown-features/react#importing-markdown
+ -->
+## Prerequisites
 
-## Prerequisite
-
-Make sure to read and follow the [General Guide](./general) on how to setup identity providers for your ZITADEL instance first, before you go through the specific guide here.
+<Prerequisites/>
 
 ## Azure AD Configuration
 
@@ -38,7 +42,7 @@ Generate a new client secret to authenticate your user.
 
 1. Click on client credentials on the detail page of the application or use the menu "Certificates & secrets"
 2. Click on "+ New client secret" and enter a description and an expiry date, add the secret afterwards
-3. Copy the value of the secret. You will not be able to see the value again after some time 
+3. Copy the value of the secret. You will not be able to see the value again after some time
 
 ![Azure Client Secret](/img/guides/azure_client_secret.png)
 
@@ -89,24 +93,20 @@ In this case, configure "Accounts in any organizational directory and personal M
 
 **Tenant ID**: If you have selected either the *Organizations* or *Customers* as the *Tenant Type*, you have to enter the *Directory (Tenant) ID*, copied previously in the Azure App configuration, here.
 
-<GeneralConfigDescription name="GeneralConfigDescription" />
+<GeneralConfigDescription provider_account="Microsoft account" />
 
 ![Azure Provider](/img/guides/zitadel_azure_provider.png)
 
 ### Activate IdP
 
-Once you created the IdP you need to activate it.
+<Activate/>
 
 ![Activate Azure AD](/img/guides/zitadel_activate_azure.png)
 
 ## Test the setup
 
-To test the setup, use incognito mode and browse to your login page.
-If you succeed, you see a new button which redirects you to your Microsoft Login.
+<TestSetup loginscreen="your Microsoft login"/>
 
-By default, your instances login is shown.
-Learn more about [how to trigger it for a specific organization](./general#trigger-configuration-on-the-login-for-a-specific-organization).
+![Azure AD Button](/img/guides/zitadel_login_azure.png)
 
-![Azure Button](/img/guides/zitadel_login_azure.png)
-
-![GitHub Login](/img/guides/microsoft_login.png)
+![Azure AD Login](/img/guides/microsoft_login.png)

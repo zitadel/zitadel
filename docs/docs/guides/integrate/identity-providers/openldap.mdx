@@ -4,26 +4,30 @@ sidebar_label: Local OpenLDAP
 ---
 
 import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import Prerequisites from './_prerequisites.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
 
-This guides shows you how to connect OpenLDAP as an identity provider in ZITADEL.
+<Intro provider="a local OpenLDAP server"/>
 
-:::info
-In ZITADEL you can connect an Identity Provider (IdP) like LDAP to your instance and provide it as default to all organizations or you can register the IdP to a specific organization only. This can also be done through your customers in a self-service fashion.
-:::
+<!--
+    Docusaurus bug: imported headings are not shown in the content tables
+    https://docusaurus.io/docs/markdown-features/react#importing-markdown
+ -->
+## Prerequisites
 
-## Prerequisite
-
-To be able to use LDAP to authenticate your users you need an LDAP server available to ZITADEL, a user with permissions to read other users information, clear defined ObjectClass and attribute restrictions for available users that can login.
+<Prerequisites/>
 
 ## OpenLDAP Configuration
 
-### Basic configuration 
+### Basic configuration
 
 To run LDAP locally to test it with ZITADEL please refer to [OpenLDAP](https://www.openldap.org/) with [slapd](https://www.openldap.org/software/man.cgi?query=slapd).
 
 For a quickstart guide please refer to their [official documentation](https://www.openldap.org/doc/admin22/quickstart.html).
 
-A basic configuration would be like this 
+A basic configuration would be like this
 ```
 #
 # See slapd.conf(5) for details on configuration options.
@@ -128,7 +132,7 @@ ou: Human Resources
 
 Which in essence creates a user with DN `cn=test,ou=people,dc=example,dc=com`, uid `test` and password `test`.
 
-The user can be applied after OpenLDAP is running with 
+The user can be applied after OpenLDAP is running with
 ```bash
 ldapadd -x -h localhost -D "cn=admin,dc=example,dc=com" -f example.ldif -w 'Password1!'
 ```
@@ -166,21 +170,20 @@ To configure the LDAP template to work with the before configured OpenLDAP, plea
 **Timeout**: Can be left empty, if this setting is set all connection run with a set timeout, if it is 0s the default timeout of 60s is used.
 
 
-<GeneralConfigDescription name="GeneralConfigDescription" />
+<GeneralConfigDescription provider_account="LDAP user" />
 
-![GitHub Provider](/img/guides/zitadel_ldap_create_provider.png)
+![LDAP Provider](/img/guides/zitadel_ldap_create_provider.png)
 
 ### Activate IdP
 
-Once you created the IdP you need to activate it, to make it usable for your users.
+<Activate/>
 
-![Activate the GitHub](/img/guides/zitadel_activate_ldap.png)
+![Activate the LDAP Provider](/img/guides/zitadel_activate_ldap.png)
 
 ## Test the setup
 
-To test the setup use incognito mode and browse to your login page.
-If you succeeded you should see a new button which should redirect you the login side on ZITADEL for LDAP.
+<TestSetup loginscreen="ZITADELs LDAP login"/>
 
-![GitHub Button](/img/guides/zitadel_login_ldap.png)
+![LDAP Button](/img/guides/zitadel_login_ldap.png)
 
-![GitHub Login](/img/guides/zitadel_login_ldap_input.png)
+![LDAP Login](/img/guides/zitadel_login_ldap_input.png)

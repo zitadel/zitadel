@@ -4,16 +4,20 @@ sidebar_label: GitHub
 ---
 
 import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import Prerequisites from './_prerequisites.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
 
-This guides shows you how to connect GitHub or GitHub Enterprise as an identity provider in ZITADEL.
+<Intro provider="GitHub"/>
 
-:::info
-In ZITADEL you can connect an Identity Provider (IdP) like GitHub to your instance and provide it as default to all organizations or you can register the IdP to a specific organization only. This can also be done through your customers in a self-service fashion.
-:::
+<!--
+    Docusaurus bug: imported headings are not shown in the content tables
+    https://docusaurus.io/docs/markdown-features/react#importing-markdown
+ -->
+## Prerequisites
 
-## Prerequisite
-
-Make sure to read and follow the [General Guide](./general) on how to setup identity providers for your ZITADEL instance first, before you go through the specific guide here.
+<Prerequisites/>
 
 ## GitHub Configuration
 
@@ -39,7 +43,7 @@ To adapt this for you setup just replace the domain
 ### Client ID and Secret
 
 After clicking "Register application", you see the detail page of the application you have just created.
-Copy the client ID you can copy directly from the detail page. 
+Copy the client ID you can copy directly from the detail page.
 Generate a new secret by clicking "Generate new client secret".
 Make sure to save the secret, as you will not be able to show it again.
 
@@ -57,23 +61,19 @@ You can configure the following settings if you like, a useful default will be f
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
 This information is used to create and/or update the user within ZITADEL.
 
-<GeneralConfigDescription name="GeneralConfigDescription" />
+<GeneralConfigDescription provider_account="GitHub account" />
 
 ![GitHub Provider](/img/guides/zitadel_github_create_provider.png)
 
 ### Activate IdP
 
-Once you created the IdP you need to activate it, to make it usable for your users.
+<Activate/>
 
 ![Activate the GitHub](/img/guides/zitadel_activate_github.png)
 
 ## Test the setup
 
-To test the setup use incognito mode and browse to your login page.
-If you succeeded you should see a new button which should redirect you to your GitHub.
-
-Per default the login of your instance will be shown, read the following section on how to trigger it for a specific organization: [Organization Scope](./general#trigger-configuration-on-the-login-for-a-specific-organization)
-
+<TestSetup loginscreen="your GitHub login"/>
 
 ![GitHub Button](/img/guides/zitadel_login_github.png)
 
@@ -92,7 +92,7 @@ The user has to enter the rest of the data himself.
 If you don't want the user to have to enter his first and lastname himself, you can add a ZITADEL action in which you specify how the data should be transferred.
 
 1. Go to the settings of the organization where the users will be registered
-2. Add a new action with the following body. Make sure the action name is the same as in the script itself. Make sure to change the id in the script to the id of your own identity provider configuration. 
+2. Add a new action with the following body. Make sure the action name is the same as in the script itself. Make sure to change the id in the script to the id of your own identity provider configuration.
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/github_identity_provider
@@ -100,4 +100,4 @@ https://github.com/zitadel/actions/blob/main/examples/github_identity_provider
 
 
 3. Add the action to the flow "External Authentication" on the trigger Post Authentication
-  
+
