@@ -1,6 +1,5 @@
 grpc:
 	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption
-	rm -rf .artifacts/grpc
 	# This foreach is a workaround from a limitation of the authoption generator and only affects zitadel.
 	# The authoption generator cannot work when passed *.proto but instead needs to have each file passed as {name}.proto
 	for i in $$(find proto/zitadel -iname *.proto); do buf generate $${i}; done
@@ -25,6 +24,9 @@ assets:
     go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
 generate: grpc static assets
+
+clean:
+	rm -rf .artifacts/grpc
 
 test:
 	go test -race -v -coverprofile=profile.cov ./...
