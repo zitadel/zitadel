@@ -15,18 +15,7 @@ on:
 
 jobs:
 
-  api:
-    name: api
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-    - uses: actions/checkout@v3
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - uses: bufbuild/buf-lint-action@v1
-    ## TODO add comment action with report
+  #api:
 
   console:
     name: console
@@ -50,11 +39,12 @@ jobs:
   core:
     name: core
     runs-on: ubuntu-latest
-    needs: console
+    strategy:
+      matrix:
+        goos: [linux, darwin]
+        goarch: [amd64, arm64]
     steps:
     - uses: actions/checkout@v3
-      with:
-        fetch-depth: '0'
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
@@ -62,10 +52,13 @@ jobs:
       with:
         version: ${{ inputs.buf_version }}
         github_token: ${{ github.token }}
-    - name: linting
-      uses: golangci/golangci-lint-action@v3
+    - run: make generate
+    - uses: actions/cache/restore@v3
       with:
-        version: v1.50.1
-        only-new-issues: true
-        skip-pkg-cache: true
-        args: -v
+        path: internal/api/ui/console/static
+        key: console-dist-${{ hashFiles('console/**') }}
+    - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
+    - uses: actions/upload-artifact@v3
+      with:
+        name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
