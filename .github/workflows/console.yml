@@ -30,7 +30,6 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
-    needs: deps
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
