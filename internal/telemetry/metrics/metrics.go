@@ -6,6 +6,7 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/instrument"
 )
 
 const (
@@ -22,8 +23,8 @@ type Metrics interface {
 	GetMetricsProvider() metric.MeterProvider
 	RegisterCounter(name, description string) error
 	AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error
-	RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error
-	RegisterValueObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error
+	RegisterUpDownSumObserver(name, description string, callbackFunc instrument.Int64Callback) error
+	RegisterValueObserver(name, description string, callbackFunc instrument.Int64Callback) error
 }
 
 var M Metrics
@@ -56,14 +57,14 @@ func AddCount(ctx context.Context, name string, value int64, labels map[string]a
 	return M.AddCount(ctx, name, value, labels)
 }
 
-func RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error {
+func RegisterUpDownSumObserver(name, description string, callbackFunc instrument.Int64Callback) error {
 	if M == nil {
 		return nil
 	}
 	return M.RegisterUpDownSumObserver(name, description, callbackFunc)
 }
 
-func RegisterValueObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error {
+func RegisterValueObserver(name, description string, callbackFunc instrument.Int64Callback) error {
 	if M == nil {
 		return nil
 	}
