@@ -1,3 +1,33 @@
+@use '@angular/material' as mat;
+
+@mixin app-create-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  // Number of steps creating app
+  $steps: 3;
+
+  .app-create-wrapper {
+    // Reference: https://github.com/angular/components/issues/10681#issuecomment-695185806
+    @for $i from 1 through $steps {
+      @for $j from 1 through $i {
+        .last-edited-step-#{$i}
+          .mat-horizontal-stepper-header-container
+          .mat-step-header:nth-child(#{1 + 2 * ($j - 1)})::after,
+        .last-edited-step-#{$i}
+          .mat-horizontal-stepper-header-container
+          .mat-stepper-horizontal-line:nth-child(#{2 + 2 * ($j - 1)}),
+        .last-edited-step-#{$i}
+          .mat-horizontal-stepper-header-container
+          .mat-step-header:nth-child(#{3 + 2 * ($j - 1)})::before {
+          border-top-width: 3px;
+          border-top-color: $primary-color;
+        }
+      }
+    }
+  }
+}
+
 .create-layout-container {
   display: flex;
   align-items: center;
