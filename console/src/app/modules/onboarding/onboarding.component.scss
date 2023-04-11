@@ -198,6 +198,12 @@
         .state-circle {
           display: none;
         }
+
+        .action-card {
+          .action-content {
+            opacity: 1;
+          }
+        }
       }
     }
   }
