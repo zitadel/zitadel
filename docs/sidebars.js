@@ -108,7 +108,7 @@ module.exports = {
     {
       type: "category",
       label: "Migrate",
-      collapsed: false,
+      collapsed: true,
       items: [
         "guides/migrate/introduction",
         "guides/migrate/users",
