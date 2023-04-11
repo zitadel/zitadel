@@ -65,7 +65,7 @@ jobs:
       id: cache
       with:
         path: console/src/app/proto/generated
-        key: console-client-${{ hashFiles('proto/**') }}3
+        key: console-client-${{ hashFiles('proto/**') }}
     - run: ls -la src/app/proto/generated
     - run: yarn install --frozen-lockfile
     - run: yarn build
