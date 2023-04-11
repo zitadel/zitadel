@@ -42,27 +42,7 @@ jobs:
     - run: make generate
     - run: make test
 
-  lint:
-    name: lint
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: '0'
-    - uses: actions/setup-go@v3
-      with:
-        go-version: ${{ inputs.go_version }}
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - name: linting
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: v1.50.1
-        only-new-issues: true
-        skip-pkg-cache: true
-        args: -v
+
 
   build:
     name: build

@@ -5,27 +5,9 @@ on:
     
 jobs:
 
-  # api:
-  #   uses: ./.github/workflows/api.yml
-  #   with:
-  #     buf_version: v1.15.1
-  #   secrets:
-  #     buf_token: ${{ secrets.buf_token }}
-
-  console:
-    uses: ./.github/workflows/console.yml
+  lint:
+    uses: ./.github/workflows/lint.yml
     with:
       node_version: 18
-
-  core:
-    uses: ./.github/workflows/core.yml
-    needs: console
-    with:
       go_version: 1.19
       buf_version: v1.15.1
-   
-  # docs:
-  # placeholder
-
-  # login:
-  # placeholder 
