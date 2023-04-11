@@ -54,7 +54,6 @@ var (
 
 type Gateway struct {
 	mux           *runtime.ServeMux
-	port          uint16
 	http1HostName string
 	connection    *grpc.ClientConn
 }
