@@ -30,7 +30,6 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderLDAPComponent {
   public updateBindPassword: boolean = false;
-  public showAttributes: boolean = false;
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public attributes: LDAPAttributes = new LDAPAttributes();

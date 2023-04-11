@@ -133,6 +133,7 @@ export class ProviderAzureADComponent {
         if (this.provider?.config?.azureAd) {
           this.form.patchValue(this.provider.config.azureAd);
           this.name?.setValue(this.provider.name);
+          console.log(this.provider.config.azureAd);
           this.tenantId?.setValue(this.provider.config.azureAd.tenant?.tenantId);
           this.tenantType?.setValue(this.provider.config.azureAd.tenant?.tenantType);
         }

@@ -70,21 +70,14 @@
         <div class="identity-provider-optional-h-wrapper">
           <h2>{{ 'IDP.LDAPATTRIBUTES' | translate }}</h2>
 
-          <button (click)="showAttributes = !showAttributes" type="button" mat-icon-button>
-            <mat-icon *ngIf="showAttributes">keyboard_arrow_up</mat-icon>
-            <mat-icon *ngIf="!showAttributes">keyboard_arrow_down</mat-icon>
-          </button>
-
           <span *ngIf="!provider?.config?.ldap?.attributes?.idAttribute" class="state error">{{
             'IDP.REQUIRED' | translate
           }}</span>
         </div>
-        <div *ngIf="showAttributes">
-          <cnsl-ldap-attributes
-            [initialAttributes]="provider?.config?.ldap?.attributes"
-            (attributesChanged)="attributes = $event"
-          ></cnsl-ldap-attributes>
-        </div>
+        <cnsl-ldap-attributes
+          [initialAttributes]="provider?.config?.ldap?.attributes"
+          (attributesChanged)="attributes = $event"
+        ></cnsl-ldap-attributes>
 
         <div class="identity-provider-optional-h-wrapper">
           <h2>{{ 'IDP.OPTIONAL' | translate }}</h2>
@@ -113,7 +106,7 @@
           color="primary"
           mat-raised-button
           class="continue-button"
-          [disabled]="(form.invalid && attributes.toObject().idAttribute !== '') || form.disabled"
+          [disabled]="form.invalid || !attributes.toObject().idAttribute || form.disabled"
           type="submit"
         >
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
