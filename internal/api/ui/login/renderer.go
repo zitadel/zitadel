@@ -325,6 +325,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var msg string
 	if err != nil {
+		logging.WithError(err).WithField("auth_req", authReq).Error()
 		_, msg = l.getErrorMessage(r, err)
 	}
 	data := l.getBaseData(r, authReq, "Errors.Internal", "", "Internal", msg)

@@ -6,10 +6,12 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/sirupsen/logrus"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -58,6 +60,7 @@ func (l *Login) renderDeviceAuthConfirm(w http.ResponseWriter, username, clientI
 // The agent ID from the context is set to the authentication request
 // to ensure the complete login flow is completed from the same browser.
 func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	err := r.ParseForm()
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -72,20 +75,23 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 		l.renderDeviceAuthUserCode(w, r, err)
 		return
 	}
-	deviceAuth, err := l.query.DeviceAuthByUserCode(r.Context(), userCode)
+	deviceAuth, err := l.query.DeviceAuthByUserCode(ctx, userCode)
 	if err != nil {
 		l.renderDeviceAuthUserCode(w, r, err)
 		return
 	}
-	agentID, ok := middleware.UserAgentIDFromCtx(r.Context())
+	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		l.renderDeviceAuthUserCode(w, r, errors.New("internal error: agent ID missing"))
 		return
 	}
-	authRequest, err := l.authRepo.CreateAuthRequest(r.Context(), &domain.AuthRequest{
-		AgentID:       agentID,
+	authRequest, err := l.authRepo.CreateAuthRequest(ctx, &domain.AuthRequest{
+		CreationDate:  time.Now(),
+		AgentID:       userAgentID,
 		ApplicationID: deviceAuth.ClientID,
+		InstanceID:    authz.GetInstance(ctx).InstanceID(),
 		Request: &domain.AuthRequestDevice{
+			ID:         deviceAuth.AggregateID,
 			DeviceCode: deviceAuth.DeviceCode,
 			UserCode:   deviceAuth.UserCode,
 			Scopes:     deviceAuth.Scopes,

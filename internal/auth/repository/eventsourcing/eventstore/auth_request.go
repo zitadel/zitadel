@@ -1153,11 +1153,11 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 			CreationDate:  p.CreationDate,
 			ChangeDate:    p.ChangeDate,
 		},
-		State:       p.State,
-		Default:     p.IsDefault,
-		TOSLink:     p.TOSLink,
-		PrivacyLink: p.PrivacyLink,
-		HelpLink:    p.HelpLink,
+		State:        p.State,
+		Default:      p.IsDefault,
+		TOSLink:      p.TOSLink,
+		PrivacyLink:  p.PrivacyLink,
+		HelpLink:     p.HelpLink,
 		SupportEmail: p.SupportEmail,
 	}
 }
@@ -1447,7 +1447,7 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, 
 func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
 	var project *query.Project
 	switch request.Request.Type() {
-	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
+	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML, domain.AuthRequestTypeDevice:
 		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID, false)
 		if err != nil {
 			return false, err
@@ -1468,13 +1468,13 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 func projectRequired(ctx context.Context, request *domain.AuthRequest, projectProvider projectProvider) (_ bool, err error) {
 	var project *query.Project
 	switch request.Request.Type() {
-	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
+	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML, domain.AuthRequestTypeDevice:
 		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID, false)
 		if err != nil {
 			return false, err
 		}
 	default:
-		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
+		return false, errors.ThrowPreconditionFailed(nil, "EVENT-ku4He", "Errors.AuthRequest.RequestTypeNotSupported")
 	}
 	if !project.HasProjectCheck {
 		return false, nil
