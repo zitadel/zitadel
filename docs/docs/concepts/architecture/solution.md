@@ -9,8 +9,7 @@ Since the storage layer takes the heavy lifting of making sure that data in sync
 
 Depending on your projects needs our general recommendation is to run ZITADEL and ZITADELs storage layer across multiple availability zones in the same region or if you need higher guarantees run the storage layer across multiple regions.
 Consult the [CockroachDB documentation](https://www.cockroachlabs.com/docs/) for more details or use the [CockroachCloud Service](https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account.html)
-
-> Postgres support of ZITADEL is currently in beta.
+Postgres is also supported by ZITADEL. Make sure to read our [Production Guide](./self-hosting/manage/production#prefer-cockroachdb) before you decide to use it.
 
 ## Scalability
 
