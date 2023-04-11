@@ -339,7 +339,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.oidcTokenForm.controls['clockSkewSeconds'].setValue(inSecs);
               }
               if (this.app.oidcConfig) {
-                console.log(this.app.oidcConfig.skipNativeAppSuccessPage);
                 this.oidcForm.patchValue(this.app.oidcConfig);
                 this.oidcTokenForm.patchValue(this.app.oidcConfig);
               }
