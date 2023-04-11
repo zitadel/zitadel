@@ -30,7 +30,7 @@ Note that the resources will be migrated without the event stream. This means th
 
 ## Authorization
 
-You need a PAT from a service user with IAM Owner permissions on both the source and target system.
+You need a PAT from a service user with IAM Owner permissions in both the source and target system.
 
 ### Source system
 
