@@ -1,5 +1,6 @@
 ---
-title: Export and import with ZITADEL
+title: Migrate from v1
+sidebar_label: From ZITADEL v1
 ---
 
 ## Export from V1 to Import into V2
