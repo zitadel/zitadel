@@ -282,6 +282,7 @@ func startAPIs(
 		return fmt.Errorf("unable to start login: %w", err)
 	}
 	apis.RegisterHandler(login.HandlerPrefix, l.Handler())
+	apis.RegisterHandler("", login.DeviceAuthRedirect())
 
 	//handle oidc at last, to be able to handle the root
 	//we might want to change that in the future

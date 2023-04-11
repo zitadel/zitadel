@@ -114,3 +114,12 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointDeviceAuthConfirm, login.handleDeviceAuthConfirm).Methods(http.MethodGet, http.MethodPost)
 	return router
 }
+
+// DeviceAuthRedirect allows users to use https://domain.com/device without the /ui/login prefix
+// and redirects them to the prefixed endpoint.
+// https://www.rfc-editor.org/rfc/rfc8628#section-3.2 recommends the URL to be as short as possible.
+func DeviceAuthRedirect() http.Handler {
+	router := mux.NewRouter()
+	router.HandleFunc(EndpointDeviceAuth, redirectDeviceAuthToPrefix)
+	return router
+}

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/muhlemmer/gu"
 	"github.com/sirupsen/logrus"
 
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -167,4 +168,10 @@ func (l *Login) handleDeviceAuthConfirm(w http.ResponseWriter, r *http.Request) 
 
 func (l *Login) deviceAuthCallbackURL(authRequestID string) string {
 	return l.renderer.pathPrefix + EndpointDeviceAuthConfirm + "?authRequestID=" + authRequestID
+}
+
+func redirectDeviceAuthToPrefix(w http.ResponseWriter, r *http.Request) {
+	target := gu.PtrCopy(r.URL)
+	target.Path = HandlerPrefix + EndpointDeviceAuth
+	http.Redirect(w, r, target.String(), http.StatusFound)
 }
