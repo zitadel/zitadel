@@ -45,6 +45,7 @@ type OIDCApp struct {
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
 	AdditionalOrigins        []string
+	SkipNativeAppSuccessPage bool
 
 	State AppState
 }
