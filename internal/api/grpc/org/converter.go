@@ -26,7 +26,7 @@ func OrgQueryToModel(apiQuery *org_pb.OrgQuery) (query.SearchQuery, error) {
 	case *org_pb.OrgQuery_NameQuery:
 		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	case *org_pb.OrgQuery_StateQuery:
-		return query.NewOrgStateSearchQuery(int32(q.StateQuery.State))
+		return query.NewOrgStateSearchQuery(OrgStateToDomain(q.StateQuery.State))
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
@@ -49,6 +49,8 @@ func OrgQueryToQuery(search *org_pb.OrgQuery) (query.SearchQuery, error) {
 		return query.NewOrgDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
 	case *org_pb.OrgQuery_NameQuery:
 		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
+	case *org_pb.OrgQuery_StateQuery:
+		return query.NewOrgStateSearchQuery(OrgStateToDomain(q.StateQuery.State))
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-ADvsd", "List.Query.Invalid")
 	}
@@ -105,6 +107,21 @@ func OrgStateToPb(state domain.OrgState) org_pb.OrgState {
 		return org_pb.OrgState_ORG_STATE_REMOVED
 	default:
 		return org_pb.OrgState_ORG_STATE_UNSPECIFIED
+	}
+}
+
+func OrgStateToDomain(state org_pb.OrgState) domain.OrgState {
+	switch state {
+	case org_pb.OrgState_ORG_STATE_ACTIVE:
+		return domain.OrgStateActive
+	case org_pb.OrgState_ORG_STATE_INACTIVE:
+		return domain.OrgStateInactive
+	case org_pb.OrgState_ORG_STATE_REMOVED:
+		return domain.OrgStateRemoved
+	case org_pb.OrgState_ORG_STATE_UNSPECIFIED:
+		fallthrough
+	default:
+		return domain.OrgStateUnspecified
 	}
 }
 
