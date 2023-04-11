@@ -44,4 +44,5 @@ jobs:
       with:
         version: ${{ inputs.buf_version }}
         github_token: ${{ github.token }}
+    - run: make generate
     - run: make test
