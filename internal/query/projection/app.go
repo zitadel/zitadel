@@ -532,7 +532,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(*e.AdditionalOrigins)))
 	}
 	if e.SkipNativeAppSuccessPage != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, e.SkipNativeAppSuccessPage))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, *e.SkipNativeAppSuccessPage))
 	}
 
 	if len(cols) == 0 {

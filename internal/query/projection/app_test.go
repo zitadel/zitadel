@@ -96,6 +96,27 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "project reduceAppChanged no change",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ApplicationChangedType),
+					project.AggregateType,
+					[]byte(`{
+			"appId": "app-id"
+		}`),
+				), project.ApplicationChangedEventMapper),
+			},
+			reduce: (&appProjection{}).reduceAppChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{},
+				},
+			},
+		},
+		{
 			name: "project reduceAppDeactivated",
 			args: args{
 				event: getEvent(testEvent(
@@ -482,7 +503,9 @@ func TestAppProjection_reduces(t *testing.T) {
                         "idTokenRoleAssertion": true,
                         "idTokenUserinfoAssertion": true,
                         "clockSkew": 1000,
-                        "additionalOrigins": ["origin.one.ch", "origin.two.ch"]
+                        "additionalOrigins": ["origin.one.ch", "origin.two.ch"],
+						"skipNativeAppSuccessPage": true
+
 		}`),
 				), project.OIDCConfigChangedEventMapper),
 			},
@@ -494,7 +517,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps5_oidc_configs SET (version, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE (app_id = $15) AND (instance_id = $16)",
+							expectedStmt: "UPDATE projections.apps5_oidc_configs SET (version, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) WHERE (app_id = $16) AND (instance_id = $17)",
 							expectedArgs: []interface{}{
 								domain.OIDCVersionV1,
 								database.StringArray{"redirect.one.ch", "redirect.two.ch"},
@@ -510,6 +533,7 @@ func TestAppProjection_reduces(t *testing.T) {
 								true,
 								1 * time.Microsecond,
 								database.StringArray{"origin.one.ch", "origin.two.ch"},
+								true,
 								"app-id",
 								"instance-id",
 							},
