@@ -5,21 +5,13 @@ sidebar_label: GitHub
 
 import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
-import Prerequisites from './_prerequisites.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 import UnlinkedOAuth from './_unlinked_oauth.mdx';
 import PrefillAction from './_prefill_action.mdx';
 
 <Intro provider="GitHub"/>
-
-<!--
-    Docusaurus bug: imported headings are not shown in the content tables
-    https://docusaurus.io/docs/markdown-features/react#importing-markdown
- -->
-## Prerequisites
-
-<Prerequisites/>
 
 ## GitHub Configuration
 
@@ -52,6 +44,10 @@ Make sure to save the secret, as you will not be able to show it again.
 ![Client ID and Secret](/img/guides/github_oauth_client_id_secret.png)
 
 ## ZITADEL Configuration
+
+### Add custom login policy
+
+<CustomLoginPolicy/>
 
 ### Create new GitHub Provider
 

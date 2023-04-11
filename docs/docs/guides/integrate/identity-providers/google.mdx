@@ -5,19 +5,11 @@ sidebar_label: Google
 
 import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
-import Prerequisites from './_prerequisites.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
 <Intro provider="Google"/>
-
-<!--
-    Docusaurus bug: imported headings are not shown in the content tables
-    https://docusaurus.io/docs/markdown-features/react#importing-markdown
- -->
-## Prerequisites
-
-<Prerequisites/>
 
 ## Google Configuration
 
@@ -36,6 +28,10 @@ import TestSetup from './_test_setup.mdx';
 ![Google Client ID and Secret](/img/guides/google_client_id_secret.png)
 
 ## ZITADEL Configuration
+
+### Add custom login policy
+
+<CustomLoginPolicy/>
 
 ### Create new Google Provider
 

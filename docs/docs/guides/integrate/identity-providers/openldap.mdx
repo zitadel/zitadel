@@ -5,19 +5,11 @@ sidebar_label: Local OpenLDAP
 
 import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
-import Prerequisites from './_prerequisites.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
 <Intro provider="a local OpenLDAP server"/>
-
-<!--
-    Docusaurus bug: imported headings are not shown in the content tables
-    https://docusaurus.io/docs/markdown-features/react#importing-markdown
- -->
-## Prerequisites
-
-<Prerequisites/>
 
 ## OpenLDAP Configuration
 
@@ -138,6 +130,10 @@ ldapadd -x -h localhost -D "cn=admin,dc=example,dc=com" -f example.ldif -w 'Pass
 ```
 
 ## ZITADEL Configuration
+
+### Add custom login policy
+
+<CustomLoginPolicy/>
 
 ### Create new LDAP Provider
 
