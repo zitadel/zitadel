@@ -13,7 +13,7 @@
             data-e2e="member-avatar"
           >
             <cnsl-avatar
-              *ngIf="member && member.profile; else cog"
+              *ngIf="member && member.userType === UserType.TYPE_HUMAN; else cog"
               class="contributor-avatar dontcloseonclick"
               [avatarUrl]="member.avatarUrl || ''"
               [name]="member.displayName"
