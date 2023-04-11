@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "Your onboarding process",
+    "MOREDESCRIPTION": "more shortcuts",
     "COMPLETED": "completed",
     "DISMISS": "No thanks, I'm a pro.",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "Setup your brand",
-        "description": "Define coloring and shape of your login and upload your logo and icons."
+        "description": "Define coloring and shape of your login and upload your logo and icons.",
+        "action": "Setup branding"
       },
       "instance.smtp.config.added": {
         "title": "Setup your SMTP settings",
-        "description": "Set your own mail server settings."
+        "description": "Set your own mail server settings.",
+        "action": "Setup SMTP"
       },
       "project.added": {
-        "title": "Create your first project",
-        "description": "Add your first project and define its roles and authorizations."
+        "title": "Create a project",
+        "description": "Add a project and define its roles and authorizations.",
+        "action": "Create project"
       },
       "project.application.added": {
-        "title": "Create your first application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow."
+        "title": "Create an application",
+        "description": "Create a web, native, api or saml application and setup your authentication flow.",
+        "action": "Create app"
       },
       "user.human.added": {
         "title": "Add users",
-        "description": "Add your application users"
+        "description": "Add your application users",
+        "action": "Add user"
       },
       "user.grant.added": {
         "title": "Grant users",
-        "description": "Allow users to access your application and setup their role."
+        "description": "Allow users to access your application and setup their role.",
+        "action": "Grant user"
       }
     }
   },
@@ -1923,6 +1930,8 @@
       "REGENERATESECRET": "Regenerate Client Secret",
       "DEVMODE": "Development Mode",
       "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Skip Login Success Page",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Skip the success page after a login for this native app.",
       "REDIRECT": "Redirect URIs",
       "REDIRECTSECTION": "Redirect URIs",
       "POSTLOGOUTREDIRECT": "Post Logout URIs",

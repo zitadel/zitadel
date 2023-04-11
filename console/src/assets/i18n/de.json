@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "Dein Onboarding-prozess",
+    "MOREDESCRIPTION": "mehr Shortcuts",
     "COMPLETED": "abgeschlossen",
     "DISMISS": "schließen",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "Branding anpassen",
-        "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons."
+        "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons.",
+        "action": "Branding anpassen"
       },
       "instance.smtp.config.added": {
         "title": "SMTP Benachrichtigungseinstellungen",
-        "description": "Konfiguriere deinen Mailserver."
+        "description": "Konfiguriere deinen Mailserver.",
+        "action": "SMTP einrichten"
       },
       "project.added": {
         "title": "Erstelle ein Projekt",
-        "description": "Erstelle dein erstes Projekt und definiere Rollen"
+        "description": "Erstelle dein erstes Projekt und definiere Rollen",
+        "action": "Projekt erstellen"
       },
       "project.application.added": {
         "title": "Erstelle eine App",
-        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow."
+        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow.",
+        "action": "App erstellen"
       },
       "user.human.added": {
         "title": "Erfasse Benutzer",
-        "description": "Erstelle Benutzer die später deine Apps nutzen können."
+        "description": "Erstelle Benutzer die später deine Apps nutzen können.",
+        "action": "Benutzer erfassen"
       },
       "user.grant.added": {
         "title": "Berechtige Benutzer",
-        "description": "Erlaube es deinen Nutzern auf deine Apps zuzugreifen und gebe ihnen Rollen."
+        "description": "Erlaube es deinen Nutzern auf deine Apps zuzugreifen und gebe ihnen Rollen.",
+        "action": "Benutzer berechtigen"
       }
     }
   },
@@ -1930,6 +1937,8 @@
       "REGENERATESECRET": "Client Secret neu generieren",
       "DEVMODE": "Entwicklermodus",
       "DEVMODEDESC": "Bei eingeschaltetem Entwicklermodus werden die Weiterleitungs-URIs im OIDC-Flow nicht validiert.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Login Erfolgseite überspringen",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Erfolgseite nach dem Login für diese Native Applikation überspringen.",
       "REDIRECT": "Weiterleitungs-URIs",
       "REDIRECTSECTION": "Weiterleitungs-URIs",
       "POSTLOGOUTREDIRECT": "URIs für Post-Log-out",

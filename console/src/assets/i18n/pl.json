@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "Twój proces wprowadzania na rynek",
+    "MOREDESCRIPTION": "więcej skrótów",
     "COMPLETED": "zakończone",
     "DISMISS": "zamknąć",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "Skonfiguruj swoją markę",
-        "description": "Zdefiniuj kolorystykę i kształt swojego loginu oraz wgraj swoje logo i ikony."
+        "description": "Zdefiniuj kolorystykę i kształt swojego loginu oraz wgraj swoje logo i ikony.",
+        "action": "Skonfiguruj branding"
       },
       "instance.smtp.config.added": {
         "title": "Ustawienia SMTP",
-        "description": "Ustawienie własnego serwera pocztowego"
+        "description": "Ustawienie własnego serwera pocztowego",
+        "action": "skonfiguruj ustawienia SMTP"
       },
       "project.added": {
         "title": "Stwórz swój pierwszy projekt",
-        "description": "Dodaj swój pierwszy projekt i określ jego role i uprawnienia."
+        "description": "Dodaj swój pierwszy projekt i określ jego role i uprawnienia.",
+        "action": "Utwórz projekt"
       },
       "project.application.added": {
         "title": "Utwórz swoją pierwszą aplikację",
-        "description": "Utwórz aplikację internetową, natywną, api lub saml i skonfiguruj swój przepływ uwierzytelniania."
+        "description": "Utwórz aplikację internetową, natywną, api lub saml i skonfiguruj swój przepływ uwierzytelniania.",
+        "action": "Utwórz aplikację"
       },
       "user.human.added": {
         "title": "Dodaj użytkowników",
-        "description": "Dodaj użytkowników aplikacji"
+        "description": "Dodaj użytkowników aplikacji",
+        "action": "Stwórz użytkownika"
       },
       "user.grant.added": {
         "title": "Użytkownicy dotacji",
-        "description": "Pozwól użytkownikom na dostęp do Twojej aplikacji i ustaw ich rolę."
+        "description": "Pozwól użytkownikom na dostęp do Twojej aplikacji i ustaw ich rolę.",
+        "action": "Utwórz autoryzację"
       }
     }
   },
@@ -1931,6 +1938,8 @@
       "REGENERATESECRET": "Odtwórz sekret klienta",
       "DEVMODE": "Tryb rozwoju",
       "DEVMODEDESC": "Uwaga: przy włączonym trybie rozwoju adresy URI przekierowania nie będą sprawdzane.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Pomiń stronę sukcesu po zalogowaniu",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Pomiń stronę sukcesu po zalogowaniu dla tej Natywny aplikację",
       "REDIRECT": "Adresy URI przekierowania",
       "REDIRECTSECTION": "Adresy URI przekierowania",
       "POSTLOGOUTREDIRECT": "Adresy URI po wylogowaniu",
