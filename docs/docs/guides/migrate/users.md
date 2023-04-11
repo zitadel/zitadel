@@ -125,6 +125,7 @@ You can show your interest or join the discussion on [this issue](https://github
 ## Migrate secrets
 
 Besides user data you need to migrate secrets, such as password hashes, OTP seeds, and public keys for passkeys (FIDO2).
+The snippets in the sections below are parts from the bulk import endpoint, to clarify how the different objects can be imported.
 
 ### Passwords
 
@@ -132,6 +133,7 @@ Passwords are stored only as hash.
 You can transfer the hashes as long as ZITADEL [supports the same hash algorithm](/docs/concepts/architecture/secrets#hashed-secrets).
 Password change on the next sign-in can be enforced.
 
+_snippet from [bulk-import](#bulk-import) example:_
 ```json
 {
   "userName": "test9@test9",
@@ -157,6 +159,7 @@ In case the hash algorithm you are using is not supported by ZITADEL, please let
 
 You can pass the OTP secret when creating users:
 
+_snippet from [bulk-import](#bulk-import) example:_
 ```json
 {
   "userName": "test9@test9",
@@ -170,6 +173,7 @@ You can pass the OTP secret when creating users:
 
 When creating new users, you can trigger a workflow that prompts the users to setup a passkey authenticator.
 
+_snippet from [bulk-import](#bulk-import) example:_
 ```json
 {
   "userName": "test9@test9",
@@ -192,6 +196,7 @@ This means that the IDP Client ID configured in ZITADEL must be the same ID as i
 
 Users should be imported with their `externalUserId`.
 
+_snippet from [bulk-import](#bulk-import) example:_
 ```json
 {
   "userName": "test9@test9",
