@@ -28,7 +28,7 @@ jobs:
     - uses: actions/cache/save@v3
       if: always()
       with:
-        path: src/app/proto/generated
+        path: console/src/app/proto/generated
         key: console-client-${{ hashFiles('proto/**') }}
 
   lint:
@@ -45,7 +45,7 @@ jobs:
     - uses: actions/cache/restore@v3
       id: cache
       with:
-        path: src/app/proto/generated
+        path: console/src/app/proto/generated
         key: console-client-${{ hashFiles('proto/**') }}
     - run: yarn lint
 
@@ -63,7 +63,7 @@ jobs:
     - uses: actions/cache/restore@v3
       id: cache
       with:
-        path: src/app/proto/generated
+        path: console/src/app/proto/generated
         key: console-client-${{ hashFiles('proto/**') }}
     - run: yarn build
 
