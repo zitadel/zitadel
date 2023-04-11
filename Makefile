@@ -28,15 +28,3 @@ generate: grpc static assets
 
 test:
 	go test -race -v -coverprofile=profile.cov ./...
-
-lint:
-	golangci-lint run
-
-tidy:
-	go mod tidy
-
-install:
-	go mod download
-
-build:
-	go build

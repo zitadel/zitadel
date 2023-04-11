@@ -13,8 +13,8 @@ defaults:
 
 jobs:
 
-  lint:
-    name: lint
+  deps:
+    name: deps
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -25,11 +25,34 @@ jobs:
         cache-dependency-path: console/yarn.lock
     - run: yarn install --frozen-lockfile
     - run: yarn generate
+    - uses: actions/cache/save@v3
+      if: always()
+      with:
+        path: src/app/proto/generated
+        key: console-client-${{ hashFiles('**/lockfiles', '../proto/**') }}
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    needs: deps
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node_version }}
+        cache: 'yarn'
+        cache-dependency-path: console/yarn.lock
+    - uses: actions/cache/restore@v3
+      id: cache
+      with:
+        path: src/app/proto/generated
+        key: console-client-${{ hashFiles('**/lockfiles', '../proto/**') }}
     - run: yarn lint
 
   build:
     name: build
     runs-on: ubuntu-latest
+    needs: deps
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
@@ -37,36 +60,11 @@ jobs:
         node-version: ${{ inputs.node_version }}
         cache: 'yarn'
         cache-dependency-path: console/yarn.lock
-    - uses: docker/setup-qemu-action@v2
-    - uses: docker/setup-buildx-action@v2
-      # uses: docker/login-action@v2
-      # with:
-      #   registry: ghcr.io
-      #   username: ${{ github.actor }}
-      #   password: ${{ secrets.GITHUB_TOKEN }}
-    - run: yarn install --frozen-lockfile
-    - run: yarn generate
+    - uses: actions/cache/restore@v3
+      id: cache
+      with:
+        path: src/app/proto/generated
+        key: console-client-${{ hashFiles('**/lockfiles', '../proto/**') }}
     - run: yarn build
-    ## The upload action is slow with multiple small artifacts
-    - run: zip -r bundle.zip dist/console
-    - uses: actions/upload-artifact@v3
-      with:
-        name: console
-        path: console/bundle.zip
-    - uses: docker/build-push-action@v4
-      with:
-        context: .
-        file: build/console/nginx
-        platforms: linux/amd64,linux/arm64
-        push: false
-        tags: zitadel/console:${{ github.sha }} 
- 
-  success:
-    name: success
-    runs-on: ubuntu-latest
-    needs: [lint, build]
-    steps:
-    - uses: actions/checkout@v3
-    - run: echo "console sucessful built"
 
 
