@@ -17,11 +17,11 @@ jobs:
     with:
       node_version: 18
 
-  # core:
-  #   uses: ./.github/workflows/core.yml
-  #   with:
-  #     go_version: 1.19
-  #     buf_version: v1.15.1
+  core:
+    uses: ./.github/workflows/core.yml
+    with:
+      go_version: 1.19
+      buf_version: v1.15.1
    
   # docs:
   # placeholder
