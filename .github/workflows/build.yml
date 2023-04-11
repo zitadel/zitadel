@@ -39,6 +39,7 @@ jobs:
   core:
     name: core
     runs-on: ubuntu-latest
+    needs: console
     strategy:
       matrix:
         goos: [linux, darwin]
