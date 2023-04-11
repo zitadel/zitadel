@@ -25,13 +25,6 @@ jobs:
    
   # docs:
   # placeholder
-  
+
   # login:
   # placeholder 
-
-  release:
-    name: release zitadel
-    runs-on: ubuntu-latest
-    needs: [api, core, console, docs]
-    steps:
-    - run: echo "This is a placeholder"
