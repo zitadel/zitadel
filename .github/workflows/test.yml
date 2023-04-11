@@ -1,4 +1,4 @@
-name: Lint
+name: Test
 
 on:
   workflow_call:
@@ -18,29 +18,17 @@ jobs:
   api:
     name: api
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
     - uses: actions/checkout@v3
     - uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
         github_token: ${{ github.token }}
-    - uses: bufbuild/buf-lint-action@v1
-    ## TODO add comment action with report
-
-  console:
-    name: console
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    - uses: bufbuild/buf-breaking-action@v1
       with:
-        node-version: ${{ inputs.node_version }}
-        cache: 'yarn'
-        cache-dependency-path: console/yarn.lock
-    - run: (cd console ; yarn install --frozen-lockfile)
-    - run: (cd console ; yarn generate)
-    - run: (cd console ; yarn lint)
+        against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
+
+  # console:
 
   core:
     name: core
@@ -56,10 +44,4 @@ jobs:
       with:
         version: ${{ inputs.buf_version }}
         github_token: ${{ github.token }}
-    - name: linting
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: v1.50.1
-        only-new-issues: true
-        skip-pkg-cache: true
-        args: -v
+    - run: make test

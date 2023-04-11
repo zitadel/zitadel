@@ -11,3 +11,17 @@ jobs:
       node_version: 18
       go_version: 1.19
       buf_version: v1.15.1
+
+  test:
+    uses: ./.github/workflows/test.yml
+    with:
+      node_version: 18
+      go_version: 1.19
+      buf_version: v1.15.1
+
+  build:
+    uses: ./.github/workflows/build.yml
+    with:
+      node_version: 18
+      go_version: 1.19
+      buf_version: v1.15.1

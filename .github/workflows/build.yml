@@ -1,4 +1,4 @@
-name: Lint
+name: Build
 
 on:
   workflow_call:
@@ -40,11 +40,17 @@ jobs:
         cache-dependency-path: console/yarn.lock
     - run: (cd console ; yarn install --frozen-lockfile)
     - run: (cd console ; yarn generate)
-    - run: (cd console ; yarn lint)
+    - run: (cd console ; yarn build)
+    - uses: actions/cache/save@v3
+      if: always()
+      with:
+        path: console/dist/console
+        key: console-dist-${{ hashFiles('console/**') }}
 
   core:
     name: core
     runs-on: ubuntu-latest
+    needs: console
     steps:
     - uses: actions/checkout@v3
       with:
