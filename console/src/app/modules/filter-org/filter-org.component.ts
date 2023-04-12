@@ -22,7 +22,7 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
   public searchQueries: OrgQuery[] = [];
 
-  public states: OrgState[] = [OrgState.ORG_STATE_ACTIVE, OrgState.ORG_STATE_INACTIVE];
+  public states: OrgState[] = [OrgState.ORG_STATE_ACTIVE, OrgState.ORG_STATE_INACTIVE, OrgState.ORG_STATE_REMOVED];
 
   constructor(router: Router, protected route: ActivatedRoute) {
     super(router, route);
