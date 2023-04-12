@@ -1466,6 +1466,11 @@ message UserGrant {
             example: "[\"RoleKey1\", \"RoleKey2\"]",
         }
     ];
+    zitadel.user.v1.Type user_type = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "type of the user (human / machine)"
+        }
+    ];
 }
 
 message ListMyProjectOrgsRequest {

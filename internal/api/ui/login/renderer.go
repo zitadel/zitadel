@@ -161,7 +161,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return path.Join(r.pathPrefix, EndpointMFAPrompt)
 		},
 		"mfaPromptChangeUrl": func(id string, provider domain.MFAType) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, QueryAuthRequestID, id, "provider", provider))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v", EndpointMFAPrompt, QueryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAInitVerify)

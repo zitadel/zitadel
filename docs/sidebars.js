@@ -108,7 +108,7 @@ module.exports = {
     {
       type: "category",
       label: "Migrate",
-      collapsed: false,
+      collapsed: true,
       items: [
         "guides/migrate/introduction",
         "guides/migrate/users",
@@ -117,7 +117,7 @@ module.exports = {
           label: "Sources",
           collapsed: true,
           items: [
-            "guides/migrate/sources/zitadel-v1",
+            "guides/migrate/sources/zitadel",
             "guides/migrate/sources/auth0",
           ]
         },

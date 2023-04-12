@@ -72,6 +72,7 @@ Use the values displayed on the AzureAD Application page in your ZITADEL IdP Set
 - You need to extract the `issuer` of your AzureAD Tenant from the OpenID configuration (`OpenID Connect metadata document`) in the `Endpoints submenu`. It should be your tenant's domain appended with `/v2.0`
 - The `Client ID` of ZITADEL corresponds to the `Application (client) ID` in the Overview page
 - The `Client Secret` was generated during the `Create Client Secret` step
+- Add `https://graph.microsoft.com/User.Read` to the scopes list to let personal Azure accounts register themselves
 
 ![Azure Application](/img/guides/azure_app.png)
 

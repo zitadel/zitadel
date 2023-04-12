@@ -723,6 +723,11 @@ message UserGrant {
             example: "\"gigi@zitadel.com\"";
         }
     ];
+    Type user_type = 19 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "type of the user (human / machine)"
+        }
+    ];
 }
 
 enum UserGrantState {
