@@ -5,14 +5,12 @@ sidebar_label: LDAP
 
 import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
+import LDAPWarn from './_ldap_warn.mdx';
 import CustomLoginPolicy from './_custom_login_policy.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
-:::caution
-LDAP does send your user passwords in clear text. Due to this we do not recommend using it with the ZITADEL cloud.
-If you want to use it anyway, please reach out to us.
-:::
+<LDAPWarn/>
 
 <Intro provider="an LDAP server"/>
 
