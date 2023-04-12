@@ -2,11 +2,13 @@ grpc:
 	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption
 	# This foreach is a workaround from a limitation of the authoption generator and only affects zitadel.
 	# The authoption generator cannot work when passed *.proto but instead needs to have each file passed as {name}.proto
-	for i in $$(find proto/zitadel -iname *.proto -not -path "user" -not -path "session"); do buf generate $${i}; done
+	for i in $$(find proto/zitadel -iname *.proto); do buf generate $${i}; done
 	mv .artifacts/grpc/zitadel/auth.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/auth
 	mv .artifacts/grpc/zitadel/admin.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/admin
 	mv .artifacts/grpc/zitadel/management.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/management
 	mv .artifacts/grpc/zitadel/system.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/system
+	mv .artifacts/grpc/zitadel/session/v2alpha/*.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/session/v2alpha
+	mv .artifacts/grpc/zitadel/user/v2alpha/*.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/user/v2alpha
 	cp -rT .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/ pkg/grpc/
 	mkdir -p openapi/v2/zitadel
 	cp .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel
