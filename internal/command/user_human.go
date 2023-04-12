@@ -272,7 +272,15 @@ func (h *AddHuman) ensureDisplayName() {
 	if strings.TrimSpace(h.DisplayName) != "" {
 		return
 	}
-	h.DisplayName = h.FirstName + " " + h.LastName
+	if strings.TrimSpace(h.FirstName) != "" && strings.TrimSpace(h.LastName) != "" {
+		h.DisplayName = h.FirstName + " " + h.LastName
+		return
+	}
+	if strings.TrimSpace(string(h.Email.Address)) != "" {
+		h.DisplayName = string(h.Email.Address)
+		return
+	}
+	h.DisplayName = h.Username
 }
 
 // shouldAddInitCode returns true for all added Humans which:
@@ -464,7 +472,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 		human.AggregateID = userID
 	}
 
-	human.SetNamesAsDisplayname()
+	human.EnsureDisplayName()
 	if human.Password != nil {
 		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, human.Password.ChangeRequired); err != nil {
 			return nil, nil, err

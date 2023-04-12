@@ -1695,7 +1695,7 @@
     "AZUREADTENANTTYPES": {
       "0": "Common",
       "1": "Organizations",
-      "2": "Consumer"
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "Tenant Type",
     "AZUREADTENANTID": "Tenant ID",
@@ -1930,6 +1930,8 @@
       "REGENERATESECRET": "Regenerate Client Secret",
       "DEVMODE": "Development Mode",
       "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Skip Login Success Page",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Skip the success page after a login for this native app.",
       "REDIRECT": "Redirect URIs",
       "REDIRECTSECTION": "Redirect URIs",
       "POSTLOGOUTREDIRECT": "Post Logout URIs",

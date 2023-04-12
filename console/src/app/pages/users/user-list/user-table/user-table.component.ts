@@ -204,6 +204,7 @@ export class UserTableComponent implements OnInit {
           sortingField = UserFieldName.USER_FIELD_NAME_CREATION_DATE;
           break;
       }
+
     this.userService
       .listUsers(
         limit,

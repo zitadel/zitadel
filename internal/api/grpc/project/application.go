@@ -60,6 +60,7 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 			ClockSkew:                durationpb.New(app.ClockSkew),
 			AdditionalOrigins:        app.AdditionalOrigins,
 			AllowedOrigins:           app.AllowedOrigins,
+			SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 		},
 	}
 }
