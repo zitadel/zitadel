@@ -2,7 +2,7 @@ grpc:
 	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption
 	# This foreach is a workaround from a limitation of the authoption generator and only affects zitadel.
 	# The authoption generator cannot work when passed *.proto but instead needs to have each file passed as {name}.proto
-	for i in $$(find proto/zitadel -iname *.proto -not -path "proto/zitadel/user" -not -path "proto/zitadel/session"); do buf generate $${i}; done
+	for i in $$(find proto/zitadel -iname *.proto -not -path "user" -not -path "session"); do buf generate $${i}; done
 	mv .artifacts/grpc/zitadel/auth.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/auth
 	mv .artifacts/grpc/zitadel/admin.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/admin
 	mv .artifacts/grpc/zitadel/management.pb.authoptions.go .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/management
