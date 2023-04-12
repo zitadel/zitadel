@@ -1223,7 +1223,7 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 	if err != nil {
 		return false, err
 	}
-	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
+	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative && !app.OIDCConfig.SkipNativeAppSuccessPage, nil
 }
 
 func (repo *AuthRequestRepo) getDomainPolicy(ctx context.Context, orgID string) (*query.DomainPolicy, error) {
