@@ -30,10 +30,11 @@ jobs:
     - run: (cd console ; yarn install --frozen-lockfile)
     - run: (cd console ; yarn generate)
     - run: (cd console ; yarn build)
+    - run: mv console/dist/console/ internal/api/ui/console/static/
     - uses: actions/cache/save@v3
       if: always()
       with:
-        path: console/dist/console
+        path: internal/api/ui/console/static/
         key: console-dist-${{ hashFiles('console/**') }}
 
   core:
@@ -56,9 +57,9 @@ jobs:
     - run: make generate
     - uses: actions/cache/restore@v3
       with:
-        path: console/dist/console
+        path: internal/api/ui/console/static/
         key: console-dist-${{ hashFiles('console/**') }}
-    - run: cp -r console/dist/console/ internal/api/ui/console/static/
+    - run: ls -la internal/api/ui/console/static/
     - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
     - uses: actions/upload-artifact@v3
       with:
