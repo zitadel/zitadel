@@ -9,6 +9,12 @@ import CustomLoginPolicy from './_custom_login_policy.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
+
+:::caution
+LDAP does send your user passwords in clear text. Due to this we do not recommend using it with the ZITADEL cloud.
+If you want to use it anyway, please reach out to us.
+:::
+
 <Intro provider="a local OpenLDAP server"/>
 
 ## OpenLDAP Configuration
