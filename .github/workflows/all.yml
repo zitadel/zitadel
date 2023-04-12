@@ -32,7 +32,6 @@ jobs:
 
   container:
     uses: ./.github/workflows/container.yml
-    secrets: inherit
     needs: [lint, test, build]
 
   #release
