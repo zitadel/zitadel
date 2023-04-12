@@ -521,9 +521,10 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *managem
 	}
 	if !queriedPrivacy.IsDefault {
 		return &management_pb.AddCustomPrivacyPolicyRequest{
-			TosLink:     queriedPrivacy.TOSLink,
-			PrivacyLink: queriedPrivacy.PrivacyLink,
-			HelpLink:    queriedPrivacy.HelpLink,
+			TosLink:      queriedPrivacy.TOSLink,
+			PrivacyLink:  queriedPrivacy.PrivacyLink,
+			HelpLink:     queriedPrivacy.HelpLink,
+			SupportEmail: string(queriedPrivacy.SupportEmail),
 		}, nil
 	}
 	return nil, nil
@@ -799,6 +800,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 						IdTokenUserinfoAssertion: app.OIDCConfig.AssertIDTokenUserinfo,
 						ClockSkew:                durationpb.New(app.OIDCConfig.ClockSkew),
 						AdditionalOrigins:        app.OIDCConfig.AdditionalOrigins,
+						SkipNativeAppSuccessPage: app.OIDCConfig.SkipNativeAppSuccessPage,
 					},
 				})
 			}

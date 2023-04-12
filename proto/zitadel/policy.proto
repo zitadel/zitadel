@@ -4,6 +4,7 @@ import "zitadel/object.proto";
 import "zitadel/idp.proto";
 import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
 
 package zitadel.policy.v1;
 
@@ -343,6 +344,13 @@ message PrivacyPolicy {
     string help_link = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"https://zitadel.com/docs/manuals/introduction\"";
+        }
+    ];
+    string support_email = 6 [
+        (validate.rules).string = {ignore_empty: true, max_len: 320, email: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"support-email@test.com\"";
+            description: "help / support email address."
         }
     ];
 }

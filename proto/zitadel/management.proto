@@ -8773,6 +8773,11 @@ message AddOIDCAppRequest {
             description: "Additional origins (other than the redirect_uris) from where the API can be used";
         }
     ];
+    bool skip_native_app_success_page = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
+        }
+    ];
 }
 
 message AddOIDCAppResponse {
@@ -8941,6 +8946,11 @@ message UpdateOIDCAppConfigRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://console.zitadel.ch/auth/callback\"]";
             description: "Additional origins (other than the redirect_uris) from where the API can be used";
+        }
+    ];
+    bool skip_native_app_success_page = 16 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
         }
     ];
 }
@@ -9834,6 +9844,13 @@ message AddCustomPrivacyPolicyRequest {
             example: "\"https://zitadel.com/docs/manuals/introduction\"";
         }
     ];
+    string support_email = 4 [
+        (validate.rules).string = {ignore_empty: true, max_len: 320, email: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"support-email@test.com\"";
+            description: "help / support email address."
+        }
+    ];
 }
 
 message AddCustomPrivacyPolicyResponse {
@@ -9857,6 +9874,13 @@ message UpdateCustomPrivacyPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Variable {{.Lang}} can be set to have different links based on the language.";
             example: "\"https://zitadel.com/docs/manuals/introduction\"";
+        }
+    ];
+    string support_email = 4 [
+        (validate.rules).string = {ignore_empty: true, max_len: 320, email: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"support-email@test.com\"";
+            description: "help / support email address."
         }
     ];
 }

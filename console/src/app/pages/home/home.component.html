@@ -1,4 +1,6 @@
 <div class="max-width-container">
+  <h1 class="home-title" data-e2e="authenticated-welcome">{{ 'HOME.WELCOME' | translate }}</h1>
+
   <div class="home-wrapper enlarged-container">
     <ng-container *ngIf="['iam.read$'] | hasRole | async; else defaultHome">
       <cnsl-onboarding></cnsl-onboarding>
@@ -10,24 +12,66 @@
     <p class="disclaimer cnsl-secondary-text">{{ 'HOME.DISCLAIMER' | translate }}</p>
 
     <span class="fill-space"></span>
+    <h2 class="desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
+
     <div class="home-grid-container">
-      <a href="https://zitadel.com/docs" target="_blank" rel="noreferrer" class="grid-item blue">
-        <div class="grid-item-avatar blue">
-          <i class="icon las la-file-alt"></i>
+      <a href="https://zitadel.com/docs" target="_blank" rel="noreferrer" class="grid-item">
+        <div
+          class="icon-wrapper"
+          [ngStyle]="{
+            background: (themeService.isDarkTheme | async) ? bluedark + 50 : bluelight + 50
+          }"
+        >
+          <div
+            class="inner"
+            [ngStyle]="{
+              background: (themeService.isDarkTheme | async) ? bluedark : bluelight,
+              color: (themeService.isDarkTheme | async) ? bluelight : bluedark
+            }"
+          >
+            <i class="las la-file-alt"></i>
+          </div>
         </div>
+
         <span>{{ 'HOME.DOCUMENTATION.TITLE' | translate }}</span>
       </a>
 
-      <a href="https://zitadel.com/docs/guides/start/quickstart" target="_blank" rel="noreferrer" class="grid-item green">
-        <div class="grid-item-avatar green">
-          <i class="icon las la-play"></i>
+      <a href="https://zitadel.com/docs/guides/start/quickstart" target="_blank" rel="noreferrer" class="grid-item">
+        <div
+          class="icon-wrapper"
+          [ngStyle]="{
+            background: (themeService.isDarkTheme | async) ? greendark + 50 : greenlight + 50
+          }"
+        >
+          <div
+            class="inner"
+            [ngStyle]="{
+              background: (themeService.isDarkTheme | async) ? greendark : greenlight,
+              color: (themeService.isDarkTheme | async) ? greenlight : greendark
+            }"
+          >
+            <i class="las la-play"></i>
+          </div>
         </div>
         <span>{{ 'HOME.GETSTARTED.TITLE' | translate }}</span>
       </a>
 
-      <a href="https://zitadel.com/docs/examples/introduction" target="_blank" rel="noreferrer" class="grid-item green">
-        <div class="grid-item-avatar green">
-          <i class="icon las la-play"></i>
+      <a href="https://zitadel.com/docs/examples/introduction" target="_blank" rel="noreferrer" class="grid-item">
+        <div
+          class="icon-wrapper"
+          [ngStyle]="{
+            background: (themeService.isDarkTheme | async) ? cyandark + 50 : cyanlight + 50
+          }"
+        >
+          <div
+            class="inner"
+            [ngStyle]="{
+              background: (themeService.isDarkTheme | async) ? cyandark : cyanlight,
+              color: (themeService.isDarkTheme | async) ? cyanlight : cyandark
+            }"
+          >
+            <i class="las la-play"></i>
+          </div>
         </div>
         <span>{{ 'HOME.QUICKSTARTS.TITLE' | translate }}</span>
       </a>

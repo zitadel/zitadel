@@ -1,5 +1,7 @@
 ```[tasklist]
+
 ### Definition of Ready
+
 - [ ] I am happy with the code
 - [ ] Short description of the feature/issue is added in the pr description
 - [ ] PR is linked to the corresponding user story
