@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: build/test.Dockerfile
+          file: build/scratch.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ghcr.io/zitadel/test:${{ github.sha }}
