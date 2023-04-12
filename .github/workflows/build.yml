@@ -35,7 +35,7 @@ jobs:
       if: always()
       with:
         path: internal/api/ui/console/static/
-        key: console-dist-${{ hashFiles('console/**') }}
+        key: console-dist-${{ hashFiles('console/src/**', 'console/yarn.lock') }}
 
   core:
     name: core
@@ -58,7 +58,7 @@ jobs:
     - uses: actions/cache/restore@v3
       with:
         path: internal/api/ui/console/static/
-        key: console-dist-${{ hashFiles('console/**') }}
+        key: console-dist-${{ hashFiles('console/src/**', 'console/yarn.lock') }}
     - run: ls -la internal/api/ui/console/static/
     - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
     - uses: actions/upload-artifact@v3
