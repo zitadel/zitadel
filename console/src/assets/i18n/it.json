@@ -1704,7 +1704,7 @@
     "AZUREADTENANTTYPES": {
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumer"
     },
     "ADD": "Aggiungi fornitore di identità",
     "AZUREADTENANTTYPE": "Tipo tenant",

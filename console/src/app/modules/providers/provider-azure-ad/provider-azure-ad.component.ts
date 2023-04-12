@@ -45,6 +45,7 @@ export class ProviderAzureADComponent {
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
   public tenantTypes = [
+    undefined,
     AzureADTenantType.AZURE_AD_TENANT_TYPE_COMMON,
     AzureADTenantType.AZURE_AD_TENANT_TYPE_ORGANISATIONS,
     AzureADTenantType.AZURE_AD_TENANT_TYPE_CONSUMERS,
@@ -160,7 +161,9 @@ export class ProviderAzureADComponent {
 
     const tenant = new AzureADTenant();
     tenant.setTenantId(this.tenantId?.value);
-    tenant.setTenantType(this.tenantType?.value);
+    if (this.tenantType?.value !== undefined) {
+      tenant.setTenantType(this.tenantType?.value);
+    }
     req.setTenant(tenant);
 
     req.setScopesList(this.scopesList?.value);
@@ -196,7 +199,9 @@ export class ProviderAzureADComponent {
       const tenant = new AzureADTenant();
 
       tenant.setTenantId(this.tenantId?.value);
-      tenant.setTenantType(this.tenantType?.value);
+      if (this.tenantType?.value !== undefined) {
+        tenant.setTenantType(this.tenantType?.value);
+      }
       req.setTenant(tenant);
 
       req.setScopesList(this.scopesList?.value);

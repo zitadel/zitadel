@@ -1694,7 +1694,7 @@
     "AZUREADTENANTTYPES": {
       "0": "共通",
       "1": "組織",
-      "2": "顧客"
+      "2": "消費者"
     },
     "AZUREADTENANTTYPE": "テナントタイプ",
     "AZUREADTENANTID": "テナントID",

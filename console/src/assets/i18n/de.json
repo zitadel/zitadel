@@ -1699,7 +1699,7 @@
     "AZUREADTENANTTYPES": {
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumer"
     },
     "ADD": "Identitätsanbieter hinzufügen",
     "AZUREADTENANTTYPE": "Tenant Typ",

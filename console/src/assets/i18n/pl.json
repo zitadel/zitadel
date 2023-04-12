@@ -1703,7 +1703,7 @@
     "AZUREADTENANTTYPES": {
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumer"
     },
     "AZUREADTENANTTYPE": "Rodzaj najemcy",
     "AZUREADTENANTID": "Identyfikator najemcy",
