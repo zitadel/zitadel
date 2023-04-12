@@ -32,3 +32,6 @@ This PR changes [a behavior] to [another behavior]
 - [ ] [Implement unit tests]
 - [ ] [Implement E2E tests]
 
+# Legend
+
+[Brackets] are exchangable placeholders
