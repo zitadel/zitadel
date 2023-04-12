@@ -21,6 +21,7 @@ This PR changes [a behavior] to [another behavior]
 - [ ] Documentation/examples are up-to-date
 - [ ] All non-functional requirements are met
 - [ ] Functionality of the acceptance criteria is checked manually on the dev system.
+- [ ] Overall duration is recorded
 
 # Implementation Tasks
 
