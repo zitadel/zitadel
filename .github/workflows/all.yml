@@ -32,7 +32,7 @@ jobs:
 
   container:
     uses: ./.github/workflows/container.yml
-    needs: [lint, test, build]
+    #needs: [lint, test, build]
 
   #release
 
