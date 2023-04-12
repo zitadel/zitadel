@@ -2,17 +2,7 @@ name: Container
 
 on:
   workflow_call:
-    inputs:
-      node_version:
-        required: true
-        type: string
-      go_version:
-        required: true
-        type: string
-      buf_version:
-        required: true
-        type: string
-
+  
 jobs:
 
   core:
