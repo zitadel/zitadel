@@ -67,8 +67,8 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 	return system.SystemService_AuthMethods
 }
 
-func (s *Server) RegisterGateway() server.GatewayFunc {
-	return system.RegisterSystemServiceHandlerFromEndpoint
+func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
+	return system.RegisterSystemServiceHandler
 }
 
 func (s *Server) GatewayPathPrefix() string {

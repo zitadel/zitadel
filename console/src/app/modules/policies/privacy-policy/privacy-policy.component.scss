@@ -7,9 +7,10 @@
   display: grid;
   grid-template-columns: 1fr;
   column-gap: 1rem;
+  width: 75%;
 
   @media only screen and (min-width: 800px) {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 

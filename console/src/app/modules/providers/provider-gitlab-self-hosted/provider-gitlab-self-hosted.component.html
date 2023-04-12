@@ -16,6 +16,11 @@
     <form [formGroup]="form" (ngSubmit)="submitForm()">
       <div class="identity-provider-content">
         <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="name" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
           <input cnslInput formControlName="issuer" />
         </cnsl-form-field>
@@ -74,12 +79,6 @@
             </cnsl-form-field>
           </div>
 
-          <cnsl-form-field class="formfield">
-            <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
-            <input cnslInput formControlName="name" />
-            <span class="name-hint cnsl-secondary-text" cnslHint>{{ 'IDP.NAMEHINT' | translate }}</span>
-          </cnsl-form-field>
-
           <cnsl-provider-options
             [initialOptions]="provider?.config?.options"
             (optionsChanged)="options = $event"
@@ -88,7 +87,13 @@
       </div>
 
       <div class="identity-provider-create-actions">
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
+        <button
+          color="primary"
+          mat-raised-button
+          class="continue-button"
+          [disabled]="form.invalid || form.disabled"
+          type="submit"
+        >
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
           <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
         </button>

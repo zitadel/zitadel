@@ -51,10 +51,11 @@ func buildQuery(ctx context.Context, db dialect.Database, queryFactory *es_model
 	query += where
 
 	if searchQuery.Columns == es_models.Columns_Event {
-		query += " ORDER BY event_sequence"
+		order := " ORDER BY creation_date, event_sequence"
 		if searchQuery.Desc {
-			query += " DESC"
+			order = " ORDER BY creation_date DESC, event_sequence DESC"
 		}
+		query += order
 	}
 
 	if searchQuery.Limit > 0 {

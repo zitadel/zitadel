@@ -23,6 +23,6 @@ func (i *inmemReporter) GetCurrentQuotaPeriod(context.Context, string, quota.Uni
 	return i.config, i.startPeriod, nil
 }
 
-func (*inmemReporter) GetDueQuotaNotifications(context.Context, *quota.AddedEvent, time.Time, uint64) ([]*quota.NotifiedEvent, error) {
+func (*inmemReporter) GetDueQuotaNotifications(context.Context, *quota.AddedEvent, time.Time, uint64) ([]*quota.NotificationDueEvent, error) {
 	return nil, nil
 }

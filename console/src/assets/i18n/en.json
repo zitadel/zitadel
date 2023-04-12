@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "Your onboarding process",
+    "MOREDESCRIPTION": "more shortcuts",
     "COMPLETED": "completed",
     "DISMISS": "No thanks, I'm a pro.",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "Setup your brand",
-        "description": "Define coloring and shape of your login and upload your logo and icons."
+        "description": "Define coloring and shape of your login and upload your logo and icons.",
+        "action": "Setup branding"
       },
       "instance.smtp.config.added": {
         "title": "Setup your SMTP settings",
-        "description": "Set your own mail server settings."
+        "description": "Set your own mail server settings.",
+        "action": "Setup SMTP"
       },
       "project.added": {
-        "title": "Create your first project",
-        "description": "Add your first project and define its roles and authorizations."
+        "title": "Create a project",
+        "description": "Add a project and define its roles and authorizations.",
+        "action": "Create project"
       },
       "project.application.added": {
-        "title": "Create your first application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow."
+        "title": "Create an application",
+        "description": "Create a web, native, api or saml application and setup your authentication flow.",
+        "action": "Create app"
       },
       "user.human.added": {
         "title": "Add users",
-        "description": "Add your application users"
+        "description": "Add your application users",
+        "action": "Add user"
       },
       "user.grant.added": {
         "title": "Grant users",
-        "description": "Allow users to access your application and setup their role."
+        "description": "Allow users to access your application and setup their role.",
+        "action": "Grant user"
       }
     }
   },
@@ -1012,11 +1019,12 @@
     "DEFAULTLANGUAGE": "Default Language",
     "LANGUAGE": {
       "de": "Deutsch",
-      "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -1185,6 +1193,7 @@
       "TOSLINK": "Link to Terms of Service",
       "POLICYLINK": "Link to Privacy Policy",
       "HELPLINK": "Link to Help",
+      "SUPPORTEMAIL": "Support Email",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
@@ -1205,10 +1214,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1651,6 +1661,10 @@
       "AZUREAD": {
         "TITLE": "Microsoft Provider",
         "DESCRIPTION": "Enter the credentials for your Microsoft Identity Provider"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Enter the credentials for your LDAP Provider"
       }
     },
     "DETAIL": {
@@ -1688,6 +1702,8 @@
     "EMAILVERIFIED": "Email verified",
     "NAMEHINT": "If specified it will be shown in the login interface.",
     "OPTIONAL": "optional",
+    "LDAPATTRIBUTES": "LDAP Attributes",
+    "UPDATEBINDPASSWORD": "update Bind Password",
     "UPDATECLIENTSECRET": "update client secret",
     "ADD": "Add Identity Provider",
     "TYPE": "Type",
@@ -1709,6 +1725,31 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "Connection",
+    "LDAPUSERBINDING": "User binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "required",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP Display Name Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Dates",
@@ -2028,10 +2069,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

@@ -49,8 +49,14 @@
         ></cnsl-provider-options>
       </div>
 
-      <div class="jwt-create-actions">
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" type="submit">
+      <div class="identity-provider-create-actions">
+        <button
+          color="primary"
+          mat-raised-button
+          class="continue-button"
+          [disabled]="form.invalid || form.disabled"
+          type="submit"
+        >
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
           <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
         </button>

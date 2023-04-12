@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "Votre processus d'intégration",
+    "MOREDESCRIPTION": "plus de raccourcis",
     "COMPLETED": "terminé",
     "DISMISS": "fermer",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "Créez votre marque",
-        "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes."
+        "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes.",
+        "action": "Définissez"
       },
       "instance.smtp.config.added": {
-        "title": "Configurez vos paramètres SMTP",
-        "description": "Définissez vos propres paramètres de serveur de messagerie"
+        "title": "Configurez paramètres SMTP",
+        "description": "Définissez paramètres de serveur de messagerie",
+        "action": "Configurez"
       },
       "project.added": {
-        "title": "Créez votre premier projet",
-        "description": "Ajoutez votre premier projet et définissez ses rôles et autorisations."
+        "title": "Créez projet",
+        "description": "Ajoutez projet et définissez ses rôles et autorisations.",
+        "action": "Créez projet"
       },
       "project.application.added": {
         "title": "Créez votre première application",
-        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification."
+        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification.",
+        "action": "Créez application"
       },
       "user.human.added": {
         "title": "Ajouter des utilisateurs",
-        "description": "Ajouter les utilisateurs de votre application"
+        "description": "Ajouter les utilisateurs de application",
+        "action": "Ajuter utilisateur"
       },
       "user.grant.added": {
         "title": "Utilisateurs de subventions",
-        "description": "Autorisez les utilisateurs à accéder à votre application et définissez leur rôle."
+        "description": "Autorisez les utilisateurs à accéder à votre application et définissez leur rôle.",
+        "action": "Autorisez"
       }
     }
   },
@@ -1012,10 +1019,11 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
-      "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1140,6 +1148,10 @@
       "MAXSIZEEXCEEDED": "La taille maximale de 524kB est dépassée.",
       "NOSVGSUPPORTED": "SVG n'est pas pris en charge",
       "FONTINLOGINONLY": "La police n'est actuellement affichée que dans l'interface de connexion.",
+      "BACKGROUNDCOLOR": "Couleur de l'arrière plan",
+      "PRIMARYCOLOR": "Couleur primaire",
+      "WARNCOLOR": "Couleur d'avertissement",
+      "FONTCOLOR": "Couleur de la police",
       "VIEWS": {
         "PREVIEW": "Aperçu",
         "CURRENT": "Configuration actuelle"
@@ -1184,6 +1196,7 @@
       "TOSLINK": "Lien vers les conditions d'utilisation",
       "POLICYLINK": "Lien vers la politique de confidentialité",
       "HELPLINK": "Lien vers l'aide",
+      "SUPPORTEMAIL": "E-mail d'assistance",
       "SAVED": "Enregistré avec succès !",
       "RESET_TITLE": "Restaurer les valeurs par défaut",
       "RESET_DESCRIPTION": "Vous êtes sur le point de restaurer les liens par défaut pour les CGS et la politique de confidentialité. Voulez-vous vraiment continuer ?"
@@ -1204,10 +1217,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1650,6 +1664,10 @@
       "AZUREAD": {
         "TITLE": "Fournisseur Microsoft",
         "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité Microsoft"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Saisissez les informations d'identification de votre fournisseur d'identité LDAP"
       }
     },
     "DETAIL": {
@@ -1692,6 +1710,8 @@
     "EMAILVERIFIED": "Courriel vérifié",
     "NAMEHINT": "Si elle est spécifiée, elle sera affichée dans l'interface de connexion.",
     "OPTIONAL": "optionnel",
+    "LDAPATTRIBUTES": "Attributs LDAP",
+    "UPDATEBINDPASSWORD": "mettre à jour le mot de bind password",
     "UPDATECLIENTSECRET": "mise à jour du secret client",
     "ADD": "Ajouter un fournisseur d'identité",
     "TYPE": "Type",
@@ -1713,6 +1733,31 @@
     "SCOPESLIST": "Liste des champs d'application",
     "CLIENTID": "ID du client",
     "CLIENTSECRET": "Secret du client",
+    "LDAPCONNECTION": "Connexion",
+    "LDAPUSERBINDING": "Enchères utilisateur",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "requis",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "Mappage de IDP nom d'affichage",
     "USERNAMEMAPPING": "Mappage des noms d'utilisateur",
     "DATES": "Dates",
@@ -2020,10 +2065,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

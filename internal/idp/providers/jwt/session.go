@@ -27,7 +27,7 @@ var (
 type Session struct {
 	*Provider
 	AuthURL string
-	Tokens  *oidc.Tokens
+	Tokens  *oidc.Tokens[*oidc.IDTokenClaims]
 }
 
 // GetAuthURL implements the [idp.Session] interface
@@ -48,12 +48,12 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	return &User{s.Tokens.IDTokenClaims}, nil
 }
 
-func (s *Session) validateToken(ctx context.Context, token string) (oidc.IDTokenClaims, error) {
+func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDTokenClaims, error) {
 	logging.Debug("begin token validation")
 	// TODO: be able to specify them in the template: https://github.com/zitadel/zitadel/issues/5322
 	offset := 3 * time.Second
 	maxAge := time.Hour
-	claims := oidc.EmptyIDTokenClaims()
+	claims := new(oidc.IDTokenClaims)
 	payload, err := oidc.ParseToken(token, claims)
 	if err != nil {
 		return nil, fmt.Errorf("%w: malformed jwt payload: %v", ErrInvalidToken, err)
@@ -84,45 +84,57 @@ func (s *Session) validateToken(ctx context.Context, token string) (oidc.IDToken
 }
 
 type User struct {
-	oidc.IDTokenClaims
+	*oidc.IDTokenClaims
 }
 
 func (u *User) GetID() string {
-	return u.IDTokenClaims.GetSubject()
+	return u.Subject
 }
 
 func (u *User) GetFirstName() string {
-	return u.IDTokenClaims.GetGivenName()
+	return u.GivenName
 }
 
 func (u *User) GetLastName() string {
-	return u.IDTokenClaims.GetFamilyName()
+	return u.FamilyName
 }
 
 func (u *User) GetDisplayName() string {
-	return u.IDTokenClaims.GetName()
+	return u.Name
 }
 
 func (u *User) GetNickname() string {
-	return u.IDTokenClaims.GetNickname()
+	return u.Nickname
 }
 
-func (u *User) GetPhone() domain.PhoneNumber {
-	return domain.PhoneNumber(u.IDTokenClaims.GetPhoneNumber())
-}
-
-func (u *User) IsPhoneVerified() bool {
-	return u.IDTokenClaims.IsPhoneNumberVerified()
-}
-
-func (u *User) GetPreferredLanguage() language.Tag {
-	return u.IDTokenClaims.GetLocale()
-}
-
-func (u *User) GetAvatarURL() string {
-	return u.IDTokenClaims.GetPicture()
+func (u *User) GetPreferredUsername() string {
+	return u.PreferredUsername
 }
 
 func (u *User) GetEmail() domain.EmailAddress {
-	return domain.EmailAddress(u.IDTokenClaims.GetEmail())
+	return domain.EmailAddress(u.Email)
+}
+
+func (u *User) IsEmailVerified() bool {
+	return bool(u.EmailVerified)
+}
+
+func (u *User) GetPhone() domain.PhoneNumber {
+	return domain.PhoneNumber(u.IDTokenClaims.PhoneNumber)
+}
+
+func (u *User) IsPhoneVerified() bool {
+	return u.PhoneNumberVerified
+}
+
+func (u *User) GetPreferredLanguage() language.Tag {
+	return u.Locale.Tag()
+}
+
+func (u *User) GetAvatarURL() string {
+	return u.Picture
+}
+
+func (u *User) GetProfile() string {
+	return u.Profile
 }

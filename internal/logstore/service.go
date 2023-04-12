@@ -15,7 +15,7 @@ const handleThresholdTimeout = time.Minute
 
 type QuotaQuerier interface {
 	GetCurrentQuotaPeriod(ctx context.Context, instanceID string, unit quota.Unit) (config *quota.AddedEvent, periodStart time.Time, err error)
-	GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, used uint64) ([]*quota.NotifiedEvent, error)
+	GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, used uint64) ([]*quota.NotificationDueEvent, error)
 }
 
 type UsageQuerier interface {
@@ -25,12 +25,12 @@ type UsageQuerier interface {
 }
 
 type UsageReporter interface {
-	Report(ctx context.Context, notifications []*quota.NotifiedEvent) (err error)
+	Report(ctx context.Context, notifications []*quota.NotificationDueEvent) (err error)
 }
 
-type UsageReporterFunc func(context.Context, []*quota.NotifiedEvent) (err error)
+type UsageReporterFunc func(context.Context, []*quota.NotificationDueEvent) (err error)
 
-func (u UsageReporterFunc) Report(ctx context.Context, notifications []*quota.NotifiedEvent) (err error) {
+func (u UsageReporterFunc) Report(ctx context.Context, notifications []*quota.NotificationDueEvent) (err error) {
 	return u(ctx, notifications)
 }
 

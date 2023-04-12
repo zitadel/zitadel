@@ -44,9 +44,10 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.PrivacyPolicy{
-					TOSLink:     "TOSLink",
-					PrivacyLink: "PrivacyLink",
-					HelpLink:    "HelpLink",
+					TOSLink:      "TOSLink",
+					PrivacyLink:  "PrivacyLink",
+					HelpLink:     "HelpLink",
+					SupportEmail: "support@example.com",
 				},
 			},
 			res: res{
@@ -65,6 +66,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
+								"support@example.com",
 							),
 						),
 					),
@@ -74,9 +76,10 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.PrivacyPolicy{
-					TOSLink:     "TOSLink",
-					PrivacyLink: "PrivacyLink",
-					HelpLink:    "HelpLink",
+					TOSLink:      "TOSLink",
+					PrivacyLink:  "PrivacyLink",
+					HelpLink:     "HelpLink",
+					SupportEmail: "support@example.com",
 				},
 			},
 			res: res{
@@ -97,6 +100,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 									"TOSLink",
 									"PrivacyLink",
 									"HelpLink",
+									"support@example.com",
 								),
 							),
 						},
@@ -107,9 +111,10 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.PrivacyPolicy{
-					TOSLink:     "TOSLink",
-					PrivacyLink: "PrivacyLink",
-					HelpLink:    "HelpLink",
+					TOSLink:      "TOSLink",
+					PrivacyLink:  "PrivacyLink",
+					HelpLink:     "HelpLink",
+					SupportEmail: "support@example.com",
 				},
 			},
 			res: res{
@@ -118,14 +123,36 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
 					},
-					TOSLink:     "TOSLink",
-					PrivacyLink: "PrivacyLink",
-					HelpLink:    "HelpLink",
+					TOSLink:      "TOSLink",
+					PrivacyLink:  "PrivacyLink",
+					HelpLink:     "HelpLink",
+					SupportEmail: "support@example.com",
 				},
 			},
 		},
 		{
-			name: "add policy empty links, ok",
+			name: "wrong email, can't add policy",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.PrivacyPolicy{
+					TOSLink:      "TOSLink",
+					PrivacyLink:  "PrivacyLink",
+					HelpLink:     "HelpLink",
+					SupportEmail: "wrong email",
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add policy empty links and empty support email, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -138,6 +165,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 									"",
 									"",
 									"",
+									"",
 								),
 							),
 						},
@@ -148,9 +176,10 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.PrivacyPolicy{
-					TOSLink:     "",
-					PrivacyLink: "",
-					HelpLink:    "",
+					TOSLink:      "",
+					PrivacyLink:  "",
+					HelpLink:     "",
+					SupportEmail: "",
 				},
 			},
 			res: res{
@@ -159,9 +188,10 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
 					},
-					TOSLink:     "",
-					PrivacyLink: "",
-					HelpLink:    "",
+					TOSLink:      "",
+					PrivacyLink:  "",
+					HelpLink:     "",
+					SupportEmail: "",
 				},
 			},
 		},
@@ -214,9 +244,10 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.PrivacyPolicy{
-					TOSLink:     "TOSLink",
-					PrivacyLink: "PrivacyLink",
-					HelpLink:    "HelpLink",
+					TOSLink:      "TOSLink",
+					PrivacyLink:  "PrivacyLink",
+					HelpLink:     "HelpLink",
+					SupportEmail: "support@example.com",
 				},
 			},
 			res: res{
@@ -235,9 +266,10 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.PrivacyPolicy{
-					TOSLink:     "TOSLink",
-					PrivacyLink: "PrivacyLink",
-					HelpLink:    "HelpLink",
+					TOSLink:      "TOSLink",
+					PrivacyLink:  "PrivacyLink",
+					HelpLink:     "HelpLink",
+					SupportEmail: "support@example.com",
 				},
 			},
 			res: res{
@@ -256,6 +288,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
+								"support@example.com",
 							),
 						),
 					),
@@ -265,13 +298,30 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.PrivacyPolicy{
-					TOSLink:     "TOSLink",
-					PrivacyLink: "PrivacyLink",
-					HelpLink:    "HelpLink",
+					TOSLink:      "TOSLink",
+					PrivacyLink:  "PrivacyLink",
+					HelpLink:     "HelpLink",
+					SupportEmail: "support@example.com",
 				},
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "wrong email, can't change policy",
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.PrivacyPolicy{
+					TOSLink:      "TOSLinkChange",
+					PrivacyLink:  "PrivacyLinkChange",
+					HelpLink:     "HelpLinkChange",
+					SupportEmail: "wrong email",
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -286,13 +336,14 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
+								"support@example.com",
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newPrivacyPolicyChangedEvent(context.Background(), "org1", "TOSLinkChange", "PrivacyLinkChange", "HelpLinkChange"),
+								newPrivacyPolicyChangedEvent(context.Background(), "org1", "TOSLinkChange", "PrivacyLinkChange", "HelpLinkChange", "support2@example.com"),
 							),
 						},
 					),
@@ -302,9 +353,10 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.PrivacyPolicy{
-					TOSLink:     "TOSLinkChange",
-					PrivacyLink: "PrivacyLinkChange",
-					HelpLink:    "HelpLinkChange",
+					TOSLink:      "TOSLinkChange",
+					PrivacyLink:  "PrivacyLinkChange",
+					HelpLink:     "HelpLinkChange",
+					SupportEmail: "support2@example.com",
 				},
 			},
 			res: res{
@@ -313,9 +365,10 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
 					},
-					TOSLink:     "TOSLinkChange",
-					PrivacyLink: "PrivacyLinkChange",
-					HelpLink:    "HelpLinkChange",
+					TOSLink:      "TOSLinkChange",
+					PrivacyLink:  "PrivacyLinkChange",
+					HelpLink:     "HelpLinkChange",
+					SupportEmail: "support2@example.com",
 				},
 			},
 		},
@@ -331,13 +384,14 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
+								"support@example.com",
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newPrivacyPolicyChangedEvent(context.Background(), "org1", "", "", ""),
+								newPrivacyPolicyChangedEvent(context.Background(), "org1", "", "", "", ""),
 							),
 						},
 					),
@@ -347,9 +401,10 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.PrivacyPolicy{
-					TOSLink:     "",
-					PrivacyLink: "",
-					HelpLink:    "",
+					TOSLink:      "",
+					PrivacyLink:  "",
+					HelpLink:     "",
+					SupportEmail: "",
 				},
 			},
 			res: res{
@@ -358,9 +413,10 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
 					},
-					TOSLink:     "",
-					PrivacyLink: "",
-					HelpLink:    "",
+					TOSLink:      "",
+					PrivacyLink:  "",
+					HelpLink:     "",
+					SupportEmail: "",
 				},
 			},
 		},
@@ -444,6 +500,7 @@ func TestCommandSide_RemovePrivacyPolicy(t *testing.T) {
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
+								"support@example.com",
 							),
 						),
 					),
@@ -487,13 +544,14 @@ func TestCommandSide_RemovePrivacyPolicy(t *testing.T) {
 	}
 }
 
-func newPrivacyPolicyChangedEvent(ctx context.Context, orgID string, tosLink, privacyLink, helpLink string) *org.PrivacyPolicyChangedEvent {
+func newPrivacyPolicyChangedEvent(ctx context.Context, orgID string, tosLink, privacyLink, helpLink, supportEmail string) *org.PrivacyPolicyChangedEvent {
 	event, _ := org.NewPrivacyPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID).Aggregate,
 		[]policy.PrivacyPolicyChanges{
 			policy.ChangeTOSLink(tosLink),
 			policy.ChangePrivacyLink(privacyLink),
 			policy.ChangeHelpLink(helpLink),
+			policy.ChangeSupportEmail(domain.EmailAddress(supportEmail)),
 		},
 	)
 	return event

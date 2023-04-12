@@ -78,8 +78,8 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 	return admin.AdminService_AuthMethods
 }
 
-func (s *Server) RegisterGateway() server.GatewayFunc {
-	return admin.RegisterAdminServiceHandlerFromEndpoint
+func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
+	return admin.RegisterAdminServiceHandler
 }
 
 func (s *Server) GatewayPathPrefix() string {

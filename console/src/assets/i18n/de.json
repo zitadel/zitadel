@@ -9,8 +9,8 @@
   "FOOTER": {
     "LINKS": {
       "CONTACT": "Kontakt",
-      "TOS": "Terms of Service",
-      "PP": "Privacy Policy"
+      "TOS": "Nutzungsbedingungen",
+      "PP": "Datenschutz-Bestimmungen"
     },
     "THEME": {
       "DARK": "Dunkel",
@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "Dein Onboarding-prozess",
+    "MOREDESCRIPTION": "mehr Shortcuts",
     "COMPLETED": "abgeschlossen",
     "DISMISS": "schließen",
     "CARD": {
@@ -53,42 +54,48 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "Branding anpassen",
-        "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons."
+        "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons.",
+        "action": "Branding anpassen"
       },
       "instance.smtp.config.added": {
         "title": "SMTP Benachrichtigungseinstellungen",
-        "description": "Konfiguriere deinen Mailserver."
+        "description": "Konfiguriere deinen Mailserver.",
+        "action": "SMTP einrichten"
       },
       "project.added": {
         "title": "Erstelle ein Projekt",
-        "description": "Erstelle dein erstes Projekt und definiere Rollen"
+        "description": "Erstelle dein erstes Projekt und definiere Rollen",
+        "action": "Projekt erstellen"
       },
       "project.application.added": {
         "title": "Erstelle eine App",
-        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow."
+        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow.",
+        "action": "App erstellen"
       },
       "user.human.added": {
         "title": "Erfasse Benutzer",
-        "description": "Erstelle Benutzer die später deine Apps nutzen können."
+        "description": "Erstelle Benutzer die später deine Apps nutzen können.",
+        "action": "Benutzer erfassen"
       },
       "user.grant.added": {
         "title": "Berechtige Benutzer",
-        "description": "Erlaube es deinen Nutzern auf deine Apps zuzugreifen und gebe ihnen Rollen."
+        "description": "Erlaube es deinen Nutzern auf deine Apps zuzugreifen und gebe ihnen Rollen.",
+        "action": "Benutzer berechtigen"
       }
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
-    "DASHBOARD": "Home",
+    "INSTANCE": "Instanz",
+    "DASHBOARD": "Startseite",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",
     "INSTANCEOVERVIEW": "Instanz",
     "ORGS": "Organisationen",
     "VIEWS": "Views",
     "EVENTS": "Events",
-    "FAILEDEVENTS": "Failed Events",
+    "FAILEDEVENTS": "Fehlerhafte Events",
     "ORGANIZATION": "Organisation",
-    "DOMAINS": "Domains",
+    "DOMAINS": "Domänen",
     "PROJECT": "Projekte",
     "PROJECTOVERVIEW": "Übersicht",
     "PROJECTGRANTS": "Berechtigte Organisationen",
@@ -106,7 +113,7 @@
     "TOS": "AGB",
     "OPENSHORTCUTSTOOLTIP": "Tippe ? um die Tastaturkürzel anzuzeigen",
     "SETTINGS": "Einstellungen",
-    "CUSTOMERPORTAL": "Customer Portal"
+    "CUSTOMERPORTAL": "Kundenportal"
   },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
@@ -204,10 +211,10 @@
     "STATE": "Status",
     "DISPLAYNAME": "Benutzer Display Name",
     "EMAIL": "Email",
-    "USERNAME": "User Name",
+    "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
     "PROJECTNAME": "Projektname",
-    "RESOURCEOWNER": "Resource Owner",
+    "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
       "5": "beinhaltet",
       "7": "endet mit",
@@ -258,13 +265,13 @@
     "SETTINGS": {
       "TITLE": "Einstellungen",
       "GENERAL": "Allgemein",
-      "IDP": "Identity Provider",
+      "IDP": "Identitätsanbieter",
       "SECURITY": "Passwort und Sicherheit",
       "KEYS": "Schlüssel",
       "PAT": "Personal Access Tokens",
-      "USERGRANTS": "Authorizations",
-      "MEMBERSHIPS": "Memberships",
-      "METADATA": "Metadata"
+      "USERGRANTS": "Berechtigungen",
+      "MEMBERSHIPS": "Mitgliedschaften",
+      "METADATA": "Metadaten"
     },
     "TITLE": "Persönliche Informationen",
     "DESCRIPTION": "Verwalte Deine persönlichen Informationen und Sicherheitseinstellungen",
@@ -325,7 +332,7 @@
       "CREATIONDATE": "Erstelldatum",
       "TYPES": {
         "HUMAN": "Benutzer",
-        "MACHINE": "Service Users"
+        "MACHINE": "Service User"
       },
       "FILTER": {
         "0": "Nach Anzeigename filtern",
@@ -426,7 +433,7 @@
       "EMPTY": "Kein IDP gefunden",
       "DIALOG": {
         "DELETE_TITLE": "Idp entfernen",
-        "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu entfernen. Wollen Sie dies wirklich tun?"
+        "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identitätsanbieter zu entfernen. Wollen Sie dies wirklich tun?"
       }
     },
     "CREATE": {
@@ -682,7 +689,7 @@
     }
   },
   "METADATA": {
-    "TITLE": "Metadata",
+    "TITLE": "Metadaten",
     "DESCRIPTION": "",
     "KEY": "Schlüssel",
     "VALUE": "Wert",
@@ -712,7 +719,7 @@
     "FLOWCLEARED": "Der Ablauf wurde zurückgesetzt",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in Sekunden",
-    "ALLOWEDTOFAIL": "Allowed To Fail",
+    "ALLOWEDTOFAIL": "Scheitern erlaubt",
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Typ",
     "TRIGGERTYPE": "Trigger Typ",
@@ -847,7 +854,7 @@
         "OTHERS": "weitere"
       },
       "DIALOG": {
-        "TITLE": "Event Detail"
+        "TITLE": "Eventdetail"
       }
     },
     "TOAST": {
@@ -919,7 +926,7 @@
     },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
-      "TITLE": "Domains",
+      "TITLE": "Domänen",
       "DESCRIPTION": "Konfiguriere die Domains, mit denen sich Deine Benutzer anmelden können.",
       "SETPRIMARY": "Primäre Domain setzen",
       "DELETE": {
@@ -989,7 +996,7 @@
       "NOTIFICATIONS": "Benachrichtigungseinstellungen",
       "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
-      "IDP": "Identity Provider",
+      "IDP": "Identitätsanbieter",
       "DOMAIN": "Domain Einstellungen",
       "LOGINTEXTS": "Login Interface Texte",
       "BRANDING": "Branding",
@@ -1012,10 +1019,11 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
-      "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1095,7 +1103,7 @@
       "RESET": {
         "DEFAULTTITLE": "Einstellungen zurücksetzen",
         "DEFAULTDESCRIPTION": "Sie sind im Begriff, Einstellungen auf die der Instanz zurückzusetzen? Wollen Sie fortfahren?",
-        "LOGINPOLICY_DESCRIPTION": "Achtung: Wenn Sie fortfahren werden auch Identity Provider auf die Instanzeinstellungen zurückgesetzt."
+        "LOGINPOLICY_DESCRIPTION": "Achtung: Wenn Sie fortfahren werden auch Identitätsanbieter auf die Instanzeinstellungen zurückgesetzt."
       }
     }
   },
@@ -1112,7 +1120,7 @@
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
     "NOTIFICATION": {
-      "TITLE": "Notification",
+      "TITLE": "Benachrichtigung",
       "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
       "PASSWORDCHANGE": "Passwortänderung"
     },
@@ -1140,6 +1148,10 @@
       "MAXSIZEEXCEEDED": "Maximale Grösse von 524kB überschritten",
       "NOSVGSUPPORTED": "SVG werden nicht unterstützt!",
       "FONTINLOGINONLY": "Die Schriftart wird momentan nur im Login interface angezeigt.",
+      "BACKGROUNDCOLOR": "Hintergrundfarbe",
+      "PRIMARYCOLOR": "Primärfarbe",
+      "WARNCOLOR": "Warnfarbe",
+      "FONTCOLOR": "Schriftfarbe",
       "VIEWS": {
         "PREVIEW": "Vorschau",
         "CURRENT": "Aktuelle Konfiguration"
@@ -1184,6 +1196,7 @@
       "TOSLINK": "Link zu den Allgemeinen Geschäftsbedingungen",
       "POLICYLINK": "Link zur den Datenschutzrichtlinien",
       "HELPLINK": "Link zur Hilfestellung",
+      "SUPPORTEMAIL": "Support E-Mail",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Standardwerte wiederherstellen",
       "RESET_DESCRIPTION": "Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"
@@ -1204,10 +1217,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1302,7 +1316,7 @@
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
       "ALLOWREGISTER": "Registrieren erlaubt",
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
-      "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identity Provider erlaubt.",
+      "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
       "FORCEMFA": "Mfa erzwingen",
       "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden.",
@@ -1646,6 +1660,10 @@
       "AZUREAD": {
         "TITLE": "Microsoft Provider",
         "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren Microsoft-Identitätsprovider ein."
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Geben Sie die erforderlichen Daten für Ihren LDAP Provider ein."
       }
     },
     "DETAIL": {
@@ -1683,13 +1701,15 @@
       "1": "Organizations",
       "2": "Customers"
     },
+    "ADD": "Identitätsanbieter hinzufügen",
     "AZUREADTENANTTYPE": "Tenant Typ",
     "AZUREADTENANTID": "Tenant ID",
     "EMAILVERIFIED": "Email verifiziert",
     "NAMEHINT": "Wenn angegeben, wir er im Login interface angezeigt.",
     "OPTIONAL": "optional",
+    "LDAPATTRIBUTES": "LDAP Attribute",
+    "UPDATEBINDPASSWORD": "Bind Password updaten",
     "UPDATECLIENTSECRET": "Client Secret updaten",
-    "ADD": "Identity Provider hinzufügen",
     "TYPE": "Typ",
     "OWNER": "Besitzer",
     "ID": "ID",
@@ -1709,6 +1729,31 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "Verbindung",
+    "LDAPUSERBINDING": "User binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in Sekunden",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "erfolderlich",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Datum",
@@ -1718,13 +1763,13 @@
     "ACTIVATE": "Aktivieren",
     "DELETE": "Löschen",
     "DELETE_TITLE": "IDP löschen",
-    "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
-    "DELETE_SELECTION_TITLE": "Identity Providers löschen",
-    "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
+    "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC Konfiguration",
-      "DESCRIPTION": "Geben Sie die Daten OIDC Identity Providers ein."
+      "DESCRIPTION": "Geben Sie die Daten OIDC Identitätsanbieter ein."
     },
     "OAUTH": {
       "TITLE": "OAuth Konfiguration",
@@ -1732,7 +1777,7 @@
     },
     "JWT": {
       "TITLE": "JWT Konfiguration",
-      "DESCRIPTION": "Geben Sie die Daten JWT Identity Providers ein. ",
+      "DESCRIPTION": "Geben Sie die Daten JWT Identitätsanbieter ein. ",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
       "JWTKEYSENDPOINT": "JWT Keys Endpoint"
@@ -1785,11 +1830,11 @@
       "TITLE": "Login Einstellungen",
       "DESCRIPTION": "Definieren Sie hier, mit welchen Idps sich Ihre Benutzer anmelden können."
     },
-    "IDPS": "Identity Providers",
+    "IDPS": "Identitätsanbieter",
     "ADDIDP": {
-      "TITLE": "Identity Provider hinzufügen",
+      "TITLE": "Identitätsanbieter hinzufügen",
       "DESCRIPTION": "Sie können vordefinierte oder selbsterstellten Provider auswählen",
-      "SELECTIDPS": "Identity Provider"
+      "SELECTIDPS": "Identitätsanbieter"
     },
     "PASSWORDLESS": "Passwortloser Login",
     "PASSWORDLESSTYPE": {
@@ -1974,10 +2019,10 @@
         "DESCRIPTION": "SAML Applikationen"
       },
       "CONFIGSECTION": "SAML Konfiguration",
-      "URL": "Url des Metadata Files",
+      "URL": "Url der Metadaten-Datei",
       "OR": "oder",
-      "XML": "Metadata XML hochladen",
-      "METADATA": "Metadata",
+      "XML": "Metadaten XML hochladen",
+      "METADATA": "Metadaten",
       "METADATAFROMFILE": "Metadata aus Datei"
     },
     "AUTHMETHODS": {
@@ -2031,10 +2076,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

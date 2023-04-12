@@ -17,7 +17,7 @@ This trigger is called before userinfo are set in the token or response.
     - `getUser()` [*User*](./objects#user)
     - `user`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
-    - `grants` [*UserGrantList*](./objects#user-grant-list)
+      - `grants` [*UserGrantList*](./objects#user-grant-list)
 - `api`  
   The second parameter contains the following fields:
   - `v1`
@@ -45,7 +45,7 @@ This trigger is called before the claims are set in the access token and the tok
     - `getUser()` [*User*](./objects#user)
     - `user`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
-    - `grants` [*UserGrantList*](./objects#user-grant-list)
+      - `grants` [*UserGrantList*](./objects#user-grant-list)
 - `api`  
   The second parameter contains the following fields:
   - `v1`

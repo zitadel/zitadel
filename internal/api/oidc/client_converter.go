@@ -112,10 +112,13 @@ func (c *Client) IsScopeAllowed(scope string) bool {
 	if strings.HasPrefix(scope, domain.SelectIDPScope) {
 		return true
 	}
-	if strings.HasPrefix(scope, ScopeUserMetaData) {
+	if scope == ScopeUserMetaData {
 		return true
 	}
-	if strings.HasPrefix(scope, ScopeResourceOwner) {
+	if scope == ScopeResourceOwner {
+		return true
+	}
+	if scope == ScopeProjectsRoles {
 		return true
 	}
 	for _, allowedScope := range c.allowedScopes {

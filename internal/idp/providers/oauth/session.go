@@ -20,7 +20,7 @@ var _ idp.Session = (*Session)(nil)
 type Session struct {
 	AuthURL string
 	Code    string
-	Tokens  *oidc.Tokens
+	Tokens  *oidc.Tokens[*oidc.IDTokenClaims]
 
 	Provider *Provider
 }
@@ -55,7 +55,7 @@ func (s *Session) authorize(ctx context.Context) (err error) {
 	if s.Code == "" {
 		return ErrCodeMissing
 	}
-	s.Tokens, err = rp.CodeExchange(ctx, s.Code, s.Provider.RelyingParty)
+	s.Tokens, err = rp.CodeExchange[*oidc.IDTokenClaims](ctx, s.Code, s.Provider.RelyingParty)
 	if err != nil {
 		return err
 	}

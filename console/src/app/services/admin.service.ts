@@ -30,6 +30,8 @@ import {
   AddIDPToLoginPolicyResponse,
   AddJWTProviderRequest,
   AddJWTProviderResponse,
+  AddLDAPProviderRequest,
+  AddLDAPProviderResponse,
   AddMultiFactorToLoginPolicyRequest,
   AddMultiFactorToLoginPolicyResponse,
   AddNotificationPolicyRequest,
@@ -156,8 +158,6 @@ import {
   RemoveIAMMemberResponse,
   RemoveIDPFromLoginPolicyRequest,
   RemoveIDPFromLoginPolicyResponse,
-  RemoveIDPRequest,
-  RemoveIDPResponse,
   RemoveLabelPolicyFontRequest,
   RemoveLabelPolicyFontResponse,
   RemoveLabelPolicyIconDarkRequest,
@@ -228,6 +228,8 @@ import {
   UpdateJWTProviderResponse,
   UpdateLabelPolicyRequest,
   UpdateLabelPolicyResponse,
+  UpdateLDAPProviderRequest,
+  UpdateLDAPProviderResponse,
   UpdateLockoutPolicyRequest,
   UpdateLockoutPolicyResponse,
   UpdateLoginPolicyRequest,
@@ -265,9 +267,20 @@ export interface OnboardingActions {
   oneof: string[];
   link: string | string[];
   fragment?: string | undefined;
+  iconClasses?: string;
+  darkcolor: string;
+  lightcolor: string;
 }
 
-type OnboardingEvent = { order: number; link: string; fragment: string | undefined; event: Event.AsObject | undefined };
+type OnboardingEvent = {
+  order: number;
+  link: string;
+  fragment: string | undefined;
+  event: Event.AsObject | undefined;
+  iconClasses?: string;
+  darkcolor: string;
+  lightcolor: string;
+};
 type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
 
 @Injectable({
@@ -284,14 +297,30 @@ export class AdminService {
       const eventsReq = new ListEventsRequest().setAsc(true).setEventTypesList(searchForTypes).setAsc(false);
       return from(this.listEvents(eventsReq)).pipe(
         map((events) => {
-          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API');
+          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API' && e.editor?.userId);
 
           let obj: { [type: string]: OnboardingEvent } = {};
           actions.map((action) => {
             const filtered = el.filter((event) => event.type?.type && action.oneof.includes(event.type.type));
             (obj as any)[action.eventType] = filtered.length
-              ? { order: action.order, link: action.link, fragment: action.fragment, event: filtered[0] }
-              : { order: action.order, link: action.link, fragment: action.fragment, event: undefined };
+              ? {
+                  order: action.order,
+                  link: action.link,
+                  fragment: action.fragment,
+                  event: filtered[0],
+                  iconClasses: action.iconClasses,
+                  darkcolor: action.darkcolor,
+                  lightcolor: action.lightcolor,
+                }
+              : {
+                  order: action.order,
+                  link: action.link,
+                  fragment: action.fragment,
+                  event: undefined,
+                  iconClasses: action.iconClasses,
+                  darkcolor: action.darkcolor,
+                  lightcolor: action.lightcolor,
+                };
           });
 
           const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
@@ -898,12 +927,6 @@ export class AdminService {
     return this.grpcService.admin.listLoginPolicyIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public removeIDP(id: string): Promise<RemoveIDPResponse.AsObject> {
-    const req = new RemoveIDPRequest();
-    req.setIdpId(id);
-    return this.grpcService.admin.removeIDP(req, null).then((resp) => resp.toObject());
-  }
-
   public deactivateIDP(id: string): Promise<DeactivateIDPResponse.AsObject> {
     const req = new DeactivateIDPRequest();
     req.setIdpId(id);
@@ -932,6 +955,14 @@ export class AdminService {
 
   public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
     return this.grpcService.admin.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addLDAPProvider(req: AddLDAPProviderRequest): Promise<AddLDAPProviderResponse.AsObject> {
+    return this.grpcService.admin.addLDAPProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateLDAPProvider(req: UpdateLDAPProviderRequest): Promise<UpdateLDAPProviderResponse.AsObject> {
+    return this.grpcService.admin.updateLDAPProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGitLabProvider(req: AddGitLabProviderRequest): Promise<AddGitLabProviderResponse.AsObject> {
@@ -1002,7 +1033,9 @@ export class AdminService {
     return this.grpcService.admin.updateGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public deleteProvider(req: DeleteProviderRequest): Promise<DeleteProviderResponse.AsObject> {
+  public deleteProvider(id: string): Promise<DeleteProviderResponse.AsObject> {
+    const req = new DeleteProviderRequest();
+    req.setId(id);
     return this.grpcService.admin.deleteProvider(req, null).then((resp) => resp.toObject());
   }
 

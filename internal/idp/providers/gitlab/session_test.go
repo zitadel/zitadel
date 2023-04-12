@@ -27,7 +27,7 @@ func TestProvider_FetchUser(t *testing.T) {
 		httpMock     func()
 		authURL      string
 		code         string
-		tokens       *openid.Tokens
+		tokens       *openid.Tokens[*openid.IDTokenClaims]
 		options      []oidc.ProviderOpts
 	}
 	type want struct {
@@ -85,7 +85,7 @@ func TestProvider_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://gitlab.com/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &openid.Tokens{
+				tokens: &openid.Tokens[*openid.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   openid.BearerToken,
@@ -122,7 +122,7 @@ func TestProvider_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://gitlab.com/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &openid.Tokens{
+				tokens: &openid.Tokens[*openid.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   openid.BearerToken,
@@ -200,18 +200,26 @@ func TestProvider_FetchUser(t *testing.T) {
 	}
 }
 
-func userinfo() openid.UserInfoSetter {
-	info := openid.NewUserInfo()
-	info.SetSubject("sub")
-	info.SetGivenName("firstname")
-	info.SetFamilyName("lastname")
-	info.SetName("firstname lastname")
-	info.SetNickname("nickname")
-	info.SetPreferredUsername("username")
-	info.SetEmail("email", true)
-	info.SetPhone("phone", true)
-	info.SetLocale(language.English)
-	info.SetPicture("picture")
-	info.SetProfile("profile")
-	return info
+func userinfo() *openid.UserInfo {
+	return &openid.UserInfo{
+		Subject: "sub",
+		UserInfoProfile: openid.UserInfoProfile{
+			GivenName:         "firstname",
+			FamilyName:        "lastname",
+			Name:              "firstname lastname",
+			Nickname:          "nickname",
+			PreferredUsername: "username",
+			Locale:            openid.NewLocale(language.English),
+			Picture:           "picture",
+			Profile:           "profile",
+		},
+		UserInfoEmail: openid.UserInfoEmail{
+			Email:         "email",
+			EmailVerified: openid.Bool(true),
+		},
+		UserInfoPhone: openid.UserInfoPhone{
+			PhoneNumber:         "phone",
+			PhoneNumberVerified: true,
+		},
+	}
 }

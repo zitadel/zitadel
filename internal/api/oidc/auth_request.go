@@ -143,7 +143,7 @@ func getInfoFromRequest(req op.TokenRequest) (string, string, string, time.Time,
 }
 
 func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (op.RefreshTokenRequest, error) {
-	tokenView, err := o.repo.RefreshTokenByID(ctx, refreshToken)
+	tokenView, err := o.repo.RefreshTokenByToken(ctx, refreshToken)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 }
 
 func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) *oidc.Error {
-	refreshToken, err := o.repo.RefreshTokenByID(ctx, token)
+	refreshToken, err := o.repo.RefreshTokenByID(ctx, token, userID)
 	if err == nil {
 		if refreshToken.ClientID != clientID {
 			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
@@ -201,6 +201,17 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 		return nil
 	}
 	return oidc.ErrServerError().WithParent(err)
+}
+
+func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {
+	refreshToken, err := o.repo.RefreshTokenByToken(ctx, token)
+	if err != nil {
+		return "", "", op.ErrInvalidRefreshToken
+	}
+	if refreshToken.ClientID != clientID {
+		return "", "", oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
+	}
+	return refreshToken.UserID, refreshToken.ID, nil
 }
 
 func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string, scopes []string) ([]string, error) {
@@ -234,12 +245,8 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	return scopes, nil
 }
 
-func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID string) error {
+func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID, projectID string) error {
 	token.Audience = append(token.Audience, clientID)
-	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
-	if err != nil {
-		return errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
-	}
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
 	if err != nil {
 		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")

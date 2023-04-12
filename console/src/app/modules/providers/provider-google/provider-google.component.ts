@@ -18,6 +18,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
@@ -30,7 +31,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderGoogleComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options();
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public id: string | null = '';
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
@@ -45,6 +46,7 @@ export class ProviderGoogleComponent {
   public updateClientSecret: boolean = false;
 
   constructor(
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -57,6 +59,23 @@ export class ProviderGoogleComponent {
       clientSecret: new FormControl('', [requiredValidator]),
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
     });
+
+    this.authService
+      .isAllowed(
+        this.serviceType === PolicyComponentServiceType.ADMIN
+          ? ['iam.idp.write']
+          : this.serviceType === PolicyComponentServiceType.MGMT
+          ? ['org.idp.write']
+          : [],
+      )
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        if (allowed) {
+          this.form.enable();
+        } else {
+          this.form.disable();
+        }
+      });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
@@ -119,50 +138,30 @@ export class ProviderGoogleComponent {
   }
 
   public addGoogleProvider(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const req = new MgmtAddGoogleProviderRequest();
+    const req =
+      this.serviceType === PolicyComponentServiceType.MGMT
+        ? new MgmtAddGoogleProviderRequest()
+        : new AdminAddGoogleProviderRequest();
 
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
+    req.setName(this.name?.value);
+    req.setClientId(this.clientId?.value);
+    req.setClientSecret(this.clientSecret?.value);
+    req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
 
-      this.loading = true;
-      (this.service as ManagementService)
-        .addGoogleProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
+    this.loading = true;
+    this.service
+      .addGoogleProvider(req)
+      .then((idp) => {
+        setTimeout(() => {
           this.loading = false;
-        });
-    } else if (PolicyComponentServiceType.ADMIN) {
-      const req = new AdminAddGoogleProviderRequest();
-      req.setName(this.name?.value);
-      req.setClientId(this.clientId?.value);
-      req.setClientSecret(this.clientSecret?.value);
-      req.setScopesList(this.scopesList?.value);
-      req.setProviderOptions(this.options);
-
-      this.loading = true;
-      (this.service as AdminService)
-        .addGoogleProvider(req)
-        .then((idp) => {
-          setTimeout(() => {
-            this.loading = false;
-            this.close();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.loading = false;
-          this.toast.showError(error);
-        });
-    }
+          this.close();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public updateGoogleProvider(): void {

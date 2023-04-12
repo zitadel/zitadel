@@ -2,6 +2,7 @@ package projection
 
 import (
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -2033,18 +2034,19 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"host": "host",
-	"port": "port",
-	"tls": true,
-	"baseDN": "base",
-	"userObjectClass": "user",
-	"userUniqueAttribute": "uid",
-	"admin": "admin",
-	"password": {
+	"servers": ["server"],
+	"startTls": false,
+	"baseDN": "basedn",
+	"bindDN": "binddn",
+	"bindPassword": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
     },
+	"userBase": "user",
+	"userObjectClasses": ["object"],
+	"userFilters": ["filter"],
+	"timeout": 30000000000,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2092,18 +2094,19 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates4_ldap (idp_id, instance_id, host, port, tls, base_dn, user_object_class, user_unique_attribute, admin, password, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
+							expectedStmt: "INSERT INTO projections.idp_templates4_ldap2 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
-								"host",
-								"port",
-								true,
-								"base",
-								"user",
-								"uid",
-								"admin",
+								database.StringArray{"server"},
+								false,
+								"basedn",
+								"binddn",
 								anyArg{},
+								"user",
+								database.StringArray{"object"},
+								database.StringArray{"filter"},
+								time.Duration(30000000000),
 								"id",
 								"first",
 								"last",
@@ -2132,18 +2135,19 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"host": "host",
-	"port": "port",
-	"tls": true,
-	"baseDN": "base",
-	"userObjectClass": "user",
-	"userUniqueAttribute": "uid",
-	"admin": "admin",
-	"password": {
+	"servers": ["server"],
+	"startTls": false,
+	"baseDN": "basedn",
+	"bindDN": "binddn",
+	"bindPassword": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
     },
+	"userBase": "user",
+	"userObjectClasses": ["object"],
+	"userFilters": ["filter"],
+	"timeout": 30000000000,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2191,18 +2195,19 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates4_ldap (idp_id, instance_id, host, port, tls, base_dn, user_object_class, user_unique_attribute, admin, password, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)",
+							expectedStmt: "INSERT INTO projections.idp_templates4_ldap2 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
-								"host",
-								"port",
-								true,
-								"base",
-								"user",
-								"uid",
-								"admin",
+								database.StringArray{"server"},
+								false,
+								"basedn",
+								"binddn",
 								anyArg{},
+								"user",
+								database.StringArray{"object"},
+								database.StringArray{"filter"},
+								time.Duration(30000000000),
 								"id",
 								"first",
 								"last",
@@ -2231,7 +2236,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"host": "host"
+	"baseDN": "basedn"
 }`),
 				), instance.LDAPIDPChangedEventMapper),
 			},
@@ -2253,9 +2258,9 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates4_ldap SET host = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates4_ldap2 SET base_dn = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
-								"host",
+								"basedn",
 								"idp-id",
 								"instance-id",
 							},
@@ -2273,18 +2278,19 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"host": "host",
-	"port": "port",
-	"tls": true,
-	"baseDN": "base",
-	"userObjectClass": "user",
-	"userUniqueAttribute": "uid",
-	"admin": "admin",
-	"password": {
+	"servers": ["server"],
+	"startTls": false,
+	"baseDN": "basedn",
+	"bindDN": "binddn",
+	"bindPassword": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
     },
+	"userBase": "user",
+	"userObjectClasses": ["object"],
+	"userFilters": ["filter"],
+	"timeout": 30000000000,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2327,16 +2333,17 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates4_ldap SET (host, port, tls, base_dn, user_object_class, user_unique_attribute, admin, password, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) WHERE (idp_id = $22) AND (instance_id = $23)",
+							expectedStmt: "UPDATE projections.idp_templates4_ldap2 SET (servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22) WHERE (idp_id = $23) AND (instance_id = $24)",
 							expectedArgs: []interface{}{
-								"host",
-								"port",
-								true,
-								"base",
-								"user",
-								"uid",
-								"admin",
+								database.StringArray{"server"},
+								false,
+								"basedn",
+								"binddn",
 								anyArg{},
+								"user",
+								database.StringArray{"object"},
+								database.StringArray{"filter"},
+								time.Duration(30000000000),
 								"id",
 								"first",
 								"last",

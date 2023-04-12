@@ -178,10 +178,10 @@ export class ShortcutsComponent implements OnDestroy {
       } else {
         switch (listName) {
           case 'main':
-            this.main = [PROFILE_SHORTCUT /* CREATE_ORG, CREATE_PROJECT, CREATE_USER */];
+            this.main = [CREATE_ORG, CREATE_PROJECT, CREATE_USER];
             break;
           case 'secondary':
-            this.secondary = [CREATE_ORG, CREATE_PROJECT, CREATE_USER];
+            this.secondary = this.ALL_SHORTCUTS.filter((item) => item.i18nTitle === 'SETTINGS.GROUPS.APPEARANCE');
             // [LOGIN_POLICY, PRIVATELABEL_POLICY].map((p) => {
             //   const policy: string = {
             //     i18nTitle: p.i18nTitle,
@@ -196,7 +196,7 @@ export class ShortcutsComponent implements OnDestroy {
             // });
             break;
           case 'third':
-            this.third = this.ALL_SHORTCUTS.filter((item) => item.i18nTitle === 'SETTINGS.GROUPS.APPEARANCE');
+            this.third = [PROFILE_SHORTCUT];
             // [LOGIN_TEXTS_POLICY, MESSAGE_TEXTS_POLICY].map((p) => {
             //   const policy: ShortcutItem = {
             //     i18nTitle: p.i18nTitle,

@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: 注册
   NextButtonText: 继续
 
+LDAP:
+  Title: 注册
+  Description: 输入您的登录数据。
+  LoginNameLabel: 登录名
+  PasswordLabel: 密码
+  NextButtonText: 继续
+
 SelectAccount:
   Title: 选择账户
   Description: 使用您的 ZITADEL 帐户
@@ -165,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: 确认密码
   CancelButtonText: 取消
   NextButtonText: 继续
+  Footer: 页脚
 
 PasswordChangeDone:
   Title: 更改密码
@@ -212,6 +220,7 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -243,6 +252,7 @@ ExternalRegistrationUserOverview:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -302,12 +312,14 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
 
 Footer:
   PoweredBy: Powered By
   Tos: 服务条款
   PrivacyPolicy: 隐私政策
   Help: 帮助
+  SupportEmail: 支持邮箱
 
 Errors:
   Internal: 发生了内部错误
@@ -407,5 +419,8 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: 用户锁定政策不存在
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: 不允许注册
 
 optional: (可选)

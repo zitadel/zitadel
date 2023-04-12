@@ -1,7 +1,6 @@
 package saml
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -29,7 +28,6 @@ type Config struct {
 }
 
 func NewProvider(
-	ctx context.Context,
 	conf Config,
 	externalSecure bool,
 	command *command.Commands,
@@ -68,13 +66,13 @@ func NewProvider(
 			accessHandler,
 			http_utils.CopyHeadersToContext,
 		),
+		provider.WithCustomTimeFormat("2006-01-02T15:04:05.999Z"),
 	}
 	if !externalSecure {
 		options = append(options, provider.WithAllowInsecure())
 	}
 
 	return provider.NewProvider(
-		ctx,
 		provStorage,
 		HandlerPrefix,
 		conf.ProviderConfig,
