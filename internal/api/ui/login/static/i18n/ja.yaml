@@ -308,7 +308,21 @@ ExternalNotFound:
 
 DeviceAuth:
   Title: デバイス認証
-  Description: デバイスに表示されたユーザー コードを入力します。
+  UserCode:
+    Label: ユーザーコード
+    Description: デバイスに表示されたユーザー コードを入力します。
+    ButtonNext: 次
+  Action:
+    Description: デバイスへのアクセスを許可します。
+    GrantDevice: デバイスを許可しようとしています
+    AccessToScopes: 次のスコープへのアクセス
+    Button:
+      Allow: 許可する
+      Deny: 拒否
+  Done:
+    Description: 終わり。
+    Approved: デバイス認証が承認されました。 これで、デバイスに戻ることができます。
+    Denied: デバイス認証が拒否されました。 これで、デバイスに戻ることができます。
 
 Footer:
   PoweredBy: Powered By
@@ -386,5 +400,7 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: ロックアウトポリシーが存在しません
+  DeviceAuth:
+    NotExisting: ユーザーコードが存在しません
 
 optional: "（オプション）"

@@ -316,7 +316,21 @@ ExternalNotFound:
 
 DeviceAuth:
   Title: Autoryzacja urządzenia
-  Description: Wprowadź kod użytkownika prezentowany na urządzeniu.
+  UserCode:
+    Label: Kod użytkownika
+    Description: Wprowadź kod użytkownika prezentowany na urządzeniu.
+    ButtonNext: Następny
+  Action:
+    Description: Przyznaj dostęp do urządzenia.
+    GrantDevice: zamierzasz przyznać urządzenie
+    AccessToScopes: dostęp do następujących zakresów
+    Button:
+      Allow: umożliwić
+      Deny: zaprzeczyć
+  Done:
+    Description: Zrobione.
+    Approved: Zatwierdzono autoryzację urządzenia. Możesz teraz wrócić do urządzenia.
+    Denied: Odmowa autoryzacji urządzenia. Możesz teraz wrócić do urządzenia.
 
 Footer:
   PoweredBy: Obsługiwane przez
@@ -426,5 +440,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: Rejestracja nie jest dozwolona
+  DeviceAuth:
+    NotExisting: Kod użytkownika nie istnieje
 
 optional: (opcjonalny)

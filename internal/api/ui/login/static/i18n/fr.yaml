@@ -316,7 +316,21 @@ ExternalNotFound:
 
 DeviceAuth:
   Title: Autorisation de l'appareil
-  Description: Saisissez le code utilisateur présenté sur l'appareil.
+  UserCode:
+    Label: Code d'utilisateur
+    Description: Saisissez le code utilisateur présenté sur l'appareil.
+    ButtonNext: suivant
+  Action:
+    Description: Accordez l'accès à l'appareil.
+    GrantDevice: vous êtes sur le point d'accorder un appareil
+    AccessToScopes: accès aux périmètres suivants
+    Button:
+      Allow: permettre
+      Deny: refuser
+  Done:
+    Description: Fait.
+    Approved: Autorisation de l'appareil approuvée. Vous pouvez maintenant retourner à l'appareil.
+    Denied: Autorisation de l'appareil refusée. Vous pouvez maintenant retourner à l'appareil.
 
 Footer:
   PoweredBy: Promulgué par
@@ -426,5 +440,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: L'enregistrement n'est pas autorisé
+  DeviceAuth:
+    NotExisting: Le code utilisateur n'existe pas
 
 optional: (facultatif)

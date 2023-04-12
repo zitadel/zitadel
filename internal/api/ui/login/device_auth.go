@@ -3,14 +3,12 @@ package login
 import (
 	errs "errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/muhlemmer/gu"
-	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -21,21 +19,19 @@ import (
 
 const (
 	tmplDeviceAuthUserCode = "device-usercode"
-	tmplDeviceAuthConfirm  = "device-confirm"
+	tmplDeviceAuthAction   = "device-action"
 )
 
-func (l *Login) renderDeviceAuthUserCode(w io.Writer, r *http.Request, err error) {
+func (l *Login) renderDeviceAuthUserCode(w http.ResponseWriter, r *http.Request, err error) {
 	var errID, errMessage string
 	if err != nil {
 		logging.WithError(err).Error()
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 
-	data := l.getBaseData(r, &domain.AuthRequest{}, "DeviceAuth.Title", "DeviceAuth.Description", errID, errMessage)
-	err = l.renderer.Templates[tmplDeviceAuthUserCode].Execute(w, data)
-	if err != nil {
-		logging.WithError(err).Error()
-	}
+	data := l.getBaseData(r, nil, "DeviceAuth.Title", "DeviceAuth.UserCode.Description", errID, errMessage)
+	translator := l.getTranslator(r.Context(), nil)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplDeviceAuthUserCode], data, nil)
 }
 
 func (l *Login) renderDeviceAuthAction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, scopes []string) {
@@ -46,16 +42,39 @@ func (l *Login) renderDeviceAuthAction(w http.ResponseWriter, r *http.Request, a
 		ClientID      string
 		Scopes        []string
 	}{
-		baseData:      l.getBaseData(r, authReq, "DeviceAuth.Title", "DeviceAuth.Description", "", ""),
+		baseData:      l.getBaseData(r, authReq, "DeviceAuth.Title", "DeviceAuth.Action.Description", "", ""),
 		AuthRequestID: authReq.ID,
 		Username:      authReq.UserName,
 		ClientID:      authReq.ApplicationID,
 		Scopes:        scopes,
 	}
 
-	err := l.renderer.Templates[tmplDeviceAuthConfirm].Execute(w, data)
-	if err != nil {
-		logrus.Error(err)
+	translator := l.getTranslator(r.Context(), authReq)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplDeviceAuthAction], data, nil)
+}
+
+const (
+	deviceAuthAllowed = "allowed"
+	deviceAuthDenied  = "denied"
+)
+
+// renderDeviceAuthDone renders success.html when the action was allowed and error.html when it was denied.
+func (l *Login) renderDeviceAuthDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, action string) {
+	data := &struct {
+		baseData
+		Message string
+	}{
+		baseData: l.getBaseData(r, authReq, "DeviceAuth.Title", "DeviceAuth.Done.Description", "", ""),
+	}
+
+	translator := l.getTranslator(r.Context(), authReq)
+	switch action {
+	case deviceAuthAllowed:
+		data.Message = translator.LocalizeFromRequest(r, "DeviceAuth.Done.Approved", nil)
+		l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplSuccess], data, nil)
+	case deviceAuthDenied:
+		data.ErrMessage = translator.LocalizeFromRequest(r, "DeviceAuth.Done.Denied", nil)
+		l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplError], data, nil)
 	}
 }
 
@@ -150,9 +169,9 @@ func (l *Login) handleDeviceAuthAction(w http.ResponseWriter, r *http.Request) {
 
 	action := mux.Vars(r)["action"]
 	switch action {
-	case "allowed":
+	case deviceAuthAllowed:
 		_, err = l.command.ApproveDeviceAuth(r.Context(), authDev.ID, authReq.UserID)
-	case "denied":
+	case deviceAuthDenied:
 		_, err = l.command.CancelDeviceAuth(r.Context(), authDev.ID, domain.DeviceAuthCanceledDenied)
 	default:
 		l.renderDeviceAuthAction(w, r, authReq, authDev.Scopes)
@@ -163,9 +182,11 @@ func (l *Login) handleDeviceAuthAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Device authorization %s. You can now return to the device", action)
+	l.renderDeviceAuthDone(w, r, authReq, action)
 }
 
+// deviceAuthCallbackURL creates the callback URL with which the user
+// is redirected back to the device authorization flow.
 func (l *Login) deviceAuthCallbackURL(authRequestID string) string {
 	return l.renderer.pathPrefix + EndpointDeviceAuthAction + "?authRequestID=" + authRequestID
 }

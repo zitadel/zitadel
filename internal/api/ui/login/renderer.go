@@ -25,7 +25,8 @@ import (
 )
 
 const (
-	tmplError = "error"
+	tmplError   = "error"
+	tmplSuccess = "success"
 )
 
 type Renderer struct {
@@ -45,6 +46,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 	}
 	tmplMapping := map[string]string{
 		tmplError:                        "error.html",
+		tmplSuccess:                      "success.html",
 		tmplLogin:                        "login.html",
 		tmplUserSelection:                "select_user.html",
 		tmplPassword:                     "password.html",
@@ -78,7 +80,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplLoginSuccess:                 "login_success.html",
 		tmplLDAPLogin:                    "ldap_login.html",
 		tmplDeviceAuthUserCode:           "device_usercode.html",
-		tmplDeviceAuthConfirm:            "device_confirm.html",
+		tmplDeviceAuthAction:             "device_action.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
