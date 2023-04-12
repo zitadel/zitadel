@@ -1,3 +1,0 @@
-FROM nginx:1.23-alpine
-COPY build/console/nginx.conf /etc/nginx/nginx.conf
-COPY console/dist/console /usr/share/nginx/html

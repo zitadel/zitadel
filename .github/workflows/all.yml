@@ -26,4 +26,10 @@ jobs:
       go_version: 1.19
       buf_version: v1.15.1
 
-  #push/release
+  container:
+    uses: ./.github/workflows/container.yml
+    needs: [lint, test, build]
+
+  #release
+
+  #e2e
