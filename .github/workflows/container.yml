@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: build/scratch.Dockerfile
+          file: build/test.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: zitadel/test:test
