@@ -4,8 +4,8 @@ This PR changes [a behavior] to [another behavior]
 
 # Follow-up Issues
 
-- Follow-up issue 1
-- Follow-up issue 2
+- [Follow-up issue 1]
+- [Follow-up issue 2]
 
 # Definition Of Ready
 
@@ -24,11 +24,11 @@ This PR changes [a behavior] to [another behavior]
 
 # Implementation Tasks
 
-- [ ] Create PoC
-- [ ] Validate PoC with a peer
-- [ ] Finish component X
-- [ ] Finish component Y
-- [ ] Finish component Z
-- [ ] Implement unit tests
-- [ ] Implement E2E tests
+- [ ] [Create PoC]
+- [ ] [Validate PoC with a peer]
+- [ ] [Finish component X]
+- [ ] [Finish component Y]
+- [ ] [Finish component Z]
+- [ ] [Implement unit tests]
+- [ ] [Implement E2E tests]
 
