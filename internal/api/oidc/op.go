@@ -74,7 +74,7 @@ type OPStorage struct {
 	assetAPIPrefix                    func(ctx context.Context) string
 }
 
-func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *database.DB, userAgentCookie, instanceHandler, accessHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+func NewProvider(config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *database.DB, userAgentCookie, instanceHandler, accessHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")

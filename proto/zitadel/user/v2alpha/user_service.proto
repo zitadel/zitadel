@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package zitadel.user.v2alpha;
+
+import "zitadel/options.proto";
+import "zitadel/user/v2alpha/user.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha;user";
+
+service UserService {
+
+  // TestGet simply demonstrates how the context (org, instance) could be handled in a GET request  //
+  //
+  // this request is subject to change and currently used for demonstration only
+  rpc TestGet (TestGetRequest) returns (TestGetResponse) {
+    option (google.api.http) = {
+      get: "/v2alpha/users/test"
+    };
+  }
+
+  // TestPOST simply demonstrates how the context (org, instance) could be handled in a POST request
+  //
+  // this request is subject to change and currently used for demonstration only
+  rpc TestPost (TestPostRequest) returns (TestPostResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/users/test"
+      body: "*"
+    };
+  }
+
+  // TestAuth demonstrates how the context (org, instance) could be handled in combination of the authorized context
+  //
+  // this request is subject to change and currently used for demonstration only
+  rpc TestAuth (TestAuthRequest) returns (TestAuthResponse) {
+    option (google.api.http) = {
+      get: "/v2alpha/users/test_auth"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+}
+
+message TestGetRequest{
+  Context ctx = 1;
+}
+
+message TestGetResponse{
+  string ctx = 1;
+}
+
+message TestPostRequest{
+  Context ctx = 1;
+}
+
+message TestPostResponse{
+  string ctx = 1;
+}
+
+message TestAuthRequest{
+  Context ctx = 1;
+}
+
+message TestAuthResponse{
+  User user = 1;
+  Context ctx = 2;
+}
+
+message Context {
+  oneof ctx {
+    bool instance = 1;
+    string org_id = 2;
+    string org_domain = 3;
+  }
+}

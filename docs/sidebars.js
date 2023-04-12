@@ -22,8 +22,8 @@ module.exports = {
           type: "category",
           label: "Backend",
           items: [
-            "examples/secure-api/go", 
-            "examples/secure-api/python-flask", 
+            "examples/secure-api/go",
+            "examples/secure-api/python-flask",
             "examples/secure-api/dot-net"
           ],
           collapsed: true,
@@ -107,15 +107,27 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Integrate",
+      label: "Migrate",
       collapsed: true,
-      link: {
-        type: 'generated-index',
-        title: 'Overview',
-        slug: 'guides/integrate',
-      },
       items: [
-        
+        "guides/migrate/introduction",
+        "guides/migrate/users",
+        {
+          type: "category",
+          label: "Sources",
+          collapsed: true,
+          items: [
+            "guides/migrate/sources/zitadel",
+            "guides/migrate/sources/auth0",
+          ]
+        },
+      ]
+    },
+    {
+      type: "category",
+      label: "Integrate",
+      items: [
+
         {
           type: "category",
           label: "Authenticate Users",
@@ -132,6 +144,12 @@ module.exports = {
           collapsed: true,
           items: [
             "guides/integrate/identity-providers/introduction",
+            "guides/integrate/identity-providers/google",
+            "guides/integrate/identity-providers/azure-ad",
+            "guides/integrate/identity-providers/github",
+            "guides/integrate/identity-providers/gitlab",
+            "guides/integrate/identity-providers/ldap",
+            "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/google-oidc",
             "guides/integrate/identity-providers/azuread-oidc",
           ],
@@ -154,7 +172,6 @@ module.exports = {
             "guides/integrate/access-zitadel-apis",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/event-api",
-            "guides/integrate/export-and-import",
             {
               type: "category",
               label: "Example Code",
@@ -277,8 +294,8 @@ module.exports = {
             title: "Auth API",
             slug: "/apis/auth",
             description:
-                "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
-                
+              "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+
           },
           items: require("./docs/apis/auth/sidebar.js"),
         },
@@ -290,7 +307,7 @@ module.exports = {
             title: "Management API",
             slug: "/apis/mgmt",
             description:
-                "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+              "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
           },
           items: require("./docs/apis/mgmt/sidebar.js"),
         },
@@ -302,7 +319,7 @@ module.exports = {
             title: "Admin API",
             slug: "/apis/admin",
             description:
-                "This API is intended to configure and manage one ZITADEL instance itself.",
+              "This API is intended to configure and manage one ZITADEL instance itself.",
           },
           items: require("./docs/apis/admin/sidebar.js"),
         },
@@ -314,9 +331,9 @@ module.exports = {
             title: "System API",
             slug: "/apis/system",
             description:
-                "This API is intended to manage the different ZITADEL instances within the system.\n" +
-                "\n" +
-                "Checkout the guide how to access the ZITADEL System API.",
+              "This API is intended to manage the different ZITADEL instances within the system.\n" +
+              "\n" +
+              "Checkout the guide how to access the ZITADEL System API.",
           },
           items: require("./docs/apis/system/sidebar.js"),
         },

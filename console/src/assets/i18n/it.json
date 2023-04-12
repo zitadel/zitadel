@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "Il tuo processo di onboarding",
+    "MOREDESCRIPTION": "più scorciatoie",
     "COMPLETED": "completato",
     "DISMISS": "chiudi",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "Imposta il tuo marchio",
-        "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone."
+        "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone.",
+        "action": "Imposta marchio"
       },
       "instance.smtp.config.added": {
         "title": "Configura le impostazioni SMTP",
-        "description": "Imposta il proprio server di posta"
+        "description": "Imposta il proprio server di posta",
+        "action": "Configura SMTP"
       },
       "project.added": {
         "title": "Crea il tuo primo progetto",
-        "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni."
+        "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni.",
+        "action": "Crea progetto"
       },
       "project.application.added": {
         "title": "Crea la tua prima applicazione",
-        "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione."
+        "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione.",
+        "action": "Crea applicazione"
       },
       "user.human.added": {
         "title": "Aggiungi utenti",
-        "description": "Aggiungi gli utenti dell'applicazione"
+        "description": "Aggiungi gli utenti dell'applicazione",
+        "action": "Aggiungi utente"
       },
       "user.grant.added": {
         "title": "Crea autorizzazioni per gli utenti",
-        "description": "Consenti agli utenti di accedere alla tua applicazione e imposta il loro ruolo."
+        "description": "Consenti agli utenti di accedere alla tua applicazione e imposta il loro ruolo.",
+        "action": "Crea autorizzazione"
       }
     }
   },
@@ -1697,7 +1704,7 @@
     "AZUREADTENANTTYPES": {
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "ADD": "Aggiungi fornitore di identità",
     "AZUREADTENANTTYPE": "Tipo tenant",
@@ -1932,6 +1939,8 @@
       "REGENERATESECRET": "Rigenera il Client Secret",
       "DEVMODE": "Modalit\u00e0 di sviluppo (DEV Mode)",
       "DEVMODEDESC": "Attenzione: Con la modalit\u00e0 di sviluppo abilitata, gli URI di reindirizzamento non saranno convalidati.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Salta la pagina di successo dopo il login",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Salta la pagina di successo dopo il login per questa applicazione nativa",
       "REDIRECT": "URI per il reindrizzamento",
       "REDIRECTSECTION": "Reindirizzamento",
       "POSTLOGOUTREDIRECT": "URI post logout",

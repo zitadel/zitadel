@@ -2,6 +2,7 @@ import { animate, animateChild, keyframes, query, stagger, style, transition, tr
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { Type } from 'src/app/proto/generated/zitadel/user_pb';
 
 @Component({
   selector: 'cnsl-contributors',
@@ -35,6 +36,8 @@ export class ContributorsComponent {
   @Output() addClicked: EventEmitter<void> = new EventEmitter();
   @Output() showDetailClicked: EventEmitter<void> = new EventEmitter();
   @Output() refreshClicked: EventEmitter<void> = new EventEmitter();
+
+  public UserType: any = Type;
 
   public emitAddMember(): void {
     this.addClicked.emit();

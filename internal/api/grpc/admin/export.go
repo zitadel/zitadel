@@ -800,6 +800,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 						IdTokenUserinfoAssertion: app.OIDCConfig.AssertIDTokenUserinfo,
 						ClockSkew:                durationpb.New(app.OIDCConfig.ClockSkew),
 						AdditionalOrigins:        app.OIDCConfig.AdditionalOrigins,
+						SkipNativeAppSuccessPage: app.OIDCConfig.SkipNativeAppSuccessPage,
 					},
 				})
 			}

@@ -18,7 +18,6 @@ import (
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
-	project_view_model "github.com/zitadel/zitadel/internal/project/repository/view/model"
 	"github.com/zitadel/zitadel/internal/query"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -106,7 +105,7 @@ type userGrantProvider interface {
 
 type projectProvider interface {
 	ProjectByClientID(context.Context, string, bool) (*query.Project, error)
-	OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*project_view_model.OrgProjectMapping, error)
+	SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries, withOwnerRemoved bool) (projects *query.ProjectGrants, err error)
 }
 
 type applicationProvider interface {
@@ -1224,7 +1223,7 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 	if err != nil {
 		return false, err
 	}
-	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
+	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative && !app.OIDCConfig.SkipNativeAppSuccessPage, nil
 }
 
 func (repo *AuthRequestRepo) getDomainPolicy(ctx context.Context, orgID string) (*query.DomainPolicy, error) {
@@ -1465,7 +1464,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 	return len(grants) == 0, nil
 }
 
-func projectRequired(ctx context.Context, request *domain.AuthRequest, projectProvider projectProvider) (_ bool, err error) {
+func projectRequired(ctx context.Context, request *domain.AuthRequest, projectProvider projectProvider) (missingGrant bool, err error) {
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML, domain.AuthRequestTypeDevice:
@@ -1476,13 +1475,23 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	default:
 		return false, errors.ThrowPreconditionFailed(nil, "EVENT-ku4He", "Errors.AuthRequest.RequestTypeNotSupported")
 	}
-	if !project.HasProjectCheck {
+	// if the user and project are part of the same organisation we do not need to check if the project exists on that org
+	if !project.HasProjectCheck || project.ResourceOwner == request.UserOrgID {
 		return false, nil
 	}
-	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, project.ID, request.InstanceID)
-	if errors.IsNotFound(err) {
-		// if not found there is no error returned
-		return true, nil
+
+	// else just check if there is a project grant for that org
+	projectID, err := query.NewProjectGrantProjectIDSearchQuery(project.ID)
+	if err != nil {
+		return false, err
 	}
-	return false, err
+	grantedOrg, err := query.NewProjectGrantGrantedOrgIDSearchQuery(request.UserOrgID)
+	if err != nil {
+		return false, err
+	}
+	grants, err := projectProvider.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectID, grantedOrg}}, false)
+	if err != nil {
+		return false, err
+	}
+	return len(grants.ProjectGrants) != 1, nil
 }
