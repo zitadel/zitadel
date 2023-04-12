@@ -56,6 +56,7 @@ func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) *domain.OIDCApp {
 		IDTokenUserinfoAssertion: req.IdTokenUserinfoAssertion,
 		ClockSkew:                req.ClockSkew.AsDuration(),
 		AdditionalOrigins:        req.AdditionalOrigins,
+		SkipNativeAppSuccessPage: req.SkipNativeAppSuccessPage,
 	}
 }
 
@@ -106,6 +107,7 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
 		ClockSkew:                app.ClockSkew.AsDuration(),
 		AdditionalOrigins:        app.AdditionalOrigins,
+		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 	}
 }
 

@@ -35,6 +35,7 @@ type OIDCApplicationWriteModel struct {
 	ClockSkew                time.Duration
 	State                    domain.AppState
 	AdditionalOrigins        []string
+	SkipNativeAppSuccessPage bool
 	oidc                     bool
 }
 
@@ -156,6 +157,7 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 	wm.IDTokenUserinfoAssertion = e.IDTokenUserinfoAssertion
 	wm.ClockSkew = e.ClockSkew
 	wm.AdditionalOrigins = e.AdditionalOrigins
+	wm.SkipNativeAppSuccessPage = e.SkipNativeAppSuccessPage
 }
 
 func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigChangedEvent) {
@@ -201,6 +203,9 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 	if e.AdditionalOrigins != nil {
 		wm.AdditionalOrigins = *e.AdditionalOrigins
 	}
+	if e.SkipNativeAppSuccessPage != nil {
+		wm.SkipNativeAppSuccessPage = *e.SkipNativeAppSuccessPage
+	}
 }
 
 func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -240,6 +245,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	idTokenUserinfoAssertion bool,
 	clockSkew time.Duration,
 	additionalOrigins []string,
+	skipNativeAppSuccessPage bool,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
@@ -286,6 +292,10 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	if !reflect.DeepEqual(wm.AdditionalOrigins, additionalOrigins) {
 		changes = append(changes, project.ChangeAdditionalOrigins(additionalOrigins))
 	}
+	if wm.SkipNativeAppSuccessPage != skipNativeAppSuccessPage {
+		changes = append(changes, project.ChangeSkipNativeAppSuccessPage(skipNativeAppSuccessPage))
+	}
+
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
