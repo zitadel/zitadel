@@ -1704,7 +1704,7 @@
     "AZUREADTENANTTYPES": {
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "ADD": "Aggiungi fornitore di identità",
     "AZUREADTENANTTYPE": "Tipo tenant",
@@ -1939,6 +1939,8 @@
       "REGENERATESECRET": "Rigenera il Client Secret",
       "DEVMODE": "Modalit\u00e0 di sviluppo (DEV Mode)",
       "DEVMODEDESC": "Attenzione: Con la modalit\u00e0 di sviluppo abilitata, gli URI di reindirizzamento non saranno convalidati.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Salta la pagina di successo dopo il login",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Salta la pagina di successo dopo il login per questa applicazione nativa",
       "REDIRECT": "URI per il reindrizzamento",
       "REDIRECTSECTION": "Reindirizzamento",
       "POSTLOGOUTREDIRECT": "URI post logout",

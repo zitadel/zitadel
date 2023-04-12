@@ -68,7 +68,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() public type: Type | undefined = undefined;
 
   public filterOpen: boolean = false;
-
   constructor(
     private authService: GrpcAuthService,
     private userService: ManagementService,

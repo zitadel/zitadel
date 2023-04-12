@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -89,10 +90,16 @@ func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {
 	return nil
 }
 
-func (u *Human) SetNamesAsDisplayname() {
+func (u *Human) EnsureDisplayName() {
 	if u.Profile != nil && u.DisplayName == "" && u.FirstName != "" && u.LastName != "" {
 		u.DisplayName = u.FirstName + " " + u.LastName
+		return
 	}
+	if u.Email != nil && strings.TrimSpace(string(u.Email.EmailAddress)) != "" {
+		u.DisplayName = string(u.Email.EmailAddress)
+		return
+	}
+	u.DisplayName = u.Username
 }
 
 func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {
