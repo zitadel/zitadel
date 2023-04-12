@@ -35,9 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      with:
-        fetch-depth: '0'
-    - run: ls -la proto/zitadel
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go_version }}
@@ -46,5 +43,4 @@ jobs:
         version: ${{ inputs.buf_version }}
         github_token: ${{ github.token }}
     - run: make generate
-    - run: ls -la proto/zitadel
     - run: make test

@@ -59,7 +59,6 @@ jobs:
         path: console/dist/console/
         key: console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}
     - run: mv console/dist/console/ internal/api/ui/console/static/
-    - run: ls -la internal/api/ui/console/static/
     - run: go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
     - uses: actions/upload-artifact@v3
       with:

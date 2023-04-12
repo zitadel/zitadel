@@ -30,12 +30,12 @@ jobs:
           file: build/scratch.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: zitadel/test-zitadel:test
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: build/alpine.Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: zitadel/test-zitadel:test-alpine
+          tags: zitadel/test:test
+      # - name: Build and push
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     file: build/alpine.Dockerfile
+      #     platforms: linux/amd64,linux/arm64
+      #     push: true
+      #     tags: zitadel/test:test-alpine
