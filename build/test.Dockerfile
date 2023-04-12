@@ -1,2 +1,2 @@
 FROM alpine:3
-COPY README.md ./
+RUN echo test
