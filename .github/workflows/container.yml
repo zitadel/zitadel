@@ -38,11 +38,11 @@ jobs:
           file: build/scratch.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: zitadel/test-zitadel:${{ GITHUB_SHA }}
+          tags: zitadel/test-zitadel:${{ github.sha }}
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           file: build/alpine.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: zitadel/test-zitadel:${{ GITHUB_SHA }}-alpine
+          tags: zitadel/test-zitadel:${{ github.sha }}-alpine
