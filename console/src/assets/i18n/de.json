@@ -1701,7 +1701,7 @@
     "AZUREADTENANTTYPES": {
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "ADD": "Identitätsanbieter hinzufügen",
     "AZUREADTENANTTYPE": "Tenant Typ",
@@ -1939,6 +1939,8 @@
       "REGENERATESECRET": "Client Secret neu generieren",
       "DEVMODE": "Entwicklermodus",
       "DEVMODEDESC": "Bei eingeschaltetem Entwicklermodus werden die Weiterleitungs-URIs im OIDC-Flow nicht validiert.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Login Erfolgseite überspringen",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Erfolgseite nach dem Login für diese Native Applikation überspringen.",
       "REDIRECT": "Weiterleitungs-URIs",
       "REDIRECTSECTION": "Weiterleitungs-URIs",
       "POSTLOGOUTREDIRECT": "URIs für Post-Log-out",

@@ -36,7 +36,7 @@
             [checked]="selection.isSelected(row)"
           >
             <cnsl-avatar
-              *ngIf="row?.displayName && row.firstName && row.lastName; else cog"
+              *ngIf="row?.userType === UserType.TYPE_HUMAN; else cog"
               class="avatar"
               [name]="row.displayName"
               [avatarUrl]="row.avatarUrl || ''"
