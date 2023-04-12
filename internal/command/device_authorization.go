@@ -67,7 +67,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, id, subject string) (*
 	return writeModelToObjectDetails(&model.WriteModel), nil
 }
 
-func (c *Commands) DenyDeviceAuth(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domain.DeviceAuthCanceled) (*domain.ObjectDetails, error) {
 	model, err := c.getDeviceAuthWriteModelByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func (c *Commands) DenyDeviceAuth(ctx context.Context, id string) (*domain.Objec
 	}
 	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
 
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewDeniedEvent(ctx, aggr))
+	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewCanceledEvent(ctx, aggr, reason))
 	if err != nil {
 		return nil, err
 	}
@@ -89,8 +89,8 @@ func (c *Commands) DenyDeviceAuth(ctx context.Context, id string) (*domain.Objec
 	return writeModelToObjectDetails(&model.WriteModel), nil
 }
 
-func (c *Commands) RemoveDeviceAuth(ctx context.Context, deviceAuth *domain.DeviceAuth) (*domain.ObjectDetails, error) {
-	model, err := c.getDeviceAuthWriteModelByID(ctx, deviceAuth.AggregateID)
+func (c *Commands) RemoveDeviceAuth(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	model, err := c.getDeviceAuthWriteModelByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (c *Commands) RemoveDeviceAuth(ctx context.Context, deviceAuth *domain.Devi
 	}
 	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
 
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewRemovedEvent(ctx, aggr, deviceAuth.ClientID, deviceAuth.DeviceCode, deviceAuth.UserCode))
+	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewRemovedEvent(ctx, aggr, model.ClientID, model.DeviceCode, model.UserCode))
 	if err != nil {
 		return nil, err
 	}

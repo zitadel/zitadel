@@ -6,6 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
+// DeviceAuth describes a Device Authorization request.
+// It is used as input and output model in the command and query packages.
 type DeviceAuth struct {
 	models.ObjectRoot
 
@@ -18,22 +20,58 @@ type DeviceAuth struct {
 	State      DeviceAuthState
 }
 
+// DeviceAuthState describes the step the
+// the device authorization process is in.
+// We generate the Stringer implemntation for pretier
+// log output.
+//
+//go:generate stringer -type=DeviceAuthState -linecomment
 type DeviceAuthState uint
 
 const (
-	DeviceAuthStateInitiated DeviceAuthState = iota
-	DeviceAuthStateApproved
-	DeviceAuthStateUserDenied
-	DeviceAuthStateCompleted
-	DeviceAuthStateRemoved
+	DeviceAuthStateUndefined DeviceAuthState = iota // undefined
+	DeviceAuthStateInitiated                        // initiated
+	DeviceAuthStateApproved                         // approved
+	DeviceAuthStateDenied                           // denied
+	DeviceAuthStateExpired                          // expired
+	DeviceAuthStateRemoved                          // removed
 )
 
+// Exists returns true until DeviceAuthState is set to Removed.
 func (s DeviceAuthState) Exists() bool {
 	return s < DeviceAuthStateRemoved
 }
+
+// Done returns true when DeviceAuthState is Approved.
+// This implements the OIDC interface requiremnt of "Done"
 func (s DeviceAuthState) Done() bool {
 	return s == DeviceAuthStateApproved
 }
+
+// Denied returns true when DeviceAuthState is Denied or Removed.
+// This implements the OIDC interface requiremnt of "Denied"
 func (s DeviceAuthState) Denied() bool {
-	return s == DeviceAuthStateUserDenied || s == DeviceAuthStateRemoved
+	return s == DeviceAuthStateDenied || s == DeviceAuthStateRemoved
+}
+
+// DeviceAuthCanceled is a subset of DeviceAuthState, allowed to
+// be used in the deviceauth.CanceledEvent.
+// The string type is used to make the eventstore more readable
+// on the reason of cancelation.
+type DeviceAuthCanceled string
+
+const (
+	DeviceAuthCanceledDenied  = "denied"
+	DeviceAuthCanceledExpired = "expired"
+)
+
+func (c DeviceAuthCanceled) State() DeviceAuthState {
+	switch c {
+	case DeviceAuthCanceledDenied:
+		return DeviceAuthStateDenied
+	case DeviceAuthCanceledExpired:
+		return DeviceAuthStateExpired
+	default:
+		return DeviceAuthStateUndefined
+	}
 }

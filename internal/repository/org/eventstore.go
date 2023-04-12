@@ -111,6 +111,6 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, NotificationPolicyRemovedEventType, NotificationPolicyRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, deviceauth.AddedEventType, eventstore.GenericEventMapper[deviceauth.AddedEvent]).
 		RegisterFilterEventMapper(AggregateType, deviceauth.ApprovedEventType, eventstore.GenericEventMapper[deviceauth.ApprovedEvent]).
-		RegisterFilterEventMapper(AggregateType, deviceauth.DeniedEventType, eventstore.GenericEventMapper[deviceauth.DeniedEvent]).
+		RegisterFilterEventMapper(AggregateType, deviceauth.CanceledEventType, eventstore.GenericEventMapper[deviceauth.CanceledEvent]).
 		RegisterFilterEventMapper(AggregateType, deviceauth.RemovedEventType, eventstore.GenericEventMapper[deviceauth.RemovedEvent])
 }

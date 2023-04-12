@@ -76,8 +76,8 @@ func (p *deviceAuthProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceAppoved,
 				},
 				{
-					Event:  deviceauth.DeniedEventType,
-					Reduce: p.reduceDenied,
+					Event:  deviceauth.CanceledEventType,
+					Reduce: p.reduceCanceled,
 				},
 				{
 					Event:  deviceauth.RemovedEventType,
@@ -117,6 +117,7 @@ func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.S
 	}
 	return crdb.NewUpdateStatement(e,
 		[]handler.Column{
+			handler.NewCol(DeviceAuthColumnState, domain.DeviceAuthStateApproved),
 			handler.NewCol(DeviceAuthColumnSubject, e.Subject),
 			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
 			handler.NewCol(DeviceAuthColumnSequence, e.Sequence()),
@@ -128,15 +129,14 @@ func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.S
 	), nil
 }
 
-func (p *deviceAuthProjection) reduceDenied(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*deviceauth.ApprovedEvent)
+func (p *deviceAuthProjection) reduceCanceled(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*deviceauth.CanceledEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eeS8d", "reduce.wrong.event.type %T != %s", event, deviceauth.DeniedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eeS8d", "reduce.wrong.event.type %T != %s", event, deviceauth.CanceledEventType)
 	}
 	return crdb.NewUpdateStatement(e,
 		[]handler.Column{
-			handler.NewCol(DeviceAuthColumnState, domain.DeviceAuthStateUserDenied),
-			handler.NewCol(DeviceAuthColumnSubject, e.Subject),
+			handler.NewCol(DeviceAuthColumnState, e.Reason.State()),
 			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
 			handler.NewCol(DeviceAuthColumnSequence, e.Sequence()),
 		},

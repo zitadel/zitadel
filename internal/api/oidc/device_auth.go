@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/op"
 
@@ -66,15 +65,29 @@ func (c *DeviceAuthorizationConfig) toOPConfig() op.DeviceAuthorizationConfig {
 	return out
 }
 
+// StoreDeviceAuthorization creates a new Device Authorization request.
+// Implements the op.DeviceAuthorizationStorage interface.
 func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes []string) (err error) {
+	const logMsg = "store device authorization"
+	logger := logging.WithFields("client_id", clientID, "device_code", deviceCode, "user_code", userCode, "expires", expires, "scopes", scopes)
+
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		if err != nil {
+			logger.WithError(err).Error(logMsg)
+		}
+		span.EndWithError(err)
+	}()
 
 	scopes, err = o.assertProjectRoleScopes(ctx, clientID, scopes)
 	if err != nil {
 		return errors.ThrowPreconditionFailed(err, "OIDC-She4t", "Errors.Internal")
 	}
-	_, _, err = o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, expires, scopes)
+	aggrID, details, err := o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, expires, scopes)
+	if err == nil {
+		logger.SetFields("aggregate_id", aggrID, "details", details).Debug(logMsg)
+	}
+
 	return err
 }
 
@@ -89,21 +102,49 @@ func createDeviceAuthorizationState(d *domain.DeviceAuth) *op.DeviceAuthorizatio
 	}
 }
 
+// GetDeviceAuthorizatonState retieves the current state of the Device Authorization process.
+// It implements the op.DeviceAuthorizationStorage interface and is used by devices that
+// are polling until they successfully receive a token or we indicate a denied or expired state.
+// As generated user codes are of low entropy, this implementation also takes care or
+// device authorization request cleanup, when it has been Approved, Denied or Expired.
 func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, deviceCode string) (state *op.DeviceAuthorizationState, err error) {
+	const logMsg = "get device authorization state"
+	logger := logging.WithFields("client_id", clientID, "device_code", deviceCode)
+
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		if err != nil {
+			logger.WithError(err).Error(logMsg)
+		}
+		span.EndWithError(err)
+	}()
 
 	deviceAuth, err := o.query.DeviceAuthByDeviceCode(ctx, clientID, deviceCode)
 	if err != nil {
-		logging.WithError(err).WithFields(logrus.Fields{"client_id": clientID, "device_code": deviceCode}).Error()
 		return nil, err
 	}
+	logger.SetFields(
+		"expires", deviceAuth.Expires, "scopes", deviceAuth.Scopes,
+		"subject", deviceAuth.Subject, "state", deviceAuth.State,
+	).Debug("device authorization state")
 
-	/*
-		if deviceAuth.State != domain.DeviceAuthStateInitiated || deviceAuth.Expires.Before(time.Now()) {
-			_, err = o.command.RemoveDeviceAuth(ctx, deviceAuth)
+	// Cancel the request if it is expired, only if it wasn't Done meanwhile
+	if !deviceAuth.State.Done() && deviceAuth.Expires.Before(time.Now()) {
+		_, err = o.command.CancelDeviceAuth(ctx, deviceAuth.AggregateID, domain.DeviceAuthCanceledExpired)
+		if err != nil {
+			return nil, err
 		}
-	*/
+		deviceAuth.State = domain.DeviceAuthStateExpired
+	}
+
+	// When the request is more then initiated, it has been either Approved, Denied or Expired.
+	// At this point we should remove it from the DB to avoid user code conflicts.
+	if deviceAuth.State > domain.DeviceAuthStateInitiated {
+		_, err = o.command.RemoveDeviceAuth(ctx, deviceAuth.AggregateID)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return createDeviceAuthorizationState(deviceAuth), nil
 }
@@ -135,6 +176,6 @@ func (o *OPStorage) DenyDeviceAuthorization(ctx context.Context, userCode string
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = o.command.DenyDeviceAuth(ctx, userCode)
+	_, err = o.command.CancelDeviceAuth(ctx, userCode, domain.DeviceAuthCanceledDenied)
 	return err
 }

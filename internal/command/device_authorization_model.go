@@ -40,8 +40,8 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 		case *deviceauth.ApprovedEvent:
 			m.Subject = e.Subject
 			m.State = domain.DeviceAuthStateApproved
-		case *deviceauth.DeniedEvent:
-			m.State = domain.DeviceAuthStateUserDenied
+		case *deviceauth.CanceledEvent:
+			m.State = e.Reason.State()
 		case *deviceauth.RemovedEvent:
 			m.State = domain.DeviceAuthStateRemoved
 		}

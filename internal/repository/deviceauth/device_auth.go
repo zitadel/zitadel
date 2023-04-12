@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -11,7 +12,7 @@ const (
 	eventTypePrefix   eventstore.EventType = "device.authorization."
 	AddedEventType                         = eventTypePrefix + "added"
 	ApprovedEventType                      = eventTypePrefix + "approved"
-	DeniedEventType                        = eventTypePrefix + "denied"
+	CanceledEventType                      = eventTypePrefix + "canceled"
 	RemovedEventType                       = eventTypePrefix + "removed"
 )
 
@@ -84,24 +85,25 @@ func NewApprovedEvent(
 	}
 }
 
-type DeniedEvent struct {
+type CanceledEvent struct {
 	*eventstore.BaseEvent
+	Reason domain.DeviceAuthCanceled
 }
 
-func (e *DeniedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+func (e *CanceledEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *DeniedEvent) Data() any {
+func (e *CanceledEvent) Data() any {
 	return e
 }
 
-func (e *DeniedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *CanceledEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewDeniedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *DeniedEvent {
-	return &DeniedEvent{eventstore.NewBaseEventForPush(ctx, aggregate, DeniedEventType)}
+func NewCanceledEvent(ctx context.Context, aggregate *eventstore.Aggregate, reason domain.DeviceAuthCanceled) *CanceledEvent {
+	return &CanceledEvent{eventstore.NewBaseEventForPush(ctx, aggregate, CanceledEventType), reason}
 }
 
 type RemovedEvent struct {
@@ -131,7 +133,7 @@ func NewRemovedEvent(
 ) *RemovedEvent {
 	return &RemovedEvent{
 		eventstore.NewBaseEventForPush(
-			ctx, aggregate, ApprovedEventType,
+			ctx, aggregate, RemovedEventType,
 		),
 		clientID, deviceCode, userCode,
 	}

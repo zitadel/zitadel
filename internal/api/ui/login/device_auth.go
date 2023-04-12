@@ -1,19 +1,22 @@
 package login
 
 import (
-	"errors"
+	errs "errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/muhlemmer/gu"
 	"github.com/sirupsen/logrus"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 const (
@@ -24,25 +27,30 @@ const (
 func (l *Login) renderDeviceAuthUserCode(w io.Writer, r *http.Request, err error) {
 	var errID, errMessage string
 	if err != nil {
+		logging.WithError(err).Error()
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 
 	data := l.getBaseData(r, &domain.AuthRequest{}, "DeviceAuth.Title", "DeviceAuth.Description", errID, errMessage)
 	err = l.renderer.Templates[tmplDeviceAuthUserCode].Execute(w, data)
 	if err != nil {
-		logrus.Error(err)
+		logging.WithError(err).Error()
 	}
 }
 
-func (l *Login) renderDeviceAuthConfirm(w http.ResponseWriter, username, clientID string, scopes []string) {
+func (l *Login) renderDeviceAuthAction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, scopes []string) {
 	data := &struct {
-		Username string
-		ClientID string
-		Scopes   []string
+		baseData
+		AuthRequestID string
+		Username      string
+		ClientID      string
+		Scopes        []string
 	}{
-		Username: username,
-		ClientID: clientID,
-		Scopes:   scopes,
+		baseData:      l.getBaseData(r, authReq, "DeviceAuth.Title", "DeviceAuth.Description", "", ""),
+		AuthRequestID: authReq.ID,
+		Username:      authReq.UserName,
+		ClientID:      authReq.ApplicationID,
+		Scopes:        scopes,
 	}
 
 	err := l.renderer.Templates[tmplDeviceAuthConfirm].Execute(w, data)
@@ -70,7 +78,7 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 	userCode := r.Form.Get("user_code")
 	if userCode == "" {
 		if prompt, _ := url.QueryUnescape(r.Form.Get("prompt")); prompt != "" {
-			err = errors.New(prompt)
+			err = errs.New(prompt)
 		}
 		l.renderDeviceAuthUserCode(w, r, err)
 		return
@@ -82,7 +90,7 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 	}
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		l.renderDeviceAuthUserCode(w, r, errors.New("internal error: agent ID missing"))
+		l.renderDeviceAuthUserCode(w, r, errs.New("internal error: agent ID missing"))
 		return
 	}
 	authRequest, err := l.authRepo.CreateAuthRequest(ctx, &domain.AuthRequest{
@@ -119,29 +127,14 @@ func (l *Login) redirectDeviceAuthStart(w http.ResponseWriter, r *http.Request, 
 	http.Redirect(w, r, url.String(), http.StatusSeeOther)
 }
 
-type deviceConfirmRequest struct {
-	AuthRequestID string `schema:"authRequestID"`
-	Action        string `schema:"action"`
-}
-
-// handleDeviceAuthConfirm is the handler where the user is redirected after login.
+// handleDeviceAuthAction is the handler where the user is redirected after login.
 // The authRequest is checked if the login was indeed completed.
 // When the action of "allowed" or "denied", the device authorization is updated accordingly.
 // Else the user is presented with a page where they can choose / submit either action.
-func (l *Login) handleDeviceAuthConfirm(w http.ResponseWriter, r *http.Request) {
-	req := new(deviceConfirmRequest)
-	if err := l.getParseData(r, req); err != nil {
-		l.redirectDeviceAuthStart(w, r, err.Error())
-		return
-
-	}
-	agentID, ok := middleware.UserAgentIDFromCtx(r.Context())
-	if !ok {
-		l.redirectDeviceAuthStart(w, r, "internal error: agent ID missing")
-		return
-	}
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), req.AuthRequestID, agentID)
-	if err != nil {
+func (l *Login) handleDeviceAuthAction(w http.ResponseWriter, r *http.Request) {
+	authReq, err := l.getAuthRequest(r)
+	if authReq == nil {
+		err = errors.ThrowInvalidArgument(err, "LOGIN-OLah8", "invalid or missing auth request")
 		l.redirectDeviceAuthStart(w, r, err.Error())
 		return
 	}
@@ -155,13 +148,14 @@ func (l *Login) handleDeviceAuthConfirm(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	switch req.Action {
+	action := mux.Vars(r)["action"]
+	switch action {
 	case "allowed":
 		_, err = l.command.ApproveDeviceAuth(r.Context(), authDev.ID, authReq.UserID)
 	case "denied":
-		_, err = l.command.DenyDeviceAuth(r.Context(), authDev.ID)
+		_, err = l.command.CancelDeviceAuth(r.Context(), authDev.ID, domain.DeviceAuthCanceledDenied)
 	default:
-		l.renderDeviceAuthConfirm(w, authReq.UserName, authReq.ApplicationID, authDev.Scopes)
+		l.renderDeviceAuthAction(w, r, authReq, authDev.Scopes)
 		return
 	}
 	if err != nil {
@@ -169,11 +163,11 @@ func (l *Login) handleDeviceAuthConfirm(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	fmt.Fprintf(w, "Device authorization %s. You can now return to the device", req.Action)
+	fmt.Fprintf(w, "Device authorization %s. You can now return to the device", action)
 }
 
 func (l *Login) deviceAuthCallbackURL(authRequestID string) string {
-	return l.renderer.pathPrefix + EndpointDeviceAuthConfirm + "?authRequestID=" + authRequestID
+	return l.renderer.pathPrefix + EndpointDeviceAuthAction + "?authRequestID=" + authRequestID
 }
 
 // RedirectDeviceAuthToPrefix allows users to use https://domain.com/device without the /ui/login prefix
