@@ -1,4 +1,9 @@
 grpc:
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2
+	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
 	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption
 	# This foreach is a workaround from a limitation of the authoption generator and only affects zitadel.
 	# The authoption generator cannot work when passed *.proto but instead needs to have each file passed as {name}.proto
