@@ -2,10 +2,6 @@ name: All in one build
 
 on:
   pull_request:
-
-permissions:
-  contents: write
-  packages: write
     
 jobs:
 
