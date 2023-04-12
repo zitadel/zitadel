@@ -45,4 +45,5 @@ jobs:
         version: ${{ inputs.buf_version }}
         github_token: ${{ github.token }}
     - run: make generate
+    - run: ls -la proto/zitadel
     - run: make test
