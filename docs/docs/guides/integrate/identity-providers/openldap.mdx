@@ -3,13 +3,26 @@ title: Configure local OpenLDAP as Identity Provider
 sidebar_label: Local OpenLDAP
 ---
 
-import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
+import HowLDAPIDPWorks from './_how_ldap_idp_works.mdx'
 import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import GeneralConfigDescription from './_general_config_description.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
+:::caution
+This guide shows you how you can configure an LDAP server locally.
+ZITADEL needs access to the LDAP server, so this won't work in ZITADEL Cloud.
+You have to spin up your own local ZITADEL.
+The easiest way to do so is [by following the Docker Compose installation guide](/docs/self-hosting/deploy/compose).
+:::
+
 <Intro provider="a local OpenLDAP server"/>
+
+## How it works
+
+<HowLDAPIDPWorks/>
 
 ## OpenLDAP Configuration
 
@@ -135,13 +148,13 @@ ldapadd -x -h localhost -D "cn=admin,dc=example,dc=com" -f example.ldif -w 'Pass
 
 <CustomLoginPolicy/>
 
-### Create new LDAP Provider
+### Go to the IdP Providers Overview
 
-Go to the settings of your ZITADEL instance or the organization where you like to add a new LDAP provider.
-Choose the LDAP provider template.
+<IDPsOverview templates="Active Directory / LDAP"/>
 
-To get basic information on what is possible to configure, please refer to the [LDAP guide](./ldap).
-To configure the LDAP template to work with the before configured OpenLDAP, please fill out the following fields:
+### Create a new LDAP Provider
+
+Fill in the template fields with the exact values listed below. The fields are described in the [LDAP guide](./ldap#create-a-new-ldap-provider).
 
 **Name**: OpenLDAP
 

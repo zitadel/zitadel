@@ -3,13 +3,19 @@ title: Configure LDAP as Identity Provider
 sidebar_label: LDAP
 ---
 
-import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
+import HowLDAPIDPWorks from './_how_ldap_idp_works.mdx'
 import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import GeneralConfigDescription from './_general_config_description.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
 <Intro provider="an LDAP server"/>
+
+## How it works
+
+<HowLDAPIDPWorks/>
 
 ## ZITADEL Configuration
 
@@ -17,23 +23,13 @@ import TestSetup from './_test_setup.mdx';
 
 <CustomLoginPolicy/>
 
-### Resulting process to connect LDAP
+### Go to the IdP Providers Overview
 
-When you wnat to use a LDAP provider in ZITADEL, the following process is followed to login:
+<IDPsOverview templates="Active Directory / LDAP"/>
 
-1. ZITADEL tries to connect to the LDAP server with or without TLS depending on the configuration
-2. If the connection fails, the next server in the list will be used to try again.
-3. ZITADEL tries a bind with the BindDN and BindPassword to check if it's possible to proceed
-4. ZITADEL does a SearchQuery to find the UserDN with the provided configuration of base, filters and objectClasses
-5. ZITADEL tries a bind with the provided loginname and password
-6. LDAP attributes get mapped to ZITADEL attributes as provided by the configuration
+### Create a new LDAP Provider
 
-### Create new LDAP Provider
-
-Go to the settings of your ZITADEL instance or the organization where you like to add a new LDAP provider.
-Choose the LDAP provider template.
-
-To configure the LDAP template please fill out the following fields:
+Fill in the following fields in the LDAP template:
 
 **Name**: Name of the identity provider
 
