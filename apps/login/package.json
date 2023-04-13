@@ -1,5 +1,5 @@
 {
-  "name": "zitadel-login",
+  "name": "@zitadel/login",
   "private": true,
   "scripts": {
     "build": "next build",
