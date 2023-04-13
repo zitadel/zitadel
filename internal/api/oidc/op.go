@@ -51,6 +51,7 @@ type EndpointConfig struct {
 	Revocation    *Endpoint
 	EndSession    *Endpoint
 	Keys          *Endpoint
+	DeviceAuth    *Endpoint
 }
 
 type Endpoint struct {
@@ -166,6 +167,9 @@ func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
 	}
 	if endpointConfig.Keys != nil {
 		options = append(options, op.WithCustomKeysEndpoint(op.NewEndpointWithURL(endpointConfig.Keys.Path, endpointConfig.Keys.URL)))
+	}
+	if endpointConfig.DeviceAuth != nil {
+		options = append(options, op.WithCustomDeviceAuthorizationEndpoint(op.NewEndpointWithURL(endpointConfig.DeviceAuth.Path, endpointConfig.DeviceAuth.URL)))
 	}
 	return options
 }
