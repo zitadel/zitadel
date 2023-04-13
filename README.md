@@ -90,7 +90,7 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 
 ## Features
 
-Authenticate Users
+Authentication
 - Single Sign On (SSO)
 - Passwordless with FIDO2 support (Including Passkeys)
 - Username / Password
@@ -100,7 +100,7 @@ Authenticate Users
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
 - [Machine-to-machine](https://zitadel.com/docs/guides/integrate/serviceusers) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
 
-Multi-tenancy
+Multi-Tenancy
 - [Identity Brokering](https://zitadel.com/docs/guides/integrate/identity-brokering) with templates for popular identity providers
 - [Delegate role management to third-parties](https://zitadel.com/docs/guides/manage/console/projects)
 - Domain discovery
