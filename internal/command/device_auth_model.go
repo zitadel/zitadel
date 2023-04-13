@@ -20,10 +20,11 @@ type DeviceAuthWriteModel struct {
 	State      domain.DeviceAuthState
 }
 
-func NewDeviceAuthWriteModel(id string) *DeviceAuthWriteModel {
+func NewDeviceAuthWriteModel(aggrID, resourceOwner string) *DeviceAuthWriteModel {
 	return &DeviceAuthWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: id,
+			AggregateID:   aggrID,
+			ResourceOwner: resourceOwner,
 		},
 	}
 }
@@ -37,6 +38,7 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 			m.UserCode = e.UserCode
 			m.Expires = e.Expires
 			m.Scopes = e.Scopes
+			m.State = e.State
 		case *deviceauth.ApprovedEvent:
 			m.Subject = e.Subject
 			m.State = domain.DeviceAuthStateApproved

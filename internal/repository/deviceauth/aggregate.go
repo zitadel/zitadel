@@ -7,20 +7,12 @@ const (
 	AggregateVersion = "v1"
 )
 
-type Aggregate struct {
-	eventstore.Aggregate
-}
-
-/*
-Note: I've included this as per other "repository" packages,
-but somehow it isn't used or required anywhere?
-*/
-func NewAggregate(id string) *Aggregate {
-	return &Aggregate{
-		Aggregate: eventstore.Aggregate{
-			Type:    AggregateType,
-			Version: AggregateVersion,
-			ID:      id,
-		},
+func NewAggregate(aggrID, instanceID string) *eventstore.Aggregate {
+	return &eventstore.Aggregate{
+		ID:            aggrID,
+		Type:          AggregateType,
+		ResourceOwner: instanceID,
+		InstanceID:    instanceID,
+		Version:       AggregateVersion,
 	}
 }

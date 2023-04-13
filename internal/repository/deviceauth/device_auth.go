@@ -24,6 +24,7 @@ type AddedEvent struct {
 	UserCode   string
 	Expires    time.Time
 	Scopes     []string
+	State      domain.DeviceAuthState
 }
 
 func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -51,7 +52,7 @@ func NewAddedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx, aggregate, AddedEventType,
 		),
-		clientID, deviceCode, userCode, expires, scopes}
+		clientID, deviceCode, userCode, expires, scopes, domain.DeviceAuthStateInitiated}
 }
 
 type ApprovedEvent struct {

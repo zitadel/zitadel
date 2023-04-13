@@ -37,21 +37,22 @@ const (
 	DeviceAuthStateRemoved                          // removed
 )
 
-// Exists returns true until DeviceAuthState is set to Removed.
+// Exists returns true when not Undefined and
+// any status lower than Removed.
 func (s DeviceAuthState) Exists() bool {
-	return s < DeviceAuthStateRemoved
+	return s != DeviceAuthStateUndefined && s < DeviceAuthStateRemoved
 }
 
 // Done returns true when DeviceAuthState is Approved.
-// This implements the OIDC interface requiremnt of "Done"
+// This implements the OIDC interface requirement of "Done"
 func (s DeviceAuthState) Done() bool {
 	return s == DeviceAuthStateApproved
 }
 
-// Denied returns true when DeviceAuthState is Denied or Removed.
-// This implements the OIDC interface requiremnt of "Denied"
+// Denied returns true when DeviceAuthState is Denied, Expired or Removed.
+// This implements the OIDC interface requirement of "Denied".
 func (s DeviceAuthState) Denied() bool {
-	return s == DeviceAuthStateDenied || s == DeviceAuthStateRemoved
+	return s >= DeviceAuthStateDenied
 }
 
 // DeviceAuthCanceled is a subset of DeviceAuthState, allowed to

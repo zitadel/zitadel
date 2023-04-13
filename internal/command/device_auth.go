@@ -17,13 +17,8 @@ func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, user
 		return "", nil, err
 	}
 
-	model := &DeviceAuthWriteModel{
-		WriteModel: eventstore.WriteModel{
-			ResourceOwner: authz.GetInstance(ctx).InstanceID(),
-			AggregateID:   aggrID,
-		},
-	}
-	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
+	aggr := deviceauth.NewAggregate(aggrID, authz.GetInstance(ctx).InstanceID())
+	model := NewDeviceAuthWriteModel(aggrID, aggr.ResourceOwner)
 
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewAddedEvent(
 		ctx,
@@ -53,7 +48,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, id, subject string) (*
 	if !model.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
 	}
-	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
+	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, aggr, subject))
 	if err != nil {
@@ -75,7 +70,7 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 	if !model.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound")
 	}
-	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
+	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewCanceledEvent(ctx, aggr, reason))
 	if err != nil {
@@ -94,10 +89,7 @@ func (c *Commands) RemoveDeviceAuth(ctx context.Context, id string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	if !model.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-yo9Ie", "Errors.DeviceAuth.NotFound")
-	}
-	aggr := eventstore.AggregateFromWriteModel(&model.WriteModel, deviceauth.AggregateType, deviceauth.AggregateVersion)
+	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewRemovedEvent(ctx, aggr, model.ClientID, model.DeviceCode, model.UserCode))
 	if err != nil {
