@@ -136,6 +136,8 @@ func OIDCGrantTypesFromModel(grantTypes []domain.OIDCGrantType) []app_pb.OIDCGra
 			oidcGrantTypes[i] = app_pb.OIDCGrantType_OIDC_GRANT_TYPE_IMPLICIT
 		case domain.OIDCGrantTypeRefreshToken:
 			oidcGrantTypes[i] = app_pb.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN
+		case domain.OIDCGrantTypeDeviceCode:
+			oidcGrantTypes[i] = app_pb.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE
 		}
 	}
 	return oidcGrantTypes
@@ -154,6 +156,8 @@ func OIDCGrantTypesToDomain(grantTypes []app_pb.OIDCGrantType) []domain.OIDCGran
 			oidcGrantTypes[i] = domain.OIDCGrantTypeImplicit
 		case app_pb.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN:
 			oidcGrantTypes[i] = domain.OIDCGrantTypeRefreshToken
+		case app_pb.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE:
+			oidcGrantTypes[i] = domain.OIDCGrantTypeDeviceCode
 		}
 	}
 	return oidcGrantTypes
