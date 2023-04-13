@@ -29,11 +29,16 @@ import TestSetup from './_test_setup.mdx';
 
 ### Create a new LDAP Provider
 
-Fill in the following fields in the LDAP template:
+Fill in the following fields in the LDAP template.
+
+:::caution
+We highly recommend to use LDAPS or StartTLS enable servers.
+Otherwise, your users passwords are sent in clear text through the wire.
+:::
 
 **Name**: Name of the identity provider
 
-**Servers**: List of servers in a format of "schema://host:port", as example "ldap://localhost:389", if TLS should be used then replace "ldap" with "ldaps" with the corresponding port.
+**Servers**: List of servers in a format of "schema://host:port", as example "ldap://localhost:389". If possible, replace "ldap" with "ldaps" with the corresponding port.
 
 **BaseDN**: BaseDN which will be used with each request to the LDAP server
 
@@ -47,7 +52,7 @@ Fill in the following fields in the LDAP template:
 
 **LDAP Attributes**: Mapping of LDAP attributes to ZITADEL attributes, the ID attributes is required, the rest depends on usage of the identity provider
 
-**StartTLS**: If this setting is enabled after the initial connection ZITADEL tries to build a TLS connection.
+**StartTLS**: If this setting is enabled after the initial connection ZITADEL tries to build a TLS connection. If your LDAP server doesn't support LDAPS, at least it should support StartTLS.
 
 **Timeout**: If this setting is set all connection run with a set timeout, if it is 0s the default timeout of 60s is used.
 

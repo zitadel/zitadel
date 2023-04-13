@@ -18,6 +18,12 @@ You have to spin up your own local ZITADEL.
 The easiest way to do so is [by following the Docker Compose installation guide](/docs/self-hosting/deploy/compose).
 :::
 
+:::caution
+Beware that this example configuration neighter supports LDAPS nor StartTLS.
+We highly recommend to enable LDAPS or StartTLS in your production setup.
+Otherwise, your users passwords are sent in clear text through the wire.
+:::
+
 <Intro provider="a local OpenLDAP server"/>
 
 ## How it works
