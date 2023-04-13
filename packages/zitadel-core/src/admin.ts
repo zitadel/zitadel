@@ -15,17 +15,14 @@ const createClient = <Client>(
   definition: CompatServiceDefinition,
   accessToken: string
 ) => {
-  const channel = createChannel(process.env.ZITADEL_API_URL);
+  const channel = createChannel(process.env.ZITADEL_API_URL ?? "");
   return createClientFactory()
     .use(authMiddleware(accessToken))
     .create(definition, channel) as Client;
 };
 
-export const getAuth = async () =>
-  createClient<AuthServiceClient>(AuthServiceDefinition, "");
-
 export const getAdmin = () =>
   createClient<AdminServiceClient>(
-    AdminServiceDefinition,
+    AdminServiceDefinition as CompatServiceDefinition,
     process.env.ZITADEL_ADMIN_TOKEN ?? ""
   );

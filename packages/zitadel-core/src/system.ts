@@ -12,7 +12,7 @@ const createSystemClient = <Client>(
   definition: CompatServiceDefinition,
   accessToken: string
 ) => {
-  const channel = createChannel(process.env.ZITADEL_SYSTEM_API_URL);
+  const channel = createChannel(process.env.ZITADEL_SYSTEM_API_URL ?? "");
   return createClientFactory()
     .use(authMiddleware(accessToken))
     .create(definition, channel) as Client;
@@ -23,13 +23,13 @@ export const getSystem = async () => {
     .setProtectedHeader({ alg: "RS256" })
     .setIssuedAt()
     .setExpirationTime("1h")
-    .setIssuer(process.env.ZITADEL_SYSTEM_API_USERID)
-    .setSubject(process.env.ZITADEL_SYSTEM_API_USERID)
-    .setAudience(process.env.ZITADEL_ISSUER)
-    .sign(await importPKCS8(process.env.ZITADEL_SYSTEM_API_KEY, "RS256"));
+    .setIssuer(process.env.ZITADEL_SYSTEM_API_USERID ?? "")
+    .setSubject(process.env.ZITADEL_SYSTEM_API_USERID ?? "")
+    .setAudience(process.env.ZITADEL_ISSUER ?? "")
+    .sign(await importPKCS8(process.env.ZITADEL_SYSTEM_API_KEY ?? "", "RS256"));
 
   return createSystemClient<SystemServiceClient>(
-    SystemServiceDefinition,
+    SystemServiceDefinition as CompatServiceDefinition,
     token
   );
 };

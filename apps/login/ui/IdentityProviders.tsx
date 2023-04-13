@@ -1,4 +1,4 @@
-import { SignInWithGoogle } from "#/../../packages/zitadel-react/dist";
+import { SignInWithGoogle } from "@zitadel/react";
 
 export default function IdentityProviders() {
   return (
