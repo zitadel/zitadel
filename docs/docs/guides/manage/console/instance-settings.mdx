@@ -176,12 +176,21 @@ If an account is locked, the administrator has to unlock it in the ZITADEL conso
 
 ## Domain settings
 
-In the domain policy you have two different settings.
-One is the "user_login_must_be_domain", by setting this all the users within an organisation will be suffixed with the domain of the organisation.
+### Add organization domain as suffix to loginnames
 
-The second is "validate_org_domains" if this is set to true all created domains on an organisation must be verified per acme challenge.
+If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.
+
+### Validate Org domains
+
+If this is enabled all created domains on an organization must be verified per dns/acme challenge.
+
 More about how to verify a domain [here](/guides/manage/console/organizations#domain-verification-and-primary-domain).
 If it is set to false, all registered domain will automatically be created as verified and the users will be able to use the domain for login.
+
+### SMTP Sender Address matches Instance Domain
+
+If enabled, the SMTP server address must match the instance's primary domain.
+With that you can ensure that users receive notifications from the same domain that is used for login.
 
 ### Use email as username
 
