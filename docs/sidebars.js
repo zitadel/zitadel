@@ -211,12 +211,19 @@ module.exports = {
     {
       type: "category",
       label: "Solution Scenarios",
+      link: {
+        type: "generated-index",
+        title: "Solution Scenarios",
+        slug: "guides/solution-scenarios/introduction",
+        description:
+          "Customers of an SaaS Identity and Access Management System usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into Solution Scenarios which aim to help you getting started with ZITADEL.",
+      },
       collapsed: true,
       items: [
-        "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
         "concepts/usecases/saas",
+        "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
       ],
     },
