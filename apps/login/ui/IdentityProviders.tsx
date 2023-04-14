@@ -1,9 +1,10 @@
-import { SignInWithGoogle } from "@zitadel/react";
+import { SignInWithGoogle, SignInWithGitlab } from "@zitadel/react";
 
 export default function IdentityProviders() {
   return (
-    <div>
+    <div className="space-y-4 py-4">
       <SignInWithGoogle />
+      <SignInWithGitlab />
     </div>
   );
 }

@@ -36,7 +36,6 @@ importers:
       clsx: 1.2.1
       date-fns: 2.29.3
       del-cli: 5.0.0
-      dinero.js: 2.0.0-alpha.8
       eslint-config-zitadel: workspace:*
       grpc-tools: 1.11.3
       lint-staged: 13.0.3
@@ -62,7 +61,6 @@ importers:
       '@zitadel/server': link:../../packages/zitadel-server
       clsx: 1.2.1
       date-fns: 2.29.3
-      dinero.js: 2.0.0-alpha.8
       next: 13.2.3_z72xxk7vwlamvgqemvc4ptm4du
       nice-grpc: 2.0.1
       react: 18.2.0
@@ -1756,22 +1754,6 @@ packages:
       prettier: 2.8.0
     dev: true
 
-  /@dinero.js/calculator-number/2.0.0-alpha.8:
-    resolution: {integrity: sha512-/L+N7g5DjcS6wlMb2hcOXWBKW2TGiG+vZDZr9ow0nsHUTdwtMarL1bmBH9fGldHhH2XsxcrjN9H+036yeNzh3Q==}
-    dependencies:
-      '@dinero.js/core': 2.0.0-alpha.8
-    dev: false
-
-  /@dinero.js/core/2.0.0-alpha.8:
-    resolution: {integrity: sha512-3jaw2j6J/SshlCZz5KhHkh8zP47HRmt9RpnjR0BJs2awpweVuZIyyX9qzGVUEVpml9IwzQ1U+YdXevhOxtcDgg==}
-    dependencies:
-      '@dinero.js/currencies': 2.0.0-alpha.8
-    dev: false
-
-  /@dinero.js/currencies/2.0.0-alpha.8:
-    resolution: {integrity: sha512-zApiqtuuPwjiM9LJA5/kNcT48VSHRiz2/mktkXjIpfxrJKzthXybUAgEenExIH6dYhLDgVmsLQZtZFOsdYl0Ag==}
-    dev: false
-
   /@emotion/unitless/0.7.5:
     resolution: {integrity: sha512-OWORNpfjMsSSUBVrRBVGECkhWcULOAJz9ZW8uK9qgxD+87M7jHRcvh/A96XXNhXTLmKcoYSQtBEX7lHMO7YRwg==}
     dev: false
@@ -3099,14 +3081,6 @@ packages:
 
   /didyoumean/1.2.2:
     resolution: {integrity: sha512-gxtyfqMg7GKyhQmb056K7M3xszy/myH8w+B4RT+QXBQsvAOdc3XymqDDPHx1BgPgsdAA5SIifona89YtRATDzw==}
-
-  /dinero.js/2.0.0-alpha.8:
-    resolution: {integrity: sha512-6bl+g6oh6iQ6vPR5Pd4qr7D+P5e51GYRUT3jl8HYqYeejYC5sd9OVTTbXC3WU7L25mAIbOm+diiTVz1rL4QLwg==}
-    dependencies:
-      '@dinero.js/calculator-number': 2.0.0-alpha.8
-      '@dinero.js/core': 2.0.0-alpha.8
-      '@dinero.js/currencies': 2.0.0-alpha.8
-    dev: false
 
   /dir-glob/3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}

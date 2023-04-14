@@ -54,6 +54,10 @@ module.exports = {
             800: "#000000",
             900: "#000000",
           },
+          light: {
+            500: colors.white,
+            600: colors.gray[50],
+          },
         },
         input: {
           light: {
@@ -77,9 +81,12 @@ module.exports = {
         },
       },
       backgroundImage: ({ theme }) => ({
-        "vc-border-gradient": `radial-gradient(at left top, ${theme(
+        "dark-vc-border-gradient": `radial-gradient(at left top, ${theme(
           "colors.gray.500"
         )}, 50px, ${theme("colors.gray.800")} 50%)`,
+        "vc-border-gradient": `radial-gradient(at left top, ${theme(
+          "colors.gray.200"
+        )}, 50px, ${theme("colors.gray.300")} 50%)`,
       }),
       keyframes: ({ theme }) => ({
         rerender: {

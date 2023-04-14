@@ -4,7 +4,7 @@ export default defineConfig((options: Options) => ({
   treeshake: true,
   splitting: true,
   publicDir: true,
-  entry: ["src/**/*.{tsx,png,svg}"],
+  entry: ["src/**/*.tsx"],
   format: ["esm"],
   dts: true,
   minify: true,
