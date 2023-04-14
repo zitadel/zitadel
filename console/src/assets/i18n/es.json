@@ -1699,6 +1699,7 @@
       "2": "inactivo"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Común",
       "1": "Organizaciones",
       "2": "Clientes"
