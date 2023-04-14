@@ -11,7 +11,7 @@ This Turborepo includes the following:
 - `login`: The new login UI powered by Next.js
 - `@zitadel/server`: core components for establishing node client connection, grpc stub
 - `@zitadel/client`: core components for establishing web client connection, grpc stub
-- `@zitadel/react`: shared React utilities and components
+- `@zitadel/react`: shared React utilities and components built with tailwindcss
 - `@zitadel/next`: shared Next.js utilities
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset

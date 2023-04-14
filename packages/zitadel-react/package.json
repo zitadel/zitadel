@@ -12,10 +12,11 @@
     "./assets/*": "./dist/assets/*"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && pnpm run copy-files",
     "dev": "tsup --watch",
     "lint": "eslint \"src/**/*.ts*\"",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "copy-files": "cp -R ./src/public/ ./dist/"
   },
   "devDependencies": {
     "@types/react": "^17.0.13",

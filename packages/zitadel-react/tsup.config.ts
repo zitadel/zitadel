@@ -3,7 +3,8 @@ import { defineConfig, Options } from "tsup";
 export default defineConfig((options: Options) => ({
   treeshake: true,
   splitting: true,
-  entry: ["src/**/*.tsx"],
+  publicDir: true,
+  entry: ["src/**/*.{tsx,png,svg}"],
   format: ["esm"],
   dts: true,
   minify: true,

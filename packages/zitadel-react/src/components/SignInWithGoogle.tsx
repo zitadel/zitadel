@@ -9,7 +9,7 @@ export function SignInWithGoogle(props: SignInWithGoogleProps) {
     <div className="ui-flex ui-flex-row ui-items-center ui-bg-white ui-text-black dark:ui-bg-transparent dark:ui-text-white rounded-md p-4 text-sm">
       <img
         className="h-8 w-8"
-        src="./assets/google.png"
+        src="./public/google.png"
         alt="google"
         height={24}
         width={24}
