@@ -27,9 +27,9 @@ More about the [scopes](/apis/openidoauth/scopes#reserved-scopes)
 
 If you have an application that runs a dedicated domain for each customer you need to instruct ZITADEL to allow redirection for each domain specifically to safeguard against phishing attacks.
 
-Example:
-MyApplication: customer-a.app.com
-ZITADEL Login: login.app.com
+Example:  
+MyApplication: `customer-a.app.com`  
+ZITADEL Login: `login.app.com`
 
 In the OIDC Authorization request you always have to send the redirect URI to where you like to be redirected after login.
 To handle this scenario it is possible to register multiple URIs on each application in ZITADEL, the only criteria is that the requested URI has to match one of the registered URIs.
