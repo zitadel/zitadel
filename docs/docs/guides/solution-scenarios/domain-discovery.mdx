@@ -81,3 +81,36 @@ You can also have multiple custom domains pointing to the same instance as descr
 The domain of your email notification can be changed by [setting up your SMTP](/docs/guides/manage/console/instance-settings#smtp).
 
 ## Organization
+
+### Alpha organization
+
+Users of **Alpha** should only be allowed to authenticate with their company's identity provider.
+
+In the organization settings under Login Behavior and Access make sure the following settings are applied:
+- **Username Password allowed**: Disabled
+- **Register allowed**: Disabled - we will configure this on the external identity provider
+- **External IDP allowed**: Enabled
+
+Now you can configure an [external identity provider](/docs/guides/manage/console/instance-settings#identity-providers).
+
+:::info
+Given you have only one external identity provider configured, when a user tries to login on that organization, then the user will be automatically redirected to the external identity provider.  
+In case multiple providers are configured, then the user will be prompted to select an identity provider.
+:::
+
+### Beta organization
+
+Users of **Beta** must create an account and login with password and 2FA.
+
+In the organization settings under Login Behavior and Access make sure the following settings are applied:
+
+- **Username Password allowed**: Enabled
+- **Register allowed**: Disabled - you may want [Managers](/docs/concepts/structure/managers) to setup accounts.
+- **External IDP allowed**: Disabled
+
+Make sure to [Force MFA](/docs/guides/manage/console/instance-settings#multifactor-mfa) so that users must setup a second factor for authentication.
+
+### Verify domains
+
+https://zitadel.com/docs/guides/manage/console/organizations#verify-your-domain-name
+--> add to this page info that manually is possible as well
