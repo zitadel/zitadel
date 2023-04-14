@@ -6,6 +6,7 @@ sidebar_label: GitLab
 import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
 import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 import UnlinkedOAuth from './_unlinked_oauth.mdx';
@@ -50,11 +51,13 @@ Save the ID and the Secret, you will not be able to copy the secret again, if yo
 
 <CustomLoginPolicy/>
 
-### Create new GitLab Provider
+### Go to the IdP Providers Overview
 
-Go to the settings of your ZITADEL instance or the organization where you like to add a new Gitlab provider.
-Choose the GitLab provider template.
-This template has everything you need preconfigured.
+<IDPsOverview templates="GitLab or GitLab Self Hosted"/>
+
+### Create a new GitLab Provider
+
+The GitLab provider templates have everything you need preconfigured.
 Add the client ID and secret you have created in the Gitlab Application.
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
