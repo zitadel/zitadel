@@ -222,7 +222,7 @@ module.exports = {
       items: [
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
-        "concepts/usecases/saas",
+        "guides/solution-scenarios/saas",
         "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
       ],
