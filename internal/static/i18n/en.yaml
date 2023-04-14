@@ -1060,7 +1060,7 @@ EventTypes:
         changed: Label policy changed
         font:
           added: Font added to label policy
-          removed: Font remove from label policy
+          removed: Font removed from label policy
         icon:
           added: Icon added to label policy
           removed: Icon removed from label policy

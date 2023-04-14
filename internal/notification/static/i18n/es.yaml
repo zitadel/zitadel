@@ -2,48 +2,48 @@ InitCode:
   Title: ZITADEL - Inicializar usuario
   PreHeader: Inicializar usuario
   Subject: Inicializar usuario
-  Greeting: Hola {{.FirstName}} {{.LastName}},
+  Greeting: Hola {{.DisplayName}},
   Text: Este usuario fue creado en ZITADEL. Utiliza el nombre de usuario {{.PreferredLoginName}} para iniciar sesión. Por favor, haz clic en el botón más abajo para finalizar el proceso de inicialización. (Código {{.Code}}) Si no solicitaste este correo electrónico, por favor ignóralo.
   ButtonText: Finalizar inicialización
 PasswordReset:
   Title: ZITADEL - Restablecer contraseña
   PreHeader: Restablecer contraseña
   Subject: Restablecer contraseña
-  Greeting: Hola {{.FirstName}} {{.LastName}},
+  Greeting: Hola {{.DisplayName}},
   Text: Hemos recibido una solicitud de restablecimiento de contraseña. Por favor, usa el botón más abajo para restablecer tu contraseña. (Código {{.Code}}) Si no solicitaste este correo electrónico, por favor ignóralo.
   ButtonText: Restablecer contraseña
 VerifyEmail:
   Title: ZITADEL - Verificar correo electrónico
   PreHeader: Verificar correo electrónico
   Subject: Verificar correo electrónico
-  Greeting: Hola {{.FirstName}} {{.LastName}},
+  Greeting: Hola {{.DisplayName}},
   Text: Se ha añadido una nueva dirección de correo electrónico. Por favor, usa el botón más abajo para verificar tu correo electrónico. (Código {{.Code}}) Si no añadiste una nueva dirección de correo electrónico, por favor ignora este correo.
   ButtonText: Verificar correo electrónico
 VerifyPhone:
   Title: ZITADEL - Verificar teléfono
   PreHeader: Verificar teléfono
   Subject: Verificar teléfono
-  Greeting: Hola {{.FirstName}} {{.LastName}},
+  Greeting: Hola {{.DisplayName}},
   Text: Se ha añadido un nuevo número de teléfono. Por favor, usa el siguiente código para verificarlo {{.Code}}
   ButtonText: Verificar teléfono
 DomainClaimed:
   Title: ZITADEL - Se ha reclamado un dominio
   PreHeader: Cambiar dirección de correo electrónico / nombre de usuario
   Subject: Se ha reclamado un dominio
-  Greeting: Hola {{.FirstName}} {{.LastName}},
+  Greeting: Hola {{.DisplayName}},
   Text: El dominio {{.Domain}} ha sido reclamado por una organización. Tu usuario actual {{.Username}} no es parte de esta organización. Por tanto tendrás que cambiar tu dirección de correo electrónico cuando inicies sesión. Hemos creado un nombre de usuario temporal ({{.TempUsername}}) para este inicio de sesión.
   ButtonText: Iniciar sesión
 PasswordlessRegistration:
   Title: ZITADEL - Añadir inicio de sesión sin contraseña
   PreHeader: Añadir inicio de sesión sin contraseña
   Subject: Añadir inicio de sesión sin contraseña
-  Greeting: Hola {{.FirstName}} {{.LastName}},
+  Greeting: Hola {{.DisplayName}},
   Text: Hemos recibido una solicitud para añadir un token para iniciar sesión sin contraseña. Por favor, usa el botón más abajo para añadir tu token o dispositivo para un inicio de sesión sin contraseña.
   ButtonText: Añadir inicio de sesión sin contraseña
 PasswordChange:
   Title: ZITADEL - La contraseña de usuario ha sido cambiada
   PreHeader: Cambiar contraseña
   Subject: La contraseña de usuario ha sido cambiada
-  Greeting: Hola {{.FirstName}} {{.LastName}},
+  Greeting: Hola {{.DisplayName}},
   Text: La contraseña de tu usuario ha sido cambiada, si este cambio no fue hecho por ti, por favor proceder a restablecer inmediatamente tu contraseña.
   ButtonText: Iniciar sesión
