@@ -16,85 +16,85 @@ import (
 )
 
 var (
-	idpTemplateQuery = `SELECT projections.idp_templates4.id,` +
-		` projections.idp_templates4.resource_owner,` +
-		` projections.idp_templates4.creation_date,` +
-		` projections.idp_templates4.change_date,` +
-		` projections.idp_templates4.sequence,` +
-		` projections.idp_templates4.state,` +
-		` projections.idp_templates4.name,` +
-		` projections.idp_templates4.type,` +
-		` projections.idp_templates4.owner_type,` +
-		` projections.idp_templates4.is_creation_allowed,` +
-		` projections.idp_templates4.is_linking_allowed,` +
-		` projections.idp_templates4.is_auto_creation,` +
-		` projections.idp_templates4.is_auto_update,` +
+	idpTemplateQuery = `SELECT projections.idp_templates5.id,` +
+		` projections.idp_templates5.resource_owner,` +
+		` projections.idp_templates5.creation_date,` +
+		` projections.idp_templates5.change_date,` +
+		` projections.idp_templates5.sequence,` +
+		` projections.idp_templates5.state,` +
+		` projections.idp_templates5.name,` +
+		` projections.idp_templates5.type,` +
+		` projections.idp_templates5.owner_type,` +
+		` projections.idp_templates5.is_creation_allowed,` +
+		` projections.idp_templates5.is_linking_allowed,` +
+		` projections.idp_templates5.is_auto_creation,` +
+		` projections.idp_templates5.is_auto_update,` +
 		// oauth
-		` projections.idp_templates4_oauth2.idp_id,` +
-		` projections.idp_templates4_oauth2.client_id,` +
-		` projections.idp_templates4_oauth2.client_secret,` +
-		` projections.idp_templates4_oauth2.authorization_endpoint,` +
-		` projections.idp_templates4_oauth2.token_endpoint,` +
-		` projections.idp_templates4_oauth2.user_endpoint,` +
-		` projections.idp_templates4_oauth2.scopes,` +
-		` projections.idp_templates4_oauth2.id_attribute,` +
+		` projections.idp_templates5_oauth2.idp_id,` +
+		` projections.idp_templates5_oauth2.client_id,` +
+		` projections.idp_templates5_oauth2.client_secret,` +
+		` projections.idp_templates5_oauth2.authorization_endpoint,` +
+		` projections.idp_templates5_oauth2.token_endpoint,` +
+		` projections.idp_templates5_oauth2.user_endpoint,` +
+		` projections.idp_templates5_oauth2.scopes,` +
+		` projections.idp_templates5_oauth2.id_attribute,` +
 		// oidc
-		` projections.idp_templates4_oidc.idp_id,` +
-		` projections.idp_templates4_oidc.issuer,` +
-		` projections.idp_templates4_oidc.client_id,` +
-		` projections.idp_templates4_oidc.client_secret,` +
-		` projections.idp_templates4_oidc.scopes,` +
-		` projections.idp_templates4_oidc.id_token_mapping,` +
+		` projections.idp_templates5_oidc.idp_id,` +
+		` projections.idp_templates5_oidc.issuer,` +
+		` projections.idp_templates5_oidc.client_id,` +
+		` projections.idp_templates5_oidc.client_secret,` +
+		` projections.idp_templates5_oidc.scopes,` +
+		` projections.idp_templates5_oidc.id_token_mapping,` +
 		// jwt
-		` projections.idp_templates4_jwt.idp_id,` +
-		` projections.idp_templates4_jwt.issuer,` +
-		` projections.idp_templates4_jwt.jwt_endpoint,` +
-		` projections.idp_templates4_jwt.keys_endpoint,` +
-		` projections.idp_templates4_jwt.header_name,` +
+		` projections.idp_templates5_jwt.idp_id,` +
+		` projections.idp_templates5_jwt.issuer,` +
+		` projections.idp_templates5_jwt.jwt_endpoint,` +
+		` projections.idp_templates5_jwt.keys_endpoint,` +
+		` projections.idp_templates5_jwt.header_name,` +
 		// azure
-		` projections.idp_templates4_azure.idp_id,` +
-		` projections.idp_templates4_azure.client_id,` +
-		` projections.idp_templates4_azure.client_secret,` +
-		` projections.idp_templates4_azure.scopes,` +
-		` projections.idp_templates4_azure.tenant,` +
-		` projections.idp_templates4_azure.is_email_verified,` +
+		` projections.idp_templates5_azure.idp_id,` +
+		` projections.idp_templates5_azure.client_id,` +
+		` projections.idp_templates5_azure.client_secret,` +
+		` projections.idp_templates5_azure.scopes,` +
+		` projections.idp_templates5_azure.tenant,` +
+		` projections.idp_templates5_azure.is_email_verified,` +
 		// github
-		` projections.idp_templates4_github.idp_id,` +
-		` projections.idp_templates4_github.client_id,` +
-		` projections.idp_templates4_github.client_secret,` +
-		` projections.idp_templates4_github.scopes,` +
+		` projections.idp_templates5_github.idp_id,` +
+		` projections.idp_templates5_github.client_id,` +
+		` projections.idp_templates5_github.client_secret,` +
+		` projections.idp_templates5_github.scopes,` +
 		// github enterprise
-		` projections.idp_templates4_github_enterprise.idp_id,` +
-		` projections.idp_templates4_github_enterprise.client_id,` +
-		` projections.idp_templates4_github_enterprise.client_secret,` +
-		` projections.idp_templates4_github_enterprise.authorization_endpoint,` +
-		` projections.idp_templates4_github_enterprise.token_endpoint,` +
-		` projections.idp_templates4_github_enterprise.user_endpoint,` +
-		` projections.idp_templates4_github_enterprise.scopes,` +
+		` projections.idp_templates5_github_enterprise.idp_id,` +
+		` projections.idp_templates5_github_enterprise.client_id,` +
+		` projections.idp_templates5_github_enterprise.client_secret,` +
+		` projections.idp_templates5_github_enterprise.authorization_endpoint,` +
+		` projections.idp_templates5_github_enterprise.token_endpoint,` +
+		` projections.idp_templates5_github_enterprise.user_endpoint,` +
+		` projections.idp_templates5_github_enterprise.scopes,` +
 		// gitlab
-		` projections.idp_templates4_gitlab.idp_id,` +
-		` projections.idp_templates4_gitlab.client_id,` +
-		` projections.idp_templates4_gitlab.client_secret,` +
-		` projections.idp_templates4_gitlab.scopes,` +
+		` projections.idp_templates5_gitlab.idp_id,` +
+		` projections.idp_templates5_gitlab.client_id,` +
+		` projections.idp_templates5_gitlab.client_secret,` +
+		` projections.idp_templates5_gitlab.scopes,` +
 		// gitlab self hosted
-		` projections.idp_templates4_gitlab_self_hosted.idp_id,` +
-		` projections.idp_templates4_gitlab_self_hosted.issuer,` +
-		` projections.idp_templates4_gitlab_self_hosted.client_id,` +
-		` projections.idp_templates4_gitlab_self_hosted.client_secret,` +
-		` projections.idp_templates4_gitlab_self_hosted.scopes,` +
+		` projections.idp_templates5_gitlab_self_hosted.idp_id,` +
+		` projections.idp_templates5_gitlab_self_hosted.issuer,` +
+		` projections.idp_templates5_gitlab_self_hosted.client_id,` +
+		` projections.idp_templates5_gitlab_self_hosted.client_secret,` +
+		` projections.idp_templates5_gitlab_self_hosted.scopes,` +
 		// google
-		` projections.idp_templates4_google.idp_id,` +
-		` projections.idp_templates4_google.client_id,` +
-		` projections.idp_templates4_google.client_secret,` +
-		` projections.idp_templates4_google.scopes,` +
+		` projections.idp_templates5_google.idp_id,` +
+		` projections.idp_templates5_google.client_id,` +
+		` projections.idp_templates5_google.client_secret,` +
+		` projections.idp_templates5_google.scopes,` +
 		// ldap
-		` projections.idp_templates4_ldap2.idp_id,` +
-		` projections.idp_templates4_ldap2.servers,` +
-		` projections.idp_templates4_ldap2.start_tls,` +
-		` projections.idp_templates4_ldap2.base_dn,` +
-		` projections.idp_templates4_ldap2.bind_dn,` +
-		` projections.idp_templates4_ldap2.bind_password,` +
-		` projections.idp_templates4_ldap2.user_base,` +
+		` projections.idp_templates5_ldap2.idp_id,` +
+		` projections.idp_templates5_ldap2.servers,` +
+		` projections.idp_templates5_ldap2.start_tls,` +
+		` projections.idp_templates5_ldap2.base_dn,` +
+		` projections.idp_templates5_ldap2.bind_dn,` +
+		` projections.idp_templates5_ldap2.bind_password,` +
+		` projections.idp_templates5_ldap2.user_base,` +
 		` projections.idp_templates4_ldap2.user_object_classes,` +
 		` projections.idp_templates4_ldap2.user_filters,` +
 		` projections.idp_templates4_ldap2.timeout,` +
