@@ -97,3 +97,13 @@ Those settings are the same as on your instance.
 If you need custom branding on a organization (for example in a B2B scenario, where organizations are allowed to use their custom design), navigate back to the home page, choose your organization in the header above, navigate to the organization settings and set the custom design here.
 
 The behaviour of the login page, applyling custom design, is then defined on your projects detail page. Read more about it [here](./projects#branding)
+
+## Default organization
+
+On the instance settings page ($YOUR_DOMAIN//ui/console/orgs) you can set an organization as default organization.
+Click the "..." on the right hand side of the table and select "Set as default organization".
+
+The current default organization is marked by a label "Default".
+
+When no organization was selected (eg, with the auth request or through [Domain Discovery](/docs/guides/solution-scenarios/domain-discovery)), then only users from the default organization will be able to login.
+Also users will self-register to this organization by default.
