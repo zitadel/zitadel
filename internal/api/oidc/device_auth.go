@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"github.com/zitadel/oidc/v2/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -159,33 +160,19 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 	return createDeviceAuthorizationState(deviceAuth), nil
 }
 
-// This is actually not used, as the current implementation operates on the storage directly from the handlers.
-func (o *OPStorage) GetDeviceAuthorizationByUserCode(ctx context.Context, userCode string) (state *op.DeviceAuthorizationState, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	deviceAuth, err := o.query.DeviceAuthByUserCode(ctx, userCode)
-	if err != nil {
-		return nil, err
-	}
-
-	return createDeviceAuthorizationState(deviceAuth), err
+// TODO(muhlemmer): remove the following methods with oidc v3.
+// They are actually not used, but are required by the oidc device storage interface.
+// https://github.com/zitadel/oidc/issues/371
+func (o *OPStorage) GetDeviceAuthorizationByUserCode(ctx context.Context, userCode string) (*op.DeviceAuthorizationState, error) {
+	return nil, nil
 }
 
-// This is actually not used, as the current implementation operates on the storage directly from the handlers.
 func (o *OPStorage) CompleteDeviceAuthorization(ctx context.Context, userCode, subject string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	_, err = o.command.ApproveDeviceAuth(ctx, userCode, subject)
-	return err
+	return nil
 }
 
-// This is actually not used, as the current implementation operates on the storage directly from the handlers.
 func (o *OPStorage) DenyDeviceAuthorization(ctx context.Context, userCode string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	_, err = o.command.CancelDeviceAuth(ctx, userCode, domain.DeviceAuthCanceledDenied)
-	return err
+	return nil
 }
+
+// TODO end.
