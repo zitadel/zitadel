@@ -79,6 +79,16 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 		span.EndWithError(err)
 	}()
 
+	// TODO(muhlemmer): Remove the following code block with oidc v3
+	// https://github.com/zitadel/oidc/issues/370
+	client, err := o.GetClientByClientID(ctx, clientID)
+	if err != nil {
+		return err
+	}
+	if !op.ValidateGrantType(client, oidc.GrantTypeDeviceCode) {
+		return errors.ThrowPermissionDeniedf(nil, "OIDC-et1Ae", "grant type %q not allowed for client", oidc.GrantTypeDeviceCode)
+	}
+
 	scopes, err = o.assertProjectRoleScopes(ctx, clientID, scopes)
 	if err != nil {
 		return errors.ThrowPreconditionFailed(err, "OIDC-She4t", "Errors.Internal")
