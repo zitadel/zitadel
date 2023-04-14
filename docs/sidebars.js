@@ -126,8 +126,14 @@ module.exports = {
     {
       type: "category",
       label: "Integrate",
+      link: {
+        type: "generated-index",
+        title: "Integrate",
+        slug: "guides/integrate",
+        description:
+          "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
+      },
       items: [
-
         {
           type: "category",
           label: "Authenticate Users",
