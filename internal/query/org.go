@@ -221,7 +221,7 @@ func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 	return NewTextQuery(OrgColumnName, value, method)
 }
 
-func NewOrgStateSearchQuery(value int32) (SearchQuery, error) {
+func NewOrgStateSearchQuery(value domain_pkg.OrgState) (SearchQuery, error) {
 	return NewNumberQuery(OrgColumnState, value, NumberEquals)
 }
 
