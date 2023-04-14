@@ -1704,6 +1704,7 @@
       "2": "inattivo"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
       "2": "Consumers"
