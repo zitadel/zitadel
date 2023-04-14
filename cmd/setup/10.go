@@ -41,7 +41,7 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 			return err
 		}
 		affected, _ := res.RowsAffected()
-		logging.WithFields("rows", affected).Info("affected")
+		logging.WithFields("count", affected).Info("creation dates changed")
 		if affected == 0 {
 			return nil
 		}
@@ -49,6 +49,5 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 }
 
 func (mig *CorrectCreationDate) String() string {
-	// TODO: reset to 10
-	return "12_correct_creation_date"
+	return "10_correct_creation_date"
 }
