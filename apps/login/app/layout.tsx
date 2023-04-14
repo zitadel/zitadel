@@ -1,13 +1,15 @@
-import '#/styles/globals.css';
-import { AddressBar } from '#/ui/AddressBar';
-import { GlobalNav } from '#/ui/GlobalNav';
-import { VercelLogo } from '#/ui/VercelLogo';
-import { ZitadelLogo } from '#/ui/ZitadelLogo';
-import { Lato } from '@next/font/google';
+import "#/styles/globals.css";
+// include styles from the ui package
+import "@zitadel/react/styles.css";
+import { AddressBar } from "#/ui/AddressBar";
+import { GlobalNav } from "#/ui/GlobalNav";
+import { VercelLogo } from "#/ui/VercelLogo";
+import { ZitadelLogo } from "#/ui/ZitadelLogo";
+import { Lato } from "@next/font/google";
 
 const lato = Lato({
-  weight: '400',
-  subsets: ['latin'],
+  weight: "400",
+  subsets: ["latin"],
 });
 
 export default function RootLayout({

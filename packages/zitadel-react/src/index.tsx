@@ -1,5 +1,6 @@
-import * as React from "react";
+import "./styles.css";
+
 export {
   SignInWithGoogle,
   type SignInWithGoogleProps,
-} from "./SignInWithGoogle";
+} from "./components/SignInWithGoogle";

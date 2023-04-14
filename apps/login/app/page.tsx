@@ -1,5 +1,5 @@
-import { demos } from '#/lib/demos';
-import Link from 'next/link';
+import { demos } from "#/lib/demos";
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -13,7 +13,6 @@ export default function Page() {
               <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">
                 {section.name}
               </div>
-
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                 {section.items.map((item) => {
                   return (

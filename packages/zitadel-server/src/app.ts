@@ -1,13 +1,6 @@
-/**
- * Return a slugified copy of a string.
- *
- * @param {CoreProps} str The ZITADEL client configuration
- * @return {Core} The client implementation.
- */
-
 let apps: ZitadelApp[] = [];
 
-export interface ZitadelCoreProps {
+export interface ZitadelClientProps {
   clientId: string;
   apiUrl: string; // process.env.ZITADEL_API_URL
   token: string;
@@ -15,17 +8,17 @@ export interface ZitadelCoreProps {
   managementToken?: string;
 }
 
-export interface ZitadelOptions extends ZitadelCoreProps {
+export interface ZitadelOptions extends ZitadelClientProps {
   name?: string;
 }
 
 export interface ZitadelApp {
   name: string | undefined;
-  config: ZitadelCoreProps;
+  config: ZitadelClientProps;
 }
 
 export async function initializeApp(
-  config: ZitadelCoreProps,
+  config: ZitadelClientProps,
   name?: string
 ): Promise<ZitadelApp> {
   const app = { config, name };

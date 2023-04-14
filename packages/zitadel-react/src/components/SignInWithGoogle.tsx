@@ -6,15 +6,15 @@ export interface SignInWithGoogleProps {
 
 export function SignInWithGoogle(props: SignInWithGoogleProps) {
   return (
-    <div className="flex flex-row items-center bg-white text-gray-500 dark:bg-transparent dark:text-white rounded-md p-4 text-sm">
+    <div className="ui-flex ui-flex-row ui-items-center ui-bg-white ui-text-black dark:ui-bg-transparent dark:ui-text-white rounded-md p-4 text-sm">
       <img
         className="h-8 w-8"
-        src="idp/google.png"
+        src="./assets/google.png"
         alt="google"
         height={24}
         width={24}
       />
-      Sign in with Google
+      <span className="ui-ml-4">Sign in with Google</span>
     </div>
   );
 }
