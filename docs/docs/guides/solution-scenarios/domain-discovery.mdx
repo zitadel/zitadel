@@ -8,6 +8,8 @@ This guide should explain how domain discovery works and how to configure it in 
 
 Domain discovery is typically used in [B2B](./b2b) or [SaaS](./saas) scenarios where you have users from different organizations and you want to route them according to their login methods, which could be a user name or, depending on your configuration, also an [email / phone number](configurations#use-email-to-login).
 
+Follow this guide to configure your ZITADEL instance for this scenario.
+
 ![Overview Domain Discovery](/img/guides/solution-scenarios/domain-discovery.png)
 
 In the example there is a service provider with a ZITADEL instance running on a [custom domain](/docs/guides/manage/cloud/instances#add-custom-domain) on `login.mycompany.com`.
@@ -18,7 +20,32 @@ In case of Alpha users will login via an external identity provider (eg, [AzureA
 Beta users must only login with username/password and MFA instead.
 
 For this scenario you need to route the user `alice@alpha.com` to the **Alpha Organization** and `bob@beta.com` to the **Beta Organization** respectively.
-Follow this guide to configure your ZITADEL instance for this scenario.
+
+The user journeys for the different users would look as follows: 
+
+- User (Alice, Bob, Chuck) clicks a login button in your application
+- Redirected to `login.mycompany.com` (ZITADEL running under a custom domain)
+
+Chuck
+
+1. Select Google button
+1. Redirect to Google IDP
+1. Chuck logs in with Google credentials
+1. Redirected back to your application
+
+Alice
+
+1. Alice enters alice@alpha.com and clicks next
+1. Redirect to AzureAD Tenant (or any other IDP)
+1. Alice logs in with her company credentials
+1. Redirected back to your application
+
+Bob
+
+1. Bob enters bob@beta.com and clicks next
+1. Bob will be redirected to a login with the branding of beta.com
+1. Bob enters his password and MFA on the login screen
+1. Redirected back to your application
 
 ## Instance
 
