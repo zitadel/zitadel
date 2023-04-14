@@ -987,6 +987,10 @@ export class ManagementService {
     return this.grpcService.mgmt.getProviderByID(req, null).then((resp) => resp.toObject());
   }
 
+  public getProviderID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse> {
+    return this.grpcService.mgmt.getProviderByID(req, null);
+  }
+
   public addHumanUser(req: AddHumanUserRequest): Promise<AddHumanUserResponse.AsObject> {
     return this.grpcService.mgmt.addHumanUser(req, null).then((resp) => resp.toObject());
   }
