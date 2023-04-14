@@ -90,7 +90,7 @@
             </mat-select>
           </cnsl-form-field>
 
-          <cnsl-form-field class="formfield">
+          <cnsl-form-field class="formfield" *ngIf="tenantType?.value === AzureTenantIDType">
             <cnsl-label>{{ 'IDP.AZUREADTENANTID' | translate }}</cnsl-label>
             <input cnslInput formControlName="tenantId" />
           </cnsl-form-field>

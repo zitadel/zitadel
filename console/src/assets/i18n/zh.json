@@ -1700,6 +1700,7 @@
       "2": "停用"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
       "2": "Consumers"
