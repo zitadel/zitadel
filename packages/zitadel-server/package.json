@@ -1,5 +1,5 @@
 {
-  "name": "@zitadel/core",
+  "name": "@zitadel/server",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

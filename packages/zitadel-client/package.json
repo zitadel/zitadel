@@ -1,0 +1,35 @@
+{
+  "name": "@zitadel/client",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "license": "MIT",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel"
+  },
+  "devDependencies": {
+    "@zitadel/tsconfig": "workspace:*",
+    "eslint": "^7.32.0",
+    "eslint-config-zitadel": "workspace:*",
+    "ts-proto": "^1.139.0",
+    "tsup": "^5.10.1",
+    "typescript": "^4.5.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "jose": "^4.13.1",
+    "nice-grpc": "2.0.1",
+    "protobufjs": "^7.2.3"
+  }
+}

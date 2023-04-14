@@ -12,4 +12,4 @@ if (!getApps().length) {
 }
 
 const app = getApp();
-// const auth = getAuth();
+const auth = getAuth();

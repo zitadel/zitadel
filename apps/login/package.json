@@ -17,7 +17,7 @@
     "*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
-    "@zitadel/core": "workspace:*",
+    "@zitadel/server": "workspace:*",
     "@zitadel/react": "workspace:*",
     "@zitadel/next": "workspace:*",
     "@heroicons/react": "2.0.13",

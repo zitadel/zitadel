@@ -16,9 +16,3 @@ plugins:
   # - plugin: buf.build/protocolbuffers/js
   #   out: src/app/proto/generated
   #   opt: import_style=commonjs,binary
-  - plugin: buf.build/grpc/web
-    out: src/proto/client
-    opt: import_style=typescript,mode=grpcweb
-  # - plugin: buf.build/grpc-ecosystem/openapiv2
-  #   out: src/app/proto/generated
-  #   opt: allow_delete_body
