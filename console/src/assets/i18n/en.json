@@ -1020,6 +1020,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1149,6 +1150,10 @@
       "MAXSIZEEXCEEDED": "Maximum size of 524kB exceeded.",
       "NOSVGSUPPORTED": "SVG are not supported!",
       "FONTINLOGINONLY": "The font is currently only displayed in the login interface.",
+      "BACKGROUNDCOLOR": "Background color",
+      "PRIMARYCOLOR": "Primary color",
+      "WARNCOLOR": "Warning color",
+      "FONTCOLOR": "Font color",
       "VIEWS": {
         "PREVIEW": "Preview",
         "CURRENT": "Current Configuration"
@@ -1209,11 +1214,12 @@
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?",
       "UNSAVED_TITLE": "Continue without saving?",
-      "UNSAVED_DESCRIPTION": "Your have made changes without saving. Do you want to save now?",
+      "UNSAVED_DESCRIPTION": "You have made changes without saving. Do you want to save now?",
       "LOCALE": "Locale Code",
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1693,6 +1699,7 @@
       "2": "inactive"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
       "2": "Consumers"
@@ -2071,6 +2078,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",
