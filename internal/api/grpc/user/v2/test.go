@@ -8,6 +8,11 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
+func (s *Server) AddUser(ctx context.Context, req *user.AddUserRequest) (*user.AddUserResponse, error) {
+	_ = req
+	return &user.AddUserResponse{}, nil
+}
+
 func (s *Server) TestGet(ctx context.Context, req *user.TestGetRequest) (*user.TestGetResponse, error) {
 	return &user.TestGetResponse{
 		Ctx: req.Ctx.String(),

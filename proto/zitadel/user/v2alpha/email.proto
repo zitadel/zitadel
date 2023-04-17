@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package zitadel.user.v2alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha;user";
+
+import "validate/validate.proto";
+
+message SetUserEmail {
+  string email = 1;
+  // if no verification is specified, an email is sent with the default url
+  oneof verification {
+    SendEmailVerificationCode send_code = 2;
+    ReturnEmailVerificationCode return_code = 3;
+    bool is_verified = 4 [(validate.rules).bool.const = true];
+  }
+}
+
+message SendEmailVerificationCode {
+  string url_template = 1;
+}
+
+message ReturnEmailVerificationCode {}
+

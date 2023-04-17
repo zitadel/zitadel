@@ -3,8 +3,11 @@ syntax = "proto3";
 package zitadel.user.v2alpha;
 
 import "zitadel/options.proto";
+import "zitadel/context/v2alpha/context.proto";
 import "zitadel/user/v2alpha/user.proto";
+import "zitadel/user/v2alpha/email.proto";
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -15,85 +18,120 @@ service UserService {
   rpc AddUser (AddUserRequest) returns (AddUserResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users"
-    };
-  }
-
-  // TestGet simply demonstrates how the context (org, instance) could be handled in a GET request  //
-  //
-  // this request is subject to change and currently used for demonstration only
-  rpc TestGet (TestGetRequest) returns (TestGetResponse) {
-    option (google.api.http) = {
-      get: "/v2alpha/users/test"
-    };
-  }
-
-  // TestPOST simply demonstrates how the context (org, instance) could be handled in a POST request
-  //
-  // this request is subject to change and currently used for demonstration only
-  rpc TestPost (TestPostRequest) returns (TestPostResponse) {
-    option (google.api.http) = {
-      post: "/v2alpha/users/test"
       body: "*"
     };
   }
 
-  // TestAuth demonstrates how the context (org, instance) could be handled in combination of the authorized context
-  //
-  // this request is subject to change and currently used for demonstration only
-  rpc TestAuth (TestAuthRequest) returns (TestAuthResponse) {
-    option (google.api.http) = {
-      get: "/v2alpha/users/test_auth"
-    };
+    rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+      option (google.api.http) = {
+        patch: "/v2alpha/users/{user_id}"
+        body: "*"
+      };
+    }
 
-    option (zitadel.v1.auth_option) = {
-      permission: "authenticated"
-    };
-  }
+    rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
+      option (google.api.http) = {
+        post: "/v2alpha/users/{user_id}/email"
+        body: "*"
+      };
+    }
 }
 
 message AddUserRequest{
-  optional string first_name = 1  [
+  // optionally set your own id unique for the user
+  optional string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
-    // (google.api.field_behavior) = REQUIRED, //TODO: ?
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"Minnie\"";
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
+  // optionally set a unique username, if none is provided the email be used
+  optional string username = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"minnie-mouse\"";
+    }
+  ];
+  zitadel.context.v2alpha.OrgContext organisation = 3;
+  SetUserProfile profile = 4 [
+    (validate.rules).message.required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  SetUserEmail email = 5 [
+    (validate.rules).message.required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  repeated SetMetadataEntry metadata = 6;
+  AddUserPassword password = 7;
 }
 
-message AddUserResponse{}
-
-message TestGetRequest{
-  Context ctx = 1;
+message AddUserResponse {
+  string user_id = 1;
+  zitadel.context.v2alpha.ObjectDetails details = 2;
 }
 
-message TestGetResponse{
-  string ctx = 1;
-}
-
-message TestPostRequest{
-  Context ctx = 1;
-}
-
-message TestPostResponse{
-  string ctx = 1;
-}
-
-message TestAuthRequest{
-  Context ctx = 1;
-}
-
-message TestAuthResponse{
-  User user = 1;
-  Context ctx = 2;
-}
-
-message Context {
-  oneof ctx {
-    bool instance = 1;
-    string org_id = 2;
-    string org_domain = 3;
+message AddUserPassword {
+  oneof password {
+      SetUserPassword password = 1;
+      SetHashedPassword hashed_password = 2;
   }
+  bool password_change_required = 3;
+}
+
+
+/*
+
+email and password
+  -> verify mail
+email verified and password
+
+email and password change
+  -> verify mail and set password
+
+email verified and password change
+  -> set password
+
+email and no password / init password
+  -> init mail?
+
+email verified and no password / init password
+  -> password reset mail?
+
+ */
+
+message UpdateUserRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  SetUserProfile profile = 2;
+  SetUserEmail email = 3;
+}
+
+message UpdateUserResponse{
+  zitadel.context.v2alpha.ObjectDetails details = 1;
+}
+
+message SetEmailRequest{
+  string user_id = 1;
+  string email = 2;
+  // if no verification is specified, an email is sent with the default url
+  oneof verification {
+    SendEmailVerificationCode send_code = 3;
+    ReturnEmailVerificationCode return_code = 4;
+    bool is_verified = 5 [(validate.rules).bool.const = true];
+  }
+}
+
+message SetEmailResponse{
+  zitadel.context.v2alpha.ObjectDetails details = 1;
 }
