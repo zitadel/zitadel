@@ -1694,9 +1694,10 @@
       "2": "非アクティブ"
     },
     "AZUREADTENANTTYPES": {
-      "0": "共通",
-      "1": "組織",
-      "2": "顧客"
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "テナントタイプ",
     "AZUREADTENANTID": "テナントID",
