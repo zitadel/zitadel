@@ -1,7 +1,7 @@
 <form class="string-list-form" (ngSubmit)="add(redInput)">
   <cnsl-form-field class="formfield">
     <cnsl-label>{{ title }}</cnsl-label>
-    <input #redInput cnslInput [formControl]="control" />
+    <input #redInput cnslInput [formControl]="control" [required]="required || !value.length" />
   </cnsl-form-field>
   <button
     matTooltip="{{ 'ACTIONS.ADD' | translate }}"

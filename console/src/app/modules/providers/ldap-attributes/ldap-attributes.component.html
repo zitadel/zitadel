@@ -1,7 +1,7 @@
 <form [formGroup]="form" class="attribute-form">
   <cnsl-form-field class="formfield">
-    <cnsl-label>{{ 'IDP.LDAPIDATTRIBUTE' | translate }}*</cnsl-label>
-    <input cnslInput formControlName="idAttribute" />
+    <cnsl-label>{{ 'IDP.LDAPIDATTRIBUTE' | translate }}</cnsl-label>
+    <input cnslInput formControlName="idAttribute" required />
   </cnsl-form-field>
 
   <div class="attribute-more-row">
