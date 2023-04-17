@@ -2,6 +2,7 @@ package member
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -33,6 +34,7 @@ func MemberToPb(assetAPIPrefix string, m *query.Member) *member_pb.Member {
 		LastName:           m.LastName,
 		DisplayName:        m.DisplayName,
 		AvatarUrl:          domain.AvatarURL(assetAPIPrefix, m.ResourceOwner, m.AvatarURL),
+		UserType:           user.TypeToPb(m.UserType),
 		Details: object.ToViewDetailsPb(
 			m.Sequence,
 			m.CreationDate,
