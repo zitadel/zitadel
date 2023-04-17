@@ -35,6 +35,7 @@ ZITADEL is available in the following languages
 
 - German (de)
 - English (en)
+- Spanish (es)
 - French (fr)
 - Italian (it)
 - 日本語 (ja)

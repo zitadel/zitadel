@@ -161,7 +161,9 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								true,
 								true,
 								time.Second*1,
-								[]string{"https://sub.test.ch"}),
+								[]string{"https://sub.test.ch"},
+								false,
+							),
 						),
 					),
 					expectPush(

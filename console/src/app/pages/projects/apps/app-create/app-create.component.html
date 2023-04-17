@@ -1,5 +1,6 @@
 <cnsl-create-layout
   title="{{ 'APP.PAGES.CREATE' | translate }}"
+  class="app-create-wrapper"
   [createSteps]="
     appType?.value?.createType === AppCreateType.OIDC
       ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
@@ -22,7 +23,7 @@
   </mat-checkbox>
 
   <mat-horizontal-stepper
-    class="stepper"
+    class="stepper {{ 'last-edited-step-' + stepper.selectedIndex }}"
     *ngIf="!devmode"
     linear
     #stepper
@@ -305,7 +306,7 @@
           </span>
           <span class="right">
             <span>
-              {{ 'APP.API.AUTHMETHOD.' + authMethodType?.value | translate }}
+              {{ 'APP.API.AUTHMETHOD.' + apiAppRequest.toObject().authMethodType | translate }}
             </span>
           </span>
         </div>
@@ -334,6 +335,11 @@
         </button>
       </div>
     </mat-step>
+
+    <!-- Icon override -->
+    <ng-template matStepperIcon="edit">
+      <mat-icon>check</mat-icon>
+    </ng-template>
   </mat-horizontal-stepper>
 
   <div *ngIf="devmode" class="dev">

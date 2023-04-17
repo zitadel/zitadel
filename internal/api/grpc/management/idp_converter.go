@@ -298,6 +298,7 @@ func addAzureADProviderToCommand(req *mgmt_pb.AddAzureADProviderRequest) command
 		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
 		EmailVerified: req.EmailVerified,
 		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Scopes:        req.Scopes,
 	}
 }
 
@@ -309,6 +310,7 @@ func updateAzureADProviderToCommand(req *mgmt_pb.UpdateAzureADProviderRequest) c
 		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
 		EmailVerified: req.EmailVerified,
 		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Scopes:        req.Scopes,
 	}
 }
 

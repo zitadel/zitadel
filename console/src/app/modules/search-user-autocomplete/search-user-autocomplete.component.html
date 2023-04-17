@@ -2,14 +2,7 @@
   <div class="found-user-row" *ngFor="let user of users; index as i">
     <div class="circle">
       <cnsl-avatar
-        *ngIf="
-          user.human &&
-            user.human.profile &&
-            user.human.profile.displayName &&
-            user.human.profile.firstName &&
-            user.human.profile.lastName;
-          else cog
-        "
+        *ngIf="user.human && user.human.profile; else cog"
         class="avatar"
         [name]="user.human.profile.displayName"
         [avatarUrl]="user.human.profile.avatarUrl || ''"
@@ -76,14 +69,7 @@
             <div class="user-option" data-e2e="user-option">
               <div class="circle">
                 <cnsl-avatar
-                  *ngIf="
-                    user.human &&
-                      user.human.profile &&
-                      user.human.profile.displayName &&
-                      user.human.profile.firstName &&
-                      user.human.profile.lastName;
-                    else cog
-                  "
+                  *ngIf="user.human && user.human.profile; else cog"
                   class="avatar"
                   [name]="user.human.profile.displayName"
                   [avatarUrl]="user.human.profile.avatarUrl || ''"
