@@ -7,6 +7,7 @@ Migrating users from Auth0 to ZITADEL requires the following steps:
 
 - Request and download hashed passwords
 - Export all user data
+- Run migration tool to merge Auth0 users and passwords
 - Import users and password hashes to ZITADEL
 
 ## Export hashed passwords
