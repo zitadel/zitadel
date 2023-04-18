@@ -38,6 +38,9 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 			return nil, err
 		}
 	}
+	if s.Provider.useIDToken {
+		return s.Provider.userInfoMapper(s.Tokens.IDTokenClaims), nil
+	}
 	info, err := rp.Userinfo(
 		s.Tokens.AccessToken,
 		s.Tokens.TokenType,
@@ -47,11 +50,7 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if err != nil {
 		return nil, err
 	}
-	if s.Provider.useIDToken {
-		info = s.Tokens.IDTokenClaims
-	}
-	u := s.Provider.userInfoMapper(info)
-	return u, nil
+	return s.Provider.userInfoMapper(info), nil
 }
 
 func (s *Session) authorize(ctx context.Context) (err error) {
