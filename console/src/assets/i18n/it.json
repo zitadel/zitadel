@@ -247,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Compilare questo campo.",
+    "ATLEASTONE": "Inserisci almeno un valore.",
     "TOKENINVALID": {
       "TITLE": "Il tuo Access Token \u00e8 scaduto.",
       "DESCRIPTION": "Clicca il pulsante per richiedere una nuova sessione."

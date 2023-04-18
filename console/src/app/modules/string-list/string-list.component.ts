@@ -1,7 +1,7 @@
-import { Component, forwardRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, forwardRef, Input, OnDestroy, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { requiredValidator } from '../form-field/validators/validators';
+import { Subject } from 'rxjs';
+import { minArrayLengthValidator, requiredValidator } from '../form-field/validators/validators';
 
 @Component({
   selector: 'cnsl-string-list',
@@ -16,22 +16,20 @@ import { requiredValidator } from '../form-field/validators/validators';
     },
   ],
 })
-export class StringListComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class StringListComponent implements ControlValueAccessor, OnDestroy {
   @Input() title: string = '';
   @Input() required: boolean = false;
-  @Input() public getValues: Observable<void> = new Observable(); // adds formfieldinput to array on emission
 
-  @Input() public control: FormControl = new FormControl<string>({ value: '', disabled: true });
+  @Input() public control: FormControl = new FormControl<string[]>({ value: [], disabled: true });
+
+  @Input() public inputControl: FormControl = new FormControl<string>('', [requiredValidator]);
+
   private destroy$: Subject<void> = new Subject();
-  @ViewChild('redInput') input!: any;
-  private val: string[] = [];
+  @ViewChildren('stringInput') input!: any[];
+  public val: string[] = [];
 
-  ngOnInit(): void {
-    this.getValues.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.add(this.input.nativeElement);
-    });
-
-    this.required ? this.control.setValidators([requiredValidator]) : this.control.setValidators([]);
+  constructor() {
+    this.control.setValidators([minArrayLengthValidator]);
   }
 
   ngOnDestroy(): void {
@@ -48,6 +46,21 @@ export class StringListComponent implements ControlValueAccessor, OnInit, OnDest
       this.onChange(val);
       this.onTouch(val);
     }
+  }
+
+  setValueAtIndex(index: number, event: any) {
+    const value = event?.target?.value ?? event.value;
+    const toSet = value.trim();
+    console.log(toSet);
+    this.value[index] = toSet;
+  }
+
+  addArrayEntry() {
+    this.value.push('');
+  }
+
+  removeEntryAtIndex(index: number) {
+    this.value.splice(index, 1);
   }
 
   get value() {

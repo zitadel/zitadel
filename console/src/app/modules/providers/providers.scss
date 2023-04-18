@@ -1,5 +1,8 @@
+@use '@angular/material' as mat;
+
 @mixin identity-provider-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
+  $background: map-get($theme, background);
 
   .identity-provider-desc {
     font-size: 14px;
