@@ -17,9 +17,14 @@
     padding: 0 1rem 0.5rem 1rem;
     margin-top: 0.5rem;
 
-    .list-header {
-      margin: 1rem 0 0rem 0;
-      font-size: 12px;
+    .list-header-wrapper {
+      display: flex;
+      align-items: center;
+      margin: 0.5rem -0.5rem 0 0;
+
+      .list-header {
+        font-size: 12px;
+      }
     }
 
     .form-field-list {

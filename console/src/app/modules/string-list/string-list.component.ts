@@ -52,13 +52,16 @@ export class StringListComponent implements ControlValueAccessor, OnDestroy {
   }
 
   addArrayEntry() {
-    this.formArray.push(new FormControl(''));
+    this.formArray.push(new FormControl('', [requiredValidator]));
   }
 
   removeEntryAtIndex(index: number) {
     this.formArray.removeAt(index);
   }
 
+  clearEntryAtIndex(index: number) {
+    this.formArray.controls[index].setValue('');
+  }
   get value() {
     return this.val;
   }
