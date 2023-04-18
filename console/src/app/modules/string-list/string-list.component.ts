@@ -1,6 +1,6 @@
 import { Component, forwardRef, Input, OnDestroy, ViewChildren, ViewEncapsulation } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { ControlValueAccessor, FormArray, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { minArrayLengthValidator, requiredValidator } from '../form-field/validators/validators';
 
 @Component({
@@ -22,14 +22,17 @@ export class StringListComponent implements ControlValueAccessor, OnDestroy {
 
   @Input() public control: FormControl = new FormControl<string[]>({ value: [], disabled: true });
 
-  @Input() public inputControl: FormControl = new FormControl<string>('', [requiredValidator]);
-
   private destroy$: Subject<void> = new Subject();
   @ViewChildren('stringInput') input!: any[];
   public val: string[] = [];
 
+  public formArray: FormArray = new FormArray([new FormControl('', [requiredValidator])]);
+
   constructor() {
     this.control.setValidators([minArrayLengthValidator]);
+    this.formArray.valueChanges.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((value) => {
+      this.value = value;
+    });
   }
 
   ngOnDestroy(): void {
@@ -48,19 +51,12 @@ export class StringListComponent implements ControlValueAccessor, OnDestroy {
     }
   }
 
-  setValueAtIndex(index: number, event: any) {
-    const value = event?.target?.value ?? event.value;
-    const toSet = value.trim();
-    console.log(toSet);
-    this.value[index] = toSet;
-  }
-
   addArrayEntry() {
-    this.value.push('');
+    this.formArray.push(new FormControl(''));
   }
 
   removeEntryAtIndex(index: number) {
-    this.value.splice(index, 1);
+    this.formArray.removeAt(index);
   }
 
   get value() {
@@ -69,6 +65,7 @@ export class StringListComponent implements ControlValueAccessor, OnDestroy {
 
   writeValue(value: string[]) {
     this.value = value;
+    value.map((v, i) => this.formArray.setControl(i, new FormControl(v, [requiredValidator])));
   }
 
   registerOnChange(fn: any) {
@@ -84,30 +81,6 @@ export class StringListComponent implements ControlValueAccessor, OnDestroy {
       this.control.disable();
     } else {
       this.control.enable();
-    }
-  }
-
-  public add(input: any): void {
-    if (this.control.valid) {
-      const trimmed = input.value.trim();
-      if (trimmed) {
-        this.val ? this.val.push(input.value) : (this.val = [input.value]);
-        this.onChange(this.val);
-        this.onTouch(this.val);
-      }
-      if (input) {
-        input.value = '';
-      }
-    }
-  }
-
-  public remove(str: string): void {
-    const index = this.value.indexOf(str);
-
-    if (index >= 0) {
-      this.value.splice(index, 1);
-      this.onChange(this.value);
-      this.onTouch(this.value);
     }
   }
 }

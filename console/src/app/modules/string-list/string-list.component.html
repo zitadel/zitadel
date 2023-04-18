@@ -1,19 +1,10 @@
 <div class="form-array-list">
   <div class="form-field-list">
     <p class="list-header cnsl-secondary-text">{{ title }}*</p>
-    <ng-container *ngFor="let entry of value; let i = index">
+    <ng-container *ngFor="let formControl of formArray.controls; index as i">
       <div class="element-row">
         <cnsl-form-field class="formfield" [hideRequiredMarker]="true">
-          <input
-            #str
-            id="stringInput"
-            cnslInput
-            title="{{ 'IDP.SERVERS' | translate }}"
-            [ngModel]="entry"
-            (change)="setValueAtIndex(i, $event)"
-            [ngModelOptions]="{ standalone: true }"
-            required
-          />
+          <input cnslInput title="{{ 'IDP.SERVERS' | translate }}" [formControl]="$any(formControl)" required />
         </cnsl-form-field>
 
         <button

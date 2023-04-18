@@ -20,7 +20,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { minArrayLengthValidator, requiredValidator } from '../../form-field/validators/validators';
+import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
@@ -37,18 +37,7 @@ export class ProviderLDAPComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
 
-  public form = new FormGroup({
-    name: new FormControl('', [requiredValidator]),
-    serversList: new FormControl<string[]>([''], [minArrayLengthValidator]),
-    baseDn: new FormControl('', [requiredValidator]),
-    bindDn: new FormControl('', [requiredValidator]),
-    bindPassword: new FormControl('', [requiredValidator]),
-    userBase: new FormControl('', [requiredValidator]),
-    userFiltersList: new FormControl<string[]>([''], [minArrayLengthValidator]),
-    userObjectClassesList: new FormControl<string[]>([''], [minArrayLengthValidator]),
-    timeout: new FormControl<number>(0),
-    startTls: new FormControl(false),
-  });
+  public form!: FormGroup;
 
   public loading: boolean = false;
 
@@ -62,6 +51,19 @@ export class ProviderLDAPComponent {
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
   ) {
+    this.form = new FormGroup({
+      name: new FormControl('', [requiredValidator]),
+      serversList: new FormControl<string[]>([''], [requiredValidator]),
+      baseDn: new FormControl('', [requiredValidator]),
+      bindDn: new FormControl('', [requiredValidator]),
+      bindPassword: new FormControl('', [requiredValidator]),
+      userBase: new FormControl('', [requiredValidator]),
+      userFiltersList: new FormControl<string[]>([''], [requiredValidator]),
+      userObjectClassesList: new FormControl<string[]>([''], [requiredValidator]),
+      timeout: new FormControl<number>(0),
+      startTls: new FormControl<boolean>(false),
+    });
+
     this.authService
       .isAllowed(
         this.serviceType === PolicyComponentServiceType.ADMIN
@@ -78,6 +80,17 @@ export class ProviderLDAPComponent {
           this.form.disable();
         }
       });
+
+    // this.form.valueChanges.subscribe((value) => {
+    //   console.log(value);
+    //   console.log(this.form.errors, this.form.invalid);
+    //   const c = this.form.controls;
+    //   for (const name in c) {
+    //     if ((c as any)[name].invalid) {
+    //       console.log(name, (c as any)[name].invalid, (c as any)[name].errors);
+    //     }
+    //   }
+    // });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
@@ -137,7 +150,9 @@ export class ProviderLDAPComponent {
             this.userBase?.setValue(config.userBase);
             this.userObjectClassesList?.setValue(config.userObjectClassesList);
             this.userFiltersList?.setValue(config.userFiltersList);
-            this.timeout?.setValue(this.provider?.config?.ldap?.timeout?.seconds);
+            if (this.provider?.config?.ldap?.timeout?.seconds) {
+              this.timeout?.setValue(this.provider?.config?.ldap?.timeout?.seconds);
+            }
           }
         }
       })
@@ -268,9 +283,5 @@ export class ProviderLDAPComponent {
 
   public get userObjectClassesList(): AbstractControl | null {
     return this.form.get('userObjectClassesList');
-  }
-
-  public get bindPasswordRequired(): boolean {
-    return !!this.bindPassword?.validator?.length;
   }
 }

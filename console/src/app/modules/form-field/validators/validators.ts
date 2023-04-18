@@ -61,8 +61,7 @@ function regexpValidator(c: AbstractControl, regexp: RegExp, i18nKey: string): V
 }
 
 function arrayLengthValidator(c: AbstractControl, length: number, i18nKey: string): ValidationErrors | null {
-  console.log(!c.value || c.value >= length);
-  return !c.value || c.value >= length ? null : i18nErr({ invalid: true }, i18nKey);
+  return c.value && c.value >= length ? null : i18nErr({ invalid: true }, i18nKey);
 }
 
 function i18nErr(err: ValidationErrors | null | undefined, i18nKey: string, params?: any): ValidationErrors | null {

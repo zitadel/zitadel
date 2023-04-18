@@ -49,7 +49,7 @@
           >
           <cnsl-form-field *ngIf="!provider || (provider && updateBindPassword)" class="formfield">
             <cnsl-label>{{ 'IDP.BINDPASSWORD' | translate }}</cnsl-label>
-            <input cnslInput formControlName="bindPassword" [required]="!!bindPassword?.validator?.length" />
+            <input cnslInput formControlName="bindPassword" [required]="!provider" />
           </cnsl-form-field>
         </div>
 
