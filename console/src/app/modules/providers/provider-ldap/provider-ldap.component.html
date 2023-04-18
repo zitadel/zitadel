@@ -47,7 +47,7 @@
             [ngModelOptions]="{ standalone: true }"
             >{{ 'IDP.UPDATEBINDPASSWORD' | translate }}</mat-checkbox
           >
-          <cnsl-form-field *ngIf="!provider || (provider && updateBindPassword)" class="formfield">
+          <cnsl-form-field class="formfield pwd" [ngClass]="{ show: !provider || (provider && updateBindPassword) }">
             <cnsl-label>{{ 'IDP.BINDPASSWORD' | translate }}</cnsl-label>
             <input cnslInput formControlName="bindPassword" [required]="!provider" />
           </cnsl-form-field>

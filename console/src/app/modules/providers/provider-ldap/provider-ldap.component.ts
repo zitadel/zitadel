@@ -81,17 +81,6 @@ export class ProviderLDAPComponent {
         }
       });
 
-    // this.form.valueChanges.subscribe((value) => {
-    //   console.log(value);
-    //   console.log(this.form.errors, this.form.invalid);
-    //   const c = this.form.controls;
-    //   for (const name in c) {
-    //     if ((c as any)[name].invalid) {
-    //       console.log(name, (c as any)[name].invalid, (c as any)[name].errors);
-    //     }
-    //   }
-    // });
-
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
 
@@ -122,6 +111,7 @@ export class ProviderLDAPComponent {
       if (this.id) {
         this.getData(this.id);
         this.bindPassword?.setValidators([]);
+        this.bindPassword?.updateValueAndValidity();
       }
     });
   }

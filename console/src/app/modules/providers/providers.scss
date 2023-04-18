@@ -47,6 +47,14 @@
       display: block;
       max-width: 400px;
 
+      &.pwd {
+        display: none;
+      }
+
+      &.pwd.show {
+        display: block;
+      }
+
       .name-hint {
         font-size: 12px;
       }
