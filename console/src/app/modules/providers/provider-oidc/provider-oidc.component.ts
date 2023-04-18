@@ -59,7 +59,7 @@ export class ProviderOIDCComponent {
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
-      this.serviceType = data.serviceType;
+      this.serviceType = data['serviceType'];
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
@@ -130,6 +130,7 @@ export class ProviderOIDCComponent {
     req.setClientSecret(this.clientSecret?.value);
     req.setIssuer(this.issuer?.value);
     req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
 
     this.loading = true;
     this.service
@@ -158,6 +159,7 @@ export class ProviderOIDCComponent {
       req.setClientSecret(this.clientSecret?.value);
       req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       this.service

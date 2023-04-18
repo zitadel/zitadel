@@ -49,19 +49,19 @@ export class ProjectGrantDetailComponent {
     private breadcrumbService: BreadcrumbService,
   ) {
     this.route.params.subscribe((params) => {
-      this.projectid = params.projectid;
-      this.grantid = params.grantid;
+      this.projectid = params['projectid'];
+      this.grantid = params['grantid'];
 
       this.dataSource = new ProjectGrantMembersDataSource(this.mgmtService);
-      this.dataSource.loadMembers(params.projectid, params.grantid, 0, this.INITIALPAGESIZE);
+      this.dataSource.loadMembers(params['projectid'], params['grantid'], 0, this.INITIALPAGESIZE);
 
-      this.getRoleOptions(params.projectid);
+      this.getRoleOptions(params['projectid']);
       this.getMemberRoleOptions();
 
       this.changePageFactory = (event?: PageEvent) => {
         return this.dataSource.loadMembers(
-          params.projectid,
-          params.grantid,
+          params['projectid'],
+          params['grantid'],
           event?.pageIndex ?? 0,
           event?.pageSize ?? this.INITIALPAGESIZE,
         );

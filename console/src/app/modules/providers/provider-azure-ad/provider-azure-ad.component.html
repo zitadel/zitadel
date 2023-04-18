@@ -25,9 +25,14 @@
           <input cnslInput formControlName="clientId" />
         </cnsl-form-field>
 
-        <mat-checkbox *ngIf="provider" [(ngModel)]="updateClientSecret" [ngModelOptions]="{ standalone: true }">{{
-          'IDP.UPDATECLIENTSECRET' | translate
-        }}</mat-checkbox>
+        <mat-checkbox
+          class="update-secret-checkbox"
+          *ngIf="provider"
+          [(ngModel)]="updateClientSecret"
+          [ngModelOptions]="{ standalone: true }"
+          >{{ 'IDP.UPDATECLIENTSECRET' | translate }}</mat-checkbox
+        >
+
         <cnsl-form-field *ngIf="!provider || (provider && updateClientSecret)" class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientSecret" />
@@ -85,7 +90,7 @@
             </mat-select>
           </cnsl-form-field>
 
-          <cnsl-form-field class="formfield">
+          <cnsl-form-field class="formfield" *ngIf="tenantType?.value === AzureTenantIDType">
             <cnsl-label>{{ 'IDP.AZUREADTENANTID' | translate }}</cnsl-label>
             <input cnslInput formControlName="tenantId" />
           </cnsl-form-field>

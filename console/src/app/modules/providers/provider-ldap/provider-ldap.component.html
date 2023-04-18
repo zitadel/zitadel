@@ -39,12 +39,22 @@
             <input cnslInput formControlName="bindDn" />
           </cnsl-form-field>
 
-          <mat-checkbox *ngIf="provider" [(ngModel)]="updateBindPassword" [ngModelOptions]="{ standalone: true }">{{
-            'IDP.UPDATEBINDPASSWORD' | translate
-          }}</mat-checkbox>
+          <mat-checkbox
+            class="update-secret-checkbox"
+            *ngIf="provider"
+            [(ngModel)]="updateBindPassword"
+            [ngModelOptions]="{ standalone: true }"
+            >{{ 'IDP.UPDATEBINDPASSWORD' | translate }}</mat-checkbox
+          >
           <cnsl-form-field *ngIf="!provider || (provider && updateBindPassword)" class="formfield">
             <cnsl-label>{{ 'IDP.BINDPASSWORD' | translate }}</cnsl-label>
-            <input cnslInput formControlName="bindPassword" />
+            <input
+              cnslInput
+              name="bindpassword"
+              formControlName="bindPassword"
+              type="password"
+              autocomplete="new-password"
+            />
           </cnsl-form-field>
         </div>
 
@@ -113,7 +123,7 @@
           color="primary"
           mat-raised-button
           class="continue-button"
-          [disabled]="(form.invalid && attributes.toObject().idAttribute !== '') || form.disabled"
+          [disabled]="form.invalid || attributes.toObject().idAttribute === '' || form.disabled"
           type="submit"
         >
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
