@@ -141,10 +141,13 @@ func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, seq
 }
 
 func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence uint64) (bool, error) {
+	logging.WithFields("sequence", sequence).Debug("ensure that the latest key event was handled")
 	maxSequence, err := o.getMaxKeySequence(ctx)
 	if err != nil {
+		logging.WithError(err).Debug("error retrieving new events")
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
+	logging.WithFields("sequence", sequence, "maxSequence", maxSequence).Debug("comparing sequences to ensure that the latest key event was handled")
 	return sequence == maxSequence, nil
 }
 
