@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -238,6 +239,7 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (_ *
 		return nil, err
 	}
 	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
+	logging.WithFields("latestSequence", keys.LatestSequence).WithError(err).Debug("latest sequence for private signing keys")
 	if !errors.IsNotFound(err) {
 		return keys, err
 	}

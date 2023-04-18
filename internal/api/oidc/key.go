@@ -144,7 +144,7 @@ func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence uint64) (boo
 	logging.WithFields("sequence", sequence).Debug("ensure that the latest key event was handled")
 	maxSequence, err := o.getMaxKeySequence(ctx)
 	if err != nil {
-		logging.WithError(err).Debug("error retrieving new events")
+		logging.WithError(err).Warn("error retrieving new events")
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
 	logging.WithFields("sequence", sequence, "maxSequence", maxSequence).Debug("comparing sequences to ensure that the latest key event was handled")
@@ -187,9 +187,11 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 }
 
 func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	logging.WithFields("instanceID", instanceID).Debug("instanceID for maxKeySequence")
 	return o.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
-			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
+			ResourceOwner(instanceID).
 			AllowTimeTravel().
 			AddQuery().
 			AggregateTypes(keypair.AggregateType, instance.AggregateType).
