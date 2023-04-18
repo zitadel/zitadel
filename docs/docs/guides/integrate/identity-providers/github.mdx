@@ -6,6 +6,7 @@ sidebar_label: GitHub
 import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
 import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 import UnlinkedOAuth from './_unlinked_oauth.mdx';
@@ -49,15 +50,18 @@ Make sure to save the secret, as you will not be able to show it again.
 
 <CustomLoginPolicy/>
 
-### Create new GitHub Provider
+### Go to the IdP Providers Overview
 
-Go to the settings of your ZITADEL instance or the organization where you like to add a new GitHub provider.
-Choose the GitHub provider template. This template has everything you need preconfigured. You only have to add the client ID and secret, you have created in the step before.
+<IDPsOverview templates="GitHub or GitHub Enterprise"/>
+
+### Create a new GitHub Provider
+
+The GitHub provider templates have everything you need preconfigured. You only have to add the client ID and secret, you have created in the step before.
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
-This information is used to create and/or update the user within ZITADEL.
+This information is used to create and/or update the user within ZITADEL. ZITADEL ensures that at least the `openid`-scope is always sent.
 
 <GeneralConfigDescription provider_account="GitHub account" />
 

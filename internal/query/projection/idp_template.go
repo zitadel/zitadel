@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTemplateTable                 = "projections.idp_templates4"
+	IDPTemplateTable                 = "projections.idp_templates5"
 	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
@@ -436,6 +436,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceLDAPIDPChanged,
 				},
 				{
+					Event:  instance.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
+				},
+				{
 					Event:  instance.IDPRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
@@ -551,6 +555,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.LDAPIDPChangedEventType,
 					Reduce: p.reduceLDAPIDPChanged,
+				},
+				{
+					Event:  org.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
 				},
 				{
 					Event:  org.IDPRemovedEventType,
@@ -1732,6 +1740,25 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 	return crdb.NewMultiStatement(
 		&idpEvent,
 		ops...,
+	), nil
+}
+func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.IDPConfigRemovedEvent
+	switch e := event.(type) {
+	case *org.IDPConfigRemovedEvent:
+		idpEvent = e.IDPConfigRemovedEvent
+	case *instance.IDPConfigRemovedEvent:
+		idpEvent = e.IDPConfigRemovedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+	}
+
+	return crdb.NewDeleteStatement(
+		&idpEvent,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		},
 	), nil
 }
 

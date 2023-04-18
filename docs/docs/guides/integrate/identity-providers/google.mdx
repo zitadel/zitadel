@@ -6,6 +6,7 @@ sidebar_label: Google
 import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
 import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
@@ -33,15 +34,18 @@ import TestSetup from './_test_setup.mdx';
 
 <CustomLoginPolicy/>
 
-### Create new Google Provider
+### Go to the IdP Providers Overview
 
-Go to the settings of your ZITADEL instance or the organization where you want to add a new Google provider.
-Choose the Google provider template. This template has everything you need preconfigured.
+<IDPsOverview templates="Google"/>
+
+### Create a new Google Provider
+
+The Google provider template has everything you need preconfigured.
 Add the client ID and secret created before on your Google App.
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
-**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This information will be taken to create/update the user within ZITADEL.
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This information will be taken to create/update the user within ZITADEL. ZITADEL ensures that at least the `openid`-scope is always sent.
 
 
 <GeneralConfigDescription provider_account="Google account" />

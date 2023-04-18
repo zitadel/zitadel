@@ -6,6 +6,7 @@ sidebar_label: Azure AD
 import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
 import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
 import TestSetup from './_test_setup.mdx';
 import Activate from './_activate.mdx';
 
@@ -64,17 +65,19 @@ To be able to get all the information that ZITADEL needs, you have to configure 
 
 <CustomLoginPolicy/>
 
-### Create new Azure AD Provider
+### Go to the IdP Providers Overview
 
-Go to the settings of your ZITADEL instance or the organization where you like to add a new **Azure AD** provider.
-Choose the **Microsoft** provider template.
-This template has everything you need preconfigured.
+<IDPsOverview templates="Microsoft"/>
+
+### Create a new Azure AD Provider
+
+The Microsoft template has everything you need preconfigured.
 You only have to add the client ID and secret, you have created in the step before.
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
-This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`
+This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`. ZITADEL ensures that at least `openid` and `User.Read` scopes are always sent.
 
 **Email Verified**: Azure AD doesn't send the email verified claim in the users token, if you don't enable this setting.
 The user is then created with an unverified email, which results in an email verification message.
