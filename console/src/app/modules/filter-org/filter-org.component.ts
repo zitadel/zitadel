@@ -24,7 +24,7 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
 
   public states: OrgState[] = [OrgState.ORG_STATE_ACTIVE, OrgState.ORG_STATE_INACTIVE, OrgState.ORG_STATE_REMOVED];
 
-  constructor(router: Router, protected route: ActivatedRoute) {
+  constructor(router: Router, protected override route: ActivatedRoute) {
     super(router, route);
   }
 
@@ -137,7 +137,7 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
-  public emitFilter(): void {
+  public override emitFilter(): void {
     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
     this.showFilter = false;
     this.filterOpen.emit(false);
