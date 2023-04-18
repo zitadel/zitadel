@@ -247,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Proszę wypełnić to pole.",
+    "ATLEASTONE": "Podaj co najmniej jedną wartość.",
     "TOKENINVALID": {
       "TITLE": "Twój token autoryzacji wygasł.",
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
