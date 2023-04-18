@@ -15,7 +15,7 @@
     "@angular/animations": "^15.2.6",
     "@angular/cdk": "^15.2.6",
     "@angular/common": "^15.2.6",
-    "@angular/compiler": "^15.2.6",
+    "@angular/compiler": "^15.2.7",
     "@angular/core": "^15.2.6",
     "@angular/forms": "^15.2.6",
     "@angular/material": "^15.2.6",
