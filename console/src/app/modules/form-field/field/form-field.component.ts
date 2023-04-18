@@ -95,7 +95,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   constructor(
-    public _elementRef: ElementRef,
+    public override _elementRef: ElementRef,
     private _changeDetectorRef: ChangeDetectorRef,
     @Inject(ElementRef)
     _labelOptions: // Use `ElementRef` here so Angular has something to inject.

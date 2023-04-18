@@ -34,7 +34,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
-      this.projectId = params.projectid;
+      this.projectId = params['projectid'];
 
       const breadcrumbs = [
         new Breadcrumb({
