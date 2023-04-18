@@ -1,7 +1,7 @@
-import { Component, forwardRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { requiredValidator } from '../form-field/validators/validators';
+import { Component, forwardRef, Input, OnDestroy, ViewChildren, ViewEncapsulation } from '@angular/core';
+import { ControlValueAccessor, FormArray, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { minArrayLengthValidator, requiredValidator } from '../form-field/validators/validators';
 
 @Component({
   selector: 'cnsl-string-list',
@@ -16,22 +16,23 @@ import { requiredValidator } from '../form-field/validators/validators';
     },
   ],
 })
-export class StringListComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class StringListComponent implements ControlValueAccessor, OnDestroy {
   @Input() title: string = '';
   @Input() required: boolean = false;
-  @Input() public getValues: Observable<void> = new Observable(); // adds formfieldinput to array on emission
 
-  @Input() public control: FormControl = new FormControl<string>({ value: '', disabled: true });
+  @Input() public control: FormControl = new FormControl<string[]>({ value: [], disabled: true });
+
   private destroy$: Subject<void> = new Subject();
-  @ViewChild('redInput') input!: any;
-  private val: string[] = [];
+  @ViewChildren('stringInput') input!: any[];
+  public val: string[] = [];
 
-  ngOnInit(): void {
-    this.getValues.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.add(this.input.nativeElement);
+  public formArray: FormArray = new FormArray([new FormControl('', [requiredValidator])]);
+
+  constructor() {
+    this.control.setValidators([minArrayLengthValidator(1)]);
+    this.formArray.valueChanges.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((value) => {
+      this.value = value;
     });
-
-    this.required ? this.control.setValidators([requiredValidator]) : this.control.setValidators([]);
   }
 
   ngOnDestroy(): void {
@@ -50,12 +51,24 @@ export class StringListComponent implements ControlValueAccessor, OnInit, OnDest
     }
   }
 
+  addArrayEntry() {
+    this.formArray.push(new FormControl('', [requiredValidator]));
+  }
+
+  removeEntryAtIndex(index: number) {
+    this.formArray.removeAt(index);
+  }
+
+  clearEntryAtIndex(index: number) {
+    this.formArray.controls[index].setValue('');
+  }
   get value() {
     return this.val;
   }
 
   writeValue(value: string[]) {
     this.value = value;
+    value.map((v, i) => this.formArray.setControl(i, new FormControl(v, [requiredValidator])));
   }
 
   registerOnChange(fn: any) {
@@ -71,30 +84,6 @@ export class StringListComponent implements ControlValueAccessor, OnInit, OnDest
       this.control.disable();
     } else {
       this.control.enable();
-    }
-  }
-
-  public add(input: any): void {
-    if (this.control.valid) {
-      const trimmed = input.value.trim();
-      if (trimmed) {
-        this.val ? this.val.push(input.value) : (this.val = [input.value]);
-        this.onChange(this.val);
-        this.onTouch(this.val);
-      }
-      if (input) {
-        input.value = '';
-      }
-    }
-  }
-
-  public remove(str: string): void {
-    const index = this.value.indexOf(str);
-
-    if (index >= 0) {
-      this.value.splice(index, 1);
-      this.onChange(this.value);
-      this.onTouch(this.value);
     }
   }
 }

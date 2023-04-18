@@ -24,6 +24,12 @@ export function requiredValidator(c: AbstractControl): ValidationErrors | null {
   return i18nErr(Validators.required(c), 'ERRORS.REQUIRED');
 }
 
+export function minArrayLengthValidator(minArrLength: number): ValidatorFn {
+  return (c: AbstractControl): ValidationErrors | null => {
+    return arrayLengthValidator(c, minArrLength, 'ERRORS.ATLEASTONE');
+  };
+}
+
 export function emailValidator(c: AbstractControl): ValidationErrors | null {
   return i18nErr(Validators.email(c), 'ERRORS.NOTANEMAIL');
 }
@@ -54,6 +60,12 @@ export function passwordConfirmValidator(passwordControlName: string = 'password
 
 function regexpValidator(c: AbstractControl, regexp: RegExp, i18nKey: string): ValidationErrors | null {
   return !c.value || regexp.test(c.value) ? null : i18nErr({ invalid: true }, i18nKey, { regexp: regexp });
+}
+
+function arrayLengthValidator(c: AbstractControl, length: number, i18nKey: string): ValidationErrors | null {
+  const arr: string[] = c.value;
+  const invalidStrings: string[] = arr.filter((val: string) => val.trim() === '');
+  return arr && invalidStrings.length === 0 && arr.length >= length ? null : i18nErr({ invalid: true }, i18nKey);
 }
 
 function i18nErr(err: ValidationErrors | null | undefined, i18nKey: string, params?: any): ValidationErrors | null {
