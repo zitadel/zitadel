@@ -24,8 +24,10 @@ export function requiredValidator(c: AbstractControl): ValidationErrors | null {
   return i18nErr(Validators.required(c), 'ERRORS.REQUIRED');
 }
 
-export function minArrayLengthValidator(c: AbstractControl): ValidationErrors | null {
-  return arrayLengthValidator(c, 1, 'ERRORS.ATLEASTONE');
+export function minArrayLengthValidator(minArrLength: number): ValidatorFn {
+  return (c: AbstractControl): ValidationErrors | null => {
+    return arrayLengthValidator(c, minArrLength, 'ERRORS.ATLEASTONE');
+  };
 }
 
 export function emailValidator(c: AbstractControl): ValidationErrors | null {
@@ -61,7 +63,9 @@ function regexpValidator(c: AbstractControl, regexp: RegExp, i18nKey: string): V
 }
 
 function arrayLengthValidator(c: AbstractControl, length: number, i18nKey: string): ValidationErrors | null {
-  return c.value && c.value >= length ? null : i18nErr({ invalid: true }, i18nKey);
+  const arr: string[] = c.value;
+  const invalidStrings: string[] = arr.filter((val: string) => val.trim() === '');
+  return arr && invalidStrings.length === 0 && arr.length >= length ? null : i18nErr({ invalid: true }, i18nKey);
 }
 
 function i18nErr(err: ValidationErrors | null | undefined, i18nKey: string, params?: any): ValidationErrors | null {

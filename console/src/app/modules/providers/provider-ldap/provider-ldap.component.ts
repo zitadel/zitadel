@@ -20,7 +20,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { requiredValidator } from '../../form-field/validators/validators';
+import { minArrayLengthValidator, requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
@@ -53,13 +53,13 @@ export class ProviderLDAPComponent {
   ) {
     this.form = new FormGroup({
       name: new FormControl('', [requiredValidator]),
-      serversList: new FormControl<string[]>([''], [requiredValidator]),
+      serversList: new FormControl<string[]>([''], [minArrayLengthValidator(1)]),
       baseDn: new FormControl('', [requiredValidator]),
       bindDn: new FormControl('', [requiredValidator]),
       bindPassword: new FormControl('', [requiredValidator]),
       userBase: new FormControl('', [requiredValidator]),
-      userFiltersList: new FormControl<string[]>([''], [requiredValidator]),
-      userObjectClassesList: new FormControl<string[]>([''], [requiredValidator]),
+      userFiltersList: new FormControl<string[]>([''], [minArrayLengthValidator(1)]),
+      userObjectClassesList: new FormControl<string[]>([''], [minArrayLengthValidator(1)]),
       timeout: new FormControl<number>(0),
       startTls: new FormControl<boolean>(false),
     });

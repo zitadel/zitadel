@@ -29,7 +29,7 @@ export class StringListComponent implements ControlValueAccessor, OnDestroy {
   public formArray: FormArray = new FormArray([new FormControl('', [requiredValidator])]);
 
   constructor() {
-    this.control.setValidators([minArrayLengthValidator]);
+    this.control.setValidators([minArrayLengthValidator(1)]);
     this.formArray.valueChanges.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((value) => {
       this.value = value;
     });
