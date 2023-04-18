@@ -31,9 +31,9 @@ type UserCodeConfig struct {
 	DashInterval int
 }
 
-// toOPConfig converts DeviceAuthorizationConfig to a op.DeviceAuthorizationConfig,
+// toOPConfig converts DeviceAuthorizationConfig to a [op.DeviceAuthorizationConfig],
 // setting sane defaults for empty values.
-// Safe to call when *DeviceAuthorizationConfig is nil.
+// Safe to call when c is nil.
 func (c *DeviceAuthorizationConfig) toOPConfig() op.DeviceAuthorizationConfig {
 	out := op.DeviceAuthorizationConfig{
 		Lifetime:     DeviceAuthDefaultLifetime,
@@ -74,9 +74,7 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		if err != nil {
-			logger.WithError(err).Error(logMsg)
-		}
+		logger.OnError(err).Error(logMsg)
 		span.EndWithError(err)
 	}()
 
@@ -102,7 +100,7 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 	return err
 }
 
-func createDeviceAuthorizationState(d *domain.DeviceAuth) *op.DeviceAuthorizationState {
+func newDeviceAuthorizationState(d *domain.DeviceAuth) *op.DeviceAuthorizationState {
 	return &op.DeviceAuthorizationState{
 		ClientID: d.ClientID,
 		Scopes:   d.Scopes,
@@ -114,7 +112,7 @@ func createDeviceAuthorizationState(d *domain.DeviceAuth) *op.DeviceAuthorizatio
 }
 
 // GetDeviceAuthorizatonState retieves the current state of the Device Authorization process.
-// It implements the op.DeviceAuthorizationStorage interface and is used by devices that
+// It implements the [op.DeviceAuthorizationStorage] interface and is used by devices that
 // are polling until they successfully receive a token or we indicate a denied or expired state.
 // As generated user codes are of low entropy, this implementation also takes care or
 // device authorization request cleanup, when it has been Approved, Denied or Expired.
@@ -157,7 +155,7 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 		}
 	}
 
-	return createDeviceAuthorizationState(deviceAuth), nil
+	return newDeviceAuthorizationState(deviceAuth), nil
 }
 
 // TODO(muhlemmer): remove the following methods with oidc v3.

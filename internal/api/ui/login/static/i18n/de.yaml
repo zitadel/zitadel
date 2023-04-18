@@ -318,17 +318,17 @@ DeviceAuth:
   Title: Geräteautorisierung
   UserCode:
     Label: Benutzercode
-    Description: Geben Sie den auf dem Gerät angezeigten Benutzercode ein.
-    ButtonNext: nächste
+    Description: Geben Sie den auf dem Gerät angezeigten Benutzercode ein
+    ButtonNext: weiter
   Action:
-    Description: Gerätezugriff gewähren.
-    GrantDevice: Sie sind dabei, das Gerät zu gewähren
-    AccessToScopes: zugriff auf die folgenden Bereiche
+    Description: Gerätezugriff erlauben
+    GrantDevice: Sie sind dabei, das Gerät zu erlauben
+    AccessToScopes: Zugriff auf die folgenden Daten
     Button:
       Allow: erlauben
-      Deny: leugnen
+      Deny: verweigern
   Done:
-    Description: Erledigt.
+    Description: Abgeschlossen
     Approved: Gerätezulassung genehmigt. Sie können jetzt zum Gerät zurückkehren.
     Denied: Geräteautorisierung verweigert. Sie können jetzt zum Gerät zurückkehren.
 

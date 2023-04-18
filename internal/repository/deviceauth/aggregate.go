@@ -9,8 +9,9 @@ const (
 
 func NewAggregate(aggrID, instanceID string) *eventstore.Aggregate {
 	return &eventstore.Aggregate{
-		ID:            aggrID,
-		Type:          AggregateType,
+		ID:   aggrID,
+		Type: AggregateType,
+		// we use the id because we don't know the resource owner yet
 		ResourceOwner: instanceID,
 		InstanceID:    instanceID,
 		Version:       AggregateVersion,

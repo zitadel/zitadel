@@ -40,7 +40,7 @@ const (
 // Exists returns true when not Undefined and
 // any status lower than Removed.
 func (s DeviceAuthState) Exists() bool {
-	return s != DeviceAuthStateUndefined && s < DeviceAuthStateRemoved
+	return s > DeviceAuthStateUndefined && s < DeviceAuthStateRemoved
 }
 
 // Done returns true when DeviceAuthState is Approved.
