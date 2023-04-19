@@ -317,6 +317,24 @@ ExternalNotFound:
   Japanese: 日本語
   Spanish: Español
 
+DeviceAuth:
+  Title: Device Authorization
+  UserCode:
+    Label: User Code
+    Description: Enter the user code presented on the device.
+    ButtonNext: next
+  Action:
+    Description: Grant device access.
+    GrantDevice: you are about to grant device
+    AccessToScopes: access to the following scopes
+    Button:
+      Allow: allow
+      Deny: deny
+  Done:
+    Description: Done.
+    Approved: Device authorization approved. You can now return to the device.
+    Denied: Device authorization denied. You can now return to the device.
+
 Footer:
   PoweredBy: Powered By
   Tos: TOS
@@ -425,5 +443,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: Registration is not allowed
+  DeviceAuth:
+    NotExisting: User Code doesn't exist
 
 optional: (optional)

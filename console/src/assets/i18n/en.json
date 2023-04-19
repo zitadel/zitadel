@@ -248,6 +248,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Please fill in this field.",
+    "ATLEASTONE": "Provide at least one value.",
     "TOKENINVALID": {
       "TITLE": "Your authorization token has expired.",
       "DESCRIPTION": "Click the button below to log in again."
@@ -1699,6 +1700,7 @@
       "2": "inactive"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
       "2": "Consumers"

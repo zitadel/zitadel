@@ -247,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Remplis ce champ s'il te plaît.",
+    "ATLEASTONE": "Indiquez au moins une valeur.",
     "TOKENINVALID": {
       "TITLE": "Votre jeton d'autorisation a expiré.",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
@@ -1703,6 +1704,7 @@
       "2": "inactif"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
       "2": "Consumers"

@@ -29,6 +29,7 @@ export class LDAPAttributesComponent implements OnChanges, OnDestroy {
     profileAttribute: new FormControl('', []),
   });
 
+  public showMore: boolean = false;
   constructor() {
     this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       if (value) {

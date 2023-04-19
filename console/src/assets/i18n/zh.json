@@ -247,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "请填写此栏",
+    "ATLEASTONE": "P至少提供一个值。",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
@@ -1702,6 +1703,7 @@
       "2": "停用"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
       "2": "Consumers"

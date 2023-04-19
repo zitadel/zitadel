@@ -247,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Proszę wypełnić to pole.",
+    "ATLEASTONE": "Podaj co najmniej jedną wartość.",
     "TOKENINVALID": {
       "TITLE": "Twój token autoryzacji wygasł.",
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
@@ -1703,6 +1704,7 @@
       "2": "nieaktywny"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
       "2": "Consumers"

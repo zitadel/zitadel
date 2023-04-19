@@ -67,7 +67,7 @@ const (
 		" $2::VARCHAR AS aggregate_type," +
 		" $3::VARCHAR AS aggregate_id," +
 		" $4::VARCHAR AS aggregate_version," +
-		" NOW() AS creation_date," +
+		" statement_timestamp() AS creation_date," +
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +

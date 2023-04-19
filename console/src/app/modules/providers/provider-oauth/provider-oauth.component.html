@@ -13,40 +13,45 @@
     <p class="identity-provider-desc cnsl-secondary-text">{{ 'IDP.CREATE.OAUTH.DESCRIPTION' | translate }}</p>
 
     <form [formGroup]="form" (ngSubmit)="submitForm()">
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
-        <input cnslInput formControlName="name" />
-      </cnsl-form-field>
-
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'IDP.AUTHORIZATIONENDPOINT' | translate }}</cnsl-label>
-        <input cnslInput formControlName="authorizationEndpoint" />
-      </cnsl-form-field>
-
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'IDP.TOKENENDPOINT' | translate }}</cnsl-label>
-        <input cnslInput formControlName="tokenEndpoint" />
-      </cnsl-form-field>
-
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'IDP.USERENDPOINT' | translate }}</cnsl-label>
-        <input cnslInput formControlName="userEndpoint" />
-      </cnsl-form-field>
-
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'IDP.IDATTRIBUTE' | translate }}</cnsl-label>
-        <input cnslInput formControlName="idAttribute" />
-      </cnsl-form-field>
-
       <div class="identity-provider-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="name" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.AUTHORIZATIONENDPOINT' | translate }}</cnsl-label>
+          <input cnslInput formControlName="authorizationEndpoint" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.TOKENENDPOINT' | translate }}</cnsl-label>
+          <input cnslInput formControlName="tokenEndpoint" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.USERENDPOINT' | translate }}</cnsl-label>
+          <input cnslInput formControlName="userEndpoint" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.IDATTRIBUTE' | translate }}</cnsl-label>
+          <input cnslInput formControlName="idAttribute" />
+        </cnsl-form-field>
+
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientId" />
         </cnsl-form-field>
 
-        <mat-checkbox *ngIf="provider" [(ngModel)]="updateClientSecret" [ngModelOptions]="{ standalone: true }">{{
-          'IDP.UPDATECLIENTSECRET' | translate
-        }}</mat-checkbox>
+        <mat-checkbox
+          class="update-secret-checkbox"
+          *ngIf="provider"
+          [(ngModel)]="updateClientSecret"
+          [ngModelOptions]="{ standalone: true }"
+          >{{ 'IDP.UPDATECLIENTSECRET' | translate }}</mat-checkbox
+        >
+
         <cnsl-form-field *ngIf="!provider || (provider && updateClientSecret)" class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientSecret" />

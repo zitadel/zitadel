@@ -27,8 +27,8 @@ export class MetadataComponent implements OnChanges {
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.metadata?.currentValue) {
-      this.dataSource = new MatTableDataSource<Metadata.AsObject>(changes.metadata.currentValue);
+    if (changes['metadata']?.currentValue) {
+      this.dataSource = new MatTableDataSource<Metadata.AsObject>(changes['metadata'].currentValue);
     }
   }
 }

@@ -36,7 +36,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				redirectURI:  "redirectURI",
 			},
 			want: &oidc.Session{
-				AuthURL: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				AuthURL: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email+phone+User.Read&state=testState",
 			},
 		},
 		{
@@ -50,7 +50,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				},
 			},
 			want: &oidc.Session{
-				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email+phone+User.Read&state=testState",
 			},
 		},
 		{
@@ -59,13 +59,13 @@ func TestProvider_BeginAuth(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
-				scopes:       []string{openid.ScopeOpenID, openid.ScopeProfile, "user"},
+				scopes:       []string{openid.ScopeOpenID, openid.ScopeProfile, "custom"},
 				options: []ProviderOptions{
 					WithTenant(ConsumersTenant),
 				},
 			},
 			want: &oidc.Session{
-				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid+profile+user&state=testState",
+				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid+profile+custom+User.Read&state=testState",
 			},
 		},
 	}

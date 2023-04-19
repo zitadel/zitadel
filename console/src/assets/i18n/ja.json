@@ -248,6 +248,7 @@
   },
   "ERRORS": {
     "REQUIRED": "一部の必須項目が不足しています。",
+    "ATLEASTONE": "少なくとも 1 つの値を指定してください。",
     "TOKENINVALID": {
       "TITLE": "トークンが期限切れになりました。",
       "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
@@ -1694,9 +1695,10 @@
       "2": "非アクティブ"
     },
     "AZUREADTENANTTYPES": {
-      "0": "共通",
-      "1": "組織",
-      "2": "顧客"
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "テナントタイプ",
     "AZUREADTENANTID": "テナントID",

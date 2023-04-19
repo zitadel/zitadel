@@ -248,6 +248,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Por favor rellena este campo.",
+    "ATLEASTONE": "Proporcione al menos un valor.",
     "TOKENINVALID": {
       "TITLE": "Tu token de autorización token ha caducado.",
       "DESCRIPTION": "Haz clic en el botón más abajo para iniciar sesión otra vez."
@@ -1699,9 +1700,10 @@
       "2": "inactivo"
     },
     "AZUREADTENANTTYPES": {
-      "0": "Común",
-      "1": "Organizaciones",
-      "2": "Clientes"
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "Tipo de Tenant",
     "AZUREADTENANTID": "ID de Tenant",

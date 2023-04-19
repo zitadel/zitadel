@@ -88,6 +88,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
 	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
 	steps.s9EventstoreIndexes2 = New09(dbClient)
+	steps.s10EventstoreCreationDate = &CorrectCreationDate{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -123,6 +124,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 8")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s9EventstoreIndexes2)
 	logging.OnError(err).Fatal("unable to migrate step 9")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s10EventstoreCreationDate)
+	logging.OnError(err).Fatal("unable to migrate step 10")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

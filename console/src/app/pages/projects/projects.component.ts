@@ -24,7 +24,7 @@ export class ProjectsComponent {
     breadcrumbService: BreadcrumbService,
   ) {
     this.activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
-      const type = params.type;
+      const type = params['type'];
       if (type && type === 'owned') {
         this.setType(ProjectType.PROJECTTYPE_OWNED);
       } else if (type && type === 'granted') {
