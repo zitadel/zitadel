@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "Votre processus d'intégration",
+    "MOREDESCRIPTION": "plus de raccourcis",
     "COMPLETED": "terminé",
     "DISMISS": "fermer",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "Créez votre marque",
-        "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes."
+        "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes.",
+        "action": "Définissez"
       },
       "instance.smtp.config.added": {
-        "title": "Configurez vos paramètres SMTP",
-        "description": "Définissez vos propres paramètres de serveur de messagerie"
+        "title": "Configurez paramètres SMTP",
+        "description": "Définissez paramètres de serveur de messagerie",
+        "action": "Configurez"
       },
       "project.added": {
-        "title": "Créez votre premier projet",
-        "description": "Ajoutez votre premier projet et définissez ses rôles et autorisations."
+        "title": "Créez projet",
+        "description": "Ajoutez projet et définissez ses rôles et autorisations.",
+        "action": "Créez projet"
       },
       "project.application.added": {
         "title": "Créez votre première application",
-        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification."
+        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification.",
+        "action": "Créez application"
       },
       "user.human.added": {
         "title": "Ajouter des utilisateurs",
-        "description": "Ajouter les utilisateurs de votre application"
+        "description": "Ajouter les utilisateurs de application",
+        "action": "Ajuter utilisateur"
       },
       "user.grant.added": {
         "title": "Utilisateurs de subventions",
-        "description": "Autorisez les utilisateurs à accéder à votre application et définissez leur rôle."
+        "description": "Autorisez les utilisateurs à accéder à votre application et définissez leur rôle.",
+        "action": "Autorisez"
       }
     }
   },
@@ -240,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Remplis ce champ s'il te plaît.",
+    "ATLEASTONE": "Indiquez au moins une valeur.",
     "TOKENINVALID": {
       "TITLE": "Votre jeton d'autorisation a expiré.",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
@@ -1012,6 +1020,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1210,6 +1219,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1694,9 +1704,10 @@
       "2": "inactif"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "Type de locataire",
     "AZUREADTENANTID": "ID du locataire",
@@ -2060,6 +2071,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

@@ -67,7 +67,7 @@ const (
 		" $2::VARCHAR AS aggregate_type," +
 		" $3::VARCHAR AS aggregate_id," +
 		" $4::VARCHAR AS aggregate_version," +
-		" NOW() AS creation_date," +
+		" statement_timestamp() AS creation_date," +
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
@@ -255,10 +255,10 @@ func (db *CRDB) db() *sql.DB {
 
 func (db *CRDB) orderByEventSequence(desc bool) string {
 	if desc {
-		return " ORDER BY event_sequence DESC"
+		return " ORDER BY creation_date DESC, event_sequence DESC"
 	}
 
-	return " ORDER BY event_sequence"
+	return " ORDER BY creation_date, event_sequence"
 }
 
 func (db *CRDB) eventQuery() string {

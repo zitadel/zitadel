@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
+import "zitadel/user.proto";
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -55,6 +56,11 @@ message Member {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "avatar URL of the user"
             example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+        }
+    ];
+    zitadel.user.v1.Type user_type = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "type of the user (human / machine)"
         }
     ];
 }

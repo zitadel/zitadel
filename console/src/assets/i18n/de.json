@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "Dein Onboarding-prozess",
+    "MOREDESCRIPTION": "mehr Shortcuts",
     "COMPLETED": "abgeschlossen",
     "DISMISS": "schließen",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "Branding anpassen",
-        "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons."
+        "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons.",
+        "action": "Branding anpassen"
       },
       "instance.smtp.config.added": {
         "title": "SMTP Benachrichtigungseinstellungen",
-        "description": "Konfiguriere deinen Mailserver."
+        "description": "Konfiguriere deinen Mailserver.",
+        "action": "SMTP einrichten"
       },
       "project.added": {
         "title": "Erstelle ein Projekt",
-        "description": "Erstelle dein erstes Projekt und definiere Rollen"
+        "description": "Erstelle dein erstes Projekt und definiere Rollen",
+        "action": "Projekt erstellen"
       },
       "project.application.added": {
         "title": "Erstelle eine App",
-        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow."
+        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow.",
+        "action": "App erstellen"
       },
       "user.human.added": {
         "title": "Erfasse Benutzer",
-        "description": "Erstelle Benutzer die später deine Apps nutzen können."
+        "description": "Erstelle Benutzer die später deine Apps nutzen können.",
+        "action": "Benutzer erfassen"
       },
       "user.grant.added": {
         "title": "Berechtige Benutzer",
-        "description": "Erlaube es deinen Nutzern auf deine Apps zuzugreifen und gebe ihnen Rollen."
+        "description": "Erlaube es deinen Nutzern auf deine Apps zuzugreifen und gebe ihnen Rollen.",
+        "action": "Benutzer berechtigen"
       }
     }
   },
@@ -240,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Bitte fülle dieses Feld aus.",
+    "ATLEASTONE": "Geben Sie mindestens einen Wert an.",
     "TOKENINVALID": {
       "TITLE": "Du bist abgemeldet",
       "DESCRIPTION": "Klicke auf \"Einloggen\", um Dich erneut anzumelden."
@@ -1012,6 +1020,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1210,6 +1219,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1690,9 +1700,10 @@
       "2": "inaktiv"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "ADD": "Identitätsanbieter hinzufügen",
     "AZUREADTENANTTYPE": "Tenant Typ",
@@ -2071,6 +2082,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

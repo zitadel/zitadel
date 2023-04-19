@@ -3,7 +3,7 @@ package otel
 import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 
 	"github.com/zitadel/zitadel/cmd/build"
 )
@@ -17,9 +17,6 @@ func ResourceWithService() (*resource.Resource, error) {
 	}
 	return resource.Merge(
 		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
-			attributes...,
-		),
+		resource.NewWithAttributes("", attributes...),
 	)
 }

@@ -91,7 +91,7 @@
 
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.TYPE' | translate }}</th>
-        <td mat-cell *matCellDef="let event">
+        <td mat-cell *matCellDef="let event" data-e2e="event-type-cell">
           <ng-container *ngIf="event | toobject as event">
             <span *ngIf="event.type?.localized?.localizedMessage">{{ event.type.localized.localizedMessage }}</span>
           </ng-container>

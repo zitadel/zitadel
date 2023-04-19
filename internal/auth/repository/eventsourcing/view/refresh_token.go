@@ -30,7 +30,7 @@ func (v *View) PutRefreshToken(token *model.RefreshTokenView, event *models.Even
 	if err != nil {
 		return err
 	}
-	return v.ProcessedTokenSequence(event)
+	return v.ProcessedRefreshTokenSequence(event)
 }
 
 func (v *View) PutRefreshTokens(token []*model.RefreshTokenView, event *models.Event) error {

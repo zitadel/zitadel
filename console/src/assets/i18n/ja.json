@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "オンボーディングの手順",
+    "MOREDESCRIPTION": "より多くのショートカット",
     "COMPLETED": "完了",
     "DISMISS": "いいえ、私はプロです。",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "ブランドをセットアップする",
-        "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。"
+        "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。",
+        "action": "ブランディングの設定"
       },
       "instance.smtp.config.added": {
         "title": "SMTP設定をセットアップする",
-        "description": "独自のメールサーバーを設定します。"
+        "description": "独自のメールサーバーを設定します。",
+        "action": "SMTP 設定を設定する"
       },
       "project.added": {
         "title": "最初のプロジェクトを作成する",
-        "description": "最初のプロジェクトを追加し、ロールと認証を定義します。"
+        "description": "最初のプロジェクトを追加し、ロールと認証を定義します。",
+        "action": "プロジェクトを作成"
       },
       "project.application.added": {
         "title": "最初のアプリケーションを作成する",
-        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。"
+        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。",
+        "action": "アプリケーションを作成"
       },
       "user.human.added": {
         "title": "ユーザーを追加する",
-        "description": "アプリケーションユーザーを追加します。"
+        "description": "アプリケーションユーザーを追加します。",
+        "action": "ユーザーを作成"
       },
       "user.grant.added": {
         "title": "ユーザーにグラントする",
-        "description": "ユーザーがアプリケーションにアクセスし、ロールをセットアップできるようにします。"
+        "description": "ユーザーがアプリケーションにアクセスし、ロールをセットアップできるようにします。",
+        "action": "承認の作成"
       }
     }
   },
@@ -241,6 +248,7 @@
   },
   "ERRORS": {
     "REQUIRED": "一部の必須項目が不足しています。",
+    "ATLEASTONE": "少なくとも 1 つの値を指定してください。",
     "TOKENINVALID": {
       "TITLE": "トークンが期限切れになりました。",
       "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
@@ -1013,6 +1021,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1206,6 +1215,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1685,9 +1695,10 @@
       "2": "非アクティブ"
     },
     "AZUREADTENANTTYPES": {
-      "0": "共通",
-      "1": "組織",
-      "2": "顧客"
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "テナントタイプ",
     "AZUREADTENANTID": "テナントID",
@@ -2063,6 +2074,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",
