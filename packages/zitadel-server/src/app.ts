@@ -1,7 +1,8 @@
 let apps: ZitadelApp[] = [];
 
 export interface ZitadelClientProps {
-  clientId: string;
+  appId: string;
+  projectId: string;
   apiUrl: string; // process.env.ZITADEL_API_URL
   token: string;
   adminToken?: string;

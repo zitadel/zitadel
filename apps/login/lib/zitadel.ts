@@ -1,4 +1,4 @@
-import { ZitadelOptions, getApps, initializeApp } from "@zitadel/core";
+import { ZitadelOptions, getApps, initializeApp } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelOptions = {
   apiUrl: process.env.ZITADEL_API_URL ?? "",
@@ -11,5 +11,5 @@ if (!getApps().length) {
   initializeApp(zitadelConfig);
 }
 
-const app = getApp();
-const auth = getAuth();
+// const app = getApp();
+// const auth = getAuth();

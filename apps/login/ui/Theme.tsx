@@ -1,12 +1,25 @@
 "use client";
+
 import { Switch } from "@headlessui/react";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function Theme() {
   const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState<boolean>(false);
 
   const isDark = resolvedTheme === "dark";
+
+  // useEffect only runs on the client, so now we can safely show the UI
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <Switch
       checked={isDark}
@@ -18,7 +31,6 @@ export default function Theme() {
       }
       relative inline-flex h-4 w-9 items-center rounded-full`}
     >
-      <span className="sr-only">Dark mode enabled</span>
       <div
         aria-hidden="true"
         className={`${
