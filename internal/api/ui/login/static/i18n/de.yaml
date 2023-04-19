@@ -317,6 +317,24 @@ ExternalNotFound:
   Japanese: 日本語
   Spanish: Español
 
+DeviceAuth:
+  Title: Geräteautorisierung
+  UserCode:
+    Label: Benutzercode
+    Description: Geben Sie den auf dem Gerät angezeigten Benutzercode ein
+    ButtonNext: weiter
+  Action:
+    Description: Gerätezugriff erlauben
+    GrantDevice: Sie sind dabei, das Gerät zu erlauben
+    AccessToScopes: Zugriff auf die folgenden Daten
+    Button:
+      Allow: erlauben
+      Deny: verweigern
+  Done:
+    Description: Abgeschlossen
+    Approved: Gerätezulassung genehmigt. Sie können jetzt zum Gerät zurückkehren.
+    Denied: Geräteautorisierung verweigert. Sie können jetzt zum Gerät zurückkehren.
+
 Footer:
   PoweredBy: Powered By
   Tos: AGB
@@ -425,5 +443,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: Registrierung ist nicht erlaubt
+  DeviceAuth:
+    NotExisting: Benutzercode existiert nicht
 
 optional: (optional)
