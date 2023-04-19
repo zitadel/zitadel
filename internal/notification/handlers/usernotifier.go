@@ -232,7 +232,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		e,
 		u.metricSuccessfulDeliveriesEmail,
 		u.metricFailedDeliveriesEmail,
-	).SendEmailVerificationCode(notifyUser, origin, code)
+	).SendEmailVerificationCode(notifyUser, origin, code, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}
