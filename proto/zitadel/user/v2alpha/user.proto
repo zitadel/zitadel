@@ -12,7 +12,6 @@ message User {
   string id = 1;
 }
 
-
 enum Gender {
   GENDER_UNSPECIFIED = 0;
   GENDER_FEMALE = 1;

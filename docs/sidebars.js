@@ -339,6 +339,20 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Instance Lifecycle",
+          link: {
+            type: "generated-index",
+            title: "User Service API",
+            slug: "/apis/user_service",
+            description:
+              "This API is intended to manage the different ZITADEL instances within the system.\n" +
+              "\n" +
+              "Checkout the guide how to access the ZITADEL System API.",
+          },
+          items: require("./docs/apis/user_service/sidebar.js"),
+        },
+        {
+          type: "category",
           label: "Assets",
           collapsed: true,
           items: ["apis/assets/assets"],

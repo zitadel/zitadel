@@ -14,6 +14,14 @@ message OrgContext {
   }
 }
 
+message Context {
+  oneof ctx {
+    string org_id = 1;
+    string org_domain = 2;
+    bool instance = 3;
+  }
+}
+
 message ObjectDetails {
   //sequence represents the order of events. It's always counting
   //

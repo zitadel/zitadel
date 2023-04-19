@@ -54,6 +54,12 @@ type AddHuman struct {
 	Passwordless           bool
 	ExternalIDP            bool
 	Register               bool
+	Metadata               []*MetadataEntry
+}
+
+type MetadataEntry struct {
+	Key   string
+	Value []byte
 }
 
 func (c *Commands) AddHumanWithID(ctx context.Context, resourceOwner string, userID string, human *AddHuman) (*domain.HumanDetails, error) {
@@ -70,6 +76,8 @@ func (c *Commands) AddHumanWithID(ctx context.Context, resourceOwner string, use
 
 func (c *Commands) addHumanWithID(ctx context.Context, resourceOwner string, userID string, human *AddHuman) (*domain.HumanDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
+	var emailCode string
+	_ = emailCode
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddHumanCommand(agg, human, c.userPasswordAlg, c.userEncryption))
 	if err != nil {
 		return nil, err

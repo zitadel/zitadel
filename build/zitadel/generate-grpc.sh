@@ -15,6 +15,7 @@ protoc \
   -I=/proto/include/ \
   --go_out $GOPATH/src \
   --go-grpc_out $GOPATH/src \
+  --validate_out=lang=go:${GOPATH}/src \
   $(find ${PROTO_PATH} -iname *.proto)
 
 # generate authoptions code from templates

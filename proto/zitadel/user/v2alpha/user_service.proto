@@ -4,8 +4,9 @@ package zitadel.user.v2alpha;
 
 import "zitadel/options.proto";
 import "zitadel/context/v2alpha/context.proto";
-import "zitadel/user/v2alpha/user.proto";
 import "zitadel/user/v2alpha/email.proto";
+import "zitadel/user/v2alpha/password.proto";
+import "zitadel/user/v2alpha/user.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -15,26 +16,24 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha;user";
 
 service UserService {
 
+  // Create a new user
   rpc AddUser (AddUserRequest) returns (AddUserResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users"
       body: "*"
     };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "user.write"
+    };
   }
 
-    rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
-      option (google.api.http) = {
-        patch: "/v2alpha/users/{user_id}"
-        body: "*"
-      };
-    }
-
-    rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
-      option (google.api.http) = {
-        post: "/v2alpha/users/{user_id}/email"
-        body: "*"
-      };
-    }
+//  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+//    option (google.api.http) = {
+//      patch: "/v2alpha/users/{user_id}"
+//      body: "*"
+//    };
+//  }
 }
 
 message AddUserRequest{
@@ -47,7 +46,7 @@ message AddUserRequest{
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
-  // optionally set a unique username, if none is provided the email be used
+  // optionally set a unique username, if none is provided the email will be used
   optional string username = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -66,42 +65,13 @@ message AddUserRequest{
     (google.api.field_behavior) = REQUIRED
   ];
   repeated SetMetadataEntry metadata = 6;
-  AddUserPassword password = 7;
+  SetUserPassword password = 7;
 }
 
 message AddUserResponse {
   string user_id = 1;
   zitadel.context.v2alpha.ObjectDetails details = 2;
 }
-
-message AddUserPassword {
-  oneof password {
-      SetUserPassword password = 1;
-      SetHashedPassword hashed_password = 2;
-  }
-  bool password_change_required = 3;
-}
-
-
-/*
-
-email and password
-  -> verify mail
-email verified and password
-
-email and password change
-  -> verify mail and set password
-
-email verified and password change
-  -> set password
-
-email and no password / init password
-  -> init mail?
-
-email verified and no password / init password
-  -> password reset mail?
-
- */
 
 message UpdateUserRequest{
   string user_id = 1 [
