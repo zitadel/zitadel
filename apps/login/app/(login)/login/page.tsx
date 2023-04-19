@@ -21,7 +21,9 @@ export default function Page() {
           <TextInput title="loginname" label="Loginname" />
         </div>
 
-        <div>{/* <IdentityProviders /> */}</div>
+        <div>
+          <IdentityProviders />
+        </div>
         <div className="mt-8 flex w-full flex-row items-center justify-between">
           <Button type="button" variant={ButtonVariants.Secondary}>
             back

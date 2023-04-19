@@ -1,18 +1,18 @@
+"use client";
+
 import "#/styles/globals.css";
 // include styles from the ui package
 import "@zitadel/react/styles.css";
 import { AddressBar } from "#/ui/AddressBar";
 import { GlobalNav } from "#/ui/GlobalNav";
-import { ZitadelLogo } from "#/ui/ZitadelLogo";
-import { Lato } from "@next/font/google";
+import { Lato } from "next/font/google";
+import { ThemeProvider } from "next-themes";
+import Byline from "#/ui/Byline";
 
 const lato = Lato({
   weight: "400",
   subsets: ["latin"],
 });
-
-const darkModeClasses = (d: boolean) =>
-  d ? "dark [color-scheme:dark] ui-dark" : "";
 
 export default function RootLayout({
   children,
@@ -20,49 +20,54 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${darkModeClasses(false)} ${lato.className}`}>
+    <html lang="en" className={`${lato.className}`}>
       <head />
-      <body className="overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600 bg-[url('/grid.svg')]">
-        <GlobalNav />
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        storageKey="cp-theme"
+        // value={{ dark: "dark ui-dark" }}
+        // [color-scheme:dark]
+      >
+        <body className="overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600 bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
+          <GlobalNav />
 
-        <div className="lg:pl-72">
-          <div className="mx-auto max-w-xl space-y-8 px-2 pt-20 lg:py-8 lg:px-8">
-            <div className="rounded-lg bg-vc-border-gradient dark:dark-bg-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
-              <div className="rounded-lg bg-background-light-500 dark:bg-background-dark-600">
-                <AddressBar />
+          <div className="lg:pl-72">
+            <div className="mx-auto max-w-xl space-y-8 px-2 pt-20 lg:py-8 lg:px-8">
+              <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
+                <div className="rounded-lg bg-background-light-500 dark:bg-background-dark-600">
+                  <AddressBar />
+                </div>
               </div>
-            </div>
 
-            <div className="rounded-lg bg-vc-border-gradient dark:dark-bg-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
-              <div className="rounded-lg bg-background-light-500 dark:bg-background-dark-500 p-3.5 lg:p-8">
-                {children}
+              <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
+                <div className="rounded-lg bg-background-light-500 dark:bg-background-dark-500 p-3.5 lg:p-8">
+                  {children}
+                </div>
               </div>
-            </div>
 
-            <div className="rounded-lg bg-vc-border-gradient dark:dark-bg-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
-              <div className="rounded-lg bg-background-light-500 dark:bg-background-dark-600">
-                <Byline />
+              <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
+                <div className="rounded-lg bg-background-light-500 dark:bg-background-dark-600">
+                  <Byline />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </body>
+        </body>
+      </ThemeProvider>
     </html>
   );
 }
 
-function Byline() {
-  return (
-    <div className="flex items-center p-3.5 lg:px-5 lg:py-3">
-      <div className="flex items-center space-x-1.5">
-        <div className="text-sm text-gray-600">By</div>
-        {/* <a href="https://zitadel.com" title="ZITADEL">
-          <div className=" text-gray-300 hover:text-gray-50">
-            <ZitadelLogo />
-          </div>
-        </a> */}
-        <div className="text-sm font-semibold">ZITADEL</div>
-      </div>
-    </div>
-  );
-}
+// export const metadata = () => {
+//   return (
+//     <>
+//       <DefaultTags />
+//       <title>ZITADEL Login Playground</title>
+//       <meta
+//         name="description"
+//         content="This is a ZITADEL Login Playground to get an understanding how the login API works."
+//       />
+//     </>
+//   );
+// };

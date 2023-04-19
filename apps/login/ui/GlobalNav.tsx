@@ -25,7 +25,7 @@ export function GlobalNav() {
             <ZitadelLogo />
           </div>
 
-          <h2 className="text-blue-500 font-bold uppercase transform translate-y-2 text-sm tracking-wide">
+          <h2 className="text-blue-500 font-bold uppercase transform translate-y-2 text-sm">
             Login
           </h2>
         </Link>

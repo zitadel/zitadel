@@ -32,6 +32,7 @@ export function AddressBar() {
             {pathname
               .split("/")
               .slice(1)
+              .filter((s) => !!s)
               .map((segment) => {
                 return (
                   <React.Fragment key={segment}>

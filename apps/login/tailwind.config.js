@@ -82,7 +82,7 @@ module.exports = {
       },
       backgroundImage: ({ theme }) => ({
         "dark-vc-border-gradient": `radial-gradient(at left top, ${theme(
-          "colors.gray.500"
+          "colors.gray.800"
         )}, 50px, ${theme("colors.gray.800")} 50%)`,
         "vc-border-gradient": `radial-gradient(at left top, ${theme(
           "colors.gray.200"

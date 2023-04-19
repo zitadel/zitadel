@@ -2,11 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-h1,
-.ztdl-h1 {
-  @apply text-xl;
-}
+@layer base {
+  h1,
+  .ztdl-h1 {
+    @apply text-2xl;
+  }
 
-.ztdl-p {
-  @apply text-sm;
+  .ztdl-p {
+    @apply text-sm;
+  }
 }
