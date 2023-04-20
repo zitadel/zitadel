@@ -2,14 +2,10 @@ import { CompatServiceDefinition } from "nice-grpc/lib/service-definitions";
 
 import { createChannel, createClientFactory } from "nice-grpc";
 import {
-  AuthServiceClient,
-  AuthServiceDefinition,
-} from "./proto/server/zitadel/auth";
-import {
   AdminServiceClient,
   AdminServiceDefinition,
-} from "./proto/server/zitadel/admin";
-import { authMiddleware } from "./middleware";
+} from "../proto/server/zitadel/admin";
+import { authMiddleware } from "../middleware";
 
 const createClient = <Client>(
   definition: CompatServiceDefinition,

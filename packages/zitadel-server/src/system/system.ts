@@ -5,8 +5,8 @@ import { createChannel, createClientFactory } from "nice-grpc";
 import {
   SystemServiceClient,
   SystemServiceDefinition,
-} from "./proto/server/zitadel/system";
-import { authMiddleware } from "./middleware";
+} from "../proto/server/zitadel/system";
+import { authMiddleware } from "../middleware";
 
 const createSystemClient = <Client>(
   definition: CompatServiceDefinition,

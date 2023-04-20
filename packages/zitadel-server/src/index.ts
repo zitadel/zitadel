@@ -1,8 +1,11 @@
-export { initializeApp, getApps } from "./app";
+export * from "./app/app";
 
-export { getAuth } from "./auth";
-export { getManagement } from "./management";
-export { getAdmin } from "./admin";
-export { getSystem } from "./system";
+export * as auth from "./auth";
+export * as management from "./management";
+export * as admin from "./admin";
+export * as system from "./system";
 
-export type { ZitadelOptions } from "./app";
+// export * as proto from "./proto/server/zitadel/*";
+// export * from "./proto/server/zitadel/management";
+// export * from "./proto/server/zitadel/system";
+// export * from "./proto/server/zitadel/admin";

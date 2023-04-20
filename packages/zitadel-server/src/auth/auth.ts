@@ -3,9 +3,10 @@ import { createChannel, createClientFactory } from "nice-grpc";
 import {
   AuthServiceClient,
   AuthServiceDefinition,
-} from "./proto/server/zitadel/auth";
-import { ZitadelApp } from "./app";
-import { authMiddleware } from "./middleware";
+  GetMyUserResponse,
+} from "../proto/server/zitadel/auth";
+import { ZitadelApp } from "../app/app";
+import { authMiddleware } from "../middleware";
 
 const createClient = <Client>(
   definition: CompatServiceDefinition,
@@ -22,4 +23,10 @@ export async function getAuth(app?: ZitadelApp): Promise<AuthServiceClient> {
     AuthServiceDefinition as CompatServiceDefinition,
     ""
   );
+}
+
+export async function getMyUser(): Promise<GetMyUserResponse> {
+  const auth = await getAuth();
+  const response = await auth.getMyUser({});
+  return response;
 }
