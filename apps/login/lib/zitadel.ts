@@ -4,7 +4,7 @@ import {
   getServers,
   initializeServer,
 } from "@zitadel/server";
-import { getAuth } from "@zitadel/server/auth";
+// import { getAuth } from "@zitadel/server/auth";
 
 export const zitadelConfig: ZitadelServerOptions = {
   apiUrl: process.env.ZITADEL_API_URL ?? "",
@@ -17,8 +17,8 @@ if (!getServers().length) {
 
 const server = getServer();
 
-export async function getMyUser(): Promise<GetMyUserResponse> {
-  const auth = await getAuth();
-  const response = await auth.getMyUser({});
-  return response;
-}
+// export async function getMyUser(): Promise<GetMyUserResponse> {
+//   const auth = await getAuth();
+//   const response = await auth.getMyUser({});
+//   return response;
+// }

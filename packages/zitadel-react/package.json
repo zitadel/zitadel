@@ -12,7 +12,7 @@
     "./assets/*": "./dist/assets/*"
   },
   "scripts": {
-    "build": "tsup && pnpm run copy-files",
+    "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
