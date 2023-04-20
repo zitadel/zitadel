@@ -27,6 +27,7 @@ importers:
       '@types/react': 18.0.25
       '@types/react-dom': 18.0.9
       '@types/tinycolor2': 1.4.3
+      '@vercel/analytics': ^1.0.0
       '@vercel/git-hooks': 1.0.0
       '@zitadel/next': workspace:*
       '@zitadel/react': workspace:*
@@ -57,6 +58,7 @@ importers:
       '@headlessui/react': 1.7.14_biqbaboplfbrettd7655fr4n2y
       '@heroicons/react': 2.0.13_react@18.2.0
       '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.4
+      '@vercel/analytics': 1.0.0_react@18.2.0
       '@zitadel/next': link:../../packages/zitadel-next
       '@zitadel/react': link:../../packages/zitadel-react
       '@zitadel/server': link:../../packages/zitadel-server
@@ -2397,6 +2399,14 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.44.0
       eslint-visitor-keys: 3.3.0
+    dev: false
+
+  /@vercel/analytics/1.0.0_react@18.2.0:
+    resolution: {integrity: sha512-RQmj7pv82JwGDHrnKeRc6TtSw2U7rWNubc2IH0ernTzWTj02yr9zvIYiYJeztsBzrJtWv7m8Nz6vxxb+cdEtJw==}
+    peerDependencies:
+      react: ^16.8||^17||^18
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /@vercel/git-hooks/1.0.0:

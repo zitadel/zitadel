@@ -1,4 +1,9 @@
-import { ZitadelServerOptions, getServers } from "@zitadel/server";
+import {
+  ZitadelServerOptions,
+  getServer,
+  getServers,
+  initializeServer,
+} from "@zitadel/server";
 import { getAuth } from "@zitadel/server/auth";
 
 export const zitadelConfig: ZitadelServerOptions = {

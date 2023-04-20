@@ -3,7 +3,7 @@ import {
   getServer,
   getServers,
   initializeServer,
-} from "#/server";
+} from "#";
 import { GetMyUserResponse, getAuth } from "#/auth";
 
 async function getMyUser(): Promise<GetMyUserResponse> {

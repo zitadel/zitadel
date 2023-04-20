@@ -9,10 +9,6 @@
   "files": [
     "dist/**"
   ],
-  "exports": {
-    ".": "./index.js",
-    "./auth": "./jwt/auth.js"
-  },
   "scripts": {
     "build": "tsup src/index.ts src/*/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts src/*/index.ts --format esm,cjs --watch --dts",
