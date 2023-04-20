@@ -1,6 +1,6 @@
 "use client";
-
 import { ThemeProvider } from "next-themes";
+import ThemeWrapper from "./ThemeWrapper";
 
 type Props = {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ export function LayoutProviders({ children }: Props) {
       storageKey="cp-theme"
       value={{ dark: "dark" }}
     >
-      {children}
+      <ThemeWrapper>{children}</ThemeWrapper>
     </ThemeProvider>
   );
 }

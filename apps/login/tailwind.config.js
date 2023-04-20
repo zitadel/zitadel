@@ -30,6 +30,14 @@ module.exports = {
           violet: "#7928CA",
         },
         primary: {
+          light: {
+            200: "#bec6ef",
+            300: "#8594e0",
+            400: "#6c7eda",
+            500: "#5469d4",
+            600: "#3c54ce",
+            contrast: "#ffffff",
+          },
           dark: {
             100: "#afd1f2",
             200: "#7fb5ea",
@@ -40,6 +48,17 @@ module.exports = {
             700: "#17548f",
             800: "#134575",
             900: "#0f355b",
+          },
+        },
+        accent: {
+          light: {
+            400: "#9142d5",
+            500: "#7e21ce",
+          },
+          dark: {
+            300: "#ff6396",
+            400: "#ff4180",
+            500: "#ff2069",
           },
         },
         background: {

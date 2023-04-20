@@ -7,6 +7,7 @@ import { Lato } from "next/font/google";
 import Byline from "#/ui/Byline";
 import { LayoutProviders } from "#/ui/LayoutProviders";
 import { Analytics } from "@vercel/analytics/react";
+import { ZitadelUIProvider } from "#/../../packages/zitadel-react/dist";
 
 const lato = Lato({
   weight: "400",
