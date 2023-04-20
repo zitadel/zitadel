@@ -54,15 +54,25 @@ type AddHuman struct {
 	Passwordless           bool
 	ExternalIDP            bool
 	Register               bool
-	Metadata               []*MetadataEntry
+	Metadata               []*AddMetadataEntry
 }
 
-type MetadataEntry struct {
+type AddMetadataEntry struct {
 	Key   string
 	Value []byte
 }
 
-func (c *Commands) AddHumanWithID(ctx context.Context, resourceOwner string, userID string, human *AddHuman) (*domain.HumanDetails, error) {
+func (m *AddMetadataEntry) Valid() error {
+	if m.Key = strings.TrimSpace(m.Key); m.Key == "" {
+		return errors.ThrowInvalidArgument(nil, "USER-Drght", "Errors.User.Metadata.KeyEmpty")
+	}
+	if len(m.Value) == 0 {
+		return errors.ThrowInvalidArgument(nil, "USER-Dbgth", "Errors.User.Metadata.ValueEmpty")
+	}
+	return nil
+}
+
+func (c *Commands) AddHumanWithID(ctx context.Context, resourceOwner string, userID string, human *AddHuman, allowInitMail bool) (*domain.HumanDetails, error) {
 	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -71,14 +81,21 @@ func (c *Commands) AddHumanWithID(ctx context.Context, resourceOwner string, use
 		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
 	}
 
-	return c.addHumanWithID(ctx, resourceOwner, userID, human)
+	return c.addHumanWithID(ctx, resourceOwner, userID, human, allowInitMail)
 }
 
-func (c *Commands) addHumanWithID(ctx context.Context, resourceOwner string, userID string, human *AddHuman) (*domain.HumanDetails, error) {
+func (c *Commands) addHumanWithID(ctx context.Context, resourceOwner string, userID string, human *AddHuman, allowInitMail bool) (*domain.HumanDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
 	var emailCode string
 	_ = emailCode
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddHumanCommand(agg, human, c.userPasswordAlg, c.userEncryption))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
+		AddHumanCommand(
+			agg,
+			human,
+			c.userPasswordAlg,
+			c.userEncryption,
+			allowInitMail,
+		))
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +115,7 @@ func (c *Commands) addHumanWithID(ctx context.Context, resourceOwner string, use
 	}, nil
 }
 
-func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman) (*domain.HumanDetails, error) {
+func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool) (*domain.HumanDetails, error) {
 	if resourceOwner == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
@@ -107,7 +124,7 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 		return nil, err
 	}
 
-	return c.addHumanWithID(ctx, resourceOwner, userID, human)
+	return c.addHumanWithID(ctx, resourceOwner, userID, human, allowInitMail)
 }
 
 type humanCreationCommand interface {
@@ -116,7 +133,7 @@ type humanCreationCommand interface {
 	AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
 }
 
-func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm) preparation.Validation {
+func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if err := human.Email.Validate(); err != nil {
 			return nil, err
@@ -135,6 +152,12 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 
 		if human.Phone.Number != "" {
 			if human.Phone.Number, err = human.Phone.Number.Normalize(); err != nil {
+				return nil, err
+			}
+		}
+
+		for _, metadataEntry := range human.Metadata {
+			if err := metadataEntry.Valid(); err != nil {
 				return nil, err
 			}
 		}
@@ -206,10 +229,12 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			if human.Email.Verified {
 				cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
 			}
-			//add init code if
+
+			// if allowInitMail, used for v1 api (system, admin, mgmt, auth):
+			// add init code if
 			// email not verified or
 			// user not registered and password set
-			if human.shouldAddInitCode() {
+			if allowInitMail && human.shouldAddInitCode() {
 				value, expiry, err := newUserInitCode(ctx, filter, codeAlg)
 				if err != nil {
 					return nil, err
@@ -233,6 +258,15 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 					return nil, err
 				}
 				cmds = append(cmds, user.NewHumanPhoneCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
+			}
+
+			for _, metadataEntry := range human.Metadata {
+				cmds = append(cmds, user.NewMetadataSetEvent(
+					ctx,
+					&a.Aggregate,
+					metadataEntry.Key,
+					metadataEntry.Value,
+				))
 			}
 
 			return cmds, nil

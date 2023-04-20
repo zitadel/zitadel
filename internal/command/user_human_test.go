@@ -35,6 +35,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		orgID           string
 		human           *AddHuman
 		secretGenerator crypto.Generator
+		allowInitMail   bool
 	}
 	type res struct {
 		want *domain.HumanDetails
@@ -68,6 +69,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						Address: "email@test.ch",
 					},
 				},
+				allowInitMail: true,
 			},
 			res: res{
 				err: errors.IsErrorInvalidArgument,
@@ -95,6 +97,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					},
 					PreferredLanguage: language.English,
 				},
+				allowInitMail: true,
 			},
 			res: res{
 				err: errors.IsInternal,
@@ -134,6 +137,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					},
 					PreferredLanguage: language.English,
 				},
+				allowInitMail: true,
 			},
 			res: res{
 				err: errors.IsInternal,
@@ -154,6 +158,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					Username:  "username",
 					FirstName: "firstname",
 				},
+				allowInitMail: true,
 			},
 			res: res{
 				err: errors.IsErrorInvalidArgument,
@@ -237,6 +242,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					PreferredLanguage: language.English,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
 			},
 			res: res{
 				want: &domain.HumanDetails{
@@ -330,6 +336,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					PreferredLanguage: language.English,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
 			},
 			res: res{
 				want: &domain.HumanDetails{
@@ -400,6 +407,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					PasswordChangeRequired: true,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
 			},
 			res: res{
 				want: &domain.HumanDetails{
@@ -470,6 +478,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					PasswordChangeRequired: true,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
 			},
 			res: res{
 				want: &domain.HumanDetails{
@@ -540,6 +549,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					PasswordChangeRequired: true,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
 			},
 			res: res{
 				want: &domain.HumanDetails{
@@ -594,6 +604,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					PasswordChangeRequired: true,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
 			},
 			res: res{
 				err: errors.IsErrorInvalidArgument,
@@ -687,6 +698,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					PasswordChangeRequired: true,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
 			},
 
 			res: res{
@@ -787,6 +799,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					PreferredLanguage: language.English,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
 			},
 			res: res{
 				want: &domain.HumanDetails{
@@ -875,6 +888,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					PreferredLanguage: language.English,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
 			},
 			res: res{
 				want: &domain.HumanDetails{
@@ -894,7 +908,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userEncryption:  tt.fields.codeAlg,
 				idGenerator:     tt.fields.idGenerator,
 			}
-			got, err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human)
+			got, err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -3480,11 +3494,12 @@ func newRegisterHumanEvent(username, password string, changeRequired bool, phone
 
 func TestAddHumanCommand(t *testing.T) {
 	type args struct {
-		a           *user.Aggregate
-		human       *AddHuman
-		passwordAlg crypto.HashAlgorithm
-		filter      preparation.FilterToQueryReducer
-		codeAlg     crypto.EncryptionAlgorithm
+		a             *user.Aggregate
+		human         *AddHuman
+		passwordAlg   crypto.HashAlgorithm
+		filter        preparation.FilterToQueryReducer
+		codeAlg       crypto.EncryptionAlgorithm
+		allowInitMail bool
 	}
 	agg := user.NewAggregate("id", "ro")
 	tests := []struct {
@@ -3654,7 +3669,7 @@ func TestAddHumanCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, context.Background(), AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg, tt.args.codeAlg), tt.args.filter, tt.want)
+			AssertValidation(t, context.Background(), AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg, tt.args.codeAlg, tt.args.allowInitMail), tt.args.filter, tt.want)
 		})
 	}
 }

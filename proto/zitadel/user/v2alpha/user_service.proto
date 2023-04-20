@@ -3,7 +3,7 @@ syntax = "proto3";
 package zitadel.user.v2alpha;
 
 import "zitadel/options.proto";
-import "zitadel/context/v2alpha/context.proto";
+import "zitadel/object/v2alpha/object.proto";
 import "zitadel/user/v2alpha/email.proto";
 import "zitadel/user/v2alpha/password.proto";
 import "zitadel/user/v2alpha/user.proto";
@@ -27,13 +27,6 @@ service UserService {
       permission: "user.write"
     };
   }
-
-//  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
-//    option (google.api.http) = {
-//      patch: "/v2alpha/users/{user_id}"
-//      body: "*"
-//    };
-//  }
 }
 
 message AddUserRequest{
@@ -55,7 +48,7 @@ message AddUserRequest{
       example: "\"minnie-mouse\"";
     }
   ];
-  zitadel.context.v2alpha.OrgContext organisation = 3;
+  zitadel.object.v2alpha.Organisation organisation = 3;
   SetUserProfile profile = 4 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED
@@ -65,12 +58,15 @@ message AddUserRequest{
     (google.api.field_behavior) = REQUIRED
   ];
   repeated SetMetadataEntry metadata = 6;
-  SetUserPassword password = 7;
+  oneof password_type {
+    Password password = 7;
+    HashedPassword hashed_password = 8;
+  }
 }
 
 message AddUserResponse {
   string user_id = 1;
-  zitadel.context.v2alpha.ObjectDetails details = 2;
+  zitadel.object.v2alpha.Details details = 2;
 }
 
 message UpdateUserRequest{
@@ -88,7 +84,7 @@ message UpdateUserRequest{
 }
 
 message UpdateUserResponse{
-  zitadel.context.v2alpha.ObjectDetails details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }
 
 message SetEmailRequest{
@@ -103,5 +99,5 @@ message SetEmailRequest{
 }
 
 message SetEmailResponse{
-  zitadel.context.v2alpha.ObjectDetails details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }
