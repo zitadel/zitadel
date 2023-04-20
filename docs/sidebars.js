@@ -144,14 +144,13 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Let users login with their preferred identity provider",
-            slug: "/guides/integrate/identity-provider",
+            slug: "/guides/integrate/identity-providers",
             description:
               "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
 
           },
           collapsed: true,
           items: [
-            "guides/integrate/identity-providers/introduction",
             "guides/integrate/identity-providers/google",
             "guides/integrate/identity-providers/azure-ad",
             "guides/integrate/identity-providers/github",
@@ -258,6 +257,7 @@ module.exports = {
         "concepts/structure/users",
         "concepts/structure/managers",
         "concepts/structure/policies",
+        "concepts/features/identity-brokering",
         "concepts/structure/jwt_idp",
         "concepts/features/actions",
         "concepts/features/selfservice",
