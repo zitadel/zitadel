@@ -11,7 +11,7 @@ Before you start, make sure you have everything set up correctly.
 
 - You need to be at least a ZITADEL _ORG_OWNER_
 - Your ZITADEL organization needs to have the actions feature enabled. <!-- TODO: How to enable it for SaaS ZITADEL? -->
-- [Your ZITADEL organization needs to have at least one external identity provider enabled](../../integrate/identity-providers/introduction.md)
+- [Your ZITADEL organization needs to have at least one external identity provider enabled](../../integrate/identity-providers)
 - [You need to have at least one role configured for a project](../console/projects)
 
 ## Copy some information for the action
