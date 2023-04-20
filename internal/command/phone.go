@@ -14,5 +14,5 @@ type Phone struct {
 }
 
 func newPhoneCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*cryptoCode, error) {
-	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg)
+	return newCryptoCode(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg)
 }

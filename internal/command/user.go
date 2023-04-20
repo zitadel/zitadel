@@ -440,7 +440,7 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 }
 
 func newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*cryptoCode, error) {
-	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
+	return newCryptoCode(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
 }
 
 func userWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, resourceOwner string) (*UserWriteModel, error) {
