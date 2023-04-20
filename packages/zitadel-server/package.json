@@ -18,6 +18,7 @@
     "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.14.0",
     "@zitadel/tsconfig": "workspace:*",
     "eslint": "^7.32.0",
     "eslint-config-zitadel": "workspace:*",

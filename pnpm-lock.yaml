@@ -107,6 +107,7 @@ importers:
 
   packages/zitadel-client:
     specifiers:
+      '@bufbuild/buf': ^1.14.0
       '@zitadel/tsconfig': workspace:*
       eslint: ^7.32.0
       eslint-config-zitadel: workspace:*
@@ -121,6 +122,7 @@ importers:
       nice-grpc-web: 3.2.3_ws@8.13.0
       protobufjs: 7.2.3
     devDependencies:
+      '@bufbuild/buf': 1.15.0
       '@zitadel/tsconfig': link:../zitadel-tsconfig
       eslint: 7.32.0
       eslint-config-zitadel: link:../eslint-config-zitadel
@@ -174,6 +176,7 @@ importers:
 
   packages/zitadel-server:
     specifiers:
+      '@bufbuild/buf': ^1.14.0
       '@zitadel/tsconfig': workspace:*
       eslint: ^7.32.0
       eslint-config-zitadel: workspace:*
@@ -192,6 +195,7 @@ importers:
       nice-grpc-common: 2.0.2
       protobufjs: 7.2.3
     devDependencies:
+      '@bufbuild/buf': 1.15.0
       '@zitadel/tsconfig': link:../zitadel-tsconfig
       eslint: 7.32.0
       eslint-config-zitadel: link:../eslint-config-zitadel
