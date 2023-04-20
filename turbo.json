@@ -1,6 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
+    "generate": {
+      "cache": true
+    },
     "build": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "dependsOn": ["generate", "^build"]
@@ -16,9 +19,6 @@
     },
     "clean": {
       "cache": false
-    },
-    "generate": {
-      "cache": true
     }
   },
   "globalDependencies": ["**/.env.*local"],
