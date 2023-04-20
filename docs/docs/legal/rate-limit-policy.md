@@ -23,7 +23,15 @@ You should consider to implement [exponential backoff](https://en.wikipedia.org/
 
 ## What rate limits do apply
 
-For ZITADEL Cloud, we have a rate limiting rule for login paths (login, register and reset features) and for API paths each. Learn more about [the exact rules](/apis/ratelimits).
+For ZITADEL Cloud, we have a rate limiting rule for login paths (login, register and reset features) and for API paths each.
+
+Rate limits are implemented with the following rules:
+
+| Path                     | Description                            | Rate Limiting                        | One Minute Banning                     |
+|--------------------------|----------------------------------------|--------------------------------------|----------------------------------------|
+| /ui/login*               | Global Login, Register and Reset Limit | 10 requests per second over a minute | 15 requests per second over 3 minutes |
+| All other paths | All gRPC- and REST APIs as well as the ZITADEL Customer Portal | 10 requests per second over a minute       | 10 requests per second over 3 minutes   |
+
 
 ## Load Testing
 
