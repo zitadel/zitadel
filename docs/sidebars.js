@@ -141,6 +141,14 @@ module.exports = {
         {
           type: "category",
           label: "Configure Identity Providers",
+          link: {
+            type: "generated-index",
+            title: "Let users login with their preferred identity provider",
+            slug: "/guides/integrate/identity-provider",
+            description:
+              "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
+
+          },
           collapsed: true,
           items: [
             "guides/integrate/identity-providers/introduction",
@@ -186,6 +194,14 @@ module.exports = {
         {
           type: "category",
           label: "Services",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your favorite services",
+            slug: "/guides/integrate/services",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your services.",
+
+          },
           collapsed: true,
           items: [
             "guides/integrate/services/gitlab-self-hosted",
@@ -200,6 +216,14 @@ module.exports = {
         {
           type: "category",
           label: "Tools",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your tools",
+            slug: "/guides/integrate/tools",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your favorite tools.",
+
+          },
           collapsed: true,
           items: [
             "guides/integrate/authenticated-mongodb-charts",
