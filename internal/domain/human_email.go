@@ -38,6 +38,7 @@ type Email struct {
 
 	EmailAddress    EmailAddress
 	IsEmailVerified bool
+	PlainCode       *string
 }
 
 type EmailCode struct {

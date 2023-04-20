@@ -202,29 +202,29 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			// email not verified or
 			// user not registered and password set
 			if human.shouldAddInitCode() {
-				value, expiry, err := newUserInitCode(ctx, filter, codeAlg)
+				userCode, err := newUserInitCode(ctx, filter, codeAlg)
 				if err != nil {
 					return nil, err
 				}
-				cmds = append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
+				cmds = append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, userCode.value, userCode.expiry))
 			} else {
 				if !human.Email.Verified {
-					value, expiry, err := newEmailCode(ctx, filter, codeAlg)
+					emailCode, err := newEmailCode(ctx, filter, codeAlg)
 					if err != nil {
 						return nil, err
 					}
-					cmds = append(cmds, user.NewHumanEmailCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
+					cmds = append(cmds, user.NewHumanEmailCodeAddedEvent(ctx, &a.Aggregate, emailCode.value, emailCode.expiry))
 				}
 			}
 
 			if human.Phone.Verified {
 				cmds = append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &a.Aggregate))
 			} else if human.Phone.Number != "" {
-				value, expiry, err := newPhoneCode(ctx, filter, codeAlg)
+				phoneCode, err := newPhoneCode(ctx, filter, codeAlg)
 				if err != nil {
 					return nil, err
 				}
-				cmds = append(cmds, user.NewHumanPhoneCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
+				cmds = append(cmds, user.NewHumanPhoneCodeAddedEvent(ctx, &a.Aggregate, phoneCode.value, phoneCode.expiry))
 			}
 
 			return cmds, nil

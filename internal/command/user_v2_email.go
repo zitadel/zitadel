@@ -2,21 +2,82 @@ package command
 
 import (
 	"context"
+	"io"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type UserEmail struct {
+// ChangeUserEmail sets a user's email address, generates a code
+// and triggers a notification e-mail with the default confirmation URL format.
+func (c *Commands) ChangeUserEmail(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
+	return c.changeUserEmail(ctx, userID, resourceOwner, email, alg, false, nil)
+}
+
+// ChangeUserEmailURLTemplate sets a user's email address, generates a code
+// and triggers a notification e-mail with the confirmation URL rendered from the passed urlTmpl.
+// urlTmpl must be a valid [tmpl.Template].
+func (c *Commands) ChangeUserEmailURLTemplate(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm, urlTmpl string) (*domain.Email, error) {
+	if err := domain.RenderConfirmURLTemplate(io.Discard, urlTmpl, userID, "code", "orgID"); err != nil {
+		return nil, err
+	}
+	return c.changeUserEmail(ctx, userID, resourceOwner, email, alg, false, &urlTmpl)
+}
+
+// ChangeUserEmailReturnCode sets a user's email address, generates a code and does not send a notification email.
+// The generated plain text code will be set in the returned Email object.
+func (c *Commands) ChangeUserEmailReturnCode(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
+	return c.changeUserEmail(ctx, userID, resourceOwner, email, alg, true, nil)
+}
+
+// ChangeUserEmailVerified sets a user's email address and marks it is verified.
+// No code is generated and no confirmation e-mail is send.
+func (c *Commands) ChangeUserEmailVerified(ctx context.Context, userID, resourceOwner, email string) (*domain.Email, error) {
+	return c.changeUserEmail(ctx, userID, resourceOwner, email, nil, false, nil)
+}
+
+// changeUserEmail set a user's email address.
+// When alg is nil, the email address is set as verified and the remainder of options are ignored.
+// returnCode controls if the plain text version of the code will be set in the return object.
+// When the plain text code is returned, no notification e-mail will be send to the user.
+// urlTmpl allows changing the target URL that is used by the e-mail annd should be a valid Go template.
+func (c *Commands) changeUserEmail(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl *string) (*domain.Email, error) {
+	cmd, err := c.NewUserEmailEvents(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if err = cmd.Change(ctx, domain.EmailAddress(email)); err != nil {
+		return nil, err
+	}
+	if alg == nil {
+		cmd.SetVerified(ctx)
+		return cmd.Push(ctx)
+	}
+	if err = cmd.AddGeneratedCode(ctx, alg, urlTmpl, returnCode); err != nil {
+		return nil, err
+	}
+
+	return cmd.Push(ctx)
+}
+
+// UserEmailEvents allows step-by-step additions of events,
+// operating on the Human Email Model.
+type UserEmailEvents struct {
 	eventstore *eventstore.Eventstore
 	aggregate  *eventstore.Aggregate
 	events     []eventstore.Command
 	model      *HumanEmailWriteModel
+
+	plainCode *string
 }
 
-func (c *Commands) UserEmail(ctx context.Context, userID, resourceOwner string) (*UserEmail, error) {
+// NewUserEmailEvents constructs a UserEmailEvents with a Human Email Write Model,
+// filtered by userID and resourceOwner.
+// If a model cannot be found, or it's state is invalid and error is returned.
+func (c *Commands) NewUserEmailEvents(ctx context.Context, userID, resourceOwner string) (*UserEmailEvents, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
 	}
@@ -31,14 +92,16 @@ func (c *Commands) UserEmail(ctx context.Context, userID, resourceOwner string) 
 	if model.UserState == domain.UserStateInitial {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J8dsk", "Errors.User.NotInitialised")
 	}
-	return &UserEmail{
+	return &UserEmailEvents{
 		eventstore: c.eventstore,
 		aggregate:  UserAggregateFromWriteModel(&model.WriteModel),
 		model:      model,
 	}, nil
 }
 
-func (c *UserEmail) Change(ctx context.Context, email domain.EmailAddress) error {
+// Change sets a new email address.
+// The generated event unsets any previously generated code and verified flag.
+func (c *UserEmailEvents) Change(ctx context.Context, email domain.EmailAddress) error {
 	if err := email.Validate(); err != nil {
 		return err
 	}
@@ -50,15 +113,27 @@ func (c *UserEmail) Change(ctx context.Context, email domain.EmailAddress) error
 	return nil
 }
 
-func (c *UserEmail) SetVerified(ctx context.Context) {
+// SetVerified sets the email address to verified.
+func (c *UserEmailEvents) SetVerified(ctx context.Context) {
 	c.events = append(c.events, user.NewHumanEmailVerifiedEvent(ctx, c.aggregate))
 }
 
-func (c *UserEmail) AddCode(ctx context.Context, code *domain.EmailCode, urlTmpl *string) {
-	c.events = append(c.events, user.NewHumanEmailCodeAddedEventV2(ctx, c.aggregate, code.Code, code.Expiry, urlTmpl))
+// AddGeneratedCode generates a new encrypted code and sets it to the email address.
+// When returnCode a plain text of the code will be returned from Push.
+func (c *UserEmailEvents) AddGeneratedCode(ctx context.Context, alg crypto.EncryptionAlgorithm, urlTmpl *string, returnCode bool) error {
+	code, err := newEmailCode(ctx, c.eventstore.Filter, alg)
+	if err != nil {
+		return err
+	}
+	c.events = append(c.events, user.NewHumanEmailCodeAddedEventV2(ctx, c.aggregate, code.value, code.expiry, urlTmpl, returnCode))
+	if returnCode {
+		c.plainCode = &code.plain
+	}
+	return nil
 }
 
-func (c *UserEmail) Push(ctx context.Context) (*domain.Email, error) {
+// Push all events to the eventstore and Reduce them into the Model.
+func (c *UserEmailEvents) Push(ctx context.Context) (*domain.Email, error) {
 	pushedEvents, err := c.eventstore.Push(ctx, c.events...)
 	if err != nil {
 		return nil, err
@@ -67,5 +142,8 @@ func (c *UserEmail) Push(ctx context.Context) (*domain.Email, error) {
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToEmail(c.model), nil
+	email := writeModelToEmail(c.model)
+	email.PlainCode = c.plainCode
+
+	return email, nil
 }

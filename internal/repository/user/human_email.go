@@ -122,9 +122,10 @@ func HumanEmailVerificationFailedEventMapper(event *repository.Event) (eventstor
 type HumanEmailCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code        *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry      time.Duration       `json:"expiry,omitempty"`
-	URLTemplate *string             `json:"url_template,omitempty"`
+	Code         *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry       time.Duration       `json:"expiry,omitempty"`
+	URLTemplate  *string             `json:"url_template,omitempty"`
+	CodeReturned bool                `json:"code_returned,omitempty"`
 }
 
 func (e *HumanEmailCodeAddedEvent) Data() interface{} {
@@ -141,7 +142,7 @@ func NewHumanEmailCodeAddedEvent(
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 ) *HumanEmailCodeAddedEvent {
-	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, nil)
+	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, nil, false)
 }
 
 func NewHumanEmailCodeAddedEventV2(
@@ -149,7 +150,9 @@ func NewHumanEmailCodeAddedEventV2(
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	urlTemplate *string) *HumanEmailCodeAddedEvent {
+	urlTemplate *string,
+	codeReturned bool,
+) *HumanEmailCodeAddedEvent {
 	return &HumanEmailCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
