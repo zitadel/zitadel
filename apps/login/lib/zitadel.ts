@@ -1,20 +1,16 @@
-import { ZitadelOptions } from "@zitadel/server";
+import { ZitadelServerOptions, getServers } from "@zitadel/server";
 import { getAuth } from "@zitadel/server/auth";
 
-import { getApp, getApps, initializeApp } from "@zitadel/server/app";
-
-export const zitadelConfig: ZitadelOptions = {
+export const zitadelConfig: ZitadelServerOptions = {
   apiUrl: process.env.ZITADEL_API_URL ?? "",
-  projectId: process.env.ZITADEL_PROJECT_ID ?? "",
-  appId: process.env.ZITADEL_APP_ID ?? "",
-  token: "this should be a pat",
+  token: process.env.ZITADEL_SERVICE_USER_TOKEN ?? "",
 };
 
-if (!getApps().length) {
-  initializeApp(zitadelConfig);
+if (!getServers().length) {
+  initializeServer(zitadelConfig);
 }
 
-const app = getApp();
+const server = getServer();
 
 export async function getMyUser(): Promise<GetMyUserResponse> {
   const auth = await getAuth();

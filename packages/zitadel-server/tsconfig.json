@@ -1,8 +1,12 @@
 {
   "extends": "@zitadel/tsconfig/node14.json",
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "*": ["./src/*"],
+      "#/*": ["./src/*"]
+    }
   },
   "exclude": ["dist", "build", "node_modules"]
 }

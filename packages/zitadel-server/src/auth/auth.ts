@@ -5,7 +5,7 @@ import {
   AuthServiceDefinition,
   GetMyUserResponse,
 } from "../proto/server/zitadel/auth";
-import { ZitadelApp } from "../app/app";
+import { ZitadelServer } from "../server";
 import { authMiddleware } from "../middleware";
 
 const createClient = <Client>(
@@ -18,7 +18,7 @@ const createClient = <Client>(
     .create(definition, channel) as Client;
 };
 
-export async function getAuth(app?: ZitadelApp): Promise<AuthServiceClient> {
+export async function getAuth(app?: ZitadelServer): Promise<AuthServiceClient> {
   return createClient<AuthServiceClient>(
     AuthServiceDefinition as CompatServiceDefinition,
     ""

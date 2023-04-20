@@ -7,7 +7,7 @@ import {
 } from "../proto/server/zitadel/management";
 
 import { authMiddleware } from "../middleware";
-import { ZitadelApp, getApps } from "../app/app";
+import { ZitadelServer, getServers } from "../server";
 
 const createClient = <Client>(
   definition: CompatServiceDefinition,
@@ -24,10 +24,10 @@ const createClient = <Client>(
     .create(definition, channel) as Client;
 };
 
-export const getManagement = (app?: string | ZitadelApp) => {
+export const getManagement = (app?: string | ZitadelServer) => {
   let config;
   if (app && typeof app === "string") {
-    const apps = getApps();
+    const apps = getServers();
     config = apps.find((a) => a.name === app)?.config;
   } else if (app && typeof app === "object") {
     config = app.config;
