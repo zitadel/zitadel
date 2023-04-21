@@ -4,6 +4,8 @@ import (
 	"context"
 	"io"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -74,6 +76,30 @@ func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, res
 	return cmd.Push(ctx)
 }
 
+func (c *Commands) VerifyUserEmail(ctx context.Context, userID, code, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
+	if err != nil {
+		return nil, err
+	}
+	gen := crypto.NewEncryptionGenerator(*config, alg)
+	return c.verifyUserEmailWithGenerator(ctx, userID, code, resourceOwner, gen)
+}
+
+func (c *Commands) verifyUserEmailWithGenerator(ctx context.Context, userID, resourceOwner, code string, gen crypto.Generator) (*domain.ObjectDetails, error) {
+	cmd, err := c.NewUserEmailEvents(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	err = cmd.VerifyCode(ctx, code, gen)
+	if err != nil {
+		return nil, err
+	}
+	if _, err = cmd.Push(ctx); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&cmd.model.WriteModel), nil
+}
+
 // UserEmailEvents allows step-by-step additions of events,
 // operating on the Human Email Model.
 type UserEmailEvents struct {
@@ -142,6 +168,21 @@ func (c *UserEmailEvents) AddGeneratedCode(ctx context.Context, gen crypto.Gener
 		c.plainCode = &plain
 	}
 	return nil
+}
+
+func (c *UserEmailEvents) VerifyCode(ctx context.Context, code string, gen crypto.Generator) error {
+	if code == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
+	}
+
+	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen)
+	if err == nil {
+		c.events = append(c.events, user.NewHumanEmailVerifiedEvent(ctx, c.aggregate))
+		return nil
+	}
+	_, err = c.eventstore.Push(ctx, user.NewHumanEmailVerificationFailedEvent(ctx, c.aggregate))
+	logging.WithFields("id", "COMMAND-Zoo6b", "userID", c.aggregate.ID).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
+	return caos_errs.ThrowInvalidArgument(err, "COMMAND-eis9R", "Errors.User.Code.Invalid")
 }
 
 // Push all events to the eventstore and Reduce them into the Model.

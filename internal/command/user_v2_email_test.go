@@ -630,6 +630,331 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 	}
 }
 
+func TestCommands_VerifyUserEmail(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		userID        string
+		resourceOwner string
+		code          string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr error
+	}{
+		{
+			name: "missing userID",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyEmailCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				userID:        "",
+				resourceOwner: "org1",
+				code:          "a",
+			},
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
+		},
+		{
+			name: "missing code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyEmailCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				code:          "",
+			},
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty"),
+		},
+		{
+			name: "wrong code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyEmailCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanEmailVerificationFailedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				code:          "wrong",
+			},
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-eis9R", "Errors.User.Code.Invalid"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			_, err := c.VerifyUserEmail(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.code, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			require.ErrorIs(t, err, tt.wantErr)
+			// successful cases are tested in TestCommands_verifyUserEmailWithGenerator
+		})
+	}
+}
+
+func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		userID        string
+		resourceOwner string
+		code          string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *domain.ObjectDetails
+		wantErr error
+	}{
+		{
+			name: "missing userID",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				userID:        "",
+				resourceOwner: "org1",
+				code:          "a",
+			},
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
+		},
+		{
+			name: "missing code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				code:          "",
+			},
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty"),
+		},
+		{
+			name: "good code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanEmailVerificationFailedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				code:          "wrong",
+			},
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-eis9R", "Errors.User.Code.Invalid"),
+		},
+		{
+			name: "wrong code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				code:          "a",
+			},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "org1",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := c.verifyUserEmailWithGenerator(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.code, GetMockSecretGenerator(t))
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, got, tt.want)
+		})
+	}
+}
+
 func TestCommands_NewUserEmailEvents(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore

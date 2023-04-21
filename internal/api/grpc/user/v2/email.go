@@ -3,8 +3,6 @@ package user
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -50,6 +48,21 @@ func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp 
 	}, nil
 }
 
-func (s *Server) VerifyEmail(context.Context, *user.VerifyEmailRequest) (*user.VerifyEmailResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
+func (s *Server) VerifyEmail(ctx context.Context, req *user.VerifyEmailRequest) (*user.VerifyEmailResponse, error) {
+	details, err := s.command.VerifyUserEmail(ctx,
+		req.GetUserId(), req.GetVerificationCode(),
+		authz.GetCtxData(ctx).ResourceOwner,
+		s.userCodeAlg,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &user.VerifyEmailResponse{
+		Details: &grpcContext.ObjectDetails{
+			Sequence:      details.Sequence,
+			CreationDate:  timestamppb.New(details.EventDate),
+			ChangeDate:    timestamppb.New(details.EventDate),
+			ResourceOwner: details.ResourceOwner,
+		},
+	}, nil
 }
