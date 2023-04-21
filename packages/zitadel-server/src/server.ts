@@ -9,17 +9,24 @@ export interface ZitadelServerOptions extends ZitadelServerProps {
   name?: string;
 }
 
-export interface ZitadelServer {
-  name: string | undefined;
-  config: ZitadelServerProps;
-}
-
-export async function initializeServer(
+export function initializeServer(
   config: ZitadelServerProps,
   name?: string
-): Promise<ZitadelServer> {
-  const app = { config, name };
-  return app;
+): ZitadelServer {
+  const server = new ZitadelServer(config, name);
+  return server;
+}
+
+export class ZitadelServer {
+  name: string | undefined;
+  config: ZitadelServerProps;
+
+  constructor(config: ZitadelServerProps, name?: string) {
+    if (name) {
+      this.name = name;
+    }
+    this.config = config;
+  }
 }
 
 export function getServers(): ZitadelServer[] {

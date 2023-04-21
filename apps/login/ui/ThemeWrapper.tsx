@@ -1,12 +1,11 @@
-"use client";
-
 import { getBranding } from "#/lib/zitadel";
-import { useTheme } from "next-themes";
 import { server } from "../lib/zitadel";
+import { use } from "react";
 
 const ThemeWrapper = async ({ children }: any) => {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme && resolvedTheme === "dark";
+  console.log("hehe");
+  //   const { resolvedTheme } = useTheme();
+  const isDark = true; //resolvedTheme && resolvedTheme === "dark";
 
   try {
     const policy = await getBranding(server);

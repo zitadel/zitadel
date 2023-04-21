@@ -1,4 +1,5 @@
 import { demos } from "#/lib/demos";
+import ThemeWrapper from "#/ui/ThemeWrapper";
 import Link from "next/link";
 
 export default function Page() {

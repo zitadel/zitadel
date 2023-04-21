@@ -12,3 +12,6 @@ export const authMiddleware = (token: string) =>
 
     return yield* call.next(call.request, options);
   };
+
+export const orgMetadata = (orgId: string) =>
+  new Metadata({ "x-zitadel-orgid": orgId });

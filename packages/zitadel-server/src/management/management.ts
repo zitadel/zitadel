@@ -25,6 +25,7 @@ const createClient = <Client>(
 };
 
 export const getManagement = (app?: string | ZitadelServer) => {
+  console.log("init management");
   let config;
   if (app && typeof app === "string") {
     const apps = getServers();
