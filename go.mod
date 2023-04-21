@@ -45,6 +45,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.50
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muesli/gamut v0.3.1
+	github.com/muhlemmer/gu v0.3.1
 	github.com/nicksnyder/go-i18n/v2 v2.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.4.0
@@ -90,7 +91,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/pprof v0.0.0-20230323073829-e72429f035bd // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
-	github.com/muhlemmer/gu v0.3.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.14.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
