@@ -141,9 +141,16 @@ module.exports = {
         {
           type: "category",
           label: "Configure Identity Providers",
+          link: {
+            type: "generated-index",
+            title: "Let users login with their preferred identity provider",
+            slug: "/guides/integrate/identity-providers",
+            description:
+              "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
+
+          },
           collapsed: true,
           items: [
-            "guides/integrate/identity-providers/introduction",
             "guides/integrate/identity-providers/google",
             "guides/integrate/identity-providers/azure-ad",
             "guides/integrate/identity-providers/github",
@@ -186,6 +193,14 @@ module.exports = {
         {
           type: "category",
           label: "Services",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your favorite services",
+            slug: "/guides/integrate/services",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your services.",
+
+          },
           collapsed: true,
           items: [
             "guides/integrate/services/gitlab-self-hosted",
@@ -200,6 +215,14 @@ module.exports = {
         {
           type: "category",
           label: "Tools",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your tools",
+            slug: "/guides/integrate/tools",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your favorite tools.",
+
+          },
           collapsed: true,
           items: [
             "guides/integrate/authenticated-mongodb-charts",
@@ -234,6 +257,7 @@ module.exports = {
         "concepts/structure/users",
         "concepts/structure/managers",
         "concepts/structure/policies",
+        "concepts/features/identity-brokering",
         "concepts/structure/jwt_idp",
         "concepts/features/actions",
         "concepts/features/selfservice",
