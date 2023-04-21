@@ -23,7 +23,8 @@ You should consider to implement [exponential backoff](https://en.wikipedia.org/
 :::
 
 :::info Raising limits
-We understand that there are certain scenarios where you must access ZITADEL from one IP Address, for example access behind a corporate proxy or simply many users behind a shared internet connection.
+We understand that there are certain scenarios where your users access ZITADEL from shared IP Addresses.
+For example if you use a corporate proxy or Network Address Translation NAT.
 Please [get in touch](https://zitadel.com/contact) with us to discuss your requirements and we'll find a solution.
 :::
 
