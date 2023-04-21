@@ -79,7 +79,7 @@ type UserEmailEvents struct {
 // If a model cannot be found, or it's state is invalid and error is returned.
 func (c *Commands) NewUserEmailEvents(ctx context.Context, userID, resourceOwner string) (*UserEmailEvents, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
 	}
 
 	model, err := c.emailWriteModel(ctx, userID, resourceOwner)
@@ -87,10 +87,10 @@ func (c *Commands) NewUserEmailEvents(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 	if model.UserState == domain.UserStateUnspecified || model.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ieJ2e", "Errors.User.Email.NotFound")
 	}
 	if model.UserState == domain.UserStateInitial {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J8dsk", "Errors.User.NotInitialised")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-uz0Uu", "Errors.User.NotInitialised")
 	}
 	return &UserEmailEvents{
 		eventstore: c.eventstore,
@@ -107,7 +107,7 @@ func (c *UserEmailEvents) Change(ctx context.Context, email domain.EmailAddress)
 	}
 	event, hasChanged := c.model.NewChangedEvent(ctx, c.aggregate, email)
 	if !hasChanged {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2b7fM", "Errors.User.Email.NotChanged")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged")
 	}
 	c.events = append(c.events, event)
 	return nil
