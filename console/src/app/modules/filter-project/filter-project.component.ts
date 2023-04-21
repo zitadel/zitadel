@@ -110,7 +110,7 @@ export class FilterProjectComponent extends FilterComponent implements OnInit {
     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
-  public emitFilter(): void {
+  public override emitFilter(): void {
     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
     this.showFilter = false;
     this.filterOpen.emit(false);

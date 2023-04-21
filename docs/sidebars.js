@@ -126,8 +126,14 @@ module.exports = {
     {
       type: "category",
       label: "Integrate",
+      link: {
+        type: "generated-index",
+        title: "Integrate",
+        slug: "guides/integrate",
+        description:
+          "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
+      },
       items: [
-
         {
           type: "category",
           label: "Authenticate Users",
@@ -141,9 +147,16 @@ module.exports = {
         {
           type: "category",
           label: "Configure Identity Providers",
+          link: {
+            type: "generated-index",
+            title: "Let users login with their preferred identity provider",
+            slug: "/guides/integrate/identity-providers",
+            description:
+              "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
+
+          },
           collapsed: true,
           items: [
-            "guides/integrate/identity-providers/introduction",
             "guides/integrate/identity-providers/google",
             "guides/integrate/identity-providers/azure-ad",
             "guides/integrate/identity-providers/github",
@@ -186,6 +199,14 @@ module.exports = {
         {
           type: "category",
           label: "Services",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your favorite services",
+            slug: "/guides/integrate/services",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your services.",
+
+          },
           collapsed: true,
           items: [
             "guides/integrate/services/gitlab-self-hosted",
@@ -200,6 +221,14 @@ module.exports = {
         {
           type: "category",
           label: "Tools",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your tools",
+            slug: "/guides/integrate/tools",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your favorite tools.",
+
+          },
           collapsed: true,
           items: [
             "guides/integrate/authenticated-mongodb-charts",
@@ -211,12 +240,19 @@ module.exports = {
     {
       type: "category",
       label: "Solution Scenarios",
+      link: {
+        type: "generated-index",
+        title: "Solution Scenarios",
+        slug: "guides/solution-scenarios/introduction",
+        description:
+          "Customers of an SaaS Identity and Access Management System usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into Solution Scenarios which aim to help you getting started with ZITADEL.",
+      },
       collapsed: true,
       items: [
-        "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
-        "concepts/usecases/saas",
+        "guides/solution-scenarios/saas",
+        "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
       ],
     },
@@ -234,6 +270,7 @@ module.exports = {
         "concepts/structure/users",
         "concepts/structure/managers",
         "concepts/structure/policies",
+        "concepts/features/identity-brokering",
         "concepts/structure/jwt_idp",
         "concepts/features/actions",
         "concepts/features/selfservice",
@@ -396,10 +433,9 @@ module.exports = {
       items: ["apis/observability/metrics", "apis/observability/health"],
     },
     {
-      type: "category",
-      label: "Rate Limits",
-      collapsed: false,
-      items: ["apis/ratelimits/ratelimits", "legal/rate-limit-policy"],
+      type: 'link',
+      label: 'Rate Limits (Cloud)', // The link label
+      href: '/legal/rate-limit-policy', // The internal path
     },
   ],
   selfHosting: [

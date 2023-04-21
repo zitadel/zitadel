@@ -267,6 +267,7 @@ func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt *handler.Statement) erro
 	}
 	err = stmt.Execute(tx, h.ProjectionName)
 	if err != nil {
+		logging.WithError(err).Error()
 		_, rollbackErr := tx.Exec("ROLLBACK TO SAVEPOINT push_stmt")
 		if rollbackErr != nil {
 			return errors.ThrowInternal(rollbackErr, "CRDB-zzp3P", "rollback to savepoint failed")

@@ -12,14 +12,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/zitadel/saml/pkg/provider"
-
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/op"
+	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -294,6 +293,7 @@ func startAPIs(
 		return fmt.Errorf("unable to start login: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(login.HandlerPrefix, l.Handler())
+	apis.HandleFunc(login.EndpointDeviceAuth, login.RedirectDeviceAuthToPrefix)
 
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()

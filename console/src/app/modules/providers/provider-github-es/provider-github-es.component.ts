@@ -80,7 +80,7 @@ export class ProviderGithubESComponent {
       });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
-      this.serviceType = data.serviceType;
+      this.serviceType = data['serviceType'];
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
@@ -153,6 +153,7 @@ export class ProviderGithubESComponent {
     req.setClientId(this.clientId?.value);
     req.setClientSecret(this.clientSecret?.value);
     req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
 
     this.loading = true;
     this.service
@@ -183,6 +184,7 @@ export class ProviderGithubESComponent {
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       this.service
