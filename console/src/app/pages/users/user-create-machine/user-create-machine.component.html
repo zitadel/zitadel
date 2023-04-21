@@ -10,11 +10,11 @@
     <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="machine-create-form">
       <div class="machine-create-content">
         <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}*</cnsl-label>
+          <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}</cnsl-label>
           <input cnslInput formControlName="userName" required />
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}*</cnsl-label>
+          <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}</cnsl-label>
           <input cnslInput formControlName="name" required />
         </cnsl-form-field>
         <cnsl-form-field class="formfield">

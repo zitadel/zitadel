@@ -247,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "请填写此栏",
+    "ATLEASTONE": "P至少提供一个值。",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"

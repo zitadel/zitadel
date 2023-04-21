@@ -5,56 +5,50 @@
   $background: map-get($theme, background);
   $is-dark-theme: map-get($theme, is-dark);
   $warn: map-get($theme, warn);
-  $warn-color: map-get($warn, 500);
-  $button-text-color: map-get($foreground, text);
-  $button-disabled-text-color: map-get($foreground, disabled-button);
-  $divider-color: map-get($foreground, dividers);
-  $secondary-text: map-get($foreground, secondary-text);
+  $warncolor: map-get($warn, 500);
 
-  .string-list {
-    width: 100%;
+  .form-array-list {
+    display: flex;
+    flex-direction: row;
     max-width: 400px;
+    background: if($is-dark-theme, #00000020, mat.get-color-from-palette($background, cards));
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding: 0 1rem 0.5rem 1rem;
+    margin-top: 0.5rem;
 
-    .value-line {
+    .list-header-wrapper {
       display: flex;
       align-items: center;
-      margin: 0.5rem 0;
-      padding: 0 0 0 0.75rem;
-      border-radius: 4px;
-      background: map-get($background, infosection);
+      margin: 0.5rem -0.5rem 0 0;
 
-      .fill-space {
-        flex: 1;
-      }
-
-      .icon-button {
-        height: 30px;
-        line-height: 30px;
-
-        .icon {
-          font-size: 1rem;
-          margin-bottom: 3px;
-        }
-
-        &:not(:hover) {
-          color: $secondary-text;
-        }
+      .list-header {
+        font-size: 12px;
       }
     }
-  }
-}
 
-.string-list-form {
-  display: flex;
-  align-items: flex-end;
-  min-width: 320px;
+    .form-field-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
 
-  .formfield {
-    width: 500px;
-  }
+      .element-row {
+        display: flex;
+        align-items: center;
 
-  button {
-    margin-bottom: 0.9rem;
-    margin-right: -0.5rem;
+        .formfield {
+          flex: 1;
+        }
+      }
+
+      .control-error {
+        font-size: 12px;
+        color: $warncolor;
+      }
+    }
+
+    .add-element-btn {
+      margin-bottom: 0rem;
+    }
   }
 }
