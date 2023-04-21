@@ -26,10 +26,19 @@ export function getServers(): ZitadelServer[] {
   return apps;
 }
 
-export function getServer(name?: string): ZitadelServer | undefined {
-  return name
-    ? apps.find((a) => a.name === name)
-    : apps.length === 1
-    ? apps[0]
-    : undefined;
+export function getServer(name?: string): ZitadelServer {
+  if (name) {
+    const found = apps.find((a) => a.name === name);
+    if (found) {
+      return found;
+    } else {
+      throw new Error("No server found");
+    }
+  } else {
+    if (apps.length) {
+      return apps[0];
+    } else {
+      throw new Error("No server found");
+    }
+  }
 }

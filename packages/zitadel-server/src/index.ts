@@ -1,5 +1,6 @@
 export * from "./server";
 export * from "./middleware";
+export * from "./management";
 
 // export * as auth from "./auth";
 // export * as management from "./management";
