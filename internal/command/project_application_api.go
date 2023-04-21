@@ -44,11 +44,10 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashA
 			}
 
 			if app.AuthMethodType == domain.APIAuthMethodTypeBasic {
-				code, err := newAppClientSecret(ctx, filter, clientSecretAlg)
+				app.ClientSecret, app.ClientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
 				if err != nil {
 					return nil, err
 				}
-				app.ClientSecret, app.ClientSecretPlain = code.value, code.plain
 			}
 
 			return []eventstore.Command{

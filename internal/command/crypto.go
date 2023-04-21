@@ -16,7 +16,7 @@ type cryptoCode struct {
 	expiry time.Duration
 }
 
-func newCryptoCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*cryptoCode, error) {
+func newCryptoCodeWithExpiry(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*cryptoCode, error) {
 	config, err := secretGeneratorConfig(ctx, filter, typ)
 	if err != nil {
 		return nil, err
@@ -37,6 +37,22 @@ func newCryptoCode(ctx context.Context, filter preparation.FilterToQueryReducer,
 		return nil, err
 	}
 	return code, nil
+}
+
+func newCryptoCodeWithPlain(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (value *crypto.CryptoValue, plain string, err error) {
+	config, err := secretGeneratorConfig(ctx, filter, typ)
+	if err != nil {
+		return nil, "", err
+	}
+
+	switch a := alg.(type) {
+	case crypto.HashAlgorithm:
+		return crypto.NewCode(crypto.NewHashGenerator(*config, a))
+	case crypto.EncryptionAlgorithm:
+		return crypto.NewCode(crypto.NewEncryptionGenerator(*config, a))
+	}
+
+	return nil, "", errors.ThrowInvalidArgument(nil, "V2-NGESt", "Errors.Internal")
 }
 
 func secretGeneratorConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType) (*crypto.GeneratorConfig, error) {

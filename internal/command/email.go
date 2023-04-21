@@ -18,5 +18,5 @@ func (e *Email) Validate() error {
 }
 
 func newEmailCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*cryptoCode, error) {
-	return newCryptoCode(ctx, filter, domain.SecretGeneratorTypeVerifyEmailCode, alg)
+	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeVerifyEmailCode, alg)
 }

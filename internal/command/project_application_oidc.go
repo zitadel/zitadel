@@ -77,11 +77,10 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.Has
 			}
 
 			if app.AuthMethodType == domain.OIDCAuthMethodTypeBasic || app.AuthMethodType == domain.OIDCAuthMethodTypePost {
-				code, err := newAppClientSecret(ctx, filter, clientSecretAlg)
+				app.ClientSecret, app.ClientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
 				if err != nil {
 					return nil, err
 				}
-				app.ClientSecret, app.ClientSecretPlain = code.value, code.plain
 			}
 
 			return []eventstore.Command{
