@@ -420,10 +420,9 @@ module.exports = {
       items: ["apis/observability/metrics", "apis/observability/health"],
     },
     {
-      type: "category",
-      label: "Rate Limits",
-      collapsed: false,
-      items: ["apis/ratelimits/ratelimits", "legal/rate-limit-policy"],
+      type: 'link',
+      label: 'Rate Limits (Cloud)', // The link label
+      href: '/legal/rate-limit-policy', // The internal path
     },
   ],
   selfHosting: [
