@@ -137,7 +137,7 @@ func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *Perso
 	if err != nil {
 		return nil, err
 	}
-	personalAccessTokens.LatestSequence, err = q.latestSequence(ctx, personalAccessTokensTable)
+	personalAccessTokens.LatestSequence, err = q.latestState(ctx, personalAccessTokensTable)
 	return personalAccessTokens, err
 }
 

@@ -91,7 +91,7 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, with
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-USNwM", "Errors.Query.InvalidRequest")
 	}
 
-	currentSequence, err := q.latestSequence(ctx, instanceMemberTable)
+	currentSequence, err := q.latestState(ctx, instanceMemberTable)
 	if err != nil {
 		return nil, err
 	}

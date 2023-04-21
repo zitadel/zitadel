@@ -1,7 +1,7 @@
 INSERT INTO projections.current_states (
     projection_name
     , instance_id
-    , event_timestamp
+    , event_date
     , last_updated
 ) VALUES (
     $1
@@ -12,6 +12,6 @@ INSERT INTO projections.current_states (
     projection_name
     , instance_id
 ) DO UPDATE SET
-    event_timestamp = $3
+    event_date = $3
     , last_updated = statement_timestamp()
 ;

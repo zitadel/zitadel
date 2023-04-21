@@ -1,7 +1,8 @@
 CREATE TABLE projections.current_states (
     projection_name TEXT NOT NULL
     , instance_id TEXT NOT NULL
-    , event_timestamp TIMESTAMPTZ NOT NULL
+    , event_date TIMESTAMPTZ NOT NULL
+    , sequence INT8 NOT NULL
     , last_updated TIMESTAMPTZ NOT NULL
 
     , PRIMARY KEY (projection_name, instance_id)
@@ -10,13 +11,15 @@ CREATE TABLE projections.current_states (
 INSERT INTO projections.current_states (
     projection_name
     , instance_id
-    , event_timestamp
+    , event_date
     , last_updated
+    , sequence
 ) SELECT 
     cs.projection_name
     , cs.instance_id
     , e.creation_date
     , cs.timestamp
+    , cs.current_sequence
 FROM 
     projections.current_sequences cs
 JOIN eventstore.events e ON

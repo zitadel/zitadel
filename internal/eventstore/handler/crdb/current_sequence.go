@@ -12,8 +12,8 @@ package crdb
 // )
 
 // const (
-// 	currentSequenceStmtFormat          = `SELECT event_timestamp, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
-// 	updateCurrentSequencesStmtFormat   = `INSERT INTO %s (projection_name, instance_id, event_timestamp, last_updated) VALUES `
+// 	currentSequenceStmtFormat          = `SELECT event_date, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
+// 	updateCurrentSequencesStmtFormat   = `INSERT INTO %s (projection_name, instance_id, event_date, last_updated) VALUES `
 // 	updateCurrentSequencesConflictStmt = ` ON CONFLICT (projection_name, instance_id) DO UPDATE SET timestamp = EXCLUDED.timestamp, last_updated = excluded.last_updated`
 // )
 

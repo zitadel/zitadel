@@ -26,9 +26,9 @@ func ViewToPb(view *model.View) *system_pb.View {
 	}
 }
 
-func CurrentSequencesToPb(database string, currentSequences *query.CurrentSequences) []*system_pb.View {
-	v := make([]*system_pb.View, len(currentSequences.CurrentSequences))
-	for i, currentSequence := range currentSequences.CurrentSequences {
+func CurrentSequencesToPb(database string, currentSequences *query.CurrentStates) []*system_pb.View {
+	v := make([]*system_pb.View, len(currentSequences.CurrentStates))
+	for i, currentSequence := range currentSequences.CurrentStates {
 		v[i] = CurrentSequenceToPb(database, currentSequence)
 	}
 	return v

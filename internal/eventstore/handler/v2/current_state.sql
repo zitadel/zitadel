@@ -1,6 +1,6 @@
 SELECT 
     instance_id
-    , event_timestamp
+    , event_date
 FROM 
     projections.current_states
 WHERE

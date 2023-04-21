@@ -24,13 +24,14 @@ const (
 )
 
 type LatestSequence struct {
-	Sequence  uint64
-	Timestamp time.Time
+	EventTimestamp time.Time
+	Sequence       uint64
+	LastUpdated    time.Time
 }
 
-type CurrentSequences struct {
+type CurrentStates struct {
 	SearchResponse
-	CurrentSequences []*CurrentSequence
+	CurrentStates []*CurrentSequence
 }
 
 type CurrentSequence struct {
@@ -45,7 +46,7 @@ type CurrentSequencesSearchQueries struct {
 }
 
 func NewCurrentSequencesInstanceIDSearchQuery(instanceID string) (SearchQuery, error) {
-	return NewTextQuery(CurrentSequenceColInstanceID, instanceID, TextEquals)
+	return NewTextQuery(CurrentStateColInstanceID, instanceID, TextEquals)
 }
 
 func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -56,11 +57,11 @@ func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.Selec
 	return query
 }
 
-func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSequencesSearchQueries) (failedEvents *CurrentSequences, err error) {
+func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSequencesSearchQueries) (failedEvents *CurrentStates, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareCurrentSequencesQuery(ctx, q.client)
+	query, scan := prepareCurrentStateQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
@@ -73,19 +74,19 @@ func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSe
 	return scan(rows)
 }
 
-func (q *Queries) latestSequence(ctx context.Context, projections ...table) (_ *LatestSequence, err error) {
+func (q *Queries) latestState(ctx context.Context, projections ...table) (_ *LatestSequence, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLatestSequence(ctx, q.client)
+	query, scan := prepareLatestState(ctx, q.client)
 	or := make(sq.Or, len(projections))
 	for i, projection := range projections {
-		or[i] = sq.Eq{CurrentSequenceColProjectionName.identifier(): projection.name}
+		or[i] = sq.Eq{CurrentStateColProjectionName.identifier(): projection.name}
 	}
 	stmt, args, err := query.
 		Where(or).
-		Where(sq.Eq{CurrentSequenceColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).
-		OrderBy(CurrentSequenceColCurrentSequence.identifier() + " DESC").
+		Where(sq.Eq{CurrentStateColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).
+		OrderBy(CurrentStateColEventDate.identifier() + " DESC").
 		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
@@ -187,9 +188,9 @@ func reset(tx *sql.Tx, tables []string, projectionName string) error {
 			return errors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
 		}
 	}
-	update, args, err := sq.Update(currentSequencesTable.identifier()).
-		Set(CurrentSequenceColCurrentSequence.name, 0).
-		Where(sq.Eq{CurrentSequenceColProjectionName.name: projectionName}).
+	update, args, err := sq.Update(currentStateTable.identifier()).
+		Set(CurrentStateColEventDate.name, 0).
+		Where(sq.Eq{CurrentStateColProjectionName.name: projectionName}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
@@ -202,57 +203,60 @@ func reset(tx *sql.Tx, tables []string, projectionName string) error {
 	return nil
 }
 
-func prepareLatestSequence(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LatestSequence, error)) {
+func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LatestSequence, error)) {
 	return sq.Select(
-			CurrentSequenceColCurrentSequence.identifier(),
-			CurrentSequenceColTimestamp.identifier()).
-			From(currentSequencesTable.identifier() + db.Timetravel(call.Took(ctx))).
+			CurrentStateColEventDate.identifier(),
+			CurrentStateColSequence.identifier(),
+			CurrentStateColLastUpdated.identifier()).
+			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LatestSequence, error) {
-			seq := new(LatestSequence)
+			state := new(LatestSequence)
 			err := row.Scan(
-				&seq.Sequence,
-				&seq.Timestamp,
+				&state.EventTimestamp,
+				&state.Sequence,
+				&state.LastUpdated,
 			)
 			if err != nil && !errs.Is(err, sql.ErrNoRows) {
 				return nil, errors.ThrowInternal(err, "QUERY-aAZ1D", "Errors.Internal")
 			}
-			return seq, nil
+			return state, nil
 		}
 }
 
-func prepareCurrentSequencesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*CurrentSequences, error)) {
+func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*CurrentStates, error)) {
 	return sq.Select(
-			"max("+CurrentSequenceColCurrentSequence.identifier()+") as "+CurrentSequenceColCurrentSequence.name,
-			"max("+CurrentSequenceColTimestamp.identifier()+") as "+CurrentSequenceColTimestamp.name,
-			CurrentSequenceColProjectionName.identifier(),
+			"max("+CurrentStateColEventDate.identifier()+") as "+CurrentStateColEventDate.name,
+			"max("+CurrentStateColSequence.identifier()+") as "+CurrentStateColSequence.name,
+			"max("+CurrentStateColLastUpdated.identifier()+") as "+CurrentStateColLastUpdated.name,
+			CurrentStateColProjectionName.identifier(),
 			countColumn.identifier()).
-			From(currentSequencesTable.identifier() + db.Timetravel(call.Took(ctx))).
-			GroupBy(CurrentSequenceColProjectionName.identifier()).
+			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
+			GroupBy(CurrentStateColProjectionName.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*CurrentSequences, error) {
-			currentSequences := make([]*CurrentSequence, 0)
+		func(rows *sql.Rows) (*CurrentStates, error) {
+			states := make([]*CurrentSequence, 0)
 			var count uint64
 			for rows.Next() {
-				currentSequence := new(CurrentSequence)
+				currentState := new(CurrentSequence)
 				err := rows.Scan(
-					&currentSequence.CurrentSequence,
-					&currentSequence.Timestamp,
-					&currentSequence.ProjectionName,
+					&currentState.Timestamp,
+					&currentState.CurrentSequence,
+					&currentState.ProjectionName,
 					&count,
 				)
 				if err != nil {
 					return nil, err
 				}
-				currentSequences = append(currentSequences, currentSequence)
+				states = append(states, currentState)
 			}
 
 			if err := rows.Close(); err != nil {
 				return nil, errors.ThrowInternal(err, "QUERY-jbJ77", "Errors.Query.CloseRows")
 			}
 
-			return &CurrentSequences{
-				CurrentSequences: currentSequences,
+			return &CurrentStates{
+				CurrentStates: states,
 				SearchResponse: SearchResponse{
 					Count: count,
 				},
@@ -261,29 +265,29 @@ func prepareCurrentSequencesQuery(ctx context.Context, db prepareDatabase) (sq.S
 }
 
 var (
-	currentSequencesTable = table{
-		name:          projection.CurrentSeqTable,
+	currentStateTable = table{
+		name:          projection.CurrentStateTable,
 		instanceIDCol: "instance_id",
 	}
-	CurrentSequenceColAggregateType = Column{
-		name:  "aggregate_type",
-		table: currentSequencesTable,
+	CurrentStateColEventDate = Column{
+		name:  "event_date",
+		table: currentStateTable,
 	}
-	CurrentSequenceColCurrentSequence = Column{
-		name:  "current_sequence",
-		table: currentSequencesTable,
+	CurrentStateColSequence = Column{
+		name:  "sequence",
+		table: currentStateTable,
 	}
-	CurrentSequenceColTimestamp = Column{
-		name:  "timestamp",
-		table: currentSequencesTable,
+	CurrentStateColLastUpdated = Column{
+		name:  "last_updated",
+		table: currentStateTable,
 	}
-	CurrentSequenceColProjectionName = Column{
+	CurrentStateColProjectionName = Column{
 		name:  "projection_name",
-		table: currentSequencesTable,
+		table: currentStateTable,
 	}
-	CurrentSequenceColInstanceID = Column{
+	CurrentStateColInstanceID = Column{
 		name:  "instance_id",
-		table: currentSequencesTable,
+		table: currentStateTable,
 	}
 )
 

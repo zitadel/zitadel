@@ -202,7 +202,7 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (_ *PublicK
 	if err != nil {
 		return nil, err
 	}
-	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
+	keys.LatestSequence, err = q.latestState(ctx, keyTable)
 	if !errors.IsNotFound(err) {
 		return keys, err
 	}
@@ -237,7 +237,7 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (_ *
 	if err != nil {
 		return nil, err
 	}
-	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
+	keys.LatestSequence, err = q.latestState(ctx, keyTable)
 	if !errors.IsNotFound(err) {
 		return keys, err
 	}

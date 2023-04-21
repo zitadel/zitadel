@@ -12,7 +12,7 @@ CREATE TABLE auth.locks (
 CREATE TABLE auth.current_sequences (
     view_name TEXT,
     current_sequence BIGINT,
-    event_timestamp TIMESTAMPTZ,
+    event_date TIMESTAMPTZ,
     last_successful_spooler_run TIMESTAMPTZ,
     instance_id TEXT NOT NULL,
 

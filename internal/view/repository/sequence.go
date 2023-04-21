@@ -14,7 +14,7 @@ import (
 type CurrentSequence struct {
 	ViewName                 string    `gorm:"column:view_name;primary_key"`
 	CurrentSequence          uint64    `gorm:"column:current_sequence"`
-	EventTimestamp           time.Time `gorm:"column:event_timestamp"`
+	EventTimestamp           time.Time `gorm:"column:event_date"`
 	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
 	InstanceID               string    `gorm:"column:instance_id;primary_key"`
 }
@@ -117,7 +117,7 @@ func SaveCurrentSequence(db *gorm.DB, table, viewName, instanceID string, sequen
 
 func SaveCurrentSequences(db *gorm.DB, table, viewName string, sequence uint64, eventTimestamp time.Time) error {
 	err := db.Table(table).Where("view_name = ?", viewName).
-		Updates(map[string]interface{}{"current_sequence": sequence, "event_timestamp": eventTimestamp, "last_successful_spooler_run": time.Now()}).Error
+		Updates(map[string]interface{}{"current_sequence": sequence, "event_date": eventTimestamp, "last_successful_spooler_run": time.Now()}).Error
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "VIEW-Sfdqs", "unable to updated processed sequence")
 	}

@@ -275,7 +275,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, errors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")
 	}
 
-	latestSequence, err := q.latestSequence(ctx, userGrantTable)
+	latestSequence, err := q.latestState(ctx, userGrantTable)
 	if err != nil {
 		return nil, err
 	}

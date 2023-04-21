@@ -39,7 +39,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 	}{
 		{
 			name:    "prepareCurrentSequencesQuery no result",
-			prepare: prepareCurrentSequencesQuery,
+			prepare: prepareCurrentStateQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(currentSequenceStmt),
@@ -47,11 +47,11 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					nil,
 				),
 			},
-			object: &CurrentSequences{CurrentSequences: []*CurrentSequence{}},
+			object: &CurrentStates{CurrentStates: []*CurrentSequence{}},
 		},
 		{
 			name:    "prepareCurrentSequencesQuery one result",
-			prepare: prepareCurrentSequencesQuery,
+			prepare: prepareCurrentStateQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(currentSequenceStmt),
@@ -65,11 +65,11 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &CurrentSequences{
+			object: &CurrentStates{
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				CurrentSequences: []*CurrentSequence{
+				CurrentStates: []*CurrentSequence{
 					{
 						Timestamp:       testNow,
 						CurrentSequence: 20211108,
@@ -80,7 +80,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareCurrentSequencesQuery multiple result",
-			prepare: prepareCurrentSequencesQuery,
+			prepare: prepareCurrentStateQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(currentSequenceStmt),
@@ -99,11 +99,11 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &CurrentSequences{
+			object: &CurrentStates{
 				SearchResponse: SearchResponse{
 					Count: 2,
 				},
-				CurrentSequences: []*CurrentSequence{
+				CurrentStates: []*CurrentSequence{
 					{
 						Timestamp:       testNow,
 						CurrentSequence: 20211108,
@@ -119,7 +119,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareCurrentSequencesQuery sql err",
-			prepare: prepareCurrentSequencesQuery,
+			prepare: prepareCurrentStateQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(currentSequenceStmt),
