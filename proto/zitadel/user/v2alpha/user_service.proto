@@ -67,6 +67,7 @@ message AddUserRequest{
 message AddUserResponse {
   string user_id = 1;
   zitadel.object.v2alpha.Details details = 2;
+  optional string email_code = 3;
 }
 
 message UpdateUserRequest{

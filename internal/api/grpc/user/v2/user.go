@@ -5,7 +5,6 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -18,18 +17,18 @@ func (s *Server) AddUser(ctx context.Context, req *user.AddUserRequest) (_ *user
 	if err != nil {
 		return nil, err
 	}
-	var details *domain.HumanDetails
-	if req.UserId != nil {
-		details, err = s.command.AddHumanWithID(ctx, authz.GetCtxData(ctx).OrgID, req.GetUserId(), human, false)
-	} else {
-		details, err = s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human, false)
-	}
+	err = s.command.AddHuman(ctx, req.GetOrganisation().GetOrgId(), human, false)
 	if err != nil {
 		return nil, err
 	}
+	var emailCode *string
+	if req.GetEmail().GetReturnCode() != nil {
+		emailCode = &human.Email.VerificationCode
+	}
 	return &user.AddUserResponse{
-		UserId:  details.ID,
-		Details: object.DomainToDetailsPb(&details.ObjectDetails),
+		UserId:    human.ID,
+		Details:   object.DomainToDetailsPb(human.Details),
+		EmailCode: emailCode,
 	}, nil
 }
 
@@ -51,14 +50,16 @@ func addUserRequestToAddHuman(req *user.AddUserRequest) (*command.AddHuman, erro
 	}
 	passwordChangeRequired := req.GetPassword().GetChangeRequired() || req.GetHashedPassword().GetChangeRequired()
 	return &command.AddHuman{
+		ID:          req.GetUserId(),
 		Username:    username,
 		FirstName:   req.GetProfile().GetFirstName(),
 		LastName:    req.GetProfile().GetLastName(),
 		NickName:    req.GetProfile().GetNickName(),
 		DisplayName: req.GetProfile().GetDisplayName(),
 		Email: command.Email{
-			Address:  domain.EmailAddress(req.GetEmail().GetEmail()),
-			Verified: req.GetEmail().GetIsVerified(), //TODO: oneof
+			Address:    domain.EmailAddress(req.GetEmail().GetEmail()),
+			Verified:   req.GetEmail().GetIsVerified(), //TODO: oneof
+			ReturnCode: req.GetEmail().GetReturnCode() != nil,
 		},
 		PreferredLanguage:      language.Make(req.GetProfile().GetPreferredLanguage()),
 		Gender:                 genderToDomain(req.GetProfile().GetGender()),
