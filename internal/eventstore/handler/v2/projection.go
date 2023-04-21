@@ -85,23 +85,24 @@ func (h *Handler) schedule(ctx context.Context) {
 			t.Stop()
 			return
 		case <-t.C:
-			instances, err := h.instances(ctx, didInitialize)
-			logging.OnError(err).Debug("unable to query instances")
+			instances, err := h.queryInstances(ctx, didInitialize)
+			h.log().OnError(err).Debug("unable to query instances")
 
+			var instanceFailed bool
 			for _, instance := range instances {
 				instanceCtx := authz.WithInstanceID(ctx, instance)
 				err = h.Trigger(instanceCtx)
-				logging.WithFields("projection", h.projection.Name(), "instance", instance).OnError(err).Info("scheduled trigger failed")
+				instanceFailed = instanceFailed || err != nil
+				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
 			}
 
-			if err == nil {
-				if !didInitialize {
-					// TODO(adlerhurst): are multiple succeed writes a problem?
-					err = h.setSucceededOnce(ctx)
-					logging.OnError(err).Debug("unable to set succeeded once")
-				}
-				didInitialize = err == nil
+			if !didInitialize && !instanceFailed {
+				// TODO(adlerhurst): are multiple succeed writes a problem?
+				err = h.setSucceededOnce(ctx)
+				h.log().OnError(err).Debug("unable to set succeeded once")
+				didInitialize = err != nil
 			}
+
 			t.Reset(h.requeueEvery)
 		}
 	}
@@ -114,14 +115,14 @@ func (h *Handler) subscribe(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			subscription.Unsubscribe()
-			logging.WithFields("projection", h.projection.Name()).Debug("shutdown")
+			h.log().Debug("shutdown")
 		case <-queue:
 
 		}
 	}
 }
 
-func (h *Handler) instances(ctx context.Context, didInitialize bool) ([]string, error) {
+func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]string, error) {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 		AllowTimeTravel().
 		AddQuery().
@@ -133,37 +134,6 @@ func (h *Handler) instances(ctx context.Context, didInitialize bool) ([]string, 
 	return h.es.InstanceIDs(ctx, query.Builder())
 }
 
-const (
-	schedulerSucceeded = eventstore.EventType("system.projections.scheduler.succeeded")
-	aggregateType      = eventstore.AggregateType("system")
-	aggregateID        = "SYSTEM"
-)
-
-func (h *Handler) didProjectionInitialize(ctx context.Context) bool {
-	events, err := h.es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AddQuery().
-		AggregateTypes(aggregateType).
-		AggregateIDs(aggregateID).
-		EventTypes(schedulerSucceeded).
-		EventData(map[string]interface{}{
-			"name": h.projection.Name(),
-		}).
-		Builder(),
-	)
-	return len(events) > 0 && err == nil
-}
-
-func (h *Handler) setSucceededOnce(ctx context.Context) error {
-	_, err := h.es.Push(ctx, &ProjectionSucceededEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(ctx,
-			eventstore.NewAggregate(ctx, aggregateID, aggregateType, "v1"),
-			schedulerSucceeded,
-		),
-		Name: h.projection.Name(),
-	})
-	return err
-}
-
 func (h *Handler) Trigger(ctx context.Context) (err error) {
 	tx, err := h.client.Begin()
 	if err != nil {
@@ -173,7 +143,7 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 	defer func() {
 		if err != nil {
 			rollbackErr := tx.Rollback()
-			logging.WithFields("projection", h.projection.Name()).OnError(rollbackErr).Debug("unable to rollback trigger")
+			h.log().OnError(rollbackErr).Debug("unable to rollback trigger")
 			return
 		}
 		err = tx.Commit()
@@ -183,6 +153,8 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 	if err != nil {
 		return err
 	}
+
+	// TODO: check if bulk limit exeeded
 
 	events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, currentState))
 	if err != nil || len(events) == 0 {
@@ -218,9 +190,6 @@ func (h *Handler) eventsToStatements(events []eventstore.Event) (statements []*S
 	statements = make([]*Statement, len(events))
 	for i, event := range events {
 		statements[i], err = h.reduce(event)
-		if statements[i] == nil {
-			statements[i], err = h.reduce(event)
-		}
 		if err != nil {
 			return nil, err
 		}
@@ -252,4 +221,8 @@ func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *stat
 		AggregateTypes(h.aggregates...).
 		CreationDateAfter(currentState.EventTimestamp.Add(-1 * time.Microsecond)).
 		Builder()
+}
+
+func (h *Handler) log() *logging.Entry {
+	return logging.WithFields("projection", h.projection.Name())
 }

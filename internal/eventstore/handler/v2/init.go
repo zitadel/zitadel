@@ -203,7 +203,7 @@ func (h *Handler) Init(ctx context.Context) error {
 		logging.WithFields("projection", h.projection.Name(), "execute", i).Debug("executing check")
 		next, err := execute(h.client, h.projection.Name())
 		if err != nil {
-			tx.Rollback()
+			logging.OnError(tx.Rollback()).Debug("unable to rollback")
 			return err
 		}
 		if !next {
@@ -279,11 +279,11 @@ func isErrAlreadyExists(err error) bool {
 	if !errors.As(err, &caosErr) {
 		return false
 	}
-	sqlErr, ok := caosErr.GetParent().(*pgconn.PgError)
-	if !ok {
-		return false
+	pgErr := new(pgconn.PgError)
+	if errors.As(caosErr.Parent, &pgErr) {
+		return pgErr.Code == "42P07"
 	}
-	return sqlErr.Code == "42P07"
+	return false
 }
 
 func createTableStatement(table *Table, tableName string, suffix string) string {
