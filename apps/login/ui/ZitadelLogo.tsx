@@ -17,22 +17,16 @@ export function ZitadelLogo({ height = 40, width = 147.5 }: Props) {
           width={width}
           src="/zitadel-logo-light.svg"
           alt="zitadel logo"
-          style={{
-            maxWidth: "100%",
-            height: "auto",
-          }}
+          priority={true}
         />
       </div>
       <div className="flex dark:hidden">
         <Image
           height={height}
           width={width}
+          priority={true}
           src="/zitadel-logo-dark.svg"
           alt="zitadel logo"
-          style={{
-            maxWidth: "100%",
-            height: "auto",
-          }}
         />
       </div>
     </>

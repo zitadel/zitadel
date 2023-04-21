@@ -1,32 +1,35 @@
 import { getBranding } from "#/lib/zitadel";
 import { server } from "../lib/zitadel";
-import { use } from "react";
 
 const ThemeWrapper = async ({ children }: any) => {
   console.log("hehe");
-  //   const { resolvedTheme } = useTheme();
-  const isDark = true; //resolvedTheme && resolvedTheme === "dark";
+
+  const defaultClasses = "bg-background-light-600 dark:bg-background-dark-600";
 
   try {
     const policy = await getBranding(server);
 
-    const backgroundStyle = {
-      backgroundColor: `${policy?.backgroundColorDark}.`,
+    const darkStyles = {
+      backgroundColor: `${policy?.backgroundColorDark}`,
+      color: `${policy?.fontColorDark}`,
+    };
+
+    const lightStyles = {
+      backgroundColor: `${policy?.backgroundColor}`,
+      color: `${policy?.fontColor}`,
     };
 
     console.log(policy);
 
     return (
-      <div className={`${isDark ? "ui-dark" : "ui-light"} `}>
-        <div style={backgroundStyle}>{children}</div>
+      <div className={defaultClasses} style={darkStyles}>
+        {children}
       </div>
     );
   } catch (error) {
     console.error(error);
 
-    return (
-      <div className={`${isDark ? "ui-dark" : "ui-light"} `}>{children}</div>
-    );
+    return <div className={defaultClasses}>{children}</div>;
   }
 };
 

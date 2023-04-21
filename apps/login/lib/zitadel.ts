@@ -28,6 +28,7 @@ export function getBranding(
   server: ZitadelServer
 ): Promise<LabelPolicy | undefined> {
   const mgmt = getManagement(server);
+  console.log(process.env.ZITADEL_ORG_ID);
   return mgmt
     .getLabelPolicy(
       {},
