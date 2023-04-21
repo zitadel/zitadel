@@ -6,8 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 )
 
 const (
@@ -17,7 +16,7 @@ const (
 )
 
 var (
-	projectionConfig                    crdb.StatementHandlerConfig
+	projectionConfig                    handler.Config
 	OrgProjection                       *orgProjection
 	OrgMetadataProjection               *orgMetadataProjection
 	ActionProjection                    *actionProjection
@@ -77,23 +76,30 @@ var (
 )
 
 func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
-	projectionConfig = crdb.StatementHandlerConfig{
-		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
-			HandlerConfig: handler.HandlerConfig{
-				Eventstore: es,
-			},
-			RequeueEvery:          config.RequeueEvery,
-			RetryFailedAfter:      config.RetryFailedAfter,
-			Retries:               config.MaxFailureCount,
-			ConcurrentInstances:   config.ConcurrentInstances,
-			HandleActiveInstances: config.HandleActiveInstances,
-		},
-		Client:            sqlClient,
-		SequenceTable:     CurrentSeqTable,
-		LockTable:         LocksTable,
-		FailedEventsTable: FailedEventsTable,
-		MaxFailureCount:   config.MaxFailureCount,
-		BulkLimit:         config.BulkLimit,
+	// projectionConfig = crdb.StatementHandlerConfig{
+	// 	ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
+	// 		HandlerConfig: handler.HandlerConfig{
+	// 			Eventstore: es,
+	// 		},
+	// 		RequeueEvery:          config.RequeueEvery,
+	// 		RetryFailedAfter:      config.RetryFailedAfter,
+	// 		Retries:               config.MaxFailureCount,
+	// 		ConcurrentInstances:   config.ConcurrentInstances,
+	// 		HandleActiveInstances: config.HandleActiveInstances,
+	// 	},
+	// 	Client:            sqlClient,
+	// 	SequenceTable:     CurrentSeqTable,
+	// 	LockTable:         LocksTable,
+	// 	FailedEventsTable: FailedEventsTable,
+	// 	MaxFailureCount:   config.MaxFailureCount,
+	// 	BulkLimit:         config.BulkLimit,
+	// }
+	projectionConfig = handler.Config{
+		Client:                sqlClient,
+		Eventstore:            es,
+		BulkLimit:             uint16(config.BulkLimit),
+		RequeueEvery:          config.RequeueEvery,
+		HandleActiveInstances: config.HandleActiveInstances,
 	}
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
@@ -160,23 +166,23 @@ func Start() {
 	}
 }
 
-func ApplyCustomConfig(customConfig CustomConfig) crdb.StatementHandlerConfig {
+func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
 	return applyCustomConfig(projectionConfig, customConfig)
 }
 
-func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomConfig) crdb.StatementHandlerConfig {
-	if customConfig.BulkLimit != nil {
-		config.BulkLimit = *customConfig.BulkLimit
-	}
-	if customConfig.MaxFailureCount != nil {
-		config.MaxFailureCount = *customConfig.MaxFailureCount
-	}
+func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler.Config {
+	// if customConfig.BulkLimit != nil {
+	// 	config.BulkLimit = *customConfig.BulkLimit
+	// }
+	// if customConfig.MaxFailureCount != nil {
+	// 	config.MaxFailureCount = *customConfig.MaxFailureCount
+	// }
 	if customConfig.RequeueEvery != nil {
 		config.RequeueEvery = *customConfig.RequeueEvery
 	}
-	if customConfig.RetryFailedAfter != nil {
-		config.RetryFailedAfter = *customConfig.RetryFailedAfter
-	}
+	// if customConfig.RetryFailedAfter != nil {
+	// 	config.RetryFailedAfter = *customConfig.RetryFailedAfter
+	// }
 	if customConfig.HandleActiveInstances != nil {
 		config.HandleActiveInstances = *customConfig.HandleActiveInstances
 	}

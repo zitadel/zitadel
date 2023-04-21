@@ -2,7 +2,7 @@ package handler
 
 import "context"
 
-//Init initializes the projection with the given check
+// Init initializes the projection with the given check
 type Init func(context.Context, *Check) error
 
 type Check struct {

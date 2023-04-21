@@ -1,4 +1,4 @@
-CREATE TABLE projections.current_state (
+CREATE TABLE projections.current_states (
     projection_name TEXT NOT NULL
     , instance_id TEXT NOT NULL
     , event_timestamp TIMESTAMPTZ NOT NULL
@@ -7,7 +7,7 @@ CREATE TABLE projections.current_state (
     , PRIMARY KEY (projection_name, instance_id)
 );
 
-INSERT INTO projections.current_state (
+INSERT INTO projections.current_states (
     projection_name
     , instance_id
     , event_timestamp
