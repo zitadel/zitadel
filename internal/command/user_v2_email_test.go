@@ -192,6 +192,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 				userID:        "user1",
 				resourceOwner: "org1",
 				email:         "email@test.ch",
+				urlTmpl:       "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
 			},
 			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
 		},
@@ -524,7 +525,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 								),
 							),
 							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEvent(context.Background(),
+								user.NewHumanEmailCodeAddedEventV2(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
@@ -533,6 +534,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 										Crypted:    []byte("a"),
 									},
 									time.Hour*1,
+									nil, false,
 								),
 							),
 						},
@@ -585,7 +587,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 								),
 							),
 							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEvent(context.Background(),
+								user.NewHumanEmailCodeAddedEventV2(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
@@ -594,6 +596,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 										Crypted:    []byte("a"),
 									},
 									time.Hour*1,
+									nil, true,
 								),
 							),
 						},
@@ -615,6 +618,68 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				EmailAddress:    "email-changed@test.ch",
 				IsEmailVerified: false,
 				PlainCode:       gu.Ptr("a"),
+			},
+		},
+		{
+			name: "email changed, URL template",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanEmailChangedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"email-changed@test.ch",
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailCodeAddedEventV2(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour*1,
+									gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"), false,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				email:         "email-changed@test.ch",
+				returnCode:    false,
+				urlTmpl:       gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+			},
+			want: &domain.Email{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID:   "user1",
+					ResourceOwner: "org1",
+				},
+				EmailAddress:    "email-changed@test.ch",
+				IsEmailVerified: false,
 			},
 		},
 	}
@@ -737,7 +802,7 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEvent(context.Background(),
+							user.NewHumanEmailCodeAddedEventV2(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -746,6 +811,7 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								nil, false,
 							),
 						),
 					),
@@ -859,7 +925,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEvent(context.Background(),
+							user.NewHumanEmailCodeAddedEventV2(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -868,6 +934,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								nil, false,
 							),
 						),
 					),
@@ -910,7 +977,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanEmailCodeAddedEvent(context.Background(),
+							user.NewHumanEmailCodeAddedEventV2(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -919,6 +986,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								nil, false,
 							),
 						),
 					),

@@ -66,22 +66,24 @@ func NewEmailCode(emailGenerator crypto.Generator) (*EmailCode, string, error) {
 	}, code, nil
 }
 
+type ConfirmURLData struct {
+	UserID string
+	Code   string
+	OrgID  string
+}
+
+// RenderConfirmURLTemplate parses and renders tmplStr.
+// userID, code and orgID are passed into the [ConfirmURLData].
+// "%s%s?userID=%s&code=%s&orgID=%s"
 func RenderConfirmURLTemplate(w io.Writer, tmplStr, userID, code, orgID string) error {
 	tmpl, err := template.New("").Parse(tmplStr)
 	if err != nil {
 		return caos_errs.ThrowInvalidArgument(err, "USERv2-ooD8p", "Errors.User.V2.Email.InvalidURLTemplate")
 	}
 
-	data := struct {
-		UserID, Code, orgID string
-	}{
-		userID, code, orgID,
-	}
-
-	if err = tmpl.Execute(w, &data); err != nil {
-		if err != nil {
-			return caos_errs.ThrowInvalidArgument(err, "USERv2-ohSi5", "Errors.User.V2.Email.InvalidURLTemplate")
-		}
+	data := &ConfirmURLData{userID, code, orgID}
+	if err = tmpl.Execute(w, data); err != nil {
+		return caos_errs.ThrowInvalidArgument(err, "USERv2-ohSi5", "Errors.User.V2.Email.InvalidURLTemplate")
 	}
 
 	return nil
