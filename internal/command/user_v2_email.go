@@ -11,10 +11,22 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
+func (c *Commands) newUserEmailCodeGenerator(ctx context.Context, alg crypto.EncryptionAlgorithm) (crypto.Generator, error) {
+	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
+	if err != nil {
+		return nil, err
+	}
+	return crypto.NewEncryptionGenerator(*config, alg), nil
+}
+
 // ChangeUserEmail sets a user's email address, generates a code
 // and triggers a notification e-mail with the default confirmation URL format.
 func (c *Commands) ChangeUserEmail(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.changeUserEmail(ctx, userID, resourceOwner, email, alg, false, nil)
+	gen, err := c.newUserEmailCodeGenerator(ctx, alg)
+	if err != nil {
+		return nil, err
+	}
+	return c.changeUserEmail(ctx, userID, resourceOwner, email, gen, false, nil)
 }
 
 // ChangeUserEmailURLTemplate sets a user's email address, generates a code
@@ -24,13 +36,21 @@ func (c *Commands) ChangeUserEmailURLTemplate(ctx context.Context, userID, resou
 	if err := domain.RenderConfirmURLTemplate(io.Discard, urlTmpl, userID, "code", "orgID"); err != nil {
 		return nil, err
 	}
-	return c.changeUserEmail(ctx, userID, resourceOwner, email, alg, false, &urlTmpl)
+	gen, err := c.newUserEmailCodeGenerator(ctx, alg)
+	if err != nil {
+		return nil, err
+	}
+	return c.changeUserEmail(ctx, userID, resourceOwner, email, gen, false, &urlTmpl)
 }
 
 // ChangeUserEmailReturnCode sets a user's email address, generates a code and does not send a notification email.
 // The generated plain text code will be set in the returned Email object.
 func (c *Commands) ChangeUserEmailReturnCode(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.changeUserEmail(ctx, userID, resourceOwner, email, alg, true, nil)
+	gen, err := c.newUserEmailCodeGenerator(ctx, alg)
+	if err != nil {
+		return nil, err
+	}
+	return c.changeUserEmail(ctx, userID, resourceOwner, email, gen, true, nil)
 }
 
 // ChangeUserEmailVerified sets a user's email address and marks it is verified.
@@ -44,7 +64,7 @@ func (c *Commands) ChangeUserEmailVerified(ctx context.Context, userID, resource
 // returnCode controls if the plain text version of the code will be set in the return object.
 // When the plain text code is returned, no notification e-mail will be send to the user.
 // urlTmpl allows changing the target URL that is used by the e-mail annd should be a valid Go template.
-func (c *Commands) changeUserEmail(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl *string) (*domain.Email, error) {
+func (c *Commands) changeUserEmail(ctx context.Context, userID, resourceOwner, email string, gen crypto.Generator, returnCode bool, urlTmpl *string) (*domain.Email, error) {
 	cmd, err := c.NewUserEmailEvents(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -52,11 +72,11 @@ func (c *Commands) changeUserEmail(ctx context.Context, userID, resourceOwner, e
 	if err = cmd.Change(ctx, domain.EmailAddress(email)); err != nil {
 		return nil, err
 	}
-	if alg == nil {
+	if gen == nil {
 		cmd.SetVerified(ctx)
 		return cmd.Push(ctx)
 	}
-	if err = cmd.AddGeneratedCode(ctx, alg, urlTmpl, returnCode); err != nil {
+	if err = cmd.AddGeneratedCode(ctx, gen, urlTmpl, returnCode); err != nil {
 		return nil, err
 	}
 
@@ -120,14 +140,15 @@ func (c *UserEmailEvents) SetVerified(ctx context.Context) {
 
 // AddGeneratedCode generates a new encrypted code and sets it to the email address.
 // When returnCode a plain text of the code will be returned from Push.
-func (c *UserEmailEvents) AddGeneratedCode(ctx context.Context, alg crypto.EncryptionAlgorithm, urlTmpl *string, returnCode bool) error {
-	code, err := newEmailCode(ctx, c.eventstore.Filter, alg)
+func (c *UserEmailEvents) AddGeneratedCode(ctx context.Context, gen crypto.Generator, urlTmpl *string, returnCode bool) error {
+	value, plain, err := crypto.NewCode(gen)
 	if err != nil {
 		return err
 	}
-	c.events = append(c.events, user.NewHumanEmailCodeAddedEventV2(ctx, c.aggregate, code.value, code.expiry, urlTmpl, returnCode))
+
+	c.events = append(c.events, user.NewHumanEmailCodeAddedEventV2(ctx, c.aggregate, value, gen.Expiry(), urlTmpl, returnCode))
 	if returnCode {
-		c.plainCode = &code.plain
+		c.plainCode = &plain
 	}
 	return nil
 }
