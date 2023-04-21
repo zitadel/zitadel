@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package zitadel.context.v2alpha;
+package zitadel.object.v2alpha;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/context/v2alpha;context";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha;object";
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -14,7 +14,7 @@ message OrgContext {
   }
 }
 
-message ObjectDetails {
+message Details {
   //sequence represents the order of events. It's always counting
   //
   // on read: the sequence of the last event reduced by the projection
@@ -25,20 +25,14 @@ message ObjectDetails {
       example: "\"2\"";
     }
   ];
-  //creation_date is the timestamp where the first operation on the object was made
-  //
-  // on read: the timestamp of the first event of the object
-  //
-  // on create: the timestamp of the event(s) added by the manipulation
-  google.protobuf.Timestamp creation_date = 2;
   //change_date is the timestamp when the object was changed
   //
   // on read: the timestamp of the last event reduced by the projection
   //
   // on manipulation: the timestamp of the event(s) added by the manipulation
-  google.protobuf.Timestamp change_date = 3;
+  google.protobuf.Timestamp change_date = 2;
   //resource_owner is the organization or instance_id an object belongs to
-  string resource_owner = 4 [
+  string resource_owner = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\"";
     }

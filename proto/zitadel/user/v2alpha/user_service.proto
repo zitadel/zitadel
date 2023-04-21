@@ -3,7 +3,7 @@ syntax = "proto3";
 package zitadel.user.v2alpha;
 
 import "zitadel/options.proto";
-import "zitadel/context/v2alpha/context.proto";
+import "zitadel/object/v2alpha/object.proto";
 import "zitadel/user/v2alpha/email.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -19,12 +19,20 @@ service UserService {
       post: "/v2alpha/users/{user_id}/email"
       body: "*"
     };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated"
+    };
   }
 
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users/{user_id}/email/_verify"
       body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated"
     };
   }
 }
@@ -57,7 +65,7 @@ message SetEmailRequest{
 }
 
 message SetEmailResponse{
-  zitadel.context.v2alpha.ObjectDetails details = 1;
+  zitadel.object.v2alpha.Details details = 1;
   // TODO: should we have a oneOf? (maybe lifetime will be added)
   optional string verification_code = 2;
 }
@@ -85,5 +93,5 @@ message VerifyEmailRequest{
 }
 
 message VerifyEmailResponse{
-  zitadel.context.v2alpha.ObjectDetails details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	grpcContext "github.com/zitadel/zitadel/pkg/grpc/context/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -38,9 +38,8 @@ func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp 
 	}
 
 	return &user.SetEmailResponse{
-		Details: &grpcContext.ObjectDetails{
+		Details: &object.Details{
 			Sequence:      email.Sequence,
-			CreationDate:  timestamppb.New(email.CreationDate),
 			ChangeDate:    timestamppb.New(email.ChangeDate),
 			ResourceOwner: email.ResourceOwner,
 		},
@@ -58,9 +57,8 @@ func (s *Server) VerifyEmail(ctx context.Context, req *user.VerifyEmailRequest) 
 		return nil, err
 	}
 	return &user.VerifyEmailResponse{
-		Details: &grpcContext.ObjectDetails{
+		Details: &object.Details{
 			Sequence:      details.Sequence,
-			CreationDate:  timestamppb.New(details.EventDate),
 			ChangeDate:    timestamppb.New(details.EventDate),
 			ResourceOwner: details.ResourceOwner,
 		},
