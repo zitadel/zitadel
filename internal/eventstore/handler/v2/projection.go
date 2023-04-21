@@ -173,7 +173,8 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 	defer func() {
 		if err != nil {
 			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Debug("unable to rollback trigger")
+			logging.WithFields("projection", h.projection.Name()).OnError(rollbackErr).Debug("unable to rollback trigger")
+			return
 		}
 		err = tx.Commit()
 	}()
@@ -183,7 +184,7 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 		return err
 	}
 
-	events, err := h.es.Filter(ctx, h.eventQuery(ctx, currentState))
+	events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, currentState))
 	if err != nil || len(events) == 0 {
 		return err
 	}
@@ -197,7 +198,7 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 		return err
 	}
 
-	return h.updateState(ctx, &state{
+	return h.setState(ctx, &state{
 		InstanceID:     events[len(events)-1].Aggregate().InstanceID,
 		EventTimestamp: events[len(events)-1].CreationDate(),
 	}, tx)
@@ -217,6 +218,9 @@ func (h *Handler) eventsToStatements(events []eventstore.Event) (statements []*S
 	statements = make([]*Statement, len(events))
 	for i, event := range events {
 		statements[i], err = h.reduce(event)
+		if statements[i] == nil {
+			statements[i], err = h.reduce(event)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -239,10 +243,11 @@ func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
 	return NewNoOpStatement(event), nil
 }
 
-func (h *Handler) eventQuery(ctx context.Context, currentState *state) *eventstore.SearchQueryBuilder {
+func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *state) *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		Limit(uint64(h.bulkLimit)).
 		AllowTimeTravel().
+		SetTx(tx).
 		AddQuery().
 		AggregateTypes(h.aggregates...).
 		CreationDateAfter(currentState.EventTimestamp.Add(-1 * time.Microsecond)).

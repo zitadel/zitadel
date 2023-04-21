@@ -10,8 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -576,7 +575,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 	}
 }
 
-func getStatementHandlerWithFilters(events ...eventstore.Command) func(t *testing.T) crdb.StatementHandler {
+func getStatementHandlerWithFilters(events ...eventstore.Command) func(t *testing.T) handler.StatementHandler {
 	filters := make([]expect, 0)
 	for _, event := range events {
 		filters = append(filters,
@@ -588,8 +587,8 @@ func getStatementHandlerWithFilters(events ...eventstore.Command) func(t *testin
 		)
 	}
 
-	return func(t *testing.T) crdb.StatementHandler {
-		return crdb.StatementHandler{
+	return func(t *testing.T) handler.StatementHandler {
+		return handler.StatementHandler{
 			ProjectionHandler: &handler.ProjectionHandler{
 				Handler: handler.Handler{
 					Eventstore: eventstoreExpect(

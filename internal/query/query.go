@@ -84,7 +84,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *dat
 	if err != nil {
 		return nil, err
 	}
-	projection.Start()
+	projection.Start(ctx)
 
 	return repo, nil
 }

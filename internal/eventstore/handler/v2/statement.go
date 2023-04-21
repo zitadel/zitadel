@@ -207,6 +207,7 @@ func NewNoOpStatement(event eventstore.Event) *Statement {
 		AggregateID:   event.Aggregate().ID,
 		CreationDate:  event.CreationDate(),
 		InstanceID:    event.Aggregate().InstanceID,
+		Execute:       func(Executer, string) error { return nil },
 	}
 }
 

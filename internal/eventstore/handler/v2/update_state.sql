@@ -7,11 +7,11 @@ INSERT INTO projections.current_states (
     $1
     , $2
     , $3
-    , statement_time()
+    , statement_timestamp()
 ) ON CONFLICT (
     projection_name
     , instance_id
 ) DO UPDATE SET
-    event_timestamp = EXCLUEDED.event_timestamp
-    , last_updated = EXCLUEDED.last_updated
+    event_timestamp = $3
+    , last_updated = statement_timestamp()
 ;

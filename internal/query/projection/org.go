@@ -28,13 +28,12 @@ const (
 
 type orgProjection struct{}
 
-func (p *orgProjection) Name() string {
+func (*orgProjection) Name() string {
 	return OrgProjectionTable
 }
 
 func newOrgProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	p := new(orgProjection)
-	return handler.NewHandler(ctx, &config, p)
+	return handler.NewHandler(ctx, &config, new(orgProjection))
 }
 
 // Init implements [handler.initializer]
