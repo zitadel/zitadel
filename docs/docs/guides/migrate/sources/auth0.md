@@ -60,7 +60,7 @@ We have developed a tool that combines your exported user data with their corres
 1. Download the latest release of [github.com/zitadel/zitadel-tools](https://github.com/zitadel/zitadel-tools/releases)
 2. Execute the binary with the following flags:
  ```bash
- ./zitadel-tools migrate auth0 --org=<organisation id> --users=./users.json --password=./passwords.json --output=./importBody.json
+ ./zitadel-tools migrate auth0 --org=<organisation id> --users=./users.json --passwords=./passwords.json --output=./importBody.json
  ```
  Use the Organization ID from your ZITADEL instance where you like to add the users.
 3. You will now get a new file importBody.json which contains the body for the request to the import of ZITADEL
