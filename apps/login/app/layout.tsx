@@ -9,23 +9,25 @@ import { LayoutProviders } from "#/ui/LayoutProviders";
 import { Analytics } from "@vercel/analytics/react";
 import { ZitadelUIProvider } from "#/../../packages/zitadel-react/dist";
 import ThemeWrapper from "#/ui/ThemeWrapper";
+import { getBranding } from "#/lib/zitadel";
+import { server } from "../lib/zitadel";
 
 const lato = Lato({
   weight: "400",
   subsets: ["latin"],
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const branding = await getBranding(server);
   return (
     <html lang="en" className={`${lato.className}`} suppressHydrationWarning>
       <head />
       <body>
-        {/* @ts-expect-error Server Component */}
-        <ThemeWrapper>
+        <ThemeWrapper branding={branding}>
           <LayoutProviders>
             <div className="overflow-y-scroll bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
               <GlobalNav />

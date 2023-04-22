@@ -1,36 +1,39 @@
-import { getBranding } from "#/lib/zitadel";
-import { server } from "../lib/zitadel";
+"use client";
 
-const ThemeWrapper = async ({ children }: any) => {
-  console.log("hehe");
+import { LabelPolicy } from "#/../../packages/zitadel-server/dist";
+import { useEffect } from "react";
 
+type Props = {
+  branding: LabelPolicy | undefined;
+  children: React.ReactNode;
+};
+
+const ThemeWrapper = ({ children, branding }: Props) => {
   const defaultClasses = "bg-background-light-600 dark:bg-background-dark-600";
 
-  try {
-    const policy = await getBranding(server);
+  console.log(branding);
+  useEffect(() => {
+    if (branding) {
+      document.documentElement.style.setProperty(
+        "--background-color",
+        branding?.backgroundColor
+      );
+      document.documentElement.style.setProperty(
+        "--dark-background-color",
+        branding?.backgroundColorDark
+      );
+    }
+  }, []);
 
-    const darkStyles = {
-      backgroundColor: `${policy?.backgroundColorDark}`,
-      color: `${policy?.fontColorDark}`,
-    };
-
-    const lightStyles = {
-      backgroundColor: `${policy?.backgroundColor}`,
-      color: `${policy?.fontColor}`,
-    };
-
-    console.log(policy);
-
-    return (
-      <div className={defaultClasses} style={darkStyles}>
-        {children}
-      </div>
-    );
-  } catch (error) {
-    console.error(error);
-
-    return <div className={defaultClasses}>{children}</div>;
-  }
+  return (
+    <div className={defaultClasses}>
+      {children}
+      {/* <style jsx>{`
+        --background-color: ${branding?.backgroundColor};
+        --dark-background-color: ${branding?.backgroundColorDark};
+      `}</style> */}
+    </div>
+  );
 };
 
 export default ThemeWrapper;

@@ -12,3 +12,16 @@
     @apply text-sm;
   }
 }
+
+html {
+  --background-color: #ffffff;
+  --dark-background-color: #000000;
+}
+
+.bg-background-light-600 {
+  background-color: var(--background-color);
+}
+
+.dark .dark\:bg-background-dark-600 {
+  background-color: var(--dark-background-color) !important;
+}
