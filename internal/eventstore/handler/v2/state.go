@@ -16,19 +16,20 @@ import (
 type state struct {
 	InstanceID     string
 	EventTimestamp time.Time
+	EventSequence  uint64
 }
 
 var (
-	//go:embed current_state.sql
+	//go:embed state_get.sql
 	currentStateStmt string
-	//go:embed update_state.sql
+	//go:embed state_set.sql
 	updateStateStmt string
 )
 
 func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (*state, error) {
 	row := tx.QueryRowContext(ctx, currentStateStmt, authz.GetInstance(ctx).InstanceID(), h.projection.Name())
 	currentState := new(state)
-	err := row.Scan(&currentState.InstanceID, &currentState.EventTimestamp)
+	err := row.Scan(&currentState.InstanceID, &currentState.EventTimestamp, &currentState.EventSequence)
 	if errors.Is(err, sql.ErrNoRows) {
 		initialState := &state{
 			InstanceID: authz.GetInstance(ctx).InstanceID(),
@@ -47,7 +48,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (*state, error) 
 }
 
 func (h *Handler) setState(ctx context.Context, updatedState *state, tx *sql.Tx) error {
-	res, err := tx.ExecContext(ctx, updateStateStmt, h.projection.Name(), updatedState.InstanceID, updatedState.EventTimestamp)
+	res, err := tx.ExecContext(ctx, updateStateStmt, h.projection.Name(), updatedState.InstanceID, updatedState.EventTimestamp, updatedState.EventSequence)
 	if err != nil {
 		logging.WithError(err).Debug("unable to update state")
 		return err

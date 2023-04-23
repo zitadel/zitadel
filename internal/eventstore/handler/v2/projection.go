@@ -19,6 +19,7 @@ type Config struct {
 	BulkLimit             uint16
 	RequeueEvery          time.Duration
 	HandleActiveInstances time.Duration
+	MaxFailureCount       uint8
 }
 
 type Handler struct {
@@ -28,6 +29,8 @@ type Handler struct {
 	es         *eventstore.Eventstore
 	bulkLimit  uint16
 	aggregates []eventstore.AggregateType
+
+	maxFailureCount uint8
 
 	requeueEvery          time.Duration
 	handleActiveInstances time.Duration
@@ -61,6 +64,7 @@ func NewHandler(
 		requeueEvery:          config.RequeueEvery,
 		handleActiveInstances: config.HandleActiveInstances,
 		now:                   time.Now,
+		maxFailureCount:       config.MaxFailureCount,
 	}
 
 	return handler
@@ -97,7 +101,6 @@ func (h *Handler) schedule(ctx context.Context) {
 			}
 
 			if !didInitialize && !instanceFailed {
-				// TODO(adlerhurst): are multiple succeed writes a problem?
 				err = h.setSucceededOnce(ctx)
 				h.log().OnError(err).Debug("unable to set succeeded once")
 				didInitialize = err != nil
@@ -161,55 +164,32 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 		return err
 	}
 
-	statements, err := h.eventsToStatements(events)
+	statements, err := h.eventsToStatements(tx, currentState, events)
 	if err != nil {
 		return err
 	}
 
-	if err = h.execute(ctx, tx, statements); err != nil {
+	if err = h.execute(ctx, tx, currentState, statements); err != nil {
 		return err
 	}
 
 	return h.setState(ctx, &state{
 		InstanceID:     events[len(events)-1].Aggregate().InstanceID,
 		EventTimestamp: events[len(events)-1].CreationDate(),
+		EventSequence:  events[len(events)-1].Sequence(),
 	}, tx)
 }
 
-func (h *Handler) execute(ctx context.Context, tx *sql.Tx, statements []*Statement) error {
+func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) error {
 	for _, statement := range statements {
 		if err := statement.Execute(tx, h.projection.Name()); err != nil {
-			// TODO(adlerhurst): failed event
+			if h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err)) {
+				continue
+			}
 			return err
 		}
 	}
 	return nil
-}
-
-func (h *Handler) eventsToStatements(events []eventstore.Event) (statements []*Statement, err error) {
-	statements = make([]*Statement, len(events))
-	for i, event := range events {
-		statements[i], err = h.reduce(event)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return statements, nil
-}
-
-func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
-	for _, reducer := range h.projection.Reducers() {
-		if reducer.Aggregate != event.Aggregate().Type {
-			continue
-		}
-		for _, reduce := range reducer.EventRedusers {
-			if reduce.Event != event.Type() {
-				continue
-			}
-			return reduce.Reduce(event)
-		}
-	}
-	return NewNoOpStatement(event), nil
 }
 
 func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *state) *eventstore.SearchQueryBuilder {

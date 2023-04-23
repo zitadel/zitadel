@@ -1,6 +1,7 @@
 SELECT 
     instance_id
     , event_date
+    , sequence
 FROM 
     projections.current_states
 WHERE

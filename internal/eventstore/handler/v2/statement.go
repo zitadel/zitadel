@@ -15,6 +15,36 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
+func (h *Handler) eventsToStatements(tx *sql.Tx, currentState *state, events []eventstore.Event) (statements []*Statement, err error) {
+	statements = make([]*Statement, len(events))
+	for i, event := range events {
+		statements[i], err = h.reduce(event)
+		if err != nil {
+			if h.handleFailedStmt(tx, currentState, failureFromEvent(event, err)) {
+				statements[i] = NewNoOpStatement(event)
+				continue
+			}
+			return nil, err
+		}
+	}
+	return statements, nil
+}
+
+func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
+	for _, reducer := range h.projection.Reducers() {
+		if reducer.Aggregate != event.Aggregate().Type {
+			continue
+		}
+		for _, reduce := range reducer.EventRedusers {
+			if reduce.Event != event.Type() {
+				continue
+			}
+			return reduce.Reduce(event)
+		}
+	}
+	return NewNoOpStatement(event), nil
+}
+
 type Statement struct {
 	AggregateType eventstore.AggregateType
 	AggregateID   string

@@ -192,7 +192,7 @@ func preparePersonalAccessTokenQuery(ctx context.Context, db prepareDatabase) (s
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.PersonalAccessToken.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-fRunu", "Errors.PersonalAccessToken.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
 			}
