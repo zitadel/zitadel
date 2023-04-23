@@ -1,6 +1,6 @@
 CREATE temporary TABLE IF NOT EXISTS wrong_events (
-    instance_id STRING
-    , event_sequence INT8
+    instance_id TEXT
+    , event_sequence BIGINT
     , current_cd TIMESTAMPTZ
     , next_cd TIMESTAMPTZ
 );
@@ -19,7 +19,7 @@ INSERT INTO wrong_events (
             ) AS next_cd
         FROM
             eventstore.events
-    ) WHERE
+    ) sub WHERE
         current_cd < next_cd
     ORDER BY
         event_sequence DESC

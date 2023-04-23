@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -53,6 +54,10 @@ func (s DeviceAuthState) Done() bool {
 // This implements the OIDC interface requirement of "Denied".
 func (s DeviceAuthState) Denied() bool {
 	return s >= DeviceAuthStateDenied
+}
+
+func (s DeviceAuthState) GoString() string {
+	return strconv.Itoa(int(s))
 }
 
 // DeviceAuthCanceled is a subset of DeviceAuthState, allowed to
