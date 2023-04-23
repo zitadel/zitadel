@@ -82,6 +82,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 		BulkLimit:             uint16(config.BulkLimit),
 		RequeueEvery:          config.RequeueEvery,
 		HandleActiveInstances: config.HandleActiveInstances,
+		MaxFailureCount:       config.MaxFailureCount,
 	}
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
