@@ -43,55 +43,61 @@ export const BACKGROUND = "#fafafa";
 export const DARK_TEXT = "#ffffff";
 export const TEXT = "#000000";
 
-export class ColorService {
-  dark: ColorMap;
-  light: ColorMap;
+export type LabelPolicyColors = {
+  backgroundColor: string;
+  backgroundColorDark: string;
+  fontColor: string;
+  fontColorDark: string;
+  warnColor: string;
+  warnColorDark: string;
+  primaryColor: string;
+  primaryColorDark: string;
+};
 
-  constructor(document: any, policy?: LabelPolicy) {
-    const lP = {
-      backgroundColor: BACKGROUND,
-      backgroundColorDark: DARK_BACKGROUND,
-      primaryColor: PRIMARY,
-      primaryColorDark: DARK_PRIMARY,
-      warnColor: WARN,
-      warnColorDark: DARK_WARN,
-      fontColor: TEXT,
-      fontColorDark: DARK_TEXT,
-      linkColor: TEXT,
-      linkColorDark: DARK_TEXT,
-    };
+export function setTheme(document: any, policy?: LabelPolicyColors) {
+  const lP = {
+    backgroundColor: BACKGROUND,
+    backgroundColorDark: DARK_BACKGROUND,
+    primaryColor: PRIMARY,
+    primaryColorDark: DARK_PRIMARY,
+    warnColor: WARN,
+    warnColorDark: DARK_WARN,
+    fontColor: TEXT,
+    fontColorDark: DARK_TEXT,
+    linkColor: TEXT,
+    linkColorDark: DARK_TEXT,
+  };
 
-    if (policy) {
-      lP.backgroundColor = policy.backgroundColor;
-      lP.backgroundColorDark = policy.backgroundColorDark;
-      lP.primaryColor = policy.primaryColor;
-      lP.primaryColorDark = policy.primaryColorDark;
-      lP.warnColor = policy.warnColor;
-      lP.warnColorDark = policy.warnColorDark;
-      lP.fontColor = policy.fontColor;
-      lP.fontColorDark = policy.fontColorDark;
-      lP.linkColor = policy.fontColor;
-      lP.linkColorDark = policy.fontColorDark;
-    }
-
-    this.dark = computeMap(lP, true);
-    this.light = computeMap(lP, false);
-
-    setColors(this.dark.background, "background", "dark", document);
-    setColors(this.light.background, "background", "light", document);
-
-    setColors(this.dark.primary, "primary", "dark", document);
-    setColors(this.light.primary, "primary", "light", document);
-
-    setColors(this.dark.text, "primary", "dark", document);
-    setColors(this.light.text, "primary", "light", document);
-
-    setColors(this.dark.link, "link", "dark", document);
-    setColors(this.light.link, "link", "light", document);
-
-    setColors(this.dark.warn, "warn", "dark", document);
-    setColors(this.light.warn, "warn", "light", document);
+  if (policy) {
+    lP.backgroundColor = policy.backgroundColor;
+    lP.backgroundColorDark = policy.backgroundColorDark;
+    lP.primaryColor = policy.primaryColor;
+    lP.primaryColorDark = policy.primaryColorDark;
+    lP.warnColor = policy.warnColor;
+    lP.warnColorDark = policy.warnColorDark;
+    lP.fontColor = policy.fontColor;
+    lP.fontColorDark = policy.fontColorDark;
+    lP.linkColor = policy.fontColor;
+    lP.linkColorDark = policy.fontColorDark;
   }
+
+  const dark = computeMap(lP, true);
+  const light = computeMap(lP, false);
+
+  setColors(dark.background, "background", "dark", document);
+  setColors(light.background, "background", "light", document);
+
+  setColors(dark.primary, "primary", "dark", document);
+  setColors(light.primary, "primary", "light", document);
+
+  setColors(dark.text, "primary", "dark", document);
+  setColors(light.text, "primary", "light", document);
+
+  setColors(dark.link, "link", "dark", document);
+  setColors(light.link, "link", "light", document);
+
+  setColors(dark.warn, "warn", "dark", document);
+  setColors(light.warn, "warn", "light", document);
 }
 
 function setColors(map: Color[], type: string, theme: string, document: any) {

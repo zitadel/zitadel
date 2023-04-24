@@ -27,7 +27,7 @@ export default function Theme() {
       className={`${
         isDark
           ? "!bg-gray-800 dark:bg-background-dark-400"
-          : "!bg-gray-100 dark:bg-background-dark-400"
+          : "!bg-gray-200 dark:bg-background-dark-400"
       }
       relative inline-flex h-4 w-9 items-center rounded-full`}
     >

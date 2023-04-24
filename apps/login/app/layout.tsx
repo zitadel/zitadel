@@ -10,6 +10,7 @@ import { Analytics } from "@vercel/analytics/react";
 import ThemeWrapper from "#/ui/ThemeWrapper";
 import { getBranding } from "#/lib/zitadel";
 import { server } from "../lib/zitadel";
+import { LabelPolicyColors } from "#/utils/colors";
 
 const lato = Lato({
   weight: "400",
@@ -22,19 +23,32 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const branding = await getBranding(server);
+  let partialPolicy: LabelPolicyColors | undefined;
+  if (branding) {
+    partialPolicy = {
+      backgroundColor: branding?.backgroundColor,
+      backgroundColorDark: branding?.backgroundColorDark,
+      primaryColor: branding?.primaryColor,
+      primaryColorDark: branding?.primaryColorDark,
+      warnColor: branding?.warnColor,
+      warnColorDark: branding?.warnColorDark,
+      fontColor: branding?.fontColor,
+      fontColorDark: branding?.fontColorDark,
+    };
+  }
   return (
     <html lang="en" className={`${lato.className}`} suppressHydrationWarning>
       <head />
       <body>
-        <ThemeWrapper branding={branding}>
+        <ThemeWrapper branding={partialPolicy}>
           <LayoutProviders>
-            <div className="overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600  bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
+            <div className="h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600  bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
               <GlobalNav />
 
               <div className="lg:pl-72">
                 <div className="mx-auto max-w-xl space-y-8 px-2 pt-20 lg:py-8 lg:px-8">
                   <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
-                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-600">
+                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
                       <AddressBar />
                     </div>
                   </div>
@@ -46,7 +60,7 @@ export default async function RootLayout({
                   </div>
 
                   <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
-                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-600">
+                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
                       <Byline />
                     </div>
                   </div>

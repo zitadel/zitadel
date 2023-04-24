@@ -26,7 +26,7 @@
     "@zitadel/server": "workspace:*",
     "clsx": "1.2.1",
     "date-fns": "2.29.3",
-    "next": "13.3.1-canary.13",
+    "next": "13.3.2-canary.2",
     "next-themes": "^0.2.1",
     "nice-grpc": "2.0.1",
     "react": "18.2.0",
