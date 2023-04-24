@@ -1,21 +1,9 @@
-const colors = require("tailwindcss/colors");
+const sharedConfig = require("zitadel-tailwind-config/tailwind.config.js");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  presets: [sharedConfig],
   prefix: "ui-",
   darkMode: "class",
   content: [`src/**/*.{js,ts,jsx,tsx}`],
-  theme: {
-    extend: {
-      colors: {
-        brandblue: colors.blue[500],
-        brandred: colors.red[500],
-        divider: {
-          light: "rgba(135,149,161,.2)",
-          dark: "rgba(135,149,161,.2)",
-        },
-      },
-    },
-  },
-  plugins: [],
 };

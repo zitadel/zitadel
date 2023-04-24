@@ -20,46 +20,23 @@ html {
   --dark-background-color: #000000;
 }
 
-.bg-background-light-300 {
-  background-color: var(--theme-light-background-300);
-}
+$types: "background", "primary", "warn", "text";
+$shades: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900;
 
-.bg-background-light-400 {
-  background-color: var(--theme-light-background-400);
-}
+@each $type in $types {
+  @each $shade in $shades {
+    .bg-#{$type}-light-#{$shade} {
+      background-color: var(--theme-light-#{$type}-#{$shade}) !important;
+    }
+    .dark .dark\:bg-#{$type}-dark-#{$shade} {
+      background-color: var(--theme-dark-#{$type}-#{$shade}) !important;
+    }
 
-.bg-background-light-500 {
-  background-color: var(--theme-light-background-500);
-}
-
-.bg-background-light-600 {
-  background-color: var(--theme-light-background-600);
-}
-
-.bg-background-light-700 {
-  background-color: var(--theme-light-background-700);
-}
-
-.bg-background-light-800 {
-  background-color: var(--theme-light-background-600);
-}
-
-.dark .dark\:bg-background-dark-400 {
-  background-color: var(--theme-dark-background-400) !important;
-}
-
-.dark .dark\:bg-background-dark-500 {
-  background-color: var(--theme-dark-background-500) !important;
-}
-
-.dark .dark\:bg-background-dark-600 {
-  background-color: var(--theme-dark-background-600) !important;
-}
-
-.dark .dark\:bg-background-dark-700 {
-  background-color: var(--theme-dark-background-700) !important;
-}
-
-.dark .dark\:bg-background-dark-800 {
-  background-color: var(--theme-dark-background-800) !important;
+    .text-#{$type}-light-#{$shade} {
+      color: var(--theme-light-#{$type}-#{$shade}) !important;
+    }
+    .dark .dark\:text-#{$type}-dark-#{$shade} {
+      color: var(--theme-dark-#{$type}-#{$shade}) !important;
+    }
+  }
 }

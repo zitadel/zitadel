@@ -84,6 +84,8 @@ export function setTheme(document: any, policy?: LabelPolicyColors) {
   const dark = computeMap(lP, true);
   const light = computeMap(lP, false);
 
+  console.log(dark, light);
+
   setColors(dark.background, "background", "dark", document);
   setColors(light.background, "background", "light", document);
 
@@ -142,16 +144,6 @@ function getColorObject(value: any, name: string): Color {
   } as Color;
 }
 
-function isLight(hex: string): boolean {
-  const color = tinycolor(hex);
-  return color.isLight();
-}
-
-function isDark(hex: string): boolean {
-  const color = tinycolor(hex);
-  return color.isDark();
-}
-
 function getContrast(color: string): string {
   const onBlack = tinycolor.readability("#000", color);
   const onWhite = tinycolor.readability("#fff", color);
@@ -162,7 +154,10 @@ function getContrast(color: string): string {
   }
 }
 
-export function computeMap(labelpolicy: any, dark: boolean): ColorMap {
+export function computeMap(
+  labelpolicy: LabelPolicyColors,
+  dark: boolean
+): ColorMap {
   return {
     background: computeColors(
       dark ? labelpolicy.backgroundColorDark : labelpolicy.backgroundColor
@@ -177,7 +172,7 @@ export function computeMap(labelpolicy: any, dark: boolean): ColorMap {
       dark ? labelpolicy.fontColorDark : labelpolicy.fontColor
     ),
     link: computeColors(
-      dark ? labelpolicy.linkColorDark : labelpolicy.linkColor
+      dark ? labelpolicy.fontColorDark : labelpolicy.fontColor
     ),
   };
 }
