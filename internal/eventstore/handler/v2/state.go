@@ -92,10 +92,7 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 
 func (h *Handler) updateLastUpdated(ctx context.Context, tx *sql.Tx, updatedState *state) {
 	_, err := tx.ExecContext(ctx, updateStateLastRunStmt, h.projection.Name(), updatedState.instanceID)
-
-	if err != nil {
-		h.log().WithError(err).Debug("unable to update last updated")
-	}
+	h.log().OnError(err).Debug("unable to update last updated")
 }
 
 func (h *Handler) lockState(ctx context.Context, tx *sql.Tx, instanceID string) error {
@@ -104,11 +101,9 @@ func (h *Handler) lockState(ctx context.Context, tx *sql.Tx, instanceID string) 
 		instanceID,
 	)
 	if err != nil {
-		h.log().WithError(err).Debug("unable to lock state")
 		return err
 	}
 	if affected, err := res.RowsAffected(); affected == 0 {
-		h.log().OnError(err).Error("projection is already locked")
 		return errs.ThrowInternal(err, "V2-lpiK0", "projection already locked")
 	}
 	return nil

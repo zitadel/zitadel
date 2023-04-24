@@ -5,8 +5,6 @@ import (
 	_ "embed"
 	"time"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -52,12 +50,12 @@ func (h *Handler) handleFailedStmt(tx *sql.Tx, currentState *state, f *failure) 
 	}
 	failureCount, err := h.failureCount(tx, f)
 	if err != nil {
-		h.logStmt(f).WithError(err).Warn("unable to get failure count")
+		h.logFailure(f).WithError(err).Warn("unable to get failure count")
 		return false
 	}
 	failureCount += 1
 	err = h.setFailureCount(tx, failureCount, f)
-	h.logStmt(f).OnError(err).Warn("unable to update failure count")
+	h.logFailure(f).OnError(err).Warn("unable to update failure count")
 
 	return failureCount >= h.maxFailureCount
 }
@@ -79,10 +77,4 @@ func (h *Handler) setFailureCount(tx *sql.Tx, count uint8, f *failure) error {
 		return errors.ThrowInternal(dbErr, "CRDB-4Ht4x", "set failure count failed")
 	}
 	return nil
-}
-
-func (h *Handler) logStmt(stmt *failure) *logging.Entry {
-	return h.log().WithField("sequence", stmt.sequence).
-		WithField("instance", stmt.instance).
-		WithField("aggregate", stmt.aggregate)
 }

@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -193,6 +191,7 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 	for {
 		events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, currentState))
 		if err != nil {
+			h.log().WithError(err).Debug("filter eventstore failed")
 			return err
 		}
 		events = skipPreviouslyReduced(events, currentState)
@@ -243,16 +242,22 @@ func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, 
 	for _, statement := range statements {
 		_, err := tx.Exec("SAVEPOINT stmt")
 		if err != nil {
+			h.log().WithError(err).Debug("create savepoint failed")
 			return err
 		}
 		if err := statement.Execute(tx, h.projection.Name()); err != nil {
+			h.log().WithError(err).Debug("statement execution failed")
+
 			_, savepointErr := tx.Exec("ROLLBACK TO SAVEPOINT stmt")
 			if savepointErr != nil {
+				h.log().WithError(savepointErr).Debug("rollback savepoint failed")
 				return savepointErr
 			}
+
 			if h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err)) {
 				continue
 			}
+
 			return err
 		}
 	}
@@ -270,8 +275,4 @@ func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *stat
 		AggregateTypes(h.aggregates...).
 		CreationDateAfter(currentState.eventTimestamp.Add(-1 * time.Microsecond)).
 		Builder()
-}
-
-func (h *Handler) log() *logging.Entry {
-	return logging.WithFields("projection", h.projection.Name())
 }
