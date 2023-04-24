@@ -34,11 +34,11 @@ func CurrentSequencesToPb(database string, currentSequences *query.CurrentStates
 	return v
 }
 
-func CurrentSequenceToPb(database string, currentSequence *query.CurrentSequence) *system_pb.View {
+func CurrentSequenceToPb(database string, currentSequence *query.CurrentState) *system_pb.View {
 	return &system_pb.View{
 		Database:                 database,
 		ViewName:                 currentSequence.ProjectionName,
 		ProcessedSequence:        currentSequence.CurrentSequence,
-		LastSuccessfulSpoolerRun: timestamppb.New(currentSequence.Timestamp),
+		LastSuccessfulSpoolerRun: timestamppb.New(currentSequence.EventTimestamp),
 	}
 }

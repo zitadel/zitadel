@@ -176,7 +176,7 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 	if err != nil {
 		return nil, err
 	}
-	apps.LatestSequence, err = q.latestState(ctx, smsConfigsTable)
+	apps.LatestState, err = q.latestState(ctx, smsConfigsTable)
 	return apps, err
 }
 

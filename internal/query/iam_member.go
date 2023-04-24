@@ -104,7 +104,7 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, with
 	if err != nil {
 		return nil, err
 	}
-	members.LatestSequence = currentSequence
+	members.LatestState = currentSequence
 	return members, err
 }
 

@@ -152,7 +152,7 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	if err != nil {
 		return nil, err
 	}
-	authNKeys.LatestSequence, err = q.latestState(ctx, authNKeyTable)
+	authNKeys.LatestState, err = q.latestState(ctx, authNKeyTable)
 	return authNKeys, err
 }
 
@@ -182,7 +182,7 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	if err != nil {
 		return nil, err
 	}
-	authNKeys.LatestSequence, err = q.latestState(ctx, authNKeyTable)
+	authNKeys.LatestState, err = q.latestState(ctx, authNKeyTable)
 	return authNKeys, err
 }
 

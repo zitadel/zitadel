@@ -106,7 +106,7 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	if err != nil {
 		return nil, err
 	}
-	members.LatestSequence = currentSequence
+	members.LatestState = currentSequence
 	return members, err
 }
 

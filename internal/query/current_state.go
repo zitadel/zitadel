@@ -17,13 +17,14 @@ import (
 )
 
 const (
+	// TODO: use current_states instead
 	lockStmtFormat = "UPDATE %[1]s" +
 		" set locker_id = $1, locked_until = now()+$2::INTERVAL" +
 		" WHERE projection_name = $3"
 	lockerIDReset = "reset"
 )
 
-type LatestSequence struct {
+type LatestState struct {
 	EventTimestamp time.Time
 	Sequence       uint64
 	LastUpdated    time.Time
@@ -31,25 +32,26 @@ type LatestSequence struct {
 
 type CurrentStates struct {
 	SearchResponse
-	CurrentStates []*CurrentSequence
+	CurrentStates []*CurrentState
 }
 
-type CurrentSequence struct {
+type CurrentState struct {
 	ProjectionName  string
 	CurrentSequence uint64
-	Timestamp       time.Time
+	EventTimestamp  time.Time
+	LastRun         time.Time
 }
 
-type CurrentSequencesSearchQueries struct {
+type CurrentStateSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
 }
 
-func NewCurrentSequencesInstanceIDSearchQuery(instanceID string) (SearchQuery, error) {
+func NewCurrentStatesInstanceIDSearchQuery(instanceID string) (SearchQuery, error) {
 	return NewTextQuery(CurrentStateColInstanceID, instanceID, TextEquals)
 }
 
-func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *CurrentStateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
 		query = q.toQuery(query)
@@ -57,7 +59,7 @@ func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.Selec
 	return query
 }
 
-func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSequencesSearchQueries) (failedEvents *CurrentStates, err error) {
+func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentStateSearchQueries) (currentStates *CurrentStates, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -74,7 +76,7 @@ func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSe
 	return scan(rows)
 }
 
-func (q *Queries) latestState(ctx context.Context, projections ...table) (_ *LatestSequence, err error) {
+func (q *Queries) latestState(ctx context.Context, projections ...table) (_ *LatestState, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -203,15 +205,15 @@ func reset(tx *sql.Tx, tables []string, projectionName string) error {
 	return nil
 }
 
-func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LatestSequence, error)) {
+func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LatestState, error)) {
 	return sq.Select(
 			CurrentStateColEventDate.identifier(),
 			CurrentStateColSequence.identifier(),
 			CurrentStateColLastUpdated.identifier()).
 			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*LatestSequence, error) {
-			state := new(LatestSequence)
+		func(row *sql.Row) (*LatestState, error) {
+			state := new(LatestState)
 			err := row.Scan(
 				&state.EventTimestamp,
 				&state.Sequence,
@@ -226,28 +228,36 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 
 func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*CurrentStates, error)) {
 	return sq.Select(
+			"max("+CurrentStateColLastUpdated.identifier()+") as "+CurrentStateColLastUpdated.name,
 			"max("+CurrentStateColEventDate.identifier()+") as "+CurrentStateColEventDate.name,
 			"max("+CurrentStateColSequence.identifier()+") as "+CurrentStateColSequence.name,
-			"max("+CurrentStateColLastUpdated.identifier()+") as "+CurrentStateColLastUpdated.name,
 			CurrentStateColProjectionName.identifier(),
 			countColumn.identifier()).
 			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
 			GroupBy(CurrentStateColProjectionName.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*CurrentStates, error) {
-			states := make([]*CurrentSequence, 0)
+			states := make([]*CurrentState, 0)
 			var count uint64
 			for rows.Next() {
-				currentState := new(CurrentSequence)
+				currentState := new(CurrentState)
+				lastRun := new(sql.NullTime)
+				eventDate := new(sql.NullTime)
+				currentSequence := new(sql.NullInt64)
+
 				err := rows.Scan(
-					&currentState.Timestamp,
-					&currentState.CurrentSequence,
+					lastRun,
+					eventDate,
+					currentSequence,
 					&currentState.ProjectionName,
 					&count,
 				)
 				if err != nil {
 					return nil, err
 				}
+				currentState.EventTimestamp = eventDate.Time
+				currentState.LastRun = lastRun.Time
+				currentState.CurrentSequence = uint64(currentSequence.Int64)
 				states = append(states, currentState)
 			}
 

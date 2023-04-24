@@ -134,7 +134,7 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	if err != nil {
 		return nil, err
 	}
-	metadata.LatestSequence, err = q.latestState(ctx, orgMetadataTable)
+	metadata.LatestState, err = q.latestState(ctx, orgMetadataTable)
 	return metadata, err
 }
 

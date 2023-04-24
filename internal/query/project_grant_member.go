@@ -120,7 +120,7 @@ func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrant
 	if err != nil {
 		return nil, err
 	}
-	members.LatestSequence = currentSequence
+	members.LatestState = currentSequence
 	return members, err
 }
 

@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Server) ListViews(ctx context.Context, _ *system_pb.ListViewsRequest) (*system_pb.ListViewsResponse, error) {
-	currentSequences, err := s.query.SearchCurrentSequences(ctx, new(query.CurrentSequencesSearchQueries))
+	currentSequences, err := s.query.SearchCurrentStates(ctx, new(query.CurrentStateSearchQueries))
 	if err != nil {
 		return nil, err
 	}

@@ -96,7 +96,7 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 	if err != nil {
 		return nil, err
 	}
-	keys.LatestSequence, err = q.latestState(ctx, keyTable)
+	keys.LatestState, err = q.latestState(ctx, keyTable)
 	if !errors.IsNotFound(err) {
 		return keys, err
 	}

@@ -184,36 +184,36 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 		err = tx.Commit()
 	}()
 
-	state, shouldSkip, err := h.currentState(ctx, tx)
+	currentState, shouldSkip, err := h.currentState(ctx, tx)
 	if err != nil || shouldSkip {
 		return err
 	}
 
 	var hasChanged bool
 	for {
-		events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, state))
+		events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, currentState))
 		if err != nil {
 			return err
 		}
-		events = skipPreviouslyReduced(events, state)
+		events = skipPreviouslyReduced(events, currentState)
 		if len(events) == 0 {
 			break
 		}
 
-		statements, err := h.eventsToStatements(tx, events, state)
+		statements, err := h.eventsToStatements(tx, events, currentState)
 		if err != nil {
 			return err
 		}
 
-		if err = h.execute(ctx, tx, state, statements); err != nil {
+		if err = h.execute(ctx, tx, currentState, statements); err != nil {
 			return err
 		}
 
 		hasChanged = true
-		state.aggregateID = events[len(events)-1].Aggregate().ID
-		state.aggregateType = events[len(events)-1].Aggregate().Type
-		state.eventSequence = events[len(events)-1].Sequence()
-		state.eventTimestamp = events[len(events)-1].CreationDate()
+		currentState.aggregateID = events[len(events)-1].Aggregate().ID
+		currentState.aggregateType = events[len(events)-1].Aggregate().Type
+		currentState.eventSequence = events[len(events)-1].Sequence()
+		currentState.eventTimestamp = events[len(events)-1].CreationDate()
 
 		if len(events) < int(h.bulkLimit) {
 			break
@@ -221,10 +221,11 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 	}
 
 	if !hasChanged {
+		h.updateLastUpdated(ctx, tx, currentState)
 		return nil
 	}
 
-	return h.setState(ctx, tx, state)
+	return h.setState(ctx, tx, currentState)
 }
 
 func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eventstore.Event {

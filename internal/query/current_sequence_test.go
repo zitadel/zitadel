@@ -47,7 +47,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					nil,
 				),
 			},
-			object: &CurrentStates{CurrentStates: []*CurrentSequence{}},
+			object: &CurrentStates{CurrentStates: []*CurrentState{}},
 		},
 		{
 			name:    "prepareCurrentSequencesQuery one result",
@@ -69,9 +69,9 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				CurrentStates: []*CurrentSequence{
+				CurrentStates: []*CurrentState{
 					{
-						Timestamp:       testNow,
+						EventTimestamp:  testNow,
 						CurrentSequence: 20211108,
 						ProjectionName:  "projection-name",
 					},
@@ -103,14 +103,14 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 				SearchResponse: SearchResponse{
 					Count: 2,
 				},
-				CurrentStates: []*CurrentSequence{
+				CurrentStates: []*CurrentState{
 					{
-						Timestamp:       testNow,
+						EventTimestamp:  testNow,
 						CurrentSequence: 20211108,
 						ProjectionName:  "projection-name",
 					},
 					{
-						Timestamp:       testNow,
+						EventTimestamp:  testNow,
 						CurrentSequence: 20211108,
 						ProjectionName:  "projection-name-2",
 					},

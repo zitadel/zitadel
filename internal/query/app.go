@@ -476,7 +476,7 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	if err != nil {
 		return nil, err
 	}
-	apps.LatestSequence, err = q.latestState(ctx, appsTable)
+	apps.LatestState, err = q.latestState(ctx, appsTable)
 	return apps, err
 }
 

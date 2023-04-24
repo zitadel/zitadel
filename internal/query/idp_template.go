@@ -661,7 +661,7 @@ func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQu
 	if err != nil {
 		return nil, err
 	}
-	idps.LatestSequence, err = q.latestState(ctx, idpTemplateTable)
+	idps.LatestState, err = q.latestState(ctx, idpTemplateTable)
 	return idps, err
 }
 

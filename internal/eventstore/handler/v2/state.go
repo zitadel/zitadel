@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgconn"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	errs "github.com/zitadel/zitadel/internal/errors"
@@ -30,6 +29,8 @@ var (
 	updateStateStmt string
 	//go:embed state_lock.sql
 	lockStateStmt string
+	//go:embed state_set_last_run.sql
+	updateStateLastRunStmt string
 )
 
 func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *state, shouldSkip bool, err error) {
@@ -58,7 +59,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		}
 	}
 	if err != nil {
-		logging.WithError(err).Debug("unable to query current state")
+		h.log().WithError(err).Debug("unable to query current state")
 		return nil, false, err
 	}
 
@@ -79,14 +80,22 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 		updatedState.eventSequence,
 	)
 	if err != nil {
-		logging.WithError(err).Debug("unable to update state")
+		h.log().WithError(err).Debug("unable to update state")
 		return err
 	}
 	if affected, err := res.RowsAffected(); affected == 0 {
-		logging.OnError(err).Error("unable to check if states are updated")
+		h.log().OnError(err).Error("unable to check if states are updated")
 		return errs.ThrowInternal(err, "V2-lpiK0", "unable to update state")
 	}
 	return nil
+}
+
+func (h *Handler) updateLastUpdated(ctx context.Context, tx *sql.Tx, updatedState *state) {
+	_, err := tx.ExecContext(ctx, updateStateLastRunStmt, h.projection.Name(), updatedState.instanceID)
+
+	if err != nil {
+		h.log().WithError(err).Debug("unable to update last updated")
+	}
 }
 
 func (h *Handler) lockState(ctx context.Context, tx *sql.Tx, instanceID string) error {
@@ -95,11 +104,11 @@ func (h *Handler) lockState(ctx context.Context, tx *sql.Tx, instanceID string) 
 		instanceID,
 	)
 	if err != nil {
-		logging.WithError(err).Debug("unable to lock state")
+		h.log().WithError(err).Debug("unable to lock state")
 		return err
 	}
 	if affected, err := res.RowsAffected(); affected == 0 {
-		logging.OnError(err).Error("projection is already locked")
+		h.log().OnError(err).Error("projection is already locked")
 		return errs.ThrowInternal(err, "V2-lpiK0", "projection already locked")
 	}
 	return nil
