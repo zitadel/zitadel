@@ -119,8 +119,40 @@ func (h *Handler) subscribe(ctx context.Context) {
 		case <-ctx.Done():
 			subscription.Unsubscribe()
 			h.log().Debug("shutdown")
-		case <-queue:
+		case event := <-queue:
+			events := checkAdditionalEvents(queue, event)
+			solvedInstances := make([]string, 0, len(events))
+			for _, event := range events {
+				if instanceSolved(solvedInstances, event.Aggregate().InstanceID) {
+					continue
+				}
+				ctx := authz.WithInstanceID(ctx, event.Aggregate().InstanceID)
+				err := h.Trigger(ctx)
+				h.log().OnError(err).Debug("trigger of queued event failed")
+			}
+		}
+	}
+}
 
+func instanceSolved(solvedInstances []string, instanceID string) bool {
+	for _, solvedInstance := range solvedInstances {
+		if solvedInstance == instanceID {
+			return true
+		}
+	}
+	return false
+}
+
+func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Event) []eventstore.Event {
+	events := make([]eventstore.Event, 1)
+	events[0] = event
+	for {
+		wait := time.NewTimer(1 * time.Millisecond)
+		select {
+		case event := <-eventQueue:
+			events = append(events, event)
+		case <-wait.C:
+			return events
 		}
 	}
 }
@@ -157,39 +189,55 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 		return err
 	}
 
-	// TODO: check if bulk limit exeeded
+	var lastEvent eventstore.Event
 
-	events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, currentState))
-	if err != nil || len(events) == 0 {
-		return err
-	}
+	for {
+		events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, currentState))
+		if err != nil || len(events) == 0 {
+			return err
+		}
 
-	statements, err := h.eventsToStatements(tx, currentState, events)
-	if err != nil {
-		return err
-	}
+		statements, err := h.eventsToStatements(tx, currentState, events)
+		if err != nil {
+			return err
+		}
 
-	if err = h.execute(ctx, tx, currentState, statements); err != nil {
-		return err
+		if err = h.execute(ctx, tx, currentState, statements); err != nil {
+			return err
+		}
+
+		lastEvent = events[len(events)-1]
+		if len(events) < int(h.bulkLimit) {
+			break
+		}
 	}
 
 	return h.setState(ctx, &state{
-		InstanceID:     events[len(events)-1].Aggregate().InstanceID,
-		EventTimestamp: events[len(events)-1].CreationDate(),
-		EventSequence:  events[len(events)-1].Sequence(),
+		InstanceID:     lastEvent.Aggregate().InstanceID,
+		EventTimestamp: lastEvent.CreationDate(),
+		EventSequence:  lastEvent.Sequence(),
 	}, tx)
 }
 
 func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) error {
 	for _, statement := range statements {
+		_, err := tx.Exec("SAVEPOINT stmt")
+		if err != nil {
+			return err
+		}
 		if err := statement.Execute(tx, h.projection.Name()); err != nil {
+			_, savepointErr := tx.Exec("ROLLBACK TO SAVEPOINT stmt")
+			if savepointErr != nil {
+				return savepointErr
+			}
 			if h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err)) {
 				continue
 			}
 			return err
 		}
 	}
-	return nil
+	_, err := tx.Exec("RELEASE SAVEPOINT stmt")
+	return err
 }
 
 func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *state) *eventstore.SearchQueryBuilder {
