@@ -14,7 +14,7 @@ export function GlobalNav() {
   const close = () => setIsOpen(false);
 
   return (
-    <div className="fixed top-0 z-10 flex w-full flex-col border-b border-gray-300 dark:border-gray-800 bg-background-light-600 dark:bg-background-dark-600 lg:bottom-0 lg:z-auto lg:w-72 lg:border-r">
+    <div className="fixed top-0 z-10 flex w-full flex-col border-b border-divider-light dark:border-divider-dark bg-background-light-700 dark:bg-background-dark-700 lg:bottom-0 lg:z-auto lg:w-72 lg:border-r">
       <div className="flex h-14 items-center py-4 px-4 lg:h-auto">
         <Link
           href="/"

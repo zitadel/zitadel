@@ -6,7 +6,7 @@ export interface SignInWithGoogleProps {
 
 export function SignInWithGoogle(props: SignInWithGoogleProps) {
   return (
-    <div className="ui-flex ui-flex-row ui-items-center ui-bg-white ui-text-black dark:ui-bg-transparent dark:ui-text-white border ui-border-gray-200 dark:ui-border-gray-800 rounded-md px-4 text-sm">
+    <div className="ui-flex ui-flex-row ui-items-center ui-bg-white ui-text-black dark:ui-bg-transparent dark:ui-text-white border ui-border-divider-light dark:ui-border-divider-dark rounded-md px-4 text-sm">
       <div className="ui-h-12 ui-w-12 ui-flex ui-items-center ui-justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"

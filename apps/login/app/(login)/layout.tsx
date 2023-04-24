@@ -1,5 +1,4 @@
 import { ZitadelLogo } from "#/ui/ZitadelLogo";
-import { ColorService } from "#/utils/colors";
 import React from "react";
 
 export default async function Layout({
@@ -7,8 +6,6 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const colorService = new ColorService();
-
   return (
     <div className="mx-auto flex max-w-[400px] flex-col items-center space-y-4 py-10">
       <div className="relative">

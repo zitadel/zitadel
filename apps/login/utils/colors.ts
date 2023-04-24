@@ -1,6 +1,8 @@
+import { LabelPolicy } from "#/../../packages/zitadel-server/dist";
+import { secondsToMilliseconds } from "date-fns";
 import tinycolor from "tinycolor2";
 
-export interface ColorForTiny {
+export interface Color {
   name: string;
   hex: string;
   rgb: string;
@@ -25,16 +27,8 @@ export type ColorName =
   | "A400"
   | "A700";
 
-// export interface ColorMap {
-//   background: { [key in ColorName]: Color[] };
-//   primary: { [key in ColorName]: Color[] };
-//   warn: { [key in ColorName]: Color[] };
-//   text: { [key in ColorName]: Color[] };
-//   link: { [key in ColorName]: Color[] };
-// }
-
 export type ColorMap = {
-  [key in MapName]: { [key in ColorName]: ColorForTiny[] };
+  [key in MapName]: Color[];
 };
 
 export const DARK_PRIMARY = "#2073c4";
@@ -53,7 +47,7 @@ export class ColorService {
   dark: ColorMap;
   light: ColorMap;
 
-  constructor() {
+  constructor(policy?: LabelPolicy) {
     const lP = {
       backgroundColor: BACKGROUND,
       backgroundColorDark: DARK_BACKGROUND,
@@ -63,15 +57,65 @@ export class ColorService {
       warnColorDark: DARK_WARN,
       fontColor: TEXT,
       fontColorDark: DARK_TEXT,
-      linkColor: BACKGROUND,
-      linkColorDark: DARK_BACKGROUND,
+      linkColor: TEXT,
+      linkColorDark: DARK_TEXT,
     };
+
+    if (policy) {
+      lP.backgroundColor = policy.backgroundColor;
+      lP.backgroundColorDark = policy.backgroundColorDark;
+      lP.primaryColor = policy.primaryColor;
+      lP.primaryColorDark = policy.primaryColorDark;
+      lP.warnColor = policy.warnColor;
+      lP.warnColorDark = policy.warnColorDark;
+      lP.fontColor = policy.fontColor;
+      lP.fontColorDark = policy.fontColorDark;
+      lP.linkColor = policy.fontColor;
+      lP.linkColorDark = policy.fontColorDark;
+    }
     this.dark = computeMap(lP, true);
     this.light = computeMap(lP, false);
+
+    setColors(this.dark.background, "background", "dark");
+    setColors(this.light.background, "background", "light");
+
+    setColors(this.dark.primary, "primary", "dark");
+    setColors(this.light.primary, "primary", "light");
+
+    setColors(this.dark.text, "primary", "dark");
+    setColors(this.light.text, "primary", "light");
+
+    setColors(this.dark.link, "link", "dark");
+    setColors(this.light.link, "link", "light");
+
+    setColors(this.dark.warn, "warn", "dark");
+    setColors(this.light.warn, "warn", "light");
   }
 }
 
-function computeColors(hex: string): ColorForTiny[] {
+function setColors(map: Color[], type: string, theme: string) {
+  map.forEach((color) => {
+    document.documentElement.style.setProperty(
+      `--theme-${theme}-${type}-${color.name}`,
+      color.hex
+    );
+    document.documentElement.style.setProperty(
+      `--theme-${theme}-${type}-contrast-${color.name}`,
+      color.contrastColor
+    );
+  });
+
+  // document.documentElement.style.setProperty(
+  //     `--${prefix}background-color`,
+  //     map?.background[500].,
+  //   );
+  //   document.documentElement.style.setProperty(
+  //     "--dark-background-color",
+  //     branding?.backgroundColorDark
+  //   );
+}
+
+function computeColors(hex: string): Color[] {
   return [
     getColorObject(tinycolor(hex).lighten(52), "50"),
     getColorObject(tinycolor(hex).lighten(37), "100"),
@@ -90,14 +134,14 @@ function computeColors(hex: string): ColorForTiny[] {
   ];
 }
 
-function getColorObject(value: any, name: string): ColorForTiny {
+function getColorObject(value: any, name: string): Color {
   const c = tinycolor(value);
   return {
     name: name,
     hex: c.toHexString(),
     rgb: c.toRgbString(),
     contrastColor: getContrast(c.toHexString()),
-  };
+  } as Color;
 }
 
 function isLight(hex: string): boolean {
@@ -121,7 +165,7 @@ function getContrast(color: string): string {
 }
 
 export function computeMap(labelpolicy: any, dark: boolean): ColorMap {
-  const colorArray = {
+  return {
     background: computeColors(
       dark ? labelpolicy.backgroundColorDark : labelpolicy.backgroundColor
     ),
@@ -138,20 +182,9 @@ export function computeMap(labelpolicy: any, dark: boolean): ColorMap {
       dark ? labelpolicy.linkColorDark : labelpolicy.linkColor
     ),
   };
-
-  let mapped: ColorMap = {} as any;
-  Object.entries(colorArray).forEach(([mapname, colors]) => {
-    (mapped as any)[mapname] = {};
-    colors.forEach((color) => {
-      (mapped as any)[mapname][`${color.name}`] = color.hex;
-      (mapped as any)[mapname][`contrast-${color.name}`] = color.contrastColor;
-    });
-  });
-
-  return mapped;
 }
 
-export interface Color {
+export interface ColorShade {
   200: string;
   300: string;
   500: string;
@@ -299,7 +332,7 @@ export const COLORS = [
   },
 ];
 
-export function getColorHash(value: string): Color {
+export function getColorHash(value: string): ColorShade {
   let hash = 0;
 
   if (value.length === 0) {
@@ -327,7 +360,7 @@ export function hashCode(str: string, seed = 0): number {
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 
-export function getMembershipColor(role: string): Color {
+export function getMembershipColor(role: string): ColorShade {
   const hash = hashCode(role);
   let color = COLORS[hash % COLORS.length];
 

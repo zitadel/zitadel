@@ -73,7 +73,7 @@ export const Avatar: FC<AvatarProps> = ({
     >
       {imageUrl ? (
         <img
-          className="border border-gray-500 rounded-full w-12 h-12"
+          className="border border-divider-light dark:border-divider-dark rounded-full w-12 h-12"
           src={imageUrl}
         />
       ) : (

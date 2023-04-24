@@ -29,7 +29,7 @@ export default async function RootLayout({
       <body>
         <ThemeWrapper branding={branding}>
           <LayoutProviders>
-            <div className="overflow-y-scroll bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
+            <div className="overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600  bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
               <GlobalNav />
 
               <div className="lg:pl-72">

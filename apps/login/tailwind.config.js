@@ -78,16 +78,22 @@ module.exports = {
             600: colors.gray[50],
           },
         },
+        divider: {
+          dark: "rgba(135,149,161,.2)",
+          light: "rgba(135,149,161,.2)",
+        },
         input: {
           light: {
             label: "#000000c7",
             background: "#00000004",
-            border: "rgba(26,25,25,.2196078431);",
+            border: "#1a191954",
+            hoverborder: "1a1b1b",
           },
           dark: {
             label: "#ffffffc7",
             background: "#00000020",
-            border: "rgba(249,247,247,.1450980392)",
+            border: "#f9f7f775",
+            hoverborder: "#e0e0e0",
           },
         },
         button: {
