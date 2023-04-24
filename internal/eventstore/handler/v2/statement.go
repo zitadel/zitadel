@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func (h *Handler) eventsToStatements(tx *sql.Tx, currentState *state, events []eventstore.Event) (statements []*Statement, err error) {
+func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
 	statements = make([]*Statement, len(events))
 	for i, event := range events {
 		statements[i], err = h.reduce(event)

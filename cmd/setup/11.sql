@@ -1,9 +1,14 @@
 CREATE TABLE projections.current_states (
     projection_name TEXT NOT NULL
     , instance_id TEXT NOT NULL
-    , event_date TIMESTAMPTZ NOT NULL
-    , sequence INT8 NOT NULL
-    , last_updated TIMESTAMPTZ NOT NULL
+
+    , event_date TIMESTAMPTZ
+    , last_updated TIMESTAMPTZ
+    --aggregate is needed if multiple events are created at the same
+    --point in time
+    , aggregate_type TEXT
+    , aggregate_id TEXT
+    , event_sequence INT8
 
     , PRIMARY KEY (projection_name, instance_id)
 );
@@ -12,14 +17,18 @@ INSERT INTO projections.current_states (
     projection_name
     , instance_id
     , event_date
+    , aggregate_type
+    , aggregate_id
+    , event_sequence
     , last_updated
-    , sequence
 ) SELECT 
     cs.projection_name
     , cs.instance_id
     , e.creation_date
+    , e.aggregate_type
+    , e.aggregate_id
+    , e.event_sequence
     , cs.timestamp
-    , cs.current_sequence
 FROM 
     projections.current_sequences cs
 JOIN eventstore.events e ON

@@ -184,39 +184,58 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 		err = tx.Commit()
 	}()
 
-	currentState, err := h.currentState(ctx, tx)
-	if err != nil {
+	state, shouldSkip, err := h.currentState(ctx, tx)
+	if err != nil || shouldSkip {
 		return err
 	}
 
-	var lastEvent eventstore.Event
-
+	var hasChanged bool
 	for {
-		events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, currentState))
-		if err != nil || len(events) == 0 {
+		events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, state))
+		if err != nil {
 			return err
 		}
+		events = skipPreviouslyReduced(events, state)
+		if len(events) == 0 {
+			break
+		}
 
-		statements, err := h.eventsToStatements(tx, currentState, events)
+		statements, err := h.eventsToStatements(tx, events, state)
 		if err != nil {
 			return err
 		}
 
-		if err = h.execute(ctx, tx, currentState, statements); err != nil {
+		if err = h.execute(ctx, tx, state, statements); err != nil {
 			return err
 		}
 
-		lastEvent = events[len(events)-1]
+		hasChanged = true
+		state.aggregateID = events[len(events)-1].Aggregate().ID
+		state.aggregateType = events[len(events)-1].Aggregate().Type
+		state.eventSequence = events[len(events)-1].Sequence()
+		state.eventTimestamp = events[len(events)-1].CreationDate()
+
 		if len(events) < int(h.bulkLimit) {
 			break
 		}
 	}
 
-	return h.setState(ctx, &state{
-		InstanceID:     lastEvent.Aggregate().InstanceID,
-		EventTimestamp: lastEvent.CreationDate(),
-		EventSequence:  lastEvent.Sequence(),
-	}, tx)
+	if !hasChanged {
+		return nil
+	}
+
+	return h.setState(ctx, tx, state)
+}
+
+func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eventstore.Event {
+	for i, event := range events {
+		if currentState.aggregateID == event.Aggregate().ID &&
+			currentState.aggregateType == event.Aggregate().Type &&
+			currentState.eventSequence == event.Sequence() {
+			return events[i+1:]
+		}
+	}
+	return events
 }
 
 func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) error {
@@ -244,10 +263,11 @@ func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *stat
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		Limit(uint64(h.bulkLimit)).
 		AllowTimeTravel().
+		OrderAsc().
 		SetTx(tx).
 		AddQuery().
 		AggregateTypes(h.aggregates...).
-		CreationDateAfter(currentState.EventTimestamp.Add(-1 * time.Microsecond)).
+		CreationDateAfter(currentState.eventTimestamp.Add(-1 * time.Microsecond)).
 		Builder()
 }
 

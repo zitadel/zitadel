@@ -274,7 +274,7 @@ var (
 		table: currentStateTable,
 	}
 	CurrentStateColSequence = Column{
-		name:  "sequence",
+		name:  "event_sequence",
 		table: currentStateTable,
 	}
 	CurrentStateColLastUpdated = Column{

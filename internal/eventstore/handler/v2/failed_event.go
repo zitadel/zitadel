@@ -47,7 +47,7 @@ func failureFromStatement(statement *Statement, err error) *failure {
 }
 
 func (h *Handler) handleFailedStmt(tx *sql.Tx, currentState *state, f *failure) (shouldContinue bool) {
-	if currentState.EventTimestamp.After(f.eventDate) || currentState.EventTimestamp.Equal(f.eventDate) {
+	if currentState.eventTimestamp.After(f.eventDate) || currentState.eventTimestamp.Equal(f.eventDate) {
 		return true
 	}
 	failureCount, err := h.failureCount(tx, f)
