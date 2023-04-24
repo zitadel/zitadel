@@ -1,7 +1,6 @@
 "use client";
 
 import { demos, type Item } from "#/lib/demos";
-import "#/styles/globals.css";
 import { ZitadelLogo } from "#/ui/ZitadelLogo";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";

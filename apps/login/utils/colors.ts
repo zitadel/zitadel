@@ -47,7 +47,7 @@ export class ColorService {
   dark: ColorMap;
   light: ColorMap;
 
-  constructor(policy?: LabelPolicy) {
+  constructor(document: any, policy?: LabelPolicy) {
     const lP = {
       backgroundColor: BACKGROUND,
       backgroundColorDark: DARK_BACKGROUND,
@@ -73,27 +73,28 @@ export class ColorService {
       lP.linkColor = policy.fontColor;
       lP.linkColorDark = policy.fontColorDark;
     }
+
     this.dark = computeMap(lP, true);
     this.light = computeMap(lP, false);
 
-    setColors(this.dark.background, "background", "dark");
-    setColors(this.light.background, "background", "light");
+    setColors(this.dark.background, "background", "dark", document);
+    setColors(this.light.background, "background", "light", document);
 
-    setColors(this.dark.primary, "primary", "dark");
-    setColors(this.light.primary, "primary", "light");
+    setColors(this.dark.primary, "primary", "dark", document);
+    setColors(this.light.primary, "primary", "light", document);
 
-    setColors(this.dark.text, "primary", "dark");
-    setColors(this.light.text, "primary", "light");
+    setColors(this.dark.text, "primary", "dark", document);
+    setColors(this.light.text, "primary", "light", document);
 
-    setColors(this.dark.link, "link", "dark");
-    setColors(this.light.link, "link", "light");
+    setColors(this.dark.link, "link", "dark", document);
+    setColors(this.light.link, "link", "light", document);
 
-    setColors(this.dark.warn, "warn", "dark");
-    setColors(this.light.warn, "warn", "light");
+    setColors(this.dark.warn, "warn", "dark", document);
+    setColors(this.light.warn, "warn", "light", document);
   }
 }
 
-function setColors(map: Color[], type: string, theme: string) {
+function setColors(map: Color[], type: string, theme: string, document: any) {
   map.forEach((color) => {
     document.documentElement.style.setProperty(
       `--theme-${theme}-${type}-${color.name}`,
@@ -104,15 +105,6 @@ function setColors(map: Color[], type: string, theme: string) {
       color.contrastColor
     );
   });
-
-  // document.documentElement.style.setProperty(
-  //     `--${prefix}background-color`,
-  //     map?.background[500].,
-  //   );
-  //   document.documentElement.style.setProperty(
-  //     "--dark-background-color",
-  //     branding?.backgroundColorDark
-  //   );
 }
 
 function computeColors(hex: string): Color[] {

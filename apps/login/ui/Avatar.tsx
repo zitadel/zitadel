@@ -1,4 +1,4 @@
-import { Color, getColorHash } from "#/utils/colors";
+import { Color, ColorShade, getColorHash } from "#/utils/colors";
 import { useTheme } from "next-themes";
 import { FC } from "react";
 
@@ -44,7 +44,7 @@ export const Avatar: FC<AvatarProps> = ({
     credentials = initials;
   }
 
-  const color: Color = getColorHash(loginName);
+  const color: ColorShade = getColorHash(loginName);
 
   const avatarStyleDark = {
     backgroundColor: color[900],
@@ -64,9 +64,9 @@ export const Avatar: FC<AvatarProps> = ({
         size === AvatarSize.LARGE
           ? "h-20 w-20 font-normal"
           : size === AvatarSize.BASE
-          ? "w-38px h-38px font-bold"
+          ? "w-[38px] h-[38px] font-bold"
           : size === AvatarSize.SMALL
-          ? "w-32px h-32px font-bold"
+          ? "w-[32px] h-[32px] font-bold"
           : ""
       }`}
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}

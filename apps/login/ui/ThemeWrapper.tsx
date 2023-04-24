@@ -2,6 +2,7 @@
 
 import { LabelPolicy } from "#/../../packages/zitadel-server/dist";
 import { ColorService } from "#/utils/colors";
+import { useEffect } from "react";
 
 type Props = {
   branding: LabelPolicy | undefined;
@@ -9,7 +10,9 @@ type Props = {
 };
 
 const ThemeWrapper = ({ children, branding }: Props) => {
-  const colorService = new ColorService(branding);
+  useEffect(() => {
+    const colorService = new ColorService(document, branding);
+  }, []);
 
   const defaultClasses = "bg-background-light-600 dark:bg-background-dark-600";
 

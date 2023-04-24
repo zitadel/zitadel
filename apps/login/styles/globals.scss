@@ -1,3 +1,5 @@
+@import "./vars.scss";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,6 +20,14 @@ html {
   --dark-background-color: #000000;
 }
 
+.bg-background-light-300 {
+  background-color: var(--theme-light-background-300);
+}
+
+.bg-background-light-400 {
+  background-color: var(--theme-light-background-400);
+}
+
 .bg-background-light-500 {
   background-color: var(--theme-light-background-500);
 }
@@ -32,6 +42,10 @@ html {
 
 .bg-background-light-800 {
   background-color: var(--theme-light-background-600);
+}
+
+.dark .dark\:bg-background-dark-400 {
+  background-color: var(--theme-dark-background-400) !important;
 }
 
 .dark .dark\:bg-background-dark-500 {

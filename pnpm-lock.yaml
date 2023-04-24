@@ -49,6 +49,7 @@ importers:
       react: 18.2.0
       react-dom: 18.2.0
       react-hook-form: 7.39.5
+      sass: ^1.62.0
       styled-components: 6.0.0-beta.2
       tailwindcss: 3.2.4
       tinycolor2: 1.4.2
@@ -64,12 +65,13 @@ importers:
       '@zitadel/server': link:../../packages/zitadel-server
       clsx: 1.2.1
       date-fns: 2.29.3
-      next: 13.3.1-canary.13_z72xxk7vwlamvgqemvc4ptm4du
+      next: 13.3.1-canary.13_q2l6mupuna4bhqrj53otrbdm2a
       next-themes: 0.2.1_amhwfk4ri4rspyzmqtvcofnhfa
       nice-grpc: 2.0.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-hook-form: 7.39.5_react@18.2.0
+      sass: 1.62.0
       styled-components: 6.0.0-beta.2_biqbaboplfbrettd7655fr4n2y
       tinycolor2: 1.4.2
     devDependencies:
@@ -4360,7 +4362,6 @@ packages:
 
   /immutable/4.3.0:
     resolution: {integrity: sha512-0AOCmOip+xgJwEVTQj1EfiDDOkPmuyllDuTuEX+DDXUgapLAsBIfkg3sxCYyCEA8mQqZrrxPUGjcOQ2JS3WLkg==}
-    dev: true
 
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -5021,7 +5022,7 @@ packages:
       react: '*'
       react-dom: '*'
     dependencies:
-      next: 13.3.1-canary.13_z72xxk7vwlamvgqemvc4ptm4du
+      next: 13.3.1-canary.13_q2l6mupuna4bhqrj53otrbdm2a
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     dev: false
@@ -5073,7 +5074,7 @@ packages:
       - babel-plugin-macros
     dev: false
 
-  /next/13.3.1-canary.13_z72xxk7vwlamvgqemvc4ptm4du:
+  /next/13.3.1-canary.13_q2l6mupuna4bhqrj53otrbdm2a:
     resolution: {integrity: sha512-nqLvbeAbJiVFWHzfvUM6D5L/nwjUD7+fc0FWPdJc/jLbInKNqQQHc4+0NKNi8tj6Af9cn4MBPrrg/lyMbf0hVA==}
     engines: {node: '>=14.6.0'}
     hasBin: true
@@ -5101,6 +5102,7 @@ packages:
       postcss: 8.4.14
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+      sass: 1.62.0
       styled-jsx: 5.1.1_duavcg6prxxl5begav3y2fyxcu
     optionalDependencies:
       '@next/swc-darwin-arm64': 13.3.1-canary.13
@@ -5914,7 +5916,6 @@ packages:
       chokidar: 3.5.3
       immutable: 4.3.0
       source-map-js: 1.0.2
-    dev: true
 
   /scheduler/0.23.0:
     resolution: {integrity: sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==}
