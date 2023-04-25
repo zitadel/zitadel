@@ -61,7 +61,7 @@ type AddHuman struct {
 	// Details are set after a successful execution of the command
 	Details *domain.ObjectDetails
 
-	// emailCode is set by the command
+	// EmailCode is set by the command
 	EmailCode *string
 }
 
@@ -240,16 +240,6 @@ func (c *Commands) AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordA
 				}
 				cmds = append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, initCode.Crypted, initCode.Expiry))
 			} else {
-				//email, err := c.NewUserEmailEvents(ctx, a.ID, a.ResourceOwner)
-				//if err != nil {
-				//	return nil, err
-				//}
-				//if human.Email.Verified {
-				//	email.Change(ctx, human.Email.Address)
-				//	email.SetVerified(ctx)
-				//} else {
-				//	c.changeUserEmailWithCode(ctx, a.ID, a.ResourceOwner, string(human.Email.Address), codeAlg, human.Email.ReturnCode, human.Email.UrlTemplate)
-				//}
 				if !human.Email.Verified {
 					emailCode, err := c.newEmailCode(ctx, filter, codeAlg)
 					if err != nil {

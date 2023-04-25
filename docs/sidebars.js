@@ -376,15 +376,15 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Instance Lifecycle",
+          label: "User Lifecycle (Alpha)",
           link: {
             type: "generated-index",
-            title: "User Service API",
+            title: "User Service API (Alpha)",
             slug: "/apis/user_service",
             description:
-              "This API is intended to manage the different ZITADEL instances within the system.\n" +
-              "\n" +
-              "Checkout the guide how to access the ZITADEL System API.",
+              "This API is intended to manage users in a ZITADEL instance.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/user_service/sidebar.js"),
         },

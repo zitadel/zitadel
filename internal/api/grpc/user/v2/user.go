@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-func (s *Server) AddUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
+func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
 	human, err := addUserRequestToAddHuman(req)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			Address:     domain.EmailAddress(req.GetEmail().GetEmail()),
 			Verified:    req.GetEmail().GetIsVerified(),
 			ReturnCode:  req.GetEmail().GetReturnCode() != nil,
-			UrlTemplate: urlTemplate,
+			URLTemplate: urlTemplate,
 		},
 		PreferredLanguage:      language.Make(req.GetProfile().GetPreferredLanguage()),
 		Gender:                 genderToDomain(req.GetProfile().GetGender()),

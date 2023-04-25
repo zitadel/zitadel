@@ -14,6 +14,65 @@ import "validate/validate.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha;user";
 
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "User Service";
+    version: "2.0-alpha";
+    description: "This API is intended to manage users in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
 service UserService {
 
   // Create a new human user
@@ -25,6 +84,17 @@ service UserService {
 
     option (zitadel.v1.auth_option) = {
       permission: "user.write"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a user (Human)";
+      description: "Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
     };
   }
 
@@ -38,6 +108,17 @@ service UserService {
     option (zitadel.v1.auth_option) = {
       permission: "authenticated"
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Change the user email";
+      description: "Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
   }
 
   // Verify the email with the provided code
@@ -49,6 +130,17 @@ service UserService {
 
     option (zitadel.v1.auth_option) = {
       permission: "authenticated"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Verify the email";
+      description: "Verify the email with the generated code."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
     };
   }
 }

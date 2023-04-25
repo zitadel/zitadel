@@ -15,8 +15,8 @@ type Email struct {
 	// ReturnCode is used if the Verified field is false
 	ReturnCode bool
 
-	// UrlTemplate can be used to specify a custom link to be sent in the mail verification
-	UrlTemplate string
+	// URLTemplate can be used to specify a custom link to be sent in the mail verification
+	URLTemplate string
 }
 
 func (e *Email) Validate() error {
