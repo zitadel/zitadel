@@ -1,16 +1,18 @@
+//go:build integration
+
 package admin_test
 
 import (
 	"context"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/integration"
-)
+	"github.com/stretchr/testify/require"
 
-const commandLine = `start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled --config ../../e2e/config/localhost/zitadel.yaml --steps ../../e2e/config/localhost/zitadel.yaml`
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
+)
 
 var (
 	Tester *integration.Tester
@@ -21,9 +23,15 @@ func TestMain(m *testing.M) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 
-		Tester = integration.NewTester(ctx, strings.Split(commandLine, " "))
+		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
 		return m.Run()
 	}())
+}
+
+func TestServer_Healthz(t *testing.T) {
+	client := admin.NewAdminServiceClient(Tester.ClientConn)
+	_, err := client.Healthz(context.TODO(), &admin.HealthzRequest{})
+	require.NoError(t, err)
 }

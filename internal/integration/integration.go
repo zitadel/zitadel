@@ -2,11 +2,15 @@
 package integration
 
 import (
+	"bytes"
 	"context"
+	_ "embed"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
+	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -15,12 +19,23 @@ import (
 	"github.com/zitadel/zitadel/cmd/start"
 )
 
+var (
+	//go:embed config/zitadel.yaml
+	zitadelYAML []byte
+	//go:embed config/cockroach.yaml
+	cockroachYAML []byte
+	//go:embed config/postgres.yaml
+	postgresYAML []byte
+)
+
 type Tester struct {
 	*start.Server
 	ClientConn *grpc.ClientConn
 
 	wg sync.WaitGroup // used for shutdown
 }
+
+const commandLine = `start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled`
 
 func (s *Tester) createClientConn(ctx context.Context) {
 	target := fmt.Sprintf("localhost:%d", s.Config.Port)
@@ -45,16 +60,31 @@ func (s *Tester) Done() {
 	s.wg.Wait()
 }
 
-func NewTester(ctx context.Context, args []string) *Tester {
-	tester := new(Tester)
+func NewTester(ctx context.Context) *Tester {
+	args := strings.Split(commandLine, " ")
+
 	sc := make(chan *start.Server)
+	cmd := cmd.New(os.Stdout, os.Stdin, args, sc)
+	cmd.SetArgs(args)
+	err := viper.MergeConfig(bytes.NewBuffer(zitadelYAML))
+	logging.OnError(err).Fatal()
+
+	flavor := os.Getenv("INTEGRATION_DB_FLAVOR")
+	switch flavor {
+	case "cockroach":
+		err = viper.MergeConfig(bytes.NewBuffer(cockroachYAML))
+	case "postgres":
+		err = viper.MergeConfig(bytes.NewBuffer(postgresYAML))
+	default:
+		logging.New().WithField("flavor", flavor).Fatal("unknown db flavor set in INTEGRATION_DB_FLAVOR")
+	}
+	logging.OnError(err).Fatal()
+
+	tester := new(Tester)
 	tester.wg.Add(1)
 	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-
-		cmd := cmd.New(os.Stdout, os.Stdin, args, sc)
-		cmd.SetArgs(args)
 		logging.OnError(cmd.Execute()).Fatal()
+		wg.Done()
 	}(&tester.wg)
 
 	select {
