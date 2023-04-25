@@ -35,9 +35,8 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -62,9 +61,8 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(ProjectGrantColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -88,9 +86,8 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -116,9 +113,8 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantReactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -147,9 +143,8 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -178,9 +173,8 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -209,9 +203,8 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantCascadeChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -240,9 +233,8 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("project"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("project"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -275,9 +267,8 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

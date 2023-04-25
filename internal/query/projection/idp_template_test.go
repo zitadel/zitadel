@@ -45,9 +45,8 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(IDPInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -71,9 +70,8 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -103,9 +101,8 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 				), org.IDPRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -132,9 +129,8 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 				), org.IDPConfigRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -203,9 +199,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOAuthIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -274,9 +269,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOAuthIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -331,9 +325,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOAuthIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -387,9 +380,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOAuthIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -470,9 +462,8 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -537,9 +528,8 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -604,9 +594,8 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -659,9 +648,8 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -713,9 +701,8 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceAzureADIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -799,9 +786,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -862,9 +848,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -915,9 +900,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -967,9 +951,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1054,9 +1037,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1123,9 +1105,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1179,9 +1160,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1234,9 +1214,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1320,9 +1299,8 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1382,9 +1360,8 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1435,9 +1412,8 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1487,9 +1463,8 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1572,9 +1547,8 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1637,9 +1611,8 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1691,9 +1664,8 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1744,9 +1716,8 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGitLabSelfHostedIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1828,9 +1799,8 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGoogleIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1890,9 +1860,8 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGoogleIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1943,9 +1912,8 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGoogleIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1995,9 +1963,8 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceGoogleIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2098,9 +2065,8 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceLDAPIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2199,9 +2165,8 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceLDAPIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2271,9 +2236,8 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceLDAPIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2342,9 +2306,8 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceLDAPIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2405,9 +2368,8 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2476,9 +2438,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2542,9 +2503,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2597,9 +2557,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2651,9 +2610,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOIDCIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2729,9 +2687,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2774,9 +2731,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2818,9 +2774,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2854,9 +2809,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2897,9 +2851,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -2951,9 +2904,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3005,9 +2957,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3057,9 +3008,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3103,9 +3053,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3151,9 +3100,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3198,9 +3146,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3244,9 +3191,8 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceOldJWTConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3320,9 +3266,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceJWTIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3380,9 +3325,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceJWTIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3434,9 +3378,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceJWTIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -3482,9 +3425,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 			},
 			reduce: (&idpTemplateProjection{}).reduceJWTIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

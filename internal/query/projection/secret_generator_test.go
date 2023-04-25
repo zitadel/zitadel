@@ -33,9 +33,8 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -61,9 +60,8 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -97,9 +95,8 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -135,9 +132,8 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

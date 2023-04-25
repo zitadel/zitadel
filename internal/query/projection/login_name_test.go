@@ -35,9 +35,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceUserCreated,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -66,9 +65,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceUserCreated,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -97,9 +95,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceUserCreated,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -126,9 +123,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -155,9 +151,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceUserNameChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -185,9 +180,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceUserDomainClaimed,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -215,9 +209,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -246,9 +239,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -274,9 +266,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -293,9 +284,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -322,9 +312,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceDomainVerified,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -352,9 +341,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceDomainRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -382,9 +370,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -422,9 +409,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -453,9 +439,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -481,9 +466,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -500,9 +484,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceInstanceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -538,9 +521,8 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 			reduce: (&loginNameProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

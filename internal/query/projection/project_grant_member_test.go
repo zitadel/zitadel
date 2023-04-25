@@ -61,9 +61,8 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					),
 				)(t)}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -104,9 +103,8 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -139,9 +137,8 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -171,9 +168,8 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -200,9 +196,8 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -227,9 +222,8 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -253,9 +247,8 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -279,9 +272,8 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -307,9 +299,8 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceOrgRemoved,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

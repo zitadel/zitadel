@@ -35,9 +35,8 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("user"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -69,9 +68,8 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("user"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -96,9 +94,8 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("user"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("user"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -123,9 +120,8 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -153,9 +149,8 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(PersonalAccessTokenColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

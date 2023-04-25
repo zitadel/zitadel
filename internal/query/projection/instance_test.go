@@ -31,9 +31,8 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceInstanceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -61,9 +60,8 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(InstanceColumnID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -87,9 +85,8 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceDefaultOrgSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -116,9 +113,8 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -145,9 +141,8 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

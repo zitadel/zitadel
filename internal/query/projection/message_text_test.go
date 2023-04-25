@@ -38,9 +38,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -77,9 +76,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -116,9 +114,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -155,9 +152,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -194,9 +190,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -233,9 +228,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -272,9 +266,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -310,9 +303,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -342,9 +334,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(MessageTextInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -372,9 +363,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -408,9 +398,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -444,9 +433,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -480,9 +468,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -516,9 +503,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -552,9 +538,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -588,9 +573,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				), org.CustomTextTemplateRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -622,9 +606,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				), instance.CustomTextSetEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -660,9 +643,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -692,9 +674,8 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

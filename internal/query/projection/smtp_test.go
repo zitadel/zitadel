@@ -38,9 +38,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -83,9 +82,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -126,9 +124,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigPasswordChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -156,9 +153,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(SMTPConfigColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

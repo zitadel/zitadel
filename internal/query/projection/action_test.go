@@ -35,9 +35,8 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("action"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("action"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -71,9 +70,8 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("action"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("action"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -102,9 +100,8 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("action"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("action"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -132,9 +129,8 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionReactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("action"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("action"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -162,9 +158,8 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("action"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("action"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -189,9 +184,8 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -219,9 +213,8 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(ActionInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

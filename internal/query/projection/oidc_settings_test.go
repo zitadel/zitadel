@@ -32,9 +32,8 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 			},
 			reduce: (&oidcSettingsProjection{}).reduceOIDCSettingsChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -65,9 +64,8 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 			},
 			reduce: (&oidcSettingsProjection{}).reduceOIDCSettingsAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -100,9 +98,8 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(OIDCSettingsColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

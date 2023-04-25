@@ -34,9 +34,8 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				), instance.DebugNotificationProviderFileAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -70,9 +69,8 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				), instance.DebugNotificationProviderFileChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -101,9 +99,8 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				), instance.DebugNotificationProviderFileRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -131,9 +128,8 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				), instance.DebugNotificationProviderLogAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -167,9 +163,8 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				), instance.DebugNotificationProviderLogChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -198,9 +193,8 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				), instance.DebugNotificationProviderLogRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -226,9 +220,8 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(DebugNotificationProviderInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
