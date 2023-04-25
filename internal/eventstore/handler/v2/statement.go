@@ -21,10 +21,7 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 		statements[i], err = h.reduce(event)
 		if err != nil {
 			h.logEvent(event).WithError(err).Error("reduce failed")
-			if h.handleFailedStmt(tx, currentState, failureFromEvent(event, err)) {
-				statements[i] = NewNoOpStatement(event)
-				continue
-			}
+			h.handleFailedStmt(tx, currentState, failureFromEvent(event, err))
 			return nil, err
 		}
 	}
