@@ -5,8 +5,6 @@ CREATE temporary TABLE IF NOT EXISTS wrong_events (
     , next_cd TIMESTAMPTZ
 );
 
-TRUNCATE wrong_events;
-
 INSERT INTO wrong_events (
     SELECT * FROM (
         SELECT
