@@ -1,0 +1,18 @@
+{{template "main-top" .}}
+
+<h1>{{.Title}}</h1>
+<p>
+    {{.Username}}, {{t "DeviceAuth.Action.GrantDevice"}} {{.ClientID}} {{t "DeviceAuth.Action.AccessToScopes"}}: {{.Scopes}}.
+</p>
+<form method="POST">
+    {{ .CSRF }}
+    <input type="hidden" name="authRequestID" value="{{.AuthRequestID}}">
+    <button class="lgn-raised-button lgn-primary left" type="submit" formaction="./allowed">
+        {{t "DeviceAuth.Action.Button.Allow"}}
+    </button>
+    <button class="lgn-raised-button lgn-warn right" type="submit" formaction="./denied">
+        {{t "DeviceAuth.Action.Button.Deny"}}
+    </button>
+</form>
+
+{{template "main-bottom" .}}

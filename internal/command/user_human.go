@@ -546,7 +546,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 		if human.Email != nil && human.EmailAddress != "" && human.IsEmailVerified {
 			events = append(events, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 		} else {
-			emailCode, err := domain.NewEmailCode(emailCodeGenerator)
+			emailCode, _, err := domain.NewEmailCode(emailCodeGenerator)
 			if err != nil {
 				return nil, nil, err
 			}

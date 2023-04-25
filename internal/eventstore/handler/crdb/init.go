@@ -377,6 +377,8 @@ func defaultValue(value interface{}) string {
 	switch v := value.(type) {
 	case string:
 		return "'" + v + "'"
+	case fmt.Stringer:
+		return fmt.Sprintf("%#v", v)
 	default:
 		return fmt.Sprintf("%v", v)
 	}

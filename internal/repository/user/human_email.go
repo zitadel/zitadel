@@ -19,6 +19,7 @@ const (
 	HumanEmailVerificationFailedType = emailEventPrefix + "verification.failed"
 	HumanEmailCodeAddedType          = emailEventPrefix + "code.added"
 	HumanEmailCodeSentType           = emailEventPrefix + "code.sent"
+	HumanEmailConfirmURLAddedType    = emailEventPrefix + "confirm_url.added"
 )
 
 type HumanEmailChangedEvent struct {
@@ -123,7 +124,8 @@ type HumanEmailCodeAddedEvent struct {
 
 	Code         *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry       time.Duration       `json:"expiry,omitempty"`
-	CodeReturned bool                `json:"codeReturned,omitempty"`
+	URLTemplate  string              `json:"url_template,omitempty"`
+	CodeReturned bool                `json:"code_returned,omitempty"`
 }
 
 func (e *HumanEmailCodeAddedEvent) Data() interface{} {
@@ -138,16 +140,9 @@ func NewHumanEmailCodeAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
-	expiry time.Duration) *HumanEmailCodeAddedEvent {
-	return &HumanEmailCodeAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			HumanEmailCodeAddedType,
-		),
-		Code:   code,
-		Expiry: expiry,
-	}
+	expiry time.Duration,
+) *HumanEmailCodeAddedEvent {
+	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, "", false)
 }
 
 func NewHumanEmailCodeAddedEventV2(
@@ -155,6 +150,7 @@ func NewHumanEmailCodeAddedEventV2(
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
+	urlTemplate string,
 	codeReturned bool,
 ) *HumanEmailCodeAddedEvent {
 	return &HumanEmailCodeAddedEvent{
@@ -165,6 +161,7 @@ func NewHumanEmailCodeAddedEventV2(
 		),
 		Code:         code,
 		Expiry:       expiry,
+		URLTemplate:  urlTemplate,
 		CodeReturned: codeReturned,
 	}
 }

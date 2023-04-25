@@ -1,5 +1,14 @@
+<ng-template #labelTemplate>
+  <label class="cnsl-label-wrapper" [attr.for]="_control.id" [attr.aria-owns]="_control.id">
+    <ng-content select="cnsl-label"></ng-content>
+    <span *ngIf="_control.required && !hideRequiredMarker" aria-hidden="true" class="cnsl-form-field-required-marker"
+      >*</span
+    >
+  </label>
+</ng-template>
+
 <div class="cnsl-form-field-wrapper" (click)="_control.onContainerClick && _control.onContainerClick($event)">
-  <ng-content select="cnsl-label"></ng-content>
+  <ng-template [ngTemplateOutlet]="labelTemplate"></ng-template>
   <div class="cnsl-rel" #inputContainer>
     <ng-content></ng-content>
     <ng-content select="cnslSuffix"></ng-content>

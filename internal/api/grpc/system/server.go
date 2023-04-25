@@ -4,7 +4,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/admin/repository"
-
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"

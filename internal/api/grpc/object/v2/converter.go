@@ -3,9 +3,8 @@ package object
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-
 	"github.com/zitadel/zitadel/internal/domain"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
