@@ -4,7 +4,7 @@ title: Support
 
 :::caution
 PostgreSQL extension is currently in [Beta](/docs/support/general#beta).
-Beta state will be removed as soon as automated tests are implemented.
+Beta state will be removed as soon as automated tests are implemented. [Github Issue](https://github.com/zitadel/zitadel/issues/5741)
 :::
 
 :::caution
