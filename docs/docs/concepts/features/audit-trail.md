@@ -43,10 +43,8 @@ Access to the API is possible with a Service User account, allowing you to integ
 
 ## Future plans
 
-- How to access information in the audit trail via GUI?
-- How to access audit information via APIs (incl. ~planned~ features like event-API)?
+There will be three major areas for future development on the audit data
 
-We could include the following as additional info: 
-- Future plans for standard reports
-- ~Future plans for~ APIs (and why pull vs. push to handle backpressure of an HA system)
-- Using / sending data to external log system
+- [Metrics](https://github.com/zitadel/zitadel/issues/4458) and [standard reports](https://github.com/zitadel/zitadel/discussions/2162#discussioncomment-1153259)
+- [Feedback loop](https://github.com/zitadel/zitadel/issues/5102) and threat detection
+- Forensics and replay
