@@ -19,7 +19,7 @@ const (
 )
 
 type instanceMemberProjection struct {
-	es *eventstore.Eventstore
+	es handler.EventStore
 }
 
 func newInstanceMemberProjection(ctx context.Context, config handler.Config) *handler.Handler {

@@ -18,7 +18,7 @@ const (
 )
 
 type orgMemberProjection struct {
-	es *eventstore.Eventstore
+	es handler.EventStore
 }
 
 func newOrgMemberProjection(ctx context.Context, config handler.Config) *handler.Handler {

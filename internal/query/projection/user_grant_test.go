@@ -43,19 +43,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				), usergrant.UserGrantAddedEventMapper),
 			},
 			reduce: (&userGrantProjection{
-				StatementHandler: getStatementHandlerWithFilters(
-					user.NewHumanAddedEvent(context.Background(),
-						&user.NewAggregate("user-id", "org1").Aggregate,
-						"username1",
-						"firstname1",
-						"lastname1",
-						"nickname1",
-						"displayname1",
-						language.German,
-						domain.GenderMale,
-						"email1",
-						true,
-					),
+				es: newMockEventStore().
+					appendFilterResponse([]eventstore.Event{
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user-id", "org1").Aggregate,
+							"username1",
+							"firstname1",
+							"lastname1",
+							"nickname1",
+							"displayname1",
+							language.German,
+							domain.GenderMale,
+							"email1",
+							true,
+						),
+					}).appendFilterResponse([]eventstore.Event{
 					project.NewProjectAddedEvent(context.Background(),
 						&project.NewAggregate("project-id", "org2").Aggregate,
 						"project",
@@ -64,7 +66,8 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 						false,
 						domain.PrivateLabelingSettingUnspecified,
 					),
-				)(t)}).reduceAdded,
+				}),
+			}).reduceAdded,
 			want: wantReduce{
 				aggregateType: usergrant.AggregateType,
 				sequence:      15,
@@ -108,26 +111,29 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				), usergrant.UserGrantAddedEventMapper),
 			},
 			reduce: (&userGrantProjection{
-				StatementHandler: getStatementHandlerWithFilters(
-					user.NewHumanAddedEvent(context.Background(),
-						&user.NewAggregate("user-id", "org1").Aggregate,
-						"username1",
-						"firstname1",
-						"lastname1",
-						"nickname1",
-						"displayname1",
-						language.German,
-						domain.GenderMale,
-						"email1",
-						true,
-					),
+				es: newMockEventStore().
+					appendFilterResponse([]eventstore.Event{
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user-id", "org1").Aggregate,
+							"username1",
+							"firstname1",
+							"lastname1",
+							"nickname1",
+							"displayname1",
+							language.German,
+							domain.GenderMale,
+							"email1",
+							true,
+						),
+					}).appendFilterResponse([]eventstore.Event{
 					project.NewGrantAddedEvent(context.Background(),
 						&project.NewAggregate("project-id", "org2").Aggregate,
 						"grant-id",
 						"org3",
 						[]string{},
 					),
-				)(t)}).reduceAdded,
+				}),
+			}).reduceAdded,
 			want: wantReduce{
 				aggregateType: usergrant.AggregateType,
 				sequence:      15,
@@ -557,31 +563,5 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			got, err = tt.reduce(event)
 			assertReduce(t, got, err, UserGrantProjectionTable, tt.want)
 		})
-	}
-}
-
-func getStatementHandlerWithFilters(events ...eventstore.Command) func(t *testing.T) handler.StatementHandler {
-	filters := make([]expect, 0)
-	for _, event := range events {
-		filters = append(filters,
-			expectFilter(
-				eventFromEventPusher(
-					event,
-				),
-			),
-		)
-	}
-
-	return func(t *testing.T) handler.StatementHandler {
-		return handler.StatementHandler{
-			ProjectionHandler: &handler.ProjectionHandler{
-				Handler: handler.Handler{
-					Eventstore: eventstoreExpect(
-						t,
-						filters...,
-					),
-				},
-			},
-		}
 	}
 }

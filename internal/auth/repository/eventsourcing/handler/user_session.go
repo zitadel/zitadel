@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
@@ -27,7 +28,7 @@ const (
 type UserSession struct {
 	queries *query2.Queries
 	view    *auth_view.View
-	es      *eventstore.Eventstore
+	es      handler.EventStore
 }
 
 var _ handler2.Projection = (*UserSession)(nil)

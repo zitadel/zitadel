@@ -94,7 +94,10 @@ type mockEventUser struct {
 }
 
 func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, changeDate time.Time) ([]eventstore.Event, error) {
-	return []eventstore.Event{m.Event}, nil
+	if m.Event != nil {
+		return []eventstore.Event{m.Event}, nil
+	}
+	return nil, nil
 }
 
 func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {

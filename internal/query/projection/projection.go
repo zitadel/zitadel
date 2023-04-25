@@ -66,6 +66,10 @@ var (
 	DeviceAuthProjection                *handler.Handler
 )
 
+type eventStore interface {
+	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
+}
+
 type projection interface {
 	Start(ctx context.Context)
 	Init(ctx context.Context) error
@@ -75,7 +79,7 @@ var (
 	projections []projection
 )
 
-func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
+func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
 	projectionConfig = handler.Config{
 		Client:                sqlClient,
 		Eventstore:            es,

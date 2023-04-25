@@ -41,7 +41,7 @@ const (
 )
 
 type userGrantProjection struct {
-	es *eventstore.Eventstore
+	es handler.EventStore
 }
 
 func newUserGrantProjection(ctx context.Context, config handler.Config) *handler.Handler {
@@ -445,7 +445,7 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 	), nil
 }
 
-func getResourceOwnerOfUser(ctx context.Context, es *eventstore.Eventstore, instanceID, aggID string) (string, error) {
+func getResourceOwnerOfUser(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
 	events, err := es.Filter(
 		ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -465,7 +465,7 @@ func getResourceOwnerOfUser(ctx context.Context, es *eventstore.Eventstore, inst
 	return events[0].Aggregate().ResourceOwner, nil
 }
 
-func getResourceOwnerOfProject(ctx context.Context, es *eventstore.Eventstore, instanceID, aggID string) (string, error) {
+func getResourceOwnerOfProject(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
 	events, err := es.Filter(
 		ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -485,7 +485,7 @@ func getResourceOwnerOfProject(ctx context.Context, es *eventstore.Eventstore, i
 	return events[0].Aggregate().ResourceOwner, nil
 }
 
-func getGrantedOrgOfGrantedProject(ctx context.Context, es *eventstore.Eventstore, instanceID, projectID, grantID string) (string, error) {
+func getGrantedOrgOfGrantedProject(ctx context.Context, es handler.EventStore, instanceID, projectID, grantID string) (string, error) {
 	events, err := es.Filter(
 		ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).

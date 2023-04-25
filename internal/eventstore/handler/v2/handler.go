@@ -10,9 +10,15 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
+type EventStore interface {
+	InstanceIDs(ctx context.Context, query *eventstore.SearchQueryBuilder) ([]string, error)
+	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
+	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
+}
+
 type Config struct {
 	Client     *database.DB
-	Eventstore *eventstore.Eventstore
+	Eventstore EventStore
 
 	BulkLimit             uint16
 	RequeueEvery          time.Duration
@@ -24,7 +30,7 @@ type Handler struct {
 	client     *database.DB
 	projection Projection
 
-	es         *eventstore.Eventstore
+	es         EventStore
 	bulkLimit  uint16
 	aggregates []eventstore.AggregateType
 

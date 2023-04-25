@@ -9,6 +9,7 @@ import (
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	proj_model "github.com/zitadel/zitadel/internal/project/model"
@@ -29,7 +30,7 @@ var _ handler2.Projection = (*Token)(nil)
 
 type Token struct {
 	view *auth_view.View
-	es   *eventstore.Eventstore
+	es   handler.EventStore
 }
 
 func newToken(

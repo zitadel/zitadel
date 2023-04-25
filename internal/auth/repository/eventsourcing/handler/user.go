@@ -8,6 +8,7 @@ import (
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
@@ -28,7 +29,7 @@ const (
 type User struct {
 	view    *auth_view.View
 	queries *query2.Queries
-	es      *eventstore.Eventstore
+	es      handler.EventStore
 }
 
 var _ handler2.Projection = (*User)(nil)

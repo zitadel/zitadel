@@ -231,6 +231,12 @@ func NewMultiStatement(event eventstore.Event, opts ...func(eventstore.Event) Ex
 	return NewStatement(event, multiExec(execs))
 }
 
+func AddNoOpStatement() func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
+		return NewNoOpStatement(event).Execute
+	}
+}
+
 func AddCreateStatement(columns []Column, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
 		return NewCreateStatement(event, columns, opts...).Execute
