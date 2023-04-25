@@ -1,14 +1,33 @@
-import { ZitadelLogoDark } from './ZitadelLogoDark';
-import { ZitadelLogoLight } from './ZitadelLogoLight';
+import Image from "next/image";
+import { ZitadelLogoDark } from "./ZitadelLogoDark";
+import { ZitadelLogoLight } from "./ZitadelLogoLight";
+type Props = {
+  height?: number;
+  width?: number;
+};
 
-export function ZitadelLogo() {
+export function ZitadelLogo({ height = 40, width = 147.5 }: Props) {
   return (
     <>
       <div className="hidden dark:flex">
-        <ZitadelLogoLight />
+        {/* <ZitadelLogoLight /> */}
+
+        <Image
+          height={height}
+          width={width}
+          src="/zitadel-logo-light.svg"
+          alt="zitadel logo"
+          priority={true}
+        />
       </div>
       <div className="flex dark:hidden">
-        <ZitadelLogoDark />
+        <Image
+          height={height}
+          width={width}
+          priority={true}
+          src="/zitadel-logo-dark.svg"
+          alt="zitadel logo"
+        />
       </div>
     </>
   );

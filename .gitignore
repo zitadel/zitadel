@@ -11,4 +11,5 @@ dist-ssr
 server/dist
 public/dist
 .turbo
-packages/zitadel-core/src/app/proto
+packages/zitadel-server/src/app/proto
+packages/zitadel-client/src/app/proto

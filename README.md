@@ -9,9 +9,9 @@ This Turborepo includes the following:
 ### Apps and Packages
 
 - `login`: The new login UI powered by Next.js
-- `@zitadel/core`: core components for establishing client connection, grpc stub
-- `@zitadel/react`: shared React utilities and components
-<!-- - `@zitadel/client`: shared public client utilities -->
+- `@zitadel/server`: core components for establishing node client connection, grpc stub
+- `@zitadel/client`: core components for establishing web client connection, grpc stub
+- `@zitadel/react`: shared React utilities and components built with tailwindcss
 - `@zitadel/next`: shared Next.js utilities
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset
@@ -28,8 +28,8 @@ This repo has some additional tools:
 
 ### Useful commands
 
-- `pnpm build` - Build all packages and the docs site
-- `pnpm dev` - Develop all packages and the docs site
+- `pnpm build` - Build all packages and the login app
+- `pnpm dev` - Develop all packages and the login app
 - `pnpm lint` - Lint all packages
 - `pnpm changeset` - Generate a changeset
 - `pnpm clean` - Clean up all `node_modules` and `dist` folders (runs each package's clean script)

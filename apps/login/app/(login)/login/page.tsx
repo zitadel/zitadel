@@ -18,10 +18,10 @@ export default function Page() {
 
       <form className="w-full" onSubmit={() => submit()}>
         <div className="block">
-          <TextInput title="loginname" label="Loginname" />
+          <TextInput label="Loginname" />
         </div>
+
         <div>
-          hello
           <IdentityProviders />
         </div>
         <div className="mt-8 flex w-full flex-row items-center justify-between">
