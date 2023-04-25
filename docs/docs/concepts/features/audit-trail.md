@@ -32,8 +32,12 @@ Go to your instance settings and then click on the Tab **Events** to open the Ev
 
 ### Event API
 
-- Guide: https://zitadel.com/docs/guides/integrate/event-api
-- API Docs: https://zitadel.com/docs/category/apis/admin/events
+Since everything that is available in Console can also be called with our APIs, you can access all events and audit data trough our APIs:
+
+- [Event API Guide](https://zitadel.com/docs/guides/integrate/event-api)
+- [API Documentation](https://zitadel.com/docs/category/apis/admin/events)
+
+Access to the API is possible with a Service User account, allowing you to integrate the events with your own business logic.
 
 ## Using logs in external systems
 
