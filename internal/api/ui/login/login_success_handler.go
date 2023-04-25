@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -44,26 +45,33 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 		userData: l.getUserData(r, authReq, "LoginSuccess.Title", "", errID, errMessage),
 	}
 	if authReq != nil {
-		//the id will be set via the html (maybe change this with the login refactoring)
-		if _, ok := authReq.Request.(*domain.AuthRequestOIDC); ok {
-			data.RedirectURI = l.oidcAuthCallbackURL(r.Context(), "")
-		} else if _, ok := authReq.Request.(*domain.AuthRequestSAML); ok {
-			data.RedirectURI = l.samlAuthCallbackURL(r.Context(), "")
+		data.RedirectURI, err = l.authRequestCallback(r.Context(), authReq)
+		if err != nil {
+			l.renderInternalError(w, r, authReq, err)
+			return
 		}
 	}
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplLoginSuccess], data, nil)
 }
 
 func (l *Login) redirectToCallback(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	var callback string
-	switch authReq.Request.(type) {
-	case *domain.AuthRequestOIDC:
-		callback = l.oidcAuthCallbackURL(r.Context(), authReq.ID)
-	case *domain.AuthRequestSAML:
-		callback = l.samlAuthCallbackURL(r.Context(), authReq.ID)
-	default:
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "LOGIN-rhjQF", "Errors.AuthRequest.RequestTypeNotSupported"))
+	callback, err := l.authRequestCallback(r.Context(), authReq)
+	if err != nil {
+		l.renderInternalError(w, r, authReq, err)
 		return
 	}
 	http.Redirect(w, r, callback, http.StatusFound)
+}
+
+func (l *Login) authRequestCallback(ctx context.Context, authReq *domain.AuthRequest) (string, error) {
+	switch authReq.Request.(type) {
+	case *domain.AuthRequestOIDC:
+		return l.oidcAuthCallbackURL(ctx, authReq.ID), nil
+	case *domain.AuthRequestSAML:
+		return l.samlAuthCallbackURL(ctx, authReq.ID), nil
+	case *domain.AuthRequestDevice:
+		return l.deviceAuthCallbackURL(authReq.ID), nil
+	default:
+		return "", caos_errs.ThrowInternal(nil, "LOGIN-rhjQF", "Errors.AuthRequest.RequestTypeNotSupported")
+	}
 }

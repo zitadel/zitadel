@@ -5,6 +5,7 @@
     (click)="showFilter = !showFilter"
     class="cnsl-action-button"
     #triggereventfilter="cdkOverlayOrigin"
+    data-e2e="open-filter-button"
   >
     <i class="las la-filter no-margin"></i>
     <span>{{ 'ACTIONS.FILTER' | translate }}</span>
@@ -15,8 +16,6 @@
   <ng-template
     cdkConnectedOverlay
     [cdkConnectedOverlayHasBackdrop]="true"
-    [flexibleDimensions]="true"
-    [lockPosition]="true"
     [cdkConnectedOverlayOffsetY]="10"
     [cdkConnectedOverlayPositions]="positions"
     [cdkConnectedOverlayOrigin]="triggereventfilter"
@@ -29,7 +28,7 @@
       <div class="filter-events-top">
         <button mat-stroked-button type="button" (click)="reset()">{{ 'ACTIONS.RESET' | translate }}</button>
         <span class="filter-middle">{{ 'FILTER.TITLE' | translate }}</span>
-        <button mat-raised-button color="primary" type="button" (click)="finish()">
+        <button mat-raised-button color="primary" type="button" (click)="finish()" data-e2e="filter-finish-button">
           {{ 'ACTIONS.FINISH' | translate }}
         </button>
       </div>
@@ -96,6 +95,7 @@
               name="eventTypesFilterSet"
               class="cb"
               formControlName="eventTypesFilterSet"
+              data-e2e="event-type-filter-checkbox"
               >{{ 'IAM.EVENTS.FILTERS.TYPE.CHECKBOX' | translate }}
             </mat-checkbox>
           </div>

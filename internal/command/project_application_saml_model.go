@@ -241,12 +241,11 @@ func (wm *SAMLEntityIDsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *project.ApplicationRemovedEvent:
-			removeAppIDFromEntityIDs(wm.EntityIDs, e.AppID)
+			wm.EntityIDs = removeAppIDFromEntityIDs(wm.EntityIDs, e.AppID)
 		case *project.SAMLConfigAddedEvent:
 			wm.EntityIDs = append(wm.EntityIDs, &AppIDToEntityID{AppID: e.AppID, EntityID: e.EntityID})
 		case *project.SAMLConfigChangedEvent:
-			for i := range wm.EntityIDs {
-				item := wm.EntityIDs[i]
+			for _, item := range wm.EntityIDs {
 				if e.AppID == item.AppID && e.EntityID != "" {
 					item.EntityID = e.EntityID
 				}

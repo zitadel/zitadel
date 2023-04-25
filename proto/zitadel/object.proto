@@ -8,7 +8,7 @@ package zitadel.v1;
 option go_package ="github.com/zitadel/zitadel/pkg/grpc/object";
 
 message ObjectDetails {
-    //sequence represents the order of events. It's always upcounting
+    //sequence represents the order of events. It's always counting
     //
     // on read: the sequence of the last event reduced by the projection
     //
@@ -30,7 +30,7 @@ message ObjectDetails {
     //
     // on manipulation: the
     google.protobuf.Timestamp change_date = 3;
-    //resource_owner is the organisation an object belongs to
+    //resource_owner is the organization an object belongs to
     string resource_owner = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";
@@ -39,15 +39,21 @@ message ObjectDetails {
 }
 
 message ListQuery {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "General List Query"
+            description: "Object unspecific list filters like offset, limit and asc/desc."
+        }
+    };
     uint64 offset = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"10\"";
+            example: "\"0\"";
         }
     ];
     uint32 limit = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "20";
-            description: "Maximum amount of events returned. Default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If limit exeeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
+            example: "100";
+            description: "Maximum amount of events returned. The default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If the limit exceeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
         }
     ];
     bool asc = 3 [

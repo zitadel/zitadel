@@ -32,7 +32,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				redirectURI:  "redirectURI",
 			},
 			want: &oauth.Session{
-				AuthURL: "https://github.com/login/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&state=testState",
+				AuthURL: "https://github.com/login/oauth/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&state=testState",
 			},
 		},
 	}

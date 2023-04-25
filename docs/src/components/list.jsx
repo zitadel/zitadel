@@ -142,7 +142,10 @@ export function ListElement({
   description,
 }) {
   return (
-    <a className={styles.listelement} href={link}>
+    <a 
+      className={styles.listelement} 
+      href={link} 
+    >
       {type
         ? type
         : iconClasses && (

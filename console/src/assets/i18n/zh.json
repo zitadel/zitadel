@@ -42,6 +42,48 @@
       "ADD": "按住并拖动来添加"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "你的入职过程",
+    "MOREDESCRIPTION": "更多捷径",
+    "COMPLETED": "已完成",
+    "DISMISS": "隐藏",
+    "CARD": {
+      "TITLE": "让你的ZITADEL运转起来",
+      "DESCRIPTION": "这份清单有助于设置你的实例，并指导你完成最重要的步骤"
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "设置你的品牌",
+        "description": "定义你的登录的颜色和形状，上传你的标志和图标。",
+        "action": "设置品牌"
+      },
+      "instance.smtp.config.added": {
+        "title": "SMTP设置",
+        "description": "设置你自己的邮件服务器设置",
+        "action": "设置 SMTP 设置"
+      },
+      "project.added": {
+        "title": "创建你的第一个项目",
+        "description": "添加你的第一个项目并定义其角色和授权。",
+        "action": "创建项目"
+      },
+      "project.application.added": {
+        "title": "创建你的第一个应用程序",
+        "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。",
+        "action": "创建应用程序"
+      },
+      "user.human.added": {
+        "title": "添加用户",
+        "description": "添加你的应用程序用户",
+        "action": "创建用户"
+      },
+      "user.grant.added": {
+        "title": "授予用户",
+        "description": "允许用户访问你的应用程序并设置他们的角色。",
+        "action": "创建授权"
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "实例",
     "DASHBOARD": "首页",
@@ -124,6 +166,7 @@
     "NEXT": "下一页",
     "MORE": "更多",
     "STEP": "Step",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -203,11 +246,21 @@
     "NOROWS": "没有数据"
   },
   "ERRORS": {
-    "REQUIRED": "缺少一些必填字段。",
+    "REQUIRED": "请填写此栏",
+    "ATLEASTONE": "P至少提供一个值。",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
-    }
+    },
+    "INVALID_FORMAT": "格式是无效的。",
+    "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
+    "MINLENGTH": "长度必须至少是{{requiredLength}}字符。",
+    "UPPERCASEMISSING": "密码必须包含大写字符。",
+    "LOWERCASEMISSING": "密码必须包含小写字符。",
+    "SYMBOLERROR": "密码必须包含符号或标点符号。",
+    "NUMBERERROR": "密码必须包含数字。",
+    "PWNOTEQUAL": "提供的密码不匹配。",
+    "PHONE": "电话号码必须以00或+开头。"
   },
   "USER": {
     "SETTINGS": {
@@ -488,8 +541,7 @@
       "SET": "设置新密码",
       "RESENDNOTIFICATION": "发送重置密码链接",
       "REQUIRED": "缺少必填字段。",
-      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
-      "NOTEQUAL": "提供的密码不匹配。"
+      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。"
     },
     "ID": "ID",
     "EMAIL": "电子邮件",
@@ -499,7 +551,7 @@
     "EMAILVERIFIED": "电子邮件已验证",
     "NOTVERIFIED": "未验证",
     "PREFERRED_LOGINNAME": "首选登录名",
-    "ISINITIAL": "此用户电子邮件尚未验证。",
+    "ISINITIAL": "用户尚未激活。",
     "LOGINMETHODS": {
       "TITLE": "联系信息",
       "DESCRIPTION": "提供的信息用于向您发送重要信息，例如密码重置电子邮件。",
@@ -543,17 +595,6 @@
         "3": "过滤角色名称"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "密码不符合定义的规则。",
-      "NOTANEMAIL": "给定的值不是合法电子邮件地址",
-      "REQUIRED": "输入字段为空。",
-      "MINLENGTH": "密码长度必须至少为 {{requiredLength}} 个字符。",
-      "NOEMAIL": "用户名不能是电子邮件地址。",
-      "UPPERCASEMISSING": "密码必须包含大写字符。",
-      "LOWERCASEMISSING": "密码必须包含小写字符。",
-      "SYMBOLERROR": "密码必须包含符号或标点符号。",
-      "NUMBERERROR": "密码必须包含数字。"
-    },
     "STATE": {
       "0": "未知",
       "1": "启用",
@@ -576,7 +617,7 @@
     "SIGNEDOUT_BTN": "登录",
     "EDITACCOUNT": "编辑账户",
     "ADDACCOUNT": "登录其他账户",
-    "RESENDINITIALEMAIL": "发送新的初始化邮件",
+    "RESENDINITIALEMAIL": "重新发送激活邮件",
     "RESENDEMAILNOTIFICATION": "重新发送电子邮件通知",
     "TOAST": {
       "CREATED": "用户创建成功。",
@@ -978,11 +1019,13 @@
     "DEFAULTLANGUAGE": "默认语言",
     "LANGUAGE": {
       "de": "Deutsch",
-      "it": "Italiano",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
-      "zh": "简体中文",
-      "pl": "Polski"
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1106,6 +1149,10 @@
       "EMAILNOSVG": "电子邮件不支持 SVG 文件格式。因此建议以 PNG 或其他支持的格式上传您的 Logo。",
       "MAXSIZEEXCEEDED": "文件大小超过了 524kB。",
       "FONTINLOGINONLY": "该字体仅在当前登录界面中显示。",
+      "BACKGROUNDCOLOR": "背景颜色",
+      "PRIMARYCOLOR": "原色",
+      "WARNCOLOR": "警示色",
+      "FONTCOLOR": "字体颜色",
       "VIEWS": {
         "PREVIEW": "预览",
         "CURRENT": "当前配置"
@@ -1150,6 +1197,7 @@
       "TOSLINK": "链接到服务条款",
       "POLICYLINK": "链接到隐私政策",
       "HELPLINK": "链接到帮助",
+      "SUPPORTEMAIL": "支持邮箱",
       "SAVED": "保存成功！",
       "RESET_TITLE": "恢复默认值",
       "RESET_DESCRIPTION": "您即将恢复 TOS 和隐私政策的默认链接。你真的要继续吗？"
@@ -1170,10 +1218,12 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
+        "es": "Español",
         "fr": "Français",
-        "zh": "简体中文",
-        "pl": "Polski"
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1578,14 +1628,65 @@
       "ACTIVETITLE": "启用的身份提供者"
     },
     "CREATE": {
-      "TITLE": "创建身份提供者",
-      "DESCRIPTION": "选择以下身份提供者类型之一。"
+      "TITLE": "创建供应商",
+      "DESCRIPTION": "选择以下一个或多个供应商。",
+      "STEPPERTITLE": "创建供应商",
+      "OIDC": {
+        "TITLE": "OIDC供应商",
+        "DESCRIPTION": "输入你的OIDC供应商的必要数据。"
+      },
+      "OAUTH": {
+        "TITLE": "OAuth供应商",
+        "DESCRIPTION": "输入你的OAuth供应商的必要数据。"
+      },
+      "JWT": {
+        "TITLE": "JWT供应商",
+        "DESCRIPTION": "输入你的JWT供应商所需的数据。"
+      },
+      "GOOGLE": {
+        "TITLE": "Google 身份提供者",
+        "DESCRIPTION": "输入您的 Google 身份提供商的凭据"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab身份提供商",
+        "DESCRIPTION": "输入您的Gitlab身份提供者的凭据"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab自我托管供应商",
+        "DESCRIPTION": "输入您的Gitlab自我托管身份提供商的凭据"
+      },
+      "GITHUBES": {
+        "TITLE": "Github Enterprise Server 身份提供者",
+        "DESCRIPTION": "输入您的GitHubEnterpriseServer身份提供者的凭据"
+      },
+      "GITHUB": {
+        "TITLE": "Github 身份提供者",
+        "DESCRIPTION": "输入您的 Github 身份提供商的凭据"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft 身份提供者",
+        "DESCRIPTION": "输入您的 Microsoft 身份提供商的凭据"
+      },
+      "LDAP": {
+        "TITLE": "LDAP 身份提供者",
+        "DESCRIPTION": "输入您的 LDAP 身份提供商的凭据"
+      }
     },
     "DETAIL": {
       "TITLE": "身份提供者",
-      "DESCRIPTION": "身份提供者的常规配置。",
+      "DESCRIPTION": "更新你的供应商配置",
       "DATECREATED": "已创建",
       "DATECHANGED": "已更新"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "是自动创建",
+      "ISAUTOCREATION_DESC": "如果选择了，如果账户还不存在，就会创建一个账户。",
+      "ISAUTOUPDATE": "正在自动更新",
+      "ISAUTOUPDATE_DESC": "如果选择，账户将在重新认证时更新。",
+      "ISCREATIONALLOWED": "是否允许创作",
+      "ISCREATIONALLOWED_DESC": "确定是否可以创建账户。",
+      "ISLINKINGALLOWED": "是否允许连接",
+      "ISLINKINGALLOWED_DESC": "确定一个身份是否可以与一个现有的账户相联系。"
     },
     "OWNERTYPES": {
       "0": "未知",
@@ -1601,22 +1702,29 @@
       "1": "启用",
       "2": "停用"
     },
-    "MAPPINGFIELD": {
-      "1": "首选用户名",
-      "2": "电子邮箱"
+    "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
     },
-    "STYLE": "样式",
-    "STYLEFIELD": {
-      "0": "没有样式",
-      "1": "Google"
-    },
+    "AZUREADTENANTTYPE": "租户类型",
+    "AZUREADTENANTID": "租户编号",
+    "EMAILVERIFIED": "电子邮件已验证",
+    "NAMEHINT": "如果指定，它将显示在登录界面。",
+    "OPTIONAL": "可选",
+    "LDAPATTRIBUTES": "LDAP 属性",
+    "UPDATEBINDPASSWORD": "更新绑定密码",
+    "UPDATECLIENTSECRET": "更新客户秘密",
     "ADD": "添加身份提供者",
-    "AUTOREGISTER": "自动注册",
-    "AUTOREGISTER_DESC": "如果勾选，当使用 IDP 登录且用户不存在时，则会创建一个。",
     "TYPE": "类型",
     "OWNER": "所有者",
     "ID": "ID",
     "NAME": "名称",
+    "AUTHORIZATIONENDPOINT": "授权端点",
+    "TOKENENDPOINT": "令牌端点",
+    "USERENDPOINT": "用户端点",
+    "IDATTRIBUTE": "标识属性",
     "AVAILABILITY": "可用性",
     "AVAILABLE": "可用的",
     "AVAILABLEBUTINACTIVE": "可用但已停用",
@@ -1628,6 +1736,31 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "联系",
+    "LDAPUSERBINDING": "用户绑定",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "必需的",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP 展示名称映射",
     "USERNAMEMAPPING": "用户名映射",
     "DATES": "日期",
@@ -1716,20 +1849,22 @@
   "APP": {
     "LIST": "应用",
     "COMPLIANCE": "OIDC 兼容性",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "配置",
     "TOKEN": "令牌设置",
     "PAGES": {
       "TITLE": "应用",
       "ID": "ID",
       "DESCRIPTION": "在这里您可以编辑您的应用程序数据及其配置。",
-      "CREATE_OIDC": "OIDC 应用",
-      "CREATE_OIDC_DESC_TITLE": "逐步输入您的应用详情",
-      "CREATE_OIDC_DESC_SUB": "将自动生成推荐的配置。",
+      "CREATE": "OIDC 应用",
+      "CREATE_SELECT_PROJECT": "首先选择你的项目",
+      "CREATE_NEW_PROJECT": "或创建一个新的<a href='{url}}' title='创建项目'>这里</a>。",
+      "CREATE_DESC_TITLE": "逐步输入您的应用详情",
+      "CREATE_DESC_SUB": "将自动生成推荐的配置。",
       "STATE": "状态",
       "DATECREATED": "创建于",
       "DATECHANGED": "修改于",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "删除应用",
       "DETAIL": {
         "TITLE": "详情",
@@ -1806,6 +1941,8 @@
       "REGENERATESECRET": "重新生成客户端密钥",
       "DEVMODE": "开发模式",
       "DEVMODEDESC": "注意：启用开发模式的重定向 URI 将不会被验证。",
+      "SKIPNATIVEAPPSUCCESSPAGE": "登录后跳过成功页面",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "登录后跳过本机应用的成功页面",
       "REDIRECT": "重定向 URLs",
       "REDIRECTSECTION": "重定向 URLs",
       "POSTLOGOUTREDIRECT": "退出登录重定向 URLs",
@@ -1933,10 +2070,12 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
+    "es": "Español",
     "fr": "Français",
-    "zh": "简体中文",
-    "pl": "Polski"
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "添加管理者",

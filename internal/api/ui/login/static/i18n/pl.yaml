@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: zarejestruj
   NextButtonText: dalej
 
+LDAP:
+  Title: Rejestracja
+  Description: Wprowadź swoje dane logowania.
+  LoginNameLabel: Nazwa użytkownika
+  PasswordLabel: Hasło
+  NextButtonText: dalej
+
 SelectAccount:
   Title: Wybierz konto
   Description: Użyj swojego konta ZITADEL
@@ -165,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Potwierdzenie hasła
   CancelButtonText: anuluj
   NextButtonText: dalej
+  Footer: Stopka
 
 PasswordChangeDone:
   Title: Zmiana hasła
@@ -212,6 +220,8 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -243,6 +253,8 @@ ExternalRegistrationUserOverview:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -302,12 +314,33 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+
+DeviceAuth:
+  Title: Autoryzacja urządzenia
+  UserCode:
+    Label: Kod użytkownika
+    Description: Wprowadź kod użytkownika prezentowany na urządzeniu.
+    ButtonNext: Następny
+  Action:
+    Description: Przyznaj dostęp do urządzenia.
+    GrantDevice: zamierzasz przyznać urządzenie
+    AccessToScopes: dostęp do następujących zakresów
+    Button:
+      Allow: umożliwić
+      Deny: zaprzeczyć
+  Done:
+    Description: Zrobione.
+    Approved: Zatwierdzono autoryzację urządzenia. Możesz teraz wrócić do urządzenia.
+    Denied: Odmowa autoryzacji urządzenia. Możesz teraz wrócić do urządzenia.
 
 Footer:
   PoweredBy: Obsługiwane przez
   Tos: TOS
   PrivacyPolicy: Polityka prywatności
   Help: Pomoc
+  SupportEmail: E-mail wsparcia
 
 Errors:
   Internal: Wewnętrzny błąd
@@ -320,6 +353,7 @@ Errors:
     MissingParameters: Brakujące wymagane parametry
   User:
     NotFound: Nie znaleziono użytkownika
+    AlreadyExists: Użytkownik już istnieje
     Inactive: Użytkownik jest nieaktywny
     NotFoundOnOrg: Nie znaleziono użytkownika w wybranej organizacji
     NotAllowedOrg: Użytkownik nie jest członkiem wymaganej organizacji
@@ -328,6 +362,33 @@ Errors:
     Invalid: Nieprawidłowe dane użytkownika
     DomainNotAllowedAsUsername: Domena jest już zarezerwowana i nie może być użyta
     NotAllowedToLink: Użytkownik nie jest upoważniony do łączenia z zewnętrznym dostawcą logowania
+    Profile:
+      NotFound: Profil nie znaleziony
+      NotChanged: Profil nie zmieniony
+      Empty: Profil jest pusty
+      FirstNameEmpty: Imię w profilu jest puste
+      LastNameEmpty: Nazwisko w profilu jest puste
+      IDMissing: Profil ID brakuje
+    Email:
+      NotFound: Adres e-mail nie znaleziony
+      Invalid: Adres e-mail jest nieprawidłowy
+      AlreadyVerified: Adres e-mail jest już zweryfikowany
+      NotChanged: Adres e-mail nie zmieniony
+      Empty: Adres e-mail jest pusty
+      IDMissing: Adres e-mail ID brakuje
+    Phone:
+      NotFound: Numer telefonu nie znaleziony
+      Invalid: Numer telefonu jest nieprawidłowy
+      AlreadyVerified: Numer telefonu już zweryfikowany
+      Empty: Numer telefonu jest pusty
+      NotChanged: Numer telefonu nie zmieniony
+    Address:
+      NotFound: Adres nie znaleziony
+      NotChanged: Adres nie zmieniony
+    Username:
+      AlreadyExists: Nazwa użytkownika jest już zajęta
+      Reserved: Nazwa użytkownika jest już zajęta
+      Empty: Nazwa użytkownika jest pusty
     Password:
       ConfirmationWrong: Potwierdzenie hasła jest niepoprawne
       Empty: Hasło jest puste
@@ -370,6 +431,8 @@ Errors:
       ExternalUserIDEmpty: Identyfikator użytkownika zewnętrznego jest pusty
       UserDisplayNameEmpty: Nazwa wyświetlana użytkownika jest pusta
       NoExternalUserData: Nie otrzymano danych użytkownika zewnętrznego
+      CreationNotAllowed: Tworzenie nowego użytkownika nie jest dozwolone w tym Providencie
+      LinkingNotAllowed: Linkowanie użytkownika nie jest dozwolone na tym Providencie
     GrantRequired: Logowanie nie jest możliwe. Użytkownik musi posiadać przynajmniej jedno uprawnienie w aplikacji. Skontaktuj się z administratorem.
     ProjectRequired: Logowanie nie jest możliwe. Organizacja użytkownika musi zostać udzielona projektowi. Skontaktuj się z administratorem.
   IdentityProvider:
@@ -377,5 +440,10 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Nie istnieje polityka blokady
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Rejestracja nie jest dozwolona
+  DeviceAuth:
+    NotExisting: Kod użytkownika nie istnieje
 
 optional: (opcjonalny)

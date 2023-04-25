@@ -2,6 +2,7 @@ package org
 
 import (
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
@@ -78,6 +79,24 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, IDPOIDCConfigChangedEventType, IDPOIDCConfigChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, IDPJWTConfigAddedEventType, IDPJWTConfigAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, IDPJWTConfigChangedEventType, IDPJWTConfigChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OAuthIDPAddedEventType, OAuthIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OAuthIDPChangedEventType, OAuthIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OIDCIDPAddedEventType, OIDCIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, OIDCIDPChangedEventType, OIDCIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, JWTIDPAddedEventType, JWTIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, JWTIDPChangedEventType, JWTIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, AzureADIDPAddedEventType, AzureADIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, AzureADIDPChangedEventType, AzureADIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubIDPAddedEventType, GitHubIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubIDPChangedEventType, GitHubIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubEnterpriseIDPAddedEventType, GitHubEnterpriseIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubEnterpriseIDPChangedEventType, GitHubEnterpriseIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitLabIDPAddedEventType, GitLabIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitLabIDPChangedEventType, GitLabIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitLabSelfHostedIDPAddedEventType, GitLabSelfHostedIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitLabSelfHostedIDPChangedEventType, GitLabSelfHostedIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GoogleIDPAddedEventType, GoogleIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GoogleIDPChangedEventType, GoogleIDPChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, LDAPIDPAddedEventType, LDAPIDPAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, LDAPIDPChangedEventType, LDAPIDPChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, IDPRemovedEventType, IDPRemovedEventMapper).
@@ -89,5 +108,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, MetadataRemovedAllType, MetadataRemovedAllEventMapper).
 		RegisterFilterEventMapper(AggregateType, NotificationPolicyAddedEventType, NotificationPolicyAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, NotificationPolicyChangedEventType, NotificationPolicyChangedEventMapper).
-		RegisterFilterEventMapper(AggregateType, NotificationPolicyRemovedEventType, NotificationPolicyRemovedEventMapper)
+		RegisterFilterEventMapper(AggregateType, NotificationPolicyRemovedEventType, NotificationPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, deviceauth.AddedEventType, eventstore.GenericEventMapper[deviceauth.AddedEvent]).
+		RegisterFilterEventMapper(AggregateType, deviceauth.ApprovedEventType, eventstore.GenericEventMapper[deviceauth.ApprovedEvent]).
+		RegisterFilterEventMapper(AggregateType, deviceauth.CanceledEventType, eventstore.GenericEventMapper[deviceauth.CanceledEvent]).
+		RegisterFilterEventMapper(AggregateType, deviceauth.RemovedEventType, eventstore.GenericEventMapper[deviceauth.RemovedEvent])
 }

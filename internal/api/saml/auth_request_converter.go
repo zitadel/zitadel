@@ -63,14 +63,6 @@ func (a *AuthRequest) GetUserID() string {
 func (a *AuthRequest) GetUserName() string {
 	return a.UserName
 }
-func (a *AuthRequest) Done() bool {
-	for _, step := range a.PossibleSteps {
-		if step.Type() == domain.NextStepRedirectToCallback {
-			return true
-		}
-	}
-	return false
-}
 
 func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ models.AuthRequestInt, err error) {
 	if _, ok := authReq.Request.(*domain.AuthRequestSAML); !ok {

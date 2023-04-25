@@ -18,9 +18,9 @@ import {
 import { FormGroupDirective, NgControl, NgForm } from '@angular/forms';
 import { CanUpdateErrorState, ErrorStateMatcher, mixinErrorState } from '@angular/material/core';
 import {
-  MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD,
   MatLegacyFormField as MatFormField,
   MatLegacyFormFieldControl as MatFormFieldControl,
+  MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD,
 } from '@angular/material/legacy-form-field';
 import {
   getMatLegacyInputUnsupportedTypeError as getMatInputUnsupportedTypeError,
@@ -199,7 +199,7 @@ export class InputDirective
   protected _type: string = 'text';
 
   /** An object used to control when error messages are shown. */
-  @Input() errorStateMatcher!: ErrorStateMatcher;
+  @Input() override errorStateMatcher!: ErrorStateMatcher;
 
   /**
    * Implemented as part of MatFormFieldControl.
@@ -241,7 +241,7 @@ export class InputDirective
     protected _elementRef: ElementRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     protected _platform: Platform,
     /** @docs-private */
-    @Optional() @Self() public ngControl: NgControl,
+    @Optional() @Self() public override ngControl: NgControl,
     @Optional() _parentForm: NgForm,
     @Optional() _parentFormGroup: FormGroupDirective,
     _defaultErrorStateMatcher: ErrorStateMatcher,

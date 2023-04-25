@@ -1,15 +1,17 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
-import localeZh from '@angular/common/locales/zh';
+import localeEn from '@angular/common/locales/en';
+import localeEs from '@angular/common/locales/es';
 import localeFr from '@angular/common/locales/fr';
 import localeIt from '@angular/common/locales/it';
+import localeJa from '@angular/common/locales/ja';
 import localePl from '@angular/common/locales/pl';
-import localeEn from '@angular/common/locales/en';
+import localeZh from '@angular/common/locales/zh';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
@@ -18,8 +20,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
-import { from, Observable } from 'rxjs';
 import * as i18nIsoCountries from 'i18n-iso-countries';
+import { from, Observable } from 'rxjs';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 import { UserGuard } from 'src/app/guards/user.guard';
@@ -61,16 +63,20 @@ import { ToastService } from './services/toast.service';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
-registerLocaleData(localeZh);
-i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/zh.json'));
+registerLocaleData(localeEn);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'));
+registerLocaleData(localeEs);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/es.json'));
 registerLocaleData(localeFr);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/fr.json'));
 registerLocaleData(localeIt);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/it.json'));
+registerLocaleData(localeJa);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ja.json'));
 registerLocaleData(localePl);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/pl.json'));
-registerLocaleData(localeEn);
-i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'));
+registerLocaleData(localeZh);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/zh.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {

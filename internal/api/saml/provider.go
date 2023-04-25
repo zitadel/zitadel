@@ -1,8 +1,6 @@
 package saml
 
 import (
-	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -14,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
@@ -29,7 +28,6 @@ type Config struct {
 }
 
 func NewProvider(
-	ctx context.Context,
 	conf Config,
 	externalSecure bool,
 	command *command.Commands,
@@ -38,7 +36,7 @@ func NewProvider(
 	encAlg crypto.EncryptionAlgorithm,
 	certEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
-	projections *sql.DB,
+	projections *database.DB,
 	instanceHandler,
 	userAgentCookie,
 	accessHandler func(http.Handler) http.Handler,
@@ -68,13 +66,13 @@ func NewProvider(
 			accessHandler,
 			http_utils.CopyHeadersToContext,
 		),
+		provider.WithCustomTimeFormat("2006-01-02T15:04:05.999Z"),
 	}
 	if !externalSecure {
 		options = append(options, provider.WithAllowInsecure())
 	}
 
 	return provider.NewProvider(
-		ctx,
 		provStorage,
 		HandlerPrefix,
 		conf.ProviderConfig,
@@ -89,12 +87,12 @@ func newStorage(
 	encAlg crypto.EncryptionAlgorithm,
 	certEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
-	projections *sql.DB,
+	db *database.DB,
 ) (*Storage, error) {
 	return &Storage{
 		encAlg:          encAlg,
 		certEncAlg:      certEncAlg,
-		locker:          crdb.NewLocker(projections, locksTable, signingKey),
+		locker:          crdb.NewLocker(db.DB, locksTable, signingKey),
 		eventstore:      es,
 		repo:            repo,
 		command:         command,

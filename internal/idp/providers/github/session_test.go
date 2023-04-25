@@ -14,6 +14,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 )
@@ -26,7 +27,7 @@ func TestSession_FetchUser(t *testing.T) {
 		httpMock     func()
 		authURL      string
 		code         string
-		tokens       *oidc.Tokens
+		tokens       *oidc.Tokens[*oidc.IDTokenClaims]
 		scopes       []string
 		options      []oauth.ProviderOpts
 	}
@@ -92,7 +93,7 @@ func TestSession_FetchUser(t *testing.T) {
 						Reply(http.StatusInternalServerError)
 				},
 				authURL: "https://github.com/login/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,
@@ -121,7 +122,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://github.com/login/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   oidc.BearerToken,
@@ -188,9 +189,9 @@ func TestSession_FetchUser(t *testing.T) {
 				a.Equal(tt.want.displayName, user.GetDisplayName())
 				a.Equal(tt.want.nickName, user.GetNickname())
 				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
-				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(domain.EmailAddress(tt.want.email), user.GetEmail())
 				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
-				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(domain.PhoneNumber(tt.want.phone), user.GetPhone())
 				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
 				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
 				a.Equal(tt.want.avatarURL, user.GetAvatarURL())

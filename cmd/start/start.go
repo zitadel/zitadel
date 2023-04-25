@@ -3,7 +3,6 @@ package start
 import (
 	"context"
 	"crypto/tls"
-	"database/sql"
 	_ "embed"
 	"fmt"
 	"net"
@@ -13,14 +12,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/zitadel/saml/pkg/provider"
-
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/op"
+	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -34,7 +32,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
+	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
@@ -95,7 +95,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start client for projection: %w", err)
 	}
 
-	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient.DB, masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
@@ -120,7 +120,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
 
-	storage, err := config.AssetStorage.NewStorage(dbClient)
+	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
 	if err != nil {
 		return fmt.Errorf("cannot start asset storage client: %w", err)
 	}
@@ -162,20 +162,20 @@ func startZitadel(config *Config, masterKey string) error {
 	}
 
 	usageReporter := logstore.UsageReporterFunc(commands.ReportUsage)
-	actionsLogstoreSvc := logstore.New(commands, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
+	actionsLogstoreSvc := logstore.New(queries, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	if actionsLogstoreSvc.Enabled() {
 		logging.Warn("execution logs are currently in beta")
 	}
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(ctx, config.Projections.Customizations["notifications"], config.Projections.Customizations["notificationsquotas"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, commands, usageReporter)
+	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, queries, usageReporter)
 	if err != nil {
 		return err
 	}
@@ -189,7 +189,7 @@ func startAPIs(
 	commands *command.Commands,
 	queries *query.Queries,
 	eventstore *eventstore.Eventstore,
-	dbClient *sql.DB,
+	dbClient *database.DB,
 	config *Config,
 	store static.Storage,
 	authZRepo authz_repo.Repository,
@@ -224,7 +224,10 @@ func startAPIs(
 		logging.Warn("access logs are currently in beta")
 	}
 	accessInterceptor := middleware.NewAccessInterceptor(accessSvc, config.Quotas.Access)
-	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
+	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
+	if err != nil {
+		return fmt.Errorf("error creating api %w", err)
+	}
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
@@ -233,10 +236,10 @@ func startAPIs(
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.Database(), config.DefaultInstance, config.ExternalDomain)); err != nil {
+	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.Database(), commands, queries, config.SystemDefaults, adminRepo, config.ExternalSecure, keys.User)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, adminRepo, config.ExternalSecure, keys.User, config.AuditLogRetention)); err != nil {
 		return err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
@@ -245,9 +248,15 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
+	if err := apis.RegisterService(ctx, user.CreateServer(commands, queries)); err != nil {
+		return err
+	}
+	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
+		return err
+	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
-	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle))
+	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources)
 	if err != nil {
@@ -259,37 +268,35 @@ func startAPIs(
 	if err != nil {
 		return fmt.Errorf("unable to start openapi handler: %w", err)
 	}
-	apis.RegisterHandler(openapi.HandlerPrefix, openAPIHandler)
+	apis.RegisterHandlerOnPrefix(openapi.HandlerPrefix, openAPIHandler)
 
-	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, accessInterceptor.Handle)
+	oidcProvider, err := oidc.NewProvider(config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, accessInterceptor.Handle)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
+	apis.RegisterHandlerPrefixes(oidcProvider.HttpHandler(), "/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2")
 
-	samlProvider, err := saml.NewProvider(ctx, config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, accessInterceptor.Handle)
+	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, accessInterceptor.Handle)
 	if err != nil {
 		return fmt.Errorf("unable to start saml provider: %w", err)
 	}
-	apis.RegisterHandler(saml.HandlerPrefix, samlProvider.HttpHandler())
+	apis.RegisterHandlerOnPrefix(saml.HandlerPrefix, samlProvider.HttpHandler())
 
-	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, instanceInterceptor.Handler, accessInterceptor.Handle, config.CustomerPortal)
+	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, accessInterceptor.Handle, config.CustomerPortal)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
-	apis.RegisterHandler(console.HandlerPrefix, c)
+	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
 
 	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
-	apis.RegisterHandler(login.HandlerPrefix, l.Handler())
+	apis.RegisterHandlerOnPrefix(login.HandlerPrefix, l.Handler())
+	apis.HandleFunc(login.EndpointDeviceAuth, login.RedirectDeviceAuthToPrefix)
 
-	//handle oidc at last, to be able to handle the root
-	//we might want to change that in the future
-	//esp. if we want to have multiple well-known endpoints
-	//it might make sense to handle the discovery endpoint and oauth and oidc prefixes individually
-	//but this will require a change in the oidc lib
-	apis.RegisterHandler("", oidcProvider.HttpHandler())
+	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
+	apis.RouteGRPC()
 	return nil
 }
 

@@ -10,16 +10,3 @@ services:
     extends:
       file: ./config/cockroach/docker-compose.yaml
       service: db
-
-  prepare:
-    extends:
-      file: ./config/cockroach/docker-compose.yaml
-      service: prepare
-
-  e2e:
-    extends:
-      file: ./config/cockroach/docker-compose.yaml
-      service: e2e
-
-networks:
-  zitadel:

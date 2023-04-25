@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/query"
 	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
@@ -43,5 +44,16 @@ func UserGrantToPb(grant *query.UserGrant) *auth_pb.UserGrant {
 		ProjectId: grant.ProjectID,
 		UserId:    grant.UserID,
 		Roles:     grant.Roles,
+		Details: object.ToViewDetailsPb(
+			grant.Sequence,
+			grant.CreationDate,
+			grant.ChangeDate,
+			grant.ResourceOwner,
+		),
+		OrgDomain:      grant.OrgPrimaryDomain,
+		ProjectName:    grant.ProjectName,
+		ProjectGrantId: grant.GrantID,
+		RoleKeys:       grant.Roles,
+		UserType:       user.TypeToPb(grant.UserType),
 	}
 }

@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -117,7 +118,7 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareActionsQuery()
+	query, scan := prepareActionsQuery(ctx, q.client)
 	eq := sq.Eq{
 		ActionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -145,7 +146,7 @@ func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string, wi
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareActionQuery()
+	stmt, scan := prepareActionQuery(ctx, q.client)
 	eq := sq.Eq{
 		ActionColumnID.identifier():            id,
 		ActionColumnResourceOwner.identifier(): orgID,
@@ -179,7 +180,7 @@ func NewActionIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ActionColumnID, id, TextEquals)
 }
 
-func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, error)) {
+func prepareActionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -192,7 +193,8 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 			ActionColumnTimeout.identifier(),
 			ActionColumnAllowedToFail.identifier(),
 			countColumn.identifier(),
-		).From(actionTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(actionTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Actions, error) {
 			actions := make([]*Action, 0)
 			var count uint64
@@ -230,7 +232,7 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 		}
 }
 
-func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)) {
+func prepareActionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Action, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -242,7 +244,8 @@ func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)
 			ActionColumnScript.identifier(),
 			ActionColumnTimeout.identifier(),
 			ActionColumnAllowedToFail.identifier(),
-		).From(actionTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(actionTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Action, error) {
 			action := new(Action)
 			err := row.Scan(

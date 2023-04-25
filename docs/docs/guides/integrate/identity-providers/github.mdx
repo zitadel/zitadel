@@ -1,0 +1,94 @@
+---
+title: Configure GitHub as Identity Provider
+sidebar_label: GitHub
+---
+
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
+import UnlinkedOAuth from './_unlinked_oauth.mdx';
+import PrefillAction from './_prefill_action.mdx';
+
+<Intro provider="GitHub"/>
+
+## GitHub Configuration
+
+### Register a new application
+
+For **GitHub** browse to the [Register a new OAuth application](https://github.com/settings/applications/new). You can find this link withing [Settings](https://github.com/settings/profile) - [Developer Settings](https://github.com/settings/apps) - - [OAuth Apps](https://github.com/settings/developers).
+
+For **GitHub Enterprise** go to your GitHub Enterprise home page and then to Settings - Developer Settings - OAuth Apps - Register a new application/New OAuth App
+
+Fill in the application name and homepage URL.
+
+You have to add the authorization callback URL, where GitHub should redirect, after the user has authenticated himself.
+In this example our test instance has the domain `https://acme-gzoe4x.zitadel.cloud`.
+This results in the following authorization callback URL:
+ `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
+
+:::info
+To adapt this for you setup just replace the domain
+:::
+
+![Register an OAuth application](/img/guides/github_oauth_app_registration.png)
+
+### Client ID and Secret
+
+After clicking "Register application", you see the detail page of the application you have just created.
+Copy the client ID directly from the detail page.
+Generate a new secret by clicking "Generate new client secret".
+Make sure to save the secret, as you will not be able to show it again.
+
+![Client ID and Secret](/img/guides/github_oauth_client_id_secret.png)
+
+## ZITADEL Configuration
+
+### Add custom login policy
+
+<CustomLoginPolicy/>
+
+### Go to the IdP Providers Overview
+
+<IDPsOverview templates="GitHub or GitHub Enterprise"/>
+
+### Create a new GitHub Provider
+
+The GitHub provider templates have everything you need preconfigured. You only have to add the client ID and secret, you have created in the step before.
+
+You can configure the following settings if you like, a useful default will be filled if you don't change anything:
+
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
+This information is used to create and/or update the user within ZITADEL. ZITADEL ensures that at least the `openid`-scope is always sent.
+
+<GeneralConfigDescription provider_account="GitHub account" />
+
+![GitHub Provider](/img/guides/zitadel_github_create_provider.png)
+
+### Activate IdP
+
+<Activate/>
+
+![Activate the GitHub](/img/guides/zitadel_activate_github.png)
+
+## Test the setup
+
+<TestSetup loginscreen="your GitHub login"/>
+
+![GitHub Button](/img/guides/zitadel_login_github.png)
+
+![GitHub Login](/img/guides/github_login.png)
+
+<UnlinkedOAuth provider="GitHub"/>
+
+![GitHub Login](/img/guides/zitadel_login_external_not_found_registration.png)
+
+## Optional: Add ZITADEL action to autofill userdata
+
+<PrefillAction fields="firstname and lastname" provider="GitHub"/>
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/github_identity_provider.js
+```

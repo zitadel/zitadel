@@ -12,9 +12,9 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacyLink, helpLink string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacyLink, helpLink string, supportEmail domain.EmailAddress) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPrivacyPolicy(instanceAgg, tosLink, privacyLink, helpLink))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPrivacyPolicy(instanceAgg, tosLink, privacyLink, helpLink, supportEmail))
 	if err != nil {
 		return nil, err
 	}
@@ -26,6 +26,13 @@ func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacy
 }
 
 func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
+	if policy.SupportEmail != "" {
+		if err := policy.SupportEmail.Validate(); err != nil {
+			return nil, err
+		}
+		policy.SupportEmail = policy.SupportEmail.Normalize()
+	}
+
 	existingPolicy, err := c.defaultPrivacyPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -35,7 +42,7 @@ func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domai
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-9jJfs", "Errors.IAM.PrivacyPolicy.NotChanged")
 	}
@@ -81,8 +88,15 @@ func prepareAddDefaultPrivacyPolicy(
 	tosLink,
 	privacyLink,
 	helpLink string,
+	supportEmail domain.EmailAddress,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if supportEmail != "" {
+			if err := supportEmail.Validate(); err != nil {
+				return nil, err
+			}
+			supportEmail = supportEmail.Normalize()
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewInstancePrivacyPolicyWriteModel(ctx)
 			events, err := filter(ctx, writeModel.Query())
@@ -97,7 +111,7 @@ func prepareAddDefaultPrivacyPolicy(
 				return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-M00rJ", "Errors.Instance.PrivacyPolicy.AlreadyExists")
 			}
 			return []eventstore.Command{
-				instance.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink, helpLink),
+				instance.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink, helpLink, supportEmail),
 			}, nil
 		}, nil
 	}

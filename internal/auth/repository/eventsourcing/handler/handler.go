@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
-	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
@@ -33,7 +32,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults, queries *query2.Queries) []query.Handler {
+func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, queries *query2.Queries) []query.Handler {
 	return []query.Handler{
 		newUser(ctx,
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es}, queries),
@@ -41,16 +40,7 @@ func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64
 			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}, queries),
 		newToken(ctx,
 			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
-		newIDPConfig(ctx,
-			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		newIDPProvider(ctx,
-			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-			systemDefaults, queries),
-		newExternalIDP(ctx,
-			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			systemDefaults, queries),
 		newRefreshToken(ctx, handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
-		newOrgProjectMapping(ctx, handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),
 	}
 }
 

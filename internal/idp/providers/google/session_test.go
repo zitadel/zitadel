@@ -14,6 +14,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 )
 
@@ -22,10 +23,11 @@ func TestSession_FetchUser(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		scopes       []string
 		httpMock     func()
 		authURL      string
 		code         string
-		tokens       *openid.Tokens
+		tokens       *openid.Tokens[*openid.IDTokenClaims]
 	}
 	type want struct {
 		err               error
@@ -55,6 +57,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				httpMock: func() {
 					gock.New("https://openidconnect.googleapis.com").
 						Get("/v1/userinfo").
@@ -74,6 +77,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				httpMock: func() {
 					gock.New("https://openidconnect.googleapis.com").
 						Get("/v1/userinfo").
@@ -81,7 +85,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://accounts.google.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &openid.Tokens{
+				tokens: &openid.Tokens[*openid.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   openid.BearerToken,
@@ -110,6 +114,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
 				httpMock: func() {
 					gock.New("https://openidconnect.googleapis.com").
 						Get("/v1/userinfo").
@@ -117,7 +122,7 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://accounts.google.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &openid.Tokens{
+				tokens: &openid.Tokens[*openid.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
 						TokenType:   openid.BearerToken,
@@ -162,7 +167,7 @@ func TestSession_FetchUser(t *testing.T) {
 
 			// call the real discovery endpoint
 			gock.New(issuer).Get(openid.DiscoveryEndpoint).EnableNetworking()
-			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
+			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes)
 			require.NoError(t, err)
 
 			session := &oidc.Session{
@@ -184,9 +189,9 @@ func TestSession_FetchUser(t *testing.T) {
 				a.Equal(tt.want.displayName, user.GetDisplayName())
 				a.Equal(tt.want.nickName, user.GetNickname())
 				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
-				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(domain.EmailAddress(tt.want.email), user.GetEmail())
 				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
-				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(domain.PhoneNumber(tt.want.phone), user.GetPhone())
 				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
 				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
 				a.Equal(tt.want.avatarURL, user.GetAvatarURL())
@@ -196,15 +201,22 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 }
 
-func userinfo() openid.UserInfoSetter {
-	info := openid.NewUserInfo()
-	info.SetSubject("sub")
-	info.SetGivenName("firstname")
-	info.SetFamilyName("lastname")
-	info.SetName("firstname lastname")
-	info.SetEmail("email", true)
-	info.SetLocale(language.English)
-	info.SetPicture("picture")
-	info.AppendClaims("hd", "hosted domain")
-	return info
+func userinfo() *openid.UserInfo {
+	return &openid.UserInfo{
+		Subject: "sub",
+		UserInfoProfile: openid.UserInfoProfile{
+			GivenName:  "firstname",
+			FamilyName: "lastname",
+			Name:       "firstname lastname",
+			Locale:     openid.NewLocale(language.English),
+			Picture:    "picture",
+		},
+		UserInfoEmail: openid.UserInfoEmail{
+			Email:         "email",
+			EmailVerified: openid.Bool(true),
+		},
+		Claims: map[string]any{
+			"hd": "hosted domain",
+		},
+	}
 }

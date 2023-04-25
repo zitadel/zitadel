@@ -70,16 +70,23 @@ Errors:
     Profile:
       NotFound: Profile not found
       NotChanged: Profile not changed
-      Invalid: Profile data invalid
+      Empty: Profile is empty
+      FirstNameEmpty: First name in profile is empty
+      LastNameEmpty: Last name in profile is empty
+      IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found
       Invalid: Email is invalid
       AlreadyVerified: Email is already verified
       NotChanged: Email not changed
+      Empty: Email is empty
+      IDMissing: Email ID is missing
     Phone:
       NotFound: Phone not found
       Invalid: Phone is invalid
       AlreadyVerified: Phone already verified
+      Empty: Phone is empty
+      NotChanged: Phone not changed
     Address:
       NotFound: Address not found
       NotChanged: Address not changed
@@ -98,8 +105,9 @@ Errors:
     WrongType: Not allowed for this user type
     NotAllowedToLink: User is not allowed to link with external login provider
     Username:
-      AlreadyExists:  Username already taken
+      AlreadyExists: Username already taken
       Reserved: Username is already taken
+      Empty: Username is empty
     Code:
       Empty: Code is empty
       NotFound: Code not found
@@ -112,14 +120,14 @@ Errors:
       NotSet: User has not set a password
     PasswordComplexityPolicy:
       NotFound: Password policy not found
-      MinLength: Password is to short
+      MinLength: Password is too short
       MinLengthNotAllowed: Given minimum length is not allowed
       HasLower: Password must contain lower case
       HasUpper: Password must contain upper case
       HasNumber: Password must contain number
       HasSymbol: Password must contain symbol
     ExternalIDP:
-      Invalid: Externer IDP invalid
+      Invalid: External IDP invalid
       IDPConfigNotExisting: IDP provider invalid for this organization
       NotAllowed: External IDP not allowed on this organization
       MinimumExternalIDPNeeded: At least one IDP must be added
@@ -233,6 +241,9 @@ Errors:
       NotFound: Notification Policy not found
       NotChanged: Notification Policy not changed
       AlreadyExists: Notification Policy already exists
+    LabelPolicy:
+      NotFound: Private Label Policy not found
+      NotChanged: Private Label Policy has not been changed
   Project:
     ProjectIDMissing: Project Id missing
     AlreadyExists: Project already exists on organization
@@ -459,7 +470,6 @@ Errors:
       StorageFailed: Storing action execution log to database failed
       ScanFailed: Querying usage for action execution seconds failed
 
-
 AggregateTypes:
   action: Action
   instance: Instance
@@ -546,10 +556,10 @@ EventTypes:
         check:
           succeeded: External login succeeded
       externalidp:
-        added: Externer IDP added
-        removed: Externer IDP removed
+        added: External IDP added
+        removed: External IDP removed
         cascade:
-          removed: Externer IDP cascade removed
+          removed: External IDP cascade removed
       phone:
         changed: Phone number changed
         verified: Phone number verified
@@ -918,7 +928,7 @@ EventTypes:
       jwt:
         config:
           added: JWT configuration to identity provider added
-          changed: JWT configuration from identity provider remvoed
+          changed: JWT configuration from identity provider removed
     customtext:
       set: Text was set
       removed: Text was removed
@@ -1050,7 +1060,7 @@ EventTypes:
         changed: Label policy changed
         font:
           added: Font added to label policy
-          removed: Font remvoed from label policy
+          removed: Font removed from label policy
         icon:
           added: Icon added to label policy
           removed: Icon removed from label policy
@@ -1078,8 +1088,8 @@ EventTypes:
           added: Multifactor added to login policy
           removed: Multifactor removed from login policy
         secondfactor:
-          added: Secondfactor added to login policy
-          removed: Secondfactor removed from login policy
+          added: Second factor added to login policy
+          removed: Second factor removed from login policy
       password:
         age:
           added: Password age policy added

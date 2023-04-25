@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { MatSort } from '@angular/material/sort';
 import { MatLegacyTable as MatTable, MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatSort } from '@angular/material/sort';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 
@@ -27,8 +27,8 @@ export class MetadataComponent implements OnChanges {
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.metadata?.currentValue) {
-      this.dataSource = new MatTableDataSource<Metadata.AsObject>(changes.metadata.currentValue);
+    if (changes['metadata']?.currentValue) {
+      this.dataSource = new MatTableDataSource<Metadata.AsObject>(changes['metadata'].currentValue);
     }
   }
 }

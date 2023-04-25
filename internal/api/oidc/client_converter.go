@@ -112,10 +112,13 @@ func (c *Client) IsScopeAllowed(scope string) bool {
 	if strings.HasPrefix(scope, domain.SelectIDPScope) {
 		return true
 	}
-	if strings.HasPrefix(scope, ScopeUserMetaData) {
+	if scope == ScopeUserMetaData {
 		return true
 	}
-	if strings.HasPrefix(scope, ScopeResourceOwner) {
+	if scope == ScopeResourceOwner {
+		return true
+	}
+	if scope == ScopeProjectsRoles {
 		return true
 	}
 	for _, allowedScope := range c.allowedScopes {
@@ -197,6 +200,8 @@ func grantTypeToOIDC(grantType domain.OIDCGrantType) oidc.GrantType {
 		return oidc.GrantTypeImplicit
 	case domain.OIDCGrantTypeRefreshToken:
 		return oidc.GrantTypeRefreshToken
+	case domain.OIDCGrantTypeDeviceCode:
+		return oidc.GrantTypeDeviceCode
 	default:
 		return oidc.GrantTypeCode
 	}

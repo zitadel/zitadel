@@ -7,6 +7,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 )
@@ -14,7 +15,9 @@ import (
 const (
 	authURLTemplate  string = "https://login.microsoftonline.com/%s/oauth2/v2.0/authorize"
 	tokenURLTemplate string = "https://login.microsoftonline.com/%s/oauth2/v2.0/token"
-	userinfoURL      string = "https://graph.microsoft.com/oidc/userinfo"
+	userinfoURL      string = "https://graph.microsoft.com/v1.0/me"
+
+	ScopeUserRead string = "User.Read"
 )
 
 // TenantType are the well known tenant types to scope the users that can authenticate. TenantType is not an
@@ -72,7 +75,7 @@ func WithOAuthOptions(opts ...oauth.ProviderOpts) ProviderOptions {
 
 // New creates an AzureAD provider using the [oauth.Provider] (OAuth 2.0 generic provider).
 // By default, it uses the [CommonTenant] and unverified emails.
-func New(name, clientID, clientSecret, redirectURI string, opts ...ProviderOptions) (*Provider, error) {
+func New(name, clientID, clientSecret, redirectURI string, scopes []string, opts ...ProviderOptions) (*Provider, error) {
 	provider := &Provider{
 		tenant:  CommonTenant,
 		options: make([]oauth.ProviderOpts, 0),
@@ -80,7 +83,7 @@ func New(name, clientID, clientSecret, redirectURI string, opts ...ProviderOptio
 	for _, opt := range opts {
 		opt(provider)
 	}
-	config := newConfig(provider.tenant, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail})
+	config := newConfig(provider.tenant, clientID, clientSecret, redirectURI, scopes)
 	rp, err := oauth.New(
 		config,
 		name,
@@ -98,7 +101,7 @@ func New(name, clientID, clientSecret, redirectURI string, opts ...ProviderOptio
 }
 
 func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes []string) *oauth2.Config {
-	c := &oauth2.Config{
+	return &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: secret,
 		RedirectURL:  callbackURL,
@@ -106,13 +109,34 @@ func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes [
 			AuthURL:  fmt.Sprintf(authURLTemplate, tenant),
 			TokenURL: fmt.Sprintf(tokenURLTemplate, tenant),
 		},
-		Scopes: []string{oidc.ScopeOpenID},
+		Scopes: ensureMinimalScope(scopes),
 	}
-	if len(scopes) > 0 {
-		c.Scopes = scopes
-	}
+}
 
-	return c
+// ensureMinimalScope ensures that at least openid and `User.Read` ist set
+// if none is provided it will request `openid profile email phone User.Read`
+func ensureMinimalScope(scopes []string) []string {
+	if len(scopes) == 0 {
+		return []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopePhone, ScopeUserRead}
+	}
+	var openIDSet, userReadSet bool
+	for _, scope := range scopes {
+		if scope == oidc.ScopeOpenID {
+			openIDSet = true
+			continue
+		}
+		if scope == ScopeUserRead {
+			userReadSet = true
+			continue
+		}
+	}
+	if !openIDSet {
+		scopes = append(scopes, oidc.ScopeOpenID)
+	}
+	if !userReadSet {
+		scopes = append(scopes, ScopeUserRead)
+	}
+	return scopes
 }
 
 // User represents the structure return on the userinfo endpoint and implements the [idp.User] interface
@@ -120,34 +144,38 @@ func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes [
 // AzureAD does not return an `email_verified` claim.
 // The verification can be automatically activated on the provider ([WithEmailVerified])
 type User struct {
-	Sub               string `json:"sub"`
-	FamilyName        string `json:"family_name"`
-	GivenName         string `json:"given_name"`
-	Name              string `json:"name"`
-	PreferredUsername string `json:"preferred_username"`
-	Email             string `json:"email"`
-	Picture           string `json:"picture"`
+	ID                string               `json:"id"`
+	BusinessPhones    []domain.PhoneNumber `json:"businessPhones"`
+	DisplayName       string               `json:"displayName"`
+	FirstName         string               `json:"givenName"`
+	JobTitle          string               `json:"jobTitle"`
+	Email             domain.EmailAddress  `json:"mail"`
+	MobilePhone       domain.PhoneNumber   `json:"mobilePhone"`
+	OfficeLocation    string               `json:"officeLocation"`
+	PreferredLanguage string               `json:"preferredLanguage"`
+	LastName          string               `json:"surname"`
+	UserPrincipalName string               `json:"userPrincipalName"`
 	isEmailVerified   bool
 }
 
 // GetID is an implementation of the [idp.User] interface.
 func (u *User) GetID() string {
-	return u.Sub
+	return u.ID
 }
 
 // GetFirstName is an implementation of the [idp.User] interface.
 func (u *User) GetFirstName() string {
-	return u.GivenName
+	return u.FirstName
 }
 
 // GetLastName is an implementation of the [idp.User] interface.
 func (u *User) GetLastName() string {
-	return u.FamilyName
+	return u.LastName
 }
 
 // GetDisplayName is an implementation of the [idp.User] interface.
 func (u *User) GetDisplayName() string {
-	return u.Name
+	return u.DisplayName
 }
 
 // GetNickname is an implementation of the [idp.User] interface.
@@ -158,11 +186,16 @@ func (u *User) GetNickname() string {
 
 // GetPreferredUsername is an implementation of the [idp.User] interface.
 func (u *User) GetPreferredUsername() string {
-	return u.PreferredUsername
+	return u.UserPrincipalName
 }
 
 // GetEmail is an implementation of the [idp.User] interface.
-func (u *User) GetEmail() string {
+func (u *User) GetEmail() domain.EmailAddress {
+	if u.Email == "" {
+		// if the user used a social login on Azure as well, the email will be empty
+		// but is used as username
+		return domain.EmailAddress(u.UserPrincipalName)
+	}
 	return u.Email
 }
 
@@ -176,7 +209,7 @@ func (u *User) IsEmailVerified() bool {
 
 // GetPhone is an implementation of the [idp.User] interface.
 // It returns an empty string because AzureAD does not provide the user's phone.
-func (u *User) GetPhone() string {
+func (u *User) GetPhone() domain.PhoneNumber {
 	return ""
 }
 
@@ -187,10 +220,8 @@ func (u *User) IsPhoneVerified() bool {
 }
 
 // GetPreferredLanguage is an implementation of the [idp.User] interface.
-// It returns [language.Und] because AzureAD does not provide the user's language
 func (u *User) GetPreferredLanguage() language.Tag {
-	// AzureAD does not provide the user's language
-	return language.Und
+	return language.Make(u.PreferredLanguage)
 }
 
 // GetProfile is an implementation of the [idp.User] interface.
@@ -201,5 +232,5 @@ func (u *User) GetProfile() string {
 
 // GetAvatarURL is an implementation of the [idp.User] interface.
 func (u *User) GetAvatarURL() string {
-	return u.Picture
+	return ""
 }

@@ -8,11 +8,12 @@ import (
 
 // SearchQuery defines the which and how data are queried
 type SearchQuery struct {
-	Columns Columns
-	Limit   uint64
-	Desc    bool
-	Filters [][]*Filter
-	Tx      *sql.Tx
+	Columns         Columns
+	Limit           uint64
+	Desc            bool
+	Filters         [][]*Filter
+	Tx              *sql.Tx
+	AllowTimeTravel bool
 }
 
 // Columns defines which fields of the event are needed for the query

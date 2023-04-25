@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: s'inscrire
   NextButtonText: suivant
 
+LDAP:
+  Title: Connexion
+  Description: Entrez vos données de connexion.
+  LoginNameLabel: Identifiant
+  PasswordLabel: Mot de passe
+  NextButtonText: suivant
+
 SelectAccount:
   Title: Sélectionner un compte
   Description: Utilisez votre compte ZITADEL
@@ -165,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Confirmation du mot de passe
   CancelButtonText: annuler
   NextButtonText: suivant
+  Footer: Bas de page
 
 PasswordChangeDone:
   Title: Changer le mot de passe
@@ -212,6 +220,8 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -243,6 +253,8 @@ ExternalRegistrationUserOverview:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -302,12 +314,33 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+
+DeviceAuth:
+  Title: Autorisation de l'appareil
+  UserCode:
+    Label: Code d'utilisateur
+    Description: Saisissez le code utilisateur présenté sur l'appareil.
+    ButtonNext: suivant
+  Action:
+    Description: Accordez l'accès à l'appareil.
+    GrantDevice: vous êtes sur le point d'accorder un appareil
+    AccessToScopes: accès aux périmètres suivants
+    Button:
+      Allow: permettre
+      Deny: refuser
+  Done:
+    Description: Fait.
+    Approved: Autorisation de l'appareil approuvée. Vous pouvez maintenant retourner à l'appareil.
+    Denied: Autorisation de l'appareil refusée. Vous pouvez maintenant retourner à l'appareil.
 
 Footer:
   PoweredBy: Promulgué par
   Tos: TOS
   PrivacyPolicy: Politique de confidentialité
   Help: Aide
+  SupportEmail: E-mail d'assistance
 
 Errors:
   Internal: Une erreur interne s'est produite
@@ -320,6 +353,7 @@ Errors:
     MissingParameters: Paramètres requis manquants
   User:
     NotFound: L'utilisateur n'a pas pu être trouvé
+    AlreadyExists: L'utilisateur existe déjà
     Inactive: L'utilisateur est inactif
     NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
     NotAllowedOrg: L'utilisateur n'est pas membre de l'organisation requise
@@ -328,6 +362,33 @@ Errors:
     Invalid: Données utilisateur non valides
     DomainNotAllowedAsUsername: Le domaine est déjà réservé et ne peut pas être utilisé.
     NotAllowedToLink: L'utilisateur n'est pas autorisé à établir un lien avec un fournisseur de connexion externe
+    Profile:
+      NotFound: Profil non trouvé
+      NotChanged: Le profil n'a pas changé
+      Empty: Profil est vide
+      FirstNameEmpty: Le prénom dans le profil est vide
+      LastNameEmpty: Le nom de famille dans le profil est vide
+      IDMissing: Profil ID manquant
+    Email:
+      NotFound: Email non trouvé
+      Invalid: L'email n'est pas valide
+      AlreadyVerified: L'adresse électronique est déjà vérifiée
+      NotChanged: L'adresse électronique n'a pas changé
+      Empty: Email est vide
+      IDMissing: Email ID manquant
+    Phone:
+      Notfound: Téléphone non trouvé
+      Invalid: Le téléphone n'est pas valide
+      AlreadyVerified: Téléphone déjà vérifié
+      Empty: Téléphone est vide
+      NotChanged: Téléphone n'a pas changé
+    Address:
+      NotFound: Adresse non trouvée
+      NotChanged: L'adresse n'a pas changé
+    Username:
+      AlreadyExists: Nom d'utilisateur déjà pris
+      Reserved: Le nom d'utilisateur est déjà pris
+      Empty: Le nom d'utilisateur est vide
     Password:
       ConfirmationWrong: La confirmation du mot de passe est erronée
       Empty: Le mot de passe est vide
@@ -370,6 +431,8 @@ Errors:
       ExternalUserIDEmpty: L'ID de l'utilisateur externe est vide
       UserDisplayNameEmpty: Le nom d'affichage de l'utilisateur est vide
       NoExternalUserData: Aucune donnée d'utilisateur externe reçue
+      CreationNotAllowed: La création d'un nouvel utilisateur n'est pas autorisée sur ce fournisseur.
+      LinkingNotAllowed: La création d'un lien vers un utilisateur n'est pas autorisée pour ce fournisseur.
     GrantRequired: Connexion impossible. L'utilisateur doit avoir au moins une subvention sur l'application. Veuillez contacter votre administrateur.
     ProjectRequired: Connexion impossible. L'organisation de l'utilisateur doit être accordée au projet. Veuillez contacter votre administrateur.
   IdentityProvider:
@@ -377,5 +440,10 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Politique de cadenassage non existante
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: L'enregistrement n'est pas autorisé
+  DeviceAuth:
+    NotExisting: Le code utilisateur n'existe pas
 
 optional: (facultatif)

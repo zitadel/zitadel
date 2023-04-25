@@ -21,23 +21,35 @@ func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetad
 	}
 
 	for i, md := range metadata.Metadata {
-		var value interface{}
-		err := json.Unmarshal(md.Value, &value)
-		if err != nil {
-			logging.WithError(err).Debug("unable to unmarshal into map")
-			panic(err)
-		}
 		result.Metadata[i] = &userMetadata{
 			CreationDate:  md.CreationDate,
 			ChangeDate:    md.ChangeDate,
 			ResourceOwner: md.ResourceOwner,
 			Sequence:      md.Sequence,
 			Key:           md.Key,
-			Value:         c.Runtime.ToValue(value),
+			Value:         metadataByteArrayToValue(md.Value, c.Runtime),
 		}
 	}
 
 	return c.Runtime.ToValue(result)
+}
+
+func metadataByteArrayToValue(val []byte, runtime *goja.Runtime) goja.Value {
+	var value interface{}
+	if !json.Valid(val) {
+		var err error
+		val, err = json.Marshal(string(val))
+		if err != nil {
+			logging.WithError(err).Debug("unable to marshal unknown value")
+			panic(err)
+		}
+	}
+	err := json.Unmarshal(val, &value)
+	if err != nil {
+		logging.WithError(err).Debug("unable to unmarshal into map")
+		panic(err)
+	}
+	return runtime.ToValue(value)
 }
 
 type userMetadataList struct {
@@ -57,7 +69,7 @@ type userMetadata struct {
 }
 
 type MetadataList struct {
-	Metadata []*Metadata
+	metadata []*Metadata
 }
 
 type Metadata struct {
@@ -79,7 +91,7 @@ func (md *MetadataList) AppendMetadataFunc(call goja.FunctionCall) goja.Value {
 		panic(err)
 	}
 
-	md.Metadata = append(md.Metadata,
+	md.metadata = append(md.metadata,
 		&Metadata{
 			Key:   call.Arguments[0].Export().(string),
 			Value: call.Arguments[1],
@@ -88,54 +100,60 @@ func (md *MetadataList) AppendMetadataFunc(call goja.FunctionCall) goja.Value {
 	return nil
 }
 
-func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
-	if metadataList == nil {
-		return nil
+func (md *MetadataList) MetadataListFromDomain(runtime *goja.Runtime) interface{} {
+	for i, metadata := range md.metadata {
+		md.metadata[i].Value = metadataByteArrayToValue(metadata.value, runtime)
 	}
-
-	list := make([]*domain.Metadata, len(metadataList.Metadata))
-	for i, metadata := range metadataList.Metadata {
-		list[i] = &domain.Metadata{
-			Key:   metadata.Key,
-			Value: metadata.value,
-		}
-	}
-
-	return list
-}
-
-func MetadataField(metadata *MetadataList) func(c *actions.FieldConfig) interface{} {
-	return func(c *actions.FieldConfig) interface{} {
-		for _, md := range metadata.Metadata {
-			if json.Valid(md.value) {
-				err := json.Unmarshal(md.value, &md.Value)
-				if err != nil {
-					panic(err)
-				}
-			}
-		}
-
-		return metadata.Metadata
-	}
+	return &md.metadata
 }
 
 func MetadataListFromDomain(metadata []*domain.Metadata) *MetadataList {
-	list := &MetadataList{Metadata: make([]*Metadata, len(metadata))}
+	list := &MetadataList{metadata: make([]*Metadata, len(metadata))}
 
 	for i, md := range metadata {
-		var val interface{}
-		if json.Valid(md.Value) {
-			err := json.Unmarshal(md.Value, &val)
-			if err != nil {
-				panic(err)
-			}
-		}
-
-		list.Metadata[i] = &Metadata{
+		list.metadata[i] = &Metadata{
 			Key:   md.Key,
 			value: md.Value,
 		}
 	}
 
 	return list
+}
+
+func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
+	if metadataList == nil {
+		return nil
+	}
+
+	list := make([]*domain.Metadata, len(metadataList.metadata))
+	for i, metadata := range metadataList.metadata {
+		value := metadata.value
+		if len(value) == 0 {
+			value = mapBytesToByteArray(metadata.Value.Export())
+		}
+		list[i] = &domain.Metadata{
+			Key:   metadata.Key,
+			Value: value,
+		}
+	}
+
+	return list
+}
+
+// mapBytesToByteArray is used for backwards compatibility of old metadata.push method
+// converts the Javascript uint8 array which is exported as []interface{} to a []byte
+func mapBytesToByteArray(i interface{}) []byte {
+	bytes, ok := i.([]interface{})
+	if !ok {
+		return nil
+	}
+	value := make([]byte, len(bytes))
+	for i, val := range bytes {
+		b, ok := val.(int64)
+		if !ok {
+			return nil
+		}
+		value[i] = byte(b)
+	}
+	return value
 }

@@ -11,6 +11,13 @@ Login:
   RegisterButtonText: registrieren
   NextButtonText: weiter
 
+LDAP:
+  Title: Anmeldung
+  Description: Mit Konto anmelden.
+  LoginNameLabel: Loginname
+  PasswordLabel: Passwort
+  NextButtonText: weiter
+
 SelectAccount:
   Title: Account auswählen
   Description: Wähle deinen Account aus.
@@ -165,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Passwort Bestätigung
   CancelButtonText: abbrechen
   NextButtonText: weiter
+  Footer: Fusszeile
 
 PasswordChangeDone:
   Title: Passwort ändern
@@ -212,6 +220,8 @@ RegistrationUser:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -243,6 +253,8 @@ ExternalRegistrationUserOverview:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
@@ -302,12 +314,33 @@ ExternalNotFound:
   French: Français
   Chinese: 简体中文
   Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+
+DeviceAuth:
+  Title: Geräteautorisierung
+  UserCode:
+    Label: Benutzercode
+    Description: Geben Sie den auf dem Gerät angezeigten Benutzercode ein
+    ButtonNext: weiter
+  Action:
+    Description: Gerätezugriff erlauben
+    GrantDevice: Sie sind dabei, das Gerät zu erlauben
+    AccessToScopes: Zugriff auf die folgenden Daten
+    Button:
+      Allow: erlauben
+      Deny: verweigern
+  Done:
+    Description: Abgeschlossen
+    Approved: Gerätezulassung genehmigt. Sie können jetzt zum Gerät zurückkehren.
+    Denied: Geräteautorisierung verweigert. Sie können jetzt zum Gerät zurückkehren.
 
 Footer:
   PoweredBy: Powered By
   Tos: AGB
   PrivacyPolicy: Datenschutzerklärung
   Help: Hilfe
+  SupportEmail: Support E-Mail
 
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten
@@ -320,6 +353,7 @@ Errors:
     MissingParameters: Benötigte Parameter fehlen
   User:
     NotFound: Benutzer konnte nicht gefunden werden
+    AlreadyExists: Benutzer existiert bereits
     Inactive: Benutzer ist inaktiv
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
@@ -328,6 +362,33 @@ Errors:
     Invalid: Userdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
+    Profile:
+      NotFound: Profil nicht gefunden
+      NotChanged: Profil nicht verändert
+      Empty: Profil ist leer
+      FirstNameEmpty: Vorname im Profil ist leer
+      LastNameEmpty: Nachname im Profil ist leer
+      IDMissing: Profil ID fehlt
+    Email:
+      NotFound: Email nicht gefunden
+      Invalid: Email ist ungültig
+      AlreadyVerified: Email ist bereits verifiziert
+      NotChanged: Email wurde nicht geändert
+      Empty: Email ist leer
+      IDMissing: Email ID fehlt
+    Phone:
+      NotFound: Telefonnummer nicht gefunden
+      Invalid: Telefonnummer ist ungültig
+      AlreadyVerified: Telefonnummer bereits verifiziert
+      Empty: Telefonnummer ist leer
+      NotChanged: Telefonnummer wurde nicht geändert
+    Address:
+      NotFound: Adresse nicht gefunden
+      NotChanged: Adresse wurde nicht geändert
+    Username:
+      AlreadyExists: Benutzername ist bereits vergeben
+      Reserved: Benutzername ist bereits vergeben
+      Empty: Benutzername ist leer
     Password:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer
@@ -370,6 +431,8 @@ Errors:
       ExternalUserIDEmpty: Externe User ID  ist leer
       UserDisplayNameEmpty: Benutzer Anzeige Name ist leer
       NoExternalUserData: Keine externe User Daten erhalten
+      CreationNotAllowed: Erstellen eines neuen User ist auf diesem Provider nicht erlaubt
+      LinkingNotAllowed: Linken eines Users ist auf diesem Provider nicht erlaubt
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
     ProjectRequired: Der Login an diese Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
@@ -377,5 +440,10 @@ Errors:
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy existiert nicht
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrierung ist nicht erlaubt
+  DeviceAuth:
+    NotExisting: Benutzercode existiert nicht
 
 optional: (optional)

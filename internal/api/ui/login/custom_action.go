@@ -13,65 +13,73 @@ import (
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/idp"
 )
 
 func (l *Login) runPostExternalAuthenticationActions(
 	user *domain.ExternalUser,
-	tokens *oidc.Tokens,
+	tokens *oidc.Tokens[*oidc.IDTokenClaims],
 	authRequest *domain.AuthRequest,
 	httpRequest *http.Request,
-	config *iam_model.IDPConfigView,
+	idpUser idp.User,
 	authenticationError error,
-) (*domain.ExternalUser, error) {
+) (_ *domain.ExternalUser, userChanged bool, err error) {
 	ctx := httpRequest.Context()
 
 	resourceOwner := authRequest.RequestedOrgID
 	if resourceOwner == "" {
-		resourceOwner = config.AggregateID
-	}
-	instance := authz.GetInstance(ctx)
-	if resourceOwner == instance.InstanceID() {
-		resourceOwner = instance.DefaultOrganisationID()
+		resourceOwner = authz.GetInstance(ctx).DefaultOrganisationID()
 	}
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	metadataList := object.MetadataListFromDomain(user.Metadatas)
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("setFirstName", func(firstName string) {
 			user.FirstName = firstName
+			userChanged = true
 		}),
 		actions.SetFields("setLastName", func(lastName string) {
 			user.LastName = lastName
+			userChanged = true
 		}),
 		actions.SetFields("setNickName", func(nickName string) {
 			user.NickName = nickName
+			userChanged = true
 		}),
 		actions.SetFields("setDisplayName", func(displayName string) {
 			user.DisplayName = displayName
+			userChanged = true
 		}),
 		actions.SetFields("setPreferredLanguage", func(preferredLanguage string) {
 			user.PreferredLanguage = language.Make(preferredLanguage)
+			userChanged = true
 		}),
 		actions.SetFields("setPreferredUsername", func(username string) {
 			user.PreferredUsername = username
+			userChanged = true
 		}),
-		actions.SetFields("setEmail", func(email string) {
+		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			user.Email = email
+			userChanged = true
 		}),
 		actions.SetFields("setEmailVerified", func(verified bool) {
 			user.IsEmailVerified = verified
+			userChanged = true
 		}),
-		actions.SetFields("setPhone", func(phone string) {
+		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			user.Phone = phone
+			userChanged = true
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			user.IsPhoneVerified = verified
+			userChanged = true
 		}),
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -92,6 +100,9 @@ func (l *Login) runPostExternalAuthenticationActions(
 				actions.SetFields("externalUser", func(c *actions.FieldConfig) interface{} {
 					return object.UserFromExternalUser(c, user)
 				}),
+				actions.SetFields("providerInfo", func(c *actions.FieldConfig) interface{} {
+					return c.Runtime.ToValue(idpUser)
+				}),
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 				actions.SetFields("httpRequest", object.HTTPRequestField(httpRequest)),
 				actions.SetFields("authError", authErrStr),
@@ -110,11 +121,11 @@ func (l *Login) runPostExternalAuthenticationActions(
 		)
 		cancel()
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 	}
 	user.Metadatas = object.MetadataListToDomain(metadataList)
-	return user, err
+	return user, userChanged, err
 }
 
 type authMethod string
@@ -146,7 +157,9 @@ func (l *Login) runPostInternalAuthenticationActions(
 
 	metadataList := object.MetadataListFromDomain(nil)
 	apiFields := actions.WithAPIFields(
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -223,7 +236,7 @@ func (l *Login) runPreCreationActions(
 		actions.SetFields("setUsername", func(username string) {
 			user.Username = username
 		}),
-		actions.SetFields("setEmail", func(email string) {
+		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			if user.Email == nil {
 				user.Email = &domain.Email{}
 			}
@@ -235,11 +248,11 @@ func (l *Login) runPreCreationActions(
 			}
 			user.Email.IsEmailVerified = verified
 		}),
-		actions.SetFields("setPhone", func(email string) {
+		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			if user.Phone == nil {
 				user.Phone = &domain.Phone{}
 			}
-			user.Phone.PhoneNumber = email
+			user.Phone.PhoneNumber = phone
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			if user.Phone == nil {
@@ -247,7 +260,9 @@ func (l *Login) runPreCreationActions(
 			}
 			user.Phone.IsPhoneVerified = verified
 		}),
-		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
+			return metadataList.MetadataListFromDomain(c.Runtime)
+		}),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -314,7 +329,7 @@ func (l *Login) runPostCreationActions(
 			actions.SetFields("v1",
 				actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 					return func(call goja.FunctionCall) goja.Value {
-						user, err := l.query.GetUserByID(actionCtx, true, authRequest.UserID, false)
+						user, err := l.query.GetUserByID(actionCtx, true, userID, false)
 						if err != nil {
 							panic(err)
 						}
@@ -342,19 +357,40 @@ func (l *Login) runPostCreationActions(
 	return object.UserGrantsToDomain(userID, mutableUserGrants.UserGrants), err
 }
 
-func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
-	return []actions.FieldOption{
-		actions.SetFields("accessToken", tokens.AccessToken),
-		actions.SetFields("idToken", tokens.IDToken),
-		actions.SetFields("getClaim", func(claim string) interface{} {
-			return tokens.IDTokenClaims.GetClaim(claim)
-		}),
-		actions.SetFields("claimsJSON", func() (string, error) {
+func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOption {
+	var accessToken, idToken string
+	getClaim := func(claim string) interface{} {
+		return nil
+	}
+	claimsJSON := func() (string, error) {
+		return "", nil
+	}
+	if tokens == nil {
+		return []actions.FieldOption{
+			actions.SetFields("accessToken", accessToken),
+			actions.SetFields("idToken", idToken),
+			actions.SetFields("getClaim", getClaim),
+			actions.SetFields("claimsJSON", claimsJSON),
+		}
+	}
+	accessToken = tokens.AccessToken
+	idToken = tokens.IDToken
+	if tokens.IDTokenClaims != nil {
+		getClaim = func(claim string) interface{} {
+			return tokens.IDTokenClaims.Claims[claim]
+		}
+		claimsJSON = func() (string, error) {
 			c, err := json.Marshal(tokens.IDTokenClaims)
 			if err != nil {
 				return "", err
 			}
 			return string(c), nil
-		}),
+		}
+	}
+	return []actions.FieldOption{
+		actions.SetFields("accessToken", accessToken),
+		actions.SetFields("idToken", idToken),
+		actions.SetFields("getClaim", getClaim),
+		actions.SetFields("claimsJSON", claimsJSON),
 	}
 }

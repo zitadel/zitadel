@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import {
-  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
   MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
 import { saveAs } from 'file-saver';
 import { AddAppKeyResponse, AddMachineKeyResponse } from 'src/app/proto/generated/zitadel/management_pb';

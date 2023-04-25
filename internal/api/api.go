@@ -10,6 +10,8 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -23,114 +25,156 @@ import (
 )
 
 type API struct {
-	port           uint16
-	grpcServer     *grpc.Server
-	verifier       *internal_authz.TokenVerifier
-	health         health
-	router         *mux.Router
-	externalSecure bool
-	http1HostName  string
+	port          uint16
+	grpcServer    *grpc.Server
+	verifier      *internal_authz.TokenVerifier
+	health        healthCheck
+	router        *mux.Router
+	http1HostName string
+	grpcGateway   *server.Gateway
+	healthServer  *health.Server
 }
 
-type health interface {
+type healthCheck interface {
 	Health(ctx context.Context) error
-	Instance(ctx context.Context, shouldTriggerBulk bool) (*query.Instance, error)
 }
 
 func New(
+	ctx context.Context,
 	port uint16,
 	router *mux.Router,
 	queries *query.Queries,
 	verifier *internal_authz.TokenVerifier,
 	authZ internal_authz.Config,
-	externalSecure bool,
-	tlsConfig *tls.Config,
-	http2HostName,
-	http1HostName string,
+	tlsConfig *tls.Config, http2HostName, http1HostName string,
 	accessSvc *logstore.Service,
-) *API {
+) (_ *API, err error) {
 	api := &API{
-		port:           port,
-		verifier:       verifier,
-		health:         queries,
-		router:         router,
-		externalSecure: externalSecure,
-		http1HostName:  http1HostName,
+		port:          port,
+		verifier:      verifier,
+		health:        queries,
+		router:        router,
+		http1HostName: http1HostName,
 	}
 
 	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessSvc)
-	api.routeGRPC()
+	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName)
+	if err != nil {
+		return nil, err
+	}
+	api.registerHealthServer()
 
-	api.RegisterHandler("/debug", api.healthHandler())
+	api.RegisterHandlerOnPrefix("/debug", api.healthHandler())
 	api.router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
 
-	return api
+	return api, nil
 }
 
-func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) error {
+// RegisterServer registers a grpc service on the grpc server,
+// creates a new grpc gateway and registers it as a separate http handler
+//
+// used for v1 api (system, admin, mgmt, auth)
+func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayPrefix) error {
 	grpcServer.RegisterServer(a.grpcServer)
-	handler, prefix, err := server.CreateGateway(ctx, grpcServer, a.port, a.http1HostName)
+	handler, prefix, err := server.CreateGatewayWithPrefix(ctx, grpcServer, a.port, a.http1HostName)
 	if err != nil {
 		return err
 	}
-	a.RegisterHandler(prefix, handler)
+	a.RegisterHandlerOnPrefix(prefix, handler)
 	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
+	a.healthServer.SetServingStatus(grpcServer.MethodPrefix(), healthpb.HealthCheckResponse_SERVING)
 	return nil
 }
 
-func (a *API) RegisterHandler(prefix string, handler http.Handler) {
+// RegisterService registers a grpc service on the grpc server,
+// and its gateway on the gateway handler
+//
+// used for >= v2 api (e.g. user, session, ...)
+func (a *API) RegisterService(ctx context.Context, grpcServer server.Server) error {
+	grpcServer.RegisterServer(a.grpcServer)
+	err := server.RegisterGateway(ctx, a.grpcGateway, grpcServer)
+	if err != nil {
+		return err
+	}
+	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
+	a.healthServer.SetServingStatus(grpcServer.MethodPrefix(), healthpb.HealthCheckResponse_SERVING)
+	return nil
+}
+
+// HandleFunc allows registering a [http.HandlerFunc] on an exact
+// path, instead of prefix like RegisterHandlerOnPrefix.
+func (a *API) HandleFunc(path string, f http.HandlerFunc) {
+	a.router.HandleFunc(path, f)
+}
+
+// RegisterHandlerOnPrefix registers a http handler on a path prefix
+// the prefix will not be passed to the actual handler
+func (a *API) RegisterHandlerOnPrefix(prefix string, handler http.Handler) {
 	prefix = strings.TrimSuffix(prefix, "/")
 	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
 	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))
 }
 
-func (a *API) routeGRPC() {
+// RegisterHandlerPrefixes registers a http handler on a multiple path prefixes
+// the prefix will remain when calling the actual handler
+func (a *API) RegisterHandlerPrefixes(handler http.Handler, prefixes ...string) {
+	for _, prefix := range prefixes {
+		prefix = strings.TrimSuffix(prefix, "/")
+		subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
+		subRouter.PathPrefix("").Handler(handler)
+	}
+}
+
+func (a *API) registerHealthServer() {
+	healthServer := health.NewServer()
+	healthpb.RegisterHealthServer(a.grpcServer, healthServer)
+	a.healthServer = healthServer
+}
+
+func (a *API) RouteGRPC() {
 	http2Route := a.router.
 		MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
 			return r.ProtoMajor == 2
 		}).
-		Subrouter()
+		Subrouter().
+		Name("grpc")
 	http2Route.
 		Methods(http.MethodPost).
 		Headers("Content-Type", "application/grpc").
 		Handler(a.grpcServer)
 
-	if !a.externalSecure {
-		a.routeGRPCWeb(a.router)
-		return
-	}
-	a.routeGRPCWeb(http2Route)
+	a.routeGRPCWeb()
+	a.router.NewRoute().
+		Handler(a.grpcGateway.Handler()).
+		Name("grpc-gateway")
 }
 
-func (a *API) routeGRPCWeb(router *mux.Router) {
-	router.NewRoute().
+func (a *API) routeGRPCWeb() {
+	grpcWebServer := grpcweb.WrapServer(a.grpcServer,
+		grpcweb.WithAllowedRequestHeaders(
+			[]string{
+				http_util.Origin,
+				http_util.ContentType,
+				http_util.Accept,
+				http_util.AcceptLanguage,
+				http_util.Authorization,
+				http_util.ZitadelOrgID,
+				http_util.XUserAgent,
+				http_util.XGrpcWeb,
+			},
+		),
+		grpcweb.WithOriginFunc(func(_ string) bool {
+			return true
+		}),
+	)
+	a.router.NewRoute().
 		Methods(http.MethodPost, http.MethodOptions).
 		MatcherFunc(
 			func(r *http.Request, _ *mux.RouteMatch) bool {
-				if strings.Contains(strings.ToLower(r.Header.Get("content-type")), "application/grpc-web+") {
-					return true
-				}
-				return strings.Contains(strings.ToLower(r.Header.Get("access-control-request-headers")), "x-grpc-web")
+				return grpcWebServer.IsGrpcWebRequest(r) || grpcWebServer.IsAcceptableGrpcCorsRequest(r)
 			}).
-		Handler(
-			grpcweb.WrapServer(a.grpcServer,
-				grpcweb.WithAllowedRequestHeaders(
-					[]string{
-						http_util.Origin,
-						http_util.ContentType,
-						http_util.Accept,
-						http_util.AcceptLanguage,
-						http_util.Authorization,
-						http_util.ZitadelOrgID,
-						http_util.XUserAgent,
-						http_util.XGrpcWeb,
-					},
-				),
-				grpcweb.WithOriginFunc(func(_ string) bool {
-					return true
-				}),
-			),
-		)
+		Handler(grpcWebServer).
+		Name("grpc-web")
 }
 
 func (a *API) healthHandler() http.Handler {

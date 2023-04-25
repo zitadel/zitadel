@@ -28,7 +28,8 @@ var (
 		` projections.sms_configs2_twilio.token,` +
 		` projections.sms_configs2_twilio.sender_number` +
 		` FROM projections.sms_configs2` +
-		` LEFT JOIN projections.sms_configs2_twilio ON projections.sms_configs2.id = projections.sms_configs2_twilio.sms_id`)
+		` LEFT JOIN projections.sms_configs2_twilio ON projections.sms_configs2.id = projections.sms_configs2_twilio.sms_id AND projections.sms_configs2.instance_id = projections.sms_configs2_twilio.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	expectedSMSConfigsQuery = regexp.QuoteMeta(`SELECT projections.sms_configs2.id,` +
 		` projections.sms_configs2.aggregate_id,` +
 		` projections.sms_configs2.creation_date,` +
@@ -44,7 +45,8 @@ var (
 		` projections.sms_configs2_twilio.sender_number,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sms_configs2` +
-		` LEFT JOIN projections.sms_configs2_twilio ON projections.sms_configs2.id = projections.sms_configs2_twilio.sms_id`)
+		` LEFT JOIN projections.sms_configs2_twilio ON projections.sms_configs2.id = projections.sms_configs2_twilio.sms_id AND projections.sms_configs2.instance_id = projections.sms_configs2_twilio.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 
 	smsConfigCols = []string{
 		"id",
@@ -228,7 +230,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
@@ -320,7 +322,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

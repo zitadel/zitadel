@@ -7,12 +7,15 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
+const handleThresholdTimeout = time.Minute
+
 type QuotaQuerier interface {
 	GetCurrentQuotaPeriod(ctx context.Context, instanceID string, unit quota.Unit) (config *quota.AddedEvent, periodStart time.Time, err error)
-	GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, used uint64) ([]*quota.NotifiedEvent, error)
+	GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, used uint64) ([]*quota.NotificationDueEvent, error)
 }
 
 type UsageQuerier interface {
@@ -22,12 +25,12 @@ type UsageQuerier interface {
 }
 
 type UsageReporter interface {
-	Report(ctx context.Context, notifications []*quota.NotifiedEvent) (err error)
+	Report(ctx context.Context, notifications []*quota.NotificationDueEvent) (err error)
 }
 
-type UsageReporterFunc func(context.Context, []*quota.NotifiedEvent) (err error)
+type UsageReporterFunc func(context.Context, []*quota.NotificationDueEvent) (err error)
 
-func (u UsageReporterFunc) Report(ctx context.Context, notifications []*quota.NotifiedEvent) (err error) {
+func (u UsageReporterFunc) Report(ctx context.Context, notifications []*quota.NotificationDueEvent) (err error) {
 	return u(ctx, notifications)
 }
 
@@ -94,17 +97,29 @@ func (s *Service) Limit(ctx context.Context, instanceID string) *uint64 {
 		return nil
 	}
 
+	go s.handleThresholds(ctx, quota, periodStart, usage)
+
 	var remaining *uint64
 	if quota.Limit {
 		r := uint64(math.Max(0, float64(quota.Amount)-float64(usage)))
 		remaining = &r
 	}
+	return remaining
+}
 
-	notifications, err := s.quotaQuerier.GetDueQuotaNotifications(ctx, quota, periodStart, usage)
-	if err != nil {
-		return remaining
+func (s *Service) handleThresholds(ctx context.Context, quota *quota.AddedEvent, periodStart time.Time, usage uint64) {
+	var err error
+	defer func() {
+		logging.OnError(err).Warn("handling quota thresholds failed")
+	}()
+
+	detatchedCtx, cancel := context.WithTimeout(authz.Detach(ctx), handleThresholdTimeout)
+	defer cancel()
+
+	notifications, err := s.quotaQuerier.GetDueQuotaNotifications(detatchedCtx, quota, periodStart, usage)
+	if err != nil || len(notifications) == 0 {
+		return
 	}
 
-	err = s.usageReporter.Report(ctx, notifications)
-	return remaining
+	err = s.usageReporter.Report(detatchedCtx, notifications)
 }

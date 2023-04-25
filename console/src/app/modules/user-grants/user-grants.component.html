@@ -77,7 +77,7 @@
             [checked]="selection.isSelected(row)"
           >
             <cnsl-avatar
-              *ngIf="row && row?.displayName && row.firstName && row.lastName; else cog"
+              *ngIf="row && row.userType === Type.TYPE_HUMAN; else cog"
               class="avatar"
               [name]="row.displayName"
               [avatarUrl]="row.avatarUrl || ''"
@@ -155,6 +155,7 @@
               actions
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               color="warn"
+              [disabled]="disableDelete"
               (click)="deleteGrant($event, grant)"
               mat-icon-button
             >
@@ -170,8 +171,8 @@
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr
-        (click)="openEditDialog(grant)"
-        class="highlight pointer"
+        (click)="!disableWrite ? openEditDialog(grant) : null"
+        [ngClass]="{ 'highlight pointer': !disableWrite }"
         mat-row
         *matRowDef="let grant; columns: displayedColumns"
       ></tr>

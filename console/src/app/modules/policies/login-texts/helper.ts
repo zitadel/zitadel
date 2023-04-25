@@ -73,6 +73,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r3.setHelp(map.footerText?.help ?? '');
   r3.setPrivacyPolicy(map.footerText?.privacyPolicy ?? '');
   r3.setTos(map.footerText?.tos ?? '');
+  r3.setSupportEmail(map.footerText?.supportEmail ?? '');
   req.setFooterText(r3);
 
   const r4 = new InitMFADoneScreenText();
