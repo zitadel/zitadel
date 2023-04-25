@@ -153,20 +153,8 @@ func (c *Commands) AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordA
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if human.ID != "" {
-				existingHuman, err := humanWriteModelByID(ctx, filter, human.ID, a.ResourceOwner)
-				if err != nil {
-					return nil, err
-				}
-				if isUserStateExists(existingHuman.UserState) {
-					return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
-				}
-			} else {
-				human.ID, err = c.idGenerator.Next()
-				if err != nil {
-					return nil, err
-				}
-				a.ID = human.ID
+			if err := c.addHumanCommandCheckID(ctx, filter, a, human); err != nil {
+				return nil, err
 			}
 
 			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ResourceOwner)
@@ -213,60 +201,21 @@ func (c *Commands) AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordA
 				createCmd.AddPhoneData(human.Phone.Number)
 			}
 
-			if human.Password != "" {
-				if err = humanValidatePassword(ctx, filter, human.Password); err != nil {
-					return nil, err
-				}
-
-				secret, err := crypto.Hash([]byte(human.Password), passwordAlg)
-				if err != nil {
-					return nil, err
-				}
-				createCmd.AddPasswordData(secret, human.PasswordChangeRequired)
-			}
-
-			if human.BcryptedPassword != "" {
-				createCmd.AddPasswordData(crypto.FillHash([]byte(human.BcryptedPassword), passwordAlg), human.PasswordChangeRequired)
+			if err := addHumanCommandPassword(ctx, filter, createCmd, human, passwordAlg); err != nil {
+				return nil, err
 			}
 
 			cmds := make([]eventstore.Command, 0, 3)
 			cmds = append(cmds, createCmd)
 
-			if human.Email.Verified {
-				cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
+			cmds, err = c.addHumanCommandEmail(ctx, filter, cmds, a, human, codeAlg, allowInitMail)
+			if err != nil {
+				return nil, err
 			}
 
-			// if allowInitMail, used for v1 api (system, admin, mgmt, auth):
-			// add init code if
-			// email not verified or
-			// user not registered and password set
-			if allowInitMail && human.shouldAddInitCode() {
-				initCode, err := newUserInitCode(ctx, filter, codeAlg)
-				if err != nil {
-					return nil, err
-				}
-				cmds = append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, initCode.Crypted, initCode.Expiry))
-			} else {
-				if !human.Email.Verified {
-					emailCode, err := c.newEmailCode(ctx, filter, codeAlg)
-					if err != nil {
-						return nil, err
-					}
-					if human.Email.ReturnCode {
-						human.EmailCode = &emailCode.Plain
-					}
-					cmds = append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &a.Aggregate, emailCode.Crypted, emailCode.Expiry, human.Email.URLTemplate, human.Email.ReturnCode))
-				}
-			}
-
-			if human.Phone.Verified {
-				cmds = append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &a.Aggregate))
-			} else if human.Phone.Number != "" {
-				phoneCode, err := newPhoneCode(ctx, filter, codeAlg)
-				if err != nil {
-					return nil, err
-				}
-				cmds = append(cmds, user.NewHumanPhoneCodeAddedEvent(ctx, &a.Aggregate, phoneCode.Crypted, phoneCode.Expiry))
+			cmds, err = c.addHumanCommandPhone(ctx, filter, cmds, a, human, codeAlg)
+			if err != nil {
+				return nil, err
 			}
 
 			for _, metadataEntry := range human.Metadata {
@@ -281,6 +230,87 @@ func (c *Commands) AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordA
 			return cmds, nil
 		}, nil
 	}
+}
+
+func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.FilterToQueryReducer, cmds []eventstore.Command, a *user.Aggregate, human *AddHuman, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) ([]eventstore.Command, error) {
+	if human.Email.Verified {
+		cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
+	}
+
+	// if allowInitMail, used for v1 api (system, admin, mgmt, auth):
+	// add init code if
+	// email not verified or
+	// user not registered and password set
+	if allowInitMail && human.shouldAddInitCode() {
+		initCode, err := newUserInitCode(ctx, filter, codeAlg)
+		if err != nil {
+			return nil, err
+		}
+		return append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, initCode.Crypted, initCode.Expiry)), nil
+	}
+	if !human.Email.Verified {
+		emailCode, err := c.newEmailCode(ctx, filter, codeAlg)
+		if err != nil {
+			return nil, err
+		}
+		if human.Email.ReturnCode {
+			human.EmailCode = &emailCode.Plain
+		}
+		return append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &a.Aggregate, emailCode.Crypted, emailCode.Expiry, human.Email.URLTemplate, human.Email.ReturnCode)), nil
+	}
+	return cmds, nil
+}
+func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.FilterToQueryReducer, cmds []eventstore.Command, a *user.Aggregate, human *AddHuman, codeAlg crypto.EncryptionAlgorithm) ([]eventstore.Command, error) {
+	if human.Phone.Number == "" {
+		return cmds, nil
+	}
+	if human.Phone.Verified {
+		return append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &a.Aggregate)), nil
+	}
+	phoneCode, err := newPhoneCode(ctx, filter, codeAlg)
+	if err != nil {
+		return nil, err
+	}
+	return append(cmds, user.NewHumanPhoneCodeAddedEvent(ctx, &a.Aggregate, phoneCode.Crypted, phoneCode.Expiry)), nil
+}
+
+func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparation.FilterToQueryReducer, a *user.Aggregate, human *AddHuman) (err error) {
+	if human.ID != "" {
+		existingHuman, err := humanWriteModelByID(ctx, filter, human.ID, a.ResourceOwner)
+		if err != nil {
+			return err
+		}
+		if isUserStateExists(existingHuman.UserState) {
+			return errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
+		}
+		return nil
+	}
+	human.ID, err = c.idGenerator.Next()
+	if err != nil {
+		return err
+	}
+	a.ID = human.ID
+	return nil
+}
+
+func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, passwordAlg crypto.HashAlgorithm) (err error) {
+	if human.Password != "" {
+		if err = humanValidatePassword(ctx, filter, human.Password); err != nil {
+			return err
+		}
+
+		secret, err := crypto.Hash([]byte(human.Password), passwordAlg)
+		if err != nil {
+			return err
+		}
+		createCmd.AddPasswordData(secret, human.PasswordChangeRequired)
+		return nil
+	}
+
+	if human.BcryptedPassword != "" {
+		createCmd.AddPasswordData(crypto.FillHash([]byte(human.BcryptedPassword), passwordAlg), human.PasswordChangeRequired)
+	}
+	return nil
 }
 
 func userValidateDomain(ctx context.Context, a *user.Aggregate, username string, mustBeDomain bool, filter preparation.FilterToQueryReducer) error {

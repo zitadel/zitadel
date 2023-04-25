@@ -453,7 +453,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					LastName:  "lastname",
 					Email: Email{
 						Address:     "email@test.ch",
-						UrlTemplate: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}",
+						URLTemplate: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}",
 					},
 					PreferredLanguage: language.English,
 				},
