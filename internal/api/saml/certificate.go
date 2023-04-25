@@ -123,7 +123,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 		if errors.IsErrorAlreadyExists(err) {
 			return nil
 		}
-		logging.OnError(err).Warn("initial lock failed")
+		logging.OnError(err).Debug("initial lock failed")
 		return err
 	}
 

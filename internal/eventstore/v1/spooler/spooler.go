@@ -126,7 +126,7 @@ func (s *spooledHandler) load(workerID string) {
 			var err error
 			s.succeededOnce, err = s.hasSucceededOnce(ctx)
 			if err != nil {
-				logging.WithFields("view", s.ViewModel()).OnError(err).Warn("initial lock failed for first schedule")
+				logging.WithFields("view", s.ViewModel()).OnError(err).Debug("initial lock failed for first schedule")
 				errs <- err
 				return
 			}
