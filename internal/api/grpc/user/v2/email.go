@@ -12,7 +12,6 @@ import (
 )
 
 func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp *user.SetEmailResponse, err error) {
-	//resourceOwner := authz.GetCtxData(ctx).OrgID
 	resourceOwner := "" // TODO: check if still needed
 	var email *domain.Email
 

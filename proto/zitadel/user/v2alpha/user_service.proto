@@ -66,7 +66,7 @@ message SetEmailRequest{
 
 message SetEmailResponse{
   zitadel.object.v2alpha.Details details = 1;
-  // TODO: should we have a oneOf? (maybe lifetime will be added)
+  // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
 
