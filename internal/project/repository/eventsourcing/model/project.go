@@ -30,7 +30,7 @@ func ProjectToModel(project *Project) *model.Project {
 	}
 }
 
-func ProjectFromEvents(project *Project, events ...*es_models.Event) (*Project, error) {
+func ProjectFromEvents(project *Project, events ...eventstore.Event) (*Project, error) {
 	if project == nil {
 		project = &Project{}
 	}
@@ -38,7 +38,7 @@ func ProjectFromEvents(project *Project, events ...*es_models.Event) (*Project, 
 	return project, project.AppendEvents(events...)
 }
 
-func (p *Project) AppendEvents(events ...*es_models.Event) error {
+func (p *Project) AppendEvents(events ...eventstore.Event) error {
 	for _, event := range events {
 		if err := p.AppendEvent(event); err != nil {
 			return err
@@ -47,10 +47,10 @@ func (p *Project) AppendEvents(events ...*es_models.Event) error {
 	return nil
 }
 
-func (p *Project) AppendEvent(event *es_models.Event) error {
+func (p *Project) AppendEvent(event eventstore.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 
-	switch eventstore.EventType(event.Type) {
+	switch eventstore.EventType(event.Type()) {
 	case project.ProjectAddedType, project.ProjectChangedType:
 		return p.AppendAddProjectEvent(event)
 	case project.ProjectDeactivatedType:
@@ -63,7 +63,7 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (p *Project) AppendAddProjectEvent(event *es_models.Event) error {
+func (p *Project) AppendAddProjectEvent(event eventstore.Event) error {
 	p.SetData(event)
 	p.State = int32(model.ProjectStateActive)
 	return nil
@@ -84,8 +84,8 @@ func (p *Project) appendRemovedEvent() error {
 	return nil
 }
 
-func (p *Project) SetData(event *es_models.Event) error {
-	if err := json.Unmarshal(event.Data, p); err != nil {
+func (p *Project) SetData(event eventstore.Event) error {
+	if err := json.Unmarshal(event.DataAsBytes(), p); err != nil {
 		logging.Log("EVEN-lo9sr").WithError(err).Error("could not unmarshal event data")
 		return err
 	}

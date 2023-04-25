@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/user/model"
 )
@@ -62,21 +63,21 @@ func GetWebauthn(webauthnTokens []*WebAuthNToken, id string) (int, *WebAuthNToke
 	return -1, nil
 }
 
-func (w *WebAuthNVerify) SetData(event *es_models.Event) error {
-	if err := json.Unmarshal(event.Data, w); err != nil {
+func (w *WebAuthNVerify) SetData(event eventstore.Event) error {
+	if err := json.Unmarshal(event.DataAsBytes(), w); err != nil {
 		logging.Log("EVEN-G342rf").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-B6641", "could not unmarshal event")
 	}
 	return nil
 }
 
-func (u *Human) appendU2FAddedEvent(event *es_models.Event) error {
+func (u *Human) appendU2FAddedEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
 		return err
 	}
-	webauthn.ObjectRoot.CreationDate = event.CreationDate
+	webauthn.ObjectRoot.CreationDate = event.CreationDate()
 	webauthn.State = int32(model.MFAStateNotReady)
 	for i, token := range u.U2FTokens {
 		if token.State == int32(model.MFAStateNotReady) {
@@ -88,7 +89,7 @@ func (u *Human) appendU2FAddedEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (u *Human) appendU2FVerifiedEvent(event *es_models.Event) error {
+func (u *Human) appendU2FVerifiedEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
@@ -105,7 +106,7 @@ func (u *Human) appendU2FVerifiedEvent(event *es_models.Event) error {
 	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-4hu9s", "Errors.Users.MFA.U2F.NotExisting")
 }
 
-func (u *Human) appendU2FChangeSignCountEvent(event *es_models.Event) error {
+func (u *Human) appendU2FChangeSignCountEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
@@ -118,7 +119,7 @@ func (u *Human) appendU2FChangeSignCountEvent(event *es_models.Event) error {
 	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-5Ms8h", "Errors.Users.MFA.U2F.NotExisting")
 }
 
-func (u *Human) appendU2FRemovedEvent(event *es_models.Event) error {
+func (u *Human) appendU2FRemovedEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
@@ -135,13 +136,13 @@ func (u *Human) appendU2FRemovedEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (u *Human) appendPasswordlessAddedEvent(event *es_models.Event) error {
+func (u *Human) appendPasswordlessAddedEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
 		return err
 	}
-	webauthn.ObjectRoot.CreationDate = event.CreationDate
+	webauthn.ObjectRoot.CreationDate = event.CreationDate()
 	webauthn.State = int32(model.MFAStateNotReady)
 	for i, token := range u.PasswordlessTokens {
 		if token.State == int32(model.MFAStateNotReady) {
@@ -153,7 +154,7 @@ func (u *Human) appendPasswordlessAddedEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (u *Human) appendPasswordlessVerifiedEvent(event *es_models.Event) error {
+func (u *Human) appendPasswordlessVerifiedEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
@@ -170,7 +171,7 @@ func (u *Human) appendPasswordlessVerifiedEvent(event *es_models.Event) error {
 	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-mKns8", "Errors.Users.MFA.Passwordless.NotExisting")
 }
 
-func (u *Human) appendPasswordlessChangeSignCountEvent(event *es_models.Event) error {
+func (u *Human) appendPasswordlessChangeSignCountEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
@@ -186,7 +187,7 @@ func (u *Human) appendPasswordlessChangeSignCountEvent(event *es_models.Event) e
 	return caos_errs.ThrowPreconditionFailed(nil, "MODEL-2Mv9s", "Errors.Users.MFA.Passwordless.NotExisting")
 }
 
-func (u *Human) appendPasswordlessRemovedEvent(event *es_models.Event) error {
+func (u *Human) appendPasswordlessRemovedEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNToken)
 	err := webauthn.setData(event)
 	if err != nil {
@@ -203,23 +204,23 @@ func (u *Human) appendPasswordlessRemovedEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (w *WebAuthNToken) setData(event *es_models.Event) error {
+func (w *WebAuthNToken) setData(event eventstore.Event) error {
 	w.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, w); err != nil {
+	if err := json.Unmarshal(event.DataAsBytes(), w); err != nil {
 		logging.Log("EVEN-4M9is").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lo023", "could not unmarshal event")
 	}
 	return nil
 }
 
-func (u *Human) appendU2FLoginEvent(event *es_models.Event) error {
+func (u *Human) appendU2FLoginEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNLogin)
 	webauthn.ObjectRoot.AppendEvent(event)
 	err := webauthn.setData(event)
 	if err != nil {
 		return err
 	}
-	webauthn.ObjectRoot.CreationDate = event.CreationDate
+	webauthn.ObjectRoot.CreationDate = event.CreationDate()
 	for i, token := range u.U2FLogins {
 		if token.AuthRequest.ID == webauthn.AuthRequest.ID {
 			u.U2FLogins[i] = webauthn
@@ -230,14 +231,14 @@ func (u *Human) appendU2FLoginEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (u *Human) appendPasswordlessLoginEvent(event *es_models.Event) error {
+func (u *Human) appendPasswordlessLoginEvent(event eventstore.Event) error {
 	webauthn := new(WebAuthNLogin)
 	webauthn.ObjectRoot.AppendEvent(event)
 	err := webauthn.setData(event)
 	if err != nil {
 		return err
 	}
-	webauthn.ObjectRoot.CreationDate = event.CreationDate
+	webauthn.ObjectRoot.CreationDate = event.CreationDate()
 	for i, token := range u.PasswordlessLogins {
 		if token.AuthRequest.ID == webauthn.AuthRequest.ID {
 			u.PasswordlessLogins[i] = webauthn
@@ -248,9 +249,9 @@ func (u *Human) appendPasswordlessLoginEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (w *WebAuthNLogin) setData(event *es_models.Event) error {
+func (w *WebAuthNLogin) setData(event eventstore.Event) error {
 	w.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, w); err != nil {
+	if err := json.Unmarshal(event.DataAsBytes(), w); err != nil {
 		logging.Log("EVEN-hmSlo").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lo023", "could not unmarshal event")
 	}

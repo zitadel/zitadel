@@ -7,7 +7,7 @@ import (
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
-	eventstore "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	iam_view_model "github.com/zitadel/zitadel/internal/iam/repository/view/model"
 	"github.com/zitadel/zitadel/internal/query"
@@ -16,7 +16,7 @@ import (
 type OrgRepository struct {
 	SearchLimit uint64
 
-	Eventstore     eventstore.Eventstore
+	Eventstore     *eventstore.Eventstore
 	View           *auth_view.View
 	SystemDefaults systemdefaults.SystemDefaults
 	Query          *query.Queries

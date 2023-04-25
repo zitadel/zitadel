@@ -4,13 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	query2 "github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type Configs map[string]*Config
@@ -19,69 +16,42 @@ type Config struct {
 	MinimumCycleDuration time.Duration
 }
 
-type handler struct {
-	view                *view.View
-	bulkLimit           uint64
-	cycleDuration       time.Duration
-	errorCountUntilSkip uint64
-
-	es v1.Eventstore
-}
-
-func (h *handler) Eventstore() v1.Eventstore {
-	return h.es
-}
-
-func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, queries *query2.Queries) []query.Handler {
-	return []query.Handler{
+func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, es *eventstore.Eventstore, queries *query2.Queries) []*handler2.Handler {
+	config := handler2.Config{
+		Eventstore:      es,
+		BulkLimit:       uint16(bulkLimit),
+		MaxFailureCount: uint8(errorCount),
+		RequeueEvery:    3 * time.Minute,
+	}
+	return []*handler2.Handler{
 		newUser(ctx,
-			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es}, queries),
+			configs.overwrite(config, "User"),
+			view,
+			queries,
+		),
 		newUserSession(ctx,
-			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}, queries),
+			configs.overwrite(config, "UserSession"),
+			view,
+			queries,
+		),
 		newToken(ctx,
-			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
-		newRefreshToken(ctx, handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
+			configs.overwrite(config, "Token"),
+			view,
+		),
+		newRefreshToken(ctx,
+			configs.overwrite(config, "RefreshToken"),
+			view,
+		),
 	}
 }
 
-func (configs Configs) cycleDuration(viewModel string) time.Duration {
+func (configs Configs) overwrite(config handler2.Config, viewModel string) handler2.Config {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 3 * time.Minute
+		return config
 	}
-	return c.MinimumCycleDuration
-}
-
-func (h *handler) MinimumCycleDuration() time.Duration {
-	return h.cycleDuration
-}
-
-func (h *handler) LockDuration() time.Duration {
-	return h.cycleDuration / 3
-}
-
-func (h *handler) QueryLimit() uint64 {
-	return h.bulkLimit
-}
-
-func withInstanceID(ctx context.Context, instanceID string) context.Context {
-	return authz.WithInstanceID(ctx, instanceID)
-}
-
-func newSearchQuery(sequences []*repository.CurrentSequence, aggregateTypes []models.AggregateType, instanceIDs []string) *models.SearchQuery {
-	searchQuery := models.NewSearchQuery()
-	for _, instanceID := range instanceIDs {
-		var seq uint64
-		for _, sequence := range sequences {
-			if sequence.InstanceID == instanceID {
-				seq = sequence.CurrentSequence
-				break
-			}
-		}
-		searchQuery.AddQuery().
-			AggregateTypeFilter(aggregateTypes...).
-			LatestSequenceFilter(seq).
-			InstanceIDFilter(instanceID)
+	if c.MinimumCycleDuration > 0 {
+		config.RequeueEvery = c.MinimumCycleDuration
 	}
-	return searchQuery
+	return config
 }

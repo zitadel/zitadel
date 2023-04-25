@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/static"
 )
 
@@ -16,45 +16,32 @@ type Config struct {
 	MinimumCycleDuration time.Duration
 }
 
-type handler struct {
-	view                *view.View
-	bulkLimit           uint64
-	cycleDuration       time.Duration
-	errorCountUntilSkip uint64
-
-	es v1.Eventstore
-}
-
-func (h *handler) Eventstore() v1.Eventstore {
-	return h.es
-}
-
-func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, static static.Storage) []query.Handler {
-	handlers := []query.Handler{}
-	if static != nil {
-		handlers = append(handlers, newStyling(ctx,
-			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
-			static))
+func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, static static.Storage, es *eventstore.Eventstore) []*handler2.Handler {
+	if static == nil {
+		return nil
 	}
-	return handlers
+	config := handler2.Config{
+		Eventstore:      es,
+		BulkLimit:       uint16(bulkLimit),
+		MaxFailureCount: uint8(errorCount),
+		RequeueEvery:    3 * time.Minute,
+	}
+	return []*handler2.Handler{
+		newStyling(ctx,
+			configs.overwrite(config, "Styling"),
+			static,
+			view,
+		),
+	}
 }
 
-func (configs Configs) cycleDuration(viewModel string) time.Duration {
+func (configs Configs) overwrite(config handler2.Config, viewModel string) handler2.Config {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 3 * time.Minute
+		return config
 	}
-	return c.MinimumCycleDuration
-}
-
-func (h *handler) MinimumCycleDuration() time.Duration {
-	return h.cycleDuration
-}
-
-func (h *handler) LockDuration() time.Duration {
-	return h.cycleDuration / 3
-}
-
-func (h *handler) QueryLimit() uint64 {
-	return h.bulkLimit
+	if c.MinimumCycleDuration > 0 {
+		config.RequeueEvery = c.MinimumCycleDuration
+	}
+	return config
 }

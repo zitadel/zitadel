@@ -53,8 +53,10 @@ type Statement struct {
 	CreationDate  time.Time
 	InstanceID    string
 
-	Execute func(ex Executer, projectionName string) error
+	Execute Exec
 }
+
+type Exec func(ex Executer, projectionName string) error
 
 func WithTableSuffix(name string) func(*execConfig) {
 	return func(o *execConfig) {
@@ -67,6 +69,17 @@ var (
 	ErrNoValues     = errs.New("no values")
 	ErrNoCondition  = errs.New("no condition")
 )
+
+func NewStatement(event eventstore.Event, e Exec) *Statement {
+	return &Statement{
+		AggregateType: event.Aggregate().Type,
+		Sequence:      event.Sequence(),
+		AggregateID:   event.Aggregate().ID,
+		CreationDate:  event.CreationDate(),
+		InstanceID:    event.Aggregate().InstanceID,
+		Execute:       e,
+	}
+}
 
 func NewCreateStatement(event eventstore.Event, values []Column, opts ...execOption) *Statement {
 	cols, params, args := columnsToQuery(values)
@@ -85,14 +98,7 @@ func NewCreateStatement(event eventstore.Event, values []Column, opts ...execOpt
 		return "INSERT INTO " + config.tableName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
 	}
 
-	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreationDate(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       exec(config, q, opts),
-	}
+	return NewStatement(event, exec(config, q, opts))
 }
 
 func NewUpsertStatement(event eventstore.Event, conflictCols []Column, values []Column, opts ...execOption) *Statement {
@@ -130,14 +136,7 @@ func NewUpsertStatement(event eventstore.Event, conflictCols []Column, values []
 			" ON CONFLICT (" + strings.Join(conflictTarget, ", ") + ") DO " + updateStmt
 	}
 
-	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreationDate(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       exec(config, q, opts),
-	}
+	return NewStatement(event, exec(config, q, opts))
 }
 
 func getUpdateCols(cols, conflictTarget []string) (updateCols, updateVals []string) {
@@ -194,14 +193,7 @@ func NewUpdateStatement(event eventstore.Event, values []Column, conditions []Co
 		return "UPDATE " + config.tableName + " SET (" + strings.Join(cols, ", ") + ") = (" + strings.Join(params, ", ") + ") WHERE " + strings.Join(wheres, " AND ")
 	}
 
-	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreationDate(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       exec(config, q, opts),
-	}
+	return NewStatement(event, exec(config, q, opts))
 }
 
 func NewDeleteStatement(event eventstore.Event, conditions []Condition, opts ...execOption) *Statement {
@@ -221,25 +213,11 @@ func NewDeleteStatement(event eventstore.Event, conditions []Condition, opts ...
 		return "DELETE FROM " + config.tableName + " WHERE " + wheresPlaceholders
 	}
 
-	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreationDate(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       exec(config, q, opts),
-	}
+	return NewStatement(event, exec(config, q, opts))
 }
 
 func NewNoOpStatement(event eventstore.Event) *Statement {
-	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreationDate(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       func(Executer, string) error { return nil },
-	}
+	return NewStatement(event, func(Executer, string) error { return nil })
 }
 
 func NewMultiStatement(event eventstore.Event, opts ...func(eventstore.Event) Exec) *Statement {
@@ -250,17 +228,8 @@ func NewMultiStatement(event eventstore.Event, opts ...func(eventstore.Event) Ex
 	for i, opt := range opts {
 		execs[i] = opt(event)
 	}
-	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreationDate(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       multiExec(execs),
-	}
+	return NewStatement(event, multiExec(execs))
 }
-
-type Exec func(ex Executer, projectionName string) error
 
 func AddCreateStatement(columns []Column, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
@@ -404,14 +373,7 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, c
 			")"
 	}
 
-	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreationDate(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       exec(config, q, opts),
-	}
+	return NewStatement(event, exec(config, q, opts))
 }
 
 func columnsToQuery(cols []Column) (names []string, parameters []string, values []interface{}) {

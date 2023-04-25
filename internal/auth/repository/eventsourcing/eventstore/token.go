@@ -9,8 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/errors"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
@@ -18,7 +17,7 @@ import (
 )
 
 type TokenRepo struct {
-	Eventstore v1.Eventstore
+	Eventstore *eventstore.Eventstore
 	View       *view.View
 }
 
@@ -45,7 +44,7 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 		token.InstanceID = authz.GetInstance(ctx).InstanceID()
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.ChangeDate)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -67,10 +66,10 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 	return model.TokenViewToModel(token), nil
 }
 
-func (r *TokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) ([]*models.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
+func (r *TokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, creationDate time.Time) ([]eventstore.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, instanceID, creationDate)
 	if err != nil {
 		return nil, err
 	}
-	return r.Eventstore.FilterEvents(ctx, query)
+	return r.Eventstore.Filter(ctx, query)
 }

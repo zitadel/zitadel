@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 )
@@ -63,9 +62,9 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 	}
 }
 
-func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
+func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
 	view := new(TokenView)
-	switch eventstore.EventType(event.Type) {
+	switch eventstore.EventType(event.Type()) {
 	case user_repo.UserTokenAddedType,
 		user_repo.PersonalAccessTokenAddedType:
 		view.setRootData(event)
@@ -91,7 +90,7 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 		return nil
 	case user_repo.UserUnlockedType,
 		user_repo.UserReactivatedType:
-		if t.ID != "" && event.CreationDate.Before(t.CreationDate) {
+		if t.ID != "" && event.CreationDate().Before(t.CreationDate) {
 			t.Deactivated = false
 		}
 		return nil
@@ -109,10 +108,10 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 	return nil
 }
 
-func (t *TokenView) AppendEvent(event *es_models.Event) error {
-	t.ChangeDate = event.CreationDate
-	t.Sequence = event.Sequence
-	switch eventstore.EventType(event.Type) {
+func (t *TokenView) AppendEvent(event eventstore.Event) error {
+	t.ChangeDate = event.CreationDate()
+	t.Sequence = event.Sequence()
+	switch eventstore.EventType(event.Type()) {
 	case user_repo.UserTokenAddedType,
 		user_repo.PersonalAccessTokenAddedType:
 		t.setRootData(event)
@@ -120,36 +119,36 @@ func (t *TokenView) AppendEvent(event *es_models.Event) error {
 		if err != nil {
 			return err
 		}
-		t.CreationDate = event.CreationDate
-		t.IsPAT = eventstore.EventType(event.Type) == user_repo.PersonalAccessTokenAddedType
+		t.CreationDate = event.CreationDate()
+		t.IsPAT = event.Type() == user_repo.PersonalAccessTokenAddedType
 	}
 	return nil
 }
 
-func (t *TokenView) setRootData(event *es_models.Event) {
-	t.UserID = event.AggregateID
-	t.ResourceOwner = event.ResourceOwner
-	t.InstanceID = event.InstanceID
+func (t *TokenView) setRootData(event eventstore.Event) {
+	t.UserID = event.Aggregate().ID
+	t.ResourceOwner = event.Aggregate().ResourceOwner
+	t.InstanceID = event.Aggregate().InstanceID
 }
 
-func (t *TokenView) setData(event *es_models.Event) error {
-	if err := json.Unmarshal(event.Data, t); err != nil {
+func (t *TokenView) setData(event eventstore.Event) error {
+	if err := json.Unmarshal(event.DataAsBytes(), t); err != nil {
 		logging.Log("EVEN-3Gm9s").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-5Gms9", "could not unmarshal event")
 	}
 	return nil
 }
 
-func agentIDFromSession(event *es_models.Event) (string, error) {
+func agentIDFromSession(event eventstore.Event) (string, error) {
 	session := make(map[string]interface{})
-	if err := json.Unmarshal(event.Data, &session); err != nil {
+	if err := json.Unmarshal(event.DataAsBytes(), &session); err != nil {
 		logging.Log("EVEN-Ghgt3").WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-GBf32", "could not unmarshal data")
 	}
 	return session["userAgentID"].(string), nil
 }
 
-func (t *TokenView) appendTokenRemoved(event *es_models.Event) error {
+func (t *TokenView) appendTokenRemoved(event eventstore.Event) error {
 	token, err := eventToMap(event)
 	if err != nil {
 		return err
@@ -160,7 +159,7 @@ func (t *TokenView) appendTokenRemoved(event *es_models.Event) error {
 	return nil
 }
 
-func (t *TokenView) appendRefreshTokenRemoved(event *es_models.Event) error {
+func (t *TokenView) appendRefreshTokenRemoved(event eventstore.Event) error {
 	refreshToken, err := eventToMap(event)
 	if err != nil {
 		return err
@@ -171,7 +170,7 @@ func (t *TokenView) appendRefreshTokenRemoved(event *es_models.Event) error {
 	return nil
 }
 
-func (t *TokenView) appendPATRemoved(event *es_models.Event) error {
+func (t *TokenView) appendPATRemoved(event eventstore.Event) error {
 	pat, err := eventToMap(event)
 	if err != nil {
 		return err
@@ -182,9 +181,9 @@ func (t *TokenView) appendPATRemoved(event *es_models.Event) error {
 	return nil
 }
 
-func eventToMap(event *es_models.Event) (map[string]interface{}, error) {
+func eventToMap(event eventstore.Event) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
-	if err := json.Unmarshal(event.Data, &m); err != nil {
+	if err := json.Unmarshal(event.DataAsBytes(), &m); err != nil {
 		logging.Log("EVEN-Dbffe").WithError(err).Error("could not unmarshal event data")
 		return nil, caos_errs.ThrowInternal(nil, "MODEL-SDAfw", "could not unmarshal data")
 	}

@@ -43,12 +43,12 @@ type ProjectGrantMemberView struct {
 }
 
 func (r *ProjectGrantMemberView) AppendEvent(event *models.Event) (err error) {
-	r.Sequence = event.Sequence
-	r.ChangeDate = event.CreationDate
-	switch eventstore.EventType(event.Type) {
+	r.Sequence = event.Seq
+	r.ChangeDate = event.CreatedAt
+	switch eventstore.EventType(event.Typ) {
 	case project.GrantMemberAddedType:
 		r.setRootData(event)
-		r.CreationDate = event.CreationDate
+		r.CreationDate = event.CreatedAt
 		err = r.SetData(event)
 	case project.GrantMemberChangedType:
 		err = r.SetData(event)

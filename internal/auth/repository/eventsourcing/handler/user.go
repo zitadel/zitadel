@@ -3,18 +3,15 @@ package handler
 import (
 	"context"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/internal/api/authz"
+	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
-	es_sdk "github.com/zitadel/zitadel/internal/eventstore/v1/sdk"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
 	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/zitadel/zitadel/internal/org/repository/view"
+	org_view "github.com/zitadel/zitadel/internal/org/repository/view"
 	query2 "github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -28,78 +25,283 @@ const (
 )
 
 type User struct {
-	handler
-	subscription *v1.Subscription
-	queries      *query2.Queries
+	view    *auth_view.View
+	queries *query2.Queries
+	es      *eventstore.Eventstore
 }
+
+var _ handler2.Projection = (*User)(nil)
 
 func newUser(
 	ctx context.Context,
-	handler handler,
+	config handler2.Config,
+	view *auth_view.View,
 	queries *query2.Queries,
-) *User {
-	h := &User{
-		handler: handler,
-		queries: queries,
-	}
-
-	h.subscribe(ctx)
-
-	return h
+) *handler2.Handler {
+	return handler2.NewHandler(
+		ctx,
+		&config,
+		&User{
+			view:    view,
+			queries: queries,
+			es:      config.Eventstore,
+		},
+	)
 }
 
-func (u *User) subscribe(ctx context.Context) {
-	u.subscription = u.es.Subscribe(u.AggregateTypes()...)
-	go func() {
-		for event := range u.subscription.Events {
-			query.ReduceEvent(ctx, u, event)
-		}
-	}()
-}
-
-func (u *User) ViewModel() string {
+func (*User) Name() string {
 	return userTable
 }
-
-func (u *User) Subscription() *v1.Subscription {
-	return u.subscription
-}
-func (_ *User) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{user_repo.AggregateType, org.AggregateType, instance.AggregateType}
-}
-
-func (u *User) CurrentSequence(instanceID string) (uint64, error) {
-	sequence, err := u.view.GetLatestUserSequence(instanceID)
-	if err != nil {
-		return 0, err
+func (u *User) Reducers() []handler2.AggregateReducer {
+	return []handler2.AggregateReducer{
+		{
+			Aggregate: user_repo.AggregateType,
+			EventRedusers: []handler2.EventReducer{
+				{
+					Event:  user_repo.MachineAddedEventType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1RegisteredType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanRegisteredType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1ProfileChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1EmailChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1EmailVerifiedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1PhoneChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1PhoneVerifiedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1PhoneRemovedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1AddressChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserDeactivatedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserReactivatedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserLockedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserUnlockedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1MFAOTPAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1MFAOTPVerifiedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1MFAOTPRemovedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1MFAInitSkippedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1PasswordChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanProfileChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanEmailChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanEmailVerifiedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanAvatarAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanAvatarRemovedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanPhoneChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanPhoneVerifiedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanPhoneRemovedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanAddressChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanMFAOTPAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanMFAOTPVerifiedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanMFAOTPRemovedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanU2FTokenAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanU2FTokenVerifiedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanU2FTokenRemovedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanPasswordlessTokenAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanPasswordlessTokenVerifiedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanPasswordlessTokenRemovedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanMFAInitSkippedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.MachineChangedEventType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanPasswordChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanInitialCodeAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1InitialCodeAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserV1InitializedCheckSucceededType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanInitializedCheckSucceededType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanPasswordlessInitCodeAddedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.HumanPasswordlessInitCodeRequestedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserDomainClaimedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserUserNameChangedType,
+					Reduce: u.ProcessUser,
+				},
+				{
+					Event:  user_repo.UserRemovedType,
+					Reduce: u.ProcessUser,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler2.EventReducer{
+				{
+					Event:  org.OrgDomainVerifiedEventType,
+					Reduce: u.ProcessOrg,
+				},
+				{
+					Event:  org.OrgDomainRemovedEventType,
+					Reduce: u.ProcessOrg,
+				},
+				{
+					Event:  org.DomainPolicyAddedEventType,
+					Reduce: u.ProcessOrg,
+				},
+				{
+					Event:  org.DomainPolicyChangedEventType,
+					Reduce: u.ProcessOrg,
+				},
+				{
+					Event:  org.DomainPolicyRemovedEventType,
+					Reduce: u.ProcessOrg,
+				},
+				{
+					Event:  org.OrgDomainPrimarySetEventType,
+					Reduce: u.ProcessOrg,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: u.ProcessOrg,
+				},
+			},
+		},
+		{
+			Aggregate:     instance.AggregateType,
+			EventRedusers: []handler2.EventReducer{},
+		},
 	}
-	return sequence.CurrentSequence, nil
 }
 
-func (u *User) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
-	sequences, err := u.view.GetLatestUserSequences(instanceIDs)
-	if err != nil {
-		return nil, err
-	}
-	return newSearchQuery(sequences, u.AggregateTypes(), instanceIDs), nil
-}
-
-func (u *User) Reduce(event *es_models.Event) (err error) {
-	switch event.AggregateType {
-	case user_repo.AggregateType:
-		return u.ProcessUser(event)
-	case org.AggregateType:
-		return u.ProcessOrg(event)
-	case instance.AggregateType:
-		return u.ProcessInstance(event)
-	default:
-		return nil
-	}
-}
-
-func (u *User) ProcessUser(event *es_models.Event) (err error) {
+func (u *User) ProcessUser(event eventstore.Event) (_ *handler2.Statement, err error) {
 	user := new(view_model.UserView)
-	switch eventstore.EventType(event.Type) {
+	switch eventstore.EventType(event.Type()) {
 	case user_repo.UserV1AddedType,
 		user_repo.MachineAddedEventType,
 		user_repo.HumanAddedType,
@@ -107,7 +309,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		user_repo.HumanRegisteredType:
 		err = user.AppendEvent(event)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		err = u.fillLoginNames(user)
 	case user_repo.UserV1ProfileChangedType,
@@ -153,63 +355,71 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		user_repo.HumanInitializedCheckSucceededType,
 		user_repo.HumanPasswordlessInitCodeAddedType,
 		user_repo.HumanPasswordlessInitCodeRequestedType:
-		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
+		user, err = u.view.UserByID(event.Aggregate().ID, event.Aggregate().InstanceID)
 		if err != nil {
 			if !errors.IsNotFound(err) {
-				return err
+				return nil, err
 			}
-			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			query, err := usr_view.UserByIDQuery(event.Aggregate().ID, event.Aggregate().InstanceID, 0)
 			if err != nil {
-				return err
+				return nil, err
 			}
-			events, err := u.es.FilterEvents(context.Background(), query)
+			events, err := u.es.Filter(context.Background(), query)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			user = &view_model.UserView{}
 			for _, e := range events {
 				if err = user.AppendEvent(e); err != nil {
-					return err
+					return nil, err
 				}
 			}
 		}
 		err = user.AppendEvent(event)
 	case user_repo.UserDomainClaimedType,
 		user_repo.UserUserNameChangedType:
-		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
+		user, err = u.view.UserByID(event.Aggregate().ID, event.Aggregate().InstanceID)
 		if err != nil {
 			if !errors.IsNotFound(err) {
-				return err
+				return nil, err
 			}
-			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			query, err := usr_view.UserByIDQuery(event.Aggregate().ID, event.Aggregate().InstanceID, 0)
 			if err != nil {
-				return err
+				return nil, err
 			}
-			events, err := u.es.FilterEvents(context.Background(), query)
+			events, err := u.es.Filter(context.Background(), query)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			user = &view_model.UserView{}
 			for _, e := range events {
 				if err = user.AppendEvent(e); err != nil {
-					return err
+					return nil, err
 				}
 			}
 		}
 		err = user.AppendEvent(event)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		err = u.fillLoginNames(user)
 	case user_repo.UserRemovedType:
-		return u.view.DeleteUser(event.AggregateID, event.InstanceID, event)
+		return handler2.NewStatement(event,
+			func(ex handler2.Executer, projectionName string) error {
+				return u.view.DeleteUser(event.Aggregate().ID, event.Aggregate().InstanceID, event)
+			},
+		), nil
 	default:
-		return u.view.ProcessedUserSequence(event)
+		return handler2.NewNoOpStatement(event), nil
 	}
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return u.view.PutUser(user, event)
+	return handler2.NewStatement(event,
+		func(ex handler2.Executer, projectionName string) error {
+			return u.view.PutUser(user, event)
+		},
+	), nil
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
@@ -222,8 +432,8 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 	return nil
 }
 
-func (u *User) ProcessOrg(event *es_models.Event) (err error) {
-	switch eventstore.EventType(event.Type) {
+func (u *User) ProcessOrg(event eventstore.Event) (_ *handler2.Statement, err error) {
+	switch eventstore.EventType(event.Type()) {
 	case org.OrgDomainVerifiedEventType,
 		org.OrgDomainRemovedEventType,
 		org.DomainPolicyAddedEventType,
@@ -233,65 +443,72 @@ func (u *User) ProcessOrg(event *es_models.Event) (err error) {
 	case org.OrgDomainPrimarySetEventType:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
 	case org.OrgRemovedEventType:
-		return u.view.UpdateOrgOwnerRemovedUsers(event)
+		return handler2.NewStatement(event,
+			func(ex handler2.Executer, projectionName string) error {
+				return u.view.UpdateOrgOwnerRemovedUsers(event)
+			},
+		), nil
 	default:
-		return u.view.ProcessedUserSequence(event)
+		return handler2.NewNoOpStatement(event), nil
 	}
 }
 
-func (u *User) ProcessInstance(event *es_models.Event) (err error) {
-	switch eventstore.EventType(event.Type) {
+func (u *User) ProcessInstance(event eventstore.Event) (_ *handler2.Statement, err error) {
+	switch eventstore.EventType(event.Type()) {
 	case instance.InstanceRemovedEventType:
-		return u.view.DeleteInstanceUsers(event)
+		return handler2.NewStatement(event,
+			func(ex handler2.Executer, projectionName string) error {
+				return u.view.DeleteInstanceUsers(event)
+			},
+		), nil
 	default:
-		return u.view.ProcessedUserSequence(event)
+		return handler2.NewNoOpStatement(event), nil
 	}
 }
 
-func (u *User) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
-	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.ResourceOwner, event.InstanceID)
+func (u *User) fillLoginNamesOnOrgUsers(event eventstore.Event) (*handler2.Statement, error) {
+	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	users, err := u.view.UsersByOrgID(event.AggregateID, event.InstanceID)
+	users, err := u.view.UsersByOrgID(event.Aggregate().ID, event.Aggregate().InstanceID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for _, user := range users {
 		user.SetLoginNames(userLoginMustBeDomain, domains)
 	}
-	return u.view.PutUsers(users, event)
+	return handler2.NewStatement(event,
+		func(ex handler2.Executer, projectionName string) error {
+			return u.view.PutUsers(users, event)
+		},
+	), nil
 }
 
-func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
-	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.ResourceOwner, event.InstanceID)
+func (u *User) fillPreferredLoginNamesOnOrgUsers(event eventstore.Event) (*handler2.Statement, error) {
+	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !userLoginMustBeDomain {
-		return nil
+		return handler2.NewNoOpStatement(event), nil
 	}
-	users, err := u.view.UsersByOrgID(event.AggregateID, event.InstanceID)
+	users, err := u.view.UsersByOrgID(event.Aggregate().ID, event.Aggregate().InstanceID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for _, user := range users {
 		user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
 	}
-	return u.view.PutUsers(users, event)
-}
-
-func (u *User) OnError(event *es_models.Event, err error) error {
-	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
-	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
-}
-
-func (u *User) OnSuccess(instanceIDs []string) error {
-	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp, instanceIDs)
+	return handler2.NewStatement(event,
+		func(ex handler2.Executer, projectionName string) error {
+			return u.view.PutUsers(users, event)
+		},
+	), nil
 }
 
 func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
-	query, err := view.OrgByIDQuery(orgID, instanceID, 0)
+	query, err := org_view.OrgByIDQuery(orgID, instanceID, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -301,8 +518,11 @@ func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_m
 			AggregateID: orgID,
 		},
 	}
-	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
-	if err != nil && !errors.IsNotFound(err) {
+	events, err := u.es.Filter(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	if err = esOrg.AppendEvents(events...); err != nil {
 		return nil, err
 	}
 	if esOrg.Sequence == 0 {
@@ -320,7 +540,7 @@ func (u *User) loginNameInformation(ctx context.Context, orgID string, instanceI
 	if org.DomainPolicy != nil {
 		return org.DomainPolicy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 	}
-	policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
+	policy, err := u.queries.DefaultDomainPolicy(authz.WithInstanceID(ctx, org.InstanceID))
 	if err != nil {
 		return false, "", nil, err
 	}

@@ -2,9 +2,6 @@ package eventstore
 
 import (
 	"sync"
-
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 var (
@@ -17,7 +14,7 @@ type Subscription struct {
 	types  map[AggregateType][]EventType
 }
 
-//SubscribeAggregates subscribes for all events on the given aggregates
+// SubscribeAggregates subscribes for all events on the given aggregates
 func SubscribeAggregates(eventQueue chan Event, aggregates ...AggregateType) *Subscription {
 	types := make(map[AggregateType][]EventType, len(aggregates))
 	for _, aggregate := range aggregates {
@@ -38,7 +35,7 @@ func SubscribeAggregates(eventQueue chan Event, aggregates ...AggregateType) *Su
 	return sub
 }
 
-//SubscribeEventTypes subscribes for the given event types
+// SubscribeEventTypes subscribes for the given event types
 // if no event types are provided the subscription is for all events of the aggregate
 func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventType) *Subscription {
 	aggregates := make([]AggregateType, len(types))
@@ -58,7 +55,6 @@ func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventT
 }
 
 func notify(events []Event) {
-	go v1.Notify(MapEventsToV1Events(events))
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
 	for _, event := range events {
@@ -103,28 +99,5 @@ func (s *Subscription) Unsubscribe() {
 	_, ok := <-s.Events
 	if ok {
 		close(s.Events)
-	}
-}
-
-func MapEventsToV1Events(events []Event) []*models.Event {
-	v1Events := make([]*models.Event, len(events))
-	for i, event := range events {
-		v1Events[i] = mapEventToV1Event(event)
-	}
-	return v1Events
-}
-
-func mapEventToV1Event(event Event) *models.Event {
-	return &models.Event{
-		Sequence:      event.Sequence(),
-		CreationDate:  event.CreationDate(),
-		Type:          models.EventType(event.Type()),
-		AggregateType: models.AggregateType(event.Aggregate().Type),
-		AggregateID:   event.Aggregate().ID,
-		ResourceOwner: event.Aggregate().ResourceOwner,
-		InstanceID:    event.Aggregate().InstanceID,
-		EditorService: event.EditorService(),
-		EditorUser:    event.EditorUser(),
-		Data:          event.DataAsBytes(),
 	}
 }

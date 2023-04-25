@@ -23,7 +23,7 @@ func TestProjectFromEvents(t *testing.T) {
 			name: "project from events, ok",
 			args: args{
 				event: []*es_models.Event{
-					{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
+					{AggregateID: "AggregateID", Seq: 1, Typ: es_models.EventType(project.ProjectAddedType)},
 				},
 				project: &Project{Name: "ProjectName"},
 			},
@@ -33,7 +33,7 @@ func TestProjectFromEvents(t *testing.T) {
 			name: "project from events, nil project",
 			args: args{
 				event: []*es_models.Event{
-					{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
+					{AggregateID: "AggregateID", Seq: 1, Typ: es_models.EventType(project.ProjectAddedType)},
 				},
 				project: nil,
 			},
@@ -67,7 +67,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append added event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
+				event:   &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: es_models.EventType(project.ProjectAddedType)},
 				project: &Project{Name: "ProjectName"},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
@@ -75,7 +75,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append change event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectChangedType)},
+				event:   &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: es_models.EventType(project.ProjectChangedType)},
 				project: &Project{Name: "ProjectName"},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
@@ -83,14 +83,14 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectDeactivatedType)},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: es_models.EventType(project.ProjectDeactivatedType)},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateInactive)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectReactivatedType)},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: es_models.EventType(project.ProjectReactivatedType)},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive)},
 		},
