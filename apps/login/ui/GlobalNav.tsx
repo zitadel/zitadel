@@ -55,7 +55,7 @@ export function GlobalNav() {
           {demos.map((section) => {
             return (
               <div key={section.name}>
-                <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-light dark:text-text-dark">
+                <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-light-500 dark:text-text-dark-500">
                   <div>{section.name}</div>
                 </div>
 

@@ -17,6 +17,7 @@ export default function Page() {
       <div className="w-full">
         <TextInput type="password" label="Password" />
       </div>
+
       <div className="flex w-full flex-row items-center justify-between">
         <Button
           onClick={() => router.back()}

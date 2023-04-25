@@ -1,6 +1,4 @@
 import "#/styles/globals.scss";
-// include styles from the ui package
-import "@zitadel/react/styles.css";
 import { AddressBar } from "#/ui/AddressBar";
 import { GlobalNav } from "#/ui/GlobalNav";
 import { Lato } from "next/font/google";

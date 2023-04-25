@@ -25,7 +25,7 @@ export type TextInputProps = DetailedHTMLProps<
 
 const styles = (error: boolean, disabled: boolean) =>
   clsx({
-    "h-40px mb-2px rounded p-[7px] bg-input-light-background dark:bg-input-dark-background transition-colors duration-300 grow":
+    "h-[40px] mb-[2px] rounded p-[7px] bg-input-light-background dark:bg-input-dark-background transition-colors duration-300 grow":
       true,
     "border border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500":
       true,
