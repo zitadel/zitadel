@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"io"
 
 	"golang.org/x/text/language"
 
@@ -21,14 +22,10 @@ func (s *Server) AddUser(ctx context.Context, req *user.AddUserRequest) (_ *user
 	if err != nil {
 		return nil, err
 	}
-	var emailCode *string
-	if req.GetEmail().GetReturnCode() != nil {
-		emailCode = &human.Email.VerificationCode
-	}
 	return &user.AddUserResponse{
 		UserId:    human.ID,
 		Details:   object.DomainToDetailsPb(human.Details),
-		EmailCode: emailCode,
+		EmailCode: human.EmailCode,
 	}, nil
 }
 
@@ -37,6 +34,19 @@ func addUserRequestToAddHuman(req *user.AddUserRequest) (*command.AddHuman, erro
 	if username == "" {
 		username = req.GetEmail().GetEmail()
 	}
+	var urlTemplate string
+	if req.GetEmail().GetSendCode() != nil {
+		urlTemplate = req.GetEmail().GetSendCode().GetUrlTemplate()
+		// test the template execution so the async notification will not fail because of it and the user won't realize
+		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
+			return nil, err
+		}
+	}
+	bcryptedPassword, err := hashedPasswordToCommand(req.GetHashedPassword())
+	if err != nil {
+		return nil, err
+	}
+	passwordChangeRequired := req.GetPassword().GetChangeRequired() || req.GetHashedPassword().GetChangeRequired()
 	metadata := make([]*command.AddMetadataEntry, len(req.Metadata))
 	for i, metadataEntry := range req.Metadata {
 		metadata[i] = &command.AddMetadataEntry{
@@ -44,11 +54,6 @@ func addUserRequestToAddHuman(req *user.AddUserRequest) (*command.AddHuman, erro
 			Value: metadataEntry.GetValue(),
 		}
 	}
-	bcryptedPassword, err := setPasswordHashedPasswordToCommand(req.GetHashedPassword())
-	if err != nil {
-		return nil, err
-	}
-	passwordChangeRequired := req.GetPassword().GetChangeRequired() || req.GetHashedPassword().GetChangeRequired()
 	return &command.AddHuman{
 		ID:          req.GetUserId(),
 		Username:    username,
@@ -57,9 +62,10 @@ func addUserRequestToAddHuman(req *user.AddUserRequest) (*command.AddHuman, erro
 		NickName:    req.GetProfile().GetNickName(),
 		DisplayName: req.GetProfile().GetDisplayName(),
 		Email: command.Email{
-			Address:    domain.EmailAddress(req.GetEmail().GetEmail()),
-			Verified:   req.GetEmail().GetIsVerified(), //TODO: oneof
-			ReturnCode: req.GetEmail().GetReturnCode() != nil,
+			Address:     domain.EmailAddress(req.GetEmail().GetEmail()),
+			Verified:    req.GetEmail().GetIsVerified(),
+			ReturnCode:  req.GetEmail().GetReturnCode() != nil,
+			UrlTemplate: urlTemplate,
 		},
 		PreferredLanguage:      language.Make(req.GetProfile().GetPreferredLanguage()),
 		Gender:                 genderToDomain(req.GetProfile().GetGender()),
@@ -89,7 +95,7 @@ func genderToDomain(gender user.Gender) domain.Gender {
 	}
 }
 
-func setPasswordHashedPasswordToCommand(hashed *user.HashedPassword) (string, error) {
+func hashedPasswordToCommand(hashed *user.HashedPassword) (string, error) {
 	if hashed == nil {
 		return "", nil
 	}

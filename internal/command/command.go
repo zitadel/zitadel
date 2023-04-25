@@ -30,6 +30,7 @@ type Commands struct {
 	httpClient *http.Client
 
 	checkPermission permissionCheck
+	newEmailCode    func(ctx context.Context, filter preparation.FilterToQueryReducer, codeAlg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error)
 
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
@@ -109,6 +110,7 @@ func StartCommands(
 		checkPermission: func(ctx context.Context, permission, orgID, resourceID string, allowSelf bool) (err error) {
 			return authz.CheckPermission(ctx, membershipsResolver, zitadelRoles, permission, orgID, resourceID, allowSelf)
 		},
+		newEmailCode: newEmailCode,
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)
