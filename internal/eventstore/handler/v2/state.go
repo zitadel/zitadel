@@ -86,7 +86,7 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 	}
 	if affected, err := res.RowsAffected(); affected == 0 {
 		h.log().OnError(err).Error("unable to check if states are updated")
-		return errs.ThrowInternal(err, "V2-lpiK0", "unable to update state")
+		return errs.ThrowInternal(err, "V2-FGEKi", "unable to update state")
 	}
 	return nil
 }
@@ -104,7 +104,7 @@ func (h *Handler) lockState(ctx context.Context, tx *sql.Tx, instanceID string) 
 	if err != nil {
 		return err
 	}
-	if affected, err := res.RowsAffected(); affected == 0 {
+	if affected, err := res.RowsAffected(); affected == 0 || err != nil {
 		return errs.ThrowInternal(err, "V2-lpiK0", "projection already locked")
 	}
 	return nil

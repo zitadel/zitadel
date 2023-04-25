@@ -34,8 +34,7 @@ type Handler struct {
 	bulkLimit  uint16
 	aggregates []eventstore.AggregateType
 
-	maxFailureCount uint8
-
+	maxFailureCount       uint8
 	requeueEvery          time.Duration
 	handleActiveInstances time.Duration
 	now                   nowFunc
@@ -126,11 +125,11 @@ func (h *Handler) subscribe(ctx context.Context) {
 		case event := <-queue:
 			events := checkAdditionalEvents(queue, event)
 			solvedInstances := make([]string, 0, len(events))
-			for _, event := range events {
-				if instanceSolved(solvedInstances, event.Aggregate().InstanceID) {
+			for _, e := range events {
+				if instanceSolved(solvedInstances, e.Aggregate().InstanceID) {
 					continue
 				}
-				ctx := authz.WithInstanceID(ctx, event.Aggregate().InstanceID)
+				ctx := authz.WithInstanceID(ctx, e.Aggregate().InstanceID)
 				err := h.Trigger(ctx)
 				h.log().OnError(err).Debug("trigger of queued event failed")
 			}
@@ -180,9 +179,7 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 	}
 
 	defer func() {
-		if err != nil {
-			h.log().OnError(err).Debug("commit should still work")
-		}
+		h.log().OnError(err).Debug("commit should still work")
 		commitErr := tx.Commit()
 		h.log().OnError(commitErr).Debug("commit failed")
 		if err == nil {

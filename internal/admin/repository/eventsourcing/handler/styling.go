@@ -43,12 +43,12 @@ func newStyling(ctx context.Context, config handler2.Config, static static.Stora
 	)
 }
 
-// Name implements handler.Projection
+// Name implements [handler.Projection]
 func (*Styling) Name() string {
 	return stylingTable
 }
 
-// Reducers implements handler.Projection
+// Reducers implements [handler.Projection]
 func (s *Styling) Reducers() []handler2.AggregateReducer {
 	return []handler2.AggregateReducer{
 		{

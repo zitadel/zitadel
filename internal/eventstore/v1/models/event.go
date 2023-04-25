@@ -15,7 +15,7 @@ func (et EventType) String() string {
 	return string(et)
 }
 
-// var _ eventstore.Event = (*Event)(nil)
+var _ eventstore.Event = (*Event)(nil)
 
 type Event struct {
 	ID               string
@@ -38,10 +38,10 @@ type Event struct {
 func (e *Event) Aggregate() eventstore.Aggregate {
 	return eventstore.Aggregate{
 		ID:            e.AggregateID,
-		Type:          eventstore.AggregateType(e.AggregateType),
+		Type:          e.AggregateType,
 		ResourceOwner: e.ResourceOwner,
 		InstanceID:    e.InstanceID,
-		Version:       eventstore.Version(e.AggregateVersion),
+		Version:       e.AggregateVersion,
 	}
 }
 
@@ -82,7 +82,7 @@ func (e *Event) Sequence() uint64 {
 
 // Type implements [eventstore.Event]
 func (e *Event) Type() eventstore.EventType {
-	return eventstore.EventType(e.Typ)
+	return e.Typ
 }
 
 func eventData(i interface{}) ([]byte, error) {
