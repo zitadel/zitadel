@@ -1,5 +1,4 @@
 import { demos } from "#/lib/demos";
-import ThemeWrapper from "#/ui/ThemeWrapper";
 import Link from "next/link";
 
 export default function Page() {
@@ -22,7 +21,7 @@ export default function Page() {
                     <Link
                       href={`/${item.slug}`}
                       key={item.name}
-                      className="bg-background-light-400 dark:bg-background-dark-400 group block space-y-1.5 rounded-lg px-5 py-3 hover:bg-background-light-500 hover:dark:bg-background-dark-300 hover:shadow-lg border border-gray-300 dark:border-gray-600 transition-all "
+                      className="bg-background-light-400 dark:bg-background-dark-400 group block space-y-1.5 rounded-lg px-5 py-3 hover:bg-background-light-500 hover:dark:bg-background-dark-300 hover:shadow-lg border border-divider-light dark:border-divider-dark transition-all "
                     >
                       <div className="font-medium text-gray-600 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-gray-300">
                         {item.name}

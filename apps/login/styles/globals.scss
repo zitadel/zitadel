@@ -1,0 +1,73 @@
+@import "./vars.scss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1,
+  .ztdl-h1 {
+    @apply text-2xl;
+  }
+
+  .ztdl-p {
+    @apply text-sm;
+  }
+}
+
+html {
+  --background-color: #ffffff;
+  --dark-background-color: #000000;
+}
+
+$types: "background", "primary", "warn";
+$shades: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900;
+
+@each $type in $types {
+  @each $shade in $shades {
+    .bg-#{$type}-light-#{$shade} {
+      background-color: var(--theme-light-#{$type}-#{$shade}) !important;
+    }
+    .dark .dark\:bg-#{$type}-dark-#{$shade} {
+      background-color: var(--theme-dark-#{$type}-#{$shade}) !important;
+    }
+
+    .text-#{$type}-light-#{$shade} {
+      color: var(--theme-light-#{$type}-#{$shade}) !important;
+    }
+    .dark .dark\:text-#{$type}-dark-#{$shade} {
+      color: var(--theme-dark-#{$type}-#{$shade}) !important;
+    }
+
+    .text-#{$type}-light-contrast-#{$shade} {
+      color: var(--theme-light-#{$type}-contrast-#{$shade}) !important;
+    }
+    .dark .dark\:text-#{$type}-dark-contrast-#{$shade} {
+      color: var(--theme-dark-#{$type}-contrast-#{$shade}) !important;
+    }
+  }
+}
+
+$alphatypes: "text", "link";
+
+@each $alphatype in $alphatypes {
+  .text-#{$alphatype}-light {
+    color: var(--theme-light-#{$alphatype}) !important;
+  }
+  .text-#{$alphatype}-light-contrast {
+    color: var(--theme-light-#{$alphatype}-contrast) !important;
+  }
+  .text-#{$alphatype}-light-secondary {
+    color: var(--theme-light-#{$alphatype}-secondary) !important;
+  }
+
+  .dark .dark\:text-#{$alphatype}-dark {
+    color: var(--theme-dark-#{$alphatype}) !important;
+  }
+  .dark .dark\:text-#{$alphatype}-dark-contrast {
+    color: var(--theme-dark-#{$alphatype}-contrast) !important;
+  }
+  .dark .dark\:text-#{$alphatype}-dark-secondary {
+    color: var(--theme-dark-#{$alphatype}-secondary) !important;
+  }
+}

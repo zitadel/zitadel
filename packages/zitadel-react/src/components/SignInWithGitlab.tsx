@@ -6,8 +6,8 @@ export interface SignInWithGitlabProps {
 
 export function SignInWithGitlab(props: SignInWithGitlabProps) {
   return (
-    <div className="ui-flex ui-flex-row ui-items-center ui-bg-white ui-text-black dark:ui-bg-transparent dark:ui-text-white border ui-border-gray-200 dark:ui-border-gray-800 rounded-md px-4 text-sm">
-      <div className="ui-h-12 ui-w-12 flex items-center justify-center">
+    <div className="ztdl-cursor-pointer ztdl-flex ztdl-flex-row ztdl-items-center ztdl-bg-white ztdl-text-black dark:ztdl-bg-transparent dark:ztdl-text-white border ztdl-border-divider-light dark:ztdl-border-divider-dark rounded-md px-4 text-sm">
+      <div className="ztdl-h-12 ztdl-w-12 flex items-center justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width={25}
@@ -33,7 +33,7 @@ export function SignInWithGitlab(props: SignInWithGitlabProps) {
           />
         </svg>
       </div>
-      <span className="ui-ml-4">Sign in with Gitlab</span>
+      <span className="ztdl-ml-4">Sign in with Gitlab</span>
     </div>
   );
 }

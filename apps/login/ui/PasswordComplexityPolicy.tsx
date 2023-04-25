@@ -1,16 +1,8 @@
-import {
-  lowerCaseValidator,
-  numberValidator,
-  symbolValidator,
-  upperCaseValidator,
-} from '../utils/validators';
-import { ClientError } from 'nice-grpc';
-
 const fetcher = (url: string) =>
   fetch(url, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   })
     .then((res) => {
@@ -39,7 +31,7 @@ const cross = (
   <i className="las la-times text-warn-light-500 dark:text-warn-dark-500 mr-4 text-lg"></i>
 );
 const desc =
-  'text-14px leading-4 text-input-light-label dark:text-input-dark-label';
+  "text-14px leading-4 text-input-light-label dark:text-input-dark-label";
 
 export default function PasswordComplexityPolicy({
   password,

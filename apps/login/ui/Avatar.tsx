@@ -1,4 +1,4 @@
-import { Color, getColorHash } from "#/utils/colors";
+import { Color, ColorShade, getColorHash } from "#/utils/colors";
 import { useTheme } from "next-themes";
 import { FC } from "react";
 
@@ -44,7 +44,7 @@ export const Avatar: FC<AvatarProps> = ({
     credentials = initials;
   }
 
-  const color: Color = getColorHash(loginName);
+  const color: ColorShade = getColorHash(loginName);
 
   const avatarStyleDark = {
     backgroundColor: color[900],
@@ -58,22 +58,22 @@ export const Avatar: FC<AvatarProps> = ({
 
   return (
     <div
-      className={`w-full h-full flex-shrink-0 flex justify-center items-center cursor-default pointer-events-none group-focus:outline-none group-focus:ring-2 transition-colors duration-200 dark:group-focus:ring-offset-blue bg-primary-light-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-500 group-focus:ring-primary-light-200 dark:group-focus:ring-primary-dark-400 dark:bg-primary-dark-300 text-white dark:text-blue rounded-full ${
+      className={`w-full h-full flex-shrink-0 flex justify-center items-center cursor-default pointer-events-none group-focus:outline-none group-focus:ring-2 transition-colors duration-200 dark:group-focus:ring-offset-blue bg-primary-light-500 text-primary-light-contrast-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-500 group-focus:ring-primary-light-200 dark:group-focus:ring-primary-dark-400 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 dark:text-blue rounded-full ${
         shadow ? "shadow" : ""
       } ${
         size === AvatarSize.LARGE
           ? "h-20 w-20 font-normal"
           : size === AvatarSize.BASE
-          ? "w-38px h-38px font-bold"
+          ? "w-[38px] h-[38px] font-bold"
           : size === AvatarSize.SMALL
-          ? "w-32px h-32px font-bold"
+          ? "w-[32px] h-[32px] font-bold"
           : ""
       }`}
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
       {imageUrl ? (
         <img
-          className="border border-gray-500 rounded-full w-12 h-12"
+          className="border border-divider-light dark:border-divider-dark rounded-full w-12 h-12"
           src={imageUrl}
         />
       ) : (

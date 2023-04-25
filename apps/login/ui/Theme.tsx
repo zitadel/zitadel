@@ -27,7 +27,7 @@ export default function Theme() {
       className={`${
         isDark
           ? "!bg-gray-800 dark:bg-background-dark-400"
-          : "!bg-gray-100 dark:bg-background-dark-400"
+          : "!bg-gray-200 dark:bg-background-dark-400"
       }
       relative inline-flex h-4 w-9 items-center rounded-full`}
     >
@@ -35,7 +35,7 @@ export default function Theme() {
         aria-hidden="true"
         className={`${
           isDark ? "translate-x-5" : "translate-x-0"
-        } flex flex-row items-center justify-center h-4 w-4 transform rounded-full bg-white transition-all shadow dark:bg-background-dark-500 ring-1 ring-gray-200 dark:ring-gray-800 ring-offset-1 ring-offset-white dark:ring-offset-background-dark-500`}
+        } flex flex-row items-center justify-center h-4 w-4 transform rounded-full bg-white transition-all shadow dark:bg-background-dark-500 ring-1 ring-[#00000020] dark:ring-[#ffffff20] ring-offset-1 ring-offset-[#ffffff50] dark:ring-offset-[#00000005]`}
       >
         {isDark ? (
           <MoonIcon className="dark:text-amber-500 h-4 w-4" />

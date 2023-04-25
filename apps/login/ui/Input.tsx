@@ -33,7 +33,7 @@ const styles = (error: boolean, disabled: boolean) =>
       true,
     "border border-warn-light-500 dark:border-warn-dark-500 hover:border-warn-light-500 hover:dark:border-warn-dark-500 focus:border-warn-light-500 focus:dark:border-warn-dark-500":
       error,
-    "pointer-events-none text-gray-500 dark:text-gray-800 border border-gray-700 dark:border-gray-900 border-opacity-30 dark:border-opacity-30 hover:border-gray-700 hover:dark:border-gray-900 hover:border-opacity-30 hover:dark:border-opacity-30 cursor-default":
+    "pointer-events-none text-gray-500 dark:text-gray-800 border border-input-light-border dark:border-input-dark-border hover:border-light-hoverborder hover:dark:border-hoverborder cursor-default":
       disabled,
   });
 
