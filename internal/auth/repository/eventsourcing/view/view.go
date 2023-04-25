@@ -11,6 +11,7 @@ import (
 
 type View struct {
 	Db           *gorm.DB
+	client       *database.DB
 	keyAlgorithm crypto.EncryptionAlgorithm
 	query        *query.Queries
 	es           *eventstore.Eventstore
@@ -23,6 +24,7 @@ func StartView(sqlClient *database.DB, keyAlgorithm crypto.EncryptionAlgorithm, 
 	}
 	return &View{
 		Db:           gorm,
+		client:       sqlClient,
 		keyAlgorithm: keyAlgorithm,
 		query:        queries,
 		es:           es,

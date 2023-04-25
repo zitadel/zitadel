@@ -8,8 +8,9 @@ import (
 )
 
 type View struct {
-	Db    *gorm.DB
-	Query *query.Queries
+	Db     *gorm.DB
+	client *database.DB
+	Query  *query.Queries
 }
 
 func StartView(sqlClient *database.DB, queries *query.Queries) (*View, error) {
@@ -18,8 +19,9 @@ func StartView(sqlClient *database.DB, queries *query.Queries) (*View, error) {
 		return nil, err
 	}
 	return &View{
-		Db:    gorm,
-		Query: queries,
+		Db:     gorm,
+		Query:  queries,
+		client: sqlClient,
 	}, nil
 }
 

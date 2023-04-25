@@ -3,10 +3,11 @@ package view
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
@@ -84,6 +85,21 @@ func (v *View) DeleteOrgRefreshTokens(event eventstore.Event) error {
 	return nil
 }
 
-func (v *View) GetLatestRefreshTokenSequence(ctx context.Context) (*handler.CurrentState, error) {
-	return handler.QueryCurrentState(ctx, v.Db.DB(), refreshTokenTable)
+func (v *View) GetLatestRefreshTokenSequence(ctx context.Context) (_ *query.CurrentState, err error) {
+	q := &query.CurrentStateSearchQueries{
+		Queries: make([]query.SearchQuery, 2),
+	}
+	q.Queries[0], err = query.NewCurrentStatesInstanceIDSearchQuery(authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
+	q.Queries[1], err = query.NewCurrentStatesProjectionSearchQuery(tokenTable)
+	if err != nil {
+		return nil, err
+	}
+	states, err := v.query.SearchCurrentStates(ctx, q)
+	if err != nil || states.SearchResponse.Count == 0 {
+		return nil, err
+	}
+	return states.CurrentStates[0], nil
 }

@@ -36,10 +36,12 @@ type CurrentStates struct {
 }
 
 type CurrentState struct {
-	ProjectionName  string
-	CurrentSequence uint64
-	EventTimestamp  time.Time
-	LastRun         time.Time
+	ProjectionName    string
+	AggregateType     string
+	AggregateID       string
+	EventSequence     uint64
+	EventCreationDate time.Time
+	LastRun           time.Time
 }
 
 type CurrentStateSearchQueries struct {
@@ -49,6 +51,10 @@ type CurrentStateSearchQueries struct {
 
 func NewCurrentStatesInstanceIDSearchQuery(instanceID string) (SearchQuery, error) {
 	return NewTextQuery(CurrentStateColInstanceID, instanceID, TextEquals)
+}
+
+func NewCurrentStatesProjectionSearchQuery(projection string) (SearchQuery, error) {
+	return NewTextQuery(CurrentStateColProjectionName, projection, TextEquals)
 }
 
 func (q *CurrentStateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -228,36 +234,43 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 
 func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*CurrentStates, error)) {
 	return sq.Select(
-			"max("+CurrentStateColLastUpdated.identifier()+") as "+CurrentStateColLastUpdated.name,
-			"max("+CurrentStateColEventDate.identifier()+") as "+CurrentStateColEventDate.name,
-			"max("+CurrentStateColSequence.identifier()+") as "+CurrentStateColSequence.name,
+			CurrentStateColLastUpdated.identifier(),
+			CurrentStateColLastAggregateType.identifier(),
+			CurrentStateColLastAggregateID.identifier(),
+			CurrentStateColEventDate.identifier(),
+			CurrentStateColSequence.identifier(),
 			CurrentStateColProjectionName.identifier(),
 			countColumn.identifier()).
 			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
-			GroupBy(CurrentStateColProjectionName.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*CurrentStates, error) {
 			states := make([]*CurrentState, 0)
 			var count uint64
 			for rows.Next() {
 				currentState := new(CurrentState)
-				lastRun := new(sql.NullTime)
-				eventDate := new(sql.NullTime)
-				currentSequence := new(sql.NullInt64)
+				var lastRun sql.NullTime
+				var eventDate sql.NullTime
+				var currentSequence sql.NullInt64
+				var aggregateType sql.NullString
+				var aggregateID sql.NullString
 
 				err := rows.Scan(
-					lastRun,
-					eventDate,
-					currentSequence,
+					&lastRun,
+					&aggregateType,
+					&aggregateID,
+					&eventDate,
+					&currentSequence,
 					&currentState.ProjectionName,
 					&count,
 				)
 				if err != nil {
 					return nil, err
 				}
-				currentState.EventTimestamp = eventDate.Time
+				currentState.EventCreationDate = eventDate.Time
 				currentState.LastRun = lastRun.Time
-				currentState.CurrentSequence = uint64(currentSequence.Int64)
+				currentState.EventSequence = uint64(currentSequence.Int64)
+				currentState.AggregateType = aggregateType.String
+				currentState.AggregateID = aggregateID.String
 				states = append(states, currentState)
 			}
 
@@ -289,6 +302,14 @@ var (
 	}
 	CurrentStateColLastUpdated = Column{
 		name:  "last_updated",
+		table: currentStateTable,
+	}
+	CurrentStateColLastAggregateType = Column{
+		name:  "aggregate_type",
+		table: currentStateTable,
+	}
+	CurrentStateColLastAggregateID = Column{
+		name:  "aggregate_id",
 		table: currentStateTable,
 	}
 	CurrentStateColProjectionName = Column{
