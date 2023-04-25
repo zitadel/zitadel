@@ -76,6 +76,7 @@ Errors:
       Invalid: 無効なメールアドレスです
       AlreadyVerified: メールアドレスはすでに検証済みです
       NotChanged: メールアドレスが変更されていません
+      InvalidURLTemplate: URLテンプレートが無効です
     Phone:
       NotFound: 電話番号が見つかりません
       Invalid: 無効な電話番号です
