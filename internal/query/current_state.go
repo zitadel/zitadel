@@ -3,25 +3,20 @@ package query
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	errs "errors"
 	"fmt"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-)
-
-const (
-	// TODO: use current_states instead
-	lockStmtFormat = "UPDATE %[1]s" +
-		" set locker_id = $1, locked_until = now()+$2::INTERVAL" +
-		" WHERE projection_name = $3"
-	lockerIDReset = "reset"
 )
 
 type LatestState struct {
@@ -105,91 +100,95 @@ func (q *Queries) latestState(ctx context.Context, projections ...table) (_ *Lat
 }
 
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
-	err = q.checkAndLock(ctx, projectionName)
-	if err != nil {
-		return err
-	}
-
 	tx, err := q.client.Begin()
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}
-	tables, err := tablesForReset(ctx, tx, projectionName)
-	if err != nil {
-		return err
-	}
-	err = reset(tx, tables, projectionName)
-	if err != nil {
-		return err
-	}
-	return tx.Commit()
-}
+	defer func() {
+		if err != nil {
+			rollbackErr := tx.Rollback()
+			logging.OnError(rollbackErr).Debug("rollback failed")
+			return
+		}
+		if commitErr := tx.Commit(); commitErr != nil {
+			err = errors.ThrowInternal(commitErr, "QUERY-JGD0l", "Errors.Internal")
+		}
+	}()
 
-func (q *Queries) checkAndLock(ctx context.Context, projectionName string) error {
-	projectionQuery, args, err := sq.Select("count(*)").
-		From("[show tables from projections]").
-		Where(
-			sq.And{
-				sq.NotEq{"table_name": []string{"locks", "current_sequences", "failed_events"}},
-				sq.Eq{"concat('projections.', table_name)": projectionName},
-			}).
-		PlaceholderFormat(sq.Dollar).
-		ToSql()
+	name, err := q.checkAndLock(tx, projectionName)
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-Dfwf2", "Errors.ProjectionName.Invalid")
+		return err
 	}
-	row := q.client.QueryRowContext(ctx, projectionQuery, args...)
-	var count int
-	if err := row.Scan(&count); err != nil || count == 0 {
-		return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
-	}
-	lock := fmt.Sprintf(lockStmtFormat, locksTable.identifier())
+
+	tables, err := tablesForReset(ctx, tx, name)
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-DVfg3", "Errors.RemoveFailed")
+		return err
 	}
-	//lock for twice the default duration (10s)
-	res, err := q.client.ExecContext(ctx, lock, lockerIDReset, 20*time.Second, projectionName)
+	err = reset(ctx, tx, tables, name)
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-WEfr2", "Errors.RemoveFailed")
+		return err
 	}
-	rows, err := res.RowsAffected()
-	if err != nil || rows == 0 {
-		return errors.ThrowInternal(err, "QUERY-Bh3ws", "Errors.RemoveFailed")
+	err = tx.Commit()
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-Sfvsc", "Errors.Internal")
 	}
-	time.Sleep(7 * time.Second) //more than half the default lock duration (10s)
 	return nil
 }
 
-func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) ([]string, error) {
-	tablesQuery, args, err := sq.Select("concat('projections.', table_name)").
-		From("[show tables from projections]").
+func (q *Queries) checkAndLock(tx *sql.Tx, projectionName string) (name string, err error) {
+	stmt, args, err := sq.Select(CurrentStateColProjectionName.identifier()).
+		From(currentStateTable.identifier()).
+		Where(sq.Eq{
+			CurrentStateColProjectionName.identifier(): projectionName,
+		}).Suffix("FOR UPDATE").
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return "", errors.ThrowInternal(err, "QUERY-UJTUy", "Errors.Internal")
+	}
+	row := tx.QueryRow(stmt, args...)
+	if err := row.Scan(&name); err != nil || name == "" {
+		return "", errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
+	}
+	return name, nil
+}
+
+func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) (tables []string, err error) {
+	names := strings.Split(projectionName, ".")
+	schema := names[0]
+	tablePrefix := names[1]
+
+	tablesQuery, args, err := sq.Select("table_name").
+		From("[show tables from " + schema + "]").
 		Where(
 			sq.And{
 				sq.Eq{"type": "table"},
-				sq.NotEq{"table_name": []string{"locks", "current_sequences", "failed_events"}},
-				sq.Like{"concat('projections.', table_name)": projectionName + "%"},
+				sq.NotEq{"table_name": []string{"locks", "current_sequences", "current_states", "failed_events", "failed_events2"}},
+				sq.Like{"table_name": tablePrefix + "%"},
 			}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-ASff2", "Errors.ProjectionName.Invalid")
 	}
-	var tables []string
+
 	rows, err := tx.QueryContext(ctx, tablesQuery, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgfw", "Errors.ProjectionName.Invalid")
 	}
+	defer rows.Close()
+
 	for rows.Next() {
 		var tableName string
 		if err := rows.Scan(&tableName); err != nil {
 			return nil, errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 		}
-		tables = append(tables, tableName)
+		tables = append(tables, schema+"."+tableName)
 	}
 	return tables, nil
 }
 
-func reset(tx *sql.Tx, tables []string, projectionName string) error {
+func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName string) error {
 	for _, tableName := range tables {
 		_, err := tx.Exec(fmt.Sprintf("TRUNCATE %s cascade", tableName))
 		if err != nil {
@@ -198,7 +197,9 @@ func reset(tx *sql.Tx, tables []string, projectionName string) error {
 	}
 	update, args, err := sq.Update(currentStateTable.identifier()).
 		Set(CurrentStateColEventDate.name, 0).
-		Where(sq.Eq{CurrentStateColProjectionName.name: projectionName}).
+		Where(sq.Eq{
+			CurrentStateColProjectionName.name: projectionName,
+		}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
