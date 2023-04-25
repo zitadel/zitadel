@@ -12,7 +12,7 @@ import (
 const (
 	CurrentStateTable = "projections.current_states"
 	LocksTable        = "projections.locks"
-	FailedEventsTable = "projections.failed_events"
+	FailedEventsTable = "projections.failed_events2"
 )
 
 var (

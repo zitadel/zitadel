@@ -17,30 +17,33 @@ var (
 )
 
 type failure struct {
-	sequence  uint64
-	instance  string
-	aggregate string
-	eventDate time.Time
-	err       error
+	sequence      uint64
+	instance      string
+	aggregateID   string
+	aggregateType eventstore.AggregateType
+	eventDate     time.Time
+	err           error
 }
 
 func failureFromEvent(event eventstore.Event, err error) *failure {
 	return &failure{
-		sequence:  event.Sequence(),
-		instance:  event.Aggregate().InstanceID,
-		aggregate: event.Aggregate().ID,
-		eventDate: event.CreationDate(),
-		err:       err,
+		sequence:      event.Sequence(),
+		instance:      event.Aggregate().InstanceID,
+		aggregateID:   event.Aggregate().ID,
+		aggregateType: event.Aggregate().Type,
+		eventDate:     event.CreationDate(),
+		err:           err,
 	}
 }
 
 func failureFromStatement(statement *Statement, err error) *failure {
 	return &failure{
-		sequence:  statement.Sequence,
-		instance:  statement.InstanceID,
-		aggregate: statement.AggregateID,
-		eventDate: statement.CreationDate,
-		err:       err,
+		sequence:      statement.Sequence,
+		instance:      statement.InstanceID,
+		aggregateID:   statement.AggregateID,
+		aggregateType: statement.AggregateType,
+		eventDate:     statement.CreationDate,
+		err:           err,
 	}
 }
 
@@ -62,7 +65,13 @@ func (h *Handler) handleFailedStmt(tx *sql.Tx, currentState *state, f *failure) 
 }
 
 func (h *Handler) failureCount(tx *sql.Tx, f *failure) (count uint8, err error) {
-	row := tx.QueryRow(failureCountStmt, h.projection.Name(), f.sequence, f.instance)
+	row := tx.QueryRow(failureCountStmt,
+		h.projection.Name(),
+		f.instance,
+		f.aggregateType,
+		f.aggregateID,
+		f.sequence,
+	)
 	if err = row.Err(); err != nil {
 		return 0, errors.ThrowInternal(err, "CRDB-Unnex", "unable to update failure count")
 	}
@@ -73,7 +82,16 @@ func (h *Handler) failureCount(tx *sql.Tx, f *failure) (count uint8, err error) 
 }
 
 func (h *Handler) setFailureCount(tx *sql.Tx, count uint8, f *failure) error {
-	_, dbErr := tx.Exec(setFailedEventStmt, h.projection.Name(), f.sequence, count, f.err.Error(), f.instance)
+	_, dbErr := tx.Exec(setFailedEventStmt,
+		h.projection.Name(),
+		f.instance,
+		f.aggregateType,
+		f.aggregateID,
+		f.eventDate,
+		f.sequence,
+		count,
+		f.err.Error(),
+	)
 	if dbErr != nil {
 		return errors.ThrowInternal(dbErr, "CRDB-4Ht4x", "set failure count failed")
 	}

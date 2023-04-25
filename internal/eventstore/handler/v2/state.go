@@ -55,6 +55,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 	} else if errors.As(err, &pgErr) {
 		// error returned if the row is currently locked by another connection
 		if pgErr.Code == "55P03" {
+			h.log().Debug("state already locked")
 			return nil, true, nil
 		}
 	}

@@ -175,11 +175,13 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 
 	defer func() {
 		if err != nil {
-			rollbackErr := tx.Rollback()
-			h.log().OnError(rollbackErr).Debug("unable to rollback trigger")
-			return
+			h.log().OnError(err).Debug("commit should still work")
 		}
-		err = tx.Commit()
+		commitErr := tx.Commit()
+		h.log().OnError(commitErr).Debug("commit failed")
+		if err == nil {
+			err = commitErr
+		}
 	}()
 
 	currentState, shouldSkip, err := h.currentState(ctx, tx)
@@ -240,15 +242,15 @@ func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eve
 
 func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) error {
 	for _, statement := range statements {
-		_, err := tx.Exec("SAVEPOINT stmt")
+		_, err := tx.Exec("SAVEPOINT exec")
 		if err != nil {
 			h.log().WithError(err).Debug("create savepoint failed")
 			return err
 		}
 		if err := statement.Execute(tx, h.projection.Name()); err != nil {
-			h.log().WithError(err).Debug("statement execution failed")
+			h.log().WithError(err).Error("statement execution failed")
 
-			_, savepointErr := tx.Exec("ROLLBACK TO SAVEPOINT stmt")
+			_, savepointErr := tx.Exec("ROLLBACK TO SAVEPOINT exec")
 			if savepointErr != nil {
 				h.log().WithError(savepointErr).Debug("rollback savepoint failed")
 				return savepointErr
@@ -260,9 +262,11 @@ func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, 
 
 			return err
 		}
+		if _, err = tx.Exec("RELEASE SAVEPOINT exec"); err != nil {
+			return err
+		}
 	}
-	_, err := tx.Exec("RELEASE SAVEPOINT stmt")
-	return err
+	return nil
 }
 
 func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *state) *eventstore.SearchQueryBuilder {

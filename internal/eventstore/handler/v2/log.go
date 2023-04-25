@@ -13,7 +13,7 @@ func (h *Handler) log() *logging.Entry {
 func (h *Handler) logFailure(fail *failure) *logging.Entry {
 	return h.log().WithField("sequence", fail.sequence).
 		WithField("instance", fail.instance).
-		WithField("aggregate", fail.aggregate)
+		WithField("aggregate", fail.aggregateID)
 }
 
 func (h *Handler) logEvent(event eventstore.Event) *logging.Entry {
