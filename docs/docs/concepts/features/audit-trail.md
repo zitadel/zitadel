@@ -17,7 +17,7 @@ Reviewing a past state of the application can be important when tracing an incid
 
 ### Last changes of an object
 
-You can check the last changes of most objects in the [Console](docs/guides/manage/console/overview).
+You can check the last changes of most objects in the [Console](/docs/guides/manage/console/overview).
 In the following screenshot you can see an example of last changes on an [user](/docs/guides/manage/console/users).
 The same view is available on several other objects such as organization or project.
 
@@ -25,7 +25,7 @@ The same view is available on several other objects such as organization or proj
 
 ### Event viewer
 
-Administrators can see all events across an instance and filter them directly in [Console](docs/guides/manage/console/overview).
+Administrators can see all events across an instance and filter them directly in [Console](/docs/guides/manage/console/overview).
 Go to your instance settings and then click on the Tab **Events** to open the Event Viewer or browse to $YOUR_DOMAIN/ui/console/events  
 
 ![Profile Self Manage](/img/concepts/audit-trail/event-viewer.png)
@@ -34,8 +34,8 @@ Go to your instance settings and then click on the Tab **Events** to open the Ev
 
 Since everything that is available in Console can also be called with our APIs, you can access all events and audit data trough our APIs:
 
-- [Event API Guide](https://zitadel.com/docs/guides/integrate/event-api)
-- [API Documentation](https://zitadel.com/docs/category/apis/admin/events)
+- [Event API Guide](/docs/guides/integrate/event-api)
+- [API Documentation](/docs/category/apis/admin/events)
 
 Access to the API is possible with a Service User account, allowing you to integrate the events with your own business logic.
 
