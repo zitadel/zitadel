@@ -5,53 +5,65 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	query2 "github.com/zitadel/zitadel/internal/query"
 )
 
-type Configs map[string]*Config
-
 type Config struct {
+	Client     *database.DB
+	Eventstore *eventstore.Eventstore
+
+	BulkLimit             uint64
+	FailureCountUntilSkip uint64
+	HandleActiveInstances time.Duration
+	Handlers              map[string]*ConfigOverwrites
+}
+
+type ConfigOverwrites struct {
 	MinimumCycleDuration time.Duration
 }
 
-func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, es *eventstore.Eventstore, queries *query2.Queries) []*handler2.Handler {
-	config := handler2.Config{
-		Eventstore:      es,
-		BulkLimit:       uint16(bulkLimit),
-		MaxFailureCount: uint8(errorCount),
-		RequeueEvery:    3 * time.Minute,
-	}
-	return []*handler2.Handler{
-		newUser(ctx,
-			configs.overwrite(config, "User"),
-			view,
-			queries,
-		),
-		newUserSession(ctx,
-			configs.overwrite(config, "UserSession"),
-			view,
-			queries,
-		),
-		newToken(ctx,
-			configs.overwrite(config, "Token"),
-			view,
-		),
-		newRefreshToken(ctx,
-			configs.overwrite(config, "RefreshToken"),
-			view,
-		),
-	}
+func Register(ctx context.Context, configs Config, view *view.View, queries *query2.Queries) {
+	newUser(ctx,
+		configs.overwrite("User"),
+		view,
+		queries,
+	).Start(ctx)
+
+	newUserSession(ctx,
+		configs.overwrite("UserSession"),
+		view,
+		queries,
+	).Start(ctx)
+
+	newToken(ctx,
+		configs.overwrite("Token"),
+		view,
+	).Start(ctx)
+
+	newRefreshToken(ctx,
+		configs.overwrite("RefreshToken"),
+		view,
+	).Start(ctx)
 }
 
-func (configs Configs) overwrite(config handler2.Config, viewModel string) handler2.Config {
-	c, ok := configs[viewModel]
+func (config Config) overwrite(viewModel string) handler2.Config {
+	c := handler2.Config{
+		Client:                config.Client,
+		Eventstore:            config.Eventstore,
+		BulkLimit:             uint16(config.BulkLimit),
+		RequeueEvery:          3 * time.Minute,
+		HandleActiveInstances: config.HandleActiveInstances,
+		MaxFailureCount:       uint8(config.FailureCountUntilSkip),
+	}
+	overwrite, ok := config.Handlers[viewModel]
 	if !ok {
-		return config
+		return c
 	}
-	if c.MinimumCycleDuration > 0 {
-		config.RequeueEvery = c.MinimumCycleDuration
+	if overwrite.MinimumCycleDuration > 0 {
+		c.RequeueEvery = overwrite.MinimumCycleDuration
 	}
-	return config
+	return c
 }

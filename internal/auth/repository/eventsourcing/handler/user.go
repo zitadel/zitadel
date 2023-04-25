@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -301,7 +302,7 @@ func (u *User) Reducers() []handler2.AggregateReducer {
 
 func (u *User) ProcessUser(event eventstore.Event) (_ *handler2.Statement, err error) {
 	user := new(view_model.UserView)
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case user_repo.UserV1AddedType,
 		user_repo.MachineAddedEventType,
 		user_repo.HumanAddedType,
@@ -360,7 +361,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler2.Statement, err e
 			if !errors.IsNotFound(err) {
 				return nil, err
 			}
-			query, err := usr_view.UserByIDQuery(event.Aggregate().ID, event.Aggregate().InstanceID, 0)
+			query, err := usr_view.UserByIDQuery(event.Aggregate().ID, event.Aggregate().InstanceID, time.Time{})
 			if err != nil {
 				return nil, err
 			}
@@ -383,7 +384,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler2.Statement, err e
 			if !errors.IsNotFound(err) {
 				return nil, err
 			}
-			query, err := usr_view.UserByIDQuery(event.Aggregate().ID, event.Aggregate().InstanceID, 0)
+			query, err := usr_view.UserByIDQuery(event.Aggregate().ID, event.Aggregate().InstanceID, time.Time{})
 			if err != nil {
 				return nil, err
 			}
@@ -433,7 +434,7 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 }
 
 func (u *User) ProcessOrg(event eventstore.Event) (_ *handler2.Statement, err error) {
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case org.OrgDomainVerifiedEventType,
 		org.OrgDomainRemovedEventType,
 		org.DomainPolicyAddedEventType,
@@ -454,7 +455,7 @@ func (u *User) ProcessOrg(event eventstore.Event) (_ *handler2.Statement, err er
 }
 
 func (u *User) ProcessInstance(event eventstore.Event) (_ *handler2.Statement, err error) {
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case instance.InstanceRemovedEventType:
 		return handler2.NewStatement(event,
 			func(ex handler2.Executer, projectionName string) error {

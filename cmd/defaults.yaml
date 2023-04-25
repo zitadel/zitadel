@@ -184,18 +184,21 @@ Projections:
 Auth:
   SearchLimit: 1000
   Spooler:
-    ConcurrentWorkers: 1
-    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
+    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+    # from HandleActiveInstances duration in the past until the projections current time
+    # Defaults to twice the RequeueEvery duration
+    HandleActiveInstances: 120s
 
 Admin:
-  SearchLimit: 1000
   Spooler:
-    ConcurrentWorkers: 1
-    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
+    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+    # from HandleActiveInstances duration in the past until the projections current time
+    # Defaults to twice the RequeueEvery duration
+    HandleActiveInstances: 120s
 
 UserAgentCookie:
   Name: zitadel.useragent

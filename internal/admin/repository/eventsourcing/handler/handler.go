@@ -5,43 +5,53 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/static"
 )
 
-type Configs map[string]*Config
-
 type Config struct {
+	Client     *database.DB
+	Eventstore *eventstore.Eventstore
+
+	BulkLimit             uint64
+	FailureCountUntilSkip uint64
+	HandleActiveInstances time.Duration
+	Handlers              map[string]*ConfigOverwrites
+}
+
+type ConfigOverwrites struct {
 	MinimumCycleDuration time.Duration
 }
 
-func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, static static.Storage, es *eventstore.Eventstore) []*handler2.Handler {
+func Register(ctx context.Context, config Config, view *view.View, static static.Storage) {
 	if static == nil {
-		return nil
+		return
 	}
-	config := handler2.Config{
-		Eventstore:      es,
-		BulkLimit:       uint16(bulkLimit),
-		MaxFailureCount: uint8(errorCount),
-		RequeueEvery:    3 * time.Minute,
-	}
-	return []*handler2.Handler{
-		newStyling(ctx,
-			configs.overwrite(config, "Styling"),
-			static,
-			view,
-		),
-	}
+
+	newStyling(ctx,
+		config.overwrite("Styling"),
+		static,
+		view,
+	).Start(ctx)
 }
 
-func (configs Configs) overwrite(config handler2.Config, viewModel string) handler2.Config {
-	c, ok := configs[viewModel]
+func (config Config) overwrite(viewModel string) handler2.Config {
+	c := handler2.Config{
+		Client:                config.Client,
+		Eventstore:            config.Eventstore,
+		BulkLimit:             uint16(config.BulkLimit),
+		RequeueEvery:          3 * time.Minute,
+		HandleActiveInstances: config.HandleActiveInstances,
+		MaxFailureCount:       uint8(config.FailureCountUntilSkip),
+	}
+	overwrite, ok := config.Handlers[viewModel]
 	if !ok {
-		return config
+		return c
 	}
-	if c.MinimumCycleDuration > 0 {
-		config.RequeueEvery = c.MinimumCycleDuration
+	if overwrite.MinimumCycleDuration > 0 {
+		c.RequeueEvery = overwrite.MinimumCycleDuration
 	}
-	return config
+	return c
 }

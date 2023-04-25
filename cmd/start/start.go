@@ -228,14 +228,21 @@ func startAPIs(
 	if err != nil {
 		return fmt.Errorf("error creating api %w", err)
 	}
+
+	config.Auth.Spooler.Client = dbClient
+	config.Auth.Spooler.Eventstore = eventstore
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
-	adminRepo, err := admin_es.Start(ctx, config.Admin, store, dbClient, eventstore)
+
+	config.Admin.Spooler.Client = dbClient
+	config.Admin.Spooler.Eventstore = eventstore
+	adminRepo, err := admin_es.Start(ctx, config.Admin, store, dbClient)
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
+
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return err
 	}

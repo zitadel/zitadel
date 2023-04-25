@@ -20,6 +20,11 @@ func QueryCurrentState(ctx context.Context, db *sql.DB, projectionName string) (
 	return nil, nil
 }
 
+func ResetState(ctx context.Context, db *sql.DB, projectionName string) error {
+	// TODO
+	return nil
+}
+
 type FailedEvent struct {
 	Projection string
 

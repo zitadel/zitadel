@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/eventstore"
+	auth_handler "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/auth_request/repository/cache"
 	"github.com/zitadel/zitadel/internal/command"
@@ -17,6 +18,7 @@ import (
 
 type Config struct {
 	SearchLimit uint64
+	Spooler     auth_handler.Config
 }
 
 type EsRepository struct {
@@ -33,6 +35,8 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 	if err != nil {
 		return nil, err
 	}
+
+	auth_handler.Register(ctx, conf.Spooler, view, queries)
 
 	authReq := cache.Start(dbClient)
 
