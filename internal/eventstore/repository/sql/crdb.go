@@ -20,7 +20,7 @@ import (
 
 const (
 	//as soon as stored procedures are possible in crdb
-	// we could move the code to migrations and coll the procedure
+	// we could move the code to migrations and call the procedure
 	// traking issue: https://github.com/cockroachdb/cockroach/issues/17511
 	//
 	//previous_data selects the needed data of the latest event of the aggregate

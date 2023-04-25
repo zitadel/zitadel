@@ -2,8 +2,11 @@ package setup
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
+	"time"
 
+	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -15,35 +18,32 @@ var (
 )
 
 type CorrectCreationDate struct {
-	dbClient *database.DB
+	dbClient  *database.DB
+	FailAfter time.Duration
 }
 
 func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
-	tx, err := mig.dbClient.Begin()
-	if err != nil {
-		return err
-	}
-	if mig.dbClient.Type() == "cockroach" {
-		if _, err := tx.Exec("SET experimental_enable_temp_tables=on"); err != nil {
-			return err
-		}
-	}
-	defer func() {
-		if err != nil {
-			logging.OnError(tx.Rollback()).Debug("rollback failed")
-			return
-		}
-		err = tx.Commit()
-	}()
+	ctx, cancel := context.WithTimeout(ctx, mig.FailAfter)
+	defer cancel()
+
 	for {
-		res, err := tx.ExecContext(ctx, correctCreationDate10)
-		if err != nil {
-			return err
-		}
-		affected, _ := res.RowsAffected()
-		logging.WithFields("count", affected).Info("creation dates changed")
-		if affected == 0 {
+		var affected int64
+		err = crdb.ExecuteTx(ctx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
+			if mig.dbClient.Type() == "cockroach" {
+				if _, err := tx.Exec("SET experimental_enable_temp_tables=on"); err != nil {
+					return err
+				}
+			}
+			res, err := tx.ExecContext(ctx, correctCreationDate10)
+			if err != nil {
+				return err
+			}
+			affected, _ = res.RowsAffected()
+			logging.WithFields("count", affected).Info("creation dates changed")
 			return nil
+		})
+		if affected == 0 || err != nil {
+			return err
 		}
 	}
 }

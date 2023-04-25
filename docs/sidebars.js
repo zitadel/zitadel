@@ -126,8 +126,14 @@ module.exports = {
     {
       type: "category",
       label: "Integrate",
+      link: {
+        type: "generated-index",
+        title: "Integrate",
+        slug: "guides/integrate",
+        description:
+          "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
+      },
       items: [
-
         {
           type: "category",
           label: "Authenticate Users",
@@ -234,12 +240,19 @@ module.exports = {
     {
       type: "category",
       label: "Solution Scenarios",
+      link: {
+        type: "generated-index",
+        title: "Solution Scenarios",
+        slug: "guides/solution-scenarios/introduction",
+        description:
+          "Customers of an SaaS Identity and Access Management System usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into Solution Scenarios which aim to help you getting started with ZITADEL.",
+      },
       collapsed: true,
       items: [
-        "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
-        "concepts/usecases/saas",
+        "guides/solution-scenarios/saas",
+        "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
       ],
     },
@@ -420,10 +433,9 @@ module.exports = {
       items: ["apis/observability/metrics", "apis/observability/health"],
     },
     {
-      type: "category",
-      label: "Rate Limits",
-      collapsed: false,
-      items: ["apis/ratelimits/ratelimits", "legal/rate-limit-policy"],
+      type: 'link',
+      label: 'Rate Limits (Cloud)', // The link label
+      href: '/legal/rate-limit-policy', // The internal path
     },
   ],
   selfHosting: [
