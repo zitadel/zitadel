@@ -6,8 +6,8 @@ export interface SignInWithGoogleProps {
 
 export function SignInWithGoogle(props: SignInWithGoogleProps) {
   return (
-    <div className="ui-cursor-pointer ui-flex ui-flex-row ui-items-center ui-bg-white ui-text-black dark:ui-bg-transparent dark:ui-text-white border ui-border-divider-light dark:ui-border-divider-dark rounded-md px-4 text-sm">
-      <div className="ui-h-12 ui-w-12 ui-flex ui-items-center ui-justify-center">
+    <div className="ztdl-cursor-pointer ztdl-flex ztdl-flex-row ztdl-items-center ztdl-bg-white ztdl-text-black dark:ztdl-bg-transparent dark:ztdl-text-white border ztdl-border-divider-light dark:ztdl-border-divider-dark rounded-md px-4 text-sm">
+      <div className="ztdl-h-12 ztdl-w-12 ztdl-flex ztdl-items-center ztdl-justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           xmlSpace="preserve"
@@ -49,7 +49,7 @@ export function SignInWithGoogle(props: SignInWithGoogleProps) {
           />
         </svg>
       </div>
-      <span className="ui-ml-4">Sign in with Google</span>
+      <span className="ztdl-ml-4">Sign in with Google</span>
     </div>
   );
 }

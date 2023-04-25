@@ -84,25 +84,34 @@ export function setTheme(document: any, policy?: LabelPolicyColors) {
   const dark = computeMap(lP, true);
   const light = computeMap(lP, false);
 
-  console.log(dark, light);
+  setColorShades(dark.background, "background", "dark", document);
+  setColorShades(light.background, "background", "light", document);
 
-  setColors(dark.background, "background", "dark", document);
-  setColors(light.background, "background", "light", document);
+  setColorShades(dark.primary, "primary", "dark", document);
+  setColorShades(light.primary, "primary", "light", document);
 
-  setColors(dark.primary, "primary", "dark", document);
-  setColors(light.primary, "primary", "light", document);
+  setColorShades(dark.warn, "warn", "dark", document);
+  setColorShades(light.warn, "warn", "light", document);
 
-  setColors(dark.text, "primary", "dark", document);
-  setColors(light.text, "primary", "light", document);
+  //   setColorShades(dark.text, "text", "dark", document);
+  //   setColorShades(light.text, "text", "light", document);
 
-  setColors(dark.link, "link", "dark", document);
-  setColors(light.link, "link", "light", document);
+  //   setColorShades(dark.link, "link", "dark", document);
+  //   setColorShades(light.link, "link", "light", document);
 
-  setColors(dark.warn, "warn", "dark", document);
-  setColors(light.warn, "warn", "light", document);
+  setColorAlpha(dark.text, "text", "dark", document);
+  setColorAlpha(light.text, "text", "light", document);
+
+  setColorAlpha(dark.link, "link", "dark", document);
+  setColorAlpha(light.link, "link", "light", document);
 }
 
-function setColors(map: Color[], type: string, theme: string, document: any) {
+function setColorShades(
+  map: Color[],
+  type: string,
+  theme: string,
+  document: any
+) {
   map.forEach((color) => {
     document.documentElement.style.setProperty(
       `--theme-${theme}-${type}-${color.name}`,
@@ -113,6 +122,30 @@ function setColors(map: Color[], type: string, theme: string, document: any) {
       color.contrastColor
     );
   });
+}
+
+function setColorAlpha(
+  map: Color[],
+  type: string,
+  theme: string,
+  document: any
+) {
+  const color = map.find((color) => color.name === "500");
+
+  if (color) {
+    document.documentElement.style.setProperty(
+      `--theme-${theme}-${type}`,
+      color.hex
+    );
+    document.documentElement.style.setProperty(
+      `--theme-${theme}-${type}-contrast`,
+      color.contrastColor
+    );
+    document.documentElement.style.setProperty(
+      `--theme-${theme}-${type}-secondary`,
+      `${color.hex}80`
+    );
+  }
 }
 
 function computeColors(hex: string): Color[] {

@@ -45,8 +45,8 @@ export default async function RootLayout({
             <div className="h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600  bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
               <GlobalNav />
 
-              <div className="lg:pl-72">
-                <div className="mx-auto max-w-xl space-y-8 px-2 pt-20 lg:py-8 lg:px-8">
+              <div className="lg:pl-72 pb-4">
+                <div className="mx-auto max-w-[440px] space-y-8 pt-20 lg:py-8">
                   <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
                     <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
                       <AddressBar />
@@ -54,7 +54,7 @@ export default async function RootLayout({
                   </div>
 
                   <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
-                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500 p-3.5 lg:p-8">
+                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500 px-8 py-12">
                       {children}
                     </div>
                   </div>

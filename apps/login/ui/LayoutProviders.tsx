@@ -7,8 +7,8 @@ type Props = {
 };
 
 export function LayoutProviders({ children }: Props) {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme && resolvedTheme === "dark";
+  //   const { resolvedTheme } = useTheme();
+  const isDark = false; //resolvedTheme && resolvedTheme === "dark";
 
   //   useEffect(() => {
   //     console.log("layoutproviders useeffect");

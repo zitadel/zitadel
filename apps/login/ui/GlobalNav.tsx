@@ -55,7 +55,7 @@ export function GlobalNav() {
           {demos.map((section) => {
             return (
               <div key={section.name}>
-                <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-600">
+                <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-light dark:text-text-dark">
                   <div>{section.name}</div>
                 </div>
 
@@ -90,9 +90,9 @@ function GlobalNavItem({
       className={clsx(
         "block rounded-md px-3 py-2 text-sm font-medium hover:text-black dark:hover:text-gray-300",
         {
-          "text-gray-500 dark:text-gray-500 hover:bg-gray-100 hover:dark:bg-gray-800":
+          "text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light hover:dark:text-text-dark":
             !isActive,
-          "text-gray-800 dark:text-gray-200": isActive,
+          "text-primary-light-500 dark:text-primary-dark-500": isActive,
         }
       )}
     >
