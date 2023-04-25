@@ -5,9 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"io"
-	"os"
 	"strings"
-	"sync"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -70,31 +68,4 @@ func initConfig() {
 		err := viper.MergeInConfig()
 		logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
 	}
-}
-
-type TestServer struct {
-	*start.Server
-	wg sync.WaitGroup
-}
-
-func (s *TestServer) Done() {
-	s.Shutdown <- os.Interrupt
-	s.wg.Wait()
-}
-
-func NewTestServer(args []string) *TestServer {
-	testServer := new(TestServer)
-	server := make(chan *start.Server, 1)
-
-	testServer.wg.Add(1)
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-
-		cmd := New(os.Stdout, os.Stdin, args, server)
-		cmd.SetArgs(args)
-		logging.OnError(cmd.Execute()).Fatal()
-	}(&testServer.wg)
-
-	testServer.Server = <-server
-	return testServer
 }
