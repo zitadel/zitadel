@@ -127,11 +127,9 @@ func (e *Event) Validate() error {
 	if e.AggregateType == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-EzdyK", "aggregate type not set")
 	}
-	// TODO: check still needed?
-	// if err := e.AggregateVersion.Validate(); err != nil {
-	// 	return err
-	// }
-
+	if err := e.AggregateVersion.Validate(); err != nil {
+		return err
+	}
 	if e.Service == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-4Yqik", "editor service not set")
 	}

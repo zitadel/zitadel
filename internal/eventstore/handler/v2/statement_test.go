@@ -750,11 +750,16 @@ func TestNewDeleteStatement(t *testing.T) {
 func TestNewNoOpStatement(t *testing.T) {
 	type args struct {
 		event *testEvent
+		table string
+	}
+	type want struct {
+		executer *wantExecuter
+		isErr    func(error) bool
 	}
 	tests := []struct {
 		name string
 		args args
-		want *Statement
+		want want
 	}{
 		{
 			name: "generate correctly",
@@ -766,20 +771,31 @@ func TestNewNoOpStatement(t *testing.T) {
 					instanceID:       "instanceID",
 				},
 			},
-			want: &Statement{
-				AggregateType: "agg",
-				Execute:       nil,
-				Sequence:      5,
-				// PreviousSequence: 3,
-				InstanceID: "instanceID",
+			want: want{
+				executer: &wantExecuter{
+					shouldExecute: false,
+				},
+				isErr: func(err error) bool {
+					return err == nil
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewNoOpStatement(tt.args.event); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewNoOpStatement() = %v, want %v", got, tt.want)
+			stmt := NewNoOpStatement(tt.args.event)
+			if tt.want.executer != nil && stmt.Execute == nil {
+				t.Error("expected executer, but was nil")
 			}
+			if stmt.Execute == nil {
+				return
+			}
+			tt.want.executer.t = t
+			err := stmt.Execute(tt.want.executer, tt.args.table)
+			if !tt.want.isErr(err) {
+				t.Errorf("unexpected error: %v", err)
+			}
+			tt.want.executer.check(t)
 		})
 	}
 }
@@ -813,10 +829,17 @@ func TestNewMultiStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
-				execs: nil,
+				execs: []func(eventstore.Event) Exec{
+					AddNoOpStatement(),
+				},
 			},
 			want: want{
-				executer: nil,
+				executer: &wantExecuter{
+					shouldExecute: false,
+				},
+				isErr: func(err error) bool {
+					return err == nil
+				},
 			},
 		},
 		{
