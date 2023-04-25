@@ -44,6 +44,7 @@ func failureFromStatement(statement *Statement, err error) *failure {
 	}
 }
 
+// TODO: if we use the tx here the insert will be reverted
 func (h *Handler) handleFailedStmt(tx *sql.Tx, currentState *state, f *failure) (shouldContinue bool) {
 	if currentState.eventTimestamp.After(f.eventDate) || currentState.eventTimestamp.Equal(f.eventDate) {
 		return true
