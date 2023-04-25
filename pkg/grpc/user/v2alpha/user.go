@@ -1,5 +1,5 @@
 package user
 
-func (r *AddUserRequest) AuthContext() string {
+func (r *AddHumanUserRequest) AuthContext() string {
 	return r.GetOrganisation().GetOrgId()
 }

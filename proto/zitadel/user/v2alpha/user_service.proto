@@ -16,8 +16,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha;user";
 
 service UserService {
 
-  // Create a new user
-  rpc AddUser (AddUserRequest) returns (AddUserResponse) {
+  // Create a new human user
+  rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users"
       body: "*"
@@ -28,6 +28,7 @@ service UserService {
     };
   }
 
+  // Change the email of a user
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users/{user_id}/email"
@@ -39,6 +40,7 @@ service UserService {
     };
   }
 
+  // Verify the email with the provided code
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users/{user_id}/email/_verify"
@@ -51,7 +53,7 @@ service UserService {
   }
 }
 
-message AddUserRequest{
+message AddHumanUserRequest{
   // optionally set your own id unique for the user
   optional string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -71,11 +73,11 @@ message AddUserRequest{
     }
   ];
   zitadel.object.v2alpha.Organisation organisation = 3;
-  SetUserProfile profile = 4 [
+  SetHumanProfile profile = 4 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED
   ];
-  SetUserEmail email = 5 [
+  SetHumanEmail email = 5 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED
   ];
@@ -86,7 +88,7 @@ message AddUserRequest{
   }
 }
 
-message AddUserResponse {
+message AddHumanUserResponse {
   string user_id = 1;
   zitadel.object.v2alpha.Details details = 2;
   optional string email_code = 3;
