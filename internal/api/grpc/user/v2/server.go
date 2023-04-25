@@ -22,14 +22,11 @@ type Server struct {
 
 type Config struct{}
 
-func CreateServer(
-	command *command.Commands,
-	query *query.Queries,
-	userCodeAlg crypto.EncryptionAlgorithm,
-) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, userCodeAlg crypto.EncryptionAlgorithm) *Server {
 	return &Server{
-		command: command,
-		query:   query,
+		command:     command,
+		query:       query,
+		userCodeAlg: userCodeAlg,
 	}
 }
 

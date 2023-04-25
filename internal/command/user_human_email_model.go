@@ -19,7 +19,6 @@ type HumanEmailWriteModel struct {
 	Code             *crypto.CryptoValue
 	CodeCreationDate time.Time
 	CodeExpiry       time.Duration
-	ConfirmURL       *string
 
 	UserState domain.UserState
 }

@@ -124,7 +124,7 @@ type HumanEmailCodeAddedEvent struct {
 
 	Code         *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry       time.Duration       `json:"expiry,omitempty"`
-	URLTemplate  *string             `json:"url_template,omitempty"`
+	URLTemplate  string              `json:"url_template,omitempty"`
 	CodeReturned bool                `json:"code_returned,omitempty"`
 }
 
@@ -142,7 +142,7 @@ func NewHumanEmailCodeAddedEvent(
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 ) *HumanEmailCodeAddedEvent {
-	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, nil, false)
+	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, "", false)
 }
 
 func NewHumanEmailCodeAddedEventV2(
@@ -150,7 +150,7 @@ func NewHumanEmailCodeAddedEventV2(
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	urlTemplate *string,
+	urlTemplate string,
 	codeReturned bool,
 ) *HumanEmailCodeAddedEvent {
 	return &HumanEmailCodeAddedEvent{
@@ -159,9 +159,10 @@ func NewHumanEmailCodeAddedEventV2(
 			aggregate,
 			HumanEmailCodeAddedType,
 		),
-		Code:        code,
-		Expiry:      expiry,
-		URLTemplate: urlTemplate,
+		Code:         code,
+		Expiry:       expiry,
+		URLTemplate:  urlTemplate,
+		CodeReturned: codeReturned,
 	}
 }
 

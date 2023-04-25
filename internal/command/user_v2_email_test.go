@@ -23,7 +23,8 @@ import (
 
 func TestCommands_ChangeUserEmail(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      *eventstore.Eventstore
+		checkPermission permissionCheck
 	}
 	type args struct {
 		userID        string
@@ -36,6 +37,46 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 		args    args
 		wantErr error
 	}{
+		{
+			name: "missing permission",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyEmailCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				email:         "",
+			},
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
 		{
 			name: "missing email",
 			fields: fields{
@@ -67,6 +108,7 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
@@ -106,6 +148,7 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
@@ -118,7 +161,8 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
 			}
 			_, err := c.ChangeUserEmail(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
@@ -129,7 +173,8 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 
 func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      *eventstore.Eventstore
+		checkPermission permissionCheck
 	}
 	type args struct {
 		userID        string
@@ -154,7 +199,48 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 				email:         "email-changed@test.ch",
 				urlTmpl:       "{{",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.V2.Email.InvalidURLTemplate"),
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.Email.InvalidURLTemplate"),
+		},
+		{
+			name: "permission missing",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyEmailCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				email:         "email@test.ch",
+				urlTmpl:       "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+			},
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "not changed",
@@ -187,6 +273,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
@@ -200,7 +287,8 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
 			}
 			_, err := c.ChangeUserEmailURLTemplate(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -211,7 +299,8 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 
 func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      *eventstore.Eventstore
+		checkPermission permissionCheck
 	}
 	type args struct {
 		userID        string
@@ -224,6 +313,46 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 		args    args
 		wantErr error
 	}{
+		{
+			name: "missing permission",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyEmailCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				email:         "email@test.ch",
+			},
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
 		{
 			name: "missing email",
 			fields: fields{
@@ -255,6 +384,7 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
@@ -267,7 +397,8 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
 			}
 			_, err := c.ChangeUserEmailReturnCode(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
@@ -278,7 +409,8 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 
 func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      *eventstore.Eventstore
+		checkPermission permissionCheck
 	}
 	type args struct {
 		userID        string
@@ -295,7 +427,8 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 		{
 			name: "missing userID",
 			fields: fields{
-				eventstore: eventstoreExpect(t),
+				eventstore:      eventstoreExpect(t),
+				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
 				userID:        "",
@@ -303,6 +436,37 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 				email:         "email@test.ch",
 			},
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
+		},
+		{
+			name: "missing permission",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				email:         "email-changed@test.ch",
+			},
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing email",
@@ -326,6 +490,7 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
@@ -371,6 +536,7 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 						},
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
@@ -390,7 +556,8 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.ChangeUserEmailVerified(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -401,14 +568,15 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 
 func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      *eventstore.Eventstore
+		checkPermission permissionCheck
 	}
 	type args struct {
 		userID        string
 		resourceOwner string
 		email         string
 		returnCode    bool
-		urlTmpl       *string
+		urlTmpl       string
 	}
 	tests := []struct {
 		name    string
@@ -427,9 +595,42 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				resourceOwner: "org1",
 				email:         "email@test.ch",
 				returnCode:    false,
-				urlTmpl:       nil,
+				urlTmpl:       "",
 			},
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
+		},
+		{
+			name: "missing permission",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				email:         "email@test.ch",
+				returnCode:    false,
+				urlTmpl:       "",
+			},
+			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing email",
@@ -453,13 +654,14 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
 				resourceOwner: "org1",
 				email:         "",
 				returnCode:    false,
-				urlTmpl:       nil,
+				urlTmpl:       "",
 			},
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
 		},
@@ -485,13 +687,14 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
 				resourceOwner: "org1",
 				email:         "email@test.ch",
 				returnCode:    false,
-				urlTmpl:       nil,
+				urlTmpl:       "",
 			},
 			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
 		},
@@ -534,19 +737,20 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 										Crypted:    []byte("a"),
 									},
 									time.Hour*1,
-									nil, false,
+									"", false,
 								),
 							),
 						},
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
 				resourceOwner: "org1",
 				email:         "email-changed@test.ch",
 				returnCode:    false,
-				urlTmpl:       nil,
+				urlTmpl:       "",
 			},
 			want: &domain.Email{
 				ObjectRoot: models.ObjectRoot{
@@ -596,19 +800,20 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 										Crypted:    []byte("a"),
 									},
 									time.Hour*1,
-									nil, true,
+									"", true,
 								),
 							),
 						},
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
 				resourceOwner: "org1",
 				email:         "email-changed@test.ch",
 				returnCode:    true,
-				urlTmpl:       nil,
+				urlTmpl:       "",
 			},
 			want: &domain.Email{
 				ObjectRoot: models.ObjectRoot{
@@ -659,19 +864,20 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 										Crypted:    []byte("a"),
 									},
 									time.Hour*1,
-									gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"), false,
+									"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}", false,
 								),
 							),
 						},
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				userID:        "user1",
 				resourceOwner: "org1",
 				email:         "email-changed@test.ch",
 				returnCode:    false,
-				urlTmpl:       gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+				urlTmpl:       "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
 			},
 			want: &domain.Email{
 				ObjectRoot: models.ObjectRoot{
@@ -686,7 +892,8 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.changeUserEmailWithGenerator(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -811,7 +1018,7 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
-								nil, false,
+								"", false,
 							),
 						),
 					),
@@ -934,7 +1141,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
-								nil, false,
+								"", false,
 							),
 						),
 					),
@@ -986,7 +1193,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
-								nil, false,
+								"", false,
 							),
 						),
 					),

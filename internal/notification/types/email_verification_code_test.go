@@ -3,7 +3,6 @@ package types
 import (
 	"testing"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -38,7 +37,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 		user    *query.NotifyUser
 		origin  string
 		code    string
-		urlTmpl *string
+		urlTmpl string
 	}
 	tests := []struct {
 		name    string
@@ -55,7 +54,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				},
 				origin:  "https://example.com",
 				code:    "123",
-				urlTmpl: nil,
+				urlTmpl: "",
 			},
 			want: &res{
 				url:                                "https://example.com/ui/login/mail/verification?userID=user1&code=123&orgID=org1",
@@ -73,10 +72,10 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				},
 				origin:  "https://example.com",
 				code:    "123",
-				urlTmpl: gu.Ptr("{{"),
+				urlTmpl: "{{",
 			},
 			want:    &res{},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.V2.Email.InvalidURLTemplate"),
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.Email.InvalidURLTemplate"),
 		},
 		{
 			name: "template success",
@@ -87,7 +86,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				},
 				origin:  "https://example.com",
 				code:    "123",
-				urlTmpl: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+				urlTmpl: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
 			},
 			want: &res{
 				url:                                "https://example.com/email/verify?userID=user1&code=123&orgID=org1",

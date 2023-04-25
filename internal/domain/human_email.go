@@ -78,12 +78,12 @@ type ConfirmURLData struct {
 func RenderConfirmURLTemplate(w io.Writer, tmplStr, userID, code, orgID string) error {
 	tmpl, err := template.New("").Parse(tmplStr)
 	if err != nil {
-		return caos_errs.ThrowInvalidArgument(err, "USERv2-ooD8p", "Errors.User.V2.Email.InvalidURLTemplate")
+		return caos_errs.ThrowInvalidArgument(err, "USERv2-ooD8p", "Errors.User.Email.InvalidURLTemplate")
 	}
 
 	data := &ConfirmURLData{userID, code, orgID}
 	if err = tmpl.Execute(w, data); err != nil {
-		return caos_errs.ThrowInvalidArgument(err, "USERv2-ohSi5", "Errors.User.V2.Email.InvalidURLTemplate")
+		return caos_errs.ThrowInvalidArgument(err, "USERv2-ohSi5", "Errors.User.Email.InvalidURLTemplate")
 	}
 
 	return nil

@@ -8,13 +8,13 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func (notify Notify) SendEmailVerificationCode(user *query.NotifyUser, origin, code string, urlTmpl *string) error {
+func (notify Notify) SendEmailVerificationCode(user *query.NotifyUser, origin, code string, urlTmpl string) error {
 	var url string
-	if urlTmpl == nil {
+	if urlTmpl == "" {
 		url = login.MailVerificationLink(origin, user.ID, code, user.ResourceOwner)
 	} else {
 		var buf strings.Builder
-		if err := domain.RenderConfirmURLTemplate(&buf, *urlTmpl, user.ID, code, user.ResourceOwner); err != nil {
+		if err := domain.RenderConfirmURLTemplate(&buf, urlTmpl, user.ID, code, user.ResourceOwner); err != nil {
 			return err
 		}
 		url = buf.String()

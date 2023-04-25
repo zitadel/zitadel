@@ -14,11 +14,11 @@ type MethodMapping map[string]Option
 type Option struct {
 	Permission string
 	CheckParam string
-	Feature    string
+	AllowSelf  bool
 }
 
-func (a *Config) getPermissionsFromRole(role string) []string {
-	for _, roleMap := range a.RolePermissionMappings {
+func getPermissionsFromRole(rolePermissionMappings []RoleMapping, role string) []string {
+	for _, roleMap := range rolePermissionMappings {
 		if roleMap.Role == role {
 			return roleMap.Permissions
 		}

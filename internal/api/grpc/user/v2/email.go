@@ -5,7 +5,6 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
@@ -13,8 +12,8 @@ import (
 )
 
 func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp *user.SetEmailResponse, err error) {
-	resourceOwner := authz.GetCtxData(ctx).ResourceOwner
-
+	//resourceOwner := authz.GetCtxData(ctx).OrgID
+	resourceOwner := "" // TODO: check if still needed
 	var email *domain.Email
 
 	switch v := req.GetVerification().(type) {
@@ -33,7 +32,7 @@ func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp 
 	default:
 		err = caos_errs.ThrowUnimplementedf(nil, "USERv2-Ahng0", "verification oneOf %T in method SetEmail not implemented", v)
 	}
-	if err == nil {
+	if err != nil {
 		return nil, err
 	}
 
@@ -49,8 +48,9 @@ func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp 
 
 func (s *Server) VerifyEmail(ctx context.Context, req *user.VerifyEmailRequest) (*user.VerifyEmailResponse, error) {
 	details, err := s.command.VerifyUserEmail(ctx,
-		req.GetUserId(), req.GetVerificationCode(),
-		authz.GetCtxData(ctx).ResourceOwner,
+		req.GetUserId(),
+		"", // TODO: check if still needed
+		req.GetVerificationCode(),
 		s.userCodeAlg,
 	)
 	if err != nil {

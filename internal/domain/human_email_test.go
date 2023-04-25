@@ -100,7 +100,7 @@ func TestRenderConfirmURLTemplate(t *testing.T) {
 				code:    "123",
 				orgID:   "org1",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.V2.Email.InvalidURLTemplate"),
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.Email.InvalidURLTemplate"),
 		},
 		{
 			name: "execution error",
@@ -110,7 +110,7 @@ func TestRenderConfirmURLTemplate(t *testing.T) {
 				code:    "123",
 				orgID:   "org1",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ohSi5", "Errors.User.V2.Email.InvalidURLTemplate"),
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ohSi5", "Errors.User.Email.InvalidURLTemplate"),
 		},
 		{
 			name: "success",
