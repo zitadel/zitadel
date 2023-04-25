@@ -7,7 +7,7 @@ Most solutions replace a historic record and track changes in a separate log whe
 ZITADEL only ever appends data in an [Eventstore](https://docs.zitadel.com/docs/concepts/eventstore), keeping all historic record.
 The audit trail itself is identical to the state, since ZITADEL calculates the state from all the past changes.
 
-![Example of events that happen for a profile change and a login](/img/concepts/audit-log-events.png)
+![Example of events that happen for a profile change and a login](/img/concepts/audit-trail/audit-log-events.png)
 
 This form of audit log has several real-life benefits.
 You can view past data in-context of the whole system at a single point in time.
@@ -17,9 +17,23 @@ Reviewing a past state of the application can be important when tracing an incid
 
 ### Last changes of an object
 
+You can check the last changes of most objects in the [Console](docs/guides/manage/console/overview).
+In the following screenshot you can see an example of last changes on an [user](/docs/guides/manage/console/users).
+The same view is available on several other objects such as organization or project.
+
+![Profile Self Manage](/img/guides/console/myprofile.png)
+
 ### Event viewer
 
+Administrators can see all events across an instance and filter them directly in [Console](docs/guides/manage/console/overview).
+Go to your instance settings and then click on the Tab **Events** to open the Event Viewer or browse to $YOUR_DOMAIN/ui/console/events  
+
+![Profile Self Manage](/img/concepts/audit-trail/event-viewer.png)
+
 ### Event API
+
+- Guide: https://zitadel.com/docs/guides/integrate/event-api
+- API Docs: https://zitadel.com/docs/category/apis/admin/events
 
 ## Using logs in external systems
 
