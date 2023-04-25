@@ -116,12 +116,14 @@ func StartCommands(es *eventstore.Eventstore,
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
 	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
+
 	repo.multifactors = domain.MultifactorConfigs{
 		OTP: domain.OTPConfig{
 			CryptoMFA: otpEncryption,
 			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},
 	}
+
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = api_http.ValidateDomain
 	return repo, nil
