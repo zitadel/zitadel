@@ -65,6 +65,36 @@ type AddHuman struct {
 	EmailCode *string
 }
 
+func (h *AddHuman) Validate() (err error) {
+	if err := h.Email.Validate(); err != nil {
+		return err
+	}
+	if h.Username = strings.TrimSpace(h.Username); h.Username == "" {
+		return errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument")
+	}
+
+	if h.FirstName = strings.TrimSpace(h.FirstName); h.FirstName == "" {
+		return errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty")
+	}
+	if h.LastName = strings.TrimSpace(h.LastName); h.LastName == "" {
+		return errors.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty")
+	}
+	h.ensureDisplayName()
+
+	if h.Phone.Number != "" {
+		if h.Phone.Number, err = h.Phone.Number.Normalize(); err != nil {
+			return err
+		}
+	}
+
+	for _, metadataEntry := range h.Metadata {
+		if err := metadataEntry.Valid(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 type AddMetadataEntry struct {
 	Key   string
 	Value []byte
@@ -118,31 +148,8 @@ type humanCreationCommand interface {
 
 func (c *Commands) AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := human.Email.Validate(); err != nil {
+		if err := human.Validate(); err != nil {
 			return nil, err
-		}
-		if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument")
-		}
-
-		if human.FirstName = strings.TrimSpace(human.FirstName); human.FirstName == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty")
-		}
-		if human.LastName = strings.TrimSpace(human.LastName); human.LastName == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty")
-		}
-		human.ensureDisplayName()
-
-		if human.Phone.Number != "" {
-			if human.Phone.Number, err = human.Phone.Number.Normalize(); err != nil {
-				return nil, err
-			}
-		}
-
-		for _, metadataEntry := range human.Metadata {
-			if err := metadataEntry.Valid(); err != nil {
-				return nil, err
-			}
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -248,7 +255,7 @@ func (c *Commands) AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordA
 					if human.Email.ReturnCode {
 						human.EmailCode = &emailCode.Plain
 					}
-					cmds = append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &a.Aggregate, emailCode.Crypted, emailCode.Expiry, human.Email.UrlTemplate, human.Email.ReturnCode))
+					cmds = append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &a.Aggregate, emailCode.Crypted, emailCode.Expiry, human.Email.URLTemplate, human.Email.ReturnCode))
 				}
 			}
 
