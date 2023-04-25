@@ -22,6 +22,7 @@ export default async function RootLayout({
 }) {
   const branding = await getBranding(server);
   let partialPolicy: LabelPolicyColors | undefined;
+  console.log(branding);
   if (branding) {
     partialPolicy = {
       backgroundColor: branding?.backgroundColor,

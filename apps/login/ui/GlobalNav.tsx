@@ -3,7 +3,7 @@
 import { demos, type Item } from "#/lib/demos";
 import { ZitadelLogo } from "#/ui/ZitadelLogo";
 import Link from "next/link";
-import { useSelectedLayoutSegment } from "next/navigation";
+import { useSelectedLayoutSegment, usePathname } from "next/navigation";
 import clsx from "clsx";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
@@ -51,11 +51,11 @@ export function GlobalNav() {
           hidden: !isOpen,
         })}
       >
-        <nav className="space-y-6 px-2 py-5">
+        <nav className="space-y-6 px-4 py-5">
           {demos.map((section) => {
             return (
               <div key={section.name}>
-                <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-light-500 dark:text-text-dark-500">
+                <div className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-text-light-secondary-500 dark:text-text-dark-secondary-500">
                   <div>{section.name}</div>
                 </div>
 
@@ -81,18 +81,20 @@ function GlobalNavItem({
   close: () => false | void;
 }) {
   const segment = useSelectedLayoutSegment();
-  const isActive = item.slug === segment;
+  const pathname = usePathname();
+
+  const isActive = `/${item.slug}` === pathname;
 
   return (
     <Link
       onClick={close}
       href={`/${item.slug}`}
       className={clsx(
-        "block rounded-md px-3 py-2 text-sm font-medium hover:text-black dark:hover:text-gray-300",
+        "block rounded-md px-3 py-2 text-[15px] font-medium hover:text-black dark:hover:text-gray-300",
         {
-          "text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light hover:dark:text-text-dark":
+          "text-text-light-secondary-500 dark:text-text-dark-secondary-500 hover:text-text-light-500 hover:dark:text-text-dark-500":
             !isActive,
-          "text-primary-light-500 dark:text-primary-dark-500": isActive,
+          "text-text-light-500 dark:text-text-dark-500 font-semibold": isActive,
         }
       )}
     >

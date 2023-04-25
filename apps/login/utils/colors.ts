@@ -130,22 +130,20 @@ function setColorAlpha(
   theme: string,
   document: any
 ) {
-  const color = map.find((color) => color.name === "500");
-
-  if (color) {
+  map.forEach((color) => {
     document.documentElement.style.setProperty(
-      `--theme-${theme}-${type}`,
+      `--theme-${theme}-${type}-${color.name}`,
       color.hex
     );
     document.documentElement.style.setProperty(
-      `--theme-${theme}-${type}-contrast`,
+      `--theme-${theme}-${type}-contrast-${color.name}`,
       color.contrastColor
     );
     document.documentElement.style.setProperty(
-      `--theme-${theme}-${type}-secondary`,
+      `--theme-${theme}-${type}-secondary-${color.name}`,
       `${color.hex}80`
     );
-  }
+  });
 }
 
 function computeColors(hex: string): Color[] {

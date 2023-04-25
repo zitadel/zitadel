@@ -28,6 +28,9 @@ types.forEach((type) => {
       colors[type][theme][
         `contrast-${shade}`
       ] = `var(--theme-${theme}-${type}-contrast-${shade})`;
+      colors[type][theme][
+        `secondary-${shade}`
+      ] = `var(--theme-${theme}-${type}-secondary-${shade})`;
     });
   });
 });

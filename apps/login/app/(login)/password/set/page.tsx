@@ -1,9 +1,9 @@
-'use client';
-import { TextInput } from '#/ui/Input';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { ClientError } from 'nice-grpc';
-import PasswordComplexityPolicy from '#/ui/PasswordComplexityPolicy';
+"use client";
+import { TextInput } from "#/ui/Input";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { ClientError } from "nice-grpc";
+import PasswordComplexityPolicy from "#/ui/PasswordComplexityPolicy";
 
 type Props = {
   userId?: string;
@@ -22,15 +22,15 @@ export default function Page() {
   };
 
   const { register, handleSubmit, watch, reset, formState } = useForm<Inputs>({
-    mode: 'onChange',
-    reValidateMode: 'onChange',
+    mode: "onChange",
+    reValidateMode: "onChange",
     shouldUseNativeValidation: true,
   });
 
   const { errors, isValid } = formState;
 
-  const watchNewPassword = watch('newPassword', '');
-  const watchConfirmPassword = watch('confirmPassword', '');
+  const watchNewPassword = watch("newPassword", "");
+  const watchConfirmPassword = watch("confirmPassword", "");
 
   async function updatePassword(value: Inputs) {
     setPasswordLoading(true);
@@ -46,12 +46,12 @@ export default function Page() {
           resend: `false`,
         })}`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({}),
-      },
+      }
     );
 
     if (response.ok) {
@@ -74,9 +74,9 @@ export default function Page() {
     // };
 
     const response = await fetch(`/api/user/password/resetlink/${userId}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({}),
     });
@@ -93,8 +93,8 @@ export default function Page() {
 
   return (
     <>
-      <h1>Set Password</h1>
-      <p className="my-4 mb-6 text-14px text-input-light-label dark:text-input-dark-label">
+      <h1 className="text-center">Set Password</h1>
+      <p className="text-center my-4 mb-6 text-14px text-input-light-label dark:text-input-dark-label">
         Enter your new Password according to the requirements listed.
       </p>
       <form>
@@ -102,7 +102,7 @@ export default function Page() {
           <TextInput
             type="password"
             required
-            {...register('password', { required: true })}
+            {...register("password", { required: true })}
             label="Password"
             error={errors.password?.message}
           />
@@ -111,7 +111,7 @@ export default function Page() {
           <TextInput
             type="password"
             required
-            {...register('newPassword', { required: true })}
+            {...register("newPassword", { required: true })}
             label="New Password"
             error={errors.newPassword?.message}
           />
@@ -120,7 +120,7 @@ export default function Page() {
           <TextInput
             type="password"
             required
-            {...register('confirmPassword', {
+            {...register("confirmPassword", {
               required: true,
             })}
             label="Confirm Password"
