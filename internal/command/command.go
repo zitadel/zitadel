@@ -136,8 +136,6 @@ func StartCommands(
 	return repo, nil
 }
 
-type permissionCheck func(ctx context.Context, permission, orgID, resourceID string, allowSelf bool) (err error)
-
 func AppendAndReduce(object interface {
 	AppendEvents(...eventstore.Event)
 	// TODO: Why is it allowed to return an error here?

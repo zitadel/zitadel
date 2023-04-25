@@ -42,7 +42,7 @@ func (c *Commands) ChangeUserEmailVerified(ctx context.Context, userID, resource
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermission(ctx, "user.write", cmd.aggregate.ResourceOwner, userID, false); err != nil {
+	if err = c.checkPermission(ctx, permissionUserWrite, cmd.aggregate.ResourceOwner, userID, false); err != nil {
 		return nil, err
 	}
 	if err = cmd.Change(ctx, domain.EmailAddress(email)); err != nil {
@@ -70,7 +70,7 @@ func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, res
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermission(ctx, "user.write", cmd.aggregate.ResourceOwner, userID, true); err != nil {
+	if err = c.checkPermission(ctx, permissionUserWrite, cmd.aggregate.ResourceOwner, userID, true); err != nil {
 		return nil, err
 	}
 	if err = cmd.Change(ctx, domain.EmailAddress(email)); err != nil {

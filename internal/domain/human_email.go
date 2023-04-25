@@ -38,7 +38,8 @@ type Email struct {
 
 	EmailAddress    EmailAddress
 	IsEmailVerified bool
-	PlainCode       *string
+	// PlainCode is set by the command and can be used to return it to the caller (API)
+	PlainCode *string
 }
 
 type EmailCode struct {

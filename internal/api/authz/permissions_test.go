@@ -565,10 +565,8 @@ func Test_CheckUserResourcePermissions(t *testing.T) {
 		{
 			name: "context requested and has no permission",
 			args: args{
-				//req:     &TestRequest{Test: "Hodor"},
 				perms:      []string{"project.read:Test"},
 				resourceID: "Hodor",
-				//authOpt: Option{CheckParam: "Test"},
 			},
 			wantErr: true,
 		},

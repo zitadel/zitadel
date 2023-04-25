@@ -17,7 +17,7 @@ func CheckPermission(ctx context.Context, resolver MembershipsResolver, roleMapp
 		return err
 	}
 
-	ctx, userPermissionSpan := tracing.NewNamedSpan(ctx, "checkUserPermissions")
+	_, userPermissionSpan := tracing.NewNamedSpan(ctx, "checkUserPermissions")
 	err = checkUserResourcePermissions(requestedPermissions, resourceID)
 	userPermissionSpan.EndWithError(err)
 	if err != nil {
