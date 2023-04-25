@@ -145,5 +145,7 @@ The storage layer of ZITADEL is responsible for multiple things. For example:
 - Backup and restore operation for disaster recovery purpose
 
 ZITADEL currently supports CockroachDB as first choice of storage due to its perfect match for ZITADELs needs.
-Postgres is also supported by ZITADEL. Make sure to read our [Production Guide](./self-hosting/manage/production#prefer-cockroachdb) before you decide to use it.
+Postgres is currently in [Beta](/docs/support/general#beta) and will be [partially supported](/docs/support/general#partially-supported) afterwards.
+Beta state will be removed as soon as [automated tests](https://github.com/zitadel/zitadel/issues/5741) are implemented.
+Make sure to read our [Production Guide](./self-hosting/manage/production#prefer-cockroachdb) before you decide to use it.
 
