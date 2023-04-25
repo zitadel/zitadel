@@ -12,17 +12,17 @@ type UserMembershipRepo struct {
 	Queries *query.Queries
 }
 
-func (repo *UserMembershipRepo) SearchMyMemberships(ctx context.Context) (_ []*authz.Membership, err error) {
+func (repo *UserMembershipRepo) SearchMyMemberships(ctx context.Context, orgID string) (_ []*authz.Membership, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	memberships, err := repo.searchUserMemberships(ctx)
+	memberships, err := repo.searchUserMemberships(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
 	return userMembershipsToMemberships(memberships), nil
 }
 
-func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) (_ []*query.Membership, err error) {
+func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context, orgID string) (_ []*query.Membership, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	ctxData := authz.GetCtxData(ctx)
@@ -30,11 +30,11 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) (_ []
 	if err != nil {
 		return nil, err
 	}
-	orgIDsQuery, err := query.NewMembershipResourceOwnersSearchQuery(ctxData.OrgID, authz.GetInstance(ctx).InstanceID())
+	orgIDsQuery, err := query.NewMembershipResourceOwnersSearchQuery(orgID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
-	grantedIDQuery, err := query.NewMembershipGrantedOrgIDSearchQuery(ctxData.OrgID)
+	grantedIDQuery, err := query.NewMembershipGrantedOrgIDSearchQuery(orgID)
 	if err != nil {
 		return nil, err
 	}
