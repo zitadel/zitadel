@@ -95,6 +95,7 @@ func NewTester(ctx context.Context) *Tester {
 	args := strings.Split(commandLine, " ")
 
 	sc := make(chan *start.Server)
+	//nolint:contextcheck
 	cmd := cmd.New(os.Stdout, os.Stdin, args, sc)
 	cmd.SetArgs(args)
 	err := viper.MergeConfig(bytes.NewBuffer(zitadelYAML))
