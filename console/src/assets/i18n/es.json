@@ -248,6 +248,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Por favor rellena este campo.",
+    "ATLEASTONE": "Proporcione al menos un valor.",
     "TOKENINVALID": {
       "TITLE": "Tu token de autorización token ha caducado.",
       "DESCRIPTION": "Haz clic en el botón más abajo para iniciar sesión otra vez."

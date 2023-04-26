@@ -18,5 +18,5 @@ For example, if Google is configured as an identity provider in your organizatio
 
 Configure external identity providers on the instance level or just for one organization via the [Console](/guides/manage/console/instance-settings#identity-providers) or ZITADEL APIs.
 
-The guides listed in this section will help you set up specific identity providers.
+You will find [detailed integration guides for many Identity Providers](/guides/integrate/identity-providers) in our docs.
 ZITADEL also provides templates to configure generic identity providers, which don't have templates.
