@@ -13,6 +13,8 @@ CREATE TABLE projections.current_states (
     , PRIMARY KEY (projection_name, instance_id)
 );
 
+-- TODO: insert from other schemas
+
 INSERT INTO projections.current_states (
     projection_name
     , instance_id
