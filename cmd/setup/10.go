@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	//go:embed 10_create_table.sql
+	//go:embed 10_create_temp_table.sql
 	correctCreationDate10CreateTable string
 	//go:embed 10_fill_table.sql
 	correctCreationDate10FillTable string
@@ -42,17 +42,18 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 			if err != nil {
 				return err
 			}
-			res, err := tx.ExecContext(ctx, correctCreationDate10FillTable)
+
+			_, err = tx.ExecContext(ctx, correctCreationDate10FillTable)
+			if err != nil {
+				return err
+			}
+
+			res, err := tx.ExecContext(ctx, correctCreationDate10Update)
 			if err != nil {
 				return err
 			}
 			affected, _ = res.RowsAffected()
 			logging.WithFields("count", affected).Info("creation dates changed")
-
-			res, err := tx.ExecContext(ctx, correctCreationDate10FillTable)
-			if err != nil {
-				return err
-			}
 			return nil
 		})
 		if affected == 0 || err != nil {
