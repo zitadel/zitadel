@@ -3,7 +3,10 @@ name: Integration tests
 on:
   push:
     tags-ignore:
-      - "*"
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   integration-tests:
