@@ -5,10 +5,7 @@ import (
 	"errors"
 	"reflect"
 	"testing"
-	"time"
 
-	"github.com/zitadel/zitadel/internal/database"
-	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -1576,59 +1573,59 @@ func TestParameterOpts(t *testing.T) {
 	}
 }
 
-func TestHandler_reduce(t *testing.T) {
-	type fields struct {
-		projection Projection
-	}
-	type args struct {
-		event eventstore.Event
-	}
-	tests := []struct {
-		name           string
-		fields         fields
-		args           args
-		isErr          func(t *testing.T, err error)
-		shouldBeCalled bool
-	}{
-		{
-			name: "",
-			fields: fields{
-				projection: &projection{
-					reducers: []AggregateReducer{
-						{
-							Aggregate: "aggregate",
-							EventRedusers: []EventReducer{
-								{
-									Event: "event",
-									Reduce: (&mockEventReducer{
-										statement: new(Statement),
-									}).reduce,
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		if tt.isErr == nil {
-			tt.isErr = func(t *testing.T, err error) {
-				if err != nil {
-					t.Error("expected no error got:", err)
-				}
-			}
-		}
-		t.Run(tt.name, func(t *testing.T) {
-			h := &Handler{
-				projection: tt.fields.projection,
-			}
-			got, err := h.reduce(tt.args.event)
-			tt.isErr(t, err)
-			if tt.shouldBeCalled != tt.
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Handler.reduce() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+// func TestHandler_reduce(t *testing.T) {
+// 	type fields struct {
+// 		projection Projection
+// 	}
+// 	type args struct {
+// 		event eventstore.Event
+// 	}
+// 	tests := []struct {
+// 		name           string
+// 		fields         fields
+// 		args           args
+// 		isErr          func(t *testing.T, err error)
+// 		shouldBeCalled bool
+// 	}{
+// 		{
+// 			name: "",
+// 			fields: fields{
+// 				projection: &projection{
+// 					reducers: []AggregateReducer{
+// 						{
+// 							Aggregate: "aggregate",
+// 							EventRedusers: []EventReducer{
+// 								{
+// 									Event: "event",
+// 									Reduce: (&mockEventReducer{
+// 										statement: new(Statement),
+// 									}).reduce,
+// 								},
+// 							},
+// 						},
+// 					},
+// 				},
+// 			},
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		if tt.isErr == nil {
+// 			tt.isErr = func(t *testing.T, err error) {
+// 				if err != nil {
+// 					t.Error("expected no error got:", err)
+// 				}
+// 			}
+// 		}
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			h := &Handler{
+// 				projection: tt.fields.projection,
+// 			}
+// 			got, err := h.reduce(tt.args.event)
+// 			tt.isErr(t, err)
+// 			if tt.shouldBeCalled != tt.
+// 			if !reflect.DeepEqual(got, tt.want) {
+// 				t.Errorf("Handler.reduce() = %v, want %v", got, tt.want)
+// 			}
+// 		})
+// 	}
+// }
