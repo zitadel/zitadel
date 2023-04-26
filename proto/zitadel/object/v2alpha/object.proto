@@ -6,11 +6,11 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha;object";
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
 
-message OrgContext {
-  oneof ctx {
+message Organisation {
+  oneof org {
     string org_id = 1;
-    string org_domain = 2;
   }
 }
 

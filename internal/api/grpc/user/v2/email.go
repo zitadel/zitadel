@@ -12,7 +12,7 @@ import (
 )
 
 func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp *user.SetEmailResponse, err error) {
-	resourceOwner := "" // TODO: check if still needed
+	var resourceOwner string // TODO: check if still needed
 	var email *domain.Email
 
 	switch v := req.GetVerification().(type) {
