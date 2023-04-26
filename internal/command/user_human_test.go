@@ -3877,7 +3877,7 @@ func TestAddHumanCommand(t *testing.T) {
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							return []eventstore.Event{
 								org.NewDomainPolicyAddedEvent(
-									context.Background(),
+									ctx,
 									&org.NewAggregate("id").Aggregate,
 									true,
 									true,
@@ -3889,7 +3889,7 @@ func TestAddHumanCommand(t *testing.T) {
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							return []eventstore.Event{
 								org.NewPasswordComplexityPolicyAddedEvent(
-									context.Background(),
+									ctx,
 									&org.NewAggregate("id").Aggregate,
 									8,
 									true,
@@ -3930,7 +3930,7 @@ func TestAddHumanCommand(t *testing.T) {
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							return []eventstore.Event{
 								org.NewDomainPolicyAddedEvent(
-									context.Background(),
+									ctx,
 									&org.NewAggregate("id").Aggregate,
 									true,
 									true,
@@ -3942,7 +3942,7 @@ func TestAddHumanCommand(t *testing.T) {
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							return []eventstore.Event{
 								org.NewPasswordComplexityPolicyAddedEvent(
-									context.Background(),
+									ctx,
 									&org.NewAggregate("id").Aggregate,
 									2,
 									false,
