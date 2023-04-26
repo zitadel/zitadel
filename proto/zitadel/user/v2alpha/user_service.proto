@@ -78,7 +78,7 @@ service UserService {
   // Create a new human user
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users"
+      post: "/v2alpha/users/human"
       body: "*"
     };
 
