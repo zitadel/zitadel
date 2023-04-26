@@ -221,6 +221,7 @@ RegistrationUser:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -253,6 +254,7 @@ ExternalRegistrationUserOverview:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -313,6 +315,25 @@ ExternalNotFound:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+
+DeviceAuth:
+  Title: Autorizzazione del dispositivo
+  UserCode:
+    Label: Codice utente
+    Description: Inserire il codice utente presentato sul dispositivo.
+    ButtonNext: prossimo
+  Action:
+    Description: Concedi l'accesso al dispositivo.
+    GrantDevice: stai per concedere il dispositivo
+    AccessToScopes: accesso ai seguenti ambiti
+    Button:
+      Allow: permettere
+      Deny: negare
+  Done:
+    Description: Fatto.
+    Approved: Autorizzazione del dispositivo approvata. Ora puoi tornare al dispositivo.
+    Denied: Autorizzazione dispositivo negata. Ora puoi tornare al dispositivo.
 
 Footer:
   PoweredBy: Alimentato da
@@ -422,5 +443,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: la registrazione non è consentita.
+  DeviceAuth:
+    NotExisting: Il codice utente non esiste
 
 optional: (opzionale)
