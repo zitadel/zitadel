@@ -43,7 +43,7 @@ Create a new application and click on "I'm a pro. Skip this wizard."
 
 - **Application Type**: Web
 - **Grant Types**: Authorization Code, Implicit, Refresh Token
-- **Response Type**: Code, ID Token, Token-ID Token
+- **Response Type**: ID Token
 - **Authentication Method**: None
 
 :::info
@@ -72,7 +72,7 @@ Make sure to replace the `WORKFORCE_POOL_ID` and `WORKFORCE_PROVIDER_ID` with yo
 After creating, go to the application settings "Token settings" and configure as follows:
 
 - **Auth Token Type**: JWT
-- **Add user roles to the access token**: enabled
+- **Add user roles to the access token**: disabled (optional)
 - **User roles inside ID Token**: enabled
 - **User Info inside ID Token**: enabled
 
@@ -94,7 +94,7 @@ If you want to configure a special attribute mapping in the workforce identity p
 
 ```javascript
 function googleGroups(ctx, api) {
-  if (ctx.v1.user.grants === undefined || ctx.v1.user.grants.count == 0) {
+  if (ctx.v1.user.grants == undefined || ctx.v1.user.grants.count == 0) {
     return;
   }
 
@@ -106,7 +106,7 @@ function googleGroups(ctx, api) {
   })
 
   api.v1.claims.setClaim('google.groups', grants)
-  api.v1.claims.setClaim('google.display_name', ctx.v1.user.human.displayName)
+  api.v1.claims.setClaim('google.display_name', ctx.v1.getUser().human.displayName)
 }
 
 ```
