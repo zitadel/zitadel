@@ -4,8 +4,6 @@ import (
 	"context"
 	_ "embed"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -19,28 +17,8 @@ type CurrentProjectionState struct {
 }
 
 func (mig *CurrentProjectionState) Execute(ctx context.Context) (err error) {
-	tx, err := mig.dbClient.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			logging.OnError(tx.Rollback()).Debug("rollback failed")
-			return
-		}
-		err = tx.Commit()
-	}()
-	for {
-		res, err := tx.ExecContext(ctx, currentProjectionState)
-		if err != nil {
-			return err
-		}
-		affected, _ := res.RowsAffected()
-		logging.WithFields("count", affected).Info("creation dates changed")
-		if affected == 0 {
-			return nil
-		}
-	}
+	_, err = mig.dbClient.ExecContext(ctx, currentProjectionState)
+	return err
 }
 
 func (mig *CurrentProjectionState) String() string {
