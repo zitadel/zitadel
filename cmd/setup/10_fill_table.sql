@@ -1,3 +1,5 @@
+TRUNCATE wrong_events;
+
 INSERT INTO wrong_events (
     SELECT * FROM (
         SELECT
