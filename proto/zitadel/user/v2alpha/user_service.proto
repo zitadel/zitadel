@@ -5,6 +5,8 @@ package zitadel.user.v2alpha;
 import "zitadel/options.proto";
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/user/v2alpha/email.proto";
+import "zitadel/user/v2alpha/password.proto";
+import "zitadel/user/v2alpha/user.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -12,8 +14,91 @@ import "validate/validate.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha;user";
 
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "User Service";
+    version: "2.0-alpha";
+    description: "This API is intended to manage users in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
 service UserService {
 
+  // Create a new human user
+  rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/users/human"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "user.write"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a user (Human)";
+      description: "Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Change the email of a user
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users/{user_id}/email"
@@ -23,8 +108,20 @@ service UserService {
     option (zitadel.v1.auth_option) = {
       permission: "authenticated"
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Change the user email";
+      description: "Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
   }
 
+  // Verify the email with the provided code
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users/{user_id}/email/_verify"
@@ -34,7 +131,59 @@ service UserService {
     option (zitadel.v1.auth_option) = {
       permission: "authenticated"
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Verify the email";
+      description: "Verify the email with the generated code."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
   }
+}
+
+message AddHumanUserRequest{
+  // optionally set your own id unique for the user
+  optional string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  // optionally set a unique username, if none is provided the email will be used
+  optional string username = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"minnie-mouse\"";
+    }
+  ];
+  zitadel.object.v2alpha.Organisation organisation = 3;
+  SetHumanProfile profile = 4 [
+    (validate.rules).message.required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  SetHumanEmail email = 5 [
+    (validate.rules).message.required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  repeated SetMetadataEntry metadata = 6;
+  oneof password_type {
+    Password password = 7;
+    HashedPassword hashed_password = 8;
+  }
+}
+
+message AddHumanUserResponse {
+  string user_id = 1;
+  zitadel.object.v2alpha.Details details = 2;
+  optional string email_code = 3;
 }
 
 message SetEmailRequest{

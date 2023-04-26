@@ -185,7 +185,6 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 	if e.CodeReturned {
 		return crdb.NewNoOpStatement(e), nil
 	}
-
 	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 		user.UserV1EmailCodeAddedType, user.UserV1EmailCodeSentType,

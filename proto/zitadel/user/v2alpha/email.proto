@@ -9,6 +9,23 @@ import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
+message SetHumanEmail {
+  string email = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"mini@mouse.com\"";
+    }
+  ];
+  // if no verification is specified, an email is sent with the default url
+  oneof verification {
+    SendEmailVerificationCode send_code = 2;
+    ReturnEmailVerificationCode return_code = 3;
+    bool is_verified = 4 [(validate.rules).bool.const = true];
+  }
+}
 
 message SendEmailVerificationCode {
   optional string url_template = 1 [

@@ -210,17 +210,14 @@ func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRe
 }
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
-	details, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToAddHuman(req))
+	human := AddHumanUserRequestToAddHuman(req)
+	err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human, true)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddHumanUserResponse{
-		UserId: details.ID,
-		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner,
-		),
+		UserId:  human.ID,
+		Details: obj_grpc.DomainToAddDetailsPb(human.Details),
 	}, nil
 }
 
