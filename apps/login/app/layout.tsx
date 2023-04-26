@@ -15,6 +15,8 @@ const lato = Lato({
   subsets: ["latin"],
 });
 
+export const revalidate = 60; // revalidate every minute
+
 export default async function RootLayout({
   children,
 }: {

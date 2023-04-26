@@ -62,4 +62,29 @@ export function getPasswordComplexityPolicy(
     .then((resp) => resp.policy);
 }
 
+export type AddHumanUserData = {
+  displayName: string;
+  email: string;
+  password: string;
+};
+export function addHumanUser(
+  server: ZitadelServer,
+  { email, displayName, password }: AddHumanUserData
+): Promise<string> {
+  const mgmt = getManagement(server);
+  return mgmt
+    .addHumanUser(
+      {
+        email: { email, isEmailVerified: false },
+        profile: { displayName },
+        initialPassword: password,
+      },
+      { metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "") }
+    )
+    .then((resp) => {
+      console.log("added user", resp.userId);
+      return resp.userId;
+    });
+}
+
 export { server };
