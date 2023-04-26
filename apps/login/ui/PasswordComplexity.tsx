@@ -19,7 +19,7 @@ const check = (
     viewBox="0 0 24 24"
     strokeWidth={1.5}
     stroke="currentColor"
-    className="w-6 h-6 las la-check text-state-success-light-color dark:text-state-success-dark-color mr-2 text-lg"
+    className="w-6 h-6 las la-check text-green-500 dark:text-green-500 mr-2 text-lg"
   >
     <path
       strokeLinecap="round"
@@ -57,13 +57,6 @@ export default function PasswordComplexity({
   const hasNumber = numberValidator(password);
   const hasUppercase = upperCaseValidator(password);
   const hasLowercase = lowerCaseValidator(password);
-
-  const policyIsValid =
-    (passwordComplexityPolicy.hasLowercase ? hasLowercase : true) &&
-    (passwordComplexityPolicy.hasNumber ? hasNumber : true) &&
-    (passwordComplexityPolicy.hasUppercase ? hasUppercase : true) &&
-    (passwordComplexityPolicy.hasSymbol ? hasSymbol : true) &&
-    hasMinLength;
 
   return (
     <div className="mb-4 grid grid-cols-2 gap-x-8 gap-y-2">

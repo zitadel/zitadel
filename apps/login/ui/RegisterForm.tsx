@@ -2,7 +2,7 @@
 
 import { PasswordComplexityPolicy, PrivacyPolicy } from "@zitadel/server";
 import PasswordComplexity from "./PasswordComplexity";
-import { use, useState } from "react";
+import { useState } from "react";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
 import { PrivacyPolicyCheckboxes } from "./PrivacyPolicyCheckboxes";
@@ -13,7 +13,6 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "#/utils/validators";
-import { addHumanUser, server } from "#/lib/zitadel";
 
 type Inputs =
   | {
@@ -30,18 +29,6 @@ type Props = {
   passwordComplexityPolicy: PasswordComplexityPolicy;
 };
 
-async function submitRegister(values: Inputs) {
-  console.log(values);
-  // use fetch for local api
-  //   return use(
-  //     addHumanUser(server, {
-  //       email: values.email,
-  //       displayName: "huhu",
-  //       password: values.password,
-  //     })
-  //   );
-}
-
 export default function RegisterForm({
   privacyPolicy,
   passwordComplexityPolicy,
@@ -49,6 +36,27 @@ export default function RegisterForm({
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
+
+  async function submitRegister(values: Inputs) {
+    const res = await fetch("/registeruser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+        firstName: values.firstname,
+        lastName: values.lastname,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to register user");
+    }
+
+    return res.json();
+  }
 
   const { errors } = formState;
 
@@ -102,7 +110,7 @@ export default function RegisterForm({
             autoComplete="email"
             required
             {...register("email", { required: "This field is required" })}
-            label="email"
+            label="E-mail"
             error={errors.email?.message as string}
           />
         </div>
