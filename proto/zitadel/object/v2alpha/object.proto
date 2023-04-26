@@ -11,15 +11,6 @@ import "validate/validate.proto";
 message Organisation {
   oneof org {
     string org_id = 1;
-    string org_domain = 2;
-  }
-}
-
-message Context {
-  oneof ctx {
-    string org_id = 1;
-    string org_domain = 2;
-    bool instance = 3 [(validate.rules).bool.const = true];
   }
 }
 
