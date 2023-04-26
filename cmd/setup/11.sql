@@ -1,4 +1,4 @@
-CREATE TABLE projections.current_states (
+CREATE IF NOT EXISTS TABLE projections.current_states (
     projection_name TEXT NOT NULL
     , instance_id TEXT NOT NULL
 
@@ -110,7 +110,7 @@ JOIN eventstore.events e ON
     )
 ;
 
-CREATE TABLE projections.failed_events2 (
+CREATE TABLE IF NOT EXISTS projections.failed_events2 (
     projection_name TEXT NOT NULL
     , instance_id TEXT NOT NULL
 
@@ -126,7 +126,7 @@ CREATE TABLE projections.failed_events2 (
     , PRIMARY KEY (projection_name, instance_id, aggregate_type, aggregate_id, failed_sequence)
 );
 
-CREATE INDEX fe2_instance_id_idx on projections.failed_events2 (instance_id);
+CREATE INDEX IF NOT EXISTS fe2_instance_id_idx on projections.failed_events2 (instance_id);
 
 INSERT INTO projections.failed_events2 (
     projection_name
