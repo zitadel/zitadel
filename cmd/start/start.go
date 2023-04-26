@@ -89,7 +89,6 @@ Requirements:
 }
 
 type Server struct {
-	background context.Context
 	Config     *Config
 	DB         *database.DB
 	KeyStorage crypto.KeyStorage
@@ -203,7 +202,6 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 
 	if server != nil {
 		server <- &Server{
-			background: ctx,
 			Config:     config,
 			DB:         dbClient,
 			KeyStorage: keyStorage,

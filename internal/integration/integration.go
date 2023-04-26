@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/cmd"
 	"github.com/zitadel/zitadel/cmd/start"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 var (
@@ -30,12 +32,11 @@ var (
 
 type Tester struct {
 	*start.Server
-	ClientConn *grpc.ClientConn
-
-	wg sync.WaitGroup // used for shutdown
+	GRPCClientConn *grpc.ClientConn
+	wg             sync.WaitGroup // used for shutdown
 }
 
-const commandLine = `start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled`
+const commandLine = `start --masterkey MasterkeyNeedsToHave32Characters`
 
 func (s *Tester) createClientConn(ctx context.Context) {
 	target := fmt.Sprintf("localhost:%d", s.Config.Port)
@@ -49,11 +50,41 @@ func (s *Tester) createClientConn(ctx context.Context) {
 	logging.OnError(err).Fatal("integration tester client dial")
 	logging.New().WithField("target", target).Info("finished dialing grpc client conn")
 
-	s.ClientConn = cc
+	s.GRPCClientConn = cc
+	err = s.pollHealth(ctx)
+	logging.OnError(err).Fatal("integration tester health")
+}
+
+// pollHealth waits until a healthy status is reported.
+// TODO: remove when we make the setup blocking on all
+// projections completed.
+func (s *Tester) pollHealth(ctx context.Context) (err error) {
+	client := admin.NewAdminServiceClient(s.GRPCClientConn)
+
+	for {
+		err = func(ctx context.Context) error {
+			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
+
+			_, err := client.Healthz(ctx, &admin.HealthzRequest{})
+			return err
+		}(ctx)
+		if err == nil {
+			return nil
+		}
+		logging.WithError(err).Info("poll healthz")
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(time.Second):
+			continue
+		}
+	}
 }
 
 func (s *Tester) Done() {
-	err := s.ClientConn.Close()
+	err := s.GRPCClientConn.Close()
 	logging.OnError(err).Error("integration tester client close")
 
 	s.Shutdown <- os.Interrupt
@@ -71,7 +102,7 @@ func NewTester(ctx context.Context) *Tester {
 
 	flavor := os.Getenv("INTEGRATION_DB_FLAVOR")
 	switch flavor {
-	case "cockroach":
+	case "cockroach", "":
 		err = viper.MergeConfig(bytes.NewBuffer(cockroachYAML))
 	case "postgres":
 		err = viper.MergeConfig(bytes.NewBuffer(postgresYAML))

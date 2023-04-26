@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       DOCKER_BUILDKIT: 1
+      INTEGRATION_DB_FLAVOR: ${{ matrix.db }} 
     steps:
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -28,8 +29,10 @@ jobs:
       - name: Download Go modules
         run: go mod download
       - name: Start ${{ matrix.db }} database
-        run: docker compose -f e2e/config/integration/docker-compose.yaml up --wait ${{ matrix.db }}
-      - name: Run integration test
-        env:
-          INTEGRATION_DB_FLAVOR: ${{ matrix.db }} 
+        run: docker compose -f e2e/config/integration/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
+      - name: Run zitadel init and setup
+        run: |
+          go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+          go run main.go setup --masterkey MasterkeyNeedsToHave32Characters --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+      - name: Run integration tests
         run: go test -tags=integration -parallel 1 -v  ./internal/integration ./internal/api/grpc/...
