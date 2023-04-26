@@ -25,7 +25,8 @@ import (
 )
 
 const (
-	tmplError = "error"
+	tmplError   = "error"
+	tmplSuccess = "success"
 )
 
 type Renderer struct {
@@ -45,6 +46,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 	}
 	tmplMapping := map[string]string{
 		tmplError:                        "error.html",
+		tmplSuccess:                      "success.html",
 		tmplLogin:                        "login.html",
 		tmplUserSelection:                "select_user.html",
 		tmplPassword:                     "password.html",
@@ -77,6 +79,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplExternalNotFoundOption:       "external_not_found_option.html",
 		tmplLoginSuccess:                 "login_success.html",
 		tmplLDAPLogin:                    "ldap_login.html",
+		tmplDeviceAuthUserCode:           "device_usercode.html",
+		tmplDeviceAuthAction:             "device_action.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -323,6 +327,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var msg string
 	if err != nil {
+		logging.WithError(err).WithField("auth_req_id", authReq.ID).Error()
 		_, msg = l.getErrorMessage(r, err)
 	}
 	data := l.getBaseData(r, authReq, "Errors.Internal", "", "Internal", msg)

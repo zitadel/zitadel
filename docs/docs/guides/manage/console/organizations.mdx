@@ -67,6 +67,10 @@ Please note that domain verification also removes the logonname from all users, 
 
 ## Verify your domain name
 
+:::info
+You can also disable domain verification with DNS challenge in the [instance settings](/docs/guides/manage/console/instance-settings#domain-settings).
+:::
+
 1. Browse to your organization
 2. Click **Add Domain**
 3. To start the domain verification click the domain name and a dialog will appear, where you can choose between DNS or HTTP challenge methods.
@@ -75,7 +79,9 @@ Please note that domain verification also removes the logonname from all users, 
 
 ![Verify Domain](/img/console_verify_domain.gif)
 
-> **_Please note:_** Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time
+:::caution
+Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time
+:::
 
 ## Organization Settings
 
@@ -97,3 +103,12 @@ Those settings are the same as on your instance.
 If you need custom branding on a organization (for example in a B2B scenario, where organizations are allowed to use their custom design), navigate back to the home page, choose your organization in the header above, navigate to the organization settings and set the custom design here.
 
 The behaviour of the login page, applyling custom design, is then defined on your projects detail page. Read more about it [here](./projects#branding)
+
+## Default organization
+
+On the instance settings page ($YOUR_DOMAIN//ui/console/orgs) you can set an organization as default organization.
+Click the "..." on the right hand side of the table and select "Set as default organization".
+
+The current default organization is marked by a label "Default".
+
+When no organization was selected (eg, with the auth request or through [Domain Discovery](/docs/guides/solution-scenarios/domain-discovery)), then all users are allowed to login and users can self-register to this default organization.

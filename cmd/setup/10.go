@@ -24,6 +24,8 @@ var (
 type CorrectCreationDate struct {
 	dbClient  *database.DB
 	FailAfter time.Duration
+	dbClient  *database.DB
+	FailAfter time.Duration
 }
 
 func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {

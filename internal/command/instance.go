@@ -333,8 +333,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			validations = append(validations, prepareAddUserMachineKey(machineKey, c.machineKeySize))
 		}
 	} else if setup.Org.Human != nil {
+		setup.Org.Human.ID = userAgg.ID
 		validations = append(validations,
-			AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+			c.AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption, true),
 		)
 	}
 

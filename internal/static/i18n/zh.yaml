@@ -81,6 +81,7 @@ Errors:
       NotChanged: 电子邮件未更改
       Empty: 电子邮件是空的
       IDMissing: 电子邮件ID丢失
+      InvalidURLTemplate: URL模板无效
     Phone:
       NotFound: 手机号码未找到
       Invalid: 手机号码无效
