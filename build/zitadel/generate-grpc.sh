@@ -15,17 +15,11 @@ protoc \
   -I=/proto/include/ \
   --go_out $GOPATH/src \
   --go-grpc_out $GOPATH/src \
+  --validate_out=lang=go:${GOPATH}/src \
   $(find ${PROTO_PATH} -iname *.proto)
 
-# generate authoptions code from templates
-go-bindata \
-  -pkg main \
-  -prefix internal/protoc/protoc-gen-authoption \
-  -o ${ZITADEL_PATH}/internal/protoc/protoc-gen-authoption/templates.gen.go \
-  ${ZITADEL_PATH}/internal/protoc/protoc-gen-authoption/templates
-
 # install authoption proto compiler
-go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-authoption
+go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-auth
 
 # output folder for openapi v2
 mkdir -p ${OPENAPI_PATH}
@@ -39,28 +33,20 @@ protoc \
   --grpc-gateway_opt logtostderr=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
-  --authoption_out ${GRPC_PATH}/system \
+  --auth_out ${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/system.proto
 
-# authoptions are generated into the wrong folder
-mv ${ZITADEL_PATH}/pkg/grpc/system/zitadel/* ${ZITADEL_PATH}/pkg/grpc/system
-rm -r ${ZITADEL_PATH}/pkg/grpc/system/zitadel
-
 protoc \
   -I=/proto/include \
   --grpc-gateway_out ${GOPATH}/src \
   --grpc-gateway_opt logtostderr=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
-  --authoption_out ${GRPC_PATH}/admin \
+  --auth_out ${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/admin.proto
 
-# authoptions are generated into the wrong folder
-mv ${ZITADEL_PATH}/pkg/grpc/admin/zitadel/* ${ZITADEL_PATH}/pkg/grpc/admin
-rm -r ${ZITADEL_PATH}/pkg/grpc/admin/zitadel
-
 protoc \
   -I=/proto/include \
   --grpc-gateway_out ${GOPATH}/src \
@@ -69,14 +55,10 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --authoption_out ${GRPC_PATH}/management \
+  --auth_out ${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/management.proto
 
-# authoptions are generated into the wrong folder
-mv ${ZITADEL_PATH}/pkg/grpc/management/zitadel/* ${ZITADEL_PATH}/pkg/grpc/management
-rm -r ${ZITADEL_PATH}/pkg/grpc/management/zitadel
-
 protoc \
   -I=/proto/include \
   --grpc-gateway_out ${GOPATH}/src \
@@ -85,14 +67,10 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --authoption_out=${GRPC_PATH}/auth \
+  --auth_out=${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/auth.proto
 
-# authoptions are generated into the wrong folder
-mv ${ZITADEL_PATH}/pkg/grpc/auth/zitadel/* ${ZITADEL_PATH}/pkg/grpc/auth
-rm -r ${ZITADEL_PATH}/pkg/grpc/auth/zitadel
-
 protoc \
   -I=/proto/include \
   --grpc-gateway_out ${GOPATH}/src \
@@ -101,14 +79,10 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --authoption_out=${GRPC_PATH}/user \
+  --auth_out=${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/user/v2alpha/user_service.proto
 
-# authoptions are generated into the wrong folder
-cp -r ${ZITADEL_PATH}/pkg/grpc/user/zitadel/* ${ZITADEL_PATH}/pkg/grpc
-rm -r ${ZITADEL_PATH}/pkg/grpc/user/zitadel
-
 protoc \
   -I=/proto/include \
   --grpc-gateway_out ${GOPATH}/src \
@@ -117,12 +91,8 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --authoption_out=${GRPC_PATH}/session \
+  --auth_out=${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/session/v2alpha/session_service.proto
-
-# authoptions are generated into the wrong folder
-cp -r ${ZITADEL_PATH}/pkg/grpc/session/zitadel/* ${ZITADEL_PATH}/pkg/grpc
-rm -r ${ZITADEL_PATH}/pkg/grpc/session/zitadel
 
 echo "done generating grpc"

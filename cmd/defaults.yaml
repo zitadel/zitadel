@@ -233,6 +233,8 @@ OIDC:
       Path: /oidc/v1/end_session
     Keys:
       Path: /oauth/v2/keys
+    DeviceAuth:
+      Path: /oauth/v2/device_authorization
 
 SAML:
   ProviderConfig:
