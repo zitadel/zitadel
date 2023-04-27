@@ -14,6 +14,7 @@ import {
   upperCaseValidator,
 } from "#/utils/validators";
 import { useRouter } from "next/navigation";
+import { Spinner } from "./Spinner";
 
 type Inputs =
   | {
@@ -38,9 +39,12 @@ export default function RegisterForm({
     mode: "onBlur",
   });
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const router = useRouter();
 
   async function submitRegister(values: Inputs) {
+    setLoading(true);
     const res = await fetch("/registeruser", {
       method: "POST",
       headers: {
@@ -55,9 +59,11 @@ export default function RegisterForm({
     });
 
     if (!res.ok) {
+      setLoading(false);
       throw new Error("Failed to register user");
     }
 
+    setLoading(false);
     return res.json();
   }
 
@@ -172,6 +178,7 @@ export default function RegisterForm({
           type="submit"
           variant={ButtonVariants.Primary}
           disabled={
+            loading ||
             !policyIsValid ||
             !formState.isValid ||
             !tosAndPolicyAccepted ||
@@ -179,6 +186,7 @@ export default function RegisterForm({
           }
           onClick={handleSubmit(submitAndLink)}
         >
+          {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue
         </Button>
       </div>
