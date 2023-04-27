@@ -55,7 +55,7 @@ export function GlobalNav() {
           {demos.map((section) => {
             return (
               <div key={section.name}>
-                <div className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-text-light-secondary-500 dark:text-text-dark-secondary-500">
+                <div className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-black/40 dark:text-white/40">
                   <div>{section.name}</div>
                 </div>
 
@@ -90,11 +90,11 @@ function GlobalNavItem({
       onClick={close}
       href={`/${item.slug}`}
       className={clsx(
-        "block rounded-md px-3 py-2 text-[15px] font-medium hover:text-black dark:hover:text-gray-300",
+        "block rounded-md px-3 py-2 text-[15px] font-medium text-text-light-500 dark:text-text-dark-500 opacity-60 dark:opacity-60",
         {
-          "text-text-light-secondary-500 dark:text-text-dark-secondary-500 hover:text-text-light-500 hover:dark:text-text-dark-500":
-            !isActive,
-          "text-text-light-500 dark:text-text-dark-500 font-semibold": isActive,
+          "hover:opacity-100 hover:dark:opacity-100": !isActive,
+          "text-text-light-500 dark:text-text-dark-500 opacity-100 dark:opacity-100 font-semibold":
+            isActive,
         }
       )}
     >
