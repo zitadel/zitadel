@@ -34,7 +34,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
-	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
+	"github.com/zitadel/zitadel/internal/api/grpc/user/v2alpha"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"

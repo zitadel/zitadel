@@ -11,30 +11,26 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
+func (s *Server) AddHumanUser(ctx context.Context, req *AddHumanUserRequest) (_ *AddHumanUserResponse, err error) {
 	human, err := addUserRequestToAddHuman(req)
 	if err != nil {
 		return nil, err
 	}
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
+	orgID := authz.GetCtxData(ctx).OrgID
 	err = s.command.AddHuman(ctx, orgID, human, false)
 	if err != nil {
 		return nil, err
 	}
-	return &user.AddHumanUserResponse{
+	return &AddHumanUserResponse{
 		UserId:    human.ID,
 		Details:   object.DomainToDetailsPb(human.Details),
 		EmailCode: human.EmailCode,
 	}, nil
 }
 
-func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman, error) {
+func addUserRequestToAddHuman(req *AddHumanUserRequest) (*command.AddHuman, error) {
 	username := req.GetUsername()
 	if username == "" {
 		username = req.GetEmail().GetEmail()
@@ -85,22 +81,22 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 	}, nil
 }
 
-func genderToDomain(gender user.Gender) domain.Gender {
+func genderToDomain(gender Gender) domain.Gender {
 	switch gender {
-	case user.Gender_GENDER_UNSPECIFIED:
+	case Gender_GENDER_UNSPECIFIED:
 		return domain.GenderUnspecified
-	case user.Gender_GENDER_FEMALE:
+	case Gender_GENDER_FEMALE:
 		return domain.GenderFemale
-	case user.Gender_GENDER_MALE:
+	case Gender_GENDER_MALE:
 		return domain.GenderMale
-	case user.Gender_GENDER_DIVERSE:
+	case Gender_GENDER_DIVERSE:
 		return domain.GenderDiverse
 	default:
 		return domain.GenderUnspecified
 	}
 }
 
-func hashedPasswordToCommand(hashed *user.HashedPassword) (string, error) {
+func hashedPasswordToCommand(hashed *HashedPassword) (string, error) {
 	if hashed == nil {
 		return "", nil
 	}

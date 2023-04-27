@@ -2,32 +2,223 @@ syntax = "proto3";
 
 package zitadel.session.v2alpha;
 
+
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/options.proto";
+import "zitadel/object/v2alpha/object.proto";
 import "zitadel/session/v2alpha/session.proto";
+import "zitadel/user/v2alpha/email.proto";
+import "zitadel/user/v2alpha/password.proto";
+import "zitadel/user/v2alpha/user.proto";
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
 
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "User Service";
+    version: "2.0-alpha";
+    description: "This API is intended to manage users in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
 service SessionService {
+
+  // Search sessions
+  rpc ListSessions (ListSessionsRequest) returns (ListSessionsResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/sessions/_search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Search session";
+      description: "Search for sessions..."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
 
   // GetSession is to demonstrate an authenticated request, where the authenticated user (usage of another grpc package) is returned
   //
   // this request is subject to change and currently used for demonstration only
   rpc GetSession (GetSessionRequest) returns (GetSessionResponse) {
     option (google.api.http) = {
-      get: "/v2alpha/sessions/{id}"
+      get: "/v2alpha/sessions/{session_id}"
     };
 
-    option (zitadel.v1.auth_option) = {
-      permission: "authenticated"
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Create a new session
+  rpc CreateSession (CreateSessionRequest) returns (CreateSessionResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/sessions"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create or update a session";
+      description: "Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Update a session
+  rpc SetSession (SetSessionRequest) returns (SetSessionResponse) {
+    option (google.api.http) = {
+      patch: "/v2alpha/sessions/{session_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update or create a session";
+      description: "Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc DeleteSession (DeleteSessionRequest) returns (DeleteSessionResponse) {
+    option (google.api.http) = {
+      delete: "/v2alpha/sessions/{session_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
   }
 }
 
+message ListSessionsRequest{}
+
+message ListSessionsResponse{}
+
 message GetSessionRequest{
-  string id = 1;
+  string session_id = 1;
 }
 message GetSessionResponse{
   Session session = 1;
 }
+
+message CreateSessionRequest{}
+
+message CreateSessionResponse{
+  string session_id = 1;
+
+}
+
+message SetSessionRequest{
+  string session_id = 1;
+}
+
+message SetSessionResponse{}
+
+message DeleteSessionRequest{
+  string session_id = 1;
+}
+
+message DeleteSessionResponse{}

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package zitadel.user.v2alpha;
 
-import "zitadel/options.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/user/v2alpha/email.proto";
 import "zitadel/user/v2alpha/password.proto";
@@ -12,7 +12,7 @@ import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha;user";
+option go_package = "github.com/zitadel/zitadel/internal/api/grpc/user/v2alpha;user";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -82,8 +82,14 @@ service UserService {
       body: "*"
     };
 
-    option (zitadel.v1.auth_option) = {
-      permission: "user.write"
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.write"
+        org_id_field: "organisation.org_id"
+      }
+      http_response: {
+        success_code: 201
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -105,8 +111,10 @@ service UserService {
       body: "*"
     };
 
-    option (zitadel.v1.auth_option) = {
-      permission: "authenticated"
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -128,8 +136,10 @@ service UserService {
       body: "*"
     };
 
-    option (zitadel.v1.auth_option) = {
-      permission: "authenticated"
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

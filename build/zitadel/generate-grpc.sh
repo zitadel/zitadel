@@ -20,6 +20,7 @@ protoc \
 
 # install authoption proto compiler
 go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-auth
+go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-zitadel
 
 # output folder for openapi v2
 mkdir -p ${OPENAPI_PATH}
@@ -44,7 +45,7 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --auth_out ${GOPATH}/src \
-  --validate_out=lang=go:${GOPATH}/src \
+  --zitadel_out ${GOPATH}/src \
   ${PROTO_PATH}/admin.proto
 
 protoc \
@@ -79,7 +80,7 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --auth_out=${GOPATH}/src \
+  --zitadel_out=${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/user/v2alpha/user_service.proto
 
@@ -91,7 +92,7 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --auth_out=${GOPATH}/src \
+  --zitadel_out=${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/session/v2alpha/session_service.proto
 

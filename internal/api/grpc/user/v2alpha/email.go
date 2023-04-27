@@ -8,19 +8,18 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp *user.SetEmailResponse, err error) {
+func (s *Server) SetEmail(ctx context.Context, req *SetEmailRequest) (resp *SetEmailResponse, err error) {
 	var resourceOwner string // TODO: check if still needed
 	var email *domain.Email
 
 	switch v := req.GetVerification().(type) {
-	case *user.SetEmailRequest_SendCode:
+	case *SetEmailRequest_SendCode:
 		email, err = s.command.ChangeUserEmailURLTemplate(ctx, req.GetUserId(), resourceOwner, req.GetEmail(), s.userCodeAlg, v.SendCode.GetUrlTemplate())
-	case *user.SetEmailRequest_ReturnCode:
+	case *SetEmailRequest_ReturnCode:
 		email, err = s.command.ChangeUserEmailReturnCode(ctx, req.GetUserId(), resourceOwner, req.GetEmail(), s.userCodeAlg)
-	case *user.SetEmailRequest_IsVerified:
+	case *SetEmailRequest_IsVerified:
 		if v.IsVerified {
 			email, err = s.command.ChangeUserEmailVerified(ctx, req.GetUserId(), resourceOwner, req.GetEmail())
 		} else {
@@ -35,7 +34,7 @@ func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp 
 		return nil, err
 	}
 
-	return &user.SetEmailResponse{
+	return &SetEmailResponse{
 		Details: &object.Details{
 			Sequence:      email.Sequence,
 			ChangeDate:    timestamppb.New(email.ChangeDate),
@@ -45,7 +44,7 @@ func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp 
 	}, nil
 }
 
-func (s *Server) VerifyEmail(ctx context.Context, req *user.VerifyEmailRequest) (*user.VerifyEmailResponse, error) {
+func (s *Server) VerifyEmail(ctx context.Context, req *VerifyEmailRequest) (*VerifyEmailResponse, error) {
 	details, err := s.command.VerifyUserEmail(ctx,
 		req.GetUserId(),
 		"", // TODO: check if still needed
@@ -55,7 +54,7 @@ func (s *Server) VerifyEmail(ctx context.Context, req *user.VerifyEmailRequest) 
 	if err != nil {
 		return nil, err
 	}
-	return &user.VerifyEmailResponse{
+	return &VerifyEmailResponse{
 		Details: &object.Details{
 			Sequence:      details.Sequence,
 			ChangeDate:    timestamppb.New(details.EventDate),
