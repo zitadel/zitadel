@@ -13,6 +13,7 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "#/utils/validators";
+import { useRouter } from "next/navigation";
 
 type Inputs =
   | {
@@ -37,6 +38,8 @@ export default function RegisterForm({
     mode: "onBlur",
   });
 
+  const router = useRouter();
+
   async function submitRegister(values: Inputs) {
     const res = await fetch("/registeruser", {
       method: "POST",
@@ -56,6 +59,12 @@ export default function RegisterForm({
     }
 
     return res.json();
+  }
+
+  function submitAndLink(value: Inputs): Promise<boolean | void> {
+    return submitRegister(value).then((resp: any) => {
+      return router.push(`/register/success?userid=${resp.userId}`);
+    });
   }
 
   const { errors } = formState;
@@ -168,7 +177,7 @@ export default function RegisterForm({
             !tosAndPolicyAccepted ||
             watchPassword !== watchConfirmPassword
           }
-          onClick={handleSubmit(submitRegister)}
+          onClick={handleSubmit(submitAndLink)}
         >
           continue
         </Button>

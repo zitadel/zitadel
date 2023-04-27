@@ -34,24 +34,28 @@ export function GlobalNav() {
         className="group absolute right-0 top-0 flex h-14 items-center space-x-2 px-4 lg:hidden"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="font-medium text-gray-100 group-hover:text-gray-400">
+        <div className="font-medium text-text-light-secondary-500 group-hover:text-text-light-500 dark:text-text-dark-secondary-500 dark:group-hover:text-text-dark-500">
           Menu
         </div>
         {isOpen ? (
-          <XMarkIcon className="block w-6 text-gray-300" />
+          <XMarkIcon className="block w-6 " />
         ) : (
-          <Bars3Icon className="block w-6 text-gray-300" />
+          <Bars3Icon className="block w-6 " />
         )}
       </button>
 
       <div
         className={clsx("overflow-y-auto lg:static lg:block", {
-          "fixed inset-x-0 bottom-0 top-14 mt-px bg-white dark:bg-black":
+          "fixed inset-x-0 bottom-0 top-14 mt-px bg-background-light-500 dark:bg-background-dark-500":
             isOpen,
           hidden: !isOpen,
         })}
       >
-        <nav className="space-y-6 px-4 py-5">
+        <nav
+          className={`space-y-6 px-4 py-5 ${
+            isOpen ? "text-center lg:text-left" : ""
+          }`}
+        >
           {demos.map((section) => {
             return (
               <div key={section.name}>

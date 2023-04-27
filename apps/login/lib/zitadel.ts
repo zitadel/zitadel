@@ -33,7 +33,9 @@ export function getBranding(
   return mgmt
     .getLabelPolicy(
       {},
-      { metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "") }
+      {
+        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
+      }
     )
     .then((resp) => resp.policy);
 }
@@ -45,7 +47,9 @@ export function getPrivacyPolicy(
   return mgmt
     .getPrivacyPolicy(
       {},
-      { metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "") }
+      {
+        //  metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
+      }
     )
     .then((resp) => resp.policy);
 }
@@ -57,7 +61,9 @@ export function getPasswordComplexityPolicy(
   return mgmt
     .getPasswordComplexityPolicy(
       {},
-      { metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "") }
+      {
+        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
+      }
     )
     .then((resp) => resp.policy);
 }
@@ -81,7 +87,9 @@ export function addHumanUser(
         profile: { firstName, lastName },
         initialPassword: password,
       },
-      { metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "") }
+      {
+        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
+      }
     )
     .then((resp) => {
       console.log("added user", resp.userId);
