@@ -275,6 +275,7 @@ module.exports = {
         "concepts/structure/jwt_idp",
         "concepts/features/actions",
         "concepts/features/selfservice",
+        "concepts/structure/domains",
       ]
     },
     {
