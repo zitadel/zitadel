@@ -16,8 +16,8 @@ type CurrentProjectionState struct {
 	dbClient *database.DB
 }
 
-func (mig *CurrentProjectionState) Execute(ctx context.Context) (err error) {
-	_, err = mig.dbClient.ExecContext(ctx, currentProjectionState)
+func (mig *CurrentProjectionState) Execute(ctx context.Context) error {
+	_, err := mig.dbClient.ExecContext(ctx, currentProjectionState)
 	return err
 }
 
