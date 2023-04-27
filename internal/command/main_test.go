@@ -10,6 +10,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
@@ -247,4 +248,16 @@ func (m *mockInstance) RequestedHost() string {
 
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
+}
+
+func newMockPermissionCheckAllowed() permissionCheck {
+	return func(ctx context.Context, permission, orgID, resourceID string, allowSelf bool) (err error) {
+		return nil
+	}
+}
+
+func newMockPermissionCheckNotAllowed() permissionCheck {
+	return func(ctx context.Context, permission, orgID, resourceID string, allowSelf bool) (err error) {
+		return errors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied")
+	}
 }

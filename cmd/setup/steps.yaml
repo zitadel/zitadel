@@ -30,3 +30,5 @@ FirstInstance:
       MachineKey:
         ExpirationDate:
         Type:
+CorrectCreationDate:
+  FailAfter: 5m
