@@ -1,5 +1,6 @@
 ---
 title: Connect with Gitlab through SAML 2.0 
+sidebar_label: Gitlab
 ---
 
 This guide shows how to enable login with ZITADEL on Gitlab.

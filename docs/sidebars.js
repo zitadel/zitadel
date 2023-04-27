@@ -211,6 +211,7 @@ module.exports = {
           items: [
             "guides/integrate/services/gitlab-self-hosted",
             "guides/integrate/services/aws-saml",
+            "guides/integrate/services/google-cloud",
             "guides/integrate/services/atlassian-saml",
             "guides/integrate/services/gitlab-saml",
             "guides/integrate/services/auth0-oidc",
