@@ -98,7 +98,7 @@ RUN rm -r cockroach-${COCKROACH_VERSION}.linux-amd64
 
 # Migrations for cockroach-secure
 RUN go install github.com/rakyll/statik \
-    && go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
+    && go test -race -v -coverprofile=profile.cov -coverpkg=./... $(go list ./... | grep -v /operator/)
 
 #######################
 ## Go test results
