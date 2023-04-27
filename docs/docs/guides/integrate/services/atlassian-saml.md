@@ -1,5 +1,6 @@
 ---
 title: Connect with Atlassian through SAML 2.0
+sidebar_label: Atlassian
 ---
 
 This guide shows how to enable login with ZITADEL on Atlassian.
