@@ -138,7 +138,7 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 	if err != nil {
 		return nil, err
 	}
-	actions.LatestSequence, err = q.latestSequence(ctx, actionTable)
+	actions.LatestState, err = q.latestState(ctx, actionTable)
 	return actions, err
 }
 

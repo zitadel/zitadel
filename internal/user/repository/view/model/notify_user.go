@@ -66,15 +66,15 @@ func (u *NotifyUser) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mo
 }
 
 func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
-	u.ChangeDate = event.CreationDate
-	u.Sequence = event.Sequence
-	switch eventstore.EventType(event.Type) {
+	u.ChangeDate = event.CreatedAt
+	u.Sequence = event.Seq
+	switch eventstore.EventType(event.Typ) {
 	case user.UserV1AddedType,
 		user.UserV1RegisteredType,
 		user.HumanRegisteredType,
 		user.HumanAddedType,
 		user.MachineAddedEventType:
-		u.CreationDate = event.CreationDate
+		u.CreationDate = event.CreatedAt
 		u.setRootData(event)
 		err = u.setData(event)
 		if err != nil {

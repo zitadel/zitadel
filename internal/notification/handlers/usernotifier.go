@@ -9,10 +9,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/types"
-	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -21,7 +19,6 @@ const (
 )
 
 type userNotifier struct {
-	crdb.StatementHandler
 	commands     *command.Commands
 	queries      *NotificationQueries
 	assetsPrefix func(context.Context) string
@@ -33,7 +30,7 @@ type userNotifier struct {
 
 func NewUserNotifier(
 	ctx context.Context,
-	config crdb.StatementHandlerConfig,
+	config handler.Config,
 	commands *command.Commands,
 	queries *NotificationQueries,
 	assetsPrefix func(context.Context) string,
@@ -41,23 +38,23 @@ func NewUserNotifier(
 	metricFailedDeliveriesEmail,
 	metricSuccessfulDeliveriesSMS,
 	metricFailedDeliveriesSMS string,
-) *userNotifier {
-	p := new(userNotifier)
-	config.ProjectionName = UserNotificationsProjectionTable
-	config.Reducers = p.reducers()
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	p.commands = commands
-	p.queries = queries
-	p.assetsPrefix = assetsPrefix
-	p.metricSuccessfulDeliveriesEmail = metricSuccessfulDeliveriesEmail
-	p.metricFailedDeliveriesEmail = metricFailedDeliveriesEmail
-	p.metricSuccessfulDeliveriesSMS = metricSuccessfulDeliveriesSMS
-	p.metricFailedDeliveriesSMS = metricFailedDeliveriesSMS
-	projection.NotificationsProjection = p
-	return p
+) *handler.Handler {
+	return handler.NewHandler(ctx, &config, &userNotifier{
+		commands:                        commands,
+		queries:                         queries,
+		assetsPrefix:                    assetsPrefix,
+		metricSuccessfulDeliveriesEmail: metricSuccessfulDeliveriesEmail,
+		metricFailedDeliveriesEmail:     metricFailedDeliveriesEmail,
+		metricSuccessfulDeliveriesSMS:   metricSuccessfulDeliveriesSMS,
+		metricFailedDeliveriesSMS:       metricFailedDeliveriesSMS,
+	})
 }
 
-func (u *userNotifier) reducers() []handler.AggregateReducer {
+func (u *userNotifier) Name() string {
+	return UserNotificationsProjectionTable
+}
+
+func (u *userNotifier) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -124,7 +121,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 		return nil, err
 	}
 	if alreadyHandled {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 	code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
 	if err != nil {
@@ -174,7 +171,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewNoOpStatement(e), nil
+	return handler.NewNoOpStatement(e), nil
 }
 
 func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -183,7 +180,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SWf3g", "reduce.wrong.event.type %s", user.HumanEmailCodeAddedType)
 	}
 	if e.CodeReturned {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
@@ -193,7 +190,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		return nil, err
 	}
 	if alreadyHandled {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 	code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
 	if err != nil {
@@ -243,7 +240,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewNoOpStatement(e), nil
+	return handler.NewNoOpStatement(e), nil
 }
 
 func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -259,7 +256,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		return nil, err
 	}
 	if alreadyHandled {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 	code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
 	if err != nil {
@@ -325,7 +322,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewNoOpStatement(e), nil
+	return handler.NewNoOpStatement(e), nil
 }
 
 func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
@@ -340,7 +337,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 		return nil, err
 	}
 	if alreadyHandled {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 	colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
@@ -386,7 +383,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewNoOpStatement(e), nil
+	return handler.NewNoOpStatement(e), nil
 }
 
 func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (*handler.Statement, error) {
@@ -400,7 +397,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 		return nil, err
 	}
 	if alreadyHandled {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 	code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
 	if err != nil {
@@ -450,7 +447,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewNoOpStatement(e), nil
+	return handler.NewNoOpStatement(e), nil
 }
 
 func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.Statement, error) {
@@ -464,12 +461,12 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		return nil, err
 	}
 	if alreadyHandled {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 
 	notificationPolicy, err := u.queries.NotificationPolicyByOrg(ctx, true, e.Aggregate().ResourceOwner, false)
 	if errors.IsNotFound(err) {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 	if err != nil {
 		return nil, err
@@ -521,7 +518,7 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 			return nil, err
 		}
 	}
-	return crdb.NewNoOpStatement(e), nil
+	return handler.NewNoOpStatement(e), nil
 }
 
 func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -537,7 +534,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		return nil, err
 	}
 	if alreadyHandled {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 	code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
 	if err != nil {
@@ -581,7 +578,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 	if err != nil {
 		return nil, err
 	}
-	return crdb.NewNoOpStatement(e), nil
+	return handler.NewNoOpStatement(e), nil
 }
 
 func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, event eventstore.Event, expiry time.Duration, data map[string]interface{}, eventTypes ...eventstore.EventType) (bool, error) {

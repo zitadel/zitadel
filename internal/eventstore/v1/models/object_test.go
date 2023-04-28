@@ -26,9 +26,9 @@ func TestObjectRoot_AppendEvent(t *testing.T) {
 			fields{},
 			args{
 				&Event{
-					AggregateID:  "aggID",
-					Sequence:     34555,
-					CreationDate: time.Now(),
+					AggregateID: "aggID",
+					Seq:         34555,
+					CreatedAt:   time.Now(),
 				},
 				true,
 			},
@@ -44,8 +44,8 @@ func TestObjectRoot_AppendEvent(t *testing.T) {
 			args{
 				&Event{
 					AggregateID:      "agg",
-					Sequence:         34555425,
-					CreationDate:     time.Now(),
+					Seq:              34555425,
+					CreatedAt:        time.Now(),
 					PreviousSequence: 22,
 				},
 				false,
@@ -62,7 +62,7 @@ func TestObjectRoot_AppendEvent(t *testing.T) {
 			}
 			o.AppendEvent(tt.args.event)
 			if tt.args.isNewRoot {
-				if !o.CreationDate.Equal(tt.args.event.CreationDate) {
+				if !o.CreationDate.Equal(tt.args.event.CreatedAt) {
 					t.Error("creationDate should be equal to event on new root")
 				}
 			} else {
@@ -70,11 +70,11 @@ func TestObjectRoot_AppendEvent(t *testing.T) {
 					t.Error("creationDate and changedate should differ")
 				}
 			}
-			if o.Sequence != tt.args.event.Sequence {
-				t.Errorf("sequence not equal to event: event: %d root: %d", tt.args.event.Sequence, o.Sequence)
+			if o.Sequence != tt.args.event.Seq {
+				t.Errorf("sequence not equal to event: event: %d root: %d", tt.args.event.Seq, o.Sequence)
 			}
-			if !o.ChangeDate.Equal(tt.args.event.CreationDate) {
-				t.Errorf("changedate should be equal to event creation date:  event: %v root: %v", tt.args.event.CreationDate, o.ChangeDate)
+			if !o.ChangeDate.Equal(tt.args.event.CreatedAt) {
+				t.Errorf("changedate should be equal to event creation date:  event: %v root: %v", tt.args.event.CreatedAt, o.ChangeDate)
 			}
 		})
 	}

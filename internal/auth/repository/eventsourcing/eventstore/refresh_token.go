@@ -11,8 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
@@ -20,7 +19,7 @@ import (
 )
 
 type RefreshTokenRepo struct {
-	Eventstore   v1.Eventstore
+	Eventstore   *eventstore.Eventstore
 	View         *view.View
 	SearchLimit  uint64
 	KeyAlgorithm crypto.EncryptionAlgorithm
@@ -53,7 +52,7 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID
 		tokenView.InstanceID = authz.GetInstance(ctx).InstanceID()
 	}
 
-	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.Sequence)
+	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.ChangeDate)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-BHB52", "Errors.User.RefreshToken.Invalid")
 	}
@@ -80,7 +79,7 @@ func (r *RefreshTokenRepo) SearchMyRefreshTokens(ctx context.Context, userID str
 	if err != nil {
 		return nil, err
 	}
-	sequence, err := r.View.GetLatestRefreshTokenSequence(authz.GetInstance(ctx).InstanceID())
+	sequence, err := r.View.GetLatestRefreshTokenSequence(ctx)
 	logging.Log("EVENT-GBdn4").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest refresh token sequence")
 	request.Queries = append(request.Queries, &usr_model.RefreshTokenSearchQuery{Key: usr_model.RefreshTokenSearchKeyUserID, Method: domain.SearchMethodEquals, Value: userID})
 	tokens, count, err := r.View.SearchRefreshTokens(request)
@@ -91,16 +90,16 @@ func (r *RefreshTokenRepo) SearchMyRefreshTokens(ctx context.Context, userID str
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Sequence:    sequence.CurrentSequence,
-		Timestamp:   sequence.LastSuccessfulSpoolerRun,
+		Sequence:    sequence.EventSequence,
+		Timestamp:   sequence.LastRun,
 		Result:      model.RefreshTokenViewsToModel(tokens),
 	}, nil
 }
 
-func (r *RefreshTokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) ([]*models.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
+func (r *RefreshTokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, creationDate time.Time) ([]eventstore.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, instanceID, creationDate)
 	if err != nil {
 		return nil, err
 	}
-	return r.Eventstore.FilterEvents(ctx, query)
+	return r.Eventstore.Filter(ctx, query)
 }

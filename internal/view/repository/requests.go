@@ -11,23 +11,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
-func PrepareGetByKey(table string, key ColumnKey, id string) func(db *gorm.DB, res interface{}) error {
-	return func(db *gorm.DB, res interface{}) error {
-		err := db.Table(table).
-			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).
-			Take(res).
-			Error
-		if err == nil {
-			return nil
-		}
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return caos_errs.ThrowNotFound(err, "VIEW-XRI9c", "object not found")
-		}
-		logging.LogWithFields("VIEW-xVShS", "AggregateID", id).WithError(err).Warn("get from view error")
-		return caos_errs.ThrowInternal(err, "VIEW-J92Td", "Errors.Internal")
-	}
-}
-
 func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, res interface{}) error {
 	return func(db *gorm.DB, res interface{}) error {
 		query := db.Table(table)
@@ -141,30 +124,6 @@ func PrepareDeleteByKeys(table string, keys ...Key) func(db *gorm.DB) error {
 			Error
 		if err != nil {
 			return caos_errs.ThrowInternal(err, "VIEW-die73", "could not delete object")
-		}
-		return nil
-	}
-}
-
-func PrepareDeleteByObject(table string, object interface{}) func(db *gorm.DB) error {
-	return func(db *gorm.DB) error {
-		err := db.Table(table).
-			Delete(object).
-			Error
-		if err != nil {
-			return caos_errs.ThrowInternal(err, "VIEW-lso9w", "could not delete object")
-		}
-		return nil
-	}
-}
-
-func PrepareTruncate(table string) func(db *gorm.DB) error {
-	return func(db *gorm.DB) error {
-		err := db.
-			Exec("TRUNCATE " + table).
-			Error
-		if err != nil {
-			return caos_errs.ThrowInternal(err, "VIEW-lso9w", "could not truncate table")
 		}
 		return nil
 	}

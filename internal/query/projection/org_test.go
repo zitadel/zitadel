@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -33,9 +33,8 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -63,9 +62,8 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgReactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -93,9 +91,8 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -123,9 +120,8 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -153,10 +149,9 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
-				executer:         &testExecuter{},
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer:      &testExecuter{},
 			},
 		},
 		{
@@ -170,9 +165,8 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -203,9 +197,8 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -233,9 +226,8 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(OrgColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

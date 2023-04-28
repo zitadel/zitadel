@@ -259,7 +259,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (_ *Seco
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.LatestState, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -281,7 +281,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (_ *SecondFactors, e
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.LatestState, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -315,7 +315,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (_ *Multi
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.LatestState, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -337,7 +337,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (_ *MultiFactors, err
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.LatestState, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 

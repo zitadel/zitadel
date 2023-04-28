@@ -476,7 +476,7 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	if err != nil {
 		return nil, err
 	}
-	apps.LatestSequence, err = q.latestSequence(ctx, appsTable)
+	apps.LatestState, err = q.latestState(ctx, appsTable)
 	return apps, err
 }
 
@@ -671,7 +671,7 @@ func prepareProjectByAppQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.Project.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-yxTMh", "Errors.Project.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
 			}

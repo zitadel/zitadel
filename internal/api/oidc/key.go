@@ -122,8 +122,8 @@ func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
 		return o.privateKeyToSigningKey(selectSigningKey(keys.Keys))
 	}
 	var sequence uint64
-	if keys.LatestSequence != nil {
-		sequence = keys.LatestSequence.Sequence
+	if keys.LatestState != nil {
+		sequence = keys.LatestState.Sequence
 	}
 	return nil, o.refreshSigningKey(ctx, o.signingKeyAlgorithm, sequence)
 }

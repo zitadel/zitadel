@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/iam/model"
 )
 
@@ -86,13 +85,13 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 	return view
 }
 
-func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *models.Event) (err error) {
-	i.Sequence = event.Sequence
-	i.ChangeDate = event.CreationDate
-	switch eventstore.EventType(event.Type) {
+func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event eventstore.Event) (err error) {
+	i.Sequence = event.Sequence()
+	i.ChangeDate = event.CreationDate()
+	switch event.Type() {
 	case instance.IDPConfigAddedEventType, org.IDPConfigAddedEventType:
 		i.setRootData(event)
-		i.CreationDate = event.CreationDate
+		i.CreationDate = event.CreationDate()
 		i.IDPProviderType = int32(providerType)
 		err = i.SetData(event)
 	case instance.IDPOIDCConfigAddedEventType, org.IDPOIDCConfigAddedEventType:
@@ -111,13 +110,13 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 	return err
 }
 
-func (r *IDPConfigView) setRootData(event *models.Event) {
-	r.AggregateID = event.AggregateID
-	r.InstanceID = event.InstanceID
+func (r *IDPConfigView) setRootData(event eventstore.Event) {
+	r.AggregateID = event.Aggregate().ID
+	r.InstanceID = event.Aggregate().InstanceID
 }
 
-func (r *IDPConfigView) SetData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
+func (r *IDPConfigView) SetData(event eventstore.Event) error {
+	if err := json.Unmarshal(event.DataAsBytes(), r); err != nil {
 		logging.New().WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lub6s", "Could not unmarshal data")
 	}
