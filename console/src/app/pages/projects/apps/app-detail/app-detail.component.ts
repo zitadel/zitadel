@@ -89,6 +89,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public oidcGrantTypes: OIDCGrantType[] = [
     OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
     OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT,
+    OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
     OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
   ];
   public oidcAppTypes: OIDCAppType[] = [
@@ -248,6 +249,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.mgmtService
           .getAppByID(projectId, appId)
           .then((app) => {
+            console.log(app);
             if (app.app) {
               this.app = app.app;
 

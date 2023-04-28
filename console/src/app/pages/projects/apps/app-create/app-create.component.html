@@ -58,13 +58,9 @@
       </form>
     </mat-step>
 
-    <!-- skip for native OIDC and SAML applications -->
+    <!-- skip for SAML applications -->
     <mat-step
-      *ngIf="
-        (appType?.value?.createType === AppCreateType.OIDC &&
-          appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE) ||
-        appType?.value?.createType === AppCreateType.API
-      "
+      *ngIf="appType?.value?.createType === AppCreateType.OIDC || appType?.value?.createType === AppCreateType.API"
       [stepControl]="secondFormGroup"
       [editable]="true"
     >

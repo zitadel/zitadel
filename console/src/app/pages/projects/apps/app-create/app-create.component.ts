@@ -32,6 +32,7 @@ import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog
 import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
+  DEVICE_CODE_METHOD,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
   PKCE_METHOD,
@@ -163,7 +164,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
           switch (this.appType?.value.oidcAppType) {
             case OIDCAppType.OIDC_APP_TYPE_NATIVE:
-              this.authMethods = [PKCE_METHOD];
+              this.authMethods = [PKCE_METHOD, DEVICE_CODE_METHOD];
 
               // automatically set to PKCE and skip step
               this.oidcAppRequest.setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE]);

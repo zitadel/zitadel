@@ -20,6 +20,7 @@ export const CODE_METHOD: RadioItemAuthType = {
   authMethod: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
   recommended: false,
 };
+
 export const PKCE_METHOD: RadioItemAuthType = {
   key: 'PKCE',
   titleI18nKey: 'APP.AUTHMETHODS.PKCE.TITLE',
@@ -32,6 +33,7 @@ export const PKCE_METHOD: RadioItemAuthType = {
   authMethod: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
   recommended: true,
 };
+
 export const POST_METHOD: RadioItemAuthType = {
   key: 'POST',
   titleI18nKey: 'APP.AUTHMETHODS.POST.TITLE',
@@ -44,6 +46,7 @@ export const POST_METHOD: RadioItemAuthType = {
   authMethod: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST,
   notRecommended: true,
 };
+
 export const PK_JWT_METHOD: RadioItemAuthType = {
   key: 'PK_JWT',
   titleI18nKey: 'APP.AUTHMETHODS.PK_JWT.TITLE',
@@ -57,6 +60,7 @@ export const PK_JWT_METHOD: RadioItemAuthType = {
   apiAuthMethod: APIAuthMethodType.API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
   // recommended: true,
 };
+
 export const BASIC_AUTH_METHOD: RadioItemAuthType = {
   key: 'BASIC',
   titleI18nKey: 'APP.AUTHMETHODS.BASIC.TITLE',
@@ -81,6 +85,19 @@ export const IMPLICIT_METHOD: RadioItemAuthType = {
   grantType: OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT,
   authMethod: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
   notRecommended: true,
+};
+
+export const DEVICE_CODE_METHOD: RadioItemAuthType = {
+  key: 'DEVICECODE',
+  titleI18nKey: 'APP.AUTHMETHODS.DEVICECODE.TITLE',
+  descI18nKey: 'APP.AUTHMETHODS.DEVICECODE.DESCRIPTION',
+  disabled: false,
+  prefix: 'DEVICECODE',
+  background: 'linear-gradient(40deg, rgb(56 189 248) 30%, rgb(14 165 233))',
+  responseType: OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
+  grantType: OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
+  authMethod: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+  recommended: false,
 };
 
 export const CUSTOM_METHOD: RadioItemAuthType = {
@@ -211,6 +228,18 @@ export function getAuthMethodFromPartialConfig(config: {
       OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST,
     ]);
 
+    const deviceCode = JSON.stringify([
+      [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+      [OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE],
+      OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    ]);
+
+    const deviceCodeWithRefresh = JSON.stringify([
+      [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+      [OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE, OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN],
+      OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    ]);
+
     const pkjwt = JSON.stringify([
       [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
       [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
@@ -244,6 +273,11 @@ export function getAuthMethodFromPartialConfig(config: {
         return POST_METHOD.key;
       case postWithRefresh:
         return POST_METHOD.key;
+
+      case deviceCode:
+        return DEVICE_CODE_METHOD.key;
+      case deviceCodeWithRefresh:
+        return DEVICE_CODE_METHOD.key;
 
       case pkjwt:
         return PK_JWT_METHOD.key;
