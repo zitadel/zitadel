@@ -1,5 +1,3 @@
-```[tasklist]
-
 ### Definition of Ready
 
 - [ ] I am happy with the code
@@ -14,4 +12,4 @@
 - [ ] Documentation/examples are up-to-date
 - [ ] All non-functional requirements are met
 - [ ] Functionality of the acceptance criteria is checked manually on the dev system.
-```
+
