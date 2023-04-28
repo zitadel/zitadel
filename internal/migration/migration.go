@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	startedType        = eventstore.EventType("system.migration.started")
+	StartedType        = eventstore.EventType("system.migration.started")
 	doneType           = eventstore.EventType("system.migration.done")
 	failedType         = eventstore.EventType("system.migration.failed")
 	repeatableDoneType = eventstore.EventType("system.migration.repeatable.done")
@@ -36,7 +36,7 @@ type RepeatableMigration interface {
 }
 
 func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration) (err error) {
-	logging.Infof("verify migration %s", migration.String())
+	logging.WithFields("name", migration.String()).Info("verify migration")
 
 	if should, err := checkExec(ctx, es, migration); !should || err != nil {
 		return err
@@ -46,16 +46,58 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		return err
 	}
 
-	logging.Infof("starting migration %s", migration.String())
+	logging.WithFields("name", migration.String()).Info("starting migration")
 	err = migration.Execute(ctx)
 	logging.OnError(err).Error("migration failed")
 
-	_, pushErr := es.Push(ctx, setupDoneCmd(migration, err))
+	_, pushErr := es.Push(ctx, setupDoneCmd(ctx, migration, err))
 	logging.OnError(pushErr).Error("migration failed")
 	if err != nil {
 		return err
 	}
 	return pushErr
+}
+
+func LatestStep(ctx context.Context, es *eventstore.Eventstore) (*SetupStep, error) {
+	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		OrderDesc().
+		Limit(1).
+		AddQuery().
+		AggregateTypes(aggregateType).
+		AggregateIDs(aggregateID).
+		EventTypes(StartedType, doneType, repeatableDoneType, failedType).
+		Builder())
+	if err != nil {
+		return nil, err
+	}
+	step, ok := events[0].(*SetupStep)
+	if !ok {
+		return nil, errors.ThrowInternal(nil, "MIGRA-hppLM", "setup step is malformed")
+	}
+	return step, nil
+}
+
+var _ Migration = (*cancelMigration)(nil)
+
+type cancelMigration struct {
+	name string
+}
+
+// Execute implements Migration
+func (*cancelMigration) Execute(context.Context) error {
+	return nil
+}
+
+// String implements Migration
+func (m *cancelMigration) String() string {
+	return m.name
+}
+
+var errCancelStep = errors.ThrowError(nil, "MIGRA-zo86K", "migration canceled manually")
+
+func CancelStep(ctx context.Context, es *eventstore.Eventstore, step *SetupStep) error {
+	_, err := es.Push(ctx, setupDoneCmd(ctx, &cancelMigration{name: step.Name}, errCancelStep))
+	return err
 }
 
 // checkExec ensures that only one setup step is done concurrently
@@ -88,7 +130,7 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		AddQuery().
 		AggregateTypes(aggregateType).
 		AggregateIDs(aggregateID).
-		EventTypes(startedType, doneType, repeatableDoneType, failedType).
+		EventTypes(StartedType, doneType, repeatableDoneType, failedType).
 		Builder())
 	if err != nil {
 		return false, err
@@ -106,7 +148,7 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		}
 
 		switch event.Type() {
-		case startedType, failedType:
+		case StartedType, failedType:
 			isStarted = !isStarted
 		case doneType,
 			repeatableDoneType:
