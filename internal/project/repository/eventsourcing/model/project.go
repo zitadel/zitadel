@@ -29,7 +29,7 @@ type oidcApp struct {
 func ProjectToModel(project *Project) *model.Project {
 	apps := make([]*model.Application, len(project.OIDCApplications))
 	for i, application := range project.OIDCApplications {
-		apps[i] = &model.Application{AppID: application.AppID}
+		apps[i] = &model.Application{OIDCConfig: &model.OIDCConfig{ClientID: application.ClientID}}
 	}
 	return &model.Project{
 		ObjectRoot:           project.ObjectRoot,

@@ -145,11 +145,13 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		applicationsIDs := make([]string, 0, len(project.Applications))
+		clientIDs := make([]string, 0, len(project.Applications))
 		for _, app := range project.Applications {
-			applicationsIDs = append(applicationsIDs, app.AppID)
+			if app.OIDCConfig != nil {
+				clientIDs = append(clientIDs, app.OIDCConfig.ClientID)
+			}
 		}
-		return t.view.DeleteApplicationTokens(event, applicationsIDs...)
+		return t.view.DeleteApplicationTokens(event, clientIDs...)
 	case instance.InstanceRemovedEventType:
 		return t.view.DeleteInstanceTokens(event)
 	case org.OrgRemovedEventType:
