@@ -41,14 +41,14 @@ func setupStartedCmd(migration Migration) eventstore.Command {
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			eventstore.NewAggregate(ctx, aggregateID, aggregateType, "v1"),
-			startedType),
+			StartedType),
 		migration: migration,
 		Name:      migration.String(),
 	}
 }
 
-func setupDoneCmd(migration Migration, err error) eventstore.Command {
-	ctx := authz.SetCtxData(service.WithService(context.Background(), "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
+func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstore.Command {
+	ctx = authz.SetCtxData(service.WithService(ctx, "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
 	typ := doneType
 	var lastRun interface{}
 	if repeatable, ok := migration.(RepeatableMigration); ok {
@@ -80,7 +80,7 @@ func (s *SetupStep) Data() interface{} {
 
 func (s *SetupStep) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	switch s.Type() {
-	case startedType:
+	case StartedType:
 		return []*eventstore.EventUniqueConstraint{
 			eventstore.NewAddGlobalEventUniqueConstraint("migration_started", s.migration.String(), "Errors.Step.Started.AlreadyExists"),
 		}
@@ -97,7 +97,7 @@ func (s *SetupStep) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 }
 
 func RegisterMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(aggregateType, startedType, SetupMapper)
+	es.RegisterFilterEventMapper(aggregateType, StartedType, SetupMapper)
 	es.RegisterFilterEventMapper(aggregateType, doneType, SetupMapper)
 	es.RegisterFilterEventMapper(aggregateType, failedType, SetupMapper)
 	es.RegisterFilterEventMapper(aggregateType, repeatableDoneType, SetupMapper)

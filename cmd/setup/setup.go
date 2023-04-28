@@ -45,6 +45,8 @@ Requirements:
 		},
 	}
 
+	cmd.AddCommand(NewCleanup())
+
 	Flags(cmd)
 
 	return cmd
