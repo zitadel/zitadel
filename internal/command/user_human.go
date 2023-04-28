@@ -27,7 +27,7 @@ func (c *Commands) getHuman(ctx context.Context, userID, resourceowner string) (
 }
 
 type AddHuman struct {
-	// ID is optional
+	// ID is optional, if empty it will be generated
 	ID string
 	// Username is required
 	Username string
@@ -114,11 +114,10 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 	if resourceOwner == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
-	agg := user.NewAggregate(human.ID, resourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
 		c.AddHumanCommand(
-			agg,
 			human,
+			resourceOwner,
 			c.userPasswordAlg,
 			c.userEncryption,
 			allowInitMail,
@@ -146,16 +145,17 @@ type humanCreationCommand interface {
 	AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
 }
 
-func (c *Commands) AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
+func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if err := human.Validate(); err != nil {
 			return nil, err
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if err := c.addHumanCommandCheckID(ctx, filter, a, human); err != nil {
+			if err := c.addHumanCommandCheckID(ctx, filter, human, orgID); err != nil {
 				return nil, err
 			}
+			a := user.NewAggregate(human.ID, orgID)
 
 			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ResourceOwner)
 			if err != nil {
@@ -274,22 +274,20 @@ func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.
 	return append(cmds, user.NewHumanPhoneCodeAddedEvent(ctx, &a.Aggregate, phoneCode.Crypted, phoneCode.Expiry)), nil
 }
 
-func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparation.FilterToQueryReducer, a *user.Aggregate, human *AddHuman) (err error) {
-	if human.ID != "" {
-		existingHuman, err := humanWriteModelByID(ctx, filter, human.ID, a.ResourceOwner)
+func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparation.FilterToQueryReducer, human *AddHuman, orgID string) (err error) {
+	if human.ID == "" {
+		human.ID, err = c.idGenerator.Next()
 		if err != nil {
 			return err
 		}
-		if isUserStateExists(existingHuman.UserState) {
-			return errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
-		}
-		return nil
 	}
-	human.ID, err = c.idGenerator.Next()
+	existingHuman, err := humanWriteModelByID(ctx, filter, human.ID, orgID)
 	if err != nil {
 		return err
 	}
-	a.ID = human.ID
+	if isUserStateExists(existingHuman.UserState) {
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
+	}
 	return nil
 }
 

@@ -145,6 +145,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
 				),
 			},
 			args: args{
@@ -173,6 +174,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -214,6 +216,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -303,6 +306,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -393,6 +397,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -472,6 +477,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -552,6 +558,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -621,6 +628,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -690,6 +698,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -759,6 +768,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -811,6 +821,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -909,6 +920,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1007,6 +1019,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1094,6 +1107,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -3781,8 +3795,8 @@ func TestAddHumanCommand(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		a             *user.Aggregate
 		human         *AddHuman
+		orgID         string
 		passwordAlg   crypto.HashAlgorithm
 		filter        preparation.FilterToQueryReducer
 		codeAlg       crypto.EncryptionAlgorithm
@@ -3798,12 +3812,12 @@ func TestAddHumanCommand(t *testing.T) {
 		{
 			name: "invalid email",
 			args: args{
-				a: agg,
 				human: &AddHuman{
 					Email: Email{
 						Address: "invalid",
 					},
 				},
+				orgID: "ro",
 			},
 			want: Want{
 				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid"),
@@ -3812,7 +3826,6 @@ func TestAddHumanCommand(t *testing.T) {
 		{
 			name: "invalid first name",
 			args: args{
-				a: agg,
 				human: &AddHuman{
 					Username:          "username",
 					PreferredLanguage: language.English,
@@ -3820,6 +3833,7 @@ func TestAddHumanCommand(t *testing.T) {
 						Address: "support@zitadel.com",
 					},
 				},
+				orgID: "ro",
 			},
 			want: Want{
 				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty"),
@@ -3828,13 +3842,13 @@ func TestAddHumanCommand(t *testing.T) {
 		{
 			name: "invalid last name",
 			args: args{
-				a: agg,
 				human: &AddHuman{
 					Username:          "username",
 					PreferredLanguage: language.English,
 					FirstName:         "hurst",
 					Email:             Email{Address: "support@zitadel.com"},
 				},
+				orgID: "ro",
 			},
 			want: Want{
 				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty"),
@@ -3846,7 +3860,6 @@ func TestAddHumanCommand(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id"),
 			},
 			args: args{
-				a: agg,
 				human: &AddHuman{
 					Email:             Email{Address: "support@zitadel.com"},
 					PreferredLanguage: language.English,
@@ -3855,23 +3868,28 @@ func TestAddHumanCommand(t *testing.T) {
 					Password:          "short",
 					Username:          "username",
 				},
+				orgID: "ro",
 				filter: NewMultiFilter().Append(
 					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-						return []eventstore.Event{
-							org.NewDomainPolicyAddedEvent(
-								context.Background(),
-								&org.NewAggregate("id").Aggregate,
-								true,
-								true,
-								true,
-							),
-						}, nil
+						return []eventstore.Event{}, nil
 					}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							return []eventstore.Event{
+								org.NewDomainPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									true,
+									true,
+									true,
+								),
+							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
 								org.NewPasswordComplexityPolicyAddedEvent(
-									context.Background(),
+									ctx,
 									&org.NewAggregate("id").Aggregate,
 									8,
 									true,
@@ -3893,7 +3911,6 @@ func TestAddHumanCommand(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id"),
 			},
 			args: args{
-				a: agg,
 				human: &AddHuman{
 					Email:             Email{Address: "support@zitadel.com", Verified: true},
 					PreferredLanguage: language.English,
@@ -3902,25 +3919,30 @@ func TestAddHumanCommand(t *testing.T) {
 					Password:          "password",
 					Username:          "username",
 				},
+				orgID:       "ro",
 				passwordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				filter: NewMultiFilter().Append(
 					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-						return []eventstore.Event{
-							org.NewDomainPolicyAddedEvent(
-								context.Background(),
-								&org.NewAggregate("id").Aggregate,
-								true,
-								true,
-								true,
-							),
-						}, nil
+						return []eventstore.Event{}, nil
 					}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							return []eventstore.Event{
+								org.NewDomainPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									true,
+									true,
+									true,
+								),
+							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
 								org.NewPasswordComplexityPolicyAddedEvent(
-									context.Background(),
+									ctx,
 									&org.NewAggregate("id").Aggregate,
 									2,
 									false,
@@ -3966,7 +3988,7 @@ func TestAddHumanCommand(t *testing.T) {
 			c := &Commands{
 				idGenerator: tt.fields.idGenerator,
 			}
-			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg, tt.args.codeAlg, tt.args.allowInitMail), tt.args.filter, tt.want)
+			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.human, tt.args.orgID, tt.args.passwordAlg, tt.args.codeAlg, tt.args.allowInitMail), tt.args.filter, tt.want)
 		})
 	}
 }

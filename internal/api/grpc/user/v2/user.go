@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -18,7 +19,11 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 	if err != nil {
 		return nil, err
 	}
-	err = s.command.AddHuman(ctx, req.GetOrganisation().GetOrgId(), human, false)
+	orgID := req.GetOrganisation().GetOrgId()
+	if orgID == "" {
+		orgID = authz.GetCtxData(ctx).OrgID
+	}
+	err = s.command.AddHuman(ctx, orgID, human, false)
 	if err != nil {
 		return nil, err
 	}
