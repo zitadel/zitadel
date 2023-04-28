@@ -17,9 +17,4 @@ message LockoutPolicy {
             example: "\"10\""
         }
     ];
-    bool is_default = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the organization's admin changed the policy"
-        }
-    ];
 }

@@ -203,6 +203,48 @@ service PolicyService {
             };
         };
     }
+    rpc GetActiveIdentityProviders (GetActiveIdentityProvidersRequest) returns (GetActiveIdentityProvidersResponse) {
+        option (google.api.http) = {
+            post: "/v2alpha/policies/idps"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get the current active identity providers";
+            description: "Return the current active identity providers for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+    rpc GetInstanceInformation(GetInstanceInformationRequest) returns (GetInstanceInformationResponse) {
+        option (google.api.http) = {
+            post: "/v2alpha/instance/information"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get basic information over the instance";
+            description: "Return the basic information of the instance for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
 }
 
 message GetLoginPolicyRequest {
@@ -257,4 +299,26 @@ message GetLockoutPolicyRequest {
 message GetLockoutPolicyResponse {
     zitadel.object.v2alpha.Details details = 1;
     zitadel.policy.v2alpha.LockoutPolicy policy = 2;
+}
+
+message GetActiveIdentityProvidersRequest {
+    zitadel.object.v2alpha.Organisation organisation = 1;
+}
+
+message GetActiveIdentityProvidersResponse {
+    zitadel.object.v2alpha.Details details = 1;
+    repeated string idps = 2;
+}
+
+
+message GetInstanceInformationRequest {}
+
+message GetInstanceInformationResponse {
+    zitadel.object.v2alpha.Details details = 1;
+    string default_org_id = 2;
+    repeated string supported_languages = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"en\", \"de\", \"it\"]"
+        }
+    ];
 }

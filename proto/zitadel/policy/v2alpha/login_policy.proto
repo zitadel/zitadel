@@ -36,67 +36,61 @@ message LoginPolicy {
             description: "defines if passwordless is allowed for users"
         }
     ];
-    bool is_default = 6 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if the organization's admin changed the policy"
-        }
-    ];
-    bool hide_password_reset = 7 [
+    bool hide_password_reset = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if password reset link should be shown in the login screen"
         }
     ];
-    bool ignore_unknown_usernames = 8 [
+    bool ignore_unknown_usernames = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if unknown username on login screen directly returns an error or always displays the password screen"
         }
     ];
-    string default_redirect_uri = 9 [
+    string default_redirect_uri = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)";
             example: "\"https://acme.com/ui/console\"";
         }
     ];
-    google.protobuf.Duration password_check_lifetime = 10 [
+    google.protobuf.Duration password_check_lifetime = 9 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"864000s\"";
         }
     ];
-    google.protobuf.Duration external_login_check_lifetime = 11 [
+    google.protobuf.Duration external_login_check_lifetime = 10 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"864000s\"";
         }
     ];
-    google.protobuf.Duration mfa_init_skip_lifetime = 12 [
+    google.protobuf.Duration mfa_init_skip_lifetime = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2592000s\"";
         }
     ];
-    google.protobuf.Duration second_factor_check_lifetime = 13 [
+    google.protobuf.Duration second_factor_check_lifetime = 12 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"64800s\"";
         }
     ];
-    google.protobuf.Duration multi_factor_check_lifetime = 14 [
+    google.protobuf.Duration multi_factor_check_lifetime = 13 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"43200s\"";
         }
     ];
-    repeated SecondFactorType second_factors = 15;
-    repeated MultiFactorType multi_factors = 16;
-    repeated string idps = 17;
+    repeated SecondFactorType second_factors = 14;
+    repeated MultiFactorType multi_factors = 15;
     // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success.
-    bool allow_domain_discovery = 18 [
+    bool allow_domain_discovery = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
         }
     ];
-    bool disable_login_with_email = 19 [
+    bool disable_login_with_email = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if the user can additionally (to the login name) be identified by their verified email address"
         }
     ];
-    bool disable_login_with_phone = 20 [
+    bool disable_login_with_phone = 18 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
         }
