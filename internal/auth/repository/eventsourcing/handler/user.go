@@ -68,16 +68,16 @@ func (_ *User) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user_repo.AggregateType, org.AggregateType, instance.AggregateType}
 }
 
-func (u *User) CurrentSequence(instanceID string) (uint64, error) {
-	sequence, err := u.view.GetLatestUserSequence(instanceID)
+func (u *User) CurrentSequence(ctx context.Context, instanceID string) (uint64, error) {
+	sequence, err := u.view.GetLatestUserSequence(ctx, instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (u *User) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
-	sequences, err := u.view.GetLatestUserSequences(instanceIDs)
+func (u *User) EventQuery(ctx context.Context, instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := u.view.GetLatestUserSequences(ctx, instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +158,11 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 			if !errors.IsNotFound(err) {
 				return err
 			}
+			logging.WithFields(
+				"instance", event.InstanceID,
+				"userID", event.AggregateID,
+				"eventType", event.Type,
+			).Info("user not found in view")
 			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
 			if err != nil {
 				return err
@@ -181,6 +186,11 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 			if !errors.IsNotFound(err) {
 				return err
 			}
+			logging.WithFields(
+				"instance", event.InstanceID,
+				"userID", event.AggregateID,
+				"eventType", event.Type,
+			).Info("user not found in view")
 			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
 			if err != nil {
 				return err
@@ -291,7 +301,7 @@ func (u *User) OnSuccess(instanceIDs []string) error {
 }
 
 func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
-	query, err := view.OrgByIDQuery(orgID, instanceID, 0)
+	orgQuery, err := view.OrgByIDQuery(orgID, instanceID, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +311,7 @@ func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_m
 			AggregateID: orgID,
 		},
 	}
-	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, orgQuery)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
