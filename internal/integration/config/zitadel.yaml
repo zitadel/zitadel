@@ -35,4 +35,3 @@ Projections:
 DefaultInstance:
   LoginPolicy:
     MfaInitSkipLifetime: "0"
-

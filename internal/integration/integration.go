@@ -4,7 +4,9 @@ package integration
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	_ "embed"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -13,11 +15,20 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/zitadel/cmd"
 	"github.com/zitadel/zitadel/cmd/start"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -30,8 +41,26 @@ var (
 	postgresYAML []byte
 )
 
+type UserType int
+
+//go:generate stringer -type=UserType
+const (
+	Unspecified UserType = iota
+	OrgOwner
+)
+
+type User struct {
+	*query.User
+	Token string
+}
+
 type Tester struct {
 	*start.Server
+
+	Instance     authz.Instance
+	Organisation *query.Org
+	Users        map[UserType]User
+
 	GRPCClientConn *grpc.ClientConn
 	wg             sync.WaitGroup // used for shutdown
 }
@@ -83,6 +112,63 @@ func (s *Tester) pollHealth(ctx context.Context) (err error) {
 	}
 }
 
+const (
+	SystemUser = "integration1"
+)
+
+func (s *Tester) createSystemUser(ctx context.Context) {
+	var err error
+
+	s.Instance, err = s.Queries.InstanceByHost(ctx, "localhost:8080")
+	logging.OnError(err).Fatal("query instance")
+	ctx = authz.WithInstance(ctx, s.Instance)
+
+	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
+	logging.OnError(err).Fatal("query organisation")
+
+	query, err := query.NewUserUsernameSearchQuery(SystemUser, query.TextEquals)
+	logging.OnError(err).Fatal("user query")
+	user, err := s.Queries.GetUser(ctx, true, true, query)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		_, err = s.Commands.AddMachine(ctx, &command.Machine{
+			ObjectRoot: models.ObjectRoot{
+				ResourceOwner: s.Organisation.ID,
+			},
+			Username:        SystemUser,
+			Name:            SystemUser,
+			Description:     "who cares?",
+			AccessTokenType: domain.OIDCTokenTypeJWT,
+		})
+		logging.OnError(err).Fatal("add machine user")
+		user, err = s.Queries.GetUser(ctx, true, true, query)
+
+	}
+	logging.OnError(err).Fatal("get user")
+
+	_, err = s.Commands.AddOrgMember(ctx, s.Organisation.ID, user.ID, "ORG_OWNER")
+	target := new(caos_errs.AlreadyExistsError)
+	if !errors.As(err, &target) {
+		logging.OnError(err).Fatal("add org member")
+	}
+
+	scopes := []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
+	pat := command.NewPersonalAccessToken(user.ResourceOwner, user.ID, time.Now().Add(time.Hour), scopes, domain.UserTypeMachine)
+	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
+	logging.OnError(err).Fatal("add pat")
+
+	s.Users = map[UserType]User{
+		OrgOwner: {
+			User:  user,
+			Token: pat.Token,
+		},
+	}
+}
+
+func (s *Tester) WithSystemAuthorization(ctx context.Context, u UserType) context.Context {
+	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", s.Users[u].Token))
+}
+
 func (s *Tester) Done() {
 	err := s.GRPCClientConn.Close()
 	logging.OnError(err).Error("integration tester client close")
@@ -125,6 +211,14 @@ func NewTester(ctx context.Context) *Tester {
 		logging.OnError(ctx.Err()).Fatal("waiting for integration tester server")
 	}
 	tester.createClientConn(ctx)
+	tester.createSystemUser(ctx)
 
 	return tester
+}
+
+func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel context.CancelFunc) {
+	errCtx, cancel = context.WithCancel(context.Background())
+	cancel()
+	ctx, cancel = context.WithTimeout(context.Background(), timeout)
+	return ctx, errCtx, cancel
 }
