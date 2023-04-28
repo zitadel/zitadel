@@ -62,16 +62,16 @@ func (t *RefreshToken) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user.AggregateType, project.AggregateType, instance.AggregateType}
 }
 
-func (t *RefreshToken) CurrentSequence(instanceID string) (uint64, error) {
-	sequence, err := t.view.GetLatestRefreshTokenSequence(instanceID)
+func (t *RefreshToken) CurrentSequence(ctx context.Context, instanceID string) (uint64, error) {
+	sequence, err := t.view.GetLatestRefreshTokenSequence(ctx, instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (t *RefreshToken) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
-	sequences, err := t.view.GetLatestRefreshTokenSequences(instanceIDs)
+func (t *RefreshToken) EventQuery(ctx context.Context, instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := t.view.GetLatestRefreshTokenSequences(ctx, instanceIDs)
 	if err != nil {
 		return nil, err
 	}
