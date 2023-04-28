@@ -14,11 +14,11 @@ const (
 	authenticated = "authenticated"
 )
 
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgIDHeader string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
+func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgIDHeader, verifier, method)
+	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier, method)
 	if err != nil {
 		return nil, err
 	}

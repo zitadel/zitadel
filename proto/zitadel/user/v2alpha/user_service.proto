@@ -85,7 +85,7 @@ service UserService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "user.write"
-        org_id_field: "organisation.org_id"
+        org_field: "organisation"
       }
       http_response: {
         success_code: 201

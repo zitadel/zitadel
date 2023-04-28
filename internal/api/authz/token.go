@@ -36,7 +36,7 @@ type authZRepo interface {
 	VerifierClientID(ctx context.Context, name string) (clientID, projectID string, err error)
 	SearchMyMemberships(ctx context.Context, orgID string) ([]*Membership, error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
-	ExistsOrg(ctx context.Context, orgID string) error
+	ExistsOrg(ctx context.Context, id, domain string) (string, error)
 }
 
 func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (v *TokenVerifier) {
@@ -144,10 +144,10 @@ func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clien
 	return v.authZRepo.ProjectIDAndOriginsByClientID(ctx, clientID)
 }
 
-func (v *TokenVerifier) ExistsOrg(ctx context.Context, orgID string) (err error) {
+func (v *TokenVerifier) ExistsOrg(ctx context.Context, id, domain string) (orgID string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return v.authZRepo.ExistsOrg(ctx, orgID)
+	return v.authZRepo.ExistsOrg(ctx, id, domain)
 }
 
 func (v *TokenVerifier) CheckAuthMethod(method string) (Option, bool) {

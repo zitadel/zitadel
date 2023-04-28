@@ -1,5 +1,5 @@
 package object
 
-func (o *Organisation) AuthContext() string {
-	return o.GetOrgId()
+func (o *Organisation) OrganisationFromRequest() *Organisation {
+	return o
 }

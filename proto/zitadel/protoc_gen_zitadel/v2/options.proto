@@ -20,7 +20,7 @@ message Options {
 message AuthOption {
     reserved 2;
     string permission = 1;
-    string org_id_field = 3;
+    string org_field = 3;
 }
 
 message CustomHTTPResponse {

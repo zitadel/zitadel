@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"text/template"
 
 	"google.golang.org/protobuf/compiler/protogen"
@@ -83,7 +82,7 @@ func main() {
 					if ext.AuthOption != nil {
 						methods.AuthOptions = append(methods.AuthOptions, authOption{Name: string(method.Desc.Name()), Permission: ext.AuthOption.Permission /*CheckFieldName: authExt.CheckFieldName*/})
 						if ext.AuthOption.OrgIdField != "" {
-							methods.AuthContext = append(methods.AuthContext, authContext{Name: string(method.Input.Desc.Name()), Field: buildAuthContextField(method.Input.Fields, ext.AuthOption.OrgIdField)})
+							methods.AuthContext = append(methods.AuthContext, authContext{Name: string(method.Input.Desc.Name()), Field: buildAuthContextField(method.Input.Fields, ext.AuthOption.OrgFromRequest)})
 						}
 					}
 					if ext.HttpResponse != nil {
@@ -118,9 +117,13 @@ func loadTemplate(templateData []byte) *template.Template {
 		Parse(string(templateData)))
 }
 
-func buildAuthContextField(fields []*protogen.Field, fieldPath string) string {
-	pathFields := strings.Split(fieldPath, ".")
-	return test(fields, pathFields, 0, "")
+func buildAuthContextField(fields []*protogen.Field, fieldName string) string {
+	for _, field := range fields {
+		if string(field.Desc.Name()) == fieldName {
+			return ".Get" + field.GoName + "()"
+		}
+	}
+	return ""
 }
 
 func test(fields []*protogen.Field, fieldNames []string, i int, function string) string {
