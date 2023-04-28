@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
 	"github.com/lib/pq"
 	"github.com/zitadel/logging"
@@ -67,7 +66,7 @@ const (
 		" $2::VARCHAR AS aggregate_type," +
 		" $3::VARCHAR AS aggregate_id," +
 		" $4::VARCHAR AS aggregate_version," +
-		" statement_timestamp() AS creation_date," +
+		" now() AS creation_date," +
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
@@ -99,10 +98,14 @@ const (
 
 type CRDB struct {
 	*database.DB
+	maxTransactionRetries uint8
 }
 
-func NewCRDB(client *database.DB) *CRDB {
-	return &CRDB{client}
+func NewCRDB(client *database.DB, maxTransactionRetries uint8) *CRDB {
+	if maxTransactionRetries == 0 {
+		maxTransactionRetries = 1
+	}
+	return &CRDB{client, maxTransactionRetries}
 }
 
 func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
@@ -110,7 +113,7 @@ func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
-	err := crdb.ExecuteTx(ctx, db.DB.DB, nil, func(tx *sql.Tx) error {
+	err := database.ExecuteWithRetries(ctx, db.DB, db.maxTransactionRetries, func(tx *sql.Tx) error {
 
 		var (
 			previousAggregateSequence     Sequence

@@ -326,3 +326,7 @@ func (*prepareDB) DatabaseName() string { return "db" }
 func (*prepareDB) Username() string { return "user" }
 
 func (*prepareDB) Type() string { return "type" }
+
+func (*prepareDB) IsRetryable(code string) bool {
+	return code == "CR000" || code == "40001"
+}

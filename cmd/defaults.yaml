@@ -400,6 +400,8 @@ Quotas:
     ExhaustedCookieMaxAge: "300s"
 
 Eventstore:
+  # Amount of retries if a the transaction of the write is retrieable 
+  MaxPushRetries: 50
   PushTimeout: 15s
 
 DefaultInstance:

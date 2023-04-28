@@ -165,3 +165,7 @@ func (c Config) String(useAdmin bool) string {
 
 	return strings.Join(fields, " ")
 }
+
+func (c *Config) IsRetryable(code string) bool {
+	return code == "CR000" || code == "40001"
+}

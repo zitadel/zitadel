@@ -124,7 +124,7 @@ func (s *Config) checkSSL(user User) {
 	}
 }
 
-func (c Config) String(useAdmin bool) string {
+func (c *Config) String(useAdmin bool) string {
 	user := c.User
 	if useAdmin {
 		user = c.Admin
@@ -159,4 +159,8 @@ func (c Config) String(useAdmin bool) string {
 	}
 
 	return strings.Join(fields, " ")
+}
+
+func (*Config) IsRetryable(code string) bool {
+	return code == "CR000" || code == "40001"
 }

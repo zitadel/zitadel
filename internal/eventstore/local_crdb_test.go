@@ -79,3 +79,7 @@ func (*testDB) DatabaseName() string { return "db" }
 func (*testDB) Username() string { return "user" }
 
 func (*testDB) Type() string { return "type" }
+
+func (*testDB) IsRetryable(code string) bool {
+	return code == "CR000" || code == "40001"
+}

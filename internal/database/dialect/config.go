@@ -39,6 +39,7 @@ type Database interface {
 	Username() string
 	Type() string
 	Timetravel(time.Duration) string
+	IsRetryable(code string) bool
 }
 
 func Register(matcher Matcher, config Connector, isDefault bool) {
