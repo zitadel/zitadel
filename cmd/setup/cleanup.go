@@ -44,6 +44,8 @@ func Cleanup(config *Config) {
 		return
 	}
 
+	logging.WithFields("name", step.Name).Info("cleanup migration")
+
 	err = migration.CancelStep(ctx, es, step)
-	logging.OnError(err).Fatal("cancel migration failed please retry")
+	logging.OnError(err).Fatal("cleanup migration failed please retry")
 }
