@@ -35,7 +35,7 @@ func (h *testHandler) AggregateTypes() []models.AggregateType {
 	return nil
 }
 
-func (h *testHandler) CurrentSequence(instanceID string) (uint64, error) {
+func (h *testHandler) CurrentSequence(ctx context.Context, instanceID string) (uint64, error) {
 	return 0, nil
 }
 
@@ -51,7 +51,7 @@ func (h *testHandler) Subscription() *v1.Subscription {
 	return nil
 }
 
-func (h *testHandler) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
+func (h *testHandler) EventQuery(ctx context.Context, instanceIDs []string) (*models.SearchQuery, error) {
 	if h.queryError != nil {
 		return nil, h.queryError
 	}

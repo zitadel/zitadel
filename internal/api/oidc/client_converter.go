@@ -200,6 +200,8 @@ func grantTypeToOIDC(grantType domain.OIDCGrantType) oidc.GrantType {
 		return oidc.GrantTypeImplicit
 	case domain.OIDCGrantTypeRefreshToken:
 		return oidc.GrantTypeRefreshToken
+	case domain.OIDCGrantTypeDeviceCode:
+		return oidc.GrantTypeDeviceCode
 	default:
 		return oidc.GrantTypeCode
 	}

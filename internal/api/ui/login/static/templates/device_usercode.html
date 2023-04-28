@@ -1,0 +1,21 @@
+{{template "main-top" .}}
+
+<h1>{{.Title}}</h1>
+<form method="POST">
+    
+    {{ .CSRF }}
+    
+    <div class="fields">
+        <label class="lgn-label" for="user_code">{{t "DeviceAuth.UserCode.Label"}}</label>
+        <input class="lgn-input" id="user_code" name="user_code" autofocus required{{if .ErrMessage}} shake{{end}}>
+    </div>
+
+    {{template "error-message" .}}
+
+    <div class="lgn-actions">
+        <span class="fill-space"></span>
+        <button id="submit-button" class="lgn-raised-button lgn-primary right" type="submit">{{t "DeviceAuth.UserCode.ButtonNext"}}</button>
+    </div>
+</form>
+
+{{template "main-bottom" .}}

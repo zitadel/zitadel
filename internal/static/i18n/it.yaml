@@ -81,6 +81,7 @@ Errors:
       NotChanged: Email non cambiata
       Empty: Email è vuota
       IDMissing: Email ID mancante
+      InvalidURLTemplate: Il modello di URL non è valido
     Phone:
       NotFound: Telefono non trovato
       Invalid: Il telefono non è valido

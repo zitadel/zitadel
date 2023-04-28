@@ -65,16 +65,16 @@ func (_ *Styling) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{org.AggregateType, instance.AggregateType}
 }
 
-func (m *Styling) CurrentSequence(instanceID string) (uint64, error) {
-	sequence, err := m.view.GetLatestStylingSequence(instanceID)
+func (m *Styling) CurrentSequence(ctx context.Context, instanceID string) (uint64, error) {
+	sequence, err := m.view.GetLatestStylingSequence(ctx, instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (m *Styling) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
-	sequences, err := m.view.GetLatestStylingSequences(instanceIDs)
+func (m *Styling) EventQuery(ctx context.Context, instanceIDs []string) (*models.SearchQuery, error) {
+	sequences, err := m.view.GetLatestStylingSequences(ctx, instanceIDs)
 	if err != nil {
 		return nil, err
 	}
