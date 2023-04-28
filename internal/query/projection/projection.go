@@ -6,72 +6,69 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 )
 
 const (
-	CurrentStateTable = "projections.current_states"
+	CurrentSeqTable   = "projections.current_sequences"
 	LocksTable        = "projections.locks"
-	FailedEventsTable = "projections.failed_events2"
+	FailedEventsTable = "projections.failed_events"
 )
 
 var (
-	projectionConfig                    handler.Config
-	OrgProjection                       *handler.Handler
-	OrgMetadataProjection               *handler.Handler
-	ActionProjection                    *handler.Handler
-	FlowProjection                      *handler.Handler
-	ProjectProjection                   *handler.Handler
-	PasswordComplexityProjection        *handler.Handler
-	PasswordAgeProjection               *handler.Handler
-	LockoutPolicyProjection             *handler.Handler
-	PrivacyPolicyProjection             *handler.Handler
-	DomainPolicyProjection              *handler.Handler
-	LabelPolicyProjection               *handler.Handler
-	ProjectGrantProjection              *handler.Handler
-	ProjectRoleProjection               *handler.Handler
-	OrgDomainProjection                 *handler.Handler
-	LoginPolicyProjection               *handler.Handler
-	IDPProjection                       *handler.Handler
-	AppProjection                       *handler.Handler
-	IDPUserLinkProjection               *handler.Handler
-	IDPLoginPolicyLinkProjection        *handler.Handler
-	IDPTemplateProjection               *handler.Handler
-	MailTemplateProjection              *handler.Handler
-	MessageTextProjection               *handler.Handler
-	CustomTextProjection                *handler.Handler
-	UserProjection                      *handler.Handler
-	LoginNameProjection                 *handler.Handler
-	OrgMemberProjection                 *handler.Handler
-	InstanceDomainProjection            *handler.Handler
-	InstanceMemberProjection            *handler.Handler
-	ProjectMemberProjection             *handler.Handler
-	ProjectGrantMemberProjection        *handler.Handler
-	AuthNKeyProjection                  *handler.Handler
-	PersonalAccessTokenProjection       *handler.Handler
-	UserGrantProjection                 *handler.Handler
-	UserMetadataProjection              *handler.Handler
-	UserAuthMethodProjection            *handler.Handler
-	InstanceProjection                  *handler.Handler
-	SecretGeneratorProjection           *handler.Handler
-	SMTPConfigProjection                *handler.Handler
-	SMSConfigProjection                 *handler.Handler
-	OIDCSettingsProjection              *handler.Handler
-	DebugNotificationProviderProjection *handler.Handler
-	KeyProjection                       *handler.Handler
-	SecurityPolicyProjection            *handler.Handler
-	NotificationPolicyProjection        *handler.Handler
+	projectionConfig                    crdb.StatementHandlerConfig
+	OrgProjection                       *orgProjection
+	OrgMetadataProjection               *orgMetadataProjection
+	ActionProjection                    *actionProjection
+	FlowProjection                      *flowProjection
+	ProjectProjection                   *projectProjection
+	PasswordComplexityProjection        *passwordComplexityProjection
+	PasswordAgeProjection               *passwordAgeProjection
+	LockoutPolicyProjection             *lockoutPolicyProjection
+	PrivacyPolicyProjection             *privacyPolicyProjection
+	DomainPolicyProjection              *domainPolicyProjection
+	LabelPolicyProjection               *labelPolicyProjection
+	ProjectGrantProjection              *projectGrantProjection
+	ProjectRoleProjection               *projectRoleProjection
+	OrgDomainProjection                 *orgDomainProjection
+	LoginPolicyProjection               *loginPolicyProjection
+	IDPProjection                       *idpProjection
+	AppProjection                       *appProjection
+	IDPUserLinkProjection               *idpUserLinkProjection
+	IDPLoginPolicyLinkProjection        *idpLoginPolicyLinkProjection
+	IDPTemplateProjection               *idpTemplateProjection
+	MailTemplateProjection              *mailTemplateProjection
+	MessageTextProjection               *messageTextProjection
+	CustomTextProjection                *customTextProjection
+	UserProjection                      *userProjection
+	LoginNameProjection                 *loginNameProjection
+	OrgMemberProjection                 *orgMemberProjection
+	InstanceDomainProjection            *instanceDomainProjection
+	InstanceMemberProjection            *instanceMemberProjection
+	ProjectMemberProjection             *projectMemberProjection
+	ProjectGrantMemberProjection        *projectGrantMemberProjection
+	AuthNKeyProjection                  *authNKeyProjection
+	PersonalAccessTokenProjection       *personalAccessTokenProjection
+	UserGrantProjection                 *userGrantProjection
+	UserMetadataProjection              *userMetadataProjection
+	UserAuthMethodProjection            *userAuthMethodProjection
+	InstanceProjection                  *instanceProjection
+	SecretGeneratorProjection           *secretGeneratorProjection
+	SMTPConfigProjection                *smtpConfigProjection
+	SMSConfigProjection                 *smsConfigProjection
+	OIDCSettingsProjection              *oidcSettingsProjection
+	DebugNotificationProviderProjection *debugNotificationProviderProjection
+	KeyProjection                       *keyProjection
+	SecurityPolicyProjection            *securityPolicyProjection
+	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
 	NotificationsQuotaProjection        interface{}
-	DeviceAuthProjection                *handler.Handler
+	DeviceAuthProjection                *deviceAuthProjection
 )
 
-type eventStore interface {
-	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
-}
-
 type projection interface {
-	Start(ctx context.Context)
+	Start()
 	Init(ctx context.Context) error
 }
 
@@ -79,14 +76,24 @@ var (
 	projections []projection
 )
 
-func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
-	projectionConfig = handler.Config{
-		Client:                sqlClient,
-		Eventstore:            es,
-		BulkLimit:             uint16(config.BulkLimit),
-		RequeueEvery:          config.RequeueEvery,
-		HandleActiveInstances: config.HandleActiveInstances,
-		MaxFailureCount:       config.MaxFailureCount,
+func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
+	projectionConfig = crdb.StatementHandlerConfig{
+		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
+			HandlerConfig: handler.HandlerConfig{
+				Eventstore: es,
+			},
+			RequeueEvery:          config.RequeueEvery,
+			RetryFailedAfter:      config.RetryFailedAfter,
+			Retries:               config.MaxFailureCount,
+			ConcurrentInstances:   config.ConcurrentInstances,
+			HandleActiveInstances: config.HandleActiveInstances,
+		},
+		Client:            sqlClient,
+		SequenceTable:     CurrentSeqTable,
+		LockTable:         LocksTable,
+		FailedEventsTable: FailedEventsTable,
+		MaxFailureCount:   config.MaxFailureCount,
+		BulkLimit:         config.BulkLimit,
 	}
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
@@ -147,29 +154,29 @@ func Init(ctx context.Context) error {
 	return nil
 }
 
-func Start(ctx context.Context) {
+func Start() {
 	for _, projection := range projections {
-		projection.Start(ctx)
+		projection.Start()
 	}
 }
 
-func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
+func ApplyCustomConfig(customConfig CustomConfig) crdb.StatementHandlerConfig {
 	return applyCustomConfig(projectionConfig, customConfig)
 }
 
-func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler.Config {
-	// if customConfig.BulkLimit != nil {
-	// 	config.BulkLimit = *customConfig.BulkLimit
-	// }
-	// if customConfig.MaxFailureCount != nil {
-	// 	config.MaxFailureCount = *customConfig.MaxFailureCount
-	// }
+func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomConfig) crdb.StatementHandlerConfig {
+	if customConfig.BulkLimit != nil {
+		config.BulkLimit = *customConfig.BulkLimit
+	}
+	if customConfig.MaxFailureCount != nil {
+		config.MaxFailureCount = *customConfig.MaxFailureCount
+	}
 	if customConfig.RequeueEvery != nil {
 		config.RequeueEvery = *customConfig.RequeueEvery
 	}
-	// if customConfig.RetryFailedAfter != nil {
-	// 	config.RetryFailedAfter = *customConfig.RetryFailedAfter
-	// }
+	if customConfig.RetryFailedAfter != nil {
+		config.RetryFailedAfter = *customConfig.RetryFailedAfter
+	}
 	if customConfig.HandleActiveInstances != nil {
 		config.HandleActiveInstances = *customConfig.HandleActiveInstances
 	}

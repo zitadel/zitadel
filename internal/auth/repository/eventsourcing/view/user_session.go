@@ -2,9 +2,10 @@ package view
 
 import (
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 const (
@@ -31,34 +32,66 @@ func (v *View) ActiveUserSessionsCount() (uint64, error) {
 	return view.ActiveUserSessions(v.Db, userSessionTable)
 }
 
-func (v *View) PutUserSession(userSession *model.UserSessionView) error {
-	return view.PutUserSession(v.Db, userSessionTable, userSession)
+func (v *View) PutUserSession(userSession *model.UserSessionView, event *models.Event) error {
+	err := view.PutUserSession(v.Db, userSessionTable, userSession)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedUserSessionSequence(event)
 }
 
-func (v *View) PutUserSessions(userSession []*model.UserSessionView) error {
-	return view.PutUserSessions(v.Db, userSessionTable, userSession...)
+func (v *View) PutUserSessions(userSession []*model.UserSessionView, event *models.Event) error {
+	err := view.PutUserSessions(v.Db, userSessionTable, userSession...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedUserSessionSequence(event)
 }
 
-func (v *View) DeleteUserSessions(userID, instanceID string) error {
+func (v *View) DeleteUserSessions(userID, instanceID string, event *models.Event) error {
 	err := view.DeleteUserSessions(v.Db, userSessionTable, userID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return nil
+	return v.ProcessedUserSessionSequence(event)
 }
 
-func (v *View) DeleteInstanceUserSessions(instanceID string) error {
-	err := view.DeleteInstanceUserSessions(v.Db, userSessionTable, instanceID)
+func (v *View) DeleteInstanceUserSessions(event *models.Event) error {
+	err := view.DeleteInstanceUserSessions(v.Db, userSessionTable, event.InstanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return nil
+	return v.ProcessedUserSessionSequence(event)
 }
 
-func (v *View) DeleteOrgUserSessions(event eventstore.Event) error {
-	err := view.DeleteOrgUserSessions(v.Db, userSessionTable, event.Aggregate().InstanceID, event.Aggregate().ResourceOwner)
+func (v *View) DeleteOrgUserSessions(event *models.Event) error {
+	err := view.DeleteOrgUserSessions(v.Db, userSessionTable, event.InstanceID, event.ResourceOwner)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return nil
+	return v.ProcessedUserSessionSequence(event)
+}
+
+func (v *View) GetLatestUserSessionSequence(instanceID string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(userSessionTable, instanceID)
+}
+
+func (v *View) GetLatestUserSessionSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(userSessionTable, instanceIDs)
+}
+
+func (v *View) ProcessedUserSessionSequence(event *models.Event) error {
+	return v.saveCurrentSequence(userSessionTable, event)
+}
+
+func (v *View) UpdateUserSessionSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(userSessionTable, instanceIDs)
+}
+
+func (v *View) GetLatestUserSessionFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(userSessionTable, instanceID, sequence)
+}
+
+func (v *View) ProcessedUserSessionFailedEvent(failedEvent *repository.FailedEvent) error {
+	return v.saveFailedEvent(failedEvent)
 }

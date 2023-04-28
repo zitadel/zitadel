@@ -1,22 +1,20 @@
 package view
 
 import (
-	"time"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-func UserByIDQuery(id, instanceID string, lastCreationDate time.Time) (*eventstore.SearchQueryBuilder, error) {
+func UserByIDQuery(id, instanceID string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8isw", "Errors.User.UserIDMissing")
 	}
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		InstanceID(instanceID).
+	return es_models.NewSearchQuery().
 		AddQuery().
-		AggregateTypes(user.AggregateType).
-		AggregateIDs(id).
-		CreationDateAfter(lastCreationDate.Add(-1 * time.Microsecond)).
-		Builder(), nil
+		AggregateTypeFilter(user.AggregateType).
+		AggregateIDFilter(id).
+		LatestSequenceFilter(latestSequence).
+		InstanceIDFilter(instanceID).
+		SearchQuery(), nil
 }

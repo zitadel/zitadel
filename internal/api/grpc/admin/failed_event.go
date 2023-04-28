@@ -10,6 +10,11 @@ import (
 
 func (s *Server) ListFailedEvents(ctx context.Context, _ *admin_pb.ListFailedEventsRequest) (*admin_pb.ListFailedEventsResponse, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
+	failedEventsOld, err := s.administrator.GetFailedEvents(ctx, instanceID)
+	if err != nil {
+		return nil, err
+	}
+	convertedOld := FailedEventsViewToPb(failedEventsOld)
 	instanceIDQuery, err := query.NewFailedEventInstanceIDSearchQuery(instanceID)
 	if err != nil {
 		return nil, err
@@ -20,11 +25,17 @@ func (s *Server) ListFailedEvents(ctx context.Context, _ *admin_pb.ListFailedEve
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.ListFailedEventsResponse{Result: FailedEventsToPb(s.database, failedEvents)}, nil
+	convertedNew := FailedEventsToPb(s.database, failedEvents)
+	return &admin_pb.ListFailedEventsResponse{Result: append(convertedOld, convertedNew...)}, nil
 }
 
 func (s *Server) RemoveFailedEvent(ctx context.Context, req *admin_pb.RemoveFailedEventRequest) (*admin_pb.RemoveFailedEventResponse, error) {
-	err := s.query.RemoveFailedEvent(ctx, req.ViewName, authz.GetInstance(ctx).InstanceID(), req.FailedSequence)
+	var err error
+	if req.Database != s.database {
+		err = s.administrator.RemoveFailedEvent(ctx, RemoveFailedEventRequestToModel(ctx, req))
+	} else {
+		err = s.query.RemoveFailedEvent(ctx, req.ViewName, authz.GetInstance(ctx).InstanceID(), req.FailedSequence)
+	}
 	if err != nil {
 		return nil, err
 	}

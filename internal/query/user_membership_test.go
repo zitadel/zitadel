@@ -29,7 +29,6 @@ var (
 			", projections.project_grants3.granted_org_id" +
 			", projections.projects3.name" +
 			", projections.orgs.name" +
-			", projections.instances.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
 			"SELECT members.user_id" +
@@ -91,7 +90,6 @@ var (
 			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id AND memberships.instance_id = projections.projects3.instance_id" +
 			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +
 			" LEFT JOIN projections.project_grants3 ON memberships.grant_id = projections.project_grants3.grant_id AND memberships.instance_id = projections.project_grants3.instance_id" +
-			" LEFT JOIN projections.instances ON memberships.instance_id = projections.instances.id" +
 			` AS OF SYSTEM TIME '-1 ms'`)
 	membershipCols = []string{
 		"user_id",
@@ -107,7 +105,6 @@ var (
 		"granted_org_id",
 		"name", //project name
 		"name", //org name
-		"name", // instance name
 		"count",
 	}
 )
@@ -157,7 +154,6 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"org-name",
-							nil,
 						},
 					},
 				),
@@ -201,7 +197,6 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							"instance",
 						},
 					},
 				),
@@ -218,7 +213,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						IAM:           &IAMMembership{IAMID: "iam-id", Name: "instance"},
+						IAM:           &IAMMembership{IAMID: "iam-id", Name: "iam-id"},
 					},
 				},
 			},
@@ -244,7 +239,6 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"project-name",
-							nil,
 							nil,
 						},
 					},
@@ -288,7 +282,6 @@ func Test_MembershipPrepares(t *testing.T) {
 							"grant-id",
 							"granted-org-id",
 							"project-name",
-							nil,
 							nil,
 						},
 					},
@@ -338,7 +331,6 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"org-name",
-							nil,
 						},
 						{
 							"user-id",
@@ -354,7 +346,6 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							"instance",
 						},
 						{
 							"user-id",
@@ -369,7 +360,6 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"project-name",
-							nil,
 							nil,
 						},
 						{
@@ -385,7 +375,6 @@ func Test_MembershipPrepares(t *testing.T) {
 							"grant-id",
 							"granted-org-id",
 							"project-name",
-							nil,
 							nil,
 						},
 					},
@@ -412,7 +401,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						IAM:           &IAMMembership{IAMID: "iam-id", Name: "instance"},
+						IAM:           &IAMMembership{IAMID: "iam-id", Name: "iam-id"},
 					},
 					{
 						UserID:        "user-id",

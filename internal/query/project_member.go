@@ -93,7 +93,7 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T8CuT", "Errors.Query.InvalidRequest")
 	}
 
-	currentSequence, err := q.latestState(ctx, projectMemberTable)
+	currentSequence, err := q.latestSequence(ctx, projectMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	if err != nil {
 		return nil, err
 	}
-	members.LatestState = currentSequence
+	members.LatestSequence = currentSequence
 	return members, err
 }
 

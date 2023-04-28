@@ -96,7 +96,7 @@ func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan fu
 	if err != nil {
 		return nil, err
 	}
-	domains.LatestState, err = q.latestState(ctx, instanceDomainsTable)
+	domains.LatestSequence, err = q.latestSequence(ctx, instanceDomainsTable)
 	return domains, err
 }
 

@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -28,39 +28,39 @@ const (
 	PersonalAccessTokenColumnOwnerRemoved  = "owner_removed"
 )
 
-type personalAccessTokenProjection struct{}
-
-func newPersonalAccessTokenProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(personalAccessTokenProjection))
+type personalAccessTokenProjection struct {
+	crdb.StatementHandler
 }
 
-func (*personalAccessTokenProjection) Name() string {
-	return PersonalAccessTokenProjectionTable
-}
-
-func (*personalAccessTokenProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(PersonalAccessTokenColumnID, handler.ColumnTypeText),
-			handler.NewColumn(PersonalAccessTokenColumnCreationDate, handler.ColumnTypeTimestamp),
-			handler.NewColumn(PersonalAccessTokenColumnChangeDate, handler.ColumnTypeTimestamp),
-			handler.NewColumn(PersonalAccessTokenColumnSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(PersonalAccessTokenColumnResourceOwner, handler.ColumnTypeText),
-			handler.NewColumn(PersonalAccessTokenColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(PersonalAccessTokenColumnUserID, handler.ColumnTypeText),
-			handler.NewColumn(PersonalAccessTokenColumnExpiration, handler.ColumnTypeTimestamp),
-			handler.NewColumn(PersonalAccessTokenColumnScopes, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(PersonalAccessTokenColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
+func newPersonalAccessTokenProjection(ctx context.Context, config crdb.StatementHandlerConfig) *personalAccessTokenProjection {
+	p := new(personalAccessTokenProjection)
+	config.ProjectionName = PersonalAccessTokenProjectionTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(PersonalAccessTokenColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PersonalAccessTokenColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PersonalAccessTokenColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(PersonalAccessTokenColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnUserID, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnExpiration, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PersonalAccessTokenColumnScopes, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(PersonalAccessTokenColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(PersonalAccessTokenColumnInstanceID, PersonalAccessTokenColumnID),
-			handler.WithIndex(handler.NewIndex("user_id", []string{PersonalAccessTokenColumnUserID})),
-			handler.WithIndex(handler.NewIndex("resource_owner", []string{PersonalAccessTokenColumnResourceOwner})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{PersonalAccessTokenColumnOwnerRemoved})),
+			crdb.NewPrimaryKey(PersonalAccessTokenColumnInstanceID, PersonalAccessTokenColumnID),
+			crdb.WithIndex(crdb.NewIndex("user_id", []string{PersonalAccessTokenColumnUserID})),
+			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{PersonalAccessTokenColumnResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{PersonalAccessTokenColumnOwnerRemoved})),
 		),
 	)
+
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *personalAccessTokenProjection) Reducers() []handler.AggregateReducer {
+func (p *personalAccessTokenProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -105,7 +105,7 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DVgf7", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
 	}
-	return handler.NewCreateStatement(
+	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(PersonalAccessTokenColumnID, e.TokenID),
@@ -126,7 +126,7 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenRemoved(event e
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g7u3F", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(PersonalAccessTokenColumnID, e.TokenID),
@@ -140,7 +140,7 @@ func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff3h", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
@@ -155,7 +155,7 @@ func (p *personalAccessTokenProjection) reduceOwnerRemoved(event eventstore.Even
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-zQVhl", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(PersonalAccessTokenColumnChangeDate, e.CreationDate()),

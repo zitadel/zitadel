@@ -10,7 +10,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -43,21 +44,19 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				), usergrant.UserGrantAddedEventMapper),
 			},
 			reduce: (&userGrantProjection{
-				es: newMockEventStore().
-					appendFilterResponse([]eventstore.Event{
-						user.NewHumanAddedEvent(context.Background(),
-							&user.NewAggregate("user-id", "org1").Aggregate,
-							"username1",
-							"firstname1",
-							"lastname1",
-							"nickname1",
-							"displayname1",
-							language.German,
-							domain.GenderMale,
-							"email1",
-							true,
-						),
-					}).appendFilterResponse([]eventstore.Event{
+				StatementHandler: getStatementHandlerWithFilters(
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org1").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					),
 					project.NewProjectAddedEvent(context.Background(),
 						&project.NewAggregate("project-id", "org2").Aggregate,
 						"project",
@@ -66,11 +65,11 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 						false,
 						domain.PrivateLabelingSettingUnspecified,
 					),
-				}),
-			}).reduceAdded,
+				)(t)}).reduceAdded,
 			want: wantReduce{
-				aggregateType: usergrant.AggregateType,
-				sequence:      15,
+				aggregateType:    usergrant.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -111,32 +110,30 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				), usergrant.UserGrantAddedEventMapper),
 			},
 			reduce: (&userGrantProjection{
-				es: newMockEventStore().
-					appendFilterResponse([]eventstore.Event{
-						user.NewHumanAddedEvent(context.Background(),
-							&user.NewAggregate("user-id", "org1").Aggregate,
-							"username1",
-							"firstname1",
-							"lastname1",
-							"nickname1",
-							"displayname1",
-							language.German,
-							domain.GenderMale,
-							"email1",
-							true,
-						),
-					}).appendFilterResponse([]eventstore.Event{
+				StatementHandler: getStatementHandlerWithFilters(
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org1").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					),
 					project.NewGrantAddedEvent(context.Background(),
 						&project.NewAggregate("project-id", "org2").Aggregate,
 						"grant-id",
 						"org3",
 						[]string{},
 					),
-				}),
-			}).reduceAdded,
+				)(t)}).reduceAdded,
 			want: wantReduce{
-				aggregateType: usergrant.AggregateType,
-				sequence:      15,
+				aggregateType:    usergrant.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -175,8 +172,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType: usergrant.AggregateType,
-				sequence:      15,
+				aggregateType:    usergrant.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -206,8 +204,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType: usergrant.AggregateType,
-				sequence:      15,
+				aggregateType:    usergrant.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -235,8 +234,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType: usergrant.AggregateType,
-				sequence:      15,
+				aggregateType:    usergrant.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -261,8 +261,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(UserGrantInstanceID),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -286,8 +287,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType: usergrant.AggregateType,
-				sequence:      15,
+				aggregateType:    usergrant.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -312,8 +314,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceDeactivated,
 			want: wantReduce{
-				aggregateType: usergrant.AggregateType,
-				sequence:      15,
+				aggregateType:    usergrant.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -341,8 +344,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceReactivated,
 			want: wantReduce{
-				aggregateType: usergrant.AggregateType,
-				sequence:      15,
+				aggregateType:    usergrant.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -370,8 +374,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -396,8 +401,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				aggregateType: project.AggregateType,
-				sequence:      15,
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -422,8 +428,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
-				aggregateType: project.AggregateType,
-				sequence:      15,
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -448,8 +455,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceRoleRemoved,
 			want: wantReduce{
-				aggregateType: project.AggregateType,
-				sequence:      15,
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -475,8 +483,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userGrantProjection{}).reduceProjectGrantChanged,
 			want: wantReduce{
-				aggregateType: project.AggregateType,
-				sequence:      15,
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -502,8 +511,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -563,5 +573,31 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			got, err = tt.reduce(event)
 			assertReduce(t, got, err, UserGrantProjectionTable, tt.want)
 		})
+	}
+}
+
+func getStatementHandlerWithFilters(events ...eventstore.Command) func(t *testing.T) crdb.StatementHandler {
+	filters := make([]expect, 0)
+	for _, event := range events {
+		filters = append(filters,
+			expectFilter(
+				eventFromEventPusher(
+					event,
+				),
+			),
+		)
+	}
+
+	return func(t *testing.T) crdb.StatementHandler {
+		return crdb.StatementHandler{
+			ProjectionHandler: &handler.ProjectionHandler{
+				Handler: handler.Handler{
+					Eventstore: eventstoreExpect(
+						t,
+						filters...,
+					),
+				},
+			},
+		}
 	}
 }

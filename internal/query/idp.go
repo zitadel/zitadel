@@ -245,7 +245,7 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwner
 	if err != nil {
 		return nil, err
 	}
-	idps.LatestState, err = q.latestState(ctx, idpTable)
+	idps.LatestSequence, err = q.latestSequence(ctx, idpTable)
 	return idps, err
 }
 

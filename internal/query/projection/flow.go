@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -24,36 +24,35 @@ const (
 	FlowOwnerRemovedCol          = "owner_removed"
 )
 
-type flowProjection struct{}
-
-func newFlowProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(flowProjection))
+type flowProjection struct {
+	crdb.StatementHandler
 }
 
-func (*flowProjection) Name() string {
-	return FlowTriggerTable
-}
-
-func (*flowProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(FlowTypeCol, handler.ColumnTypeEnum),
-			handler.NewColumn(FlowChangeDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(FlowSequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(FlowTriggerTypeCol, handler.ColumnTypeEnum),
-			handler.NewColumn(FlowResourceOwnerCol, handler.ColumnTypeText),
-			handler.NewColumn(FlowInstanceIDCol, handler.ColumnTypeText),
-			handler.NewColumn(FlowActionTriggerSequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(FlowActionIDCol, handler.ColumnTypeText),
-			handler.NewColumn(FlowOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+func newFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) *flowProjection {
+	p := new(flowProjection)
+	config.ProjectionName = FlowTriggerTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(FlowTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(FlowChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(FlowSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(FlowTriggerTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(FlowResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FlowInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FlowActionTriggerSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(FlowActionIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FlowOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(FlowInstanceIDCol, FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{FlowOwnerRemovedCol})),
+			crdb.NewPrimaryKey(FlowInstanceIDCol, FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{FlowOwnerRemovedCol})),
 		),
 	)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *flowProjection) Reducers() []handler.AggregateReducer {
+func (p *flowProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -89,8 +88,8 @@ func (p *flowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.TriggerActionsSetEventType)
 	}
-	stmts := make([]func(reader eventstore.Event) handler.Exec, len(e.ActionIDs)+1)
-	stmts[0] = handler.AddDeleteStatement(
+	stmts := make([]func(reader eventstore.Event) crdb.Exec, len(e.ActionIDs)+1)
+	stmts[0] = crdb.AddDeleteStatement(
 		[]handler.Condition{
 			handler.NewCond(FlowTypeCol, e.FlowType),
 			handler.NewCond(FlowTriggerTypeCol, e.TriggerType),
@@ -99,7 +98,7 @@ func (p *flowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 		},
 	)
 	for i, id := range e.ActionIDs {
-		stmts[i+1] = handler.AddCreateStatement(
+		stmts[i+1] = crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(FlowResourceOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCol(FlowInstanceIDCol, e.Aggregate().InstanceID),
@@ -112,7 +111,7 @@ func (p *flowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 			},
 		)
 	}
-	return handler.NewMultiStatement(e, stmts...), nil
+	return crdb.NewMultiStatement(e, stmts...), nil
 }
 
 func (p *flowProjection) reduceFlowClearedEventType(event eventstore.Event) (*handler.Statement, error) {
@@ -120,7 +119,7 @@ func (p *flowProjection) reduceFlowClearedEventType(event eventstore.Event) (*ha
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.FlowClearedEventType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(FlowTypeCol, e.FlowType),
@@ -136,7 +135,7 @@ func (p *flowProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.St
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Yd7WC", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(FlowChangeDateCol, e.CreationDate()),

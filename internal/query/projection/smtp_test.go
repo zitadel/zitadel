@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -38,8 +38,9 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -82,8 +83,9 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -124,8 +126,9 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigPasswordChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -153,8 +156,9 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(SMTPConfigColumnInstanceID),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

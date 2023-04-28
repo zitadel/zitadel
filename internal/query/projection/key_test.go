@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
@@ -38,8 +38,9 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("key_pair"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("key_pair"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -93,9 +94,10 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&keyProjection{}).reduceKeyPairAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("key_pair"),
-				sequence:      15,
-				executer:      &testExecuter{},
+				aggregateType:    eventstore.AggregateType("key_pair"),
+				sequence:         15,
+				previousSequence: 10,
+				executer:         &testExecuter{},
 			},
 		},
 		{
@@ -109,8 +111,9 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(KeyColumnInstanceID),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -134,8 +137,9 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&keyProjection{certEncryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceCertificateAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("key_pair"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("key_pair"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

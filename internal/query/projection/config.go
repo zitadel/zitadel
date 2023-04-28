@@ -7,7 +7,7 @@ import (
 type Config struct {
 	RequeueEvery          time.Duration
 	RetryFailedAfter      time.Duration
-	MaxFailureCount       uint8
+	MaxFailureCount       uint
 	ConcurrentInstances   uint
 	BulkLimit             uint64
 	Customizations        map[string]CustomConfig

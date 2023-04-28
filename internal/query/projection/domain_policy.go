@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -30,39 +30,38 @@ const (
 	DomainPolicyOwnerRemovedCol                           = "owner_removed"
 )
 
-type domainPolicyProjection struct{}
-
-func newDomainPolicyProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(domainPolicyProjection))
+type domainPolicyProjection struct {
+	crdb.StatementHandler
 }
 
-func (*domainPolicyProjection) Name() string {
-	return DomainPolicyTable
-}
-
-func (*domainPolicyProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(DomainPolicyIDCol, handler.ColumnTypeText),
-			handler.NewColumn(DomainPolicyCreationDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(DomainPolicyChangeDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(DomainPolicySequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(DomainPolicyStateCol, handler.ColumnTypeEnum),
-			handler.NewColumn(DomainPolicyUserLoginMustBeDomainCol, handler.ColumnTypeBool),
-			handler.NewColumn(DomainPolicyValidateOrgDomainsCol, handler.ColumnTypeBool),
-			handler.NewColumn(DomainPolicySMTPSenderAddressMatchesInstanceDomainCol, handler.ColumnTypeBool),
-			handler.NewColumn(DomainPolicyIsDefaultCol, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(DomainPolicyResourceOwnerCol, handler.ColumnTypeText),
-			handler.NewColumn(DomainPolicyInstanceIDCol, handler.ColumnTypeText),
-			handler.NewColumn(DomainPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+func newDomainPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *domainPolicyProjection {
+	p := new(domainPolicyProjection)
+	config.ProjectionName = DomainPolicyTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(DomainPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DomainPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(DomainPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(DomainPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(DomainPolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(DomainPolicyUserLoginMustBeDomainCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(DomainPolicyValidateOrgDomainsCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(DomainPolicySMTPSenderAddressMatchesInstanceDomainCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(DomainPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(DomainPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DomainPolicyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DomainPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(DomainPolicyInstanceIDCol, DomainPolicyIDCol),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{DomainPolicyOwnerRemovedCol})),
+			crdb.NewPrimaryKey(DomainPolicyInstanceIDCol, DomainPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{DomainPolicyOwnerRemovedCol})),
 		),
 	)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *domainPolicyProjection) Reducers() []handler.AggregateReducer {
+func (p *domainPolicyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -118,7 +117,7 @@ func (p *domainPolicyProjection) reduceAdded(event eventstore.Event) (*handler.S
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CSE7A", "reduce.wrong.event.type %v", []eventstore.EventType{org.DomainPolicyAddedEventType, instance.DomainPolicyAddedEventType})
 	}
-	return handler.NewCreateStatement(
+	return crdb.NewCreateStatement(
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(DomainPolicyCreationDateCol, policyEvent.CreationDate()),
@@ -158,7 +157,7 @@ func (p *domainPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 	if policyEvent.SMTPSenderAddressMatchesInstanceDomain != nil {
 		cols = append(cols, handler.NewCol(DomainPolicySMTPSenderAddressMatchesInstanceDomainCol, *policyEvent.SMTPSenderAddressMatchesInstanceDomain))
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		&policyEvent,
 		cols,
 		[]handler.Condition{
@@ -172,7 +171,7 @@ func (p *domainPolicyProjection) reduceRemoved(event eventstore.Event) (*handler
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-JAENd", "reduce.wrong.event.type %s", org.DomainPolicyRemovedEventType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(DomainPolicyIDCol, policyEvent.Aggregate().ID),
@@ -186,7 +185,7 @@ func (p *domainPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-JYD2K", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(DomainPolicyChangeDateCol, e.CreationDate()),

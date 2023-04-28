@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -31,8 +31,9 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceInstanceAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -60,8 +61,9 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(InstanceColumnID),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -85,8 +87,9 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceDefaultOrgSet,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -113,8 +116,9 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -141,8 +145,9 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

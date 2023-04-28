@@ -36,13 +36,13 @@ func (t *Token) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (t *Token) AppendEvent(event *es_models.Event) error {
-	switch eventstore.EventType(event.Typ) {
+	switch eventstore.EventType(event.Type) {
 	case user_repo.UserTokenAddedType:
 		err := t.setData(event)
 		if err != nil {
 			return err
 		}
-		t.CreationDate = event.CreatedAt
+		t.CreationDate = event.CreationDate
 	}
 	return nil
 }

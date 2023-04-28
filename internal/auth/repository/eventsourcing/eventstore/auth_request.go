@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
@@ -31,6 +32,7 @@ type AuthRequestRepo struct {
 	Query        *query.Queries
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
+	Eventstore   v1.Eventstore
 	UserCodeAlg  crypto.EncryptionAlgorithm
 
 	LabelPolicyProvider       labelPolicyProvider
@@ -84,7 +86,7 @@ type idpUserLinksProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, changeDate time.Time) ([]eventstore.Event, error)
+	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
 }
 
 type userCommandProvider interface {
@@ -1303,14 +1305,14 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		}
 		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.ChangeDate)
+	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
 	}
 	sessionCopy := *session
 	for _, event := range events {
-		switch event.Type() {
+		switch eventstore.EventType(event.Type) {
 		case user_repo.UserV1PasswordCheckSucceededType,
 			user_repo.UserV1PasswordCheckFailedType,
 			user_repo.UserV1MFAOTPCheckSucceededType,
@@ -1384,7 +1386,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	} else if user == nil {
 		user = new(user_view_model.UserView)
 	}
-	events, err := eventProvider.UserEventsByID(ctx, userID, user.ChangeDate)
+	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil

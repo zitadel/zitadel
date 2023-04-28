@@ -58,7 +58,7 @@ func (a *Email) setData(event *es_models.Event) error {
 
 func (a *EmailCode) SetData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
-	a.CreationDate = event.CreatedAt
+	a.CreationDate = event.CreationDate
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-lo9s").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-s8uws", "could not unmarshal event")

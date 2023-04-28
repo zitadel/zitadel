@@ -10,15 +10,23 @@ import (
 
 func (s *Server) ListViews(ctx context.Context, _ *admin_pb.ListViewsRequest) (*admin_pb.ListViewsResponse, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	instanceIDQuery, err := query.NewCurrentStatesInstanceIDSearchQuery(instanceID)
+	instanceIDQuery, err := query.NewCurrentSequencesInstanceIDSearchQuery(instanceID)
 	if err != nil {
 		return nil, err
 	}
-	currentSequences, err := s.query.SearchCurrentStates(ctx, &query.CurrentStateSearchQueries{
+	currentSequences, err := s.query.SearchCurrentSequences(ctx, &query.CurrentSequencesSearchQueries{
 		Queries: []query.SearchQuery{instanceIDQuery},
 	})
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.ListViewsResponse{Result: CurrentSequencesToPb(s.database, currentSequences)}, nil
+	convertedCurrentSequences := CurrentSequencesToPb(s.database, currentSequences)
+	views, err := s.administrator.GetViews(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	convertedViews := ViewsToPb(views)
+
+	convertedCurrentSequences = append(convertedCurrentSequences, convertedViews...)
+	return &admin_pb.ListViewsResponse{Result: convertedCurrentSequences}, nil
 }

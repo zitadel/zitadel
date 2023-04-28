@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -36,8 +36,9 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -72,8 +73,9 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -107,8 +109,9 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -144,8 +147,9 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userAuthMethodProjection{}).reduceActivateEvent,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -180,8 +184,9 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userAuthMethodProjection{}).reduceActivateEvent,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -214,8 +219,9 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userAuthMethodProjection{}).reduceActivateEvent,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -247,8 +253,9 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -276,8 +283,9 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(UserAuthMethodInstanceIDCol),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

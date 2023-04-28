@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -48,10 +48,11 @@ func getEvent(event *repository.Event, mapper func(*repository.Event) (eventstor
 }
 
 type wantReduce struct {
-	aggregateType eventstore.AggregateType
-	sequence      uint64
-	executer      *testExecuter
-	err           func(error) bool
+	aggregateType    eventstore.AggregateType
+	sequence         uint64
+	previousSequence uint64
+	executer         *testExecuter
+	err              func(error) bool
 }
 
 func assertReduce(t *testing.T, stmt *handler.Statement, err error, projection string, want wantReduce) {
@@ -65,6 +66,10 @@ func assertReduce(t *testing.T, stmt *handler.Statement, err error, projection s
 	}
 	if stmt.AggregateType != want.aggregateType {
 		t.Errorf("wrong aggregate type: want: %q got: %q", want.aggregateType, stmt.AggregateType)
+	}
+
+	if stmt.PreviousSequence != want.previousSequence {
+		t.Errorf("wrong previous sequence: want: %d got: %d", want.previousSequence, stmt.PreviousSequence)
 	}
 
 	if stmt.Sequence != want.sequence {

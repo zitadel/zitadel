@@ -110,7 +110,7 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	if err != nil {
 		return nil, err
 	}
-	userAuthMethods.LatestState, err = q.latestState(ctx, userAuthMethodTable)
+	userAuthMethods.LatestSequence, err = q.latestSequence(ctx, userAuthMethodTable)
 	return userAuthMethods, err
 }
 

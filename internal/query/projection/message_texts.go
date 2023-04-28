@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -34,43 +34,42 @@ const (
 	MessageTextOwnerRemovedCol = "owner_removed"
 )
 
-type messageTextProjection struct{}
-
-func newMessageTextProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(messageTextProjection))
+type messageTextProjection struct {
+	crdb.StatementHandler
 }
 
-func (*messageTextProjection) Name() string {
-	return MessageTextTable
-}
-
-func (*messageTextProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(MessageTextAggregateIDCol, handler.ColumnTypeText),
-			handler.NewColumn(MessageTextInstanceIDCol, handler.ColumnTypeText),
-			handler.NewColumn(MessageTextCreationDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(MessageTextChangeDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(MessageTextSequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(MessageTextStateCol, handler.ColumnTypeEnum),
-			handler.NewColumn(MessageTextTypeCol, handler.ColumnTypeText),
-			handler.NewColumn(MessageTextLanguageCol, handler.ColumnTypeText),
-			handler.NewColumn(MessageTextTitleCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MessageTextPreHeaderCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MessageTextSubjectCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MessageTextGreetingCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MessageTextTextCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MessageTextButtonTextCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MessageTextFooterCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MessageTextOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+func newMessageTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *messageTextProjection {
+	p := new(messageTextProjection)
+	config.ProjectionName = MessageTextTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(MessageTextAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MessageTextChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MessageTextSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(MessageTextStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(MessageTextTypeCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextLanguageCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextTitleCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextPreHeaderCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextSubjectCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextGreetingCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextTextCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextButtonTextCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextFooterCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(MessageTextInstanceIDCol, MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{MessageTextOwnerRemovedCol})),
+			crdb.NewPrimaryKey(MessageTextInstanceIDCol, MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{MessageTextOwnerRemovedCol})),
 		),
 	)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *messageTextProjection) Reducers() []handler.AggregateReducer {
+func (p *messageTextProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -128,7 +127,7 @@ func (p *messageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n90r", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return handler.NewNoOpStatement(event), nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 
 	cols := []handler.Column{
@@ -162,7 +161,7 @@ func (p *messageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	if isFooterText(templateEvent.Key) {
 		cols = append(cols, handler.NewCol(MessageTextFooterCol, templateEvent.Text))
 	}
-	return handler.NewUpsertStatement(
+	return crdb.NewUpsertStatement(
 		&templateEvent,
 		[]handler.Column{
 			handler.NewCol(MessageTextInstanceIDCol, nil),
@@ -185,7 +184,7 @@ func (p *messageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-fm0ge", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return handler.NewNoOpStatement(event), nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 	cols := []handler.Column{
 		handler.NewCol(MessageTextChangeDateCol, templateEvent.CreationDate()),
@@ -212,7 +211,7 @@ func (p *messageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	if isFooterText(templateEvent.Key) {
 		cols = append(cols, handler.NewCol(MessageTextFooterCol, ""))
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		&templateEvent,
 		cols,
 		[]handler.Condition{
@@ -235,9 +234,9 @@ func (p *messageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n9rs", "reduce.wrong.event.type %s", org.CustomTextTemplateRemovedEventType)
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return handler.NewNoOpStatement(event), nil
+		return crdb.NewNoOpStatement(event), nil
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		event,
 		[]handler.Condition{
 			handler.NewCond(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
@@ -254,7 +253,7 @@ func (p *messageTextProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-mLsQw", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(MessageTextChangeDateCol, e.CreationDate()),

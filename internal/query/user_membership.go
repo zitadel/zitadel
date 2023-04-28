@@ -115,7 +115,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
-	latestSequence, err := q.latestState(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
+	latestSequence, err := q.latestSequence(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, err
 	}
-	memberships.LatestState = latestSequence
+	memberships.LatestSequence = latestSequence
 	return memberships, nil
 }
 
@@ -238,13 +238,11 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerR
 			ProjectGrantColumnGrantedOrgID.identifier(),
 			ProjectColumnName.identifier(),
 			OrgColumnName.identifier(),
-			InstanceColumnName.identifier(),
 			countColumn.identifier(),
 		).From(query).
 			LeftJoin(join(ProjectColumnID, membershipProjectID)).
 			LeftJoin(join(OrgColumnID, membershipOrgID)).
-			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID)).
-			LeftJoin(join(InstanceColumnID, membershipInstanceID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		args,
 		func(rows *sql.Rows) (*Memberships, error) {
@@ -255,13 +253,12 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerR
 				var (
 					membership   = new(Membership)
 					orgID        = sql.NullString{}
-					instanceID   = sql.NullString{}
+					iamID        = sql.NullString{}
 					projectID    = sql.NullString{}
 					grantID      = sql.NullString{}
 					grantedOrgID = sql.NullString{}
 					projectName  = sql.NullString{}
 					orgName      = sql.NullString{}
-					instanceName = sql.NullString{}
 				)
 
 				err := rows.Scan(
@@ -272,13 +269,12 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerR
 					&membership.Sequence,
 					&membership.ResourceOwner,
 					&orgID,
-					&instanceID,
+					&iamID,
 					&projectID,
 					&grantID,
 					&grantedOrgID,
 					&projectName,
 					&orgName,
-					&instanceName,
 					&count,
 				)
 
@@ -291,10 +287,10 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerR
 						OrgID: orgID.String,
 						Name:  orgName.String,
 					}
-				} else if instanceID.Valid {
+				} else if iamID.Valid {
 					membership.IAM = &IAMMembership{
-						IAMID: instanceID.String,
-						Name:  instanceName.String,
+						IAMID: iamID.String,
+						Name:  iamID.String,
 					}
 				} else if projectID.Valid && grantID.Valid && grantedOrgID.Valid {
 					membership.ProjectGrant = &ProjectGrantMembership{

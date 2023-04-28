@@ -5,53 +5,56 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
 	"github.com/zitadel/zitadel/internal/static"
 )
 
+type Configs map[string]*Config
+
 type Config struct {
-	Client     *database.DB
-	Eventstore *eventstore.Eventstore
-
-	BulkLimit             uint64
-	FailureCountUntilSkip uint64
-	HandleActiveInstances time.Duration
-	Handlers              map[string]*ConfigOverwrites
-}
-
-type ConfigOverwrites struct {
 	MinimumCycleDuration time.Duration
 }
 
-func Register(ctx context.Context, config Config, view *view.View, static static.Storage) {
-	if static == nil {
-		return
-	}
+type handler struct {
+	view                *view.View
+	bulkLimit           uint64
+	cycleDuration       time.Duration
+	errorCountUntilSkip uint64
 
-	newStyling(ctx,
-		config.overwrite("Styling"),
-		static,
-		view,
-	).Start(ctx)
+	es v1.Eventstore
 }
 
-func (config Config) overwrite(viewModel string) handler2.Config {
-	c := handler2.Config{
-		Client:                config.Client,
-		Eventstore:            config.Eventstore,
-		BulkLimit:             uint16(config.BulkLimit),
-		RequeueEvery:          3 * time.Minute,
-		HandleActiveInstances: config.HandleActiveInstances,
-		MaxFailureCount:       uint8(config.FailureCountUntilSkip),
+func (h *handler) Eventstore() v1.Eventstore {
+	return h.es
+}
+
+func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, static static.Storage) []query.Handler {
+	handlers := []query.Handler{}
+	if static != nil {
+		handlers = append(handlers, newStyling(ctx,
+			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
+			static))
 	}
-	overwrite, ok := config.Handlers[viewModel]
+	return handlers
+}
+
+func (configs Configs) cycleDuration(viewModel string) time.Duration {
+	c, ok := configs[viewModel]
 	if !ok {
-		return c
+		return 3 * time.Minute
 	}
-	if overwrite.MinimumCycleDuration > 0 {
-		c.RequeueEvery = overwrite.MinimumCycleDuration
-	}
-	return c
+	return c.MinimumCycleDuration
+}
+
+func (h *handler) MinimumCycleDuration() time.Duration {
+	return h.cycleDuration
+}
+
+func (h *handler) LockDuration() time.Duration {
+	return h.cycleDuration / 3
+}
+
+func (h *handler) QueryLimit() uint64 {
+	return h.bulkLimit
 }

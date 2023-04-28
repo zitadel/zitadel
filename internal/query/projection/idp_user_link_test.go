@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -37,8 +37,9 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpUserLinkProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -73,8 +74,9 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpUserLinkProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -104,8 +106,9 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpUserLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -132,8 +135,9 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpUserLinkProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
-				aggregateType: org.AggregateType,
-				sequence:      15,
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -161,8 +165,9 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -186,8 +191,9 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpUserLinkProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -214,8 +220,9 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpUserLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
-				aggregateType: org.AggregateType,
-				sequence:      15,
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -243,8 +250,9 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpUserLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
-				aggregateType: instance.AggregateType,
-				sequence:      15,
+				aggregateType:    instance.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

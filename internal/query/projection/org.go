@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -26,38 +26,36 @@ const (
 	OrgColumnDomain        = "primary_domain"
 )
 
-type orgProjection struct{}
-
-func (*orgProjection) Name() string {
-	return OrgProjectionTable
+type orgProjection struct {
+	crdb.StatementHandler
 }
 
-func newOrgProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(orgProjection))
-}
-
-// Init implements [handler.initializer]
-func (p *orgProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(OrgColumnID, handler.ColumnTypeText),
-			handler.NewColumn(OrgColumnCreationDate, handler.ColumnTypeTimestamp),
-			handler.NewColumn(OrgColumnChangeDate, handler.ColumnTypeTimestamp),
-			handler.NewColumn(OrgColumnResourceOwner, handler.ColumnTypeText),
-			handler.NewColumn(OrgColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(OrgColumnState, handler.ColumnTypeEnum),
-			handler.NewColumn(OrgColumnSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(OrgColumnName, handler.ColumnTypeText),
-			handler.NewColumn(OrgColumnDomain, handler.ColumnTypeText, handler.Default("")),
+func newOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *orgProjection {
+	p := new(orgProjection)
+	config.ProjectionName = OrgProjectionTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(OrgColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(OrgColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OrgColumnName, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgColumnDomain, crdb.ColumnTypeText, crdb.Default("")),
 		},
-			handler.NewPrimaryKey(OrgColumnInstanceID, OrgColumnID),
-			handler.WithIndex(handler.NewIndex("domain", []string{OrgColumnDomain})),
-			handler.WithIndex(handler.NewIndex("name", []string{OrgColumnName})),
+			crdb.NewPrimaryKey(OrgColumnInstanceID, OrgColumnID),
+			crdb.WithIndex(crdb.NewIndex("domain", []string{OrgColumnDomain})),
+			crdb.WithIndex(crdb.NewIndex("name", []string{OrgColumnName})),
 		),
 	)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *orgProjection) Reducers() []handler.AggregateReducer {
+func (p *orgProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -105,7 +103,7 @@ func (p *orgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Stateme
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.OrgAddedEventType)
 	}
-	return handler.NewCreateStatement(
+	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnID, e.Aggregate().ID),
@@ -126,9 +124,9 @@ func (p *orgProjection) reduceOrgChanged(event eventstore.Event) (*handler.State
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bg8oM", "reduce.wrong.event.type %s", org.OrgChangedEventType)
 	}
 	if e.Name == "" {
-		return handler.NewNoOpStatement(e), nil
+		return crdb.NewNoOpStatement(e), nil
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
@@ -147,7 +145,7 @@ func (p *orgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-BApK4", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
@@ -166,7 +164,7 @@ func (p *orgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o37De", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
@@ -185,7 +183,7 @@ func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-4TbKT", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
@@ -204,7 +202,7 @@ func (p *orgProjection) reduceOrgRemoved(event eventstore.Event) (*handler.State
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DgMSg", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),

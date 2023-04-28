@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -36,8 +36,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType: instance.AggregateType,
-				sequence:      15,
+				aggregateType:    instance.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -71,8 +72,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType: instance.AggregateType,
-				sequence:      15,
+				aggregateType:    instance.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -101,8 +103,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType: instance.AggregateType,
-				sequence:      15,
+				aggregateType:    instance.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -131,8 +134,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType: org.AggregateType,
-				sequence:      15,
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -166,8 +170,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType: org.AggregateType,
-				sequence:      15,
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -193,8 +198,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -221,8 +227,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType: org.AggregateType,
-				sequence:      15,
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -248,8 +255,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reducePolicyRemoved,
 			want: wantReduce{
-				aggregateType: org.AggregateType,
-				sequence:      15,
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -276,8 +284,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
-				aggregateType: org.AggregateType,
-				sequence:      15,
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -305,8 +314,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
-				aggregateType: instance.AggregateType,
-				sequence:      15,
+				aggregateType:    instance.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -333,8 +343,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPRemoved,
 			want: wantReduce{
-				aggregateType: org.AggregateType,
-				sequence:      15,
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -362,8 +373,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPRemoved,
 			want: wantReduce{
-				aggregateType: instance.AggregateType,
-				sequence:      15,
+				aggregateType:    instance.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -388,8 +400,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

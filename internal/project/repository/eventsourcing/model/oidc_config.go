@@ -75,14 +75,14 @@ func (key *ClientKey) AppendEvents(events ...*es_models.Event) error {
 
 func (key *ClientKey) AppendEvent(event *es_models.Event) (err error) {
 	key.ObjectRoot.AppendEvent(event)
-	switch eventstore.EventType(event.Typ) {
+	switch eventstore.EventType(event.Type) {
 	case project.ApplicationKeyAddedEventType:
 		err = json.Unmarshal(event.Data, key)
 		if err != nil {
 			return errors.ThrowInternal(err, "MODEL-Fetg3", "Errors.Internal")
 		}
 	case project.ApplicationKeyRemovedEventType:
-		key.ExpirationDate = event.CreatedAt
+		key.ExpirationDate = event.CreationDate
 	}
 	return err
 }

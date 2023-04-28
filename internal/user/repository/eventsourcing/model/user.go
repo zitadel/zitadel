@@ -40,7 +40,7 @@ func (u *User) AppendEvents(events ...*es_models.Event) error {
 func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
 
-	switch eventstore.EventType(event.Typ) {
+	switch eventstore.EventType(event.Type) {
 	case user.UserV1AddedType,
 		user.HumanAddedType,
 		user.MachineAddedEventType,
@@ -72,11 +72,11 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 		u.Machine.user = u
 		return u.Machine.AppendEvent(event)
 	}
-	if strings.HasPrefix(string(event.Typ), "user.human") || event.AggregateVersion == "v1" {
+	if strings.HasPrefix(string(event.Type), "user.human") || event.AggregateVersion == "v1" {
 		u.Human = &Human{user: u}
 		return u.Human.AppendEvent(event)
 	}
-	if strings.HasPrefix(string(event.Typ), "user.machine") {
+	if strings.HasPrefix(string(event.Type), "user.machine") {
 		u.Machine = &Machine{user: u}
 		return u.Machine.AppendEvent(event)
 	}

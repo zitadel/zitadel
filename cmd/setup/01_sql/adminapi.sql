@@ -12,7 +12,7 @@ CREATE TABLE adminapi.locks (
 CREATE TABLE adminapi.current_sequences (
     view_name TEXT,
     current_sequence BIGINT,
-    event_date TIMESTAMPTZ,
+    event_timestamp TIMESTAMPTZ,
     last_successful_spooler_run TIMESTAMPTZ,
     instance_id TEXT NOT NULL,
 

@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -35,8 +35,9 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("user"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("user"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -68,8 +69,9 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("user"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("user"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -94,8 +96,9 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("user"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("user"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -120,8 +123,9 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -149,8 +153,9 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(PersonalAccessTokenColumnInstanceID),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

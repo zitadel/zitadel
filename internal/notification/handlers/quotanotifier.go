@@ -7,10 +7,12 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/notification/types"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
@@ -19,7 +21,7 @@ const (
 )
 
 type quotaNotifier struct {
-	// crdb.Handler
+	crdb.StatementHandler
 	commands                       *command.Commands
 	queries                        *NotificationQueries
 	metricSuccessfulDeliveriesJSON string
@@ -28,25 +30,25 @@ type quotaNotifier struct {
 
 func NewQuotaNotifier(
 	ctx context.Context,
-	config handler.Config,
+	config crdb.StatementHandlerConfig,
 	commands *command.Commands,
 	queries *NotificationQueries,
 	metricSuccessfulDeliveriesJSON,
 	metricFailedDeliveriesJSON string,
-) *handler.Handler {
-	return handler.NewHandler(ctx, &config, &quotaNotifier{
-		commands:                       commands,
-		queries:                        queries,
-		metricSuccessfulDeliveriesJSON: metricSuccessfulDeliveriesJSON,
-		metricFailedDeliveriesJSON:     metricFailedDeliveriesJSON,
-	})
+) *quotaNotifier {
+	p := new(quotaNotifier)
+	config.ProjectionName = QuotaNotificationsProjectionTable
+	config.Reducers = p.reducers()
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	p.commands = commands
+	p.queries = queries
+	p.metricSuccessfulDeliveriesJSON = metricSuccessfulDeliveriesJSON
+	p.metricFailedDeliveriesJSON = metricFailedDeliveriesJSON
+	projection.NotificationsQuotaProjection = p
+	return p
 }
 
-func (*quotaNotifier) Name() string {
-	return QuotaNotificationsProjectionTable
-}
-
-func (u *quotaNotifier) Reducers() []handler.AggregateReducer {
+func (u *quotaNotifier) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: quota.AggregateType,
@@ -71,7 +73,7 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 		return nil, err
 	}
 	if alreadyHandled {
-		return handler.NewNoOpStatement(e), nil
+		return crdb.NewNoOpStatement(e), nil
 	}
 	err = types.SendJSON(
 		ctx,
@@ -93,5 +95,5 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 	if err != nil {
 		return nil, err
 	}
-	return handler.NewNoOpStatement(e), nil
+	return crdb.NewNoOpStatement(e), nil
 }

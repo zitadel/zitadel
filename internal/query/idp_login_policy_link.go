@@ -107,7 +107,7 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	if err != nil {
 		return nil, err
 	}
-	idps.LatestState, err = q.latestState(ctx, idpLoginPolicyLinkTable)
+	idps.LatestSequence, err = q.latestSequence(ctx, idpLoginPolicyLinkTable)
 	return idps, err
 }
 

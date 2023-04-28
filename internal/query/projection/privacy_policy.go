@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -31,40 +31,39 @@ const (
 	PrivacyPolicyOwnerRemovedCol  = "owner_removed"
 )
 
-type privacyPolicyProjection struct{}
-
-func newPrivacyPolicyProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(privacyPolicyProjection))
+type privacyPolicyProjection struct {
+	crdb.StatementHandler
 }
 
-func (*privacyPolicyProjection) Name() string {
-	return PrivacyPolicyTable
-}
-
-func (*privacyPolicyProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(PrivacyPolicyIDCol, handler.ColumnTypeText),
-			handler.NewColumn(PrivacyPolicyCreationDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(PrivacyPolicyChangeDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(PrivacyPolicySequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(PrivacyPolicyStateCol, handler.ColumnTypeEnum),
-			handler.NewColumn(PrivacyPolicyIsDefaultCol, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(PrivacyPolicyResourceOwnerCol, handler.ColumnTypeText),
-			handler.NewColumn(PrivacyPolicyInstanceIDCol, handler.ColumnTypeText),
-			handler.NewColumn(PrivacyPolicyPrivacyLinkCol, handler.ColumnTypeText),
-			handler.NewColumn(PrivacyPolicyTOSLinkCol, handler.ColumnTypeText),
-			handler.NewColumn(PrivacyPolicyHelpLinkCol, handler.ColumnTypeText),
-			handler.NewColumn(PrivacyPolicySupportEmailCol, handler.ColumnTypeText),
-			handler.NewColumn(PrivacyPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+func newPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *privacyPolicyProjection {
+	p := new(privacyPolicyProjection)
+	config.ProjectionName = PrivacyPolicyTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(PrivacyPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PrivacyPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PrivacyPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(PrivacyPolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(PrivacyPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(PrivacyPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyPrivacyLinkCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyTOSLinkCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyHelpLinkCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicySupportEmailCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{PrivacyPolicyOwnerRemovedCol})),
+			crdb.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{PrivacyPolicyOwnerRemovedCol})),
 		),
 	)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *privacyPolicyProjection) Reducers() []handler.AggregateReducer {
+func (p *privacyPolicyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -120,7 +119,7 @@ func (p *privacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kRNh8", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyAddedEventType, instance.PrivacyPolicyAddedEventType})
 	}
-	return handler.NewCreateStatement(
+	return crdb.NewCreateStatement(
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(PrivacyPolicyCreationDateCol, policyEvent.CreationDate()),
@@ -164,7 +163,7 @@ func (p *privacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	if policyEvent.SupportEmail != nil {
 		cols = append(cols, handler.NewCol(PrivacyPolicySupportEmailCol, *policyEvent.SupportEmail))
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		&policyEvent,
 		cols,
 		[]handler.Condition{
@@ -178,7 +177,7 @@ func (p *privacyPolicyProjection) reduceRemoved(event eventstore.Event) (*handle
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-FvtGO", "reduce.wrong.event.type %s", org.PrivacyPolicyRemovedEventType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(PrivacyPolicyIDCol, policyEvent.Aggregate().ID),
@@ -192,7 +191,7 @@ func (p *privacyPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*h
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-bxJCY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(PrivacyPolicyChangeDateCol, e.CreationDate()),

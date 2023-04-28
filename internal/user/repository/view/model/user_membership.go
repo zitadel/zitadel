@@ -45,10 +45,10 @@ type UserMembershipView struct {
 }
 
 func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {
-	u.ChangeDate = event.CreatedAt
-	u.Sequence = event.Seq
+	u.ChangeDate = event.CreationDate
+	u.Sequence = event.Sequence
 
-	switch eventstore.EventType(event.Typ) {
+	switch eventstore.EventType(event.Type) {
 	case instance.MemberAddedEventType:
 		u.setRootData(event, model.MemberTypeIam)
 		err = u.setIamMemberData(event)
@@ -82,7 +82,7 @@ func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {
 }
 
 func (u *UserMembershipView) setRootData(event *models.Event, memberType model.MemberType) {
-	u.CreationDate = event.CreatedAt
+	u.CreationDate = event.CreationDate
 	u.AggregateID = event.AggregateID
 	u.ObjectID = event.AggregateID
 	u.ResourceOwner = event.ResourceOwner

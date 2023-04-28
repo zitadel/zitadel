@@ -147,7 +147,7 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 	if err != nil {
 		return nil, err
 	}
-	projects.LatestState, err = q.latestState(ctx, projectsTable)
+	projects.LatestSequence, err = q.latestSequence(ctx, projectsTable)
 	return projects, err
 }
 

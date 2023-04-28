@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -67,88 +67,87 @@ const (
 	AppSAMLConfigColumnMetadataURL = "metadata_url"
 )
 
-type appProjection struct{}
-
-func newAppProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(appProjection))
+type appProjection struct {
+	crdb.StatementHandler
 }
 
-func (*appProjection) Name() string {
-	return AppProjectionTable
-}
-
-func (*appProjection) Init() *old_handler.Check {
-	return handler.NewMultiTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(AppColumnID, handler.ColumnTypeText),
-			handler.NewColumn(AppColumnName, handler.ColumnTypeText),
-			handler.NewColumn(AppColumnProjectID, handler.ColumnTypeText),
-			handler.NewColumn(AppColumnCreationDate, handler.ColumnTypeTimestamp),
-			handler.NewColumn(AppColumnChangeDate, handler.ColumnTypeTimestamp),
-			handler.NewColumn(AppColumnResourceOwner, handler.ColumnTypeText),
-			handler.NewColumn(AppColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(AppColumnState, handler.ColumnTypeEnum),
-			handler.NewColumn(AppColumnSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(AppColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
+func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *appProjection {
+	p := new(appProjection)
+	config.ProjectionName = AppProjectionTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewMultiTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(AppColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnName, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnProjectID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AppColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AppColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(AppColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
-			handler.WithIndex(handler.NewIndex("project_id", []string{AppColumnProjectID})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{AppColumnOwnerRemoved})),
+			crdb.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
+			crdb.WithIndex(crdb.NewIndex("project_id", []string{AppColumnProjectID})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{AppColumnOwnerRemoved})),
 		),
-		handler.NewSuffixedTable([]*handler.InitColumn{
-			handler.NewColumn(AppAPIConfigColumnAppID, handler.ColumnTypeText),
-			handler.NewColumn(AppAPIConfigColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(AppAPIConfigColumnClientID, handler.ColumnTypeText),
-			handler.NewColumn(AppAPIConfigColumnClientSecret, handler.ColumnTypeJSONB, handler.Nullable()),
-			handler.NewColumn(AppAPIConfigColumnAuthMethod, handler.ColumnTypeEnum),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppAPIConfigColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppAPIConfigColumnClientID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
 		},
-			handler.NewPrimaryKey(AppAPIConfigColumnInstanceID, AppAPIConfigColumnAppID),
+			crdb.NewPrimaryKey(AppAPIConfigColumnInstanceID, AppAPIConfigColumnAppID),
 			appAPITableSuffix,
-			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
-			handler.WithIndex(handler.NewIndex("client_id", []string{AppAPIConfigColumnClientID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			crdb.WithIndex(crdb.NewIndex("client_id", []string{AppAPIConfigColumnClientID})),
 		),
-		handler.NewSuffixedTable([]*handler.InitColumn{
-			handler.NewColumn(AppOIDCConfigColumnAppID, handler.ColumnTypeText),
-			handler.NewColumn(AppOIDCConfigColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(AppOIDCConfigColumnVersion, handler.ColumnTypeEnum),
-			handler.NewColumn(AppOIDCConfigColumnClientID, handler.ColumnTypeText),
-			handler.NewColumn(AppOIDCConfigColumnClientSecret, handler.ColumnTypeJSONB, handler.Nullable()),
-			handler.NewColumn(AppOIDCConfigColumnRedirectUris, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(AppOIDCConfigColumnResponseTypes, handler.ColumnTypeEnumArray, handler.Nullable()),
-			handler.NewColumn(AppOIDCConfigColumnGrantTypes, handler.ColumnTypeEnumArray, handler.Nullable()),
-			handler.NewColumn(AppOIDCConfigColumnApplicationType, handler.ColumnTypeEnum),
-			handler.NewColumn(AppOIDCConfigColumnAuthMethodType, handler.ColumnTypeEnum),
-			handler.NewColumn(AppOIDCConfigColumnPostLogoutRedirectUris, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(AppOIDCConfigColumnDevMode, handler.ColumnTypeBool),
-			handler.NewColumn(AppOIDCConfigColumnAccessTokenType, handler.ColumnTypeEnum),
-			handler.NewColumn(AppOIDCConfigColumnAccessTokenRoleAssertion, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(AppOIDCConfigColumnIDTokenRoleAssertion, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(AppOIDCConfigColumnIDTokenUserinfoAssertion, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(AppOIDCConfigColumnClockSkew, handler.ColumnTypeInt64, handler.Default(0)),
-			handler.NewColumn(AppOIDCConfigColumnAdditionalOrigins, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(AppOIDCConfigColumnSkipNativeAppSuccessPage, handler.ColumnTypeBool, handler.Default(false)),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnResponseTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnGrantTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnApplicationType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnAuthMethodType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnPostLogoutRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnDevMode, crdb.ColumnTypeBool),
+			crdb.NewColumn(AppOIDCConfigColumnAccessTokenType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnAccessTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(AppOIDCConfigColumnIDTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(AppOIDCConfigColumnIDTokenUserinfoAssertion, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Default(0)),
+			crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnSkipNativeAppSuccessPage, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
+			crdb.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
-			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
-			handler.WithIndex(handler.NewIndex("client_id", []string{AppOIDCConfigColumnClientID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			crdb.WithIndex(crdb.NewIndex("client_id", []string{AppOIDCConfigColumnClientID})),
 		),
-		handler.NewSuffixedTable([]*handler.InitColumn{
-			handler.NewColumn(AppSAMLConfigColumnAppID, handler.ColumnTypeText),
-			handler.NewColumn(AppSAMLConfigColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(AppSAMLConfigColumnEntityID, handler.ColumnTypeText),
-			handler.NewColumn(AppSAMLConfigColumnMetadata, handler.ColumnTypeBytes),
-			handler.NewColumn(AppSAMLConfigColumnMetadataURL, handler.ColumnTypeText),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AppSAMLConfigColumnAppID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppSAMLConfigColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppSAMLConfigColumnEntityID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppSAMLConfigColumnMetadata, crdb.ColumnTypeBytes),
+			crdb.NewColumn(AppSAMLConfigColumnMetadataURL, crdb.ColumnTypeText),
 		},
-			handler.NewPrimaryKey(AppSAMLConfigColumnInstanceID, AppSAMLConfigColumnAppID),
+			crdb.NewPrimaryKey(AppSAMLConfigColumnInstanceID, AppSAMLConfigColumnAppID),
 			appSAMLTableSuffix,
-			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
-			handler.WithIndex(handler.NewIndex("entity_id", []string{AppSAMLConfigColumnEntityID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			crdb.WithIndex(crdb.NewIndex("entity_id", []string{AppSAMLConfigColumnEntityID})),
 		),
 	)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *appProjection) Reducers() []handler.AggregateReducer {
+func (p *appProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -237,7 +236,7 @@ func (p *appProjection) reduceAppAdded(event eventstore.Event) (*handler.Stateme
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-1xYE6", "reduce.wrong.event.type %s", project.ApplicationAddedType)
 	}
-	return handler.NewCreateStatement(
+	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(AppColumnID, e.AppID),
@@ -259,9 +258,9 @@ func (p *appProjection) reduceAppChanged(event eventstore.Event) (*handler.State
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ZJ8JA", "reduce.wrong.event.type %s", project.ApplicationChangedType)
 	}
 	if e.Name == "" {
-		return handler.NewNoOpStatement(event), nil
+		return crdb.NewNoOpStatement(event), nil
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(AppColumnName, e.Name),
@@ -280,7 +279,7 @@ func (p *appProjection) reduceAppDeactivated(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-MVWxZ", "reduce.wrong.event.type %s", project.ApplicationDeactivatedType)
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(AppColumnState, domain.AppStateInactive),
@@ -299,7 +298,7 @@ func (p *appProjection) reduceAppReactivated(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-D0HZO", "reduce.wrong.event.type %s", project.ApplicationReactivatedType)
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(AppColumnState, domain.AppStateActive),
@@ -318,7 +317,7 @@ func (p *appProjection) reduceAppRemoved(event eventstore.Event) (*handler.State
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Y99aq", "reduce.wrong.event.type %s", project.ApplicationRemovedType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
@@ -332,7 +331,7 @@ func (p *appProjection) reduceProjectRemoved(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DlUlO", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(AppColumnProjectID, e.Aggregate().ID),
@@ -346,9 +345,9 @@ func (p *appProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Y99aq", "reduce.wrong.event.type %s", project.APIConfigAddedType)
 	}
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
-		handler.AddCreateStatement(
+		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AppAPIConfigColumnAppID, e.AppID),
 				handler.NewCol(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
@@ -356,9 +355,9 @@ func (p *appProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 				handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret),
 				handler.NewCol(AppAPIConfigColumnAuthMethod, e.AuthMethodType),
 			},
-			handler.WithTableSuffix(appAPITableSuffix),
+			crdb.WithTableSuffix(appAPITableSuffix),
 		),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 				handler.NewCol(AppColumnSequence, e.Sequence()),
@@ -384,19 +383,19 @@ func (p *appProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler
 		cols = append(cols, handler.NewCol(AppAPIConfigColumnAuthMethod, *e.AuthMethodType))
 	}
 	if len(cols) == 0 {
-		return handler.NewNoOpStatement(e), nil
+		return crdb.NewNoOpStatement(e), nil
 	}
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
 				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
 				handler.NewCond(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
-			handler.WithTableSuffix(appAPITableSuffix),
+			crdb.WithTableSuffix(appAPITableSuffix),
 		),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 				handler.NewCol(AppColumnSequence, e.Sequence()),
@@ -414,9 +413,9 @@ func (p *appProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*h
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ttb0I", "reduce.wrong.event.type %s", project.APIConfigSecretChangedType)
 	}
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret),
 			},
@@ -424,9 +423,9 @@ func (p *appProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*h
 				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
 				handler.NewCond(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
-			handler.WithTableSuffix(appAPITableSuffix),
+			crdb.WithTableSuffix(appAPITableSuffix),
 		),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 				handler.NewCol(AppColumnSequence, e.Sequence()),
@@ -444,9 +443,9 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigAddedType)
 	}
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
-		handler.AddCreateStatement(
+		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AppOIDCConfigColumnAppID, e.AppID),
 				handler.NewCol(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
@@ -468,9 +467,9 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(e.AdditionalOrigins)),
 				handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, e.SkipNativeAppSuccessPage),
 			},
-			handler.WithTableSuffix(appOIDCTableSuffix),
+			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 				handler.NewCol(AppColumnSequence, e.Sequence()),
@@ -537,20 +536,20 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	}
 
 	if len(cols) == 0 {
-		return handler.NewNoOpStatement(e), nil
+		return crdb.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
 				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
 				handler.NewCond(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
-			handler.WithTableSuffix(appOIDCTableSuffix),
+			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 				handler.NewCol(AppColumnSequence, e.Sequence()),
@@ -568,9 +567,9 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigSecretChangedType)
 	}
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
 			},
@@ -578,9 +577,9 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
 				handler.NewCond(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
-			handler.WithTableSuffix(appOIDCTableSuffix),
+			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 				handler.NewCol(AppColumnSequence, e.Sequence()),
@@ -599,7 +598,7 @@ func (p *appProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Sta
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
@@ -618,9 +617,9 @@ func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU1", "reduce.wrong.event.type")
 	}
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
-		handler.AddCreateStatement(
+		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AppSAMLConfigColumnAppID, e.AppID),
 				handler.NewCol(AppSAMLConfigColumnInstanceID, e.Aggregate().InstanceID),
@@ -628,9 +627,9 @@ func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppSAMLConfigColumnMetadata, e.Metadata),
 				handler.NewCol(AppSAMLConfigColumnMetadataURL, e.MetadataURL),
 			},
-			handler.WithTableSuffix(appSAMLTableSuffix),
+			crdb.WithTableSuffix(appSAMLTableSuffix),
 		),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 				handler.NewCol(AppColumnSequence, e.Sequence()),
@@ -661,20 +660,20 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 	}
 
 	if len(cols) == 0 {
-		return handler.NewNoOpStatement(e), nil
+		return crdb.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
 				handler.NewCond(AppSAMLConfigColumnAppID, e.AppID),
 				handler.NewCond(AppSAMLConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
-			handler.WithTableSuffix(appSAMLTableSuffix),
+			crdb.WithTableSuffix(appSAMLTableSuffix),
 		),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 				handler.NewCol(AppColumnSequence, e.Sequence()),

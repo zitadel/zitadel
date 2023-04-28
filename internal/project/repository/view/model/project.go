@@ -35,12 +35,12 @@ type ProjectView struct {
 }
 
 func (p *ProjectView) AppendEvent(event *models.Event) (err error) {
-	p.ChangeDate = event.CreatedAt
-	p.Sequence = event.Seq
-	switch eventstore.EventType(event.Typ) {
+	p.ChangeDate = event.CreationDate
+	p.Sequence = event.Sequence
+	switch eventstore.EventType(event.Type) {
 	case project.ProjectAddedType:
 		p.State = int32(model.ProjectStateActive)
-		p.CreationDate = event.CreatedAt
+		p.CreationDate = event.CreationDate
 		p.setRootData(event)
 		err = p.setData(event)
 	case project.ProjectChangedType:

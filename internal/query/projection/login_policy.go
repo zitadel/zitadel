@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -42,52 +42,51 @@ const (
 	LoginPolicyOwnerRemovedCol          = "owner_removed"
 )
 
-type loginPolicyProjection struct{}
-
-func newLoginPolicyProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(loginPolicyProjection))
+type loginPolicyProjection struct {
+	crdb.StatementHandler
 }
 
-func (*loginPolicyProjection) Name() string {
-	return LoginPolicyTable
-}
-
-func (*loginPolicyProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(LoginPolicyIDCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginPolicyInstanceIDCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginPolicyCreationDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(LoginPolicyChangeDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(LoginPolicySequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(LoginPolicyIsDefaultCol, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(LoginPolicyAllowRegisterCol, handler.ColumnTypeBool),
-			handler.NewColumn(LoginPolicyAllowUsernamePasswordCol, handler.ColumnTypeBool),
-			handler.NewColumn(LoginPolicyAllowExternalIDPsCol, handler.ColumnTypeBool),
-			handler.NewColumn(LoginPolicyForceMFACol, handler.ColumnTypeBool),
-			handler.NewColumn(LoginPolicy2FAsCol, handler.ColumnTypeEnumArray, handler.Nullable()),
-			handler.NewColumn(LoginPolicyMFAsCol, handler.ColumnTypeEnumArray, handler.Nullable()),
-			handler.NewColumn(LoginPolicyPasswordlessTypeCol, handler.ColumnTypeEnum),
-			handler.NewColumn(LoginPolicyHidePWResetCol, handler.ColumnTypeBool),
-			handler.NewColumn(IgnoreUnknownUsernames, handler.ColumnTypeBool),
-			handler.NewColumn(AllowDomainDiscovery, handler.ColumnTypeBool),
-			handler.NewColumn(DisableLoginWithEmail, handler.ColumnTypeBool),
-			handler.NewColumn(DisableLoginWithPhone, handler.ColumnTypeBool),
-			handler.NewColumn(DefaultRedirectURI, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(PasswordCheckLifetimeCol, handler.ColumnTypeInt64),
-			handler.NewColumn(ExternalLoginCheckLifetimeCol, handler.ColumnTypeInt64),
-			handler.NewColumn(MFAInitSkipLifetimeCol, handler.ColumnTypeInt64),
-			handler.NewColumn(SecondFactorCheckLifetimeCol, handler.ColumnTypeInt64),
-			handler.NewColumn(MultiFactorCheckLifetimeCol, handler.ColumnTypeInt64),
-			handler.NewColumn(LoginPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+func newLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *loginPolicyProjection {
+	p := new(loginPolicyProjection)
+	config.ProjectionName = LoginPolicyTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(LoginPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginPolicyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(LoginPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(LoginPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LoginPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(LoginPolicyAllowRegisterCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginPolicyAllowUsernamePasswordCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginPolicyAllowExternalIDPsCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginPolicyForceMFACol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginPolicy2FAsCol, crdb.ColumnTypeEnumArray, crdb.Nullable()),
+			crdb.NewColumn(LoginPolicyMFAsCol, crdb.ColumnTypeEnumArray, crdb.Nullable()),
+			crdb.NewColumn(LoginPolicyPasswordlessTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(LoginPolicyHidePWResetCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(IgnoreUnknownUsernames, crdb.ColumnTypeBool),
+			crdb.NewColumn(AllowDomainDiscovery, crdb.ColumnTypeBool),
+			crdb.NewColumn(DisableLoginWithEmail, crdb.ColumnTypeBool),
+			crdb.NewColumn(DisableLoginWithPhone, crdb.ColumnTypeBool),
+			crdb.NewColumn(DefaultRedirectURI, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(PasswordCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(MFAInitSkipLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(SecondFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(MultiFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LoginPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(LoginPolicyInstanceIDCol, LoginPolicyIDCol),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{LoginPolicyOwnerRemovedCol})),
+			crdb.NewPrimaryKey(LoginPolicyInstanceIDCol, LoginPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginPolicyOwnerRemovedCol})),
 		),
 	)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *loginPolicyProjection) Reducers() []handler.AggregateReducer {
+func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -176,7 +175,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyAddedEventType, instance.LoginPolicyAddedEventType})
 	}
 
-	return handler.NewCreateStatement(&policyEvent, []handler.Column{
+	return crdb.NewCreateStatement(&policyEvent, []handler.Column{
 		handler.NewCol(LoginPolicyIDCol, policyEvent.Aggregate().ID),
 		handler.NewCol(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		handler.NewCol(LoginPolicyCreationDateCol, policyEvent.CreationDate()),
@@ -266,7 +265,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 		cols = append(cols, handler.NewCol(MultiFactorCheckLifetimeCol, *policyEvent.MultiFactorCheckLifetime))
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		&policyEvent,
 		cols,
 		[]handler.Condition{
@@ -287,12 +286,12 @@ func (p *loginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WMhAV", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorAddedEventType, instance.LoginPolicyMultiFactorAddedEventType})
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
 			handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
-			handler.NewArrayAppendCol(LoginPolicyMFAsCol, policyEvent.MFAType),
+			crdb.NewArrayAppendCol(LoginPolicyMFAsCol, policyEvent.MFAType),
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
@@ -312,12 +311,12 @@ func (p *loginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handl
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-czU7n", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, instance.LoginPolicyMultiFactorRemovedEventType})
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
 			handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
-			handler.NewArrayRemoveCol(LoginPolicyMFAsCol, policyEvent.MFAType),
+			crdb.NewArrayRemoveCol(LoginPolicyMFAsCol, policyEvent.MFAType),
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
@@ -331,7 +330,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-oRSvD", "reduce.wrong.event.type %s", org.LoginPolicyRemovedEventType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, e.Aggregate().ID),
@@ -351,12 +350,12 @@ func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-agB2E", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, instance.LoginPolicySecondFactorAddedEventType})
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
 			handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
-			handler.NewArrayAppendCol(LoginPolicy2FAsCol, policyEvent.MFAType),
+			crdb.NewArrayAppendCol(LoginPolicy2FAsCol, policyEvent.MFAType),
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
@@ -376,12 +375,12 @@ func (p *loginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handl
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-KYJvA", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, instance.LoginPolicySecondFactorRemovedEventType})
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
 			handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
-			handler.NewArrayRemoveCol(LoginPolicy2FAsCol, policyEvent.MFAType),
+			crdb.NewArrayRemoveCol(LoginPolicy2FAsCol, policyEvent.MFAType),
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
@@ -396,7 +395,7 @@ func (p *loginPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-B8NZW", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(LoginPolicyChangeDateCol, e.CreationDate()),

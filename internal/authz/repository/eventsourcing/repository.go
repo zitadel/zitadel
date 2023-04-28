@@ -4,30 +4,37 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/authz/repository"
-	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
 	authz_view "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
 type EsRepository struct {
-	authz_es.UserMembershipRepo
-	authz_es.TokenVerifierRepo
+	eventstore.UserMembershipRepo
+	eventstore.TokenVerifierRepo
 }
 
-func Start(queries *query.Queries, es *eventstore.Eventstore, dbClient *database.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
-	view, err := authz_view.StartView(dbClient, queries)
+func Start(queries *query.Queries, dbClient *database.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
+	es, err := v1.Start(dbClient)
+	if err != nil {
+		return nil, err
+	}
+
+	idGenerator := id.SonyFlakeGenerator()
+	view, err := authz_view.StartView(dbClient, idGenerator, queries)
 	if err != nil {
 		return nil, err
 	}
 
 	return &EsRepository{
-		authz_es.UserMembershipRepo{
+		eventstore.UserMembershipRepo{
 			Queries: queries,
 		},
-		authz_es.TokenVerifierRepo{
+		eventstore.TokenVerifierRepo{
 			TokenVerificationKey: keyEncryptionAlgorithm,
 			Eventstore:           es,
 			View:                 view,

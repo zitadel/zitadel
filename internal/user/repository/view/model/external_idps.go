@@ -35,12 +35,12 @@ type ExternalIDPView struct {
 }
 
 func (i *ExternalIDPView) AppendEvent(event *models.Event) (err error) {
-	i.Sequence = event.Seq
-	i.ChangeDate = event.CreatedAt
-	switch eventstore.EventType(event.Typ) {
+	i.Sequence = event.Sequence
+	i.ChangeDate = event.CreationDate
+	switch eventstore.EventType(event.Type) {
 	case user_repo.UserIDPLinkAddedType:
 		i.setRootData(event)
-		i.CreationDate = event.CreatedAt
+		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
 	}
 	return err

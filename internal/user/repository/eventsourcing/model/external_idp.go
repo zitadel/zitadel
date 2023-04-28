@@ -31,7 +31,7 @@ func (u *Human) appendExternalIDPAddedEvent(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	idp.ObjectRoot.CreationDate = event.CreatedAt
+	idp.ObjectRoot.CreationDate = event.CreationDate
 	u.ExternalIDPs = append(u.ExternalIDPs, idp)
 	return nil
 }

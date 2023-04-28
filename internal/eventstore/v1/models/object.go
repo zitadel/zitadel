@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type ObjectRoot struct {
@@ -15,25 +13,25 @@ type ObjectRoot struct {
 	ChangeDate    time.Time `json:"-"`
 }
 
-func (o *ObjectRoot) AppendEvent(event eventstore.Event) {
+func (o *ObjectRoot) AppendEvent(event *Event) {
 	if o.AggregateID == "" {
-		o.AggregateID = event.Aggregate().ID
-	} else if o.AggregateID != event.Aggregate().ID {
+		o.AggregateID = event.AggregateID
+	} else if o.AggregateID != event.AggregateID {
 		return
 	}
 	if o.ResourceOwner == "" {
-		o.ResourceOwner = event.Aggregate().ResourceOwner
+		o.ResourceOwner = event.ResourceOwner
 	}
 	if o.InstanceID == "" {
-		o.InstanceID = event.Aggregate().InstanceID
+		o.InstanceID = event.InstanceID
 	}
 
-	o.ChangeDate = event.CreationDate()
+	o.ChangeDate = event.CreationDate
 	if o.CreationDate.IsZero() {
 		o.CreationDate = o.ChangeDate
 	}
 
-	o.Sequence = event.Sequence()
+	o.Sequence = event.Sequence
 }
 func (o *ObjectRoot) IsZero() bool {
 	return o.AggregateID == ""

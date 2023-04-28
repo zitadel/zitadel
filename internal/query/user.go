@@ -542,7 +542,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, w
 	if err != nil {
 		return nil, err
 	}
-	users.LatestState, err = q.latestState(ctx, userTable)
+	users.LatestSequence, err = q.latestSequence(ctx, userTable)
 	return users, err
 }
 

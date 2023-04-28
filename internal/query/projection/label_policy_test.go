@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -33,8 +33,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -76,8 +77,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -109,8 +111,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -135,8 +138,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(LabelPolicyInstanceIDCol),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -160,8 +164,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceActivated,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -190,8 +195,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -220,8 +226,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -250,8 +257,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -280,8 +288,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -310,8 +319,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -340,8 +350,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -370,8 +381,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -400,8 +412,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -430,8 +443,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceFontAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -460,8 +474,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceFontRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -490,8 +505,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceAssetsRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -524,8 +540,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -567,8 +584,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -607,8 +625,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceActivated,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -637,8 +656,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -667,8 +687,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -697,8 +718,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -727,8 +749,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -757,8 +780,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -787,8 +811,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -817,8 +842,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -847,8 +873,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -877,8 +904,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceFontAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -907,8 +935,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceFontRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -937,8 +966,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&labelPolicyProjection{}).reduceAssetsRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -971,8 +1001,9 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -33,8 +33,9 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -59,8 +60,9 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(ProjectRoleColumnInstanceID),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -84,8 +86,9 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -111,8 +114,9 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -142,9 +146,10 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
-				executer:      &testExecuter{},
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer:         &testExecuter{},
 			},
 		},
 		{
@@ -158,8 +163,9 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -191,8 +197,9 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

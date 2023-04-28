@@ -107,7 +107,7 @@ func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrant
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-USNwM", "Errors.Query.InvalidRequest")
 	}
 
-	currentSequence, err := q.latestState(ctx, projectGrantMemberTable)
+	currentSequence, err := q.latestSequence(ctx, projectGrantMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrant
 	if err != nil {
 		return nil, err
 	}
-	members.LatestState = currentSequence
+	members.LatestSequence = currentSequence
 	return members, err
 }
 

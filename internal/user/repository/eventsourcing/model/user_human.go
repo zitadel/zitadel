@@ -50,7 +50,7 @@ func (p *Human) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (h *Human) AppendEvent(event *es_models.Event) (err error) {
-	switch eventstore.EventType(event.Typ) {
+	switch eventstore.EventType(event.Type) {
 	case user.UserV1AddedType,
 		user.UserV1RegisteredType,
 		user.UserV1ProfileChangedType,
@@ -171,7 +171,7 @@ func (u *Human) appendInitUsercodeCreatedEvent(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	initCode.ObjectRoot.CreationDate = event.CreatedAt
+	initCode.ObjectRoot.CreationDate = event.CreationDate
 	u.InitCode = initCode
 	return nil
 }

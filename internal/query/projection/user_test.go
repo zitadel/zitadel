@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -45,8 +45,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -113,8 +114,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -176,8 +178,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -244,8 +247,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -312,8 +316,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -375,8 +380,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -433,8 +439,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeAdded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -460,8 +467,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeAdded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -487,8 +495,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeSucceeded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -514,8 +523,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeSucceeded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -541,8 +551,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceUserLocked,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -570,8 +581,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceUserUnlocked,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -599,8 +611,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceUserDeactivated,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -628,8 +641,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceUserReactivated,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -657,8 +671,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -685,8 +700,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceUserNameChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -716,8 +732,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceDomainClaimed,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -752,8 +769,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanProfileChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -800,8 +818,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanProfileChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -843,8 +862,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -890,8 +910,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -935,8 +956,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneRemoved,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -981,8 +1003,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneRemoved,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1027,8 +1050,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneVerified,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1070,8 +1094,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneVerified,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1115,8 +1140,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanEmailChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1162,8 +1188,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanEmailChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1207,8 +1234,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanEmailVerified,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1250,8 +1278,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanEmailVerified,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1295,8 +1324,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanAvatarAdded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1331,8 +1361,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceHumanAvatarRemoved,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1370,8 +1401,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceMachineAdded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1417,8 +1449,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceMachineAdded,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1463,8 +1496,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1502,8 +1536,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1540,8 +1575,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1576,8 +1612,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -1596,8 +1633,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceMachineSecretSet,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1632,8 +1670,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: (&userProjection{}).reduceMachineSecretRemoved,
 			want: wantReduce{
-				aggregateType: user.AggregateType,
-				sequence:      15,
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1668,8 +1707,9 @@ func TestUserProjection_reduces(t *testing.T) {
 				), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1697,8 +1737,9 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(UserInstanceIDCol),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{

@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/member"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -23,36 +23,34 @@ const (
 )
 
 type projectGrantMemberProjection struct {
-	es handler.EventStore
+	crdb.StatementHandler
 }
 
-func newProjectGrantMemberProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, &projectGrantMemberProjection{es: config.Eventstore})
-}
-
-func (*projectGrantMemberProjection) Name() string {
-	return ProjectGrantMemberProjectionTable
-}
-
-func (*projectGrantMemberProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable(
+func newProjectGrantMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectGrantMemberProjection {
+	p := new(projectGrantMemberProjection)
+	config.ProjectionName = ProjectGrantMemberProjectionTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable(
 			append(memberColumns,
-				handler.NewColumn(ProjectGrantMemberProjectIDCol, handler.ColumnTypeText),
-				handler.NewColumn(ProjectGrantMemberGrantIDCol, handler.ColumnTypeText),
-				handler.NewColumn(ProjectGrantMemberGrantedOrg, handler.ColumnTypeText),
-				handler.NewColumn(ProjectGrantMemberGrantedOrgRemoved, handler.ColumnTypeBool, handler.Default(false)),
+				crdb.NewColumn(ProjectGrantMemberProjectIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantMemberGrantIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantMemberGrantedOrg, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantMemberGrantedOrgRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 			),
-			handler.NewPrimaryKey(MemberInstanceID, ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
-			handler.WithIndex(handler.NewIndex("user_id", []string{MemberUserIDCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{MemberOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("granted_org_removed", []string{ProjectGrantMemberGrantedOrgRemoved})),
+			crdb.NewPrimaryKey(MemberInstanceID, ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
+			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{MemberOwnerRemoved})),
+			crdb.WithIndex(crdb.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
+			crdb.WithIndex(crdb.NewIndex("granted_org_removed", []string{ProjectGrantMemberGrantedOrgRemoved})),
 		),
 	)
+
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *projectGrantMemberProjection) Reducers() []handler.AggregateReducer {
+func (p *projectGrantMemberProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -119,11 +117,11 @@ func (p *projectGrantMemberProjection) reduceAdded(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0EBQf", "reduce.wrong.event.type %s", project.GrantMemberAddedType)
 	}
 	ctx := setMemberContext(e.Aggregate())
-	userOwner, err := getResourceOwnerOfUser(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
+	userOwner, err := getResourceOwnerOfUser(ctx, p.Eventstore, e.Aggregate().InstanceID, e.UserID)
 	if err != nil {
 		return nil, err
 	}
-	grantedOrg, err := getGrantedOrgOfGrantedProject(ctx, p.es, e.Aggregate().InstanceID, e.Aggregate().ID, e.GrantID)
+	grantedOrg, err := getGrantedOrgOfGrantedProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.Aggregate().ID, e.GrantID)
 	if err != nil {
 		return nil, err
 	}
@@ -194,11 +192,11 @@ func (p *projectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) 
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Zzp6o", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
 		multiReduceMemberOwnerRemoved(e),
 		multiReduceMemberUserOwnerRemoved(e),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(MemberChangeDate, e.CreationDate()),
 				handler.NewCol(MemberSequence, e.Sequence()),

@@ -135,7 +135,7 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	if err != nil {
 		return nil, err
 	}
-	metadata.LatestState, err = q.latestState(ctx, userMetadataTable)
+	metadata.LatestSequence, err = q.latestSequence(ctx, userMetadataTable)
 	return metadata, err
 }
 

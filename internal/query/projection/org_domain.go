@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -27,37 +27,36 @@ const (
 	OrgDomainOwnerRemovedCol   = "owner_removed"
 )
 
-type orgDomainProjection struct{}
-
-func newOrgDomainProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(orgDomainProjection))
+type orgDomainProjection struct {
+	crdb.StatementHandler
 }
 
-func (*orgDomainProjection) Name() string {
-	return OrgDomainTable
-}
-
-func (*orgDomainProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(OrgDomainOrgIDCol, handler.ColumnTypeText),
-			handler.NewColumn(OrgDomainInstanceIDCol, handler.ColumnTypeText),
-			handler.NewColumn(OrgDomainCreationDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(OrgDomainChangeDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(OrgDomainSequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(OrgDomainDomainCol, handler.ColumnTypeText),
-			handler.NewColumn(OrgDomainIsVerifiedCol, handler.ColumnTypeBool),
-			handler.NewColumn(OrgDomainIsPrimaryCol, handler.ColumnTypeBool),
-			handler.NewColumn(OrgDomainValidationTypeCol, handler.ColumnTypeEnum),
-			handler.NewColumn(OrgDomainOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+func newOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *orgDomainProjection {
+	p := new(orgDomainProjection)
+	config.ProjectionName = OrgDomainTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(OrgDomainOrgIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgDomainInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgDomainCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgDomainChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgDomainSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OrgDomainDomainCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgDomainIsVerifiedCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(OrgDomainIsPrimaryCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(OrgDomainValidationTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(OrgDomainOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(OrgDomainOrgIDCol, OrgDomainDomainCol, OrgDomainInstanceIDCol),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{OrgDomainOwnerRemovedCol})),
+			crdb.NewPrimaryKey(OrgDomainOrgIDCol, OrgDomainDomainCol, OrgDomainInstanceIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{OrgDomainOwnerRemovedCol})),
 		),
 	)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func (p *orgDomainProjection) Reducers() []handler.AggregateReducer {
+func (p *orgDomainProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -105,7 +104,7 @@ func (p *orgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handle
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DM2DI", "reduce.wrong.event.type %s", org.OrgDomainAddedEventType)
 	}
-	return handler.NewCreateStatement(
+	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgDomainCreationDateCol, e.CreationDate()),
@@ -126,7 +125,7 @@ func (p *orgDomainProjection) reduceDomainVerificationAdded(event eventstore.Eve
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-EBzyu", "reduce.wrong.event.type %s", org.OrgDomainVerificationAddedEventType)
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
@@ -146,7 +145,7 @@ func (p *orgDomainProjection) reduceDomainVerified(event eventstore.Event) (*han
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-3Rvkr", "reduce.wrong.event.type %s", org.OrgDomainVerifiedEventType)
 	}
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
@@ -166,9 +165,9 @@ func (p *orgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-aIuei", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
 	}
-	return handler.NewMultiStatement(
+	return crdb.NewMultiStatement(
 		e,
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
 				handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
@@ -180,7 +179,7 @@ func (p *orgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 				handler.NewCond(OrgDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
-		handler.AddUpdateStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
 				handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
@@ -200,7 +199,7 @@ func (p *orgDomainProjection) reduceDomainRemoved(event eventstore.Event) (*hand
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gh1Mx", "reduce.wrong.event.type %s", org.OrgDomainRemovedEventType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(OrgDomainDomainCol, e.Domain),
@@ -216,7 +215,7 @@ func (p *orgDomainProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-dMUKJ", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),

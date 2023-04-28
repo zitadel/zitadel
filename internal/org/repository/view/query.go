@@ -2,19 +2,19 @@ package view
 
 import (
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
-func OrgByIDQuery(id, instanceID string, latestSequence uint64) (*eventstore.SearchQueryBuilder, error) {
+func OrgByIDQuery(id, instanceID string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "id should be filled")
 	}
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		InstanceID(instanceID).
+	return es_models.NewSearchQuery().
 		AddQuery().
-		AggregateTypes(org.AggregateType).
-		AggregateIDs(id).
-		SequenceGreater(latestSequence).
-		Builder(), nil
+		AggregateTypeFilter(org.AggregateType).
+		LatestSequenceFilter(latestSequence).
+		InstanceIDFilter(instanceID).
+		AggregateIDFilter(id).
+		SearchQuery(), nil
 }

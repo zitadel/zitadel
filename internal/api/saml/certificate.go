@@ -78,8 +78,8 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 	}
 
 	var sequence uint64
-	if certs.LatestState != nil {
-		sequence = certs.LatestState.Sequence
+	if certs.LatestSequence != nil {
+		sequence = certs.LatestSequence.Sequence
 	}
 
 	return nil, p.refreshCertificate(ctx, usage, sequence)

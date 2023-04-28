@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,36 +25,36 @@ const (
 	OrgMetadataColumnOwnerRemoved  = "owner_removed"
 )
 
-type orgMetadataProjection struct{}
-
-func (*orgMetadataProjection) Name() string {
-	return OrgMetadataProjectionTable
+type orgMetadataProjection struct {
+	crdb.StatementHandler
 }
 
-func (*orgMetadataProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(OrgMetadataColumnOrgID, handler.ColumnTypeText),
-			handler.NewColumn(OrgMetadataColumnCreationDate, handler.ColumnTypeTimestamp),
-			handler.NewColumn(OrgMetadataColumnChangeDate, handler.ColumnTypeTimestamp),
-			handler.NewColumn(OrgMetadataColumnSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(OrgMetadataColumnResourceOwner, handler.ColumnTypeText),
-			handler.NewColumn(OrgMetadataColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(OrgMetadataColumnKey, handler.ColumnTypeText),
-			handler.NewColumn(OrgMetadataColumnValue, handler.ColumnTypeBytes, handler.Nullable()),
-			handler.NewColumn(OrgMetadataColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
+func newOrgMetadataProjection(ctx context.Context, config crdb.StatementHandlerConfig) *orgMetadataProjection {
+	p := new(orgMetadataProjection)
+	config.ProjectionName = OrgMetadataProjectionTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(OrgMetadataColumnOrgID, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgMetadataColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgMetadataColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgMetadataColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OrgMetadataColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgMetadataColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgMetadataColumnKey, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
+			crdb.NewColumn(OrgMetadataColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			handler.NewPrimaryKey(OrgMetadataColumnInstanceID, OrgMetadataColumnOrgID, OrgMetadataColumnKey),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{OrgMetadataColumnOwnerRemoved})),
+			crdb.NewPrimaryKey(OrgMetadataColumnInstanceID, OrgMetadataColumnOrgID, OrgMetadataColumnKey),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{OrgMetadataColumnOwnerRemoved})),
 		),
 	)
+
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
 }
 
-func newOrgMetadataProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, new(orgMetadataProjection))
-}
-
-func (p *orgMetadataProjection) Reducers() []handler.AggregateReducer {
+func (p *orgMetadataProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -94,7 +94,7 @@ func (p *orgMetadataProjection) reduceMetadataSet(event eventstore.Event) (*hand
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Ghn53", "reduce.wrong.event.type %s", org.MetadataSetType)
 	}
-	return handler.NewUpsertStatement(
+	return crdb.NewUpsertStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgMetadataColumnInstanceID, nil),
@@ -119,7 +119,7 @@ func (p *orgMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (*
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bm542", "reduce.wrong.event.type %s", org.MetadataRemovedType)
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(OrgMetadataColumnOrgID, e.Aggregate().ID),
@@ -137,7 +137,7 @@ func (p *orgMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event)
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bmnf3", "reduce.wrong.event.type %v", []eventstore.EventType{org.MetadataRemovedAllType, org.OrgRemovedEventType})
 	}
-	return handler.NewDeleteStatement(
+	return crdb.NewDeleteStatement(
 		event,
 		[]handler.Condition{
 			handler.NewCond(OrgMetadataColumnOrgID, event.Aggregate().ID),
@@ -152,7 +152,7 @@ func (p *orgMetadataProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hkd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewUpdateStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgMetadataColumnChangeDate, e.CreationDate()),

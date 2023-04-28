@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/org/model"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -12,7 +11,7 @@ import (
 
 func TestOrgFromEvents(t *testing.T) {
 	type args struct {
-		event []eventstore.Event
+		event []*es_models.Event
 		org   *Org
 	}
 	tests := []struct {
@@ -23,8 +22,8 @@ func TestOrgFromEvents(t *testing.T) {
 		{
 			name: "org from events, ok",
 			args: args{
-				event: []eventstore.Event{
-					&es_models.Event{AggregateID: "ID", Seq: 1, Typ: org.OrgAddedEventType},
+				event: []*es_models.Event{
+					{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgAddedEventType)},
 				},
 				org: &Org{Name: "OrgName"},
 			},
@@ -33,8 +32,8 @@ func TestOrgFromEvents(t *testing.T) {
 		{
 			name: "org from events, nil org",
 			args: args{
-				event: []eventstore.Event{
-					&es_models.Event{AggregateID: "ID", Seq: 1, Typ: org.OrgAddedEventType},
+				event: []*es_models.Event{
+					{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgAddedEventType)},
 				},
 				org: nil,
 			},
@@ -45,7 +44,7 @@ func TestOrgFromEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.args.org != nil {
 				data, _ := json.Marshal(tt.args.org)
-				tt.args.event[0].(*es_models.Event).Data = data
+				tt.args.event[0].Data = data
 			}
 			result, _ := OrgFromEvents(tt.args.org, tt.args.event...)
 			if result.Name != tt.result.Name {
@@ -68,7 +67,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append added event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Seq: 1, Typ: org.OrgAddedEventType},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgAddedEventType)},
 				org:   &Org{Name: "OrgName"},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive), Name: "OrgName"},
@@ -76,7 +75,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append change event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Seq: 1, Typ: org.OrgChangedEventType, Data: []byte(`{"name": "OrgName}`)},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgChangedEventType), Data: []byte(`{"name": "OrgName}`)},
 				org:   &Org{Name: "OrgNameChanged"},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive), Name: "OrgNameChanged"},
@@ -84,14 +83,14 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Seq: 1, Typ: org.OrgDeactivatedEventType},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgDeactivatedEventType)},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateInactive)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Seq: 1, Typ: org.OrgReactivatedEventType},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgReactivatedEventType)},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive)},
 		},

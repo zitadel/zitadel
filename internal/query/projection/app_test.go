@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -39,8 +39,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAppAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -75,8 +76,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAppChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -106,8 +108,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAppChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -126,8 +129,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAppDeactivated,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -157,8 +161,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAppReactivated,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -188,8 +193,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAppRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -214,8 +220,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -240,8 +247,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(AppColumnInstanceID),
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -270,8 +278,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAPIConfigAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -313,8 +322,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAPIConfigChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -352,8 +362,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAPIConfigChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -373,8 +384,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceAPIConfigSecretChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -428,8 +440,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -498,8 +511,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -550,8 +564,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -571,8 +586,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceOIDCConfigSecretChanged,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -607,8 +623,9 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: (&appProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("org"),
-				sequence:      15,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
