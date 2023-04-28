@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package zitadel.policy.v2alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/policy/v2alpha;policy";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/duration.proto";
+
+message BrandingPolicy {
+    // hex value for primary color
+    string primary_color = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for primary color";
+            example: "\"#5469d4\"";
+        }
+    ];
+    // defines if the organization's admin changed the policy
+     bool is_default = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the organization's admin changed the policy"
+        }
+    ];
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set
+    bool hide_login_name_suffix = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set";
+        }
+    ];
+    // hex value for secondary color
+    string warn_color = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for warn color";
+            example: "\"#CD3D56\"";
+        }
+    ];
+    // hex value for background color
+    string background_color = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for background color";
+            example: "\"#FAFAFA\"";
+        }
+    ];
+    // hex value for font color
+    string font_color = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color";
+            example: "\"#000000\"";
+        }
+    ];
+    // hex value for primary color dark theme
+    string primary_color_dark = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for the primary color dark theme";
+            example: "\"#BBBAFA\"";
+        }
+    ];
+    // hex value for background color dark theme
+    string background_color_dark = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for background color dark theme";
+            example: "\"#111827\"";
+        }
+    ];
+    // hex value for warning color dark theme
+    string warn_color_dark = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for warning color dark theme";
+            example: "\"#FF3B5B\"";
+        }
+    ];
+    // hex value for font color dark theme
+    string font_color_dark = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color dark theme";
+            example: "\"#FFFFFF\"";
+        }
+    ];
+    bool disable_watermark = 11;
+    string logo_url = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color dark theme";
+            example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/logo-180950416321494657\"";
+        }
+    ];
+    string icon_url = 13 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color dark theme";
+            example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/icon-180950498874178817\"";
+        }
+    ];
+    string logo_url_dark = 14 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color dark theme";
+            example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/logo-dark-180950229376461345\"";
+        }
+    ];
+    string icon_url_dark = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "hex value for font color dark theme";
+            example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/icon-dark-180950243237405441\"";
+        }
+    ];
+    string font_url = 16;
+}

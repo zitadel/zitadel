@@ -1,0 +1,260 @@
+syntax = "proto3";
+
+package zitadel.policy.v2alpha;
+
+import "zitadel/options.proto";
+import "zitadel/object/v2alpha/object.proto";
+import "zitadel/policy/v2alpha/login_policy.proto";
+import "zitadel/policy/v2alpha/password_policy.proto";
+import "zitadel/policy/v2alpha/branding_policy.proto";
+import "zitadel/policy/v2alpha/domain_policy.proto";
+import "zitadel/policy/v2alpha/privacy_policy.proto";
+import "zitadel/policy/v2alpha/lockout_policy.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/policy/v2alpha;policy";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Policy Service";
+        version: "2.0-alpha";
+        description: "This API is intended to manage policies in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+        contact:{
+            name: "ZITADEL"
+            url: "https://zitadel.com"
+            email: "hi@zitadel.com"
+        }
+        license: {
+            name: "Apache 2.0",
+            url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+        };
+    };
+    schemes: HTTPS;
+    schemes: HTTP;
+
+    consumes: "application/json";
+    consumes: "application/grpc";
+
+    produces: "application/json";
+    produces: "application/grpc";
+
+    consumes: "application/grpc-web+proto";
+    produces: "application/grpc-web+proto";
+
+    host: "$ZITADEL_DOMAIN";
+    base_path: "/";
+
+    external_docs: {
+        description: "Detailed information about ZITADEL",
+        url: "https://zitadel.com/docs"
+    }
+
+    responses: {
+        key: "403";
+        value: {
+            description: "Returned when the user does not have permission to access the resource.";
+            schema: {
+                json_schema: {
+                    ref: "#/definitions/rpcStatus";
+                }
+            }
+        }
+    }
+    responses: {
+        key: "404";
+        value: {
+            description: "Returned when the resource does not exist.";
+            schema: {
+                json_schema: {
+                    ref: "#/definitions/rpcStatus";
+                }
+            }
+        }
+    }
+};
+
+service PolicyService {
+    rpc GetLoginPolicy (GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
+        option (google.api.http) = {
+            post: "/v2alpha/policies/login"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get the current active login policy";
+            description: "Return the current active login policy for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+    rpc GetPasswordPolicy (GetPasswordPolicyRequest) returns (GetPasswordPolicyResponse) {
+        option (google.api.http) = {
+            post: "/v2alpha/policies/password"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get the current active password policy";
+            description: "Return the current active password policy for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+    rpc GetBrandingPolicy (GetBrandingPolicyRequest) returns (GetBrandingPolicyResponse) {
+        option (google.api.http) = {
+            post: "/v2alpha/policies/branding"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get the current active branding policy";
+            description: "Return the current active branding policy for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+    rpc GetDomainPolicy (GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
+        option (google.api.http) = {
+            post: "/v2alpha/policies/domain"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get the current active domain policy";
+            description: "Return the current active domain policy for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+    rpc GetPrivacyPolicy (GetPrivacyPolicyRequest) returns (GetPrivacyPolicyResponse) {
+        option (google.api.http) = {
+            post: "/v2alpha/policies/privacy"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get the current active privacy policy";
+            description: "Return the current active privacy policy for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+    rpc GetLockoutPolicy (GetLockoutPolicyRequest) returns (GetLockoutPolicyResponse) {
+        option (google.api.http) = {
+            post: "/v2alpha/policies/lockout"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get the current active lockout policy";
+            description: "Return the current active lockout policy for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+}
+
+message GetLoginPolicyRequest {
+    zitadel.object.v2alpha.Organisation organisation = 1;
+}
+
+message GetLoginPolicyResponse {
+    zitadel.object.v2alpha.Details details = 1;
+    zitadel.policy.v2alpha.LoginPolicy policy = 2;
+}
+
+message GetPasswordPolicyRequest {
+    zitadel.object.v2alpha.Organisation organisation = 1;
+}
+
+message GetPasswordPolicyResponse {
+    zitadel.object.v2alpha.Details details = 1;
+    zitadel.policy.v2alpha.PasswordPolicy policy = 2;
+}
+
+message GetBrandingPolicyRequest {
+    zitadel.object.v2alpha.Organisation organisation = 1;
+}
+
+message GetBrandingPolicyResponse {
+    zitadel.object.v2alpha.Details details = 1;
+    zitadel.policy.v2alpha.BrandingPolicy policy = 2;
+}
+
+message GetDomainPolicyRequest {
+    zitadel.object.v2alpha.Organisation organisation = 1;
+}
+
+message GetDomainPolicyResponse {
+    zitadel.object.v2alpha.Details details = 1;
+    zitadel.policy.v2alpha.DomainPolicy policy = 2;
+}
+
+message GetPrivacyPolicyRequest {
+    zitadel.object.v2alpha.Organisation organisation = 1;
+}
+
+message GetPrivacyPolicyResponse {
+    zitadel.object.v2alpha.Details details = 1;
+    zitadel.policy.v2alpha.PrivacyPolicy policy = 2;
+}
+
+message GetLockoutPolicyRequest {
+    zitadel.object.v2alpha.Organisation organisation = 1;
+}
+
+message GetLockoutPolicyResponse {
+    zitadel.object.v2alpha.Details details = 1;
+    zitadel.policy.v2alpha.LockoutPolicy policy = 2;
+}

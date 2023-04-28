@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package zitadel.policy.v2alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/policy/v2alpha;policy";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/duration.proto";
+
+message PrivacyPolicy {
+    string tos_link = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+        }
+    ];
+    string privacy_link = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+        }
+    ];
+    bool is_default = 3;
+    string help_link = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://zitadel.com/docs/manuals/introduction\"";
+        }
+    ];
+    string support_email = 5 [
+        (validate.rules).string = {ignore_empty: true, max_len: 320, email: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"support-email@test.com\"";
+            description: "help / support email address."
+        }
+    ];
+}
