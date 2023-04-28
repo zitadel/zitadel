@@ -542,6 +542,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 					DB:       tt.fields.client,
 					Database: new(testDB),
 				},
+				AllowOrderByCreationDate: true,
 			}
 
 			// setup initial data for query
@@ -820,9 +821,12 @@ func Test_query_events_mocked(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			crdb := &CRDB{DB: &database.DB{
-				Database: new(testDB),
-			}}
+			crdb := &CRDB{
+				DB: &database.DB{
+					Database: new(testDB),
+				},
+				AllowOrderByCreationDate: true,
+			}
 			if tt.fields.mock != nil {
 				crdb.DB.DB = tt.fields.mock.client
 			}

@@ -69,6 +69,8 @@ func (l *Login) authRequestCallback(ctx context.Context, authReq *domain.AuthReq
 		return l.oidcAuthCallbackURL(ctx, authReq.ID), nil
 	case *domain.AuthRequestSAML:
 		return l.samlAuthCallbackURL(ctx, authReq.ID), nil
+	case *domain.AuthRequestDevice:
+		return l.deviceAuthCallbackURL(authReq.ID), nil
 	default:
 		return "", caos_errs.ThrowInternal(nil, "LOGIN-rhjQF", "Errors.AuthRequest.RequestTypeNotSupported")
 	}

@@ -1,9 +1,4 @@
-CREATE temporary TABLE IF NOT EXISTS wrong_events (
-    instance_id TEXT
-    , event_sequence BIGINT
-    , current_cd TIMESTAMPTZ
-    , next_cd TIMESTAMPTZ
-);
+TRUNCATE wrong_events;
 
 INSERT INTO wrong_events (
     SELECT * FROM (
@@ -22,5 +17,3 @@ INSERT INTO wrong_events (
     ORDER BY
         event_sequence DESC
 );
-
-UPDATE eventstore.events e SET creation_date = we.next_cd FROM wrong_events we WHERE e.event_sequence = we.event_sequence and e.instance_id = we.instance_id;

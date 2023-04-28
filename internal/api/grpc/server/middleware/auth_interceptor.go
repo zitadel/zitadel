@@ -34,6 +34,9 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	}
 
 	orgID := grpc_util.GetHeader(authCtx, http.ZitadelOrgID)
+	if o, ok := req.(AuthContext); ok {
+		orgID = o.AuthContext()
+	}
 
 	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, verifier, authConfig, authOpt, info.FullMethod)
 	if err != nil {
@@ -41,4 +44,8 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	}
 	span.End()
 	return handler(ctxSetter(ctx), req)
+}
+
+type AuthContext interface {
+	AuthContext() string
 }

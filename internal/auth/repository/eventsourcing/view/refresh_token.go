@@ -1,6 +1,8 @@
 package view
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
@@ -81,12 +83,12 @@ func (v *View) DeleteOrgRefreshTokens(event *models.Event) error {
 	return v.ProcessedRefreshTokenSequence(event)
 }
 
-func (v *View) GetLatestRefreshTokenSequence(instanceID string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(refreshTokenTable, instanceID)
+func (v *View) GetLatestRefreshTokenSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(ctx, refreshTokenTable, instanceID)
 }
 
-func (v *View) GetLatestRefreshTokenSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(refreshTokenTable, instanceIDs)
+func (v *View) GetLatestRefreshTokenSequences(ctx context.Context, instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(ctx, refreshTokenTable, instanceIDs)
 }
 
 func (v *View) ProcessedRefreshTokenSequence(event *models.Event) error {

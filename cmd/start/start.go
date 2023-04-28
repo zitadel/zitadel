@@ -12,14 +12,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/zitadel/saml/pkg/provider"
-
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/op"
+	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -116,7 +115,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
 
-	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC, config.ExternalSecure)
+	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC, config.ExternalSecure, config.Eventstore.AllowOrderByCreationDate)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
@@ -147,6 +146,7 @@ func startZitadel(config *Config, masterKey string) error {
 		keys.OIDC,
 		keys.SAML,
 		&http.Client{},
+		authZRepo,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -229,11 +229,11 @@ func startAPIs(
 	if err != nil {
 		return fmt.Errorf("error creating api %w", err)
 	}
-	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
+	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User, config.Eventstore.AllowOrderByCreationDate)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
-	adminRepo, err := admin_es.Start(ctx, config.Admin, store, dbClient, eventstore)
+	adminRepo, err := admin_es.Start(ctx, config.Admin, store, dbClient, eventstore, config.Eventstore.AllowOrderByCreationDate)
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
@@ -249,7 +249,7 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, user.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, user.CreateServer(commands, queries, keys.User)); err != nil {
 		return err
 	}
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
@@ -294,6 +294,7 @@ func startAPIs(
 		return fmt.Errorf("unable to start login: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(login.HandlerPrefix, l.Handler())
+	apis.HandleFunc(login.EndpointDeviceAuth, login.RedirectDeviceAuthToPrefix)
 
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()
