@@ -1,6 +1,8 @@
 package view
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/iam/repository/view"
 	"github.com/zitadel/zitadel/internal/iam/repository/view/model"
@@ -39,12 +41,12 @@ func (v *View) UpdateOrgOwnerRemovedStyling(event *models.Event) error {
 	return v.ProcessedStylingSequence(event)
 }
 
-func (v *View) GetLatestStylingSequence(instanceID string) (*global_view.CurrentSequence, error) {
-	return v.latestSequence(stylingTyble, instanceID)
+func (v *View) GetLatestStylingSequence(ctx context.Context, instanceID string) (*global_view.CurrentSequence, error) {
+	return v.latestSequence(ctx, stylingTyble, instanceID)
 }
 
-func (v *View) GetLatestStylingSequences(instanceIDs []string) ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(stylingTyble, instanceIDs)
+func (v *View) GetLatestStylingSequences(ctx context.Context, instanceIDs []string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(ctx, stylingTyble, instanceIDs)
 }
 
 func (v *View) ProcessedStylingSequence(event *models.Event) error {
