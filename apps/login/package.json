@@ -4,7 +4,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "next lint",
+    "lint": "next lint && prettier --check .",
     "lint-staged": "lint-staged",
     "start": "next start",
     "test": "yarn prettier:check &nexarn lint",

@@ -9,16 +9,16 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'zitadel.com',
-        port: '',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "zitadel.com",
+        port: "",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'zitadel.cloud',
-        port: '',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "zitadel.cloud",
+        port: "",
+        pathname: "/**",
       },
     ],
   },
