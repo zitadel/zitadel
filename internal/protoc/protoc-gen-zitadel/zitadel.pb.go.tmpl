@@ -4,6 +4,7 @@ package {{.GoPackageName}}
 
 import (
 	"github.com/zitadel/zitadel/internal/api/authz"
+    {{if .AuthContext}}"github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"{{end}}
 )
 
 var {{.ServiceName}}_AuthMethods = authz.MethodMapping {
@@ -16,8 +17,8 @@ var {{.ServiceName}}_AuthMethods = authz.MethodMapping {
 }
 
 {{ range $m := .AuthContext}}
-func (r *{{ $m.Name }}) AuthContext() string {
-    return r{{$m.Field}}
+func (r *{{ $m.Name }}) OrganisationFromRequest() *object.Organisation {
+    return r{{$m.OrgMethod}}
 }
 {{ end }}
 

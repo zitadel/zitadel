@@ -37,8 +37,8 @@ type authOption struct {
 }
 
 type authContext struct {
-	Name  string
-	Field string
+	Name      string
+	OrgMethod string
 }
 
 type httpResponse struct {
@@ -81,8 +81,11 @@ func main() {
 					}
 					if ext.AuthOption != nil {
 						methods.AuthOptions = append(methods.AuthOptions, authOption{Name: string(method.Desc.Name()), Permission: ext.AuthOption.Permission /*CheckFieldName: authExt.CheckFieldName*/})
-						if ext.AuthOption.OrgIdField != "" {
-							methods.AuthContext = append(methods.AuthContext, authContext{Name: string(method.Input.Desc.Name()), Field: buildAuthContextField(method.Input.Fields, ext.AuthOption.OrgFromRequest)})
+						if ext.AuthOption.OrgField != "" {
+							orgMethod := buildAuthContextField(method.Input.Fields, ext.AuthOption.OrgField)
+							if orgMethod != "" {
+								methods.AuthContext = append(methods.AuthContext, authContext{Name: string(method.Input.Desc.Name()), OrgMethod: orgMethod})
+							}
 						}
 					}
 					if ext.HttpResponse != nil {
@@ -92,12 +95,18 @@ func main() {
 			}
 		}
 		if len(methods.AuthOptions) > 0 {
-			authTemp.Execute(&buf, &methods)
+			err = authTemp.Execute(&buf, &methods)
+			if err != nil {
+				panic(err)
+			}
 
 			filename := file.GeneratedFilenamePrefix + ".pb.zitadel.go"
 			file := plugin.NewGeneratedFile(filename, ".")
 
-			file.Write(buf.Bytes())
+			_, err = file.Write(buf.Bytes())
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 
@@ -109,7 +118,10 @@ func main() {
 	}
 
 	// Write the response to stdout, to be picked up by protoc
-	fmt.Fprintf(os.Stdout, string(out))
+	_, err = fmt.Fprint(os.Stdout, string(out))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func loadTemplate(templateData []byte) *template.Template {
@@ -124,17 +136,4 @@ func buildAuthContextField(fields []*protogen.Field, fieldName string) string {
 		}
 	}
 	return ""
-}
-
-func test(fields []*protogen.Field, fieldNames []string, i int, function string) string {
-	for _, field := range fields {
-		if string(field.Desc.Name()) == fieldNames[i] {
-			function += ".Get" + field.GoName + "()"
-			if len(fieldNames) == i+1 {
-				return function
-			}
-			return test(field.Message.Fields, fieldNames, i+1, function)
-		}
-	}
-	return function
 }
