@@ -1,9 +1,12 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import {
   MatLegacyDialog as MatDialog,
   MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
+import { Router } from '@angular/router';
+
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { mapTo } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -17,7 +20,7 @@ import { ToastService } from 'src/app/services/toast.service';
   templateUrl: './add-action-dialog.component.html',
   styleUrls: ['./add-action-dialog.component.scss'],
 })
-export class AddActionDialogComponent {
+export class AddActionDialogComponent implements OnInit {
   public name: string = '';
   public script: string = '';
   public durationInSec: number = 10;
@@ -26,14 +29,24 @@ export class AddActionDialogComponent {
   public id: string = '';
 
   public opened$ = this.dialogRef.afterOpened().pipe(mapTo(true));
-
+  public form!: UntypedFormGroup;
   constructor(
     private toast: ToastService,
     private mgmtService: ManagementService,
     private dialog: MatDialog,
+    private unsavedChangesDialog: MatDialog,
     public dialogRef: MatDialogRef<AddActionDialogComponent>,
+    private fb: UntypedFormBuilder,
+    private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
+    this.form = this.fb.group({
+      name: [data.name || ''],
+      script: [data.script || ''],
+      durationInSec: [data.durationInSec || 10],
+      allowedToFail: [data.allowedToFail],
+    });
+
     if (data && data.action) {
       const action: Action.AsObject = data.action;
       this.name = action.name;
@@ -44,6 +57,44 @@ export class AddActionDialogComponent {
       this.allowedToFail = action.allowedToFail;
       this.id = action.id;
     }
+  }
+
+  ngOnInit(): void {
+    this.dialogRef.backdropClick().subscribe(() => {
+      if (this.form.dirty) {
+        this.showUnsavedDialog();
+      } else {
+        this.dialogRef.close(false);
+      }
+    });
+
+    this.dialogRef.keydownEvents().subscribe((event) => {
+      if (event.key === 'Escape') {
+        if (this.form.dirty) {
+          this.showUnsavedDialog();
+        } else {
+          this.dialogRef.close(false);
+        }
+      }
+    });
+  }
+
+  private showUnsavedDialog(): void {
+    const unsavedChangesDialogRef = this.unsavedChangesDialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.UNSAVED.DIALOG.DISCARD',
+        cancelKey: 'ACTIONS.UNSAVED.DIALOG.CANCEL',
+        titleKey: 'ACTIONS.UNSAVEDCHANGES',
+        descriptionKey: 'ACTIONS.UNSAVED.DIALOG.DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    unsavedChangesDialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.dialogRef.close(false);
+      }
+    });
   }
 
   public closeDialog(): void {
