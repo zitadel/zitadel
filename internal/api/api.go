@@ -103,6 +103,12 @@ func (a *API) RegisterService(ctx context.Context, grpcServer server.Server) err
 	return nil
 }
 
+// HandleFunc allows registering a [http.HandlerFunc] on an exact
+// path, instead of prefix like RegisterHandlerOnPrefix.
+func (a *API) HandleFunc(path string, f http.HandlerFunc) {
+	a.router.HandleFunc(path, f)
+}
+
 // RegisterHandlerOnPrefix registers a http handler on a path prefix
 // the prefix will not be passed to the actual handler
 func (a *API) RegisterHandlerOnPrefix(prefix string, handler http.Handler) {

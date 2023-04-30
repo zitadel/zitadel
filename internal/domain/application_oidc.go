@@ -90,6 +90,7 @@ const (
 	OIDCGrantTypeAuthorizationCode OIDCGrantType = iota
 	OIDCGrantTypeImplicit
 	OIDCGrantTypeRefreshToken
+	OIDCGrantTypeDeviceCode
 )
 
 type OIDCApplicationType int32

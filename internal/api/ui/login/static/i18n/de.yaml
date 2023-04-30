@@ -221,6 +221,7 @@ RegistrationUser:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -253,6 +254,7 @@ ExternalRegistrationUserOverview:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
@@ -313,6 +315,25 @@ ExternalNotFound:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+
+DeviceAuth:
+  Title: Geräteautorisierung
+  UserCode:
+    Label: Benutzercode
+    Description: Geben Sie den auf dem Gerät angezeigten Benutzercode ein
+    ButtonNext: weiter
+  Action:
+    Description: Gerätezugriff erlauben
+    GrantDevice: Sie sind dabei, das Gerät zu erlauben
+    AccessToScopes: Zugriff auf die folgenden Daten
+    Button:
+      Allow: erlauben
+      Deny: verweigern
+  Done:
+    Description: Abgeschlossen
+    Approved: Gerätezulassung genehmigt. Sie können jetzt zum Gerät zurückkehren.
+    Denied: Geräteautorisierung verweigert. Sie können jetzt zum Gerät zurückkehren.
 
 Footer:
   PoweredBy: Powered By
@@ -422,5 +443,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: Registrierung ist nicht erlaubt
+  DeviceAuth:
+    NotExisting: Benutzercode existiert nicht
 
 optional: (optional)

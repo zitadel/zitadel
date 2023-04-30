@@ -1047,6 +1047,10 @@ export class AdminService {
     return this.grpcService.admin.getProviderByID(req, null).then((resp) => resp.toObject());
   }
 
+  public getProviderID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse> {
+    return this.grpcService.admin.getProviderByID(req, null);
+  }
+
   public listIAMMembers(
     limit: number,
     offset: number,

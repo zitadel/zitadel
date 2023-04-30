@@ -22,6 +22,7 @@ type AuthRequestType int32
 const (
 	AuthRequestTypeOIDC AuthRequestType = iota
 	AuthRequestTypeSAML
+	AuthRequestTypeDevice
 )
 
 type AuthRequestOIDC struct {
@@ -55,4 +56,19 @@ func (a *AuthRequestSAML) Type() AuthRequestType {
 
 func (a *AuthRequestSAML) IsValid() bool {
 	return true
+}
+
+type AuthRequestDevice struct {
+	ID         string
+	DeviceCode string
+	UserCode   string
+	Scopes     []string
+}
+
+func (*AuthRequestDevice) Type() AuthRequestType {
+	return AuthRequestTypeDevice
+}
+
+func (a *AuthRequestDevice) IsValid() bool {
+	return a.DeviceCode != "" && a.UserCode != "" && len(a.Scopes) > 0
 }

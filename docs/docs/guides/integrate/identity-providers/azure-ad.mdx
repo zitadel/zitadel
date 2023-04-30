@@ -77,7 +77,7 @@ You only have to add the client ID and secret, you have created in the step befo
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
-This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`
+This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`. ZITADEL ensures that at least `openid` and `User.Read` scopes are always sent.
 
 **Email Verified**: Azure AD doesn't send the email verified claim in the users token, if you don't enable this setting.
 The user is then created with an unverified email, which results in an email verification message.
@@ -90,11 +90,11 @@ In this case, configure "Accounts in any organizational directory and personal M
 - Organizations: Choose organization if you have Azure AD Tenants and no personal accounts. (You have configured either "Accounts in this organization" or "Accounts in any organizational directory" on your Azure APP)
 - Consumers: Choose this if you want to allow public accounts. (In your Azure AD App you have configured "Personal Microsoft accounts only")
 
-**Tenant ID**: If you have selected either the *Organizations* or *Customers* as the *Tenant Type*, you have to enter the *Directory (Tenant) ID*, copied previously in the Azure App configuration, here.
+**Tenant ID**: If you have selected *Tenant ID* as *Tenant Type*, you have to enter the *Directory (Tenant) ID* into the *Tenant ID* field, copied previously from the Azure App configuration.
 
 <GeneralConfigDescription provider_account="Microsoft account" />
 
-![Azure Provider](/img/guides/zitadel_azure_provider.png)
+![Azure Provider](/img/guides/zitadel_azure_provider2.png)
 
 ### Activate IdP
 

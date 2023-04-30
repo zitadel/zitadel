@@ -29,6 +29,9 @@ import (
 type Commands struct {
 	httpClient *http.Client
 
+	checkPermission permissionCheck
+	newEmailCode    func(ctx context.Context, filter preparation.FilterToQueryReducer, codeAlg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error)
+
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
 	idGenerator    id.Generator
@@ -59,7 +62,8 @@ type Commands struct {
 	certificateLifetime  time.Duration
 }
 
-func StartCommands(es *eventstore.Eventstore,
+func StartCommands(
+	es *eventstore.Eventstore,
 	defaults sd.SystemDefaults,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
@@ -76,6 +80,7 @@ func StartCommands(es *eventstore.Eventstore,
 	oidcEncryption,
 	samlEncryption crypto.EncryptionAlgorithm,
 	httpClient *http.Client,
+	membershipsResolver authz.MembershipsResolver,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -102,6 +107,10 @@ func StartCommands(es *eventstore.Eventstore,
 		certificateAlgorithm:  samlEncryption,
 		webauthnConfig:        webAuthN,
 		httpClient:            httpClient,
+		checkPermission: func(ctx context.Context, permission, orgID, resourceID string, allowSelf bool) (err error) {
+			return authz.CheckPermission(ctx, membershipsResolver, zitadelRoles, permission, orgID, resourceID, allowSelf)
+		},
+		newEmailCode: newEmailCode,
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)

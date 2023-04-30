@@ -10,11 +10,6 @@ import (
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
-type HumanDetails struct {
-	ID string
-	ObjectDetails
-}
-
 type Human struct {
 	es_models.ObjectRoot
 
@@ -91,7 +86,13 @@ func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {
 }
 
 func (u *Human) EnsureDisplayName() {
-	if u.Profile != nil && u.DisplayName == "" && u.FirstName != "" && u.LastName != "" {
+	if u.Profile == nil {
+		u.Profile = new(Profile)
+	}
+	if u.DisplayName != "" {
+		return
+	}
+	if u.FirstName != "" && u.LastName != "" {
 		u.DisplayName = u.FirstName + " " + u.LastName
 		return
 	}

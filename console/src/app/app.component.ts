@@ -201,7 +201,7 @@ export class AppComponent implements OnDestroy {
       }
     });
 
-    this.activatedRoute.queryParams.pipe(filter((params) => !!params.org)).subscribe((params) => {
+    this.activatedRoute.queryParams.pipe(filter((params) => !!params['org'])).subscribe((params) => {
       const { org } = params;
       this.authService.getActiveOrg(org);
     });
@@ -252,7 +252,7 @@ export class AppComponent implements OnDestroy {
   }
 
   public prepareRoute(outlet: RouterOutlet): boolean {
-    return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
+    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
   }
 
   public onSetTheme(theme: string): void {
@@ -267,15 +267,15 @@ export class AppComponent implements OnDestroy {
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['de', 'en', 'fr', 'it', 'ja', 'pl', 'zh']);
+    this.translate.addLangs(['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh']);
     this.translate.setDefaultLang('en');
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/de|en|fr|it|ja|pl|zh/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/de|en|es|fr|it|ja|pl|zh/) ? cropped : 'en';
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/de|en|fr|it|ja|pl|zh/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/de|en|es|fr|it|ja|pl|zh/)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);
