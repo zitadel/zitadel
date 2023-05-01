@@ -159,25 +159,25 @@ func (s *Server) GetBrandingPolicy(ctx context.Context, req *policy.GetBrandingP
 
 func ModelLabelPolicyToPb(current *query.LabelPolicy, assetPrefix string) *policy.BrandingPolicy {
 	return &policy.BrandingPolicy{
-		PrimaryColor:        current.Light.PrimaryColor,
-		BackgroundColor:     current.Light.BackgroundColor,
-		FontColor:           current.Light.FontColor,
-		WarnColor:           current.Light.WarnColor,
-		PrimaryColorDark:    current.Dark.PrimaryColor,
-		BackgroundColorDark: current.Dark.BackgroundColor,
-		WarnColorDark:       current.Dark.WarnColor,
-		FontColorDark:       current.Dark.FontColor,
-		FontUrl:             domain.AssetURL(assetPrefix, current.ResourceOwner, current.FontURL),
-		LogoUrl:             domain.AssetURL(assetPrefix, current.ResourceOwner, current.Light.LogoURL),
-		LogoUrlDark:         domain.AssetURL(assetPrefix, current.ResourceOwner, current.Dark.LogoURL),
-		IconUrl:             domain.AssetURL(assetPrefix, current.ResourceOwner, current.Light.IconURL),
-		IconUrlDark:         domain.AssetURL(assetPrefix, current.ResourceOwner, current.Dark.IconURL),
-		DisableWatermark:    current.WatermarkDisabled,
-		HideLoginNameSuffix: current.HideLoginNameSuffix,
+		PrimaryColorLight:    current.Light.PrimaryColor,
+		BackgroundColorLight: current.Light.BackgroundColor,
+		FontColorLight:       current.Light.FontColor,
+		WarnColorLight:       current.Light.WarnColor,
+		PrimaryColorDark:     current.Dark.PrimaryColor,
+		BackgroundColorDark:  current.Dark.BackgroundColor,
+		WarnColorDark:        current.Dark.WarnColor,
+		FontColorDark:        current.Dark.FontColor,
+		FontUrl:              domain.AssetURL(assetPrefix, current.ResourceOwner, current.FontURL),
+		LogoUrlLight:         domain.AssetURL(assetPrefix, current.ResourceOwner, current.Light.LogoURL),
+		LogoUrlDark:          domain.AssetURL(assetPrefix, current.ResourceOwner, current.Dark.LogoURL),
+		IconUrlLight:         domain.AssetURL(assetPrefix, current.ResourceOwner, current.Light.IconURL),
+		IconUrlDark:          domain.AssetURL(assetPrefix, current.ResourceOwner, current.Dark.IconURL),
+		DisableWatermark:     current.WatermarkDisabled,
+		HideLoginNameSuffix:  current.HideLoginNameSuffix,
 	}
 }
 
-func (s *Server) GetDomainPolicy(ctx context.Context, req *policy.GetDomainPolicyRequest) (*policy.GetDomainPolicyResponse, error) {
+func (s *Server) GetDomainSettings(ctx context.Context, req *policy.GetDomainSettingsRequest) (*policy.GetDomainSettingsResponse, error) {
 	orgID := req.GetOrganisation().GetOrgId()
 	if orgID == "" {
 		orgID = authz.GetCtxData(ctx).OrgID
@@ -187,8 +187,8 @@ func (s *Server) GetDomainPolicy(ctx context.Context, req *policy.GetDomainPolic
 	if err != nil {
 		return nil, err
 	}
-	return &policy.GetDomainPolicyResponse{
-		Policy: DomainPolicyToPb(current),
+	return &policy.GetDomainSettingsResponse{
+		Policy: DomainSettingsToPb(current),
 		Details: &object.Details{
 			Sequence:          current.Sequence,
 			ChangeDate:        timestamppb.New(current.ChangeDate),
@@ -198,15 +198,15 @@ func (s *Server) GetDomainPolicy(ctx context.Context, req *policy.GetDomainPolic
 	}, nil
 }
 
-func DomainPolicyToPb(current *query.DomainPolicy) *policy.DomainPolicy {
-	return &policy.DomainPolicy{
-		UserLoginMustBeDomain:                  current.UserLoginMustBeDomain,
-		ValidateOrgDomains:                     current.ValidateOrgDomains,
+func DomainSettingsToPb(current *query.DomainPolicy) *policy.DomainSettings {
+	return &policy.DomainSettings{
+		LoginnameIncludesDomain:                current.UserLoginMustBeDomain,
+		VerifyOrgDomains:                       current.ValidateOrgDomains,
 		SmtpSenderAddressMatchesInstanceDomain: current.SMTPSenderAddressMatchesInstanceDomain,
 	}
 }
 
-func (s *Server) GetPrivacyPolicy(ctx context.Context, req *policy.GetPrivacyPolicyRequest) (*policy.GetPrivacyPolicyResponse, error) {
+func (s *Server) GetLegalSettings(ctx context.Context, req *policy.GetLegalSettingsRequest) (*policy.GetLegalSettingsResponse, error) {
 	orgID := req.GetOrganisation().GetOrgId()
 	if orgID == "" {
 		orgID = authz.GetCtxData(ctx).OrgID
@@ -216,8 +216,8 @@ func (s *Server) GetPrivacyPolicy(ctx context.Context, req *policy.GetPrivacyPol
 	if err != nil {
 		return nil, err
 	}
-	return &policy.GetPrivacyPolicyResponse{
-		Policy: ModelPrivacyPolicyToPb(current),
+	return &policy.GetLegalSettingsResponse{
+		Policy: ModelLegalSettingsToPb(current),
 		Details: &object.Details{
 			Sequence:          current.Sequence,
 			ChangeDate:        timestamppb.New(current.ChangeDate),
@@ -227,8 +227,8 @@ func (s *Server) GetPrivacyPolicy(ctx context.Context, req *policy.GetPrivacyPol
 	}, nil
 }
 
-func ModelPrivacyPolicyToPb(current *query.PrivacyPolicy) *policy.PrivacyPolicy {
-	return &policy.PrivacyPolicy{
+func ModelLegalSettingsToPb(current *query.PrivacyPolicy) *policy.LegalSettings {
+	return &policy.LegalSettings{
 		TosLink:      current.TOSLink,
 		PrivacyLink:  current.PrivacyLink,
 		HelpLink:     current.HelpLink,

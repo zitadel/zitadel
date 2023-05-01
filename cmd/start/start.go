@@ -256,7 +256,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, policy.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, policy.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
 		return err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)

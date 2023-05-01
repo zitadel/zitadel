@@ -7,8 +7,8 @@ import "zitadel/object/v2alpha/object.proto";
 import "zitadel/policy/v2alpha/login_policy.proto";
 import "zitadel/policy/v2alpha/password_policy.proto";
 import "zitadel/policy/v2alpha/branding_policy.proto";
-import "zitadel/policy/v2alpha/domain_policy.proto";
-import "zitadel/policy/v2alpha/privacy_policy.proto";
+import "zitadel/policy/v2alpha/domain_settings.proto";
+import "zitadel/policy/v2alpha/legal_settings.proto";
 import "zitadel/policy/v2alpha/lockout_policy.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -140,7 +140,7 @@ service PolicyService {
             };
         };
     }
-    rpc GetDomainPolicy (GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
+    rpc GetDomainSettings (GetDomainSettingsRequest) returns (GetDomainSettingsResponse) {
         option (google.api.http) = {
             post: "/v2alpha/policies/domain"
             body: "*"
@@ -151,8 +151,8 @@ service PolicyService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get the current active domain policy";
-            description: "Return the current active domain policy for the requested context"
+            summary: "Get the current active domain settings";
+            description: "Return the current active domain settings for the requested context"
             responses: {
                 key: "200"
                 value: {
@@ -161,9 +161,9 @@ service PolicyService {
             };
         };
     }
-    rpc GetPrivacyPolicy (GetPrivacyPolicyRequest) returns (GetPrivacyPolicyResponse) {
+    rpc GetLegalSettings (GetLegalSettingsRequest) returns (GetLegalSettingsResponse) {
         option (google.api.http) = {
-            post: "/v2alpha/policies/privacy"
+            post: "/v2alpha/policies/legal"
             body: "*"
         };
 
@@ -172,8 +172,8 @@ service PolicyService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get the current active privacy policy";
-            description: "Return the current active privacy policy for the requested context"
+            summary: "Get the current active legal settings";
+            description: "Return the current active legal settings for the requested context"
             responses: {
                 key: "200"
                 value: {
@@ -274,22 +274,22 @@ message GetBrandingPolicyResponse {
     zitadel.policy.v2alpha.BrandingPolicy policy = 2;
 }
 
-message GetDomainPolicyRequest {
+message GetDomainSettingsRequest {
     zitadel.object.v2alpha.Organisation organisation = 1;
 }
 
-message GetDomainPolicyResponse {
+message GetDomainSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.DomainPolicy policy = 2;
+    zitadel.policy.v2alpha.DomainSettings policy = 2;
 }
 
-message GetPrivacyPolicyRequest {
+message GetLegalSettingsRequest {
     zitadel.object.v2alpha.Organisation organisation = 1;
 }
 
-message GetPrivacyPolicyResponse {
+message GetLegalSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.PrivacyPolicy policy = 2;
+    zitadel.policy.v2alpha.LegalSettings policy = 2;
 }
 
 message GetLockoutPolicyRequest {

@@ -12,7 +12,7 @@ import "google/protobuf/duration.proto";
 
 message BrandingPolicy {
     // hex value for primary color
-    string primary_color = 1 [
+    string primary_color_light = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for primary color";
             example: "\"#5469d4\"";
@@ -25,21 +25,21 @@ message BrandingPolicy {
         }
     ];
     // hex value for secondary color
-    string warn_color = 3 [
+    string warn_color_light = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for warn color";
             example: "\"#CD3D56\"";
         }
     ];
     // hex value for background color
-    string background_color = 4 [
+    string background_color_light = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for background color";
             example: "\"#FAFAFA\"";
         }
     ];
     // hex value for font color
-    string font_color = 5 [
+    string font_color_light = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for font color";
             example: "\"#000000\"";
@@ -74,13 +74,13 @@ message BrandingPolicy {
         }
     ];
     bool disable_watermark = 10;
-    string logo_url = 11 [
+    string logo_url_light = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for font color dark theme";
             example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/logo-180950416321494657\"";
         }
     ];
-    string icon_url = 12 [
+    string icon_url_light = 12 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "hex value for font color dark theme";
             example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/icon-180950498874178817\"";
