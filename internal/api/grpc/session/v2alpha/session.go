@@ -17,7 +17,10 @@ func (s *Server) CreateSession(ctx context.Context, req *CreateSessionRequest) (
 	}, nil
 }
 func (s *Server) SetSession(ctx context.Context, req *SetSessionRequest) (*SetSessionResponse, error) {
-	test.id = req.GetSessionId()
+	if sessions == nil {
+		sessions = make(map[string]session)
+	}
+	test, _ := sessions[req.GetSessionId()]
 	if user := req.Checks.GetUser(); user != nil {
 		switch s := user.GetSearch().(type) {
 		case *CheckUser_UserId:
@@ -40,23 +43,25 @@ func (s *Server) SetSession(ctx context.Context, req *SetSessionRequest) (*SetSe
 		}
 		test.password = time.Now()
 	}
+	sessions[req.GetSessionId()] = test
 	return &SetSessionResponse{}, nil
 }
 
 func (s *Server) GetSession(ctx context.Context, req *GetSessionRequest) (*GetSessionResponse, error) {
-	if test.id != req.SessionId {
+	test, ok := sessions[req.GetSessionId()]
+	if !ok {
 		return nil, status.Error(codes.NotFound, "invalid id")
 	}
-	factors := make(map[string]*Factor, 2)
+	factors := new(Factors)
 	if test.userID != "" {
-		factors["user"] = &Factor{
-			Checked: timestamppb.New(test.userCheck),
-			Factor:  &Factor_User{User: &user.User{Id: test.userID}},
+		factors.User = &UserFactor{
+			VerifiedAt: timestamppb.New(test.userCheck),
+			User:       &user.User{Id: test.userID},
 		}
 	}
 	if !test.password.IsZero() {
-		factors["password"] = &Factor{
-			Checked: timestamppb.New(test.password),
+		factors.Password = &PasswordFactor{
+			VerifiedAt: timestamppb.New(test.password),
 		}
 	}
 	return &GetSessionResponse{
@@ -74,4 +79,4 @@ type session struct {
 	password  time.Time
 }
 
-var test session
+var sessions map[string]session

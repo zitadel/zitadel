@@ -13,18 +13,29 @@ option go_package = "github.com/zitadel/zitadel/internal/api/grpc/session/v2alph
 
 message Session {
   string id = 1;
-  map<string,Factor> factors = 2;
+//  map<string,Factor> factors = 2;
+  Factors factors = 2;
   repeated Metadata metadata = 3;
 }
 
-message Factor {
-  google.protobuf.Timestamp checked = 1;
-  oneof factor {
-    zitadel.user.v2alpha.User user = 2;
-  }
+message Factors {
+  UserFactor user = 1;
+  PasswordFactor password = 2;
+//  oneof factor {
+//    zitadel.user.v2alpha.User user = 2;
+//    Password password = 3;
+//  }
+//  map<string,google.protobuf.Value> test = 4;
 }
 
-message Password {}
+message UserFactor {
+  google.protobuf.Timestamp verified_at = 1;
+  zitadel.user.v2alpha.User user = 2;
+}
+
+message PasswordFactor {
+  google.protobuf.Timestamp verified_at = 1;
+}
 
 message SetMetadataEntry {
   string key = 1 [

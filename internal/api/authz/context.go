@@ -86,10 +86,10 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		orgID = resourceOwner
 	}
 
-	verifiedID, err := t.ExistsOrg(ctx, orgID, orgDomain)
+	verifiedOrgID, err := t.ExistsOrg(ctx, orgID, orgDomain)
 	if err != nil {
 		err = retry(func() error {
-			verifiedID, err = t.ExistsOrg(ctx, orgID, orgDomain)
+			verifiedOrgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
 			return err
 		})
 		if err != nil {
@@ -99,7 +99,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 
 	return CtxData{
 		UserID:            userID,
-		OrgID:             verifiedID,
+		OrgID:             verifiedOrgID,
 		ProjectID:         projectID,
 		AgentID:           agentID,
 		PreferredLanguage: prefLang,
