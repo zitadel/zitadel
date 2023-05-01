@@ -46,6 +46,7 @@ import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
   CUSTOM_METHOD,
+  DEVICE_CODE_METHOD,
   getAuthMethodFromPartialConfig,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
@@ -383,7 +384,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     if (type === 'OIDC') {
       switch (this.app?.oidcConfig?.appType) {
         case OIDCAppType.OIDC_APP_TYPE_NATIVE:
-          this.authMethods = [PKCE_METHOD, CUSTOM_METHOD];
+          this.authMethods = [PKCE_METHOD, DEVICE_CODE_METHOD, CUSTOM_METHOD];
           break;
         case OIDCAppType.OIDC_APP_TYPE_WEB:
           this.authMethods = [PKCE_METHOD, CODE_METHOD, PK_JWT_METHOD, POST_METHOD];

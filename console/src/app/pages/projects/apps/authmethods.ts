@@ -129,6 +129,15 @@ export function getPartialConfigFromAuthMethod(authMethod: string):
         },
       };
       return config;
+    case DEVICE_CODE_METHOD.key:
+      config = {
+        oidc: {
+          responseTypesList: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+          grantTypesList: [OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE],
+          authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+        },
+      };
+      return config;
     case PKCE_METHOD.key:
       config = {
         oidc: {

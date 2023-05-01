@@ -113,6 +113,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     { type: OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT, checked: false, disabled: true },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, checked: false, disabled: true },
+    { type: OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE, checked: false, disabled: true },
   ];
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -472,6 +473,13 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   get grantTypesList(): AbstractControl | null {
     return this.form.get('grantTypesList');
+  }
+
+  get grantTypesListContainsOnlyDeviceCode(): boolean {
+    return (
+      this.oidcAppRequest.toObject().grantTypesList.length === 1 &&
+      this.oidcAppRequest.toObject().grantTypesList[0] === OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE
+    );
   }
 
   get formappType(): AbstractControl | null {
