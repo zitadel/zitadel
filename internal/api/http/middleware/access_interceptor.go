@@ -1,10 +1,11 @@
 package middleware
 
 import (
+	"bytes"
 	"math"
 	"net/http"
 	"net/url"
-	"strconv"
+	"text/template"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -20,21 +21,28 @@ type AccessInterceptor struct {
 	svc           *logstore.Service
 	cookieHandler *http_utils.CookieHandler
 	limitConfig   *AccessConfig
+	storeOnly     bool
 }
 
 type AccessConfig struct {
 	ExhaustedCookieKey    string
+	ExhaustedCookieValue  string
 	ExhaustedCookieMaxAge time.Duration
 }
 
-func NewAccessInterceptor(svc *logstore.Service, cookieConfig *AccessConfig) *AccessInterceptor {
+// NewAccessInterceptor intercepts all requests and stores them to the logstore.
+// If storeOnly is false, it also checks if requests are exhausted.
+// If requests are exhausted, it also returns http.StatusTooManyRequests and sets a cookie
+func NewAccessInterceptor(svc *logstore.Service, cookieConfig *AccessConfig, storeOnly bool) *AccessInterceptor {
 	return &AccessInterceptor{
 		svc: svc,
 		cookieHandler: http_utils.NewCookieHandler(
 			http_utils.WithUnsecure(),
+			http_utils.WithNonHttpOnly(),
 			http_utils.WithMaxAge(int(math.Floor(cookieConfig.ExhaustedCookieMaxAge.Seconds()))),
 		),
 		limitConfig: cookieConfig,
+		storeOnly:   storeOnly,
 	}
 }
 
@@ -53,18 +61,29 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
 
 		instance := authz.GetInstance(ctx)
-		remaining := a.svc.Limit(tracingCtx, instance.InstanceID())
-		limit := remaining != nil && *remaining == 0
-
-		a.cookieHandler.SetCookie(wrappedWriter, a.limitConfig.ExhaustedCookieKey, request.Host, strconv.FormatBool(limit))
-
-		if limit {
-			wrappedWriter.WriteHeader(http.StatusTooManyRequests)
-			wrappedWriter.ignoreWrites = true
+		limit := false
+		if !a.storeOnly {
+			remaining := a.svc.Limit(tracingCtx, instance.InstanceID())
+			limit = remaining != nil && *remaining == 0
 		}
-
-		next.ServeHTTP(wrappedWriter, request)
-
+		if limit {
+			// Limit can only be true when storeOnly is false, so set the cookie and the response code
+			cookieValue, err := templateCookieValue(a.limitConfig.ExhaustedCookieValue, instance)
+			if err != nil {
+				// If templating didn't succeed, emit a warning log and just use the plain config
+				logging.WithError(err).WithField("value", a.limitConfig.ExhaustedCookieValue).Warning("failed to go template cookie value config")
+				err = nil
+			}
+			a.cookieHandler.SetCookie(wrappedWriter, a.limitConfig.ExhaustedCookieKey, request.Host, cookieValue)
+			http.Error(wrappedWriter, "quota for authenticated requests is exhausted", http.StatusTooManyRequests)
+		} else {
+			if !a.storeOnly {
+				// If not limited and not storeOnly, ensure the cookie is deleted
+				a.cookieHandler.DeleteCookie(wrappedWriter, request, a.limitConfig.ExhaustedCookieKey)
+			}
+			// Always serve if not limited
+			next.ServeHTTP(wrappedWriter, request)
+		}
 		requestURL := request.RequestURI
 		unescapedURL, err := url.QueryUnescape(requestURL)
 		if err != nil {
@@ -99,4 +118,16 @@ func (r *statusRecorder) WriteHeader(status int) {
 	}
 	r.status = status
 	r.ResponseWriter.WriteHeader(status)
+}
+
+func templateCookieValue(templateableCookieValue string, instance authz.Instance) (string, error) {
+	cookieValueTemplate, err := template.New("cookievalue").Parse(templateableCookieValue)
+	if err != nil {
+		return templateableCookieValue, err
+	}
+	cookieValue := new(bytes.Buffer)
+	if err = cookieValueTemplate.Execute(cookieValue, instance); err != nil {
+		return templateableCookieValue, err
+	}
+	return cookieValue.String(), nil
 }
