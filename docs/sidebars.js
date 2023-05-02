@@ -303,6 +303,18 @@ module.exports = {
       items: [
         "support/troubleshooting",
         {
+          type: 'category',
+          label: "Technical Advisory",
+          link: {
+            type: 'doc',
+            id: 'support/technical_advisory',
+          },
+          collapsed: true,
+          items: [
+              "support/advisory/a10000",
+          ],
+        },
+        {
           type: "category",
           label: "Trainings",
           collapsed: true,
