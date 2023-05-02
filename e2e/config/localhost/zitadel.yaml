@@ -33,7 +33,8 @@ LogStore:
 Quotas:
   Access:
     ExhaustedCookieKey: "zitadel.quota.limiting"
-    ExhaustedCookieMaxAge: "60s"
+    ExhaustedCookieValue: "https://my-zitadel/instances/{{.InstanceID}}"
+    ExhaustedCookieMaxAge: "300s"
 
 Projections:
   Customizations:

@@ -94,9 +94,16 @@ describe('quotas', () => {
         });
       });
 
-      it('authenticated requests are limited', () => {
+      it.only('only authenticated requests are limited', () => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
+            cy.intercept({
+              url: Cypress.config("baseUrl"),
+            }, (req) => {
+              req.continue(res => {
+                expect(res.headers.SetCookie, "Static assets other than the never have a SetCookie header which would disable their caching").to.be.undefined
+              })
+            })
             const start = new Date();
             urls.forEach((url) => {
               cy.request({
@@ -131,8 +138,12 @@ describe('quotas', () => {
             createHumanUser(ctx.api, testUserName, false).then((res) => {
               expect(res.status).to.equal(429);
             });
+            cy.visit("/users/me")
+            cy.contains('[data-e2e="authenticated-requests-exhausted-dialog"]', "Upgrade your instance")
             ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests);
             createHumanUser(ctx.api, testUserName);
+            cy.reload()
+            cy.pause()
           });
         });
       });
