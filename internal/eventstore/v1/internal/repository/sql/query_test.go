@@ -470,7 +470,7 @@ func Test_buildQuery(t *testing.T) {
 		ctx := context.Background()
 		db := new(testDB)
 		t.Run(tt.name, func(t *testing.T) {
-			gotQuery, gotLimit, gotValues, gotRowScanner := buildQuery(ctx, db, tt.args.queryFactory)
+			gotQuery, gotLimit, gotValues, gotRowScanner := (&SQL{allowOrderByCreationDate: true}).buildQuery(ctx, db, tt.args.queryFactory)
 			if gotQuery != tt.res.query {
 				t.Errorf("buildQuery() gotQuery = %v, want %v", gotQuery, tt.res.query)
 			}

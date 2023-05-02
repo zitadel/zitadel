@@ -4,8 +4,9 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 )
 
-func Start(client *database.DB) *SQL {
+func Start(client *database.DB, allowOrderByCreationDate bool) *SQL {
 	return &SQL{
-		client: client,
+		client:                   client,
+		allowOrderByCreationDate: allowOrderByCreationDate,
 	}
 }

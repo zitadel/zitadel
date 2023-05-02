@@ -23,8 +23,8 @@ type EsRepository struct {
 	eventstore.AdministratorRepo
 }
 
-func Start(ctx context.Context, conf Config, static static.Storage, dbClient *database.DB, esV2 *eventstore2.Eventstore) (*EsRepository, error) {
-	es, err := v1.Start(dbClient)
+func Start(ctx context.Context, conf Config, static static.Storage, dbClient *database.DB, esV2 *eventstore2.Eventstore, allowOrderByCreationDate bool) (*EsRepository, error) {
+	es, err := v1.Start(dbClient, allowOrderByCreationDate)
 	if err != nil {
 		return nil, err
 	}
