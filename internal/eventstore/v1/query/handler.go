@@ -17,7 +17,7 @@ const (
 
 type Handler interface {
 	ViewModel() string
-	EventQuery(instanceIDs []string) (*models.SearchQuery, error)
+	EventQuery(ctx context.Context, instanceIDs []string) (*models.SearchQuery, error)
 	Reduce(*models.Event) error
 	OnError(event *models.Event, err error) error
 	OnSuccess(instanceIDs []string) error
@@ -26,7 +26,7 @@ type Handler interface {
 	QueryLimit() uint64
 
 	AggregateTypes() []models.AggregateType
-	CurrentSequence(instanceID string) (uint64, error)
+	CurrentSequence(ctx context.Context, instanceID string) (uint64, error)
 	Eventstore() v1.Eventstore
 
 	Subscription() *v1.Subscription
@@ -46,7 +46,7 @@ func ReduceEvent(ctx context.Context, handler Handler, event *models.Event) {
 			).Error("reduce panicked")
 		}
 	}()
-	currentSequence, err := handler.CurrentSequence(event.InstanceID)
+	currentSequence, err := handler.CurrentSequence(ctx, event.InstanceID)
 	if err != nil {
 		logging.WithError(err).Warn("unable to get current sequence")
 		return
@@ -67,7 +67,7 @@ func ReduceEvent(ctx context.Context, handler Handler, event *models.Event) {
 	}
 
 	for _, unprocessedEvent := range unprocessedEvents {
-		currentSequence, err := handler.CurrentSequence(unprocessedEvent.InstanceID)
+		currentSequence, err := handler.CurrentSequence(ctx, unprocessedEvent.InstanceID)
 		if err != nil {
 			logging.WithError(err).Warn("unable to get current sequence")
 			return
