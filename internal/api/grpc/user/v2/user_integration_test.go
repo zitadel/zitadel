@@ -57,7 +57,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organisation: &object.Organisation{
 						Org: &object.Organisation_OrgId{
-							OrgId: "211137963315232910",
+							OrgId: Tester.Organisation.ID,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -97,7 +97,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organisation: &object.Organisation{
 						Org: &object.Organisation_OrgId{
-							OrgId: "211137963315232910",
+							OrgId: Tester.Organisation.ID,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -142,7 +142,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organisation: &object.Organisation{
 						Org: &object.Organisation_OrgId{
-							OrgId: "211137963315232910",
+							OrgId: Tester.Organisation.ID,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -188,7 +188,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organisation: &object.Organisation{
 						Org: &object.Organisation_OrgId{
-							OrgId: "211137963315232910",
+							OrgId: Tester.Organisation.ID,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -229,7 +229,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organisation: &object.Organisation{
 						Org: &object.Organisation_OrgId{
-							OrgId: "211137963315232910",
+							OrgId: Tester.Organisation.ID,
 						},
 					},
 					Email: &user.SetHumanEmail{
@@ -260,7 +260,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organisation: &object.Organisation{
 						Org: &object.Organisation_OrgId{
-							OrgId: "211137963315232910",
+							OrgId: Tester.Organisation.ID,
 						},
 					},
 					Profile: &user.SetHumanProfile{

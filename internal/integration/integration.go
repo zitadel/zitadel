@@ -41,6 +41,11 @@ var (
 	postgresYAML []byte
 )
 
+// UserType provides constants that give
+// a short explinanation with the purpose
+// a serverice user.
+// This allows to pre-create users with
+// different permissions and reuse them.
 type UserType int
 
 //go:generate stringer -type=UserType
@@ -49,11 +54,13 @@ const (
 	OrgOwner
 )
 
+// User information with a Personal Access Token.
 type User struct {
 	*query.User
 	Token string
 }
 
+// Tester is a Zitadel server and client with all resources available for testing.
 type Tester struct {
 	*start.Server
 
@@ -113,7 +120,7 @@ func (s *Tester) pollHealth(ctx context.Context) (err error) {
 }
 
 const (
-	SystemUser = "integration1"
+	SystemUser = "integration"
 )
 
 func (s *Tester) createSystemUser(ctx context.Context) {
@@ -169,6 +176,7 @@ func (s *Tester) WithSystemAuthorization(ctx context.Context, u UserType) contex
 	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", s.Users[u].Token))
 }
 
+// Done send an interrupt signal to cleanly shutdown the server.
 func (s *Tester) Done() {
 	err := s.GRPCClientConn.Close()
 	logging.OnError(err).Error("integration tester client close")
@@ -177,6 +185,20 @@ func (s *Tester) Done() {
 	s.wg.Wait()
 }
 
+// NewTester start a new Zitadel server by passing the default commandline.
+// The server will listen on the configured port.
+// The database configuration that will be used can be set by the
+// INTEGRATION_DB_FLAVOR environment variable and can have the values "cockroach"
+// or "postgres". Defaults to "cockroach".
+//
+// The deault Instance and Organisation are read from the DB and system
+// users are created as needed.
+//
+// After the server is started, a [grpc.ClientConn] will be created and
+// the server is polled for it's health status.
+//
+// Note: the database must already be setup and intialized before
+// using NewTester. See the CONTRIBUTING.md document for details.
 func NewTester(ctx context.Context) *Tester {
 	args := strings.Split(commandLine, " ")
 

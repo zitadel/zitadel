@@ -3,7 +3,7 @@ version: '3.8'
 services:
   cockroach:
     extends:
-      file: '../localhost/docker-compose.yaml'
+      file: '../../../e2e/config/localhost/docker-compose.yaml'
       service: 'db'
   
   postgres:

@@ -9,7 +9,7 @@ on:
       - '**'
 
 jobs:
-  integration-tests:
+  run:
     strategy:
       matrix:
         db: [cockroach, postgres]
@@ -36,7 +36,7 @@ jobs:
       - name: Download Go modules
         run: go mod download
       - name: Start ${{ matrix.db }} database
-        run: docker compose -f e2e/config/integration/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
+        run: docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
       - name: Run zitadel init and setup
         run: |
           go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml

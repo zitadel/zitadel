@@ -13,13 +13,29 @@ type DetailsMsg interface {
 	GetDetails() *object.Details
 }
 
+// AssertDetails asserts values in a message's object Details,
+// if the object Details in expected is a non-nil value.
+// It targets API v2 messages that have the `GetDetails()` method.
+//
+// Dynamically generated values are not compared with expected.
+// Instead a sanity check is performed.
+// For the sequence a non-zero value is expected.
+// The change date has to be now, with a tollerance of 1 second.
+//
+// The resource owner is compared with expected and is
+// therefore the only value that has to be set.
 func AssertDetails[D DetailsMsg](t testing.TB, exptected, actual D) {
 	wantDetails, gotDetails := exptected.GetDetails(), actual.GetDetails()
-
-	if wantDetails != nil {
-		assert.NotZero(t, gotDetails.GetSequence())
+	if wantDetails == nil {
+		assert.Nil(t, gotDetails)
+		return
 	}
-	wantCD, gotCD := wantDetails.GetChangeDate().AsTime(), gotDetails.GetChangeDate().AsTime()
-	assert.WithinRange(t, gotCD, wantCD, wantCD.Add(time.Minute))
+
+	assert.NotZero(t, gotDetails.GetSequence())
+
+	gotCD := gotDetails.GetChangeDate().AsTime()
+	now := time.Now()
+	assert.WithinRange(t, gotCD, now.Add(-time.Second), now.Add(time.Second))
+
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
 }
