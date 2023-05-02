@@ -1,6 +1,7 @@
 package view
 
 import (
+	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -15,12 +16,12 @@ func (v *View) saveCurrentSequence(viewName string, event *models.Event) error {
 	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, event.InstanceID, event.Sequence, event.CreationDate)
 }
 
-func (v *View) latestSequence(viewName, instanceID string) (*repository.CurrentSequence, error) {
-	return repository.LatestSequence(v.Db, sequencesTable, viewName, instanceID)
+func (v *View) latestSequence(ctx context.Context, viewName, instanceID string) (*repository.CurrentSequence, error) {
+	return repository.LatestSequence(v.Db, v.TimeTravel(ctx, sequencesTable), viewName, instanceID)
 }
 
-func (v *View) latestSequences(viewName string, instanceIDs []string) ([]*repository.CurrentSequence, error) {
-	return repository.LatestSequences(v.Db, sequencesTable, viewName, instanceIDs)
+func (v *View) latestSequences(ctx context.Context, viewName string, instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return repository.LatestSequences(v.Db, v.TimeTravel(ctx, sequencesTable), viewName, instanceIDs)
 }
 
 func (v *View) AllCurrentSequences(db, instanceID string) ([]*repository.CurrentSequence, error) {

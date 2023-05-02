@@ -9,8 +9,9 @@ import (
 )
 
 type Config struct {
-	PushTimeout time.Duration
-	Client      *database.DB
+	PushTimeout              time.Duration
+	Client                   *database.DB
+	AllowOrderByCreationDate bool
 
 	repo repository.Repository
 }
@@ -20,6 +21,6 @@ func TestConfig(repo repository.Repository) *Config {
 }
 
 func Start(config *Config) (*Eventstore, error) {
-	config.repo = z_sql.NewCRDB(config.Client)
+	config.repo = z_sql.NewCRDB(config.Client, config.AllowOrderByCreationDate)
 	return NewEventstore(config), nil
 }
