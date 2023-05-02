@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
@@ -71,6 +72,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *dat
 	action.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
 	usergrant.RegisterEventMappers(repo.eventstore)
+	session.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigEncryption = idpConfigEncryption
 	repo.multifactors = domain.MultifactorConfigs{

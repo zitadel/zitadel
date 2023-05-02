@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/static"
@@ -107,8 +108,8 @@ func StartCommands(
 		certificateAlgorithm:  samlEncryption,
 		webauthnConfig:        webAuthN,
 		httpClient:            httpClient,
-		checkPermission: func(ctx context.Context, permission, orgID, resourceID string, allowSelf bool) (err error) {
-			return authz.CheckPermission(ctx, membershipsResolver, zitadelRoles, permission, orgID, resourceID, allowSelf)
+		checkPermission: func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+			return authz.CheckPermission(ctx, membershipsResolver, zitadelRoles, permission, orgID, resourceID)
 		},
 		newEmailCode: newEmailCode,
 	}
@@ -121,6 +122,7 @@ func StartCommands(
 	keypair.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
+	session.RegisterEventMappers(repo.eventstore)
 
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
