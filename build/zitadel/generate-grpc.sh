@@ -93,6 +93,18 @@ protoc \
   --openapiv2_opt allow_delete_body=true \
   --auth_out=${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
+  ${PROTO_PATH}/policy/v2alpha/policy_service.proto
+
+protoc \
+  -I=/proto/include \
+  --grpc-gateway_out ${GOPATH}/src \
+  --grpc-gateway_opt logtostderr=true \
+  --grpc-gateway_opt allow_delete_body=true \
+  --openapiv2_out ${OPENAPI_PATH} \
+  --openapiv2_opt logtostderr=true \
+  --openapiv2_opt allow_delete_body=true \
+  --auth_out=${GOPATH}/src \
+  --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/session/v2alpha/session_service.proto
 
 echo "done generating grpc"

@@ -4,11 +4,7 @@ package zitadel.policy.v2alpha;
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/policy/v2alpha;policy";
 
-import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "validate/validate.proto";
-import "google/protobuf/duration.proto";
 
 message DomainSettings {
     bool loginname_includes_domain = 1 [

@@ -4,13 +4,9 @@ package zitadel.policy.v2alpha;
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/policy/v2alpha;policy";
 
-import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "validate/validate.proto";
-import "google/protobuf/duration.proto";
 
-message BrandingPolicy {
+message BrandingSettings {
     // hex value for primary color
     string primary_color_light = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

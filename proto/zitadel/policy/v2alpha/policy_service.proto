@@ -6,7 +6,7 @@ import "zitadel/options.proto";
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/policy/v2alpha/login_policy.proto";
 import "zitadel/policy/v2alpha/password_policy.proto";
-import "zitadel/policy/v2alpha/branding_policy.proto";
+import "zitadel/policy/v2alpha/branding_settings.proto";
 import "zitadel/policy/v2alpha/domain_settings.proto";
 import "zitadel/policy/v2alpha/legal_settings.proto";
 import "zitadel/policy/v2alpha/lockout_policy.proto";
@@ -79,8 +79,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service PolicyService {
     rpc GetLoginPolicy (GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
         option (google.api.http) = {
-            post: "/v2alpha/policies/login"
-            body: "*"
+            get: "/v2alpha/policies/login"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -100,8 +99,7 @@ service PolicyService {
     }
     rpc GetPasswordPolicy (GetPasswordPolicyRequest) returns (GetPasswordPolicyResponse) {
         option (google.api.http) = {
-            post: "/v2alpha/policies/password"
-            body: "*"
+            get: "/v2alpha/policies/password"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -119,10 +117,9 @@ service PolicyService {
             };
         };
     }
-    rpc GetBrandingPolicy (GetBrandingPolicyRequest) returns (GetBrandingPolicyResponse) {
+    rpc GetBrandingSettings (GetBrandingSettingsRequest) returns (GetBrandingSettingsResponse) {
         option (google.api.http) = {
-            post: "/v2alpha/policies/branding"
-            body: "*"
+            get: "/v2alpha/policies/branding"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -142,8 +139,7 @@ service PolicyService {
     }
     rpc GetDomainSettings (GetDomainSettingsRequest) returns (GetDomainSettingsResponse) {
         option (google.api.http) = {
-            post: "/v2alpha/policies/domain"
-            body: "*"
+            get: "/v2alpha/policies/domain"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -163,8 +159,7 @@ service PolicyService {
     }
     rpc GetLegalSettings (GetLegalSettingsRequest) returns (GetLegalSettingsResponse) {
         option (google.api.http) = {
-            post: "/v2alpha/policies/legal"
-            body: "*"
+            get: "/v2alpha/policies/legal"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -184,8 +179,7 @@ service PolicyService {
     }
     rpc GetLockoutPolicy (GetLockoutPolicyRequest) returns (GetLockoutPolicyResponse) {
         option (google.api.http) = {
-            post: "/v2alpha/policies/lockout"
-            body: "*"
+            get: "/v2alpha/policies/lockout"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -205,8 +199,7 @@ service PolicyService {
     }
     rpc GetActiveIdentityProviders (GetActiveIdentityProvidersRequest) returns (GetActiveIdentityProvidersResponse) {
         option (google.api.http) = {
-            post: "/v2alpha/policies/idps"
-            body: "*"
+            get: "/v2alpha/policies/idps"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -224,10 +217,9 @@ service PolicyService {
             };
         };
     }
-    rpc GetInstanceInformation(GetInstanceInformationRequest) returns (GetInstanceInformationResponse) {
+    rpc GetGeneralSettings(GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
         option (google.api.http) = {
-            post: "/v2alpha/instance/information"
-            body: "*"
+            get: "/v2alpha/general/settings"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -265,13 +257,13 @@ message GetPasswordPolicyResponse {
     zitadel.policy.v2alpha.PasswordPolicy policy = 2;
 }
 
-message GetBrandingPolicyRequest {
+message GetBrandingSettingsRequest {
     zitadel.object.v2alpha.Organisation organisation = 1;
 }
 
-message GetBrandingPolicyResponse {
+message GetBrandingSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.BrandingPolicy policy = 2;
+    zitadel.policy.v2alpha.BrandingSettings settings = 2;
 }
 
 message GetDomainSettingsRequest {
@@ -280,7 +272,7 @@ message GetDomainSettingsRequest {
 
 message GetDomainSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.DomainSettings policy = 2;
+    zitadel.policy.v2alpha.DomainSettings settings = 2;
 }
 
 message GetLegalSettingsRequest {
@@ -289,7 +281,7 @@ message GetLegalSettingsRequest {
 
 message GetLegalSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.LegalSettings policy = 2;
+    zitadel.policy.v2alpha.LegalSettings settings = 2;
 }
 
 message GetLockoutPolicyRequest {
@@ -311,9 +303,9 @@ message GetActiveIdentityProvidersResponse {
 }
 
 
-message GetInstanceInformationRequest {}
+message GetGeneralSettingsRequest {}
 
-message GetInstanceInformationResponse {
+message GetGeneralSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
     string default_org_id = 2;
     repeated string supported_languages = 3 [

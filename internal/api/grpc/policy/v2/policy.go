@@ -136,7 +136,7 @@ func ModelPasswordPolicyToPb(current *query.PasswordComplexityPolicy) *policy.Pa
 	}
 }
 
-func (s *Server) GetBrandingPolicy(ctx context.Context, req *policy.GetBrandingPolicyRequest) (*policy.GetBrandingPolicyResponse, error) {
+func (s *Server) GetBrandingSettings(ctx context.Context, req *policy.GetBrandingSettingsRequest) (*policy.GetBrandingSettingsResponse, error) {
 	orgID := req.GetOrganisation().GetOrgId()
 	if orgID == "" {
 		orgID = authz.GetCtxData(ctx).OrgID
@@ -146,8 +146,8 @@ func (s *Server) GetBrandingPolicy(ctx context.Context, req *policy.GetBrandingP
 	if err != nil {
 		return nil, err
 	}
-	return &policy.GetBrandingPolicyResponse{
-		Policy: ModelLabelPolicyToPb(current, s.assetsAPIDomain(ctx)),
+	return &policy.GetBrandingSettingsResponse{
+		Settings: ModelBrandingSettingsToPb(current, s.assetsAPIDomain(ctx)),
 		Details: &object.Details{
 			Sequence:          current.Sequence,
 			ChangeDate:        timestamppb.New(current.ChangeDate),
@@ -157,8 +157,8 @@ func (s *Server) GetBrandingPolicy(ctx context.Context, req *policy.GetBrandingP
 	}, nil
 }
 
-func ModelLabelPolicyToPb(current *query.LabelPolicy, assetPrefix string) *policy.BrandingPolicy {
-	return &policy.BrandingPolicy{
+func ModelBrandingSettingsToPb(current *query.LabelPolicy, assetPrefix string) *policy.BrandingSettings {
+	return &policy.BrandingSettings{
 		PrimaryColorLight:    current.Light.PrimaryColor,
 		BackgroundColorLight: current.Light.BackgroundColor,
 		FontColorLight:       current.Light.FontColor,
@@ -188,7 +188,7 @@ func (s *Server) GetDomainSettings(ctx context.Context, req *policy.GetDomainSet
 		return nil, err
 	}
 	return &policy.GetDomainSettingsResponse{
-		Policy: DomainSettingsToPb(current),
+		Settings: DomainSettingsToPb(current),
 		Details: &object.Details{
 			Sequence:          current.Sequence,
 			ChangeDate:        timestamppb.New(current.ChangeDate),
@@ -217,7 +217,7 @@ func (s *Server) GetLegalSettings(ctx context.Context, req *policy.GetLegalSetti
 		return nil, err
 	}
 	return &policy.GetLegalSettingsResponse{
-		Policy: ModelLegalSettingsToPb(current),
+		Settings: ModelLegalSettingsToPb(current),
 		Details: &object.Details{
 			Sequence:          current.Sequence,
 			ChangeDate:        timestamppb.New(current.ChangeDate),
@@ -284,7 +284,7 @@ func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *policy.Get
 	}, nil
 }
 
-func (s *Server) GetInstanceInformation(ctx context.Context, req *policy.GetInstanceInformationRequest) (*policy.GetInstanceInformationResponse, error) {
+func (s *Server) GetGeneralSettings(ctx context.Context, _ *policy.GetGeneralSettingsRequest) (*policy.GetGeneralSettingsResponse, error) {
 	langs, err := s.query.Languages(ctx)
 	if err != nil {
 		return nil, err
@@ -293,7 +293,7 @@ func (s *Server) GetInstanceInformation(ctx context.Context, req *policy.GetInst
 	if err != nil {
 		return nil, err
 	}
-	return &policy.GetInstanceInformationResponse{
+	return &policy.GetGeneralSettingsResponse{
 		SupportedLanguages: text.LanguageTagsToStrings(langs),
 		DefaultOrgId:       instance.DefaultOrgID,
 		Details:            &object.Details{},

@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	policy "github.com/zitadel/zitadel/pkg/grpc/policy/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
 var _ policy.PolicyServiceServer = (*Server)(nil)
@@ -42,17 +41,17 @@ func (s *Server) RegisterServer(grpcServer *grpc.Server) {
 }
 
 func (s *Server) AppName() string {
-	return user.UserService_ServiceDesc.ServiceName
+	return policy.PolicyService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return user.UserService_ServiceDesc.ServiceName
+	return policy.PolicyService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return user.UserService_AuthMethods
+	return policy.PolicyService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return user.RegisterUserServiceHandler
+	return policy.RegisterPolicyServiceHandler
 }
