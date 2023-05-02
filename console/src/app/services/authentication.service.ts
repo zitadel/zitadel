@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, lastValueFrom, Observable } from 'rxjs';
+import { ExhaustedService } from './exhausted.service';
 
 import { StatehandlerService } from './statehandler/statehandler.service';
 
@@ -12,7 +13,11 @@ export class AuthenticationService {
   private _authenticated: boolean = false;
   private readonly _authenticationChanged: BehaviorSubject<boolean> = new BehaviorSubject(this.authenticated);
 
-  constructor(private oauthService: OAuthService, private statehandler: StatehandlerService) {}
+  constructor(
+    private oauthService: OAuthService,
+    private statehandler: StatehandlerService,
+    private exhaustedService: ExhaustedService,
+  ) {}
 
   public initConfig(data: AuthConfig): void {
     this.authConfig = data;
@@ -35,10 +40,10 @@ export class AuthenticationService {
       Object.assign(this.authConfig, partialConfig);
     }
     this.oauthService.configure(this.authConfig);
-
     this.oauthService.strictDiscoveryDocumentValidation = false;
+    // If resources are exhausted, the discovery endpoint will return 429
+    this.exhaustedService.checkCookie()
     await this.oauthService.loadDiscoveryDocumentAndTryLogin();
-
     this._authenticated = this.oauthService.hasValidAccessToken();
     if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {
       const newState = await lastValueFrom(this.statehandler.createState());

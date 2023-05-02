@@ -9,7 +9,9 @@ import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClien
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
 import { ManagementServiceClient } from '../proto/generated/zitadel/ManagementServiceClientPb';
 import { AuthenticationService } from './authentication.service';
+import { ExhaustedService } from './exhausted.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ExhaustedInterceptor } from './interceptors/exhausted.interceptor';
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
@@ -29,6 +31,7 @@ export class GrpcService {
     private storageService: StorageService,
     private dialog: MatDialog,
     private translate: TranslateService,
+    private exhaustedService: ExhaustedService,
   ) {}
 
   public async loadAppEnvironment(): Promise<any> {
@@ -39,6 +42,7 @@ export class GrpcService {
         if (data && data.api && data.issuer) {
           const interceptors = {
             unaryInterceptors: [
+              new ExhaustedInterceptor(this.exhaustedService),
               new OrgInterceptor(this.storageService),
               new AuthInterceptor(this.authenticationService, this.storageService, this.dialog),
               new I18nInterceptor(this.translate),

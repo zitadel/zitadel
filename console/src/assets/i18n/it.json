@@ -252,6 +252,10 @@
       "TITLE": "Il tuo Access Token \u00e8 scaduto.",
       "DESCRIPTION": "Clicca il pulsante per richiedere una nuova sessione."
     },
+    "EXHAUSTED": {
+      "TITLE": "La quota di richieste autenticate è esaurita.",
+      "DESCRIPTION": "Cancellare o aumentare il limite per questa istanza ZITADEL."
+    },
     "INVALID_FORMAT": "Il formato non è valido.",
     "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail.",
     "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",

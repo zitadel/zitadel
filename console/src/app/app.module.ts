@@ -43,6 +43,7 @@ import { BreadcrumbService } from './services/breadcrumb.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
+import { ExhaustedInterceptor } from './services/interceptors/exhausted.interceptor';
 import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
@@ -166,6 +167,11 @@ const authConfig: AuthConfig = {
     {
       provide: OAuthStorage,
       useClass: StorageService,
+    },
+    {
+      provide: GRPC_INTERCEPTORS,
+      multi: true,
+      useClass: ExhaustedInterceptor,
     },
     {
       provide: GRPC_INTERCEPTORS,

@@ -253,6 +253,10 @@
       "TITLE": "Your authorization token has expired.",
       "DESCRIPTION": "Click the button below to log in again."
     },
+    "EXHAUSTED": {
+      "TITLE": "Your quota for authenticated requests is exhausted.",
+      "DESCRIPTION": "Remove or increase the quota limit for this ZITADEL instance."
+    },
     "INVALID_FORMAT": "The formatting is invalid.",
     "NOTANEMAIL": "The given value is not an e-mail address.",
     "MINLENGTH": "Must be at least {{requiredLength}} characters long.",
