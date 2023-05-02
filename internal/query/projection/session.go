@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -66,8 +68,28 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 			Aggregate: session.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
+					Event:  session.AddedType,
+					Reduce: p.reduceSessionAdded,
+				},
+				{
 					Event:  session.SetType,
 					Reduce: p.reduceSessionSet,
+				},
+				{
+					Event:  session.UserCheckedType,
+					Reduce: p.reduceUserChecked,
+				},
+				{
+					Event:  session.PasswordCheckedType,
+					Reduce: p.reducePasswordChecked,
+				},
+				{
+					Event:  session.TokenSetType,
+					Reduce: p.reduceTokenSet,
+				},
+				{
+					Event:  session.MetadataSetType,
+					Reduce: p.reduceMetadataSet,
 				},
 				{
 					Event:  session.TerminateType,
@@ -85,6 +107,27 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 	}
+}
+
+func (p *sessionProjection) reduceSessionAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.AddedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Sfrgf", "reduce.wrong.event.type %s", session.AddedType)
+	}
+
+	return crdb.NewCreateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnID, e.Aggregate().ID),
+			handler.NewCol(SessionColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(SessionColumnCreationDate, e.CreationDate()),
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(SessionColumnState, domain.SessionStateActive),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnCreator, e.User),
+		},
+	), nil
 }
 
 func (p *sessionProjection) reduceSessionSet(event eventstore.Event) (*handler.Statement, error) {
@@ -124,6 +167,90 @@ func (p *sessionProjection) reduceSessionSet(event eventstore.Event) (*handler.S
 			handler.NewCol(SessionColumnInstanceID, e.Aggregate().InstanceID),
 		},
 		columns,
+	), nil
+}
+
+func (p *sessionProjection) reduceUserChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.UserCheckedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-saDg5", "reduce.wrong.event.type %s", session.UserCheckedType)
+	}
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnUserID, e.UserID),
+			handler.NewCol(SessionColumnUserCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reducePasswordChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.PasswordCheckedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SDgrb", "reduce.wrong.event.type %s", session.PasswordCheckedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnPasswordCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceTokenSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.TokenSetEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAfd3", "reduce.wrong.event.type %s", session.TokenSetType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.MetadataSetEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAfd3", "reduce.wrong.event.type %s", session.MetadataSetType)
+	}
+
+	// marshal the metadata to be able to put it in a byte column
+	// just log the error (will result in failed events) and do not return it at this would stop the projection
+	metadata, err := json.Marshal(e.Metadata)
+	logging.WithFields("sessionID", e.Aggregate().ID, "sequence", e.Sequence()).OnError(err).Error("unable to marshal metadata")
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnMetadata, metadata),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
 	), nil
 }
 

@@ -54,14 +54,9 @@ var (
 	)
 
 	responseForwarder = func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
-		md, ok := runtime.ServerMetadataFromContext(ctx)
-		if !ok {
-			return nil
-		}
-		_ = md
 		t, ok := resp.(CustomHTTPResponse)
 		if ok {
-			//w.Header().Set("location", t.Location())
+			// TODO: find a way to return a location header if needed w.Header().Set("location", t.Location())
 			w.WriteHeader(t.CustomHTTPCode())
 		}
 		return nil

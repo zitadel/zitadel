@@ -21,7 +21,7 @@ func (s *Server) CreateSession(ctx context.Context, req *CreateSessionRequest) (
 	return &CreateSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionId:    set.ID,
-		SessionToken: set.Token,
+		SessionToken: set.NewToken,
 	}, nil
 }
 
@@ -34,9 +34,13 @@ func (s *Server) SetSession(ctx context.Context, req *SetSessionRequest) (*SetSe
 	if err != nil {
 		return nil, err
 	}
+	// if there's no new token, just return the current
+	if set.NewToken == "" {
+		set.NewToken = req.GetSessionToken()
+	}
 	return &SetSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
-		SessionToken: set.Token,
+		SessionToken: set.NewToken,
 	}, nil
 }
 
