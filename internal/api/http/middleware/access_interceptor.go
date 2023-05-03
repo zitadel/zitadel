@@ -48,7 +48,6 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 	}
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		ctx := request.Context()
-		var err error
 		tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccess")
 		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
 		instance := authz.GetInstance(ctx)
@@ -64,7 +63,6 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			if err != nil {
 				// If templating didn't succeed, emit a warning log and just use the plain config
 				logging.WithError(err).WithField("value", a.limitConfig.ExhaustedCookieValue).Warning("failed to go template cookie value config")
-				err = nil
 			}
 			a.cookieHandler.SetCookie(wrappedWriter, a.limitConfig.ExhaustedCookieKey, request.Host, cookieValue)
 			http.Error(wrappedWriter, "quota for authenticated requests is exhausted", http.StatusTooManyRequests)
@@ -82,8 +80,6 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		unescapedURL, err := url.QueryUnescape(requestURL)
 		if err != nil {
 			logging.WithError(err).WithField("url", requestURL).Warning("failed to unescape request url")
-			// err = nil is effective because of deferred tracing span end
-			err = nil
 		}
 		a.svc.Handle(tracingCtx, &access.Record{
 			LogDate:         time.Now(),
@@ -106,12 +102,10 @@ func SetExhaustedCookie(cookieHandler *http_utils.CookieHandler, writer http.Res
 	if err != nil {
 		// If templating didn't succeed, emit a warning log and just use the plain config
 		logging.WithError(err).WithField("value", cookieConfig.ExhaustedCookieValue).Warning("failed to go template cookie value config")
-		err = nil
 	}
 	host, _, err := net.SplitHostPort(requestHost)
 	if err != nil {
 		logging.WithError(err).WithField("host", requestHost).Warning("failed to extract cookie domain from request")
-		err = nil
 	}
 	cookieHandler.SetCookie(writer, cookieConfig.ExhaustedCookieKey, host, cookieValue)
 }
