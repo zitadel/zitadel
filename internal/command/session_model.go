@@ -141,7 +141,7 @@ func (wm *SessionWriteModel) SetToken(ctx context.Context, token *crypto.CryptoV
 	wm.commands = append(wm.commands, session.NewTokenSetEvent(ctx, wm.aggregate, token))
 }
 
-func (wm *SessionWriteModel) ChangeMetadata(ctx context.Context, metadata map[string][]byte) error {
+func (wm *SessionWriteModel) ChangeMetadata(ctx context.Context, metadata map[string][]byte) {
 	var changed bool
 	for key, value := range metadata {
 		currentValue, exists := wm.Metadata[key]
@@ -163,5 +163,4 @@ func (wm *SessionWriteModel) ChangeMetadata(ctx context.Context, metadata map[st
 	if changed {
 		wm.commands = append(wm.commands, session.NewMetadataSetEvent(ctx, wm.aggregate, wm.Metadata))
 	}
-	return nil
 }

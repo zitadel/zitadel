@@ -19,6 +19,7 @@ import (
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
@@ -38,6 +39,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	usergrant.RegisterEventMappers(es)
 	key_repo.RegisterEventMappers(es)
 	action_repo.RegisterEventMappers(es)
+	session.RegisterEventMappers(es)
 	return es
 }
 
@@ -123,6 +125,11 @@ func expectPushFailed(err error, events []*repository.Event, uniqueConstraints .
 func expectFilter(events ...*repository.Event) expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectFilterEvents(events...)
+	}
+}
+func expectFilterError(err error) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectFilterEventsError(err)
 	}
 }
 
@@ -251,13 +258,13 @@ func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 }
 
 func newMockPermissionCheckAllowed() permissionCheck {
-	return func(ctx context.Context, permission, orgID, resourceID string, allowSelf bool) (err error) {
+	return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return nil
 	}
 }
 
 func newMockPermissionCheckNotAllowed() permissionCheck {
-	return func(ctx context.Context, permission, orgID, resourceID string, allowSelf bool) (err error) {
+	return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return errors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied")
 	}
 }

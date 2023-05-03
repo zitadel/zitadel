@@ -54,7 +54,7 @@ func (s *Server) DeleteSession(ctx context.Context, req *DeleteSessionRequest) (
 	}, nil
 }
 
-func (s *Server) createSessionRequestToCommand(ctx context.Context, req *CreateSessionRequest) (*command.SessionChecks, map[string][]byte, error) {
+func (s *Server) createSessionRequestToCommand(ctx context.Context, req *CreateSessionRequest) ([]command.SessionCheck, map[string][]byte, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
 		return nil, nil, err
@@ -62,7 +62,7 @@ func (s *Server) createSessionRequestToCommand(ctx context.Context, req *CreateS
 	return checks, req.GetMetadata(), nil
 }
 
-func (s *Server) setSessionRequestToCommand(ctx context.Context, req *SetSessionRequest) (*command.SessionChecks, error) {
+func (s *Server) setSessionRequestToCommand(ctx context.Context, req *SetSessionRequest) ([]command.SessionCheck, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
 		return nil, err
@@ -70,21 +70,22 @@ func (s *Server) setSessionRequestToCommand(ctx context.Context, req *SetSession
 	return checks, nil
 }
 
-func (s *Server) checksToCommand(ctx context.Context, checks *Checks) (*command.SessionChecks, error) {
+func (s *Server) checksToCommand(ctx context.Context, checks *Checks) ([]command.SessionCheck, error) {
 	checkUser, err := userCheck(checks.GetUser())
 	if err != nil {
 		return nil, err
 	}
-	sessionChecks := s.command.NewSessionChecks()
+	//sessionChecks := s.command.NewSessionChecks(nil, nil)
+	sessionChecks := make([]command.SessionCheck, 0, 2)
 	if checkUser != nil {
 		user, err := checkUser(ctx, s.query)
 		if err != nil {
 			return nil, err
 		}
-		sessionChecks.CheckUser(user.ID)
+		sessionChecks = append(sessionChecks, command.CheckUser(user.ID))
 	}
 	if password := checks.GetPassword(); password != nil {
-		sessionChecks.CheckPassword(password.GetPassword())
+		sessionChecks = append(sessionChecks, command.CheckPassword(password.GetPassword()))
 	}
 	return sessionChecks, nil
 }
