@@ -2,7 +2,8 @@ syntax = "proto3";
 
 package zitadel.session.v2alpha;
 
-import "zitadel/options.proto";
+
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/session/v2alpha/session.proto";
 import "google/api/annotations.proto";
 import "validate/validate.proto";
@@ -19,8 +20,10 @@ service SessionService {
       get: "/v2alpha/sessions/{id}"
     };
 
-    option (zitadel.v1.auth_option) = {
-      permission: "authenticated"
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
   }
 }
