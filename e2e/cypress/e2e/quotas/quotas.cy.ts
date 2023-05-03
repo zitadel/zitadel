@@ -135,8 +135,9 @@ describe('quotas', () => {
             }).then((res) => {
               expect(res.status).to.equal(429);
             });
+            const upgradeInstancePage = `https://example.com/instances/${ctx.instanceId}`;
             cy.getCookie('zitadel.quota.limiting').then((cookie) => {
-              expect(cookie.value).to.equal(`https://my-zitadel/instances/${ctx.instanceId}`);
+              expect(cookie.value).to.equal(upgradeInstancePage);
               const cookieExpiry = new Date();
               cookieExpiry.setTime(cookie.expiry * 1000);
               expect(cookieExpiry).to.be.within(start, expiresMax);
@@ -144,10 +145,16 @@ describe('quotas', () => {
             createHumanUser(ctx.api, testUserName, false).then((res) => {
               expect(res.status).to.equal(429);
             });
+            // visit limited console
             cy.visit('/users/me');
             cy.contains('#authenticated-requests-exhausted-dialog button', 'Continue').click();
+            cy.origin(upgradeInstancePage, { args: {upgradeInstancePage} }, ({upgradeInstancePage}) => {
+              cy.location('href').should('equal', upgradeInstancePage)
+            })
+            // upgrade instance
             ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests);
-            cy.reload();
+            // visit upgraded console again
+            cy.visit('/users/me');
             cy.get('[data-e2e="top-view-title"]');
             createHumanUser(ctx.api, testUserName);
           });
