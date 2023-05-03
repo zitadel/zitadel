@@ -16,6 +16,7 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
@@ -33,6 +34,9 @@ type API struct {
 	http1HostName string
 	grpcGateway   *server.Gateway
 	healthServer  *health.Server
+	cookieHandler *http_util.CookieHandler
+	cookieConfig  *http_mw.AccessConfig
+	queries       *query.Queries
 }
 
 type healthCheck interface {
@@ -48,6 +52,8 @@ func New(
 	authZ internal_authz.Config,
 	tlsConfig *tls.Config, http2HostName, http1HostName string,
 	accessSvc *logstore.Service,
+	cookieHandler *http_util.CookieHandler,
+	cookieConfig *http_mw.AccessConfig,
 ) (_ *API, err error) {
 	api := &API{
 		port:          port,
@@ -55,10 +61,13 @@ func New(
 		health:        queries,
 		router:        router,
 		http1HostName: http1HostName,
+		cookieConfig:  cookieConfig,
+		cookieHandler: cookieHandler,
+		queries:       queries,
 	}
 
 	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessSvc)
-	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName)
+	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName, cookieHandler, cookieConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +85,15 @@ func New(
 // used for v1 api (system, admin, mgmt, auth)
 func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayPrefix) error {
 	grpcServer.RegisterServer(a.grpcServer)
-	handler, prefix, err := server.CreateGatewayWithPrefix(ctx, grpcServer, a.port, a.http1HostName)
+	handler, prefix, err := server.CreateGatewayWithPrefix(
+		ctx,
+		grpcServer,
+		a.port,
+		a.http1HostName,
+		a.cookieHandler,
+		a.cookieConfig,
+		a.queries,
+	)
 	if err != nil {
 		return err
 	}
