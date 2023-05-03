@@ -3,7 +3,8 @@ package view
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -21,16 +22,16 @@ func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
 	return view.UserByID(v.Db, userTable, userID, instanceID)
 }
 
-func (v *View) UserByLoginName(loginName, instanceID string) (*model.UserView, error) {
+func (v *View) UserByLoginName(ctx context.Context, loginName, instanceID string) (*model.UserView, error) {
 	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
 	if err != nil {
 		return nil, err
 	}
 
-	return v.userByID(instanceID, loginNameQuery)
+	return v.userByID(ctx, instanceID, loginNameQuery)
 }
 
-func (v *View) UserByLoginNameAndResourceOwner(loginName, resourceOwner, instanceID string) (*model.UserView, error) {
+func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, resourceOwner, instanceID string) (*model.UserView, error) {
 	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
 	if err != nil {
 		return nil, err
@@ -40,18 +41,18 @@ func (v *View) UserByLoginNameAndResourceOwner(loginName, resourceOwner, instanc
 		return nil, err
 	}
 
-	return v.userByID(instanceID, loginNameQuery, resourceOwnerQuery)
+	return v.userByID(ctx, instanceID, loginNameQuery, resourceOwnerQuery)
 }
 
-func (v *View) UserByEmail(email, instanceID string) (*model.UserView, error) {
+func (v *View) UserByEmail(ctx context.Context, email, instanceID string) (*model.UserView, error) {
 	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEqualsIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
-	return v.userByID(instanceID, emailQuery)
+	return v.userByID(ctx, instanceID, emailQuery)
 }
 
-func (v *View) UserByEmailAndResourceOwner(email, resourceOwner, instanceID string) (*model.UserView, error) {
+func (v *View) UserByEmailAndResourceOwner(ctx context.Context, email, resourceOwner, instanceID string) (*model.UserView, error) {
 	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEquals)
 	if err != nil {
 		return nil, err
@@ -61,18 +62,18 @@ func (v *View) UserByEmailAndResourceOwner(email, resourceOwner, instanceID stri
 		return nil, err
 	}
 
-	return v.userByID(instanceID, emailQuery, resourceOwnerQuery)
+	return v.userByID(ctx, instanceID, emailQuery, resourceOwnerQuery)
 }
 
-func (v *View) UserByPhone(phone, instanceID string) (*model.UserView, error) {
+func (v *View) UserByPhone(ctx context.Context, phone, instanceID string) (*model.UserView, error) {
 	phoneQuery, err := query.NewUserVerifiedPhoneSearchQuery(phone, query.TextEquals)
 	if err != nil {
 		return nil, err
 	}
-	return v.userByID(instanceID, phoneQuery)
+	return v.userByID(ctx, instanceID, phoneQuery)
 }
 
-func (v *View) UserByPhoneAndResourceOwner(phone, resourceOwner, instanceID string) (*model.UserView, error) {
+func (v *View) UserByPhoneAndResourceOwner(ctx context.Context, phone, resourceOwner, instanceID string) (*model.UserView, error) {
 	phoneQuery, err := query.NewUserVerifiedPhoneSearchQuery(phone, query.TextEquals)
 	if err != nil {
 		return nil, err
@@ -82,12 +83,10 @@ func (v *View) UserByPhoneAndResourceOwner(phone, resourceOwner, instanceID stri
 		return nil, err
 	}
 
-	return v.userByID(instanceID, phoneQuery, resourceOwnerQuery)
+	return v.userByID(ctx, instanceID, phoneQuery, resourceOwnerQuery)
 }
 
-func (v *View) userByID(instanceID string, queries ...query.SearchQuery) (*model.UserView, error) {
-	ctx := authz.WithInstanceID(context.Background(), instanceID)
-
+func (v *View) userByID(ctx context.Context, instanceID string, queries ...query.SearchQuery) (*model.UserView, error) {
 	queriedUser, err := v.query.GetNotifyUser(ctx, true, false, queries...)
 	if err != nil {
 		return nil, err
@@ -99,7 +98,14 @@ func (v *View) userByID(instanceID string, queries ...query.SearchQuery) (*model
 	}
 
 	if err != nil {
+		sequence, err := v.GetLatestUserSequence(ctx, instanceID)
+		logging.WithFields("instanceID", instanceID).
+			OnError(err).
+			Errorf("could not get current sequence for userByID")
 		user = new(model.UserView)
+		if sequence != nil {
+			user.Sequence = sequence.CurrentSequence
+		}
 	}
 
 	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.Sequence)
@@ -188,12 +194,12 @@ func (v *View) UpdateOrgOwnerRemovedUsers(event *models.Event) error {
 	return v.ProcessedUserSequence(event)
 }
 
-func (v *View) GetLatestUserSequence(instanceID string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(userTable, instanceID)
+func (v *View) GetLatestUserSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(ctx, userTable, instanceID)
 }
 
-func (v *View) GetLatestUserSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(userTable, instanceIDs)
+func (v *View) GetLatestUserSequences(ctx context.Context, instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(ctx, userTable, instanceIDs)
 }
 
 func (v *View) ProcessedUserSequence(event *models.Event) error {

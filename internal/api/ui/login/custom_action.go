@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/dop251/goja"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 func (l *Login) runPostExternalAuthenticationActions(
@@ -26,7 +28,21 @@ func (l *Login) runPostExternalAuthenticationActions(
 ) (_ *domain.ExternalUser, userChanged bool, err error) {
 	ctx := httpRequest.Context()
 
+	// use the request org (scopes or domain discovery) as default
 	resourceOwner := authRequest.RequestedOrgID
+	// if the user was already linked to an IDP and redirected to that, the requested org might be empty
+	if resourceOwner == "" {
+		resourceOwner = authRequest.UserOrgID
+	}
+	// if we will have no org (e.g. user clicked directly on the IDP on the login page)
+	if resourceOwner == "" {
+		// in this case the user might nevertheless already be linked to an IDP,
+		// so let's do a workaround and resourceOwnerOfUserIDPLink if there would be a IDP link
+		resourceOwner, err = l.resourceOwnerOfUserIDPLink(ctx, authRequest.SelectedIDPConfigID, user.ExternalUserID)
+		logging.WithFields("authReq", authRequest.ID, "idpID", authRequest.SelectedIDPConfigID).OnError(err).
+			Warn("could not determine resource owner for runPostExternalAuthenticationActions, fall back to default org id")
+	}
+	// fallback to default org id
 	if resourceOwner == "" {
 		resourceOwner = authz.GetInstance(ctx).DefaultOrganisationID()
 	}
@@ -393,4 +409,26 @@ func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOpt
 		actions.SetFields("getClaim", getClaim),
 		actions.SetFields("claimsJSON", claimsJSON),
 	}
+}
+
+func (l *Login) resourceOwnerOfUserIDPLink(ctx context.Context, idpConfigID string, externalUserID string) (string, error) {
+	idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpConfigID)
+	if err != nil {
+		return "", err
+	}
+	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUserID)
+	if err != nil {
+		return "", err
+	}
+	queries := []query.SearchQuery{
+		idQuery, externalIDQuery,
+	}
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	if err != nil {
+		return "", err
+	}
+	if len(links.Links) != 1 {
+		return "", nil
+	}
+	return links.Links[0].ResourceOwner, nil
 }

@@ -222,7 +222,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 }
 
 func (s *spooledHandler) query(ctx context.Context, instanceIDs []string) ([]*models.Event, error) {
-	query, err := s.EventQuery(instanceIDs)
+	query, err := s.EventQuery(ctx, instanceIDs)
 	if err != nil {
 		return nil, err
 	}

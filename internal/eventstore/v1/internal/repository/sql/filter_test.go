@@ -123,7 +123,8 @@ func TestSQL_Filter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sql := &SQL{
-				client: &database.DB{DB: tt.fields.client.sqlClient, Database: new(testDB)},
+				client:                   &database.DB{DB: tt.fields.client.sqlClient, Database: new(testDB)},
+				allowOrderByCreationDate: true,
 			}
 			events, err := sql.Filter(context.Background(), tt.args.searchQuery)
 			if (err != nil) != tt.res.wantErr {
