@@ -129,7 +129,7 @@ func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken st
 	return c.updateSession(ctx, cmd, metadata)
 }
 
-func (c *Commands) TerminateSession(ctx context.Context, sessionID, sessionToken string) (*SessionChanged, error) {
+func (c *Commands) TerminateSession(ctx context.Context, sessionID, sessionToken string) (*domain.ObjectDetails, error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, "")
 	if err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
@@ -138,7 +138,7 @@ func (c *Commands) TerminateSession(ctx context.Context, sessionID, sessionToken
 		return nil, err
 	}
 	if sessionWriteModel.State != domain.SessionStateActive {
-		return sessionWriteModelToSessionChanged(sessionWriteModel), nil
+		return writeModelToObjectDetails(&sessionWriteModel.WriteModel), nil
 	}
 	terminate := session.NewTerminateEvent(ctx, &session.NewAggregate(sessionWriteModel.AggregateID, sessionWriteModel.ResourceOwner).Aggregate)
 	pushedEvents, err := c.eventstore.Push(ctx, terminate)
@@ -149,7 +149,7 @@ func (c *Commands) TerminateSession(ctx context.Context, sessionID, sessionToken
 	if err != nil {
 		return nil, err
 	}
-	return sessionWriteModelToSessionChanged(sessionWriteModel), nil
+	return writeModelToObjectDetails(&sessionWriteModel.WriteModel), nil
 }
 
 // updateSession execute the [SessionChecks] where new events will be created and as well as for metadata (changes)
@@ -193,7 +193,6 @@ func (c *Commands) sessionPermission(ctx context.Context, sessionWriteModel *Ses
 		return c.checkPermission(ctx, permission, authz.GetCtxData(ctx).OrgID, sessionWriteModel.AggregateID)
 	}
 	_, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-	//err = crypto.CompareHash(sessionWriteModel.Token, []byte(sessionToken), c.userPasswordAlg)
 	var token string
 	token, err = crypto.DecryptString(sessionWriteModel.Token, c.sessionAlg)
 	spanPasswordComparison.EndWithError(err)

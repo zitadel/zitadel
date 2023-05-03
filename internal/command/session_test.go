@@ -451,7 +451,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 		sessionToken string
 	}
 	type res struct {
-		want *SessionChanged
+		want *domain.ObjectDetails
 		err  func(err error) bool
 	}
 	tests := []struct {
@@ -533,12 +533,8 @@ func TestCommands_TerminateSession(t *testing.T) {
 				sessionToken: "token",
 			},
 			res{
-				want: &SessionChanged{
-					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-					ID:       "sessionID",
-					NewToken: "",
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -608,12 +604,8 @@ func TestCommands_TerminateSession(t *testing.T) {
 				sessionToken: "token",
 			},
 			res{
-				want: &SessionChanged{
-					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-					ID:       "sessionID",
-					NewToken: "",
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},

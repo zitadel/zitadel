@@ -45,12 +45,12 @@ func (s *Server) SetSession(ctx context.Context, req *SetSessionRequest) (*SetSe
 }
 
 func (s *Server) DeleteSession(ctx context.Context, req *DeleteSessionRequest) (*DeleteSessionResponse, error) {
-	terminated, err := s.command.TerminateSession(ctx, req.GetSessionId(), req.GetSessionToken())
+	details, err := s.command.TerminateSession(ctx, req.GetSessionId(), req.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}
 	return &DeleteSessionResponse{
-		Details: object.DomainToDetailsPb(terminated.ObjectDetails),
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
@@ -75,7 +75,6 @@ func (s *Server) checksToCommand(ctx context.Context, checks *Checks) ([]command
 	if err != nil {
 		return nil, err
 	}
-	//sessionChecks := s.command.NewSessionChecks(nil, nil)
 	sessionChecks := make([]command.SessionCheck, 0, 2)
 	if checkUser != nil {
 		user, err := checkUser(ctx, s.query)
