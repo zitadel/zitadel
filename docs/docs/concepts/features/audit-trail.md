@@ -43,7 +43,7 @@ Access to the API is possible with a Service User account, allowing you to integ
 
 You can use the [Event API](#event-api) to pull data and ingest it in an external system.
 
-[Actions](actions.md) can be used to write events to the logs.
+[Actions](actions.md) can be used to write events to the stdout and [process the events as logs](../../self-hosting/manage/production).
 Please refer to the zitadel/actions repository for a [code sample](https://github.com/zitadel/actions/blob/main/examples/post_auth_log.js).
 You can use your log processing pipeline to parse and ingest the events in your favorite analytics tool.
 
