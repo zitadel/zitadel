@@ -177,7 +177,7 @@ module.exports = {
               label: "Authenticate Service Users",
               collapsed: true,
               items: [
-                "guides/integrate/serviceusers",
+                "guides/integrate/private-key-jwt",
                 "guides/integrate/client-credentials",
                 "guides/integrate/pat",
               ],
