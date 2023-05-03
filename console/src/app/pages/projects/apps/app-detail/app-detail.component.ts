@@ -276,13 +276,24 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               if (this.app.oidcConfig) {
                 this.getAuthMethodOptions('OIDC');
 
-                this.settingsList = [
-                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                  { id: 'token', i18nKey: 'APP.TOKEN' },
-                  { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
-                  { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
-                  { id: 'urls', i18nKey: 'APP.URLS' },
-                ];
+                if (
+                  this.app.oidcConfig.grantTypesList.length === 1 &&
+                  this.app.oidcConfig.grantTypesList[0] === OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE
+                ) {
+                  this.settingsList = [
+                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                    { id: 'token', i18nKey: 'APP.TOKEN' },
+                    { id: 'urls', i18nKey: 'APP.URLS' },
+                  ];
+                } else {
+                  this.settingsList = [
+                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                    { id: 'token', i18nKey: 'APP.TOKEN' },
+                    { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
+                    { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
+                    { id: 'urls', i18nKey: 'APP.URLS' },
+                  ];
+                }
 
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
                 this.currentAuthMethod = this.initialAuthMethod;
