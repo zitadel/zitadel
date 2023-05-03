@@ -175,6 +175,13 @@ module.exports = {
             {
               type: "category",
               label: "Authenticate Service Users",
+              link: {
+                type: "generated-index",
+                title: "Authenticate Service Users",
+                slug: "/guides/integrate/serviceusers",
+                description:
+                  "How to authenticate service users",
+              },
               collapsed: true,
               items: [
                 "guides/integrate/private-key-jwt",
