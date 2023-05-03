@@ -40,13 +40,6 @@ export class AddActionDialogComponent implements OnInit {
     private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
-    this.form = this.fb.group({
-      name: [data.name || ''],
-      script: [data.script || ''],
-      durationInSec: [data.durationInSec || 10],
-      allowedToFail: [data.allowedToFail],
-    });
-
     if (data && data.action) {
       const action: Action.AsObject = data.action;
       this.name = action.name;
@@ -57,6 +50,13 @@ export class AddActionDialogComponent implements OnInit {
       this.allowedToFail = action.allowedToFail;
       this.id = action.id;
     }
+
+    this.form = this.fb.group({
+      name: this.name,
+      script: this.script,
+      durationInSec: this.durationInSec,
+      allowedToFail: this.allowedToFail,
+    });
   }
 
   ngOnInit(): void {
@@ -104,28 +104,28 @@ export class AddActionDialogComponent implements OnInit {
   public closeDialogWithSuccess(): void {
     if (this.id) {
       const req = new UpdateActionRequest();
-      req.setId(this.id);
-      req.setName(this.name);
-      req.setScript(this.script);
+      req.setId(this.form.value.id);
+      req.setName(this.form.value.name);
+      req.setScript(this.form.value.script);
 
       const duration = new Duration();
       duration.setNanos(0);
-      duration.setSeconds(this.durationInSec);
+      duration.setSeconds(this.form.value.durationInSec);
 
-      req.setAllowedToFail(this.allowedToFail);
+      req.setAllowedToFail(this.form.value.allowedToFail);
 
       req.setTimeout(duration);
       this.dialogRef.close(req);
     } else {
       const req = new CreateActionRequest();
-      req.setName(this.name);
-      req.setScript(this.script);
+      req.setName(this.form.value.name);
+      req.setScript(this.form.value.script);
 
       const duration = new Duration();
       duration.setNanos(0);
-      duration.setSeconds(this.durationInSec);
+      duration.setSeconds(this.form.value.durationInSec);
 
-      req.setAllowedToFail(this.allowedToFail);
+      req.setAllowedToFail(this.form.value.allowedToFail);
 
       req.setTimeout(duration);
       this.dialogRef.close(req);
