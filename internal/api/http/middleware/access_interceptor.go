@@ -47,12 +47,10 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		return next
 	}
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-
 		ctx := request.Context()
 		var err error
 
-		tracingCtx, span := tracing.NewServerInterceptorSpan(ctx)
-		defer func() { span.EndWithError(err) }()
+		tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccess")
 
 		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
 
@@ -62,6 +60,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			remaining := a.svc.Limit(tracingCtx, instance.InstanceID())
 			limit = remaining != nil && *remaining == 0
 		}
+		checkSpan.End()
 		if limit {
 			// Limit can only be true when storeOnly is false, so set the cookie and the response code
 			cookieValue, err := templateCookieValue(a.limitConfig.ExhaustedCookieValue, instance)
@@ -80,6 +79,8 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			// Always serve if not limited
 			next.ServeHTTP(wrappedWriter, request)
 		}
+		tracingCtx, writeSpan := tracing.NewNamedSpan(tracingCtx, "writeAccess")
+		defer writeSpan.End()
 		requestURL := request.RequestURI
 		unescapedURL, err := url.QueryUnescape(requestURL)
 		if err != nil {
