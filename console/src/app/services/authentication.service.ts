@@ -41,8 +41,7 @@ export class AuthenticationService {
     }
     this.oauthService.configure(this.authConfig);
     this.oauthService.strictDiscoveryDocumentValidation = false;
-    // If resources are exhausted, the discovery endpoint will return 429
-    this.exhaustedService.checkCookie()
+    await lastValueFrom(this.exhaustedService.checkCookie());
     await this.oauthService.loadDiscoveryDocumentAndTryLogin();
     this._authenticated = this.oauthService.hasValidAccessToken();
     if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {
