@@ -250,7 +250,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.mgmtService
           .getAppByID(projectId, appId)
           .then((app) => {
-            console.log(app);
             if (app.app) {
               this.app = app.app;
 

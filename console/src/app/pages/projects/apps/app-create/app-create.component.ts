@@ -489,9 +489,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   get formMetadataUrl(): AbstractControl | null {
     return this.form.get('metadataUrl');
   }
-  // get formapplicationType(): AbstractControl | null {
-  //     return this.form.get('applicationType');
-  // }
 
   get authMethodType(): AbstractControl | null {
     return this.form.get('authMethodType');
