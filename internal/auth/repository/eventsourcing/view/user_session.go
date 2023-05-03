@@ -1,6 +1,8 @@
 package view
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
@@ -72,12 +74,12 @@ func (v *View) DeleteOrgUserSessions(event *models.Event) error {
 	return v.ProcessedUserSessionSequence(event)
 }
 
-func (v *View) GetLatestUserSessionSequence(instanceID string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(userSessionTable, instanceID)
+func (v *View) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(ctx, userSessionTable, instanceID)
 }
 
-func (v *View) GetLatestUserSessionSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(userSessionTable, instanceIDs)
+func (v *View) GetLatestUserSessionSequences(ctx context.Context, instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(ctx, userSessionTable, instanceIDs)
 }
 
 func (v *View) ProcessedUserSessionSequence(event *models.Event) error {

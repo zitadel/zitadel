@@ -18,7 +18,7 @@ import (
 )
 
 type Metrics struct {
-	Exporter          *prometheus.Exporter
+	Provider          metric.MeterProvider
 	Meter             metric.Meter
 	Counters          sync.Map
 	UpDownSumObserver sync.Map
@@ -34,12 +34,13 @@ func NewMetrics(meterName string) (metrics.Metrics, error) {
 	if err != nil {
 		return &Metrics{}, err
 	}
+	meterProvider := sdk_metric.NewMeterProvider(
+		sdk_metric.WithReader(exporter),
+		sdk_metric.WithResource(resource),
+	)
 	return &Metrics{
-		Exporter: exporter,
-		Meter: sdk_metric.NewMeterProvider(
-			sdk_metric.WithReader(exporter),
-			sdk_metric.WithResource(resource),
-		).Meter(meterName),
+		Provider: meterProvider,
+		Meter:    meterProvider.Meter(meterName),
 	}, nil
 }
 
@@ -48,7 +49,7 @@ func (m *Metrics) GetExporter() http.Handler {
 }
 
 func (m *Metrics) GetMetricsProvider() metric.MeterProvider {
-	return sdk_metric.NewMeterProvider(sdk_metric.WithReader(m.Exporter))
+	return m.Provider
 }
 
 func (m *Metrics) RegisterCounter(name, description string) error {

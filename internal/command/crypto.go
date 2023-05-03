@@ -10,24 +10,33 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
-func newCryptoCodeWithExpiry(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (value *crypto.CryptoValue, expiry time.Duration, err error) {
+type CryptoCodeWithExpiry struct {
+	Crypted *crypto.CryptoValue
+	Plain   string
+	Expiry  time.Duration
+}
+
+func newCryptoCodeWithExpiry(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCodeWithExpiry, error) {
 	config, err := secretGeneratorConfig(ctx, filter, typ)
 	if err != nil {
-		return nil, -1, err
+		return nil, err
 	}
 
+	code := new(CryptoCodeWithExpiry)
 	switch a := alg.(type) {
 	case crypto.HashAlgorithm:
-		value, _, err = crypto.NewCode(crypto.NewHashGenerator(*config, a))
+		code.Crypted, code.Plain, err = crypto.NewCode(crypto.NewHashGenerator(*config, a))
 	case crypto.EncryptionAlgorithm:
-		value, _, err = crypto.NewCode(crypto.NewEncryptionGenerator(*config, a))
+		code.Crypted, code.Plain, err = crypto.NewCode(crypto.NewEncryptionGenerator(*config, a))
 	default:
-		return nil, -1, errors.ThrowInternal(nil, "COMMA-RreV6", "Errors.Internal")
+		return nil, errors.ThrowInternal(nil, "COMMA-RreV6", "Errors.Internal")
 	}
 	if err != nil {
-		return nil, -1, err
+		return nil, err
 	}
-	return value, config.Expiry, nil
+
+	code.Expiry = config.Expiry
+	return code, nil
 }
 
 func newCryptoCodeWithPlain(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (value *crypto.CryptoValue, plain string, err error) {
