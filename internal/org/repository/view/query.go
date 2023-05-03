@@ -16,5 +16,19 @@ func OrgByIDQuery(id, instanceID string, latestSequence uint64) (*es_models.Sear
 		LatestSequenceFilter(latestSequence).
 		InstanceIDFilter(instanceID).
 		AggregateIDFilter(id).
+		EventTypesFilter(
+			es_models.EventType(org.OrgAddedEventType),
+			es_models.EventType(org.OrgChangedEventType),
+			es_models.EventType(org.OrgDeactivatedEventType),
+			es_models.EventType(org.OrgReactivatedEventType),
+			es_models.EventType(org.OrgDomainAddedEventType),
+			es_models.EventType(org.OrgDomainVerificationAddedEventType),
+			es_models.EventType(org.OrgDomainVerifiedEventType),
+			es_models.EventType(org.OrgDomainPrimarySetEventType),
+			es_models.EventType(org.OrgDomainRemovedEventType),
+			es_models.EventType(org.DomainPolicyAddedEventType),
+			es_models.EventType(org.DomainPolicyChangedEventType),
+			es_models.EventType(org.DomainPolicyRemovedEventType),
+		).
 		SearchQuery(), nil
 }
