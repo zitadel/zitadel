@@ -28,7 +28,7 @@ The same view is available on several other objects such as organization or proj
 Administrators can see all events across an instance and filter them directly in [Console](/docs/guides/manage/console/overview).
 Go to your instance settings and then click on the Tab **Events** to open the Event Viewer or browse to $YOUR_DOMAIN/ui/console/events  
 
-![Profile Self Manage](/img/concepts/audit-trail/event-viewer.png)
+![Event viewer](/img/concepts/audit-trail/event-viewer.png)
 
 ### Event API
 
@@ -41,10 +41,24 @@ Access to the API is possible with a Service User account, allowing you to integ
 
 ## Using logs in external systems
 
+You can use the [Event API](#event-api) to pull data and ingest it in an external system.
+
+[Actions](actions.md) can be used to write events to the logs.
+Please refer to the zitadel/actions repository for a [code sample](https://github.com/zitadel/actions/blob/main/examples/post_auth_log.js).
+You can use your log processing pipeline to parse and ingest the events in your favorite analytics tool.
+
+Theoretically it would be possible to send events directly with an http request to an external tool.
+We don't recommend this approach since this would create back-pressure and increase the overall processing time for requests.
+
+:::info Scope of Actions
+At this moment Actions can be invoked on certain events, but not generally on every event.  
+This is not a technical limitation, but a [feature on our backlog](https://github.com/zitadel/zitadel/issues/5101).  
+:::
+
 ## Future plans
 
 There will be three major areas for future development on the audit data
 
 - [Metrics](https://github.com/zitadel/zitadel/issues/4458) and [standard reports](https://github.com/zitadel/zitadel/discussions/2162#discussioncomment-1153259)
 - [Feedback loop](https://github.com/zitadel/zitadel/issues/5102) and threat detection
-- Forensics and replay
+- Forensics and replay of events
