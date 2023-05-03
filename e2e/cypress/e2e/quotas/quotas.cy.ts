@@ -97,13 +97,19 @@ describe('quotas', () => {
       it.only('only authenticated requests are limited', () => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
-            cy.intercept({
-              url: Cypress.config("baseUrl"),
-            }, (req) => {
-              req.continue(res => {
-                expect(res.headers.SetCookie, "Static assets other than the never have a SetCookie header which would disable their caching").to.be.undefined
-              })
-            })
+            cy.intercept(
+              {
+                url: Cypress.config('baseUrl'),
+              },
+              (req) => {
+                req.continue((res) => {
+                  expect(
+                    res.headers.SetCookie,
+                    'Static assets other than the never have a SetCookie header which would disable their caching',
+                  ).to.be.undefined;
+                });
+              },
+            );
             const start = new Date();
             urls.forEach((url) => {
               cy.request({
@@ -117,7 +123,7 @@ describe('quotas', () => {
             const expiresMax = new Date();
             expiresMax.setMinutes(expiresMax.getMinutes() + 20);
             cy.getCookie('zitadel.quota.limiting').then((cookie) => {
-              expect(cookie).to.be.null
+              expect(cookie).to.be.null;
             });
             cy.request({
               url: urls[1],
@@ -138,11 +144,11 @@ describe('quotas', () => {
             createHumanUser(ctx.api, testUserName, false).then((res) => {
               expect(res.status).to.equal(429);
             });
-            cy.visit("/users/me")
-            cy.contains('#authenticated-requests-exhausted-dialog button', "Continue").click()
+            cy.visit('/users/me');
+            cy.contains('#authenticated-requests-exhausted-dialog button', 'Continue').click();
             ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests);
-            cy.reload()
-            cy.get('[data-e2e="top-view-title"]')
+            cy.reload();
+            cy.get('[data-e2e="top-view-title"]');
             createHumanUser(ctx.api, testUserName);
           });
         });
