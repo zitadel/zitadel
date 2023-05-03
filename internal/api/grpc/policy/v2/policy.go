@@ -91,6 +91,8 @@ func ModelSecondFactorTypeToPb(secondFactorType domain.SecondFactorType) policy.
 		return policy.SecondFactorType_SECOND_FACTOR_TYPE_OTP
 	case domain.SecondFactorTypeU2F:
 		return policy.SecondFactorType_SECOND_FACTOR_TYPE_U2F
+	case domain.SecondFactorTypeUnspecified:
+		return policy.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED
 	default:
 		return policy.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED
 	}
@@ -100,6 +102,8 @@ func ModelMultiFactorTypeToPb(typ domain.MultiFactorType) policy.MultiFactorType
 	switch typ {
 	case domain.MultiFactorTypeU2FWithPIN:
 		return policy.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION
+	case domain.MultiFactorTypeUnspecified:
+		return policy.MultiFactorType_MULTI_FACTOR_TYPE_UNSPECIFIED
 	default:
 		return policy.MultiFactorType_MULTI_FACTOR_TYPE_UNSPECIFIED
 	}
@@ -142,7 +146,7 @@ func (s *Server) GetBrandingSettings(ctx context.Context, req *policy.GetBrandin
 		orgID = authz.GetCtxData(ctx).OrgID
 	}
 
-	current, err := s.query.ActiveLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID, false)
+	current, err := s.query.ActiveLabelPolicyByOrg(ctx, orgID, false)
 	if err != nil {
 		return nil, err
 	}
