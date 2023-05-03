@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { BehaviorSubject, of, switchMap, take } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, of, take } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 
 const exhaustedKey = 'zitadel.quota.limiting';
@@ -15,47 +15,39 @@ export class ExhaustedService {
 
   public checkCookie() {
     const cookieValue = this.cookieIsPresent();
-    if (!cookieValue) {
-      return of(true);
+    console.log('cookie value', cookieValue);
+    if (!cookieValue || !this.isClosed.value) {
+      return lastValueFrom(of(true));
     }
-    return this.isClosed.pipe(
-      switchMap((closed) => {
-        if (!closed) {
-          return of(true);
+    this.isClosed.next(false);
+    let isURL = false;
+    try {
+      new URL(cookieValue).toString();
+      isURL = true;
+    } catch (_) {
+      // is not url
+    }
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: isURL ? 'ACTIONS.CONTINUE' : '',
+        titleKey: 'ERRORS.EXHAUSTED.TITLE',
+        descriptionKey: 'ERRORS.EXHAUSTED.DESCRIPTION',
+      },
+      disableClose: true,
+      width: '400px',
+      id: 'authenticated-requests-exhausted-dialog',
+    });
+    const newClosed = dialogRef.afterClosed();
+    if (isURL) {
+      newClosed.pipe(take(1)).subscribe((resp) => {
+        if (resp && isURL) {
+          this.deleteCookie();
+          location.href = cookieValue;
         }
-        this.isClosed.next(false);
-
-        let isURL = false;
-        try {
-          new URL(cookieValue).toString();
-          isURL = true;
-        } catch (_) {
-          // is not url
-        }
-        const dialogRef = this.dialog.open(WarnDialogComponent, {
-          data: {
-            confirmKey: isURL ? 'ACTIONS.CONTINUE' : '',
-            titleKey: 'ERRORS.EXHAUSTED.TITLE',
-            descriptionKey: 'ERRORS.EXHAUSTED.DESCRIPTION',
-          },
-          disableClose: false,
-          width: '400px',
-          id: 'authenticated-requests-exhausted-dialog',
-        });
-
-        const newClosed = dialogRef.afterClosed();
-        if (isURL) {
-          newClosed.pipe(take(1)).subscribe((resp) => {
-            if (resp && isURL) {
-              window.open(cookieValue, '_blank');
-              this.deleteCookie();
-            }
-            this.isClosed.next(true);
-          });
-        }
-        return newClosed;
-      }),
-    );
+        this.isClosed.next(true);
+      });
+    }
+    return newClosed;
   }
 
   private cookieIsPresent() {

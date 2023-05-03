@@ -41,8 +41,13 @@ export class AuthenticationService {
     }
     this.oauthService.configure(this.authConfig);
     this.oauthService.strictDiscoveryDocumentValidation = false;
-    await lastValueFrom(this.exhaustedService.checkCookie());
-    await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+    await this.exhaustedService.checkCookie();
+    await this.oauthService.loadDiscoveryDocumentAndTryLogin().catch(async (err: any) => {
+      if (err.status === 429) {
+        await this.exhaustedService.checkCookie();
+      }
+      return Promise.reject(err);
+    });
     this._authenticated = this.oauthService.hasValidAccessToken();
     if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {
       const newState = await lastValueFrom(this.statehandler.createState());

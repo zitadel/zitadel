@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Request, UnaryInterceptor, UnaryResponse } from 'grpc-web';
-import { lastValueFrom } from 'rxjs';
 import { ExhaustedService } from '../exhausted.service';
 
 @Injectable({ providedIn: 'root' })
@@ -11,7 +10,7 @@ export class ExhaustedInterceptor<TReq = unknown, TResp = unknown> implements Un
   constructor(private exhaustedService: ExhaustedService) {}
 
   public async intercept(request: Request<TReq, TResp>, invoker: any): Promise<UnaryResponse<TReq, TResp>> {
-    await lastValueFrom(this.exhaustedService.checkCookie());
+    await this.exhaustedService.checkCookie();
     return invoker(request);
   }
 }
