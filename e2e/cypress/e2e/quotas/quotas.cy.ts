@@ -94,7 +94,7 @@ describe('quotas', () => {
         });
       });
 
-      it.only('only authenticated requests are limited', () => {
+      it('only authenticated requests are limited', () => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
             cy.intercept(
