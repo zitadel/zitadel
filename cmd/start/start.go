@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	_ "embed"
 	"fmt"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -224,9 +225,14 @@ func startAPIs(
 	if accessSvc.Enabled() {
 		logging.Warn("access logs are currently in beta")
 	}
-	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, config.Quotas.Access, false)
-	nonLimitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, config.Quotas.Access, true)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
+	exhaustedCookieHandler := http_util.NewCookieHandler(
+		http_util.WithUnsecure(),
+		http_util.WithNonHttpOnly(),
+		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
+	)
+	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, config.Quotas.Access, false)
+	nonLimitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, nil, config.Quotas.Access, true)
+	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc, exhaustedCookieHandler, config.Quotas.Access)
 	if err != nil {
 		return fmt.Errorf("error creating api %w", err)
 	}

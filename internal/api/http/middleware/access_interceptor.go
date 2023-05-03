@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"bytes"
-	"math"
+	"net"
 	"net/http"
 	"net/url"
 	"text/template"
@@ -33,16 +33,12 @@ type AccessConfig struct {
 // NewAccessInterceptor intercepts all requests and stores them to the logstore.
 // If storeOnly is false, it also checks if requests are exhausted.
 // If requests are exhausted, it also returns http.StatusTooManyRequests and sets a cookie
-func NewAccessInterceptor(svc *logstore.Service, cookieConfig *AccessConfig, storeOnly bool) *AccessInterceptor {
+func NewAccessInterceptor(svc *logstore.Service, cookieHandler *http_utils.CookieHandler, cookieConfig *AccessConfig, storeOnly bool) *AccessInterceptor {
 	return &AccessInterceptor{
-		svc: svc,
-		cookieHandler: http_utils.NewCookieHandler(
-			http_utils.WithUnsecure(),
-			http_utils.WithNonHttpOnly(),
-			http_utils.WithMaxAge(int(math.Floor(cookieConfig.ExhaustedCookieMaxAge.Seconds()))),
-		),
-		limitConfig: cookieConfig,
-		storeOnly:   storeOnly,
+		svc:           svc,
+		cookieHandler: cookieHandler,
+		limitConfig:   cookieConfig,
+		storeOnly:     storeOnly,
 	}
 }
 
@@ -79,7 +75,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		} else {
 			if !a.storeOnly {
 				// If not limited and not storeOnly, ensure the cookie is deleted
-				a.cookieHandler.DeleteCookie(wrappedWriter, request, a.limitConfig.ExhaustedCookieKey)
+				DeleteExhaustedCookie(a.cookieHandler, wrappedWriter, request, a.limitConfig)
 			}
 			// Always serve if not limited
 			next.ServeHTTP(wrappedWriter, request)
@@ -106,18 +102,24 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 	})
 }
 
-type statusRecorder struct {
-	http.ResponseWriter
-	status       int
-	ignoreWrites bool
+func SetExhaustedCookie(cookieHandler *http_utils.CookieHandler, writer http.ResponseWriter, cookieConfig *AccessConfig, instance authz.Instance, requestHost string) {
+	// Limit can only be true when storeOnly is false, so set the cookie and the response code
+	cookieValue, err := templateCookieValue(cookieConfig.ExhaustedCookieValue, instance)
+	if err != nil {
+		// If templating didn't succeed, emit a warning log and just use the plain config
+		logging.WithError(err).WithField("value", cookieConfig.ExhaustedCookieValue).Warning("failed to go template cookie value config")
+		err = nil
+	}
+	host, _, err := net.SplitHostPort(requestHost)
+	if err != nil {
+		logging.WithError(err).WithField("host", requestHost).Warning("failed to extract cookie domain from request")
+		err = nil
+	}
+	cookieHandler.SetCookie(writer, cookieConfig.ExhaustedCookieKey, host, cookieValue)
 }
 
-func (r *statusRecorder) WriteHeader(status int) {
-	if r.ignoreWrites {
-		return
-	}
-	r.status = status
-	r.ResponseWriter.WriteHeader(status)
+func DeleteExhaustedCookie(cookieHandler *http_utils.CookieHandler, writer http.ResponseWriter, request *http.Request, cookieConfig *AccessConfig) {
+	cookieHandler.DeleteCookie(writer, request, cookieConfig.ExhaustedCookieKey)
 }
 
 func templateCookieValue(templateableCookieValue string, instance authz.Instance) (string, error) {
@@ -130,4 +132,18 @@ func templateCookieValue(templateableCookieValue string, instance authz.Instance
 		return templateableCookieValue, err
 	}
 	return cookieValue.String(), nil
+}
+
+type statusRecorder struct {
+	http.ResponseWriter
+	status       int
+	ignoreWrites bool
+}
+
+func (r *statusRecorder) WriteHeader(status int) {
+	if r.ignoreWrites {
+		return
+	}
+	r.status = status
+	r.ResponseWriter.WriteHeader(status)
 }
