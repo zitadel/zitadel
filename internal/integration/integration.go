@@ -72,10 +72,14 @@ type Tester struct {
 	wg             sync.WaitGroup // used for shutdown
 }
 
-const commandLine = `start --masterkey MasterkeyNeedsToHave32Characters`
+const commandLine = `start --masterkeyFromEnv`
+
+func (s *Tester) Host() string {
+	return fmt.Sprintf("%s:%d", s.Config.ExternalDomain, s.Config.Port)
+}
 
 func (s *Tester) createClientConn(ctx context.Context) {
-	target := fmt.Sprintf("localhost:%d", s.Config.Port)
+	target := s.Host()
 	cc, err := grpc.DialContext(ctx, target,
 		grpc.WithBlock(), grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
@@ -126,7 +130,7 @@ const (
 func (s *Tester) createSystemUser(ctx context.Context) {
 	var err error
 
-	s.Instance, err = s.Queries.InstanceByHost(ctx, "localhost:8080")
+	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
 	logging.OnError(err).Fatal("query instance")
 	ctx = authz.WithInstance(ctx, s.Instance)
 
