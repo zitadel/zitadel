@@ -148,9 +148,9 @@ describe('quotas', () => {
             // visit limited console
             cy.visit('/users/me');
             cy.contains('#authenticated-requests-exhausted-dialog button', 'Continue').click();
-            cy.origin(upgradeInstancePage, { args: {upgradeInstancePage} }, ({upgradeInstancePage}) => {
-              cy.location('href').should('equal', upgradeInstancePage)
-            })
+            cy.origin(upgradeInstancePage, { args: { upgradeInstancePage } }, ({ upgradeInstancePage }) => {
+              cy.location('href').should('equal', upgradeInstancePage);
+            });
             // upgrade instance
             ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests);
             // visit upgraded console again
