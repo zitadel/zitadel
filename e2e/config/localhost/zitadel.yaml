@@ -1,5 +1,5 @@
 Log:
-  Level: debug
+  Level: info
 
 ExternalDomain: localhost
 ExternalSecure: false
@@ -34,7 +34,7 @@ Quotas:
   Access:
     ExhaustedCookieKey: "zitadel.quota.limiting"
     ExhaustedCookieValue: "https://my-zitadel/instances/{{.InstanceID}}"
-    ExhaustedCookieMaxAge: "300s"
+    ExhaustedCookieMaxAge: "600s"
 
 Projections:
   Customizations:
