@@ -45,6 +45,24 @@ Tracing:
   MetricPrefix: zitadel
 ```
 
+## Logging
+
+ZITADEL follows the principles that guide cloud-native and twelve factor applications.
+Logs are a stream of time-ordered events collected from all running processes.
+
+ZITADEL processes write the following events to the standard output:
+
+- ZITADEL Runtime
+- Access (http calls)
+- Actions Runtime
+- Standard Output from Actions
+- Standard Output from Events 
+
+Log file management should not be in each business apps responsibility.
+Instead, your execution environment should provide tooling for managing logs in a generic way.
+This includes tasks like rotating files, routing, collecting, archiving and cleaning-up.
+For example, systemd has journald and kubernetes has fluentd and fluentbit.
+
 ## Database
 
 ### Prefer CockroachDB
