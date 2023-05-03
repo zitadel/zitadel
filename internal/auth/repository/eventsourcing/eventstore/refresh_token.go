@@ -42,15 +42,24 @@ func (r *RefreshTokenRepo) RefreshTokenByToken(ctx context.Context, refreshToken
 }
 
 func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID string) (*usr_model.RefreshTokenView, error) {
-	tokenView, viewErr := r.View.RefreshTokenByID(tokenID, authz.GetInstance(ctx).InstanceID())
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	tokenView, viewErr := r.View.RefreshTokenByID(tokenID, instanceID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
+		sequence, err := r.View.GetLatestRefreshTokenSequence(ctx, instanceID)
+		logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
+			OnError(err).
+			Errorf("could not get current sequence for RefreshTokenByID")
+
 		tokenView = new(model.RefreshTokenView)
 		tokenView.ID = tokenID
 		tokenView.UserID = userID
-		tokenView.InstanceID = authz.GetInstance(ctx).InstanceID()
+		tokenView.InstanceID = instanceID
+		if sequence != nil {
+			tokenView.Sequence = sequence.CurrentSequence
+		}
 	}
 
 	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.Sequence)
@@ -80,7 +89,7 @@ func (r *RefreshTokenRepo) SearchMyRefreshTokens(ctx context.Context, userID str
 	if err != nil {
 		return nil, err
 	}
-	sequence, err := r.View.GetLatestRefreshTokenSequence(authz.GetInstance(ctx).InstanceID())
+	sequence, err := r.View.GetLatestRefreshTokenSequence(ctx, authz.GetInstance(ctx).InstanceID())
 	logging.Log("EVENT-GBdn4").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest refresh token sequence")
 	request.Queries = append(request.Queries, &usr_model.RefreshTokenSearchQuery{Key: usr_model.RefreshTokenSearchKeyUserID, Method: domain.SearchMethodEquals, Value: userID})
 	tokens, count, err := r.View.SearchRefreshTokens(request)

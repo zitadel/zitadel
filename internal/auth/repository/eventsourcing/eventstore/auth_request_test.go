@@ -19,6 +19,7 @@ import (
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 var (
@@ -35,6 +36,10 @@ func (m *mockViewNoUserSession) UserSessionsByAgentID(string, string) ([]*user_v
 	return nil, nil
 }
 
+func (m *mockViewNoUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
+	return &repository.CurrentSequence{}, nil
+}
+
 type mockViewErrUserSession struct{}
 
 func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
@@ -43,6 +48,10 @@ func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user
 
 func (m *mockViewErrUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+func (m *mockViewErrUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
+	return &repository.CurrentSequence{}, nil
 }
 
 type mockViewUserSession struct {
@@ -80,6 +89,10 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_vie
 		}
 	}
 	return sessions, nil
+}
+
+func (m *mockViewUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
+	return &repository.CurrentSequence{}, nil
 }
 
 type mockViewNoUser struct{}

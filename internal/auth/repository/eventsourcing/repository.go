@@ -34,8 +34,8 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *database.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
-	es, err := v1.Start(dbClient)
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *database.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm, allowOrderByCreationDate bool) (*EsRepository, error) {
+	es, err := v1.Start(dbClient, allowOrderByCreationDate)
 	if err != nil {
 		return nil, err
 	}
