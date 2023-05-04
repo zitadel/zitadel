@@ -204,8 +204,6 @@ func (r *cookieResponseWriter) WriteHeader(status int) {
 		r.ResponseWriter.WriteHeader(status)
 		return
 	}
-	instance, err := r.queries.InstanceByHost(r.request.Context(), r.request.Header.Get(middleware.HTTP1Host))
-	logging.OnError(err).Warn("could not get instance for templating exhausted cookie value")
-	http_mw.SetExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.cookieConfig, instance, r.request.Host)
+	http_mw.SetExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.cookieConfig, r.request)
 	r.ResponseWriter.WriteHeader(status)
 }
