@@ -65,16 +65,16 @@ func (_ *UserSession) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{user.AggregateType, org.AggregateType, instance.AggregateType}
 }
 
-func (u *UserSession) CurrentSequence(instanceID string) (uint64, error) {
-	sequence, err := u.view.GetLatestUserSessionSequence(instanceID)
+func (u *UserSession) CurrentSequence(ctx context.Context, instanceID string) (uint64, error) {
+	sequence, err := u.view.GetLatestUserSessionSequence(ctx, instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (u *UserSession) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
-	sequences, err := u.view.GetLatestUserSessionSequences(instanceIDs)
+func (u *UserSession) EventQuery(ctx context.Context, instanceIDs []string) (*models.SearchQuery, error) {
+	sequences, err := u.view.GetLatestUserSessionSequences(ctx, instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +231,7 @@ func (u *UserSession) loginNameInformation(ctx context.Context, orgID string, in
 }
 
 func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
-	query, err := view.OrgByIDQuery(orgID, instanceID, 0)
+	orgQuery, err := view.OrgByIDQuery(orgID, instanceID, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -241,7 +241,7 @@ func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) 
 			AggregateID: orgID,
 		},
 	}
-	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, query)
+	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, esOrg.AppendEvents, orgQuery)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}

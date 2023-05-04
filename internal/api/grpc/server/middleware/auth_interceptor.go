@@ -11,6 +11,7 @@ import (
 	grpc_util "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 )
 
 func AuthorizationInterceptor(verifier *authz.TokenVerifier, authConfig authz.Config) grpc.UnaryServerInterceptor {
@@ -34,8 +35,8 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	}
 
 	orgID := grpc_util.GetHeader(authCtx, http.ZitadelOrgID)
-	if o, ok := req.(AuthContext); ok {
-		orgID = o.AuthContext()
+	if o, ok := req.(OrganisationFromRequest); ok {
+		orgID = o.OrganisationFromRequest().GetOrgId()
 	}
 
 	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, verifier, authConfig, authOpt, info.FullMethod)
@@ -46,6 +47,6 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	return handler(ctxSetter(ctx), req)
 }
 
-type AuthContext interface {
-	AuthContext() string
+type OrganisationFromRequest interface {
+	OrganisationFromRequest() *object.Organisation
 }

@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"golang.org/x/sys/unix"
 
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
@@ -45,6 +46,7 @@ import (
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -60,7 +62,7 @@ import (
 	"github.com/zitadel/zitadel/openapi"
 )
 
-func New() *cobra.Command {
+func New(server chan<- *Server) *cobra.Command {
 	start := &cobra.Command{
 		Use:   "start",
 		Short: "starts ZITADEL instance",
@@ -78,7 +80,7 @@ Requirements:
 				return err
 			}
 
-			return startZitadel(config, masterKey)
+			return startZitadel(config, masterKey, server)
 		},
 	}
 
@@ -87,7 +89,23 @@ Requirements:
 	return start
 }
 
-func startZitadel(config *Config, masterKey string) error {
+type Server struct {
+	Config     *Config
+	DB         *database.DB
+	KeyStorage crypto.KeyStorage
+	Keys       *encryptionKeys
+	Eventstore *eventstore.Eventstore
+	Queries    *query.Queries
+	AuthzRepo  authz_repo.Repository
+	Storage    static.Storage
+	Commands   *command.Commands
+	LogStore   *logstore.Service
+	Router     *mux.Router
+	TLSConfig  *tls.Config
+	Shutdown   chan<- os.Signal
+}
+
+func startZitadel(config *Config, masterKey string, server chan<- *Server) error {
 	ctx := context.Background()
 
 	dbClient, err := database.Connect(config.Database, false)
@@ -115,7 +133,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
 
-	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC, config.ExternalSecure)
+	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC, config.ExternalSecure, config.Eventstore.AllowOrderByCreationDate)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
@@ -180,7 +198,30 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	return listen(ctx, router, config.Port, tlsConfig)
+
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+
+	if server != nil {
+		server <- &Server{
+			Config:     config,
+			DB:         dbClient,
+			KeyStorage: keyStorage,
+			Keys:       keys,
+			Eventstore: eventstoreClient,
+			Queries:    queries,
+			AuthzRepo:  authZRepo,
+			Storage:    storage,
+			Commands:   commands,
+			LogStore:   actionsLogstoreSvc,
+			Router:     router,
+			TLSConfig:  tlsConfig,
+			Shutdown:   shutdown,
+		}
+		close(server)
+	}
+
+	return listen(ctx, router, config.Port, tlsConfig, shutdown)
 }
 
 func startAPIs(
@@ -229,11 +270,11 @@ func startAPIs(
 	if err != nil {
 		return fmt.Errorf("error creating api %w", err)
 	}
-	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
+	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User, config.Eventstore.AllowOrderByCreationDate)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
-	adminRepo, err := admin_es.Start(ctx, config.Admin, store, dbClient, eventstore)
+	adminRepo, err := admin_es.Start(ctx, config.Admin, store, dbClient, eventstore, config.Eventstore.AllowOrderByCreationDate)
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
@@ -301,10 +342,21 @@ func startAPIs(
 	return nil
 }
 
-func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config) error {
+func reusePort(network, address string, conn syscall.RawConn) error {
+	return conn.Control(func(descriptor uintptr) {
+		err := syscall.SetsockoptInt(int(descriptor), syscall.SOL_SOCKET, unix.SO_REUSEPORT, 1)
+		if err != nil {
+			panic(err)
+		}
+	})
+}
+
+func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, shutdown <-chan os.Signal) error {
 	http2Server := &http2.Server{}
 	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig}
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+
+	lc := &net.ListenConfig{Control: reusePort}
+	lis, err := lc.Listen(ctx, "tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return fmt.Errorf("tcp listener on %d failed: %w", port, err)
 	}
@@ -320,9 +372,6 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 			errCh <- http1Server.Serve(lis)
 		}
 	}()
-
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
 	select {
 	case err := <-errCh:

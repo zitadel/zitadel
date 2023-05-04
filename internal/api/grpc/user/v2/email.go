@@ -21,11 +21,7 @@ func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp 
 	case *user.SetEmailRequest_ReturnCode:
 		email, err = s.command.ChangeUserEmailReturnCode(ctx, req.GetUserId(), resourceOwner, req.GetEmail(), s.userCodeAlg)
 	case *user.SetEmailRequest_IsVerified:
-		if v.IsVerified {
-			email, err = s.command.ChangeUserEmailVerified(ctx, req.GetUserId(), resourceOwner, req.GetEmail())
-		} else {
-			email, err = s.command.ChangeUserEmail(ctx, req.GetUserId(), resourceOwner, req.GetEmail(), s.userCodeAlg)
-		}
+		email, err = s.command.ChangeUserEmailVerified(ctx, req.GetUserId(), resourceOwner, req.GetEmail())
 	case nil:
 		email, err = s.command.ChangeUserEmail(ctx, req.GetUserId(), resourceOwner, req.GetEmail(), s.userCodeAlg)
 	default:

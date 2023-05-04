@@ -199,6 +199,21 @@ When you are happy with your changes, you can cleanup your environment.
 docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ```
 
+#### Integration tests
+
+In order to run the integrations tests for the gRPC API, PostgreSQL and CockroachDB must be started and initialized:
+
+```bash
+export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
+docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
+go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+go test -tags=integration -race -parallel 1 ./internal/integration ./internal/api/grpc/...
+docker compose -f internal/integration/config/docker-compose.yaml down
+```
+
+The above can be repeated with `INTEGRATION_DB_FLAVOR="postgres"`.
+
 ### Console
 
 By executing the commands from this section, you run everything you need to develop the console locally.

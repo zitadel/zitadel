@@ -1,5 +1,6 @@
 ---
 title: Connect with Ping Identity through SAML 2.0
+sidebar_label: Ping Identity
 ---
 
 This guide shows how to enable login with ZITADEL on Auth0.
