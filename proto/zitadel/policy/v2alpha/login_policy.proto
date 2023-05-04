@@ -28,9 +28,9 @@ message LoginPolicy {
             description: "defines if a user MUST use a multi-factor to log in"
         }
     ];
-    PasswordkeysType passwordkeys_type = 5 [
+    PasskeysType passkeys_type = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if passwordkeys are allowed for users"
+            description: "defines if passkeys are allowed for users"
         }
     ];
     bool hide_password_reset = 6 [
@@ -105,7 +105,7 @@ enum MultiFactorType {
     MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION = 1;
 }
 
-enum PasswordkeysType {
-    PASSWORDKEYS_TYPE_NOT_ALLOWED = 0;
-    PASSWORDKEYS_TYPE_ALLOWED = 1;
+enum PasskeysType {
+    PASSKEYS_TYPE_NOT_ALLOWED = 0;
+    PASSKEYS_TYPE_ALLOWED = 1;
 }
