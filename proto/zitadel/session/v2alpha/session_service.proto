@@ -208,9 +208,15 @@ service SessionService {
   }
 }
 
-message ListSessionsRequest{}
+message ListSessionsRequest{
+  zitadel.object.v2alpha.ListQuery query = 1;
+  repeated SearchQuery queries = 2;
+}
 
-message ListSessionsResponse{}
+message ListSessionsResponse{
+  zitadel.object.v2alpha.ListDetails details = 1;
+  repeated Session sessions = 2;
+}
 
 message GetSessionRequest{
   string session_id = 1;
