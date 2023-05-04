@@ -43,8 +43,6 @@ func (wm *SessionWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *session.AddedEvent:
 			wm.reduceAdded(e)
-		case *session.SetEvent:
-			wm.reduceSet(e)
 		case *session.UserCheckedEvent:
 			wm.reduceUserChecked(e)
 		case *session.PasswordCheckedEvent:
@@ -65,7 +63,6 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			session.AddedType,
-			session.SetType,
 			session.UserCheckedType,
 			session.PasswordCheckedType,
 			session.TokenSetType,
@@ -82,23 +79,6 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
 	wm.State = domain.SessionStateActive
-}
-
-func (wm *SessionWriteModel) reduceSet(e *session.SetEvent) {
-	wm.State = domain.SessionStateActive
-	wm.Token = e.Token
-	if e.UserID != nil {
-		wm.UserID = *e.UserID
-	}
-	if e.UserCheckedAt != nil {
-		wm.UserCheckedAt = *e.UserCheckedAt
-	}
-	if e.PasswordCheckedAt != nil {
-		wm.PasswordCheckedAt = *e.PasswordCheckedAt
-	}
-	if len(e.Metadata) != 0 {
-		wm.Metadata = e.Metadata
-	}
 }
 
 func (wm *SessionWriteModel) reduceUserChecked(e *session.UserCheckedEvent) {

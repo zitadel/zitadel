@@ -63,10 +63,6 @@ var (
 	}
 )
 
-type CustomHTTPResponse interface {
-	CustomHTTPCode() int
-}
-
 type Gateway struct {
 	mux           *runtime.ServeMux
 	http1HostName string

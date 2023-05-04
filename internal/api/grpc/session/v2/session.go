@@ -7,9 +7,10 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 )
 
-func (s *Server) CreateSession(ctx context.Context, req *CreateSessionRequest) (*CreateSessionResponse, error) {
+func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRequest) (*session.CreateSessionResponse, error) {
 	checks, metadata, err := s.createSessionRequestToCommand(ctx, req)
 	if err != nil {
 		return nil, err
@@ -18,14 +19,14 @@ func (s *Server) CreateSession(ctx context.Context, req *CreateSessionRequest) (
 	if err != nil {
 		return nil, err
 	}
-	return &CreateSessionResponse{
+	return &session.CreateSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionId:    set.ID,
 		SessionToken: set.NewToken,
 	}, nil
 }
 
-func (s *Server) SetSession(ctx context.Context, req *SetSessionRequest) (*SetSessionResponse, error) {
+func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest) (*session.SetSessionResponse, error) {
 	checks, err := s.setSessionRequestToCommand(ctx, req)
 	if err != nil {
 		return nil, err
@@ -38,23 +39,23 @@ func (s *Server) SetSession(ctx context.Context, req *SetSessionRequest) (*SetSe
 	if set.NewToken == "" {
 		set.NewToken = req.GetSessionToken()
 	}
-	return &SetSessionResponse{
+	return &session.SetSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionToken: set.NewToken,
 	}, nil
 }
 
-func (s *Server) DeleteSession(ctx context.Context, req *DeleteSessionRequest) (*DeleteSessionResponse, error) {
+func (s *Server) DeleteSession(ctx context.Context, req *session.DeleteSessionRequest) (*session.DeleteSessionResponse, error) {
 	details, err := s.command.TerminateSession(ctx, req.GetSessionId(), req.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}
-	return &DeleteSessionResponse{
+	return &session.DeleteSessionResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) createSessionRequestToCommand(ctx context.Context, req *CreateSessionRequest) ([]command.SessionCheck, map[string][]byte, error) {
+func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCheck, map[string][]byte, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
 		return nil, nil, err
@@ -62,7 +63,7 @@ func (s *Server) createSessionRequestToCommand(ctx context.Context, req *CreateS
 	return checks, req.GetMetadata(), nil
 }
 
-func (s *Server) setSessionRequestToCommand(ctx context.Context, req *SetSessionRequest) ([]command.SessionCheck, error) {
+func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.SetSessionRequest) ([]command.SessionCheck, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
 		return nil, err
@@ -70,7 +71,7 @@ func (s *Server) setSessionRequestToCommand(ctx context.Context, req *SetSession
 	return checks, nil
 }
 
-func (s *Server) checksToCommand(ctx context.Context, checks *Checks) ([]command.SessionCheck, error) {
+func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([]command.SessionCheck, error) {
 	checkUser, err := userCheck(checks.GetUser())
 	if err != nil {
 		return nil, err
@@ -89,14 +90,14 @@ func (s *Server) checksToCommand(ctx context.Context, checks *Checks) ([]command
 	return sessionChecks, nil
 }
 
-func userCheck(user *CheckUser) (userSearch, error) {
+func userCheck(user *session.CheckUser) (userSearch, error) {
 	if user == nil {
 		return nil, nil
 	}
 	switch s := user.GetSearch().(type) {
-	case *CheckUser_UserId:
+	case *session.CheckUser_UserId:
 		return userByID(s.UserId), nil
-	case *CheckUser_LoginName:
+	case *session.CheckUser_LoginName:
 		return userByLoginName(s.LoginName)
 	default:
 		return nil, caos_errs.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", s)
