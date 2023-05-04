@@ -52,10 +52,9 @@ Logs are a stream of time-ordered events collected from all running processes.
 
 ZITADEL processes write the following events to the standard output:
 
-- Runtime Logs: Startup events, runtime errors, database connection changes
-- Access Logs: API request
-- Actions Execution Logs: Success and error messages
-- Actions Logger: Actions can log customer chosen logs, including Events/Operations such as creating a user or a user authentication
+- Runtime Logs: Define the log level and record format [in the Log configuration section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L1-L4)
+- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L366) 
+- Actions Exectution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L387) .
 
 Log file management should not be in each business apps responsibility.
 Instead, your execution environment should provide tooling for managing logs in a generic way.
