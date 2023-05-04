@@ -112,6 +112,10 @@ var (
 		name:  projection.SessionColumnMetadata,
 		table: sessionsTable,
 	}
+	SessionColumnToken = Column{
+		name:  projection.SessionColumnToken,
+		table: sessionsTable,
+	}
 )
 
 func (q *Queries) SessionByID(ctx context.Context, id string) (_ *Session, err error) {

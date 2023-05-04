@@ -27,7 +27,6 @@ type SessionWriteModel struct {
 }
 
 func NewSessionWriteModel(sessionID string, resourceOwner string) *SessionWriteModel {
-	// var resourceOwner string //TODO: resourceowner?
 	return &SessionWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   sessionID,
@@ -91,7 +90,6 @@ func (wm *SessionWriteModel) reducePasswordChecked(e *session.PasswordCheckedEve
 }
 
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
-	wm.State = domain.SessionStateActive //TODO: ?
 	wm.Token = e.Token
 }
 

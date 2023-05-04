@@ -2,9 +2,6 @@ package projection
 
 import (
 	"context"
-	"encoding/json"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -30,6 +27,7 @@ const (
 	SessionColumnUserCheckedAt     = "user_checked_at"
 	SessionColumnPasswordCheckedAt = "password_checked_at"
 	SessionColumnMetadata          = "metadata"
+	SessionColumnToken             = "token"
 )
 
 type sessionProjection struct {
@@ -53,7 +51,8 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnUserID, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnUserCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnPasswordCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
-			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeBytes, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnToken, crdb.ColumnTypeJSONB, crdb.Nullable()),
 		},
 			crdb.NewPrimaryKey(SessionColumnInstanceID, SessionColumnID),
 		),
@@ -177,6 +176,7 @@ func (p *sessionProjection) reduceTokenSet(event eventstore.Event) (*handler.Sta
 		[]handler.Column{
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnToken, e.Token),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),
@@ -191,17 +191,12 @@ func (p *sessionProjection) reduceMetadataSet(event eventstore.Event) (*handler.
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAfd3", "reduce.wrong.event.type %s", session.MetadataSetType)
 	}
 
-	// marshal the metadata to be able to put it in a byte column
-	// just log the error (will result in failed events) and do not return it at this would stop the projection
-	metadata, err := json.Marshal(e.Metadata)
-	logging.WithFields("sessionID", e.Aggregate().ID, "sequence", e.Sequence()).OnError(err).Error("unable to marshal metadata")
-
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
-			handler.NewCol(SessionColumnMetadata, metadata),
+			handler.NewCol(SessionColumnMetadata, e.Metadata),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),
