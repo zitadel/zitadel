@@ -281,6 +281,7 @@ module.exports = {
         "concepts/features/identity-brokering",
         "concepts/structure/jwt_idp",
         "concepts/features/actions",
+        "concepts/features/audit-trail",
         "concepts/features/selfservice",
       ]
     },
