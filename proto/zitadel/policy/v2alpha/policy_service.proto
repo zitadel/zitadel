@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package zitadel.policy.v2alpha;
 
-import "zitadel/options.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/policy/v2alpha/login_policy.proto";
 import "zitadel/policy/v2alpha/password_policy.proto";
@@ -82,8 +82,10 @@ service PolicyService {
             get: "/v2alpha/policies/login"
         };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "policy.read"
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -102,8 +104,10 @@ service PolicyService {
             get: "/v2alpha/policies/password"
         };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "policy.read"
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -122,8 +126,10 @@ service PolicyService {
             get: "/v2alpha/policies/branding"
         };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "policy.read"
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -142,8 +148,10 @@ service PolicyService {
             get: "/v2alpha/policies/domain"
         };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "policy.read"
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -162,8 +170,10 @@ service PolicyService {
             get: "/v2alpha/policies/legal"
         };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "policy.read"
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -182,8 +192,10 @@ service PolicyService {
             get: "/v2alpha/policies/lockout"
         };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "policy.read"
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -202,8 +214,10 @@ service PolicyService {
             get: "/v2alpha/policies/idps"
         };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "policy.read"
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -222,8 +236,10 @@ service PolicyService {
             get: "/v2alpha/general/settings"
         };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "policy.read"
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
