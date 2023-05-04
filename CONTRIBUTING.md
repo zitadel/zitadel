@@ -330,13 +330,15 @@ docker compose down
 
 Project documentation is made with docusaurus and is located under [./docs](./docs).
 
-### Local Testing
+### Local Testing
+
 Please refer to the [README](./docs/README.md) for more information and local testing.
 
-### Style Guide
+### Style Guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
 - **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
+- **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
 ### Docs Pull Request
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
