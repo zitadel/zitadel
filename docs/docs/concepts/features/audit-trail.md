@@ -37,7 +37,7 @@ Since everything that is available in Console can also be called with our APIs, 
 - [Event API Guide](/docs/guides/integrate/event-api)
 - [API Documentation](/docs/category/apis/admin/events)
 
-Access to the API is possible with a Service User account, allowing you to integrate the events with your own business logic.
+Access to the API is possible with a [Service User](/docs/guides/integrate/serviceusers) account, allowing you to integrate the events with your own business logic.
 
 ## Using logs in external systems
 
