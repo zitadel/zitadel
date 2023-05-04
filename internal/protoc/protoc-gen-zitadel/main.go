@@ -13,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
 
-	"github.com/zitadel/zitadel/internal/protoc/protoc-gen-zitadel/zitadel"
+	protoc_gen_zitadel "github.com/zitadel/zitadel/pkg/grpc/protoc/v2"
 )
 
 var (
@@ -47,7 +47,6 @@ type httpResponse struct {
 }
 
 func main() {
-
 	input, _ := io.ReadAll(os.Stdin)
 	var req pluginpb.CodeGeneratorRequest
 	err := proto.Unmarshal(input, &req)
@@ -62,51 +61,33 @@ func main() {
 	}
 	plugin.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 
-	authTemp := loadTemplate(zitadelTemplate)
+	tmpl := loadTemplate(zitadelTemplate)
 
 	for _, file := range plugin.Files {
-
-		var buf bytes.Buffer
-
-		var methods authMethods
+		methods := new(authMethods)
 		for _, service := range file.Services {
 			methods.ServiceName = service.GoName
 			methods.GoPackageName = string(file.GoPackageName)
 			methods.ProtoPackageName = *file.Proto.Package
 			for _, method := range service.Methods {
-				if options := method.Desc.Options().(*descriptorpb.MethodOptions); options != nil {
-					ext := proto.GetExtension(options, zitadel.E_Options).(*zitadel.Options)
-					if ext == nil {
-						continue
-					}
-					if ext.AuthOption != nil {
-						methods.AuthOptions = append(methods.AuthOptions, authOption{Name: string(method.Desc.Name()), Permission: ext.AuthOption.Permission /*CheckFieldName: authExt.CheckFieldName*/})
-						if ext.AuthOption.OrgField != "" {
-							orgMethod := buildAuthContextField(method.Input.Fields, ext.AuthOption.OrgField)
-							if orgMethod != "" {
-								methods.AuthContext = append(methods.AuthContext, authContext{Name: string(method.Input.Desc.Name()), OrgMethod: orgMethod})
-							}
-						}
-					}
-					if ext.HttpResponse != nil {
-						methods.CustomHTTPResponses = append(methods.CustomHTTPResponses, httpResponse{Name: string(method.Output.Desc.Name()), Code: ext.HttpResponse.SuccessCode})
-					}
+				options := method.Desc.Options().(*descriptorpb.MethodOptions)
+				if options == nil {
+					continue
+				}
+				ext := proto.GetExtension(options, protoc_gen_zitadel.E_Options).(*protoc_gen_zitadel.Options)
+				if ext == nil {
+					continue
+				}
+				if ext.AuthOption != nil {
+					generateAuthOption(methods, ext.AuthOption, method)
+				}
+				if ext.HttpResponse != nil {
+					methods.CustomHTTPResponses = append(methods.CustomHTTPResponses, httpResponse{Name: string(method.Output.Desc.Name()), Code: ext.HttpResponse.SuccessCode})
 				}
 			}
 		}
 		if len(methods.AuthOptions) > 0 {
-			err = authTemp.Execute(&buf, &methods)
-			if err != nil {
-				panic(err)
-			}
-
-			filename := file.GeneratedFilenamePrefix + ".pb.zitadel.go"
-			file := plugin.NewGeneratedFile(filename, ".")
-
-			_, err = file.Write(buf.Bytes())
-			if err != nil {
-				panic(err)
-			}
+			generateFile(tmpl, methods, file, plugin)
 		}
 	}
 
@@ -119,6 +100,33 @@ func main() {
 
 	// Write the response to stdout, to be picked up by protoc
 	_, err = fmt.Fprint(os.Stdout, string(out))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func generateAuthOption(methods *authMethods, protoAuthOption *protoc_gen_zitadel.AuthOption, method *protogen.Method) {
+	methods.AuthOptions = append(methods.AuthOptions, authOption{Name: string(method.Desc.Name()), Permission: protoAuthOption.Permission})
+	if protoAuthOption.OrgField == "" {
+		return
+	}
+	orgMethod := buildAuthContextField(method.Input.Fields, protoAuthOption.OrgField)
+	if orgMethod != "" {
+		methods.AuthContext = append(methods.AuthContext, authContext{Name: string(method.Input.Desc.Name()), OrgMethod: orgMethod})
+	}
+}
+
+func generateFile(tmpl *template.Template, methods *authMethods, protoFile *protogen.File, plugin *protogen.Plugin) {
+	var buffer bytes.Buffer
+	err := tmpl.Execute(&buffer, &methods)
+	if err != nil {
+		panic(err)
+	}
+
+	filename := protoFile.GeneratedFilenamePrefix + ".pb.zitadel.go"
+	file := plugin.NewGeneratedFile(filename, ".")
+
+	_, err = file.Write(buffer.Bytes())
 	if err != nil {
 		panic(err)
 	}

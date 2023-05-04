@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package zitadel.user.v2alpha;
 
-import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/object/v2alpha/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/user/v2alpha/email.proto";
 import "zitadel/user/v2alpha/password.proto";
 import "zitadel/user/v2alpha/user.proto";

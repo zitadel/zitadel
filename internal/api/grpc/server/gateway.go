@@ -77,6 +77,10 @@ func (g *Gateway) Handler() http.Handler {
 	return addInterceptors(g.mux, g.http1HostName)
 }
 
+type CustomHTTPResponse interface {
+	CustomHTTPCode() int
+}
+
 type RegisterGatewayFunc func(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error
 
 func CreateGatewayWithPrefix(ctx context.Context, g WithGatewayPrefix, port uint16, http1HostName string) (http.Handler, string, error) {

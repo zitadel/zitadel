@@ -18,7 +18,7 @@ protoc \
   --validate_out=lang=go:${GOPATH}/src \
   $(find ${PROTO_PATH} -iname *.proto)
 
-# install authoption proto compiler
+# install authoption and zitadel proto compiler
 go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-auth
 go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-zitadel
 
