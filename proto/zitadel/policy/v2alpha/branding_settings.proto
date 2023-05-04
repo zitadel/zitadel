@@ -69,30 +69,39 @@ message BrandingSettings {
             example: "\"#FFFFFF\"";
         }
     ];
-    bool disable_watermark = 10;
+    bool disable_watermark = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "boolean to disable the watermark";
+        }
+    ];
     string logo_url_light = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hex value for font color dark theme";
+            description: "url to the logo used in the light theme";
             example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/logo-180950416321494657\"";
         }
     ];
     string icon_url_light = 12 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hex value for font color dark theme";
+            description: "url to the icon used in the light theme";
             example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/icon-180950498874178817\"";
         }
     ];
     string logo_url_dark = 13 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hex value for font color dark theme";
+            description: "url to the logo used in the dark theme";
             example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/logo-dark-180950229376461345\"";
         }
     ];
     string icon_url_dark = 14 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hex value for font color dark theme";
+            description: "url to the icon used in the dark theme";
             example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/icon-dark-180950243237405441\"";
         }
     ];
-    string font_url = 15;
+    string font_url = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "url to the font used";
+            example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/font-180950243237405441\"";
+        }
+    ];
 }

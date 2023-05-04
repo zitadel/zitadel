@@ -132,11 +132,11 @@ func (s *Server) GetPasswordPolicy(ctx context.Context, req *policy.GetPasswordP
 
 func ModelPasswordPolicyToPb(current *query.PasswordComplexityPolicy) *policy.PasswordPolicy {
 	return &policy.PasswordPolicy{
-		MinLength:    current.MinLength,
-		HasUppercase: current.HasUppercase,
-		HasLowercase: current.HasLowercase,
-		HasNumber:    current.HasNumber,
-		HasSymbol:    current.HasSymbol,
+		MinLength:         current.MinLength,
+		RequiresUppercase: current.HasUppercase,
+		RequiresLowercase: current.HasLowercase,
+		RequiresNumber:    current.HasNumber,
+		RequiresSymbol:    current.HasSymbol,
 	}
 }
 
@@ -283,8 +283,7 @@ func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *policy.Get
 		idps[i] = d.IDPID
 	}
 	return &policy.GetActiveIdentityProvidersResponse{
-		Idps:    idps,
-		Details: &object.Details{},
+		Idps: idps,
 	}, nil
 }
 
@@ -293,13 +292,10 @@ func (s *Server) GetGeneralSettings(ctx context.Context, _ *policy.GetGeneralSet
 	if err != nil {
 		return nil, err
 	}
-	instance, err := s.query.Instance(ctx, true)
-	if err != nil {
-		return nil, err
-	}
+	instance := authz.GetInstance(ctx)
 	return &policy.GetGeneralSettingsResponse{
 		SupportedLanguages: text.LanguageTagsToStrings(langs),
-		DefaultOrgId:       instance.DefaultOrgID,
-		Details:            &object.Details{},
+		DefaultOrgId:       instance.DefaultOrganisationID(),
+		DefaultLanguage:    instance.DefaultLanguage().String(),
 	}, nil
 }

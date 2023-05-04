@@ -298,16 +298,23 @@ message GetActiveIdentityProvidersRequest {
 }
 
 message GetActiveIdentityProvidersResponse {
-    zitadel.object.v2alpha.Details details = 1;
-    repeated string idps = 2;
+    repeated string idps = 1;
 }
-
 
 message GetGeneralSettingsRequest {}
 
 message GetGeneralSettingsResponse {
-    zitadel.object.v2alpha.Details details = 1;
-    string default_org_id = 2;
+    string default_org_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "default organization for the current context"
+        }
+    ];
+    string default_language = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "default language for the current context"
+            example: "\"en\""
+        }
+    ];
     repeated string supported_languages = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"en\", \"de\", \"it\"]"
