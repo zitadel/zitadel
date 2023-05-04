@@ -71,7 +71,6 @@ COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/statik/statik.go
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/openapi/statik/statik.go openapi/statik/statik.go
 
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/pkg/grpc pkg/grpc
-COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/api/grpc internal/api/grpc
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/openapi/v2/zitadel openapi/v2/zitadel
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/openapi/statik/statik.go openapi/statik/statik.go
 COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go internal/protoc/protoc-gen-authoption/authoption/options.pb.go

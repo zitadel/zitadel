@@ -9,7 +9,7 @@ import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/internal/api/grpc/session/v2alpha;session";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
 
 message Session {
   string id = 1;

@@ -72,10 +72,6 @@ func (p *sessionProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceSessionAdded,
 				},
 				{
-					Event:  session.SetType,
-					Reduce: p.reduceSessionSet,
-				},
-				{
 					Event:  session.UserCheckedType,
 					Reduce: p.reduceUserChecked,
 				},
@@ -127,46 +123,6 @@ func (p *sessionProjection) reduceSessionAdded(event eventstore.Event) (*handler
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnCreator, e.User),
 		},
-	), nil
-}
-
-func (p *sessionProjection) reduceSessionSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*session.SetEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SFegf", "reduce.wrong.event.type %s", session.SetType)
-	}
-
-	columns := []handler.Column{
-		handler.NewCol(SessionColumnID, e.Aggregate().ID),
-		handler.NewCol(SessionColumnInstanceID, e.Aggregate().InstanceID),
-		handler.NewCol(SessionColumnCreationDate, e.CreationDate()), // TODO: overwrites every time
-		handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
-		handler.NewCol(SessionColumnResourceOwner, e.Aggregate().ResourceOwner),
-		handler.NewCol(SessionColumnState, domain.SessionStateActive),
-		handler.NewCol(SessionColumnSequence, e.Sequence()),
-		handler.NewCol(SessionColumnCreator, e.User),
-	}
-	if e.UserID != nil {
-		columns = append(columns, handler.NewCol(SessionColumnUserID, *e.UserID))
-	}
-	if e.UserCheckedAt != nil {
-		columns = append(columns, handler.NewCol(SessionColumnUserCheckedAt, *e.UserCheckedAt))
-	}
-	if e.PasswordCheckedAt != nil {
-		columns = append(columns, handler.NewCol(SessionColumnPasswordCheckedAt, *e.PasswordCheckedAt))
-	}
-	if len(e.Metadata) != 0 {
-		m, _ := json.Marshal(e.Metadata)
-		columns = append(columns, handler.NewCol(SessionColumnMetadata, m))
-	}
-
-	return crdb.NewUpsertStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(SessionColumnID, e.Aggregate().ID),
-			handler.NewCol(SessionColumnInstanceID, e.Aggregate().InstanceID),
-		},
-		columns,
 	), nil
 }
 

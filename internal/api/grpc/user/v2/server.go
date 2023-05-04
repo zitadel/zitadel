@@ -8,12 +8,13 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-var _ UserServiceServer = (*Server)(nil)
+var _ user.UserServiceServer = (*Server)(nil)
 
 type Server struct {
-	UnimplementedUserServiceServer
+	user.UnimplementedUserServiceServer
 	command     *command.Commands
 	query       *query.Queries
 	userCodeAlg crypto.EncryptionAlgorithm
@@ -30,21 +31,21 @@ func CreateServer(command *command.Commands, query *query.Queries, userCodeAlg c
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	RegisterUserServiceServer(grpcServer, s)
+	user.RegisterUserServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
-	return UserService_ServiceDesc.ServiceName
+	return user.UserService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return UserService_ServiceDesc.ServiceName
+	return user.UserService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return UserService_AuthMethods
+	return user.UserService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return RegisterUserServiceHandler
+	return user.RegisterUserServiceHandler
 }

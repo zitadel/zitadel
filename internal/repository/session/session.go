@@ -14,7 +14,6 @@ import (
 const (
 	sessionEventPrefix  = "session."
 	AddedType           = sessionEventPrefix + "added"
-	SetType             = sessionEventPrefix + "set"
 	UserCheckedType     = sessionEventPrefix + "user.checked"
 	PasswordCheckedType = sessionEventPrefix + "password.checked"
 	TokenSetType        = sessionEventPrefix + "token.set"
@@ -53,70 +52,6 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	err := json.Unmarshal(event.Data, added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DG4gn", "unable to unmarshal session added")
-	}
-
-	return added, nil
-}
-
-type SetEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	Token             *crypto.CryptoValue `json:"token,omitempty"`
-	UserID            *string             `json:"userID,omitempty"`
-	UserCheckedAt     *time.Time          `json:"userCheckedAt,omitempty"`
-	PasswordCheckedAt *time.Time          `json:"passwordCheckedAt,omitempty"`
-	Metadata          map[string][]byte   `json:"metadata,omitempty"`
-}
-
-func (e *SetEvent) Data() interface{} {
-	return e
-}
-
-func (e *SetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func (e *SetEvent) AddUserData(userID string, checkedAt time.Time) *SetEvent {
-	e.UserID = &userID
-	e.UserCheckedAt = &checkedAt
-	return e
-}
-
-func (e *SetEvent) AddPasswordData(checkedAt time.Time) *SetEvent {
-	e.PasswordCheckedAt = &checkedAt
-	return e
-}
-
-func (e *SetEvent) SetToken(token *crypto.CryptoValue) *SetEvent {
-	e.Token = token
-	return e
-}
-
-func (e *SetEvent) AddMetadata(metadata map[string][]byte) *SetEvent {
-	e.Metadata = metadata
-	return e
-}
-
-func NewSetEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-) *SetEvent {
-	return &SetEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			SetType,
-		),
-	}
-}
-
-func SetEventMapper(event *repository.Event) (eventstore.Event, error) {
-	added := &SetEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, added)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "SESSION-Dbzj5", "unable to unmarshal session set")
 	}
 
 	return added, nil

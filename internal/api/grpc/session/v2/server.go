@@ -7,12 +7,13 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 )
 
-var _ SessionServiceServer = (*Server)(nil)
+var _ session.SessionServiceServer = (*Server)(nil)
 
 type Server struct {
-	UnimplementedSessionServiceServer
+	session.UnimplementedSessionServiceServer
 	command *command.Commands
 	query   *query.Queries
 }
@@ -30,21 +31,21 @@ func CreateServer(
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	RegisterSessionServiceServer(grpcServer, s)
+	session.RegisterSessionServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
-	return SessionService_ServiceDesc.ServiceName
+	return session.SessionService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return SessionService_ServiceDesc.ServiceName
+	return session.SessionService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return SessionService_AuthMethods
+	return session.SessionService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return RegisterSessionServiceHandler
+	return session.RegisterSessionServiceHandler
 }

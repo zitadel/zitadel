@@ -6,7 +6,7 @@ import (
 
 const (
 	AggregateType    = "session"
-	AggregateVersion = "v2" //TODO: ?
+	AggregateVersion = "v1"
 )
 
 type Aggregate struct {

@@ -45,7 +45,7 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --auth_out ${GOPATH}/src \
-  --zitadel_out ${GOPATH}/src \
+  --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/admin.proto
 
 protoc \

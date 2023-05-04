@@ -11,9 +11,10 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-func (s *Server) AddHumanUser(ctx context.Context, req *AddHumanUserRequest) (_ *AddHumanUserResponse, err error) {
+func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
 	human, err := addUserRequestToAddHuman(req)
 	if err != nil {
 		return nil, err
@@ -23,14 +24,14 @@ func (s *Server) AddHumanUser(ctx context.Context, req *AddHumanUserRequest) (_ 
 	if err != nil {
 		return nil, err
 	}
-	return &AddHumanUserResponse{
+	return &user.AddHumanUserResponse{
 		UserId:    human.ID,
 		Details:   object.DomainToDetailsPb(human.Details),
 		EmailCode: human.EmailCode,
 	}, nil
 }
 
-func addUserRequestToAddHuman(req *AddHumanUserRequest) (*command.AddHuman, error) {
+func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman, error) {
 	username := req.GetUsername()
 	if username == "" {
 		username = req.GetEmail().GetEmail()
@@ -81,22 +82,22 @@ func addUserRequestToAddHuman(req *AddHumanUserRequest) (*command.AddHuman, erro
 	}, nil
 }
 
-func genderToDomain(gender Gender) domain.Gender {
+func genderToDomain(gender user.Gender) domain.Gender {
 	switch gender {
-	case Gender_GENDER_UNSPECIFIED:
+	case user.Gender_GENDER_UNSPECIFIED:
 		return domain.GenderUnspecified
-	case Gender_GENDER_FEMALE:
+	case user.Gender_GENDER_FEMALE:
 		return domain.GenderFemale
-	case Gender_GENDER_MALE:
+	case user.Gender_GENDER_MALE:
 		return domain.GenderMale
-	case Gender_GENDER_DIVERSE:
+	case user.Gender_GENDER_DIVERSE:
 		return domain.GenderDiverse
 	default:
 		return domain.GenderUnspecified
 	}
 }
 
-func hashedPasswordToCommand(hashed *HashedPassword) (string, error) {
+func hashedPasswordToCommand(hashed *user.HashedPassword) (string, error) {
 	if hashed == nil {
 		return "", nil
 	}
