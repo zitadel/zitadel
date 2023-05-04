@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 
 	"github.com/jackc/pgtype"
 )
@@ -69,4 +70,25 @@ func (s EnumArray[F]) Value() (driver.Value, error) {
 	}
 
 	return array.Value()
+}
+
+type mapKeyType interface {
+	string
+}
+
+type mapValue interface {
+	string | []byte | interface{}
+}
+
+type Map[K mapKeyType, V mapValue] map[K]V
+
+func (m *Map[K, V]) Scan(src any) error {
+	bytea := new(pgtype.Bytea)
+	if err := bytea.Scan(src); err != nil {
+		return err
+	}
+	if len(bytea.Bytes) == 0 {
+		return nil
+	}
+	return json.Unmarshal(bytea.Bytes, &m)
 }

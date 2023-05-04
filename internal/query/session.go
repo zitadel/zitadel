@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	errs "errors"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -197,7 +197,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				loginName         sql.NullString
 				displayName       sql.NullString
 				passwordCheckedAt sql.NullTime
-				metadata          []byte
+				metadata          database.Map[string, []byte]
 			)
 
 			err := row.Scan(
@@ -227,11 +227,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.UserFactor.LoginName = loginName.String
 			session.UserFactor.DisplayName = displayName.String
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
-			if len(metadata) != 0 {
-				if err := json.Unmarshal(metadata, &session.Metadata); err != nil {
-					return nil, err
-				}
-			}
+			session.Metadata = metadata
 
 			return session, nil
 		}
@@ -268,7 +264,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					loginName         sql.NullString
 					displayName       sql.NullString
 					passwordCheckedAt sql.NullTime
-					metadata          []byte
+					metadata          database.Map[string, []byte]
 				)
 
 				err := rows.Scan(
@@ -296,11 +292,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.UserFactor.LoginName = loginName.String
 				session.UserFactor.DisplayName = displayName.String
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
-				if len(metadata) != 0 {
-					if err := json.Unmarshal(metadata, &session.Metadata); err != nil {
-						return nil, err
-					}
-				}
+				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)
 			}
