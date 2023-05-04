@@ -1,5 +1,6 @@
 ---
 title: Connect with AWS through SAML 2.0
+sidebar_label: Amazon Web Services
 ---
 
 This guide shows how to enable login with ZITADEL on AWS SSO.

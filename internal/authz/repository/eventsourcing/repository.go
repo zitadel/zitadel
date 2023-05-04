@@ -18,8 +18,8 @@ type EsRepository struct {
 	eventstore.TokenVerifierRepo
 }
 
-func Start(queries *query.Queries, dbClient *database.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
-	es, err := v1.Start(dbClient)
+func Start(queries *query.Queries, dbClient *database.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure, allowOrderByCreationDate bool) (repository.Repository, error) {
+	es, err := v1.Start(dbClient, allowOrderByCreationDate)
 	if err != nil {
 		return nil, err
 	}

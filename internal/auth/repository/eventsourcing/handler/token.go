@@ -67,16 +67,16 @@ func (_ *Token) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user.AggregateType, project.AggregateType, instance.AggregateType}
 }
 
-func (t *Token) CurrentSequence(instanceID string) (uint64, error) {
-	sequence, err := t.view.GetLatestTokenSequence(instanceID)
+func (t *Token) CurrentSequence(ctx context.Context, instanceID string) (uint64, error) {
+	sequence, err := t.view.GetLatestTokenSequence(ctx, instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (t *Token) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
-	sequences, err := t.view.GetLatestTokenSequences(instanceIDs)
+func (t *Token) EventQuery(ctx context.Context, instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := t.view.GetLatestTokenSequences(ctx, instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -145,11 +145,13 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		applicationsIDs := make([]string, 0, len(project.Applications))
+		clientIDs := make([]string, 0, len(project.Applications))
 		for _, app := range project.Applications {
-			applicationsIDs = append(applicationsIDs, app.AppID)
+			if app.OIDCConfig != nil {
+				clientIDs = append(clientIDs, app.OIDCConfig.ClientID)
+			}
 		}
-		return t.view.DeleteApplicationTokens(event, applicationsIDs...)
+		return t.view.DeleteApplicationTokens(event, clientIDs...)
 	case instance.InstanceRemovedEventType:
 		return t.view.DeleteInstanceTokens(event)
 	case org.OrgRemovedEventType:
@@ -208,7 +210,7 @@ func (t *Token) OnSuccess(instanceIDs []string) error {
 }
 
 func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (*proj_model.Project, error) {
-	query, err := proj_view.ProjectByIDQuery(projID, instanceID, 0)
+	projectQuery, err := proj_view.ProjectByIDQuery(projID, instanceID, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +219,7 @@ func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (
 			AggregateID: projID,
 		},
 	}
-	err = es_sdk.Filter(ctx, t.Eventstore().FilterEvents, esProject.AppendEvents, query)
+	err = es_sdk.Filter(ctx, t.Eventstore().FilterEvents, esProject.AppendEvents, projectQuery)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
