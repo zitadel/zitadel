@@ -15,12 +15,7 @@ import (
 )
 
 func (s *Server) GetLoginPolicy(ctx context.Context, req *policy.GetLoginPolicyRequest) (*policy.GetLoginPolicyResponse, error) {
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
-
-	current, err := s.query.LoginPolicyByID(ctx, true, orgID, false)
+	current, err := s.query.LoginPolicyByID(ctx, true, ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +52,7 @@ func modelLoginPolicyToPb(current *query.LoginPolicy) *policy.LoginPolicy {
 		AllowRegister:              current.AllowRegister,
 		AllowExternalIdp:           current.AllowExternalIDPs,
 		ForceMfa:                   current.ForceMFA,
-		PasswordlessType:           ModelPasswordlessTypeToPb(current.PasswordlessType),
+		PasswordkeysType:           ModelPasswordlessTypeToPb(current.PasswordlessType),
 		HidePasswordReset:          current.HidePasswordReset,
 		IgnoreUnknownUsernames:     current.IgnoreUnknownUsernames,
 		AllowDomainDiscovery:       current.AllowDomainDiscovery,
@@ -74,14 +69,14 @@ func modelLoginPolicyToPb(current *query.LoginPolicy) *policy.LoginPolicy {
 	}
 }
 
-func ModelPasswordlessTypeToPb(passwordlessType domain.PasswordlessType) policy.PasswordlessType {
+func ModelPasswordlessTypeToPb(passwordlessType domain.PasswordlessType) policy.PasswordkeysType {
 	switch passwordlessType {
 	case domain.PasswordlessTypeAllowed:
-		return policy.PasswordlessType_PASSWORDLESS_TYPE_ALLOWED
+		return policy.PasswordkeysType_PASSWORDKEYS_TYPE_ALLOWED
 	case domain.PasswordlessTypeNotAllowed:
-		return policy.PasswordlessType_PASSWORDLESS_TYPE_NOT_ALLOWED
+		return policy.PasswordkeysType_PASSWORDKEYS_TYPE_NOT_ALLOWED
 	default:
-		return policy.PasswordlessType_PASSWORDLESS_TYPE_NOT_ALLOWED
+		return policy.PasswordkeysType_PASSWORDKEYS_TYPE_NOT_ALLOWED
 	}
 }
 
@@ -110,12 +105,7 @@ func ModelMultiFactorTypeToPb(typ domain.MultiFactorType) policy.MultiFactorType
 }
 
 func (s *Server) GetPasswordPolicy(ctx context.Context, req *policy.GetPasswordPolicyRequest) (*policy.GetPasswordPolicyResponse, error) {
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
-
-	current, err := s.query.PasswordComplexityPolicyByOrg(ctx, true, orgID, false)
+	current, err := s.query.PasswordComplexityPolicyByOrg(ctx, true, ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
@@ -141,12 +131,7 @@ func ModelPasswordPolicyToPb(current *query.PasswordComplexityPolicy) *policy.Pa
 }
 
 func (s *Server) GetBrandingSettings(ctx context.Context, req *policy.GetBrandingSettingsRequest) (*policy.GetBrandingSettingsResponse, error) {
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
-
-	current, err := s.query.ActiveLabelPolicyByOrg(ctx, orgID, false)
+	current, err := s.query.ActiveLabelPolicyByOrg(ctx, ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
@@ -182,12 +167,7 @@ func ModelBrandingSettingsToPb(current *query.LabelPolicy, assetPrefix string) *
 }
 
 func (s *Server) GetDomainSettings(ctx context.Context, req *policy.GetDomainSettingsRequest) (*policy.GetDomainSettingsResponse, error) {
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
-
-	current, err := s.query.DomainPolicyByOrg(ctx, true, orgID, false)
+	current, err := s.query.DomainPolicyByOrg(ctx, true, ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
@@ -205,18 +185,13 @@ func (s *Server) GetDomainSettings(ctx context.Context, req *policy.GetDomainSet
 func DomainSettingsToPb(current *query.DomainPolicy) *policy.DomainSettings {
 	return &policy.DomainSettings{
 		LoginnameIncludesDomain:                current.UserLoginMustBeDomain,
-		VerifyOrgDomains:                       current.ValidateOrgDomains,
+		RequireOrgDomainVerification:           current.ValidateOrgDomains,
 		SmtpSenderAddressMatchesInstanceDomain: current.SMTPSenderAddressMatchesInstanceDomain,
 	}
 }
 
 func (s *Server) GetLegalSettings(ctx context.Context, req *policy.GetLegalSettingsRequest) (*policy.GetLegalSettingsResponse, error) {
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
-
-	current, err := s.query.PrivacyPolicyByOrg(ctx, true, orgID, false)
+	current, err := s.query.PrivacyPolicyByOrg(ctx, true, ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
@@ -241,12 +216,7 @@ func ModelLegalSettingsToPb(current *query.PrivacyPolicy) *policy.LegalSettings 
 }
 
 func (s *Server) GetLockoutPolicy(ctx context.Context, req *policy.GetLockoutPolicyRequest) (*policy.GetLockoutPolicyResponse, error) {
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
-
-	current, err := s.query.LockoutPolicyByOrg(ctx, true, orgID, false)
+	current, err := s.query.LockoutPolicyByOrg(ctx, true, ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
@@ -268,12 +238,7 @@ func ModelLockoutPolicyToPb(current *query.LockoutPolicy) *policy.LockoutPolicy 
 }
 
 func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *policy.GetActiveIdentityProvidersRequest) (*policy.GetActiveIdentityProvidersResponse, error) {
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
-
-	links, err := s.query.IDPLoginPolicyLinks(ctx, orgID, &query.IDPLoginPolicyLinksSearchQuery{}, false)
+	links, err := s.query.IDPLoginPolicyLinks(ctx, ResourceOwnerFromReq(ctx, req.GetCtx()), &query.IDPLoginPolicyLinksSearchQuery{}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -298,4 +263,17 @@ func (s *Server) GetGeneralSettings(ctx context.Context, _ *policy.GetGeneralSet
 		DefaultOrgId:       instance.DefaultOrganisationID(),
 		DefaultLanguage:    instance.DefaultLanguage().String(),
 	}, nil
+}
+
+func ResourceOwnerFromReq(ctx context.Context, req *object.RequestContext) string {
+	if req.GetInstance() {
+		return authz.GetInstance(ctx).InstanceID()
+	} else {
+		resourceOwner := req.GetOrgId()
+		if resourceOwner == "" {
+			return authz.GetCtxData(ctx).OrgID
+		} else {
+			return resourceOwner
+		}
+	}
 }

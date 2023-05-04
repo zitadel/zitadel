@@ -240,7 +240,7 @@ service PolicyService {
 }
 
 message GetLoginPolicyRequest {
-    zitadel.object.v2alpha.Organisation organisation = 1;
+    zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
 message GetLoginPolicyResponse {
@@ -249,7 +249,7 @@ message GetLoginPolicyResponse {
 }
 
 message GetPasswordPolicyRequest {
-    zitadel.object.v2alpha.Organisation organisation = 1;
+    zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
 message GetPasswordPolicyResponse {
@@ -258,7 +258,7 @@ message GetPasswordPolicyResponse {
 }
 
 message GetBrandingSettingsRequest {
-    zitadel.object.v2alpha.Organisation organisation = 1;
+    zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
 message GetBrandingSettingsResponse {
@@ -267,7 +267,7 @@ message GetBrandingSettingsResponse {
 }
 
 message GetDomainSettingsRequest {
-    zitadel.object.v2alpha.Organisation organisation = 1;
+    zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
 message GetDomainSettingsResponse {
@@ -276,7 +276,7 @@ message GetDomainSettingsResponse {
 }
 
 message GetLegalSettingsRequest {
-    zitadel.object.v2alpha.Organisation organisation = 1;
+    zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
 message GetLegalSettingsResponse {
@@ -285,7 +285,7 @@ message GetLegalSettingsResponse {
 }
 
 message GetLockoutPolicyRequest {
-    zitadel.object.v2alpha.Organisation organisation = 1;
+    zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
 message GetLockoutPolicyResponse {
@@ -294,7 +294,7 @@ message GetLockoutPolicyResponse {
 }
 
 message GetActiveIdentityProvidersRequest {
-    zitadel.object.v2alpha.Organisation organisation = 1;
+    zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
 message GetActiveIdentityProvidersResponse {

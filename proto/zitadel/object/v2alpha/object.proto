@@ -14,6 +14,13 @@ message Organisation {
     }
 }
 
+message RequestContext {
+    oneof resource_owner {
+        string org_id = 1;
+        bool instance = 2 [(validate.rules).bool = {const: true}];
+    }
+}
+
 message Details {
     //sequence represents the order of events. It's always counting
     //

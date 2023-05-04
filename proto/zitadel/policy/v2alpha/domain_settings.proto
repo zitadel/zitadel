@@ -12,7 +12,7 @@ message DomainSettings {
             description: "the username has to end with the domain of its organization"
         }
     ];
-    bool verify_org_domains = 2 [
+    bool require_org_domain_verification = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if organization domains should be verified upon creation, otherwise will be created already verified"
         }
