@@ -1,5 +1,5 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
@@ -27,7 +27,6 @@ import { RoleGuard } from 'src/app/guards/role.guard';
 import { UserGuard } from 'src/app/guards/user.guard';
 import { InfoOverlayModule } from 'src/app/modules/info-overlay/info-overlay.module';
 import { AssetService } from 'src/app/services/asset.service';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HasRoleModule } from './directives/has-role/has-role.module';
@@ -40,10 +39,12 @@ import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
 import { AdminService } from './services/admin.service';
 import { AuthenticationService } from './services/authentication.service';
 import { BreadcrumbService } from './services/breadcrumb.service';
+import { ExhaustedService } from './services/exhausted.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
-import { ExhaustedInterceptor } from './services/interceptors/exhausted.interceptor';
+import { ExhaustedGrpcInterceptor } from './services/interceptors/exhausted.grpc.interceptor';
+import { ExhaustedHttpInterceptor } from './services/interceptors/exhausted.http.interceptor';
 import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
@@ -140,6 +141,11 @@ const authConfig: AuthConfig = {
     RoleGuard,
     UserGuard,
     ThemeService,
+    ExhaustedService,
+    {
+      provide: 'UNINTERCEPTED_HTTP_CLIENT',
+      useClass: HttpClient,
+    },
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializerFn,
@@ -169,9 +175,14 @@ const authConfig: AuthConfig = {
       useClass: StorageService,
     },
     {
+      provide: HTTP_INTERCEPTORS,
+      multi: true,
+      useClass: ExhaustedHttpInterceptor,
+    },
+    {
       provide: GRPC_INTERCEPTORS,
       multi: true,
-      useClass: ExhaustedInterceptor,
+      useClass: ExhaustedGrpcInterceptor,
     },
     {
       provide: GRPC_INTERCEPTORS,
