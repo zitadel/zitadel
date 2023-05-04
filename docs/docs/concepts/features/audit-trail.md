@@ -3,13 +3,13 @@ title: Audit Trail
 ---
 
 ZITADEL provides you with an built-in audit trail to track all changes and events over an unlimited period of time.
-Most solutions replace a historic record and track changes in a separate log when information is updated.
-ZITADEL only ever appends data in an [Eventstore](https://docs.zitadel.com/docs/concepts/eventstore), keeping all historic record.
+Most other solutions replace a historic record and track changes in a separate log when information is updated.
+ZITADEL only ever appends data in an [Eventstore](https://zitadel.com/docs/concepts/eventstore), keeping all historic record.
 The audit trail itself is identical to the state, since ZITADEL calculates the state from all the past changes.
 
 ![Example of events that happen for a profile change and a login](/img/concepts/audit-trail/audit-log-events.png)
 
-This form of audit log has several real-life benefits.
+This form of audit log has several benefits over storing classic audit logs.
 You can view past data in-context of the whole system at a single point in time.
 Reviewing a past state of the application can be important when tracing an incident that happened months back. Moreover the eventstore provides a truly complete and clean audit log.
 
@@ -23,7 +23,7 @@ The same view is available on several other objects such as organization or proj
 
 ![Profile Self Manage](/img/guides/console/myprofile.png)
 
-### Event viewer
+### Event View
 
 Administrators can see all events across an instance and filter them directly in [Console](/docs/guides/manage/console/overview).
 Go to your instance settings and then click on the Tab **Events** to open the Event Viewer or browse to $YOUR_DOMAIN/ui/console/events  
@@ -47,7 +47,7 @@ You can use the [Event API](#event-api) to pull data and ingest it in an externa
 Please refer to the zitadel/actions repository for a [code sample](https://github.com/zitadel/actions/blob/main/examples/post_auth_log.js).
 You can use your log processing pipeline to parse and ingest the events in your favorite analytics tool.
 
-Theoretically it would be possible to send events directly with an http request to an external tool.
+It is possible to send events directly with an http request to an external tool.
 We don't recommend this approach since this would create back-pressure and increase the overall processing time for requests.
 
 :::info Scope of Actions
