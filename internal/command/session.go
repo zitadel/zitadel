@@ -122,7 +122,7 @@ func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken st
 	if err != nil {
 		return nil, err
 	}
-	if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, permissionSessionWrite); err != nil {
+	if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionWrite); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionChecks(checks, sessionWriteModel)
@@ -134,7 +134,7 @@ func (c *Commands) TerminateSession(ctx context.Context, sessionID, sessionToken
 	if err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
-	if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, permissionSessionDelete); err != nil {
+	if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionDelete); err != nil {
 		return nil, err
 	}
 	if sessionWriteModel.State != domain.SessionStateActive {

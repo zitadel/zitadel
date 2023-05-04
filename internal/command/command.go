@@ -30,7 +30,7 @@ import (
 type Commands struct {
 	httpClient *http.Client
 
-	checkPermission permissionCheck
+	checkPermission domain.PermissionCheck
 	newEmailCode    func(ctx context.Context, filter preparation.FilterToQueryReducer, codeAlg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error)
 
 	eventstore     *eventstore.Eventstore
@@ -65,26 +65,7 @@ type Commands struct {
 	certificateLifetime  time.Duration
 }
 
-func StartCommands(
-	es *eventstore.Eventstore,
-	defaults sd.SystemDefaults,
-	zitadelRoles []authz.RoleMapping,
-	staticStore static.Storage,
-	webAuthN *webauthn_helper.Config,
-	externalDomain string,
-	externalSecure bool,
-	externalPort uint16,
-	idpConfigEncryption,
-	otpEncryption,
-	smtpEncryption,
-	smsEncryption,
-	userEncryption,
-	domainVerificationEncryption,
-	oidcEncryption,
-	samlEncryption crypto.EncryptionAlgorithm,
-	httpClient *http.Client,
-	membershipsResolver authz.MembershipsResolver,
-) (repo *Commands, err error) {
+func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, zitadelRoles []authz.RoleMapping, staticStore static.Storage, webAuthN *webauthn_helper.Config, externalDomain string, externalSecure bool, externalPort uint16, idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption crypto.EncryptionAlgorithm, httpClient *http.Client, permissionCheck domain.PermissionCheck) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
 	}
@@ -112,10 +93,8 @@ func StartCommands(
 		sessionAlg:            sessionAlg,
 		webauthnConfig:        webAuthN,
 		httpClient:            httpClient,
-		checkPermission: func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-			return authz.CheckPermission(ctx, membershipsResolver, zitadelRoles, permission, orgID, resourceID)
-		},
-		newEmailCode: newEmailCode,
+		checkPermission:       permissionCheck,
+		newEmailCode:          newEmailCode,
 
 		// TODO: change config and algorithm (and encrypt instead?)
 		// TODO: or maybe just change to generate id and encrypt it

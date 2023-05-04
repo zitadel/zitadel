@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
@@ -25,7 +26,8 @@ var (
 		` projections.login_names2.login_name,` +
 		` projections.users8_humans.display_name,` +
 		` projections.sessions.password_checked_at,` +
-		` projections.sessions.metadata` +
+		` projections.sessions.metadata,` +
+		` projections.sessions.token` +
 		` FROM projections.sessions` +
 		` LEFT JOIN projections.login_names2 ON projections.sessions.user_id = projections.login_names2.user_id AND projections.sessions.instance_id = projections.login_names2.instance_id` +
 		` LEFT JOIN projections.users8_humans ON projections.sessions.user_id = projections.users8_humans.user_id AND projections.sessions.instance_id = projections.users8_humans.instance_id` +
@@ -56,15 +58,32 @@ var (
 		"sequence",
 		"state",
 		"resource_owner",
-		"sessions.creator",
-		"sessions.user_id",
-		"sessions.user_checked_at",
-		"login_names2.login_name",
-		"users8_humans.display_name",
-		"sessions.password_checked_at",
-		"sessions.metadata",
+		"creator",
+		"user_id",
+		"user_checked_at",
+		"login_name",
+		"display_name",
+		"password_checked_at",
+		"metadata",
+		"token",
 	}
-	sessionsCols = append(sessionCols, "count")
+
+	sessionsCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"sequence",
+		"state",
+		"resource_owner",
+		"creator",
+		"user_id",
+		"user_checked_at",
+		"login_name",
+		"display_name",
+		"password_checked_at",
+		"metadata",
+		"count",
+	}
 )
 
 func Test_SessionsPrepare(t *testing.T) {
@@ -112,7 +131,6 @@ func Test_SessionsPrepare(t *testing.T) {
 							"display-name",
 							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
-							//&crypto.CryptoValue{},
 						},
 					},
 				),
@@ -167,11 +185,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							"login-name",
 							"display-name",
 							testNow,
-							nil,
-							//map[string][]byte{
-							//	"key": []byte("value"),
-							//},
-							//&crypto.CryptoValue{},
+							[]byte(`{"key": "dmFsdWU="}`),
 						},
 						{
 							"session-id2",
@@ -186,11 +200,7 @@ func Test_SessionsPrepare(t *testing.T) {
 							"login-name2",
 							"display-name2",
 							testNow,
-							nil,
-							//map[string][]byte{
-							//	"key": []byte("value"),
-							//},
-							//&crypto.CryptoValue{},
+							[]byte(`{"key": "dmFsdWU="}`),
 						},
 					},
 				),
@@ -217,9 +227,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						PasswordFactor: SessionPasswordFactor{
 							PasswordCheckedAt: testNow,
 						},
-						//Metadata: map[string][]byte{
-						//	"key": []byte("value"),
-						//},
+						Metadata: map[string][]byte{
+							"key": []byte("value"),
+						},
 					},
 					{
 						ID:            "session-id2",
@@ -238,9 +248,9 @@ func Test_SessionsPrepare(t *testing.T) {
 						PasswordFactor: SessionPasswordFactor{
 							PasswordCheckedAt: testNow,
 						},
-						//Metadata: map[string][]byte{
-						//	"key": []byte("value"),
-						//},
+						Metadata: map[string][]byte{
+							"key": []byte("value"),
+						},
 					},
 				},
 			},
@@ -319,11 +329,13 @@ func Test_SessionPrepare(t *testing.T) {
 						"login-name",
 						"display-name",
 						testNow,
-						nil,
-						//map[string][]byte{
-						//	"key": []byte("value"),
-						//},
-						//&crypto.CryptoValue{},
+						[]byte(`{"key": "dmFsdWU="}`),
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "enc",
+							KeyID:      "keyid",
+							Crypted:    []byte("token"),
+						},
 					},
 				),
 			},
@@ -344,9 +356,9 @@ func Test_SessionPrepare(t *testing.T) {
 				PasswordFactor: SessionPasswordFactor{
 					PasswordCheckedAt: testNow,
 				},
-				//Metadata: map[string][]byte{
-				//	"key": []byte("value"),
-				//},
+				Metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
 			},
 		},
 		{

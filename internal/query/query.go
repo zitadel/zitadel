@@ -32,6 +32,7 @@ type Queries struct {
 	client     *database.DB
 
 	idpConfigEncryption crypto.EncryptionAlgorithm
+	sessionEncryption   crypto.EncryptionAlgorithm
 
 	DefaultLanguage                     language.Tag
 	LoginDir                            http.FileSystem
@@ -44,7 +45,16 @@ type Queries struct {
 	multifactors                        domain.MultifactorConfigs
 }
 
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *database.DB, projections projection.Config, defaults sd.SystemDefaults, idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
+func StartQueries(
+	ctx context.Context,
+	es *eventstore.Eventstore,
+	sqlClient *database.DB,
+	projections projection.Config,
+	defaults sd.SystemDefaults,
+	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm crypto.EncryptionAlgorithm,
+	certEncryptionAlgorithm crypto.EncryptionAlgorithm,
+	zitadelRoles []authz.RoleMapping,
+) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login statik dir")
@@ -75,6 +85,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *dat
 	session.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigEncryption = idpConfigEncryption
+	repo.sessionEncryption = keyEncryptionAlgorithm
 	repo.multifactors = domain.MultifactorConfigs{
 		OTP: domain.OTPConfig{
 			CryptoMFA: otpEncryption,
