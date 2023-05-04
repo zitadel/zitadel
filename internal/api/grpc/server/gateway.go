@@ -199,14 +199,13 @@ type cookieResponseWriter struct {
 }
 
 func (r *cookieResponseWriter) WriteHeader(status int) {
-	if status == 429 {
-		instance, err := r.queries.InstanceByHost(r.request.Context(), r.request.Host)
-		if err != nil {
-			logging.WithError(err).Warn("could not get instance for templating exhausted cookie value")
-		}
-		http_mw.SetExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.cookieConfig, instance, r.request.Host)
-	} else {
+	if status != http.StatusTooManyRequests {
 		http_mw.DeleteExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.request, r.cookieConfig)
+		r.ResponseWriter.WriteHeader(status)
+		return
 	}
+	instance, err := r.queries.InstanceByHost(r.request.Context(), r.request.Header.Get(middleware.HTTP1Host))
+	logging.OnError(err).Warn("could not get instance for templating exhausted cookie value")
+	http_mw.SetExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.cookieConfig, instance, r.request.Host)
 	r.ResponseWriter.WriteHeader(status)
 }
