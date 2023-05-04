@@ -197,7 +197,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				loginName         sql.NullString
 				displayName       sql.NullString
 				passwordCheckedAt sql.NullTime
-				metadata          database.Map[string, []byte]
+				metadata          database.Map[[]byte]
 			)
 
 			err := row.Scan(
@@ -264,7 +264,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					loginName         sql.NullString
 					displayName       sql.NullString
 					passwordCheckedAt sql.NullTime
-					metadata          database.Map[string, []byte]
+					metadata          database.Map[[]byte]
 				)
 
 				err := rows.Scan(
