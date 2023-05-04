@@ -9,7 +9,7 @@ import (
 
 type StringArray []string
 
-// Scan implements the `database/sql.Scanner` interface.
+// Scan implements the [database/sql.Scanner] interface.
 func (s *StringArray) Scan(src any) error {
 	array := new(pgtype.TextArray)
 	if err := array.Scan(src); err != nil {
@@ -21,7 +21,7 @@ func (s *StringArray) Scan(src any) error {
 	return nil
 }
 
-// Value implements the `database/sql/driver.Valuer` interface.
+// Value implements the [database/sql/driver.Valuer] interface.
 func (s StringArray) Value() (driver.Value, error) {
 	if len(s) == 0 {
 		return nil, nil
@@ -41,7 +41,7 @@ type enumField interface {
 
 type EnumArray[F enumField] []F
 
-// Scan implements the `database/sql.Scanner` interface.
+// Scan implements the [database/sql.Scanner] interface.
 func (s *EnumArray[F]) Scan(src any) error {
 	array := new(pgtype.Int2Array)
 	if err := array.Scan(src); err != nil {
@@ -58,7 +58,7 @@ func (s *EnumArray[F]) Scan(src any) error {
 	return nil
 }
 
-// Value implements the `database/sql/driver.Valuer` interface.
+// Value implements the [database/sql/driver.Valuer] interface.
 func (s EnumArray[F]) Value() (driver.Value, error) {
 	if len(s) == 0 {
 		return nil, nil
@@ -72,17 +72,14 @@ func (s EnumArray[F]) Value() (driver.Value, error) {
 	return array.Value()
 }
 
-type mapKeyType interface {
-	string
-}
-
 type mapValue interface {
 	string | []byte | interface{}
 }
 
-type Map[K mapKeyType, V mapValue] map[K]V
+type Map[V mapValue] map[string]V
 
-func (m *Map[K, V]) Scan(src any) error {
+// Scan implements the [database/sql.Scanner] interface.
+func (m *Map[V]) Scan(src any) error {
 	bytea := new(pgtype.Bytea)
 	if err := bytea.Scan(src); err != nil {
 		return err
@@ -91,4 +88,12 @@ func (m *Map[K, V]) Scan(src any) error {
 		return nil
 	}
 	return json.Unmarshal(bytea.Bytes, &m)
+}
+
+// Value implements the [database/sql/driver.Valuer] interface.
+func (m Map[V]) Value() (driver.Value, error) {
+	if len(m) == 0 {
+		return nil, nil
+	}
+	return json.Marshal(m)
 }
