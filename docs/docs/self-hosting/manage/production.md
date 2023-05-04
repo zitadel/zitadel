@@ -52,11 +52,10 @@ Logs are a stream of time-ordered events collected from all running processes.
 
 ZITADEL processes write the following events to the standard output:
 
-- ZITADEL Runtime
-- Access (http calls)
-- Actions Runtime
-- Standard Output from Actions
-- Standard Output from Events 
+- Runtime Logs: Startup events, runtime errors, database connection changes
+- Access Logs: API request
+- Actions Execution Logs: Success and error messages
+- Actions Logger: Actions can log customer chosen logs, including Events/Operations such as creating a user or a user authentication
 
 Log file management should not be in each business apps responsibility.
 Instead, your execution environment should provide tooling for managing logs in a generic way.
