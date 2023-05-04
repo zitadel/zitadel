@@ -23,17 +23,27 @@ type Sessions struct {
 }
 
 type Session struct {
-	ID                string
-	CreationDate      time.Time
-	ChangeDate        time.Time
-	Sequence          uint64
-	State             domain.SessionState
-	ResourceOwner     string
-	Creator           string
-	UserID            string
-	UserCheckedAt     time.Time
+	ID             string
+	CreationDate   time.Time
+	ChangeDate     time.Time
+	Sequence       uint64
+	State          domain.SessionState
+	ResourceOwner  string
+	Creator        string
+	UserFactor     SessionUserFactor
+	PasswordFactor SessionPasswordFactor
+	Metadata       map[string][]byte
+}
+
+type SessionUserFactor struct {
+	UserID        string
+	UserCheckedAt time.Time
+	LoginName     string
+	DisplayName   string
+}
+
+type SessionPasswordFactor struct {
 	PasswordCheckedAt time.Time
-	Metadata          map[string][]byte
 }
 
 type SessionsSearchQueries struct {
@@ -123,28 +133,6 @@ func (q *Queries) SessionByID(ctx context.Context, id string) (_ *Session, err e
 	return scan(row)
 }
 
-//
-//func (q *Queries) SessionProviderConfig(ctx context.Context, queries ...SearchQuery) (_ *Session, err error) {
-//	ctx, span := tracing.NewSpan(ctx)
-//	defer func() { span.EndWithError(err) }()
-//
-//	query, scan := prepareSessionQuery(ctx, q.client)
-//	for _, searchQuery := range queries {
-//		query = searchQuery.toQuery(query)
-//	}
-//	stmt, args, err := query.Where(
-//		sq.Eq{
-//			SessionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-//		},
-//	).ToSql()
-//	if err != nil {
-//		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
-//	}
-//
-//	row := q.client.QueryRowContext(ctx, stmt, args...)
-//	return scan(row)
-//}
-
 func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries) (_ *Sessions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -159,7 +147,7 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
+	if err != nil || rows.Err() != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Sfg42", "Errors.Internal")
 	}
 	sessions, err := scan(rows)
@@ -178,19 +166,6 @@ func NewSessionIDsSearchQuery(ids []string) (SearchQuery, error) {
 	return NewListQuery(SessionColumnID, list, ListIn)
 }
 
-//
-//func NewSessionTokensSearchQuery(ids []string) (SearchQuery, error) {
-//	list := make([]interface{}, len(ids))
-//	for i, value := range ids {
-//		list[i] = value
-//	}
-//	return NewListQuery(SessionColumnTID, list, ListIn)
-//}
-
-func NewSessionStateQuery(state domain.SessionState) (SearchQuery, error) {
-	return NewNumberQuery(SessionColumnState, state, NumberEquals)
-}
-
 func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
@@ -202,13 +177,24 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnCreator.identifier(),
 			SessionColumnUserID.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
+			LoginNameNameCol.identifier(),
+			HumanDisplayNameCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
-		).From(sessionsTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(sessionsTable.identifier()).
+			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
+			LeftJoin(join(HumanUserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, error) {
 			session := new(Session)
 
-			var metadata []byte
+			var (
+				userID            sql.NullString
+				userCheckedAt     sql.NullTime
+				loginName         sql.NullString
+				displayName       sql.NullString
+				passwordCheckedAt sql.NullTime
+				metadata          []byte
+			)
 
 			err := row.Scan(
 				&session.ID,
@@ -218,9 +204,11 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&session.State,
 				&session.ResourceOwner,
 				&session.Creator,
-				&session.UserID,
-				&session.UserCheckedAt,
-				&session.PasswordCheckedAt,
+				&userID,
+				&userCheckedAt,
+				&loginName,
+				&displayName,
+				&passwordCheckedAt,
 				&metadata,
 			)
 
@@ -230,9 +218,15 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-SAder", "Errors.Internal")
 			}
-
-			if err := json.Unmarshal(metadata, &session.Metadata); err != nil {
-				return nil, err
+			session.UserFactor.UserID = userID.String
+			session.UserFactor.UserCheckedAt = userCheckedAt.Time
+			session.UserFactor.LoginName = loginName.String
+			session.UserFactor.DisplayName = displayName.String
+			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
+			if len(metadata) != 0 {
+				if err := json.Unmarshal(metadata, &session.Metadata); err != nil {
+					return nil, err
+				}
 			}
 
 			return session, nil
@@ -250,18 +244,30 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnCreator.identifier(),
 			SessionColumnUserID.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
+			LoginNameNameCol.identifier(),
+			HumanDisplayNameCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
-		).From(sessionsTable.identifier() + db.Timetravel(call.Took(ctx))).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*Sessions, error) {
+		).From(sessionsTable.identifier()).
+			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
+			LeftJoin(join(HumanUserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) (*Sessions, error) {
 			sessions := &Sessions{Sessions: []*Session{}}
 
-			for row.Next() {
+			for rows.Next() {
 				session := new(Session)
-				var metadata []byte
 
-				err := row.Scan(
+				var (
+					userID            sql.NullString
+					userCheckedAt     sql.NullTime
+					loginName         sql.NullString
+					displayName       sql.NullString
+					passwordCheckedAt sql.NullTime
+					metadata          []byte
+				)
+
+				err := rows.Scan(
 					&session.ID,
 					&session.CreationDate,
 					&session.ChangeDate,
@@ -269,9 +275,11 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&session.State,
 					&session.ResourceOwner,
 					&session.Creator,
-					&session.UserID,
-					&session.UserCheckedAt,
-					&session.PasswordCheckedAt,
+					&userID,
+					&userCheckedAt,
+					&loginName,
+					&displayName,
+					&passwordCheckedAt,
 					&metadata,
 					&sessions.Count,
 				)
@@ -279,9 +287,15 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				if err != nil {
 					return nil, errors.ThrowInternal(err, "QUERY-SAfeg", "Errors.Internal")
 				}
-
-				if err := json.Unmarshal(metadata, &session.Metadata); err != nil {
-					return nil, err
+				session.UserFactor.UserID = userID.String
+				session.UserFactor.UserCheckedAt = userCheckedAt.Time
+				session.UserFactor.LoginName = loginName.String
+				session.UserFactor.DisplayName = displayName.String
+				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
+				if len(metadata) != 0 {
+					if err := json.Unmarshal(metadata, &session.Metadata); err != nil {
+						return nil, err
+					}
 				}
 
 				sessions.Sessions = append(sessions.Sessions, session)

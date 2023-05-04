@@ -10,7 +10,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
 func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
@@ -19,7 +18,6 @@ func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest)
 		return nil, err
 	}
 	return &session.GetSessionResponse{
-		//Details: object.DomainToDetailsPb(), //TODO: ?
 		Session: sessionToPb(res),
 	}, nil
 }
@@ -37,38 +35,6 @@ func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequ
 		Details:  object.ToListDetails(sessions.SearchResponse),
 		Sessions: sessionsToPb(sessions.Sessions),
 	}, nil
-}
-
-func sessionsToPb(sessions []*query.Session) []*session.Session {
-	s := make([]*session.Session, len(sessions))
-	for i, session := range sessions {
-		s[i] = sessionToPb(session)
-	}
-	return s
-}
-
-func sessionToPb(s *query.Session) *session.Session {
-	return &session.Session{
-		Id:       s.ID,
-		Factors:  factorsToPb(s),
-		Metadata: s.Metadata,
-	}
-}
-
-func factorsToPb(s *query.Session) *session.Factors {
-	factors := new(session.Factors)
-	if s.UserID != "" && !s.UserCheckedAt.IsZero() {
-		factors.User = &session.UserFactor{
-			VerifiedAt: timestamppb.New(s.UserCheckedAt),
-			User:       &user.User{Id: s.UserID},
-		}
-	}
-	if !s.PasswordCheckedAt.IsZero() {
-		factors.Password = &session.PasswordFactor{
-			VerifiedAt: timestamppb.New(s.PasswordCheckedAt),
-		}
-	}
-	return factors
 }
 
 func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRequest) (*session.CreateSessionResponse, error) {
@@ -116,6 +82,58 @@ func (s *Server) DeleteSession(ctx context.Context, req *session.DeleteSessionRe
 	}, nil
 }
 
+func sessionsToPb(sessions []*query.Session) []*session.Session {
+	s := make([]*session.Session, len(sessions))
+	for i, session := range sessions {
+		s[i] = sessionToPb(session)
+	}
+	return s
+}
+
+func sessionToPb(s *query.Session) *session.Session {
+	return &session.Session{
+		Id:           s.ID,
+		CreationDate: timestamppb.New(s.CreationDate),
+		ChangeDate:   timestamppb.New(s.ChangeDate),
+		Sequence:     s.Sequence,
+		Factors:      factorsToPb(s),
+		Metadata:     s.Metadata,
+	}
+}
+
+func factorsToPb(s *query.Session) *session.Factors {
+	user := userFactorToPb(s.UserFactor)
+	pw := passwordFactorToPb(s.PasswordFactor)
+	if user == nil && pw == nil {
+		return nil
+	}
+	return &session.Factors{
+		User:     user,
+		Password: pw,
+	}
+}
+
+func passwordFactorToPb(factor query.SessionPasswordFactor) *session.PasswordFactor {
+	if factor.PasswordCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.PasswordFactor{
+		VerifiedAt: timestamppb.New(factor.PasswordCheckedAt),
+	}
+}
+
+func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
+	if factor.UserID == "" || factor.UserCheckedAt.IsZero() {
+		return nil
+	}
+	return &session.UserFactor{
+		VerifiedAt:  timestamppb.New(factor.UserCheckedAt),
+		Id:          factor.UserID,
+		LoginName:   factor.LoginName,
+		DisplayName: factor.DisplayName,
+	}
+}
+
 func listSessionsRequestToQuery(req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToQuery(req.Query)
 	queries, err := sessionQueriesToQuery(req.GetQueries())
@@ -147,8 +165,9 @@ func sessionQueryToQuery(query *session.SearchQuery) (query.SearchQuery, error) 
 	switch q := query.Query.(type) {
 	case *session.SearchQuery_IdsQuery:
 		return idsQueryToQuery(q.IdsQuery)
-	//case *session.SearchQuery_TokensQuery:
-	//	return TokensQueryToQuery(q.TokensQuery)
+		// TODO: ?
+	// case *session.SearchQuery_TokensQuery:
+	// 	return TokensQueryToQuery(q.TokensQuery)
 	default:
 		return nil, caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid")
 	}

@@ -27,7 +27,7 @@ type SessionWriteModel struct {
 }
 
 func NewSessionWriteModel(sessionID string, resourceOwner string) *SessionWriteModel {
-	//var resourceOwner string //TODO: resourceowner?
+	// var resourceOwner string //TODO: resourceowner?
 	return &SessionWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   sessionID,

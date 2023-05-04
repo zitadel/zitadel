@@ -158,11 +158,11 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionChecks, met
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated") //TODO: i18n
 	}
 	if err := checks.Check(ctx); err != nil {
-		//TODO: how to handle failed checks (e.g. pw wrong)
-		//if e := checks.sessionWriteModel.event; e != nil {
+		// TODO: how to handle failed checks (e.g. pw wrong)
+		// if e := checks.sessionWriteModel.event; e != nil {
 		//	_, err := c.eventstore.Push(ctx, e)
-		//	logging.OnError(err).Error("could not push event check failed events")
-		//}
+		// 	logging.OnError(err).Error("could not push event check failed events")
+		// }
 		return nil, err
 	}
 	checks.sessionWriteModel.ChangeMetadata(ctx, metadata)

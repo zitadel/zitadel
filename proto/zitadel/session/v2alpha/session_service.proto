@@ -3,9 +3,8 @@ syntax = "proto3";
 package zitadel.session.v2alpha;
 
 
-import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/options.proto";
 import "zitadel/object/v2alpha/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/session/v2alpha/session.proto";
 import "zitadel/user/v2alpha/email.proto";
 import "zitadel/user/v2alpha/password.proto";
@@ -223,8 +222,7 @@ message GetSessionRequest{
   optional string session_token = 2;
 }
 message GetSessionResponse{
-  zitadel.object.v2alpha.Details details = 1;
-  Session session = 2;
+  Session session = 1;
 }
 
 message CreateSessionRequest{
