@@ -266,6 +266,13 @@ module.exports = {
             sidebarOptions: {
               groupPathsBy: "tag",
             },
+          },
+          session: {
+            specPath: ".artifacts/openapi/zitadel/session/v2alpha/session_service.swagger.json",
+            outputDir: "docs/apis/session_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
           }
         }
       },

@@ -6,9 +6,6 @@ package zitadel.session.v2alpha;
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/session/v2alpha/session.proto";
-import "zitadel/user/v2alpha/email.proto";
-import "zitadel/user/v2alpha/password.proto";
-import "zitadel/user/v2alpha/user.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -18,9 +15,9 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "User Service";
+    title: "Session Service";
     version: "2.0-alpha";
-    description: "This API is intended to manage users in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    description: "This API is intended to manage sessions in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -91,8 +88,8 @@ service SessionService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Search session";
-      description: "Search for sessions..."
+      summary: "Search sessions";
+      description: "Search for sessions"
       responses: {
         key: "200"
         value: {
@@ -235,31 +232,87 @@ message GetSessionResponse{
 }
 
 message CreateSessionRequest{
-  Checks checks = 1;
-  map<string,bytes> metadata = 2;
+  Checks checks = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Check for user and password. Successful checks will be stated as factors on the session.\"";
+    }
+  ];
+  map<string, bytes> metadata = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"custom key value list to be stored on the session\"";
+    }
+  ];
 }
 
 message CreateSessionResponse{
   zitadel.object.v2alpha.Details details = 1;
-  string session_id = 2;
-  string session_token = 3;
+  string session_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"id of the session\"";
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string session_token = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
+    }
+  ];
 }
 
 message SetSessionRequest{
-  string session_id = 1;
-  string session_token = 2;
-  Checks checks = 3;
-  map<string,bytes> metadata = 4;
+  string session_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"id of the session to update\"";
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string session_token = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"token of the session, previously returned on the create / update request\"";
+    }
+  ];
+  Checks checks = 3[
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Check for user and password. Successful checks will be stated as factors on the session.\"";
+    }
+  ];
+  map<string, bytes> metadata = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"custom key value list to be stored on the session\"";
+    }
+  ];
 }
 
 message SetSessionResponse{
   zitadel.object.v2alpha.Details details = 1;
-  string session_token = 2;
+  string session_token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
+    }
+  ];
 }
 
 message DeleteSessionRequest{
-  string session_id = 1;
-  optional string session_token = 2;
+  string session_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"id of the session to terminate\"";
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  optional string session_token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"token of the session, previously returned on the create / update request\"";
+    }
+  ];
 }
 
 message DeleteSessionResponse{
@@ -267,17 +320,46 @@ message DeleteSessionResponse{
 }
 
 message Checks {
-  optional CheckUser user = 1;
-  optional CheckPassword password = 2;
+  optional CheckUser user = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"checks the user and updates the session on success\"";
+    }
+  ];
+  optional CheckPassword password = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
 }
 
 message CheckUser {
   oneof search {
-    string user_id = 1;
-    string login_name = 2;
+    string user_id = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1;
+        max_length: 200;
+        example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      }
+    ];
+    string login_name = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1;
+        max_length: 200;
+        example: "\"mini@mouse.com\"";
+      }
+    ];
   }
 }
 
 message CheckPassword {
-  string password = 1;
+  string password = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"V3ryS3cure!\"";
+    }
+  ];
 }

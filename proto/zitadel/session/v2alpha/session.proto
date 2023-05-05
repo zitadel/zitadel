@@ -10,12 +10,36 @@ import "validate/validate.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha;session";
 
 message Session {
-  string id = 1;
-  google.protobuf.Timestamp creation_date = 2;
-  google.protobuf.Timestamp change_date = 3;
-  uint64 sequence = 4;
-  Factors factors = 5;
-  map<string, bytes> metadata = 6;
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"id of the session\"";
+    }
+  ];
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the session was created\"";
+    }
+  ];
+  google.protobuf.Timestamp change_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the session was last updated\"";
+    }
+  ];
+  uint64 sequence = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"sequence of the session\"";
+    }
+  ];
+  Factors factors = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"checked factors of the session, e.g. the user, password and more\"";
+    }
+  ];
+  map<string, bytes> metadata = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"custom key value list\"";
+    }
+  ];
 }
 
 message Factors {
@@ -24,14 +48,34 @@ message Factors {
 }
 
 message UserFactor {
-  google.protobuf.Timestamp verified_at = 1;
-  string id = 2;
-  string login_name = 3;
-  string display_name = 4;
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the user was last checked\"";
+    }
+  ];
+  string id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"id of the checked user\"";
+    }
+  ];
+  string login_name = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"login name of the checked user\"";
+    }
+  ];
+  string display_name = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"display name of the checked user\"";
+    }
+  ];
 }
 
 message PasswordFactor {
-  google.protobuf.Timestamp verified_at = 1;
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the password was last checked\"";
+    }
+  ];
 }
 
 message SearchQuery {
