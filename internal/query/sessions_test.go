@@ -12,7 +12,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
@@ -297,7 +296,7 @@ func Test_SessionPrepare(t *testing.T) {
 	}{
 		{
 			name:    "prepareSessionQuery no result",
-			prepare: prepareSessionQueryTesting(t, nil),
+			prepare: prepareSessionQueryTesting(t, ""),
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedSessionQuery,
@@ -314,14 +313,8 @@ func Test_SessionPrepare(t *testing.T) {
 			object: (*Session)(nil),
 		},
 		{
-			name: "prepareSessionQuery found",
-			prepare: prepareSessionQueryTesting(t,
-				&crypto.CryptoValue{
-					CryptoType: crypto.TypeEncryption,
-					Algorithm:  "enc",
-					KeyID:      "keyid",
-					Crypted:    []byte("token"),
-				}),
+			name:    "prepareSessionQuery found",
+			prepare: prepareSessionQueryTesting(t, "tokenID"),
 			want: want{
 				sqlExpectations: mockQuery(
 					expectedSessionQuery,
@@ -340,12 +333,7 @@ func Test_SessionPrepare(t *testing.T) {
 						"display-name",
 						testNow,
 						[]byte(`{"key": "dmFsdWU="}`),
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
-							Algorithm:  "enc",
-							KeyID:      "keyid",
-							Crypted:    []byte("token"),
-						},
+						"tokenID",
 					},
 				),
 			},
@@ -373,7 +361,7 @@ func Test_SessionPrepare(t *testing.T) {
 		},
 		{
 			name:    "prepareSessionQuery sql err",
-			prepare: prepareSessionQueryTesting(t, nil),
+			prepare: prepareSessionQueryTesting(t, ""),
 			want: want{
 				sqlExpectations: mockQueryErr(
 					expectedSessionQuery,
@@ -396,12 +384,12 @@ func Test_SessionPrepare(t *testing.T) {
 	}
 }
 
-func prepareSessionQueryTesting(t *testing.T, cryptoToken *crypto.CryptoValue) func(context.Context, prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
+func prepareSessionQueryTesting(t *testing.T, token string) func(context.Context, prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
 	return func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
 		builder, scan := prepareSessionQuery(ctx, db)
 		return builder, func(row *sql.Row) (*Session, error) {
-			session, token, err := scan(row)
-			require.Equal(t, cryptoToken, token)
+			session, tokenID, err := scan(row)
+			require.Equal(t, tokenID, token)
 			return session, err
 		}
 	}

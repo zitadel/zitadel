@@ -129,7 +129,21 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
 
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, config.SystemDefaults, keys.IDPConfig, keys.OTP, keys.OIDC, keys.SAML, config.InternalAuthZ.RolePermissionMappings)
+	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+
+	queries, err := query.StartQueries(
+		ctx,
+		eventstoreClient,
+		dbClient,
+		config.Projections,
+		config.SystemDefaults,
+		keys.IDPConfig,
+		keys.OTP,
+		keys.OIDC,
+		keys.SAML,
+		config.InternalAuthZ.RolePermissionMappings,
+		sessionTokenVerifier,
+	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
@@ -169,6 +183,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		keys.SAML,
 		&http.Client{},
 		permissionCheck,
+		sessionTokenVerifier,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)

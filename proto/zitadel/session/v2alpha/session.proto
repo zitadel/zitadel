@@ -61,7 +61,6 @@ message SearchQuery {
     option (validate.required) = true;
 
     IDsQuery ids_query = 1;
-    TokensQuery tokens_query = 2;
   }
 }
 

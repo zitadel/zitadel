@@ -31,8 +31,8 @@ type Queries struct {
 	eventstore *eventstore.Eventstore
 	client     *database.DB
 
-	idpConfigEncryption crypto.EncryptionAlgorithm
-	sessionEncryption   crypto.EncryptionAlgorithm
+	idpConfigEncryption  crypto.EncryptionAlgorithm
+	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
 
 	DefaultLanguage                     language.Tag
 	LoginDir                            http.FileSystem
@@ -51,9 +51,9 @@ func StartQueries(
 	sqlClient *database.DB,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
-	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm crypto.EncryptionAlgorithm,
-	certEncryptionAlgorithm crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	zitadelRoles []authz.RoleMapping,
+	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 ) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
@@ -74,6 +74,7 @@ func StartQueries(
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,
+		sessionTokenVerifier:                sessionTokenVerifier,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
@@ -85,7 +86,6 @@ func StartQueries(
 	session.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigEncryption = idpConfigEncryption
-	repo.sessionEncryption = keyEncryptionAlgorithm
 	repo.multifactors = domain.MultifactorConfigs{
 		OTP: domain.OTPConfig{
 			CryptoMFA: otpEncryption,

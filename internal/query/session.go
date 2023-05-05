@@ -10,7 +10,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -135,15 +134,14 @@ func (q *Queries) SessionByID(ctx context.Context, id, sessionToken string) (_ *
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
-	session, token, err := scan(row)
+	session, tokenID, err := scan(row)
 	if err != nil {
 		return nil, err
 	}
 	if sessionToken == "" {
 		return session, nil
 	}
-	decryptedToken, err := crypto.DecryptString(token, q.sessionEncryption)
-	if err != nil || decryptedToken != sessionToken {
+	if err := q.sessionTokenVerifier(ctx, sessionToken, session.ID, tokenID); err != nil {
 		return nil, errors.ThrowPermissionDenied(nil, "QUERY-dsfr3", "Errors.PermissionDenied")
 	}
 	return session, nil
@@ -157,7 +155,6 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SessionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			SessionColumnCreator.identifier():    authz.GetCtxData(ctx).UserID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
@@ -183,7 +180,11 @@ func NewSessionIDsSearchQuery(ids []string) (SearchQuery, error) {
 	return NewListQuery(SessionColumnID, list, ListIn)
 }
 
-func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, *crypto.CryptoValue, error)) {
+func NewSessionCreatorSearchQuery(creator string) (SearchQuery, error) {
+	return NewTextQuery(SessionColumnCreator, creator, TextEquals)
+}
+
+func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
 			SessionColumnCreationDate.identifier(),
@@ -202,7 +203,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, *crypto.CryptoValue, error) {
+			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, string, error) {
 			session := new(Session)
 
 			var (
@@ -212,7 +213,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				displayName       sql.NullString
 				passwordCheckedAt sql.NullTime
 				metadata          database.Map[[]byte]
-				token             *crypto.CryptoValue
+				token             sql.NullString
 			)
 
 			err := row.Scan(
@@ -234,9 +235,9 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, nil, errors.ThrowNotFound(err, "QUERY-SFeaa", "Errors.Session.NotExisting")
+					return nil, "", errors.ThrowNotFound(err, "QUERY-SFeaa", "Errors.Session.NotExisting")
 				}
-				return nil, nil, errors.ThrowInternal(err, "QUERY-SAder", "Errors.Internal")
+				return nil, "", errors.ThrowInternal(err, "QUERY-SAder", "Errors.Internal")
 			}
 
 			session.UserFactor.UserID = userID.String
@@ -246,7 +247,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 			session.Metadata = metadata
 
-			return session, token, nil
+			return session, token.String, nil
 		}
 }
 

@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -23,7 +24,7 @@ func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest)
 }
 
 func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequest) (*session.ListSessionsResponse, error) {
-	queries, err := listSessionsRequestToQuery(req)
+	queries, err := listSessionsRequestToQuery(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -134,9 +135,9 @@ func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 	}
 }
 
-func listSessionsRequestToQuery(req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
+func listSessionsRequestToQuery(ctx context.Context, req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToQuery(req.Query)
-	queries, err := sessionQueriesToQuery(req.GetQueries())
+	queries, err := sessionQueriesToQuery(ctx, req.GetQueries())
 	if err != nil {
 		return nil, err
 	}
@@ -150,14 +151,19 @@ func listSessionsRequestToQuery(req *session.ListSessionsRequest) (*query.Sessio
 	}, nil
 }
 
-func sessionQueriesToQuery(queries []*session.SearchQuery) (_ []query.SearchQuery, err error) {
-	q := make([]query.SearchQuery, len(queries))
+func sessionQueriesToQuery(ctx context.Context, queries []*session.SearchQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries)+1)
 	for i, query := range queries {
 		q[i], err = sessionQueryToQuery(query)
 		if err != nil {
 			return nil, err
 		}
 	}
+	creatorQuery, err := query.NewSessionCreatorSearchQuery(authz.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	q[len(queries)] = creatorQuery
 	return q, nil
 }
 

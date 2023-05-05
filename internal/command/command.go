@@ -65,7 +65,20 @@ type Commands struct {
 	certificateLifetime  time.Duration
 }
 
-func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, zitadelRoles []authz.RoleMapping, staticStore static.Storage, webAuthN *webauthn_helper.Config, externalDomain string, externalSecure bool, externalPort uint16, idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption crypto.EncryptionAlgorithm, httpClient *http.Client, permissionCheck domain.PermissionCheck) (repo *Commands, err error) {
+func StartCommands(
+	es *eventstore.Eventstore,
+	defaults sd.SystemDefaults,
+	zitadelRoles []authz.RoleMapping,
+	staticStore static.Storage,
+	webAuthN *webauthn_helper.Config,
+	externalDomain string,
+	externalSecure bool,
+	externalPort uint16,
+	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption crypto.EncryptionAlgorithm,
+	httpClient *http.Client,
+	permissionCheck domain.PermissionCheck,
+	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
+) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
 	}
@@ -96,7 +109,7 @@ func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, zitade
 		checkPermission:       permissionCheck,
 		newEmailCode:          newEmailCode,
 		sessionTokenCreator:   sessionTokenCreator(idGenerator, sessionAlg),
-		sessionTokenVerifier:  sessionTokenVerifier(sessionAlg),
+		sessionTokenVerifier:  sessionTokenVerifier,
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)

@@ -3,6 +3,8 @@ package authz
 import (
 	"context"
 	"crypto/rsa"
+	"encoding/base64"
+	"fmt"
 	"os"
 	"strings"
 	"sync"
@@ -17,7 +19,8 @@ import (
 )
 
 const (
-	BearerPrefix = "Bearer "
+	BearerPrefix       = "Bearer "
+	SessionTokenFormat = "sess_%s:%s"
 )
 
 type TokenVerifier struct {
@@ -164,4 +167,21 @@ func verifyAccessToken(ctx context.Context, token string, t *TokenVerifier, meth
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
 	}
 	return t.VerifyAccessToken(ctx, parts[1], method)
+}
+
+func SessionTokenVerifier(algorithm crypto.EncryptionAlgorithm) func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+		decodedToken, err := base64.RawURLEncoding.DecodeString(sessionToken)
+		if err != nil {
+			return err
+		}
+		_, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
+		var token string
+		token, err = algorithm.DecryptString(decodedToken, algorithm.EncryptionKeyID())
+		spanPasswordComparison.EndWithError(err)
+		if err != nil || token != fmt.Sprintf(SessionTokenFormat, sessionID, tokenID) {
+			return caos_errs.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
+		}
+		return nil
+	}
 }

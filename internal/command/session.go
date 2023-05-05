@@ -199,34 +199,13 @@ func sessionTokenCreator(idGenerator id.Generator, sessionAlg crypto.EncryptionA
 		if err != nil {
 			return "", "", err
 		}
-		encrypted, err := sessionAlg.Encrypt([]byte(fmt.Sprintf(sessionTokenFormat, sessionID, id)))
+		encrypted, err := sessionAlg.Encrypt([]byte(fmt.Sprintf(authz.SessionTokenFormat, sessionID, id)))
 		if err != nil {
 			return "", "", err
 		}
 		return id, base64.RawURLEncoding.EncodeToString(encrypted), nil
 	}
 }
-
-func sessionTokenVerifier(sessionAlg crypto.EncryptionAlgorithm) func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-		decodedToken, err := base64.RawURLEncoding.DecodeString(sessionToken)
-		if err != nil {
-			return err
-		}
-		_, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-		var token string
-		token, err = sessionAlg.DecryptString(decodedToken, sessionAlg.EncryptionKeyID())
-		spanPasswordComparison.EndWithError(err)
-		if err != nil || token != fmt.Sprintf(sessionTokenFormat, sessionID, tokenID) {
-			return caos_errs.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
-		}
-		return nil
-	}
-}
-
-const (
-	sessionTokenFormat = "sess_%s:%s"
-)
 
 type SessionChanged struct {
 	*domain.ObjectDetails
