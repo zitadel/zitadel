@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
@@ -35,7 +34,7 @@ func TestCommands_CreateSession(t *testing.T) {
 	}
 	type res struct {
 		want *SessionChanged
-		err  func(err error) bool
+		err  error
 	}
 	tests := []struct {
 		name   string
@@ -52,9 +51,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "id", "generator failed"))
-				},
+				err: caos_errs.ThrowInternal(nil, "id", "generator failed"),
 			},
 		},
 		{
@@ -69,9 +66,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "id", "filter failed"))
-				},
+				err: caos_errs.ThrowInternal(nil, "id", "filter failed"),
 			},
 		},
 		{
@@ -116,15 +111,8 @@ func TestCommands_CreateSession(t *testing.T) {
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
 			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata)
-			if tt.res.err == nil {
-				require.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
+			require.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
 		})
 	}
 }
@@ -143,7 +131,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 	}
 	type res struct {
 		want *SessionChanged
-		err  func(err error) bool
+		err  error
 	}
 	tests := []struct {
 		name   string
@@ -162,9 +150,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "id", "filter failed"))
-				},
+				err: caos_errs.ThrowInternal(nil, "id", "filter failed"),
 			},
 		},
 		{
@@ -189,9 +175,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				sessionToken: "invalid",
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"))
-				},
+				err: caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
 			},
 		},
 		{
@@ -234,15 +218,8 @@ func TestCommands_UpdateSession(t *testing.T) {
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
 			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata)
-			if tt.res.err == nil {
-				require.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
+			require.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
 		})
 	}
 }
@@ -259,7 +236,7 @@ func TestCommands_updateSession(t *testing.T) {
 	}
 	type res struct {
 		want *SessionChanged
-		err  func(err error) bool
+		err  error
 	}
 	tests := []struct {
 		name   string
@@ -279,9 +256,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated"))
-				},
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated"),
 			},
 		},
 		{
@@ -301,9 +276,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "id", "check failed"))
-				},
+				err: caos_errs.ThrowInternal(nil, "id", "check failed"),
 			},
 		},
 		{
@@ -402,15 +375,8 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 			}
 			got, err := c.updateSession(tt.args.ctx, tt.args.checks, tt.args.metadata)
-			if tt.res.err == nil {
-				require.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
+			require.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
 		})
 	}
 }
@@ -427,7 +393,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 	}
 	type res struct {
 		want *domain.ObjectDetails
-		err  func(err error) bool
+		err  error
 	}
 	tests := []struct {
 		name   string
@@ -446,9 +412,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "id", "filter failed"))
-				},
+				err: caos_errs.ThrowInternal(nil, "id", "filter failed"),
 			},
 		},
 		{
@@ -473,9 +437,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				sessionToken: "invalid",
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"))
-				},
+				err: caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
 			},
 		},
 		{
@@ -535,9 +497,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				sessionToken: "token",
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "id", "pushed failed"))
-				},
+				err: caos_errs.ThrowInternal(nil, "id", "pushed failed"),
 			},
 		},
 		{
@@ -580,15 +540,8 @@ func TestCommands_TerminateSession(t *testing.T) {
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
 			got, err := c.TerminateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken)
-			if tt.res.err == nil {
-				require.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
+			require.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
 		})
 	}
 }
