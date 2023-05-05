@@ -165,9 +165,6 @@ func sessionQueryToQuery(query *session.SearchQuery) (query.SearchQuery, error) 
 	switch q := query.Query.(type) {
 	case *session.SearchQuery_IdsQuery:
 		return idsQueryToQuery(q.IdsQuery)
-		// TODO: ?
-	// case *session.SearchQuery_TokensQuery:
-	// 	return TokensQueryToQuery(q.TokensQuery)
 	default:
 		return nil, caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid")
 	}

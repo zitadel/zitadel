@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"encoding/base64"
+	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -9,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -22,7 +25,7 @@ type SessionChecks struct {
 	passwordWriteModel *HumanPasswordWriteModel
 	eventstore         *eventstore.Eventstore
 	userPasswordAlg    crypto.HashAlgorithm
-	createToken        func() (*crypto.CryptoValue, string, error)
+	createToken        func(sessionID string) (id string, token string, err error)
 	now                func() time.Time
 }
 
@@ -32,7 +35,7 @@ func (c *Commands) NewSessionChecks(checks []SessionCheck, session *SessionWrite
 		sessionWriteModel: session,
 		eventstore:        c.eventstore,
 		userPasswordAlg:   c.userPasswordAlg,
-		createToken:       c.tokenCreator,
+		createToken:       c.sessionTokenCreator,
 		now:               time.Now,
 	}
 }
@@ -40,7 +43,6 @@ func (c *Commands) NewSessionChecks(checks []SessionCheck, session *SessionWrite
 // CheckUser defines a user check to be executed for a session update
 func CheckUser(id string) SessionCheck {
 	return func(ctx context.Context, cmd *SessionChecks) error {
-		// TODO: check here?
 		if cmd.sessionWriteModel.UserID != "" && id != "" && cmd.sessionWriteModel.UserID != id {
 			return caos_errs.ThrowInvalidArgument(nil, "", "user change not possible")
 		}
@@ -70,7 +72,7 @@ func CheckPassword(password string) SessionCheck {
 		err = crypto.CompareHash(cmd.passwordWriteModel.Secret, []byte(password), cmd.userPasswordAlg)
 		spanPasswordComparison.EndWithError(err)
 		if err != nil {
-			//TODO: reset session?
+			//TODO: maybe we wan to reset the session in the future #sessionissues
 			return caos_errs.ThrowInvalidArgument(err, "COMMAND-SAF3g", "Errors.User.Password.Invalid")
 		}
 		cmd.sessionWriteModel.PasswordChecked(ctx, cmd.now())
@@ -93,12 +95,12 @@ func (s *SessionChecks) commands(ctx context.Context) (string, []eventstore.Comm
 		return "", nil, nil
 	}
 
-	token, plain, err := s.createToken()
+	tokenID, token, err := s.createToken(s.sessionWriteModel.AggregateID)
 	if err != nil {
 		return "", nil, err
 	}
-	s.sessionWriteModel.SetToken(ctx, token)
-	return plain, s.sessionWriteModel.commands, nil
+	s.sessionWriteModel.SetToken(ctx, tokenID)
+	return token, s.sessionWriteModel.commands, nil
 }
 
 func (c *Commands) CreateSession(ctx context.Context, checks []SessionCheck, metadata map[string][]byte) (set *SessionChanged, err error) {
@@ -158,11 +160,7 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionChecks, met
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated") //TODO: i18n
 	}
 	if err := checks.Check(ctx); err != nil {
-		// TODO: how to handle failed checks (e.g. pw wrong)
-		// if e := checks.sessionWriteModel.event; e != nil {
-		//	_, err := c.eventstore.Push(ctx, e)
-		// 	logging.OnError(err).Error("could not push event check failed events")
-		// }
+		// TODO: how to handle failed checks (e.g. pw wrong) #sessionissues
 		return nil, err
 	}
 	checks.sessionWriteModel.ChangeMetadata(ctx, metadata)
@@ -192,15 +190,43 @@ func (c *Commands) sessionPermission(ctx context.Context, sessionWriteModel *Ses
 	if sessionToken == "" {
 		return c.checkPermission(ctx, permission, authz.GetCtxData(ctx).OrgID, sessionWriteModel.AggregateID)
 	}
-	_, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-	var token string
-	token, err = crypto.DecryptString(sessionWriteModel.Token, c.sessionAlg)
-	spanPasswordComparison.EndWithError(err)
-	if err != nil || token != sessionToken {
-		return caos_errs.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid") //TODO: i18n
-	}
-	return nil
+	return c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID)
 }
+
+func sessionTokenCreator(idGenerator id.Generator, sessionAlg crypto.EncryptionAlgorithm) func(sessionID string) (id string, token string, err error) {
+	return func(sessionID string) (id string, token string, err error) {
+		id, err = idGenerator.Next()
+		if err != nil {
+			return "", "", err
+		}
+		encrypted, err := sessionAlg.Encrypt([]byte(fmt.Sprintf(sessionTokenFormat, sessionID, id)))
+		if err != nil {
+			return "", "", err
+		}
+		return id, base64.RawURLEncoding.EncodeToString(encrypted), nil
+	}
+}
+
+func sessionTokenVerifier(sessionAlg crypto.EncryptionAlgorithm) func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+		decodedToken, err := base64.RawURLEncoding.DecodeString(sessionToken)
+		if err != nil {
+			return err
+		}
+		_, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
+		var token string
+		token, err = sessionAlg.DecryptString(decodedToken, sessionAlg.EncryptionKeyID())
+		spanPasswordComparison.EndWithError(err)
+		if err != nil || token != fmt.Sprintf(sessionTokenFormat, sessionID, tokenID) {
+			return caos_errs.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid") //TODO: i18n
+		}
+		return nil
+	}
+}
+
+const (
+	sessionTokenFormat = "sess_%s:%s"
+)
 
 type SessionChanged struct {
 	*domain.ObjectDetails

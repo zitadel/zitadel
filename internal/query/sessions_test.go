@@ -31,7 +31,7 @@ var (
 		` projections.users8_humans.display_name,` +
 		` projections.sessions.password_checked_at,` +
 		` projections.sessions.metadata,` +
-		` projections.sessions.token` +
+		` projections.sessions.token_id` +
 		` FROM projections.sessions` +
 		` LEFT JOIN projections.login_names2 ON projections.sessions.user_id = projections.login_names2.user_id AND projections.sessions.instance_id = projections.login_names2.instance_id` +
 		` LEFT JOIN projections.users8_humans ON projections.sessions.user_id = projections.users8_humans.user_id AND projections.sessions.instance_id = projections.users8_humans.instance_id` +

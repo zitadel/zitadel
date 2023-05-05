@@ -114,7 +114,7 @@ var (
 		table: sessionsTable,
 	}
 	SessionColumnToken = Column{
-		name:  projection.SessionColumnToken,
+		name:  projection.SessionColumnTokenID,
 		table: sessionsTable,
 	}
 )

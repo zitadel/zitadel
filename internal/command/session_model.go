@@ -5,9 +5,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
 )
@@ -15,7 +13,7 @@ import (
 type SessionWriteModel struct {
 	eventstore.WriteModel
 
-	Token             *crypto.CryptoValue
+	TokenID           string
 	UserID            string
 	UserCheckedAt     time.Time
 	PasswordCheckedAt time.Time
@@ -90,7 +88,7 @@ func (wm *SessionWriteModel) reducePasswordChecked(e *session.PasswordCheckedEve
 }
 
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
-	wm.Token = e.Token
+	wm.TokenID = e.TokenID
 }
 
 func (wm *SessionWriteModel) reduceTerminate() {
@@ -102,9 +100,6 @@ func (wm *SessionWriteModel) Start(ctx context.Context) {
 }
 
 func (wm *SessionWriteModel) UserChecked(ctx context.Context, userID string, checkedAt time.Time) error {
-	if wm.UserID != "" && userID != "" && wm.UserID != userID {
-		return caos_errs.ThrowInvalidArgument(nil, "", "user change not possible")
-	}
 	wm.commands = append(wm.commands, session.NewUserCheckedEvent(ctx, wm.aggregate, userID, checkedAt))
 	// set the userID so other checks can use it
 	wm.UserID = userID
@@ -115,8 +110,8 @@ func (wm *SessionWriteModel) PasswordChecked(ctx context.Context, checkedAt time
 	wm.commands = append(wm.commands, session.NewPasswordCheckedEvent(ctx, wm.aggregate, checkedAt))
 }
 
-func (wm *SessionWriteModel) SetToken(ctx context.Context, token *crypto.CryptoValue) {
-	wm.commands = append(wm.commands, session.NewTokenSetEvent(ctx, wm.aggregate, token))
+func (wm *SessionWriteModel) SetToken(ctx context.Context, tokenID string) {
+	wm.commands = append(wm.commands, session.NewTokenSetEvent(ctx, wm.aggregate, tokenID))
 }
 
 func (wm *SessionWriteModel) ChangeMetadata(ctx context.Context, metadata map[string][]byte) {

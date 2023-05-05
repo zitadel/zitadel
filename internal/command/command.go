@@ -46,13 +46,13 @@ type Commands struct {
 	smsEncryption               crypto.EncryptionAlgorithm
 	userEncryption              crypto.EncryptionAlgorithm
 	userPasswordAlg             crypto.HashAlgorithm
-	sessionAlg                  crypto.EncryptionAlgorithm
 	machineKeySize              int
 	applicationKeySize          int
 	domainVerificationAlg       crypto.EncryptionAlgorithm
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType api_http.CheckType) error
-	tokenCreator                func() (*crypto.CryptoValue, string, error)
+	sessionTokenCreator         func(sessionID string) (id string, token string, err error)
+	sessionTokenVerifier        func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 
 	multifactors         domain.MultifactorConfigs
 	webauthnConfig       *webauthn_helper.Config
@@ -69,11 +69,12 @@ func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, zitade
 	if externalDomain == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
 	}
-	sessionAlg := oidcEncryption // TODO: ?
+	idGenerator := id.SonyFlakeGenerator()
+	sessionAlg := oidcEncryption
 	repo = &Commands{
 		eventstore:            es,
 		static:                staticStore,
-		idGenerator:           id.SonyFlakeGenerator(),
+		idGenerator:           idGenerator,
 		zitadelRoles:          zitadelRoles,
 		externalDomain:        externalDomain,
 		externalSecure:        externalSecure,
@@ -90,24 +91,12 @@ func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, zitade
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
 		certificateAlgorithm:  samlEncryption,
-		sessionAlg:            sessionAlg,
 		webauthnConfig:        webAuthN,
 		httpClient:            httpClient,
 		checkPermission:       permissionCheck,
 		newEmailCode:          newEmailCode,
-
-		// TODO: change config and algorithm (and encrypt instead?)
-		// TODO: or maybe just change to generate id and encrypt it
-		tokenCreator: func() (*crypto.CryptoValue, string, error) {
-			return crypto.NewCode(crypto.NewEncryptionGenerator(crypto.GeneratorConfig{
-				Length:              64,
-				Expiry:              0,
-				IncludeLowerLetters: true,
-				IncludeUpperLetters: true,
-				IncludeDigits:       true,
-				IncludeSymbols:      false,
-			}, sessionAlg))
-		},
+		sessionTokenCreator:   sessionTokenCreator(idGenerator, sessionAlg),
+		sessionTokenVerifier:  sessionTokenVerifier(sessionAlg),
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)

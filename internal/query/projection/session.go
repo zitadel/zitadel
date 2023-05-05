@@ -27,7 +27,7 @@ const (
 	SessionColumnUserCheckedAt     = "user_checked_at"
 	SessionColumnPasswordCheckedAt = "password_checked_at"
 	SessionColumnMetadata          = "metadata"
-	SessionColumnToken             = "token"
+	SessionColumnTokenID           = "token_id"
 )
 
 type sessionProjection struct {
@@ -52,7 +52,7 @@ func newSessionProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(SessionColumnUserCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnPasswordCheckedAt, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 			crdb.NewColumn(SessionColumnMetadata, crdb.ColumnTypeJSONB, crdb.Nullable()),
-			crdb.NewColumn(SessionColumnToken, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(SessionColumnTokenID, crdb.ColumnTypeText, crdb.Nullable()),
 		},
 			crdb.NewPrimaryKey(SessionColumnInstanceID, SessionColumnID),
 		),
@@ -176,7 +176,7 @@ func (p *sessionProjection) reduceTokenSet(event eventstore.Event) (*handler.Sta
 		[]handler.Column{
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
-			handler.NewCol(SessionColumnToken, e.Token),
+			handler.NewCol(SessionColumnTokenID, e.TokenID),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

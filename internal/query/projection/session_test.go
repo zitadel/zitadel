@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -129,14 +128,8 @@ func TestSessionProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					session.TokenSetType,
 					session.AggregateType,
-					//tokenSetEventData(),
 					[]byte(`{
-						"token": {
-							"cryptoType": 0,
-							"algorithm": "enc",
-							"keyID": "id",
-							"crypted": "dG9rZW4="
-						}
+						"tokenID": "tokenID"
 					}`),
 				), session.TokenSetEventMapper),
 			},
@@ -148,16 +141,11 @@ func TestSessionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sessions SET (change_date, sequence, token) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.sessions SET (change_date, sequence, token_id) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("token"),
-								},
+								"tokenID",
 								"agg-id",
 								"instance-id",
 							},

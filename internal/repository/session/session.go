@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -145,7 +144,7 @@ func PasswordCheckedEventMapper(event *repository.Event) (eventstore.Event, erro
 type TokenSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Token *crypto.CryptoValue `json:"token"`
+	TokenID string `json:"tokenID"`
 }
 
 func (e *TokenSetEvent) Data() interface{} {
@@ -159,7 +158,7 @@ func (e *TokenSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint 
 func NewTokenSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	token *crypto.CryptoValue,
+	tokenID string,
 ) *TokenSetEvent {
 	return &TokenSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -167,7 +166,7 @@ func NewTokenSetEvent(
 			aggregate,
 			TokenSetType,
 		),
-		Token: token,
+		TokenID: tokenID,
 	}
 }
 

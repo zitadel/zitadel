@@ -24,9 +24,9 @@ import (
 
 func TestCommands_CreateSession(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
-		createToken func() (*crypto.CryptoValue, string, error)
+		eventstore   *eventstore.Eventstore
+		idGenerator  id.Generator
+		tokenCreator func(sessionID string) (string, string, error)
 	}
 	type args struct {
 		ctx      context.Context
@@ -84,22 +84,13 @@ func TestCommands_CreateSession(t *testing.T) {
 						eventPusherToEvents(
 							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("token"),
-								}),
+								"tokenID",
+							),
 						),
 					),
 				),
-				createToken: func() (*crypto.CryptoValue, string, error) {
-					return &crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
-							Algorithm:  "enc",
-							KeyID:      "id",
-							Crypted:    []byte("token"),
-						},
+				tokenCreator: func(sessionID string) (string, string, error) {
+					return "tokenID",
 						"token",
 						nil
 				},
@@ -120,9 +111,9 @@ func TestCommands_CreateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:   tt.fields.eventstore,
-				idGenerator:  tt.fields.idGenerator,
-				tokenCreator: tt.fields.createToken,
+				eventstore:          tt.fields.eventstore,
+				idGenerator:         tt.fields.idGenerator,
+				sessionTokenCreator: tt.fields.tokenCreator,
 			}
 			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata)
 			if tt.res.err == nil {
@@ -140,8 +131,8 @@ func TestCommands_CreateSession(t *testing.T) {
 
 func TestCommands_UpdateSession(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
-		sessionAlg crypto.EncryptionAlgorithm
+		eventstore    *eventstore.Eventstore
+		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 	}
 	type args struct {
 		ctx          context.Context
@@ -185,15 +176,12 @@ func TestCommands_UpdateSession(t *testing.T) {
 							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("token"),
-								})),
+								"tokenID")),
 					),
 				),
-				sessionAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+					return caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
+				},
 			},
 			args{
 				ctx:          context.Background(),
@@ -215,15 +203,12 @@ func TestCommands_UpdateSession(t *testing.T) {
 							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("token"),
-								})),
+								"tokenID")),
 					),
 				),
-				sessionAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+					return nil
+				},
 			},
 			args{
 				ctx:          context.Background(),
@@ -245,8 +230,8 @@ func TestCommands_UpdateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
-				sessionAlg: tt.fields.sessionAlg,
+				eventstore:           tt.fields.eventstore,
+				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
 			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata)
 			if tt.res.err == nil {
@@ -356,12 +341,7 @@ func TestCommands_updateSession(t *testing.T) {
 							session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
 								map[string][]byte{"key": []byte("value")}),
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("token"),
-								}),
+								"tokenID"),
 						),
 					),
 				),
@@ -391,13 +371,8 @@ func TestCommands_updateSession(t *testing.T) {
 							),
 						),
 					),
-					createToken: func() (*crypto.CryptoValue, string, error) {
-						return &crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("token"),
-							},
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
 							"token",
 							nil
 					},
@@ -442,8 +417,8 @@ func TestCommands_updateSession(t *testing.T) {
 
 func TestCommands_TerminateSession(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
-		sessionAlg crypto.EncryptionAlgorithm
+		eventstore    *eventstore.Eventstore
+		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 	}
 	type args struct {
 		ctx          context.Context
@@ -485,15 +460,12 @@ func TestCommands_TerminateSession(t *testing.T) {
 							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("token"),
-								})),
+								"tokenID")),
 					),
 				),
-				sessionAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+					return caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
+				},
 			},
 			args{
 				ctx:          context.Background(),
@@ -515,17 +487,14 @@ func TestCommands_TerminateSession(t *testing.T) {
 							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("token"),
-								})),
+								"tokenID")),
 						eventFromEventPusher(
 							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 					),
 				),
-				sessionAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+					return nil
+				},
 			},
 			args{
 				ctx:          context.Background(),
@@ -547,12 +516,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("token"),
-								}),
+								"tokenID"),
 						),
 					),
 					expectPushFailed(
@@ -561,7 +525,9 @@ func TestCommands_TerminateSession(t *testing.T) {
 							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 					),
 				),
-				sessionAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+					return nil
+				},
 			},
 			args{
 				ctx:          context.Background(),
@@ -583,12 +549,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 							session.NewAddedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("token"),
-								}),
+								"tokenID"),
 						),
 					),
 					expectPush(
@@ -596,7 +557,9 @@ func TestCommands_TerminateSession(t *testing.T) {
 							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
 					),
 				),
-				sessionAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+					return nil
+				},
 			},
 			args{
 				ctx:          context.Background(),
@@ -613,8 +576,8 @@ func TestCommands_TerminateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
-				sessionAlg: tt.fields.sessionAlg,
+				eventstore:           tt.fields.eventstore,
+				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
 			got, err := c.TerminateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken)
 			if tt.res.err == nil {
