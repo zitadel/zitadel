@@ -149,6 +149,7 @@ func addInterceptors(handler http.Handler, http1HostName string) http.Handler {
 	handler = http_mw.CallDurationHandler(handler)
 	handler = http1Host(handler, http1HostName)
 	handler = http_mw.CORSInterceptor(handler)
+	handler = http_mw.RobotsTagHandler(handler)
 	handler = http_mw.DefaultTelemetryHandler(handler)
 	return http_mw.DefaultMetricsHandler(handler)
 }

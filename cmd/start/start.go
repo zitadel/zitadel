@@ -39,6 +39,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/robots_txt"
 	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -339,6 +340,13 @@ func startAPIs(
 	if err != nil {
 		return err
 	}
+
+	// robots.txt handler
+	robotsTxtHandler, err := robots_txt.Start()
+	if err != nil {
+		return fmt.Errorf("unable to start robots txt handler: %w", err)
+	}
+	apis.RegisterHandlerOnPrefix(robots_txt.HandlerPrefix, robotsTxtHandler)
 
 	// TODO: Record openapi access logs?
 	openAPIHandler, err := openapi.Start()
