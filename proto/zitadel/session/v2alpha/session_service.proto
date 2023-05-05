@@ -113,9 +113,7 @@ service SessionService {
     };
   }
 
-  // GetSession is to demonstrate an authenticated request, where the authenticated user (usage of another grpc package) is returned
-  //
-  // this request is subject to change and currently used for demonstration only
+  // GetSession a session
   rpc GetSession (GetSessionRequest) returns (GetSessionResponse) {
     option (google.api.http) = {
       get: "/v2alpha/sessions/{session_id}"
@@ -125,6 +123,17 @@ service SessionService {
       auth_option: {
         permission: "authenticated"
       }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get a session";
+      description: "Get a session and all its information like the time of the user or password verification"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
     };
   }
 
@@ -146,7 +155,7 @@ service SessionService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Create a new session";
-      description: "Create a new session"
+      description: "Create a new session. A token will be returned, which is required for further updates of the session."
       responses: {
         key: "200"
         value: {

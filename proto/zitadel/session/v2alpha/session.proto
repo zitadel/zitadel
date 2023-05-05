@@ -34,28 +34,6 @@ message PasswordFactor {
   google.protobuf.Timestamp verified_at = 1;
 }
 
-message Metadata {
-  string key = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"my-key\"";
-      min_length: 1,
-      max_length: 200;
-    }
-  ];
-  bytes value = 2 [
-    (validate.rules).bytes = {min_len: 1, max_len: 500000},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "The value has to be base64 encoded.";
-      example: "\"VGhpcyBpcyBteSB0ZXN0IHZhbHVl\"";
-      min_length: 1,
-      max_length: 500000;
-    }
-  ];
-}
-
 message SearchQuery {
   oneof query {
     option (validate.required) = true;
@@ -65,9 +43,5 @@ message SearchQuery {
 }
 
 message IDsQuery {
-  repeated string ids = 1;
-}
-
-message TokensQuery {
   repeated string ids = 1;
 }
