@@ -73,6 +73,17 @@ To run the application make sure to install the dependencies with
 pnpm install
 ```
 
+then setup the environment for the login application which needs a `.env.local` in `/apps/login`.
+Go to your instance and create a service user for the application having the IAM_OWNER manager role.
+This user is required to have access to create users on your primary organization and reading policy data so it can be restricted to your personal use case but we'll stick with IAM_OWNER for convenience. Create a PAT and copy the value to paste it under the `ZITADEL_SERVICE_USER_TOKEN` key.
+The file should look as follows:
+
+```
+ZITADEL_API_URL=[yourinstanceurl]
+ZITADEL_ORG_ID=[yourprimaryorg]
+ZITADEL_SERVICE_USER_TOKEN=[yourserviceuserpersonalaccesstoken]
+```
+
 then generate the GRPC stubs with
 
 ```sh
