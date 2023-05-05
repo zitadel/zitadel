@@ -4,6 +4,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -92,9 +93,13 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 func SetExhaustedCookie(cookieHandler *http_utils.CookieHandler, writer http.ResponseWriter, cookieConfig *AccessConfig, request *http.Request) {
 	cookieValue := "true"
 	host := request.Header.Get(middleware.HTTP1Host)
-	domain, _, err := net.SplitHostPort(host)
-	if err != nil {
-		logging.WithError(err).WithField("host", host).Warning("failed to extract cookie domain from request host")
+	domain := host
+	if strings.IndexAny(host, ":") > -1 {
+		var err error
+		domain, _, err = net.SplitHostPort(host)
+		if err != nil {
+			logging.WithError(err).WithField("host", host).Warning("failed to extract cookie domain from request host")
+		}
 	}
 	cookieHandler.SetCookie(writer, cookieConfig.ExhaustedCookieKey, domain, cookieValue)
 }
