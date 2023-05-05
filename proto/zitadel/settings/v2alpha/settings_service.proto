@@ -112,8 +112,8 @@ service SettingsService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get the current active login settings";
-            description: "Return the current active login settings for the requested context"
+            summary: "Get the login settings";
+            description: "Return the settings for the requested context"
             responses: {
                 key: "200"
                 value: {
@@ -247,7 +247,7 @@ service SettingsService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get the current active lockout settings";
-            description: "Return the current active lockout settings for the requested context"
+            description: "Return the lockout settings for the requested context, which define when a user will be locked"
             responses: {
                 key: "200"
                 value: {
