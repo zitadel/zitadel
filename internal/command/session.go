@@ -72,7 +72,7 @@ func CheckPassword(password string) SessionCheck {
 		err = crypto.CompareHash(cmd.passwordWriteModel.Secret, []byte(password), cmd.userPasswordAlg)
 		spanPasswordComparison.EndWithError(err)
 		if err != nil {
-			//TODO: maybe we wan to reset the session in the future #sessionissues
+			//TODO: maybe we want to reset the session in the future https://github.com/zitadel/zitadel/issues/5807
 			return caos_errs.ThrowInvalidArgument(err, "COMMAND-SAF3g", "Errors.User.Password.Invalid")
 		}
 		cmd.sessionWriteModel.PasswordChecked(ctx, cmd.now())
@@ -160,7 +160,7 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionChecks, met
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated")
 	}
 	if err := checks.Check(ctx); err != nil {
-		// TODO: how to handle failed checks (e.g. pw wrong) #sessionissues
+		// TODO: how to handle failed checks (e.g. pw wrong) https://github.com/zitadel/zitadel/issues/5807
 		return nil, err
 	}
 	checks.sessionWriteModel.ChangeMetadata(ctx, metadata)

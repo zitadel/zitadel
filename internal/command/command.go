@@ -83,6 +83,7 @@ func StartCommands(
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
 	}
 	idGenerator := id.SonyFlakeGenerator()
+	// reuse the oidcEncryption to be able to handle both tokens in the interceptor later on
 	sessionAlg := oidcEncryption
 	repo = &Commands{
 		eventstore:            es,

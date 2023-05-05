@@ -22,7 +22,7 @@ const (
 	SessionColumnState             = "state"
 	SessionColumnResourceOwner     = "resource_owner"
 	SessionColumnInstanceID        = "instance_id"
-	SessionColumnCreator           = "creator" //TODO: client?
+	SessionColumnCreator           = "creator"
 	SessionColumnUserID            = "user_id"
 	SessionColumnUserCheckedAt     = "user_checked_at"
 	SessionColumnPasswordCheckedAt = "password_checked_at"
