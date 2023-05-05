@@ -52,7 +52,7 @@ func modelLoginPolicyToPb(current *query.LoginPolicy) *policy.LoginPolicy {
 		AllowRegister:              current.AllowRegister,
 		AllowExternalIdp:           current.AllowExternalIDPs,
 		ForceMfa:                   current.ForceMFA,
-		PasswordkeysType:           ModelPasswordlessTypeToPb(current.PasswordlessType),
+		PasskeysType:               ModelPasswordlessTypeToPb(current.PasswordlessType),
 		HidePasswordReset:          current.HidePasswordReset,
 		IgnoreUnknownUsernames:     current.IgnoreUnknownUsernames,
 		AllowDomainDiscovery:       current.AllowDomainDiscovery,
@@ -69,14 +69,14 @@ func modelLoginPolicyToPb(current *query.LoginPolicy) *policy.LoginPolicy {
 	}
 }
 
-func ModelPasswordlessTypeToPb(passwordlessType domain.PasswordlessType) policy.PasswordkeysType {
+func ModelPasswordlessTypeToPb(passwordlessType domain.PasswordlessType) policy.PasskeysType {
 	switch passwordlessType {
 	case domain.PasswordlessTypeAllowed:
-		return policy.PasswordkeysType_PASSWORDKEYS_TYPE_ALLOWED
+		return policy.PasskeysType_PASSKEYS_TYPE_ALLOWED
 	case domain.PasswordlessTypeNotAllowed:
-		return policy.PasswordkeysType_PASSWORDKEYS_TYPE_NOT_ALLOWED
+		return policy.PasskeysType_PASSKEYS_TYPE_NOT_ALLOWED
 	default:
-		return policy.PasswordkeysType_PASSWORDKEYS_TYPE_NOT_ALLOWED
+		return policy.PasskeysType_PASSKEYS_TYPE_NOT_ALLOWED
 	}
 }
 
