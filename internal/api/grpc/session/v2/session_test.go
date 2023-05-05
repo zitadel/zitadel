@@ -321,3 +321,59 @@ func Test_sessionQueryToQuery(t *testing.T) {
 		})
 	}
 }
+
+func mustUserLoginNamesSearchQuery(t testing.TB, value string) query.SearchQuery {
+	loginNameQuery, err := query.NewUserLoginNamesSearchQuery("bar")
+	require.NoError(t, err)
+	return loginNameQuery
+}
+
+func Test_userCheck(t *testing.T) {
+	type args struct {
+		user *session.CheckUser
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    userSearch
+		wantErr error
+	}{
+		{
+			name: "nil user",
+			args: args{nil},
+			want: nil,
+		},
+		{
+			name: "by user id",
+			args: args{&session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: "foo",
+				},
+			}},
+			want: userSearchByID{"foo"},
+		},
+		{
+			name: "by user id",
+			args: args{&session.CheckUser{
+				Search: &session.CheckUser_LoginName{
+					LoginName: "bar",
+				},
+			}},
+			want: userSearchByLoginName{mustUserLoginNamesSearchQuery(t, "bar")},
+		},
+		{
+			name: "unimplemented error",
+			args: args{&session.CheckUser{
+				Search: nil,
+			}},
+			wantErr: caos_errs.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", nil),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := userCheck(tt.args.user)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

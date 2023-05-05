@@ -203,7 +203,7 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	}
 	sessionChecks := make([]command.SessionCheck, 0, 2)
 	if checkUser != nil {
-		user, err := checkUser(ctx, s.query)
+		user, err := checkUser.search(ctx, s.query)
 		if err != nil {
 			return nil, err
 		}
@@ -229,12 +229,12 @@ func userCheck(user *session.CheckUser) (userSearch, error) {
 	}
 }
 
-type userSearch func(ctx context.Context, q *query.Queries) (*query.User, error)
+type userSearch interface {
+	search(ctx context.Context, q *query.Queries) (*query.User, error)
+}
 
-func userByID(id string) userSearch {
-	return func(ctx context.Context, q *query.Queries) (*query.User, error) {
-		return q.GetUserByID(ctx, true, id, false)
-	}
+func userByID(userID string) userSearch {
+	return userSearchByID{userID}
 }
 
 func userByLoginName(loginName string) (userSearch, error) {
@@ -242,7 +242,21 @@ func userByLoginName(loginName string) (userSearch, error) {
 	if err != nil {
 		return nil, err
 	}
-	return func(ctx context.Context, q *query.Queries) (*query.User, error) {
-		return q.GetUser(ctx, true, false, loginNameQuery)
-	}, nil
+	return userSearchByLoginName{loginNameQuery}, nil
+}
+
+type userSearchByID struct {
+	id string
+}
+
+func (u userSearchByID) search(ctx context.Context, q *query.Queries) (*query.User, error) {
+	return q.GetUserByID(ctx, true, u.id, false)
+}
+
+type userSearchByLoginName struct {
+	loginNameQuery query.SearchQuery
+}
+
+func (u userSearchByLoginName) search(ctx context.Context, q *query.Queries) (*query.User, error) {
+	return q.GetUser(ctx, true, false, u.loginNameQuery)
 }
