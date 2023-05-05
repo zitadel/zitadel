@@ -28,6 +28,7 @@ This repo has some additional tools:
 
 ### Useful commands
 
+- `pnpm generate` - Build proto stubs for server and client package
 - `pnpm build` - Build all packages and the login app
 - `pnpm dev` - Develop all packages and the login app
 - `pnpm lint` - Lint all packages
@@ -63,3 +64,25 @@ See [Working with the npm registry](https://docs.github.com/en/packages/working-
 - Buf setup to get grpc stub in the core package
 - Decide whether a seperate client package is required to expose public client convenience methods only or generate a grpc-web output there
 - Fix #/\* path in login application
+
+### Run Login UI
+
+To run the application make sure to install the dependencies with
+
+```sh
+pnpm install
+```
+
+then generate the GRPC stubs with
+
+```sh
+pnpm generate
+```
+
+and then run it with
+
+```sh
+pnpm dev
+```
+
+The login application with run on `localhost:3000`.

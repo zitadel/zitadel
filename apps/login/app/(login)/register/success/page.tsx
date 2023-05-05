@@ -14,7 +14,7 @@ export default async function Page({ searchParams }: Props) {
 
       {`userId: ${searchParams["userid"]}`}
       <Link href="/register">
-        <Button variant={ButtonVariants.Primary}>go back</Button>
+        <Button variant={ButtonVariants.Primary}>back</Button>
       </Link>
     </div>
   );
