@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
 func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
@@ -19,10 +19,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 	if err != nil {
 		return nil, err
 	}
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
+	orgID := authz.GetCtxData(ctx).OrgID
 	err = s.command.AddHuman(ctx, orgID, human, false)
 	if err != nil {
 		return nil, err

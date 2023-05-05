@@ -34,12 +34,14 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 		return nil, status.Error(codes.Unauthenticated, "auth header missing")
 	}
 
+	var orgDomain string
 	orgID := grpc_util.GetHeader(authCtx, http.ZitadelOrgID)
 	if o, ok := req.(OrganisationFromRequest); ok {
 		orgID = o.OrganisationFromRequest().GetOrgId()
+		orgDomain = o.OrganisationFromRequest().GetOrgDomain()
 	}
 
-	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, verifier, authConfig, authOpt, info.FullMethod)
+	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, orgDomain, verifier, authConfig, authOpt, info.FullMethod)
 	if err != nil {
 		return nil, err
 	}

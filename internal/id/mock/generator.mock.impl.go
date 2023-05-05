@@ -25,3 +25,9 @@ func ExpectID(t *testing.T, id string) *MockGenerator {
 	m.EXPECT().Next().Return(id, nil)
 	return m
 }
+
+func NewIDGeneratorExpectError(t *testing.T, err error) *MockGenerator {
+	m := NewMockGenerator(gomock.NewController(t))
+	m.EXPECT().Next().Return("", err)
+	return m
+}
