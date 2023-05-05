@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
 import { ExhaustedService } from '../exhausted.service';
 
 /**
@@ -12,7 +12,9 @@ export class ExhaustedHttpInterceptor implements HttpInterceptor {
   constructor(private exhaustedSvc: ExhaustedService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return this.exhaustedSvc.checkCookie().pipe(
+    // Don't check the cookie for the environment.json
+    let cookie$ = req.url.endsWith('/assets/environment.json') ? of(undefined) : this.exhaustedSvc.checkCookie();
+    return cookie$.pipe(
       switchMap(() => next.handle(req)),
       catchError((error: HttpErrorResponse) => {
         if (error.status === 429) {
