@@ -43,12 +43,10 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		return next
 	}
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-
 		ctx := request.Context()
 		var err error
 
-		tracingCtx, span := tracing.NewServerInterceptorSpan(ctx)
-		defer func() { span.EndWithError(err) }()
+		tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccess")
 
 		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
 
@@ -63,7 +61,12 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			wrappedWriter.ignoreWrites = true
 		}
 
+		checkSpan.End()
+
 		next.ServeHTTP(wrappedWriter, request)
+
+		tracingCtx, writeSpan := tracing.NewNamedSpan(tracingCtx, "writeAccess")
+		defer writeSpan.End()
 
 		requestURL := request.RequestURI
 		unescapedURL, err := url.QueryUnescape(requestURL)

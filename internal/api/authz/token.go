@@ -27,10 +27,14 @@ type TokenVerifier struct {
 	systemJWTProfile op.JWTProfileVerifier
 }
 
+type MembershipsResolver interface {
+	SearchMyMemberships(ctx context.Context, orgID string) ([]*Membership, error)
+}
+
 type authZRepo interface {
 	VerifyAccessToken(ctx context.Context, token, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error)
 	VerifierClientID(ctx context.Context, name string) (clientID, projectID string, err error)
-	SearchMyMemberships(ctx context.Context) ([]*Membership, error)
+	SearchMyMemberships(ctx context.Context, orgID string) ([]*Membership, error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
 	ExistsOrg(ctx context.Context, orgID string) error
 }
@@ -127,10 +131,10 @@ func (v *TokenVerifier) RegisterServer(appName, methodPrefix string, mappings Me
 	}
 }
 
-func (v *TokenVerifier) SearchMyMemberships(ctx context.Context) (_ []*Membership, err error) {
+func (v *TokenVerifier) SearchMyMemberships(ctx context.Context, orgID string) (_ []*Membership, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return v.authZRepo.SearchMyMemberships(ctx)
+	return v.authZRepo.SearchMyMemberships(ctx, orgID)
 }
 
 func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (_ string, _ []string, err error) {

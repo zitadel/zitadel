@@ -1,0 +1,10 @@
+Database:
+  cockroach:
+    Host: localhost
+    Port: 26257
+    Database: zitadel
+    Options: ""
+    User:
+      Username: zitadel
+    Admin:
+      Username: root

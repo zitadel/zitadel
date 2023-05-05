@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
@@ -38,6 +39,7 @@ var (
 		runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonMarshaler),
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
 		runtime.WithOutgoingHeaderMatcher(runtime.DefaultHeaderMatcher),
+		runtime.WithForwardResponseOption(responseForwarder),
 	}
 
 	headerMatcher = runtime.HeaderMatcherFunc(
@@ -50,6 +52,15 @@ var (
 			return runtime.DefaultHeaderMatcher(header)
 		},
 	)
+
+	responseForwarder = func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
+		t, ok := resp.(CustomHTTPResponse)
+		if ok {
+			// TODO: find a way to return a location header if needed w.Header().Set("location", t.Location())
+			w.WriteHeader(t.CustomHTTPCode())
+		}
+		return nil
+	}
 )
 
 type Gateway struct {
@@ -60,6 +71,10 @@ type Gateway struct {
 
 func (g *Gateway) Handler() http.Handler {
 	return addInterceptors(g.mux, g.http1HostName)
+}
+
+type CustomHTTPResponse interface {
+	CustomHTTPCode() int
 }
 
 type RegisterGatewayFunc func(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error

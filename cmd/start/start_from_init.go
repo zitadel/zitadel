@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/tls"
 )
 
-func NewStartFromInit() *cobra.Command {
+func NewStartFromInit(server chan<- *Server) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start-from-init",
 		Short: "cold starts zitadel",
@@ -37,7 +37,7 @@ Requirements:
 
 			startConfig := MustNewConfig(viper.GetViper())
 
-			err = startZitadel(startConfig, masterKey)
+			err = startZitadel(startConfig, masterKey, server)
 			logging.OnError(err).Fatal("unable to start zitadel")
 		},
 	}

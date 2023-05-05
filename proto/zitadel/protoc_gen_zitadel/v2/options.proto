@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package zitadel.protoc_gen_zitadel.v2;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/protoc/v2;protoc";
+
+extend google.protobuf.MethodOptions {
+  Options options = 50001;
+}
+
+message Options {
+  AuthOption auth_option = 1;
+  CustomHTTPResponse http_response = 2;
+}
+
+message AuthOption {
+  reserved 2;
+  string permission = 1;
+  string org_field = 3;
+}
+
+message CustomHTTPResponse {
+  int32 success_code = 1;
+}
