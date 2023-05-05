@@ -50,6 +50,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
@@ -129,7 +130,21 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
 
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, config.SystemDefaults, keys.IDPConfig, keys.OTP, keys.OIDC, keys.SAML, config.InternalAuthZ.RolePermissionMappings)
+	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+
+	queries, err := query.StartQueries(
+		ctx,
+		eventstoreClient,
+		dbClient,
+		config.Projections,
+		config.SystemDefaults,
+		keys.IDPConfig,
+		keys.OTP,
+		keys.OIDC,
+		keys.SAML,
+		config.InternalAuthZ.RolePermissionMappings,
+		sessionTokenVerifier,
+	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
@@ -137,6 +152,9 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC, config.ExternalSecure, config.Eventstore.AllowOrderByCreationDate)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
+	}
+	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
 
 	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
@@ -165,7 +183,8 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		keys.OIDC,
 		keys.SAML,
 		&http.Client{},
-		authZRepo,
+		permissionCheck,
+		sessionTokenVerifier,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -195,7 +214,22 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, queries, usageReporter)
+	err = startAPIs(
+		ctx,
+		clock,
+		router,
+		commands,
+		queries,
+		eventstoreClient,
+		dbClient,
+		config,
+		storage,
+		authZRepo,
+		keys,
+		queries,
+		usageReporter,
+		permissionCheck,
+	)
 	if err != nil {
 		return err
 	}
@@ -239,6 +273,7 @@ func startAPIs(
 	keys *encryptionKeys,
 	quotaQuerier logstore.QuotaQuerier,
 	usageReporter logstore.UsageReporter,
+	permissionCheck domain.PermissionCheck,
 ) error {
 	repo := struct {
 		authz_repo.Repository
@@ -294,7 +329,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, user.CreateServer(commands, queries, keys.User)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)

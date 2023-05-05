@@ -24,7 +24,7 @@ import (
 func TestCommands_ChangeUserEmail(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -174,7 +174,7 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -300,7 +300,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -410,7 +410,7 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -569,7 +569,7 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		checkPermission permissionCheck
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string

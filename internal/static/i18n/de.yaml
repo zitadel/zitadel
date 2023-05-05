@@ -470,6 +470,11 @@ Errors:
     Execution:
       StorageFailed: Das Speichern des Action Logs in der Datenbank ist fehlgeschlagen
       ScanFailed: Das Abfragen der verbrauchten Actions Sekunden ist fehlgeschlagen
+  Session:
+    NotExisting: Session existiert nicht
+    Terminated: Session bereits beendet
+    Token:
+      Invalid: Session Token ist ungültig
 
 AggregateTypes:
   action: Action

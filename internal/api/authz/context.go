@@ -60,7 +60,7 @@ const (
 	MemberTypeIam
 )
 
-func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *TokenVerifier, method string) (_ CtxData, err error) {
+func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t *TokenVerifier, method string) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -82,14 +82,15 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	if err := checkOrigin(ctx, origins); err != nil {
 		return CtxData{}, err
 	}
-	if orgID == "" {
+	if orgID == "" && orgDomain == "" {
 		orgID = resourceOwner
 	}
 
-	err = t.ExistsOrg(ctx, orgID)
+	verifiedOrgID, err := t.ExistsOrg(ctx, orgID, orgDomain)
 	if err != nil {
 		err = retry(func() error {
-			return t.ExistsOrg(ctx, orgID)
+			verifiedOrgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
+			return err
 		})
 		if err != nil {
 			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
@@ -98,7 +99,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 
 	return CtxData{
 		UserID:            userID,
-		OrgID:             orgID,
+		OrgID:             verifiedOrgID,
 		ProjectID:         projectID,
 		AgentID:           agentID,
 		PreferredLanguage: prefLang,
