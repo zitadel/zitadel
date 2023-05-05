@@ -9,7 +9,7 @@ type Props = {
 export default async function Page({ searchParams }: Props) {
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1>Register successful</h1>
+      <h1>Registration successful</h1>
       <p className="ztdl-p">You are registered.</p>
 
       {`userId: ${searchParams["userid"]}`}
