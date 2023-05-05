@@ -1,4 +1,4 @@
-package policy
+package settings
 
 import (
 	"context"
@@ -10,13 +10,13 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
-	policy "github.com/zitadel/zitadel/pkg/grpc/policy/v2alpha"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2alpha"
 )
 
-var _ policy.PolicyServiceServer = (*Server)(nil)
+var _ settings.SettingsServiceServer = (*Server)(nil)
 
 type Server struct {
-	policy.UnimplementedPolicyServiceServer
+	settings.UnimplementedSettingsServiceServer
 	command         *command.Commands
 	query           *query.Queries
 	assetsAPIDomain func(context.Context) string
@@ -37,21 +37,21 @@ func CreateServer(
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	policy.RegisterPolicyServiceServer(grpcServer, s)
+	settings.RegisterSettingsServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
-	return policy.PolicyService_ServiceDesc.ServiceName
+	return settings.SettingsService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return policy.PolicyService_ServiceDesc.ServiceName
+	return settings.SettingsService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return policy.PolicyService_AuthMethods
+	return settings.SettingsService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return policy.RegisterPolicyServiceHandler
+	return settings.RegisterSettingsServiceHandler
 }

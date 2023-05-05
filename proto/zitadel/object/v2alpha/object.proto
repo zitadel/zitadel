@@ -9,47 +9,39 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 message Organisation {
-    oneof org {
-        string org_id = 1;
-    }
+  oneof org {
+    string org_id = 1;
+  }
 }
 
 message RequestContext {
-    oneof resource_owner {
-        string org_id = 1;
-        bool instance = 2 [(validate.rules).bool = {const: true}];
-    }
+  oneof resource_owner {
+    string org_id = 1;
+    bool instance = 2 [(validate.rules).bool = {const: true}];
+  }
 }
 
 message Details {
-    //sequence represents the order of events. It's always counting
-    //
-    // on read: the sequence of the last event reduced by the projection
-    //
-    // on manipulation: the timestamp of the event(s) added by the manipulation
-    uint64 sequence = 1 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"2\"";
-        }
-    ];
-    //change_date is the timestamp when the object was changed
-    //
-    // on read: the timestamp of the last event reduced by the projection
-    //
-    // on manipulation: the timestamp of the event(s) added by the manipulation
-    google.protobuf.Timestamp change_date = 2;
-    //resource_owner is the organization or instance_id an object belongs to
-    string resource_owner = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"69629023906488334\"";
-        }
-    ];
-    //resource_owner_type gives the additional information if the resourceowner is an organization or an instance
-    ResourceOwnerType resource_owner_type = 4;
-}
-
-enum ResourceOwnerType {
-    RESOURCE_OWNER_TYPE_UNSPECIFIED = 0;
-    RESOURCE_OWNER_TYPE_INSTANCE = 1;
-    RESOURCE_OWNER_TYPE_ORG = 2;
+  //sequence represents the order of events. It's always counting
+  //
+  // on read: the sequence of the last event reduced by the projection
+  //
+  // on manipulation: the timestamp of the event(s) added by the manipulation
+  uint64 sequence = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2\"";
+    }
+  ];
+  //change_date is the timestamp when the object was changed
+  //
+  // on read: the timestamp of the last event reduced by the projection
+  //
+  // on manipulation: the timestamp of the event(s) added by the manipulation
+  google.protobuf.Timestamp change_date = 2;
+  //resource_owner is the organization or instance_id an object belongs to
+  string resource_owner = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
 }

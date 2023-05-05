@@ -1,27 +1,27 @@
 syntax = "proto3";
 
-package zitadel.policy.v2alpha;
+package zitadel.settings.v2alpha;
 
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/object/v2alpha/object.proto";
-import "zitadel/policy/v2alpha/login_policy.proto";
-import "zitadel/policy/v2alpha/password_policy.proto";
-import "zitadel/policy/v2alpha/branding_settings.proto";
-import "zitadel/policy/v2alpha/domain_settings.proto";
-import "zitadel/policy/v2alpha/legal_settings.proto";
-import "zitadel/policy/v2alpha/lockout_policy.proto";
+import "zitadel/settings/v2alpha/branding_settings.proto";
+import "zitadel/settings/v2alpha/domain_settings.proto";
+import "zitadel/settings/v2alpha/legal_settings.proto";
+import "zitadel/settings/v2alpha/lockout_settings.proto";
+import "zitadel/settings/v2alpha/login_settings.proto";
+import "zitadel/settings/v2alpha/password_settings.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/policy/v2alpha;policy";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2alpha;settings";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
-        title: "Policy Service";
+        title: "Settings Service";
         version: "2.0-alpha";
-        description: "This API is intended to manage policies in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+        description: "This API is intended to manage settings in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.";
         contact:{
             name: "ZITADEL"
             url: "https://zitadel.com"
@@ -76,10 +76,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
 };
 
-service PolicyService {
-    rpc GetLoginPolicy (GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
+service SettingsService {
+    rpc GetGeneralSettings(GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
         option (google.api.http) = {
-            get: "/v2alpha/policies/login"
+            get: "/v2alpha/settings"
         };
 
         option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -89,8 +89,8 @@ service PolicyService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get the current active login policy";
-            description: "Return the current active login policy for the requested context"
+            summary: "Get basic information over the instance";
+            description: "Return the basic information of the instance for the requested context"
             responses: {
                 key: "200"
                 value: {
@@ -99,9 +99,10 @@ service PolicyService {
             };
         };
     }
-    rpc GetPasswordPolicy (GetPasswordPolicyRequest) returns (GetPasswordPolicyResponse) {
+
+    rpc GetLoginSettings (GetLoginSettingsRequest) returns (GetLoginSettingsResponse) {
         option (google.api.http) = {
-            get: "/v2alpha/policies/password"
+            get: "/v2alpha/settings/login"
         };
 
         option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -111,8 +112,54 @@ service PolicyService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get the current active password policy";
-            description: "Return the current active password policy for the requested context"
+            summary: "Get the current active login settings";
+            description: "Return the current active login settings for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+
+    rpc GetActiveIdentityProviders (GetActiveIdentityProvidersRequest) returns (GetActiveIdentityProvidersResponse) {
+        option (google.api.http) = {
+            get: "/v2alpha/settings/login/idps"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get the current active identity providers";
+            description: "Return the current active identity providers for the requested context"
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+
+    rpc GetPasswordComplexitySettings (GetPasswordComplexitySettingsRequest) returns (GetPasswordComplexitySettingsResponse) {
+        option (google.api.http) = {
+            get: "/v2alpha/settings/password/complexity"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "policy.read"
+            }
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get the current active password complexity settings";
+            description: "Return the current active password complexity settings for the requested context"
             responses: {
                 key: "200"
                 value: {
@@ -123,7 +170,7 @@ service PolicyService {
     }
     rpc GetBrandingSettings (GetBrandingSettingsRequest) returns (GetBrandingSettingsResponse) {
         option (google.api.http) = {
-            get: "/v2alpha/policies/branding"
+            get: "/v2alpha/settings/branding"
         };
 
         option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -133,8 +180,8 @@ service PolicyService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get the current active branding policy";
-            description: "Return the current active branding policy for the requested context"
+            summary: "Get the current active branding settings";
+            description: "Return the current active branding settings for the requested context"
             responses: {
                 key: "200"
                 value: {
@@ -145,7 +192,7 @@ service PolicyService {
     }
     rpc GetDomainSettings (GetDomainSettingsRequest) returns (GetDomainSettingsResponse) {
         option (google.api.http) = {
-            get: "/v2alpha/policies/domain"
+            get: "/v2alpha/settings/domain"
         };
 
         option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -167,7 +214,7 @@ service PolicyService {
     }
     rpc GetLegalSettings (GetLegalSettingsRequest) returns (GetLegalSettingsResponse) {
         option (google.api.http) = {
-            get: "/v2alpha/policies/legal"
+            get: "/v2alpha/settings/legal"
         };
 
         option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -187,9 +234,9 @@ service PolicyService {
             };
         };
     }
-    rpc GetLockoutPolicy (GetLockoutPolicyRequest) returns (GetLockoutPolicyResponse) {
+    rpc GetLockoutSettings (GetLockoutSettingsRequest) returns (GetLockoutSettingsResponse) {
         option (google.api.http) = {
-            get: "/v2alpha/policies/lockout"
+            get: "/v2alpha/settings/lockout"
         };
 
         option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -199,52 +246,8 @@ service PolicyService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get the current active lockout policy";
-            description: "Return the current active lockout policy for the requested context"
-            responses: {
-                key: "200"
-                value: {
-                    description: "OK";
-                }
-            };
-        };
-    }
-    rpc GetActiveIdentityProviders (GetActiveIdentityProvidersRequest) returns (GetActiveIdentityProvidersResponse) {
-        option (google.api.http) = {
-            get: "/v2alpha/policies/idps"
-        };
-
-        option (zitadel.protoc_gen_zitadel.v2.options) = {
-            auth_option: {
-                permission: "policy.read"
-            }
-        };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get the current active identity providers";
-            description: "Return the current active identity providers for the requested context"
-            responses: {
-                key: "200"
-                value: {
-                    description: "OK";
-                }
-            };
-        };
-    }
-    rpc GetGeneralSettings(GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
-        option (google.api.http) = {
-            get: "/v2alpha/general/settings"
-        };
-
-        option (zitadel.protoc_gen_zitadel.v2.options) = {
-            auth_option: {
-                permission: "policy.read"
-            }
-        };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get basic information over the instance";
-            description: "Return the basic information of the instance for the requested context"
+            summary: "Get the current active lockout settings";
+            description: "Return the current active lockout settings for the requested context"
             responses: {
                 key: "200"
                 value: {
@@ -255,22 +258,22 @@ service PolicyService {
     }
 }
 
-message GetLoginPolicyRequest {
+message GetLoginSettingsRequest {
     zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
-message GetLoginPolicyResponse {
+message GetLoginSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.LoginPolicy policy = 2;
+    zitadel.settings.v2alpha.LoginSettings settings = 2;
 }
 
-message GetPasswordPolicyRequest {
+message GetPasswordComplexitySettingsRequest {
     zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
-message GetPasswordPolicyResponse {
+message GetPasswordComplexitySettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.PasswordPolicy policy = 2;
+    zitadel.settings.v2alpha.PasswordComplexitySettings settings = 2;
 }
 
 message GetBrandingSettingsRequest {
@@ -279,7 +282,7 @@ message GetBrandingSettingsRequest {
 
 message GetBrandingSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.BrandingSettings settings = 2;
+    zitadel.settings.v2alpha.BrandingSettings settings = 2;
 }
 
 message GetDomainSettingsRequest {
@@ -288,7 +291,7 @@ message GetDomainSettingsRequest {
 
 message GetDomainSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.DomainSettings settings = 2;
+    zitadel.settings.v2alpha.DomainSettings settings = 2;
 }
 
 message GetLegalSettingsRequest {
@@ -297,16 +300,16 @@ message GetLegalSettingsRequest {
 
 message GetLegalSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.LegalSettings settings = 2;
+    zitadel.settings.v2alpha.LegalSettings settings = 2;
 }
 
-message GetLockoutPolicyRequest {
+message GetLockoutSettingsRequest {
     zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
-message GetLockoutPolicyResponse {
+message GetLockoutSettingsResponse {
     zitadel.object.v2alpha.Details details = 1;
-    zitadel.policy.v2alpha.LockoutPolicy policy = 2;
+    zitadel.settings.v2alpha.LockoutSettings settings = 2;
 }
 
 message GetActiveIdentityProvidersRequest {
@@ -314,7 +317,8 @@ message GetActiveIdentityProvidersRequest {
 }
 
 message GetActiveIdentityProvidersResponse {
-    repeated string idps = 1;
+    zitadel.object.v2alpha.Details details = 1;
+    repeated zitadel.settings.v2alpha.IdentityProvider identity_providers = 2;
 }
 
 message GetGeneralSettingsRequest {}

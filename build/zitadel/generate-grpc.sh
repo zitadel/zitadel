@@ -106,6 +106,6 @@ protoc \
   --openapiv2_opt allow_delete_body=true \
   --zitadel_out=${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
-  ${PROTO_PATH}/policy/v2alpha/policy_service.proto
+  ${PROTO_PATH}/settings/v2alpha/settings_service.proto
 
 echo "done generating grpc"
