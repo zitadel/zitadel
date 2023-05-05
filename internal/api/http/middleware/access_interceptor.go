@@ -94,7 +94,7 @@ func SetExhaustedCookie(cookieHandler *http_utils.CookieHandler, writer http.Res
 	cookieValue := "true"
 	host := request.Header.Get(middleware.HTTP1Host)
 	domain := host
-	if strings.IndexAny(host, ":") > -1 {
+	if strings.ContainsAny(host, ":") {
 		var err error
 		domain, _, err = net.SplitHostPort(host)
 		if err != nil {
