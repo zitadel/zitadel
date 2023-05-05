@@ -85,4 +85,4 @@ and then run it with
 pnpm dev
 ```
 
-The login application with run on `localhost:3000`.
+Open the login application with your favorite browser at `localhost:3000`.
