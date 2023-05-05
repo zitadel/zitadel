@@ -5,6 +5,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint && prettier --check .",
+    "lint:fix": "prettier --write .",
     "lint-staged": "lint-staged",
     "start": "next start",
     "test": "yarn prettier:check &nexarn lint",
