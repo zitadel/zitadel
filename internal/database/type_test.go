@@ -12,11 +12,11 @@ func TestMap_Scan(t *testing.T) {
 	type args struct {
 		src any
 	}
-	type res[V mapValue] struct {
+	type res[V any] struct {
 		want Map[V]
 		err  bool
 	}
-	type testCase[V mapValue] struct {
+	type testCase[V any] struct {
 		name string
 		m    Map[V]
 		args args
@@ -74,7 +74,7 @@ func TestMap_Value(t *testing.T) {
 		want driver.Value
 		err  bool
 	}
-	type testCase[V mapValue] struct {
+	type testCase[V any] struct {
 		name string
 		m    Map[V]
 		res  res

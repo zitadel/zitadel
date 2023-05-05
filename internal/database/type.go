@@ -72,11 +72,7 @@ func (s EnumArray[F]) Value() (driver.Value, error) {
 	return array.Value()
 }
 
-type mapValue interface {
-	string | []byte | interface{}
-}
-
-type Map[V mapValue] map[string]V
+type Map[V any] map[string]V
 
 // Scan implements the [database/sql.Scanner] interface.
 func (m *Map[V]) Scan(src any) error {
