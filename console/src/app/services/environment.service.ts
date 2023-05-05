@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { catchError, map, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
@@ -32,7 +32,7 @@ export class EnvironmentService {
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
 
-  constructor(@Inject('UNINTERCEPTED_HTTP_CLIENT') private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   private environment$ = this.http.get<Environment>(this.environmentJsonPath).pipe(
     map((env) => {

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { lastValueFrom, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 
 import { PolicyComponentServiceType } from '../modules/policies/policy-component-types.enum';
 import { Theme } from '../modules/policies/private-labeling-policy/private-labeling-policy.component';
@@ -85,12 +85,14 @@ export class AssetService {
     if (orgId) {
       headers[orgKey] = `${orgId}`;
     }
-    return this.envService.env.pipe(
+    return this.envService.env
+      .pipe(
         switchMap((env) =>
           this.http.post(`${env.api}/assets/v1/${endpoint}`, body, {
             headers: headers,
           }),
         ),
-      ).toPromise();
+      )
+      .toPromise();
   }
 }

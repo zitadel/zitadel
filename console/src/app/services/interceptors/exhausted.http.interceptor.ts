@@ -1,6 +1,6 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable, of, switchMap } from 'rxjs';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { ExhaustedService } from '../exhausted.service';
 
 /**
@@ -13,20 +13,13 @@ export class ExhaustedHttpInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return this.exhaustedSvc.checkCookie().pipe(
-      switchMap(() =>
-        next.handle(req).pipe(
-          switchMap((event) => {
-            if (!(event instanceof HttpResponse) || event.status != 429) {
-              return of(event);
-            }
-            return this.exhaustedSvc.showExhaustedDialog().pipe(
-              // This map just makes the compiler happy.
-              // It should never be executed, as we expect a new page load now.
-              map(() => event),
-            );
-          }),
-        ),
-      ),
+      switchMap(() => next.handle(req)),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 429) {
+          return this.exhaustedSvc.showExhaustedDialog().pipe(switchMap(() => throwError(() => error)));
+        }
+        return throwError(() => error);
+      }),
     );
   }
 }
