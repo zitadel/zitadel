@@ -126,8 +126,8 @@ func domainSettingsToPb(current *query.DomainPolicy) *settings.DomainSettings {
 	}
 }
 
-func legalSettingsToPb(current *query.PrivacyPolicy) *settings.LegalSettings {
-	return &settings.LegalSettings{
+func legalAndSupportSettingsToPb(current *query.PrivacyPolicy) *settings.LegalAndSupportSettings {
+	return &settings.LegalAndSupportSettings{
 		TosLink:           current.TOSLink,
 		PrivacyPolicyLink: current.PrivacyLink,
 		HelpLink:          current.HelpLink,

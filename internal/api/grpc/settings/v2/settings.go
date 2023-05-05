@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2alpha"
 )
 
-func (s *Server) GetLoginPolicy(ctx context.Context, req *settings.GetLoginSettingsRequest) (*settings.GetLoginSettingsResponse, error) {
+func (s *Server) GetLoginSettings(ctx context.Context, req *settings.GetLoginSettingsRequest) (*settings.GetLoginSettingsResponse, error) {
 	current, err := s.query.LoginPolicyByID(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (s *Server) GetLoginPolicy(ctx context.Context, req *settings.GetLoginSetti
 	}, nil
 }
 
-func (s *Server) GetPasswordPolicy(ctx context.Context, req *settings.GetPasswordComplexitySettingsRequest) (*settings.GetPasswordComplexitySettingsResponse, error) {
+func (s *Server) GetPasswordComplexitySettings(ctx context.Context, req *settings.GetPasswordComplexitySettingsRequest) (*settings.GetPasswordComplexitySettingsResponse, error) {
 	current, err := s.query.PasswordComplexityPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
@@ -73,13 +73,13 @@ func (s *Server) GetDomainSettings(ctx context.Context, req *settings.GetDomainS
 	}, nil
 }
 
-func (s *Server) GetLegalSettings(ctx context.Context, req *settings.GetLegalSettingsRequest) (*settings.GetLegalSettingsResponse, error) {
+func (s *Server) GetLegalAndSupportSettings(ctx context.Context, req *settings.GetLegalAndSupportSettingsRequest) (*settings.GetLegalAndSupportSettingsResponse, error) {
 	current, err := s.query.PrivacyPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
-	return &settings.GetLegalSettingsResponse{
-		Settings: legalSettingsToPb(current),
+	return &settings.GetLegalAndSupportSettingsResponse{
+		Settings: legalAndSupportSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
 			ChangeDate:    timestamppb.New(current.ChangeDate),
@@ -88,7 +88,7 @@ func (s *Server) GetLegalSettings(ctx context.Context, req *settings.GetLegalSet
 	}, nil
 }
 
-func (s *Server) GetLockoutPolicy(ctx context.Context, req *settings.GetLockoutSettingsRequest) (*settings.GetLockoutSettingsResponse, error) {
+func (s *Server) GetLockoutSettings(ctx context.Context, req *settings.GetLockoutSettingsRequest) (*settings.GetLockoutSettingsResponse, error) {
 	current, err := s.query.LockoutPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err

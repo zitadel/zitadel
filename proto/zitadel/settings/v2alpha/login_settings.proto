@@ -58,7 +58,7 @@ message LoginSettings {
   ];
   google.protobuf.Duration external_login_check_lifetime = 10 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-     description: "Defines after how much time the user has to re-authenticate with an external provider.";
+      description: "Defines after how much time the user has to re-authenticate with an external provider.";
       example: "\"864000s\"";
     }
   ];

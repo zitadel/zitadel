@@ -266,6 +266,13 @@ module.exports = {
             sidebarOptions: {
               groupPathsBy: "tag",
             },
+          },
+          settings: {
+            specPath: ".artifacts/openapi/zitadel/settings/v2alpha/settings_service.swagger.json",
+            outputDir: "docs/apis/settings_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
           }
         }
       },
