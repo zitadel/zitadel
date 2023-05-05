@@ -1,5 +1,5 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
-import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
@@ -142,15 +142,12 @@ const authConfig: AuthConfig = {
     UserGuard,
     ThemeService,
     ExhaustedService,
-    {
-      provide: 'UNINTERCEPTED_HTTP_CLIENT',
-      useClass: HttpClient,
-    },
+    ExhaustedHttpInterceptor,
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializerFn,
       multi: true,
-      deps: [GrpcService],
+      deps: [GrpcService, ExhaustedHttpInterceptor],
     },
     {
       provide: APP_INITIALIZER,

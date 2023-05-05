@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Request, StatusCode, UnaryInterceptor, UnaryResponse } from 'grpc-web';
-import { from, lastValueFrom, map, of, switchMap } from 'rxjs';
+import { catchError, from, lastValueFrom, switchMap, throwError } from 'rxjs';
 import { ExhaustedService } from '../exhausted.service';
 
 /**
@@ -19,15 +19,11 @@ export class ExhaustedGrpcInterceptor<TReq = unknown, TResp = unknown> implement
       this.exhaustedSvc.checkCookie().pipe(
         switchMap(() =>
           from(invoker(request)).pipe(
-            switchMap((response) => {
-              if (response.getStatus().code != StatusCode.RESOURCE_EXHAUSTED) {
-                return of(response);
+            catchError((error) => {
+              if (error.code === StatusCode.RESOURCE_EXHAUSTED) {
+                return this.exhaustedSvc.showExhaustedDialog().pipe(switchMap(() => throwError(() => error)));
               }
-              return this.exhaustedSvc.showExhaustedDialog().pipe(
-                // This map just makes the compiler happy.
-                // It should never be executed, as we expect a new page load now.
-                map(() => response),
-              );
+              return throwError(() => error);
             }),
           ),
         ),
