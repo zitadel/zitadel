@@ -157,7 +157,7 @@ func (c *Commands) TerminateSession(ctx context.Context, sessionID, sessionToken
 // updateSession execute the [SessionChecks] where new events will be created and as well as for metadata (changes)
 func (c *Commands) updateSession(ctx context.Context, checks *SessionChecks, metadata map[string][]byte) (set *SessionChanged, err error) {
 	if checks.sessionWriteModel.State == domain.SessionStateTerminated {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated") //TODO: i18n
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated")
 	}
 	if err := checks.Check(ctx); err != nil {
 		// TODO: how to handle failed checks (e.g. pw wrong) #sessionissues
@@ -218,7 +218,7 @@ func sessionTokenVerifier(sessionAlg crypto.EncryptionAlgorithm) func(ctx contex
 		token, err = sessionAlg.DecryptString(decodedToken, sessionAlg.EncryptionKeyID())
 		spanPasswordComparison.EndWithError(err)
 		if err != nil || token != fmt.Sprintf(sessionTokenFormat, sessionID, tokenID) {
-			return caos_errs.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid") //TODO: i18n
+			return caos_errs.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
 		}
 		return nil
 	}
