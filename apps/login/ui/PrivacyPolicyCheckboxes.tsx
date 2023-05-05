@@ -23,7 +23,7 @@ export function PrivacyPolicyCheckboxes({ privacyPolicy, onChange }: Props) {
   return (
     <>
       <p className="flex flex-row items-center text-text-light-secondary-500 dark:text-text-dark-secondary-500 mt-4 text-sm">
-        To register you must agree our terms and conditions
+        To register you must agree to the terms and conditions
         {privacyPolicy?.helpLink && (
           <span>
             <Link href={privacyPolicy.helpLink} target="_blank">
