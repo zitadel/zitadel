@@ -135,9 +135,8 @@ describe('quotas', () => {
             }).then((res) => {
               expect(res.status).to.equal(429);
             });
-            const upgradeInstancePage = `https://example.com/instances/${ctx.instanceId}`;
             cy.getCookie('zitadel.quota.limiting').then((cookie) => {
-              expect(cookie.value).to.equal(upgradeInstancePage);
+              expect(cookie.value).to.equal("true");
               const cookieExpiry = new Date();
               cookieExpiry.setTime(cookie.expiry * 1000);
               expect(cookieExpiry).to.be.within(start, expiresMax);
@@ -148,6 +147,7 @@ describe('quotas', () => {
             // visit limited console
             cy.visit('/users/me');
             cy.contains('#authenticated-requests-exhausted-dialog button', 'Continue').click();
+            const upgradeInstancePage = `https://example.com/instances/${ctx.instanceId}`;
             cy.origin(upgradeInstancePage, { args: { upgradeInstancePage } }, ({ upgradeInstancePage }) => {
               cy.location('href').should('equal', upgradeInstancePage);
             });
