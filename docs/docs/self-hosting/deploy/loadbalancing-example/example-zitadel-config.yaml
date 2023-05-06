@@ -27,4 +27,4 @@ Database:
 LogStore:
   Access:
     Stdout:
-      Enable: true
+      Enabled: true
