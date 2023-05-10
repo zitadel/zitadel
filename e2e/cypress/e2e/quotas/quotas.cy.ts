@@ -120,7 +120,7 @@ describe('quotas', () => {
                 },
               });
             });
-            expectCookieDoesntExist()
+            expectCookieDoesntExist();
             const expiresMax = new Date();
             expiresMax.setMinutes(expiresMax.getMinutes() + 20);
             cy.request({
@@ -155,7 +155,7 @@ describe('quotas', () => {
             cy.visit('/users/me');
             cy.get('[data-e2e="top-view-title"]');
             createHumanUser(ctx.api, testUserName);
-            expectCookieDoesntExist()
+            expectCookieDoesntExist();
           });
         });
       });
