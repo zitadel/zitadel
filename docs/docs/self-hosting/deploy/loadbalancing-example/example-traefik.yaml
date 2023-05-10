@@ -28,6 +28,8 @@ http:
         isDevelopment: false
         allowedHosts:
         - 'my.domain'
+        customRequestHeaders:
+          :authority: 'my.domain'
     redirect-to-https:
       redirectScheme:
         scheme: https

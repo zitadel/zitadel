@@ -395,7 +395,6 @@ LogStore:
 Quotas:
   Access:
     ExhaustedCookieKey: "zitadel.quota.exhausted"
-    ExhaustedCookieValue: "true"
     ExhaustedCookieMaxAge: "300s"
 
 Eventstore:

@@ -107,7 +107,7 @@ describe('quotas', () => {
                 },
               });
             });
-            expectCookieDoesntExist()
+            expectCookieDoesntExist();
             const expiresMax = new Date();
             expiresMax.setMinutes(expiresMax.getMinutes() + 2);
             cy.request({
@@ -131,7 +131,7 @@ describe('quotas', () => {
             });
             ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests);
             createHumanUser(ctx.api, testUserName);
-            expectCookieDoesntExist()
+            expectCookieDoesntExist();
           });
         });
       });
