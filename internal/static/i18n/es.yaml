@@ -470,6 +470,11 @@ Errors:
     Execution:
       StorageFailed: Ha fallado el almacenaje del registro de ejecución de acciones en la base de datos
       ScanFailed: La consulta de uso de los segundos de ejecuciónde acciones ha fallado
+  Session:
+    NotExisting: La sesión no existe
+    Terminated: Sesión ya terminada
+    Token:
+      Invalid: El identificador de sesión no es válido
 
 AggregateTypes:
   action: Acción

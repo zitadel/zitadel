@@ -7,12 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func CheckPermission(ctx context.Context, resolver MembershipsResolver, roleMappings []RoleMapping, permission, orgID, resourceID string, allowSelf bool) (err error) {
-	ctxData := GetCtxData(ctx)
-	if allowSelf && ctxData.UserID == resourceID {
-		return nil
-	}
-	requestedPermissions, _, err := getUserPermissions(ctx, resolver, permission, roleMappings, ctxData, orgID)
+func CheckPermission(ctx context.Context, resolver MembershipsResolver, roleMappings []RoleMapping, permission, orgID, resourceID string) (err error) {
+	requestedPermissions, _, err := getUserPermissions(ctx, resolver, permission, roleMappings, GetCtxData(ctx), orgID)
 	if err != nil {
 		return err
 	}

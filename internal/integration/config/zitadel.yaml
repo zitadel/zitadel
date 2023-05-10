@@ -1,0 +1,37 @@
+Log:
+  Level: debug
+
+TLS:
+  Enabled: false
+
+FirstInstance:
+  Org:
+    Human:
+      PasswordChangeRequired: false
+
+LogStore:
+  Access:
+    Database:
+      Enabled: true
+      Debounce:
+        MinFrequency: 0s
+        MaxBulkSize: 0
+  Execution:
+    Database:
+      Enabled: true
+    Stdout:
+      Enabled: true
+
+Quotas:
+  Access:
+    ExhaustedCookieKey: "zitadel.quota.limiting"
+    ExhaustedCookieMaxAge: "60s"
+
+Projections:
+  Customizations:
+    NotificationsQuotas:
+      RequeueEvery: 1s
+
+DefaultInstance:
+  LoginPolicy:
+    MfaInitSkipLifetime: "0"
