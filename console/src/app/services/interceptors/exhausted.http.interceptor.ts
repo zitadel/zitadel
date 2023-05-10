@@ -13,7 +13,7 @@ export class ExhaustedHttpInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Don't check the cookie for the environment.json
-    let cookie$ = req.url.endsWith('/assets/environment.json') ? of(undefined) : this.exhaustedSvc.checkCookie();
+    let cookie$ = req.url.endsWith('./assets/environment.json') ? of(undefined) : this.exhaustedSvc.checkCookie();
     return cookie$.pipe(
       switchMap(() => next.handle(req)),
       catchError((error: HttpErrorResponse) => {
