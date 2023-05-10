@@ -184,6 +184,7 @@ func (a *API) routeGRPCWeb() {
 			return true
 		}),
 	)
+	a.router.Use(http_mw.RobotsTagHandler)
 	a.router.NewRoute().
 		Methods(http.MethodPost, http.MethodOptions).
 		MatcherFunc(

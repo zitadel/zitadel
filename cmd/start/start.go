@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"golang.org/x/sys/unix"
 
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
@@ -39,6 +40,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/robots_txt"
 	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -46,8 +48,10 @@ import (
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
@@ -61,7 +65,7 @@ import (
 	"github.com/zitadel/zitadel/openapi"
 )
 
-func New() *cobra.Command {
+func New(server chan<- *Server) *cobra.Command {
 	start := &cobra.Command{
 		Use:   "start",
 		Short: "starts ZITADEL instance",
@@ -79,7 +83,7 @@ Requirements:
 				return err
 			}
 
-			return startZitadel(config, masterKey)
+			return startZitadel(config, masterKey, server)
 		},
 	}
 
@@ -88,7 +92,23 @@ Requirements:
 	return start
 }
 
-func startZitadel(config *Config, masterKey string) error {
+type Server struct {
+	Config     *Config
+	DB         *database.DB
+	KeyStorage crypto.KeyStorage
+	Keys       *encryptionKeys
+	Eventstore *eventstore.Eventstore
+	Queries    *query.Queries
+	AuthzRepo  authz_repo.Repository
+	Storage    static.Storage
+	Commands   *command.Commands
+	LogStore   *logstore.Service
+	Router     *mux.Router
+	TLSConfig  *tls.Config
+	Shutdown   chan<- os.Signal
+}
+
+func startZitadel(config *Config, masterKey string, server chan<- *Server) error {
 	ctx := context.Background()
 
 	dbClient, err := database.Connect(config.Database, false)
@@ -111,7 +131,21 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
 
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, config.SystemDefaults, keys.IDPConfig, keys.OTP, keys.OIDC, keys.SAML, config.InternalAuthZ.RolePermissionMappings)
+	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+
+	queries, err := query.StartQueries(
+		ctx,
+		eventstoreClient,
+		dbClient,
+		config.Projections,
+		config.SystemDefaults,
+		keys.IDPConfig,
+		keys.OTP,
+		keys.OIDC,
+		keys.SAML,
+		config.InternalAuthZ.RolePermissionMappings,
+		sessionTokenVerifier,
+	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
@@ -119,6 +153,9 @@ func startZitadel(config *Config, masterKey string) error {
 	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC, config.ExternalSecure, config.Eventstore.AllowOrderByCreationDate)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
+	}
+	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
 
 	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
@@ -147,7 +184,8 @@ func startZitadel(config *Config, masterKey string) error {
 		keys.OIDC,
 		keys.SAML,
 		&http.Client{},
-		authZRepo,
+		permissionCheck,
+		sessionTokenVerifier,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -177,11 +215,49 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, queries, usageReporter)
+	err = startAPIs(
+		ctx,
+		clock,
+		router,
+		commands,
+		queries,
+		eventstoreClient,
+		dbClient,
+		config,
+		storage,
+		authZRepo,
+		keys,
+		queries,
+		usageReporter,
+		permissionCheck,
+	)
 	if err != nil {
 		return err
 	}
-	return listen(ctx, router, config.Port, tlsConfig)
+
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+
+	if server != nil {
+		server <- &Server{
+			Config:     config,
+			DB:         dbClient,
+			KeyStorage: keyStorage,
+			Keys:       keys,
+			Eventstore: eventstoreClient,
+			Queries:    queries,
+			AuthzRepo:  authZRepo,
+			Storage:    storage,
+			Commands:   commands,
+			LogStore:   actionsLogstoreSvc,
+			Router:     router,
+			TLSConfig:  tlsConfig,
+			Shutdown:   shutdown,
+		}
+		close(server)
+	}
+
+	return listen(ctx, router, config.Port, tlsConfig, shutdown)
 }
 
 func startAPIs(
@@ -198,6 +274,7 @@ func startAPIs(
 	keys *encryptionKeys,
 	quotaQuerier logstore.QuotaQuerier,
 	usageReporter logstore.UsageReporter,
+	permissionCheck domain.PermissionCheck,
 ) error {
 	repo := struct {
 		authz_repo.Repository
@@ -259,7 +336,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, user.CreateServer(commands, queries, keys.User)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
@@ -270,6 +347,13 @@ func startAPIs(
 	if err != nil {
 		return err
 	}
+
+	// robots.txt handler
+	robotsTxtHandler, err := robots_txt.Start()
+	if err != nil {
+		return fmt.Errorf("unable to start robots txt handler: %w", err)
+	}
+	apis.RegisterHandlerOnPrefix(robots_txt.HandlerPrefix, robotsTxtHandler)
 
 	// TODO: Record openapi access logs?
 	openAPIHandler, err := openapi.Start()
@@ -308,10 +392,21 @@ func startAPIs(
 	return nil
 }
 
-func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config) error {
+func reusePort(network, address string, conn syscall.RawConn) error {
+	return conn.Control(func(descriptor uintptr) {
+		err := syscall.SetsockoptInt(int(descriptor), syscall.SOL_SOCKET, unix.SO_REUSEPORT, 1)
+		if err != nil {
+			panic(err)
+		}
+	})
+}
+
+func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, shutdown <-chan os.Signal) error {
 	http2Server := &http2.Server{}
 	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig}
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+
+	lc := &net.ListenConfig{Control: reusePort}
+	lis, err := lc.Listen(ctx, "tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return fmt.Errorf("tcp listener on %d failed: %w", port, err)
 	}
@@ -327,9 +422,6 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 			errCh <- http1Server.Serve(lis)
 		}
 	}()
-
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
 	select {
 	case err := <-errCh:

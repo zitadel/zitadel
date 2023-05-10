@@ -44,7 +44,7 @@ jobs:
         uses: codecov/codecov-action@v3.1.0
         with:
           file: .artifacts/codecov/profile.cov
-          name: go-codecov
+          name: unit-tests
       # As goreleaser doesn't build a dockerfile in snapshot mode, we have to build it here
       - name: Build Docker Image
         run: docker build -t zitadel:pr --file build/Dockerfile .artifacts/zitadel
