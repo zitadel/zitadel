@@ -120,11 +120,9 @@ describe('quotas', () => {
                 },
               });
             });
+            expectCookieDoesntExist()
             const expiresMax = new Date();
             expiresMax.setMinutes(expiresMax.getMinutes() + 20);
-            cy.getCookie('zitadel.quota.limiting').then((cookie) => {
-              expect(cookie).to.be.null;
-            });
             cy.request({
               url: urls[1],
               method: 'GET',
@@ -136,7 +134,7 @@ describe('quotas', () => {
               expect(res.status).to.equal(429);
             });
             cy.getCookie('zitadel.quota.limiting').then((cookie) => {
-              expect(cookie.value).to.equal("true");
+              expect(cookie.value).to.equal('true');
               const cookieExpiry = new Date();
               cookieExpiry.setTime(cookie.expiry * 1000);
               expect(cookieExpiry).to.be.within(start, expiresMax);
@@ -157,6 +155,7 @@ describe('quotas', () => {
             cy.visit('/users/me');
             cy.get('[data-e2e="top-view-title"]');
             createHumanUser(ctx.api, testUserName);
+            expectCookieDoesntExist()
           });
         });
       });
@@ -325,3 +324,9 @@ describe('quotas', () => {
     });
   });
 });
+
+function expectCookieDoesntExist() {
+  cy.getCookie('zitadel.quota.limiting').then((cookie) => {
+    expect(cookie).to.be.null;
+  });
+}

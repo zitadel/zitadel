@@ -152,11 +152,13 @@ func addInterceptors(
 	cookieConfig *http_mw.AccessConfig,
 	queries *query.Queries,
 ) http.Handler {
-	handler = exhaustedCookieInterceptor(handler, cookieHandler, cookieConfig, queries)
 	handler = http_mw.CallDurationHandler(handler)
 	handler = http1Host(handler, http1HostName)
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.DefaultTelemetryHandler(handler)
+	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
+	// only if it follows the http_mw.DefaultTelemetryHandler
+	handler = exhaustedCookieInterceptor(handler, cookieHandler, cookieConfig, queries)
 	handler = http_mw.DefaultMetricsHandler(handler)
 	return handler
 }
@@ -199,11 +201,11 @@ type cookieResponseWriter struct {
 }
 
 func (r *cookieResponseWriter) WriteHeader(status int) {
-	if status != http.StatusTooManyRequests {
+	if status >= 200 && status < 300 {
 		http_mw.DeleteExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.request, r.cookieConfig)
-		r.ResponseWriter.WriteHeader(status)
-		return
 	}
-	http_mw.SetExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.cookieConfig, r.request)
+	if status == http.StatusTooManyRequests {
+		http_mw.SetExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.cookieConfig, r.request)
+	}
 	r.ResponseWriter.WriteHeader(status)
 }

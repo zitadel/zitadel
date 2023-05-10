@@ -23,3 +23,8 @@ Database:
         RootCert: "/crdb-certs/ca.crt"
         Cert: "/crdb-certs/client.root.crt"
         Key: "/crdb-certs/client.root.key"
+
+LogStore:
+  Access:
+    Stdout:
+      Enabled: true
