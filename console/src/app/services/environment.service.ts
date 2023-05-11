@@ -37,7 +37,7 @@ export class EnvironmentService {
 
   private environment$ = of(
     // Delete the exhausted cookie before the enviroment is loaded
-    () => (document.cookie = `${this.exhaustedCookieKey}=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"`),
+    () => (document.cookie = `${this.exhaustedCookieKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC"`),
   ).pipe(
     switchMap(() => {
       return this.http.get<Environment>(this.environmentJsonPath).pipe(
