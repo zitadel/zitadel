@@ -470,6 +470,11 @@ Errors:
     Execution:
       StorageFailed: Zapisywanie dziennika wykonania akcji do bazy danych nie powiodło się
       ScanFailed: Zapytanie o użycie dla sekund wykonania akcji nie powiodło się
+  Session:
+    NotExisting: Sesja nie istnieje
+    Terminated: Sesja już zakończona
+    Token:
+      Invalid: Token sesji jest nieprawidłowy
 
 AggregateTypes:
   action: Działanie

@@ -470,6 +470,11 @@ Errors:
     Execution:
       StorageFailed: Il salvataggio del registro delle azioni nel database non è riuscito
       ScanFailed: La query dei secondi delle azioni utilizzate non è riuscita
+  Session:
+    NotExisting: La sessione non esiste
+    Terminated: Sessione già terminata
+    Token:
+      Invalid: Il token della sessione non è valido
 
 AggregateTypes:
   action: Azione
