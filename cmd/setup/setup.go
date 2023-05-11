@@ -91,7 +91,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
 	steps.s9EventstoreIndexes2 = New09(dbClient)
 	steps.CorrectCreationDate.dbClient = dbClient
-	steps.s11AddEventCreatedAt = &AddEventCreatedAt{dbClient: dbClient}
+	steps.s11AddEventCreatedAt = &AddEventCreatedAt{dbClient: dbClient, step10: steps.CorrectCreationDate}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
