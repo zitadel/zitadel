@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, map, shareReplay, switchMap, throwError } from 'rxjs';
+import { catchError, map, of, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
@@ -26,6 +26,7 @@ interface WellKnown {
   providedIn: 'root',
 })
 export class EnvironmentService {
+  private exhaustedCookieKey = 'zitadel.quota.limiting';
   private environmentJsonPath = './assets/environment.json';
   private wellknownPath = '/.well-known/openid-configuration`';
   public auth!: AuthServiceClient;
@@ -34,17 +35,25 @@ export class EnvironmentService {
 
   constructor(private http: HttpClient) {}
 
-  private environment$ = this.http.get<Environment>(this.environmentJsonPath).pipe(
-    map((env) => {
-      return env;
-    }),
-    catchError((err) => {
-      console.error('Getting environment.json failed', err);
-      return throwError(() => err);
+  private environment$ = of(
+    // Delete the exhausted cookie before the enviroment is loaded
+    () => (document.cookie = `${this.exhaustedCookieKey}=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT"`),
+  ).pipe(
+    switchMap(() => {
+      return this.http.get<Environment>(this.environmentJsonPath).pipe(
+        map((env) => {
+          return env;
+        }),
+        catchError((err) => {
+          console.error('Getting environment.json failed', err);
+          return throwError(() => err);
+        }),
+      );
     }),
     // Cache the first response, then replay it
     shareReplay(1),
   );
+
   private wellKnown$ = this.environment$.pipe(
     catchError((err) => {
       console.error('Getting well-known OIDC configuration failed', err);
@@ -63,5 +72,12 @@ export class EnvironmentService {
 
   get wellKnown() {
     return this.wellKnown$;
+  }
+
+  get hasExhaustedCookie() {
+    return !!document.cookie
+      .split(';')
+      .map((c) => c.trim())
+      .find((c) => c.startsWith(`${this.exhaustedCookieKey}=`));
   }
 }
