@@ -155,7 +155,11 @@
           white-space: nowrap;
         }
 
-        :first-child {
+        .space {
+          margin-left: 0.5rem;
+        }
+
+        .row-entry {
           margin-right: 1rem;
           overflow: hidden;
           text-overflow: ellipsis;
