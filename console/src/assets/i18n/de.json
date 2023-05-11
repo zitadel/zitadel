@@ -1969,7 +1969,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2059,6 +2060,10 @@
       "IMPLICIT": {
         "TITLE": "Implicit",
         "DESCRIPTION": "Erhalte die Token direkt vom authorize Endpoint"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autorisieren Sie das Gerät auf einem Computer oder Smartphone."
       },
       "CUSTOM": {
         "TITLE": "Custom",

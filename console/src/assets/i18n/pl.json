@@ -1970,7 +1970,8 @@
       "GRANT": {
         "0": "Kod autoryzacyjny",
         "1": "Implicite",
-        "2": "Token odświeżający"
+        "2": "Token odświeżający",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Podstawowy",
@@ -2060,6 +2061,10 @@
       "IMPLICIT": {
         "TITLE": "Implicit",
         "DESCRIPTION": "Pobierz tokeny bezpośrednio z punktu autoryzacyjnego"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoryzuj urządzenie na komputerze lub smartfonie."
       },
       "CUSTOM": {
         "TITLE": "Niestandardowy",
