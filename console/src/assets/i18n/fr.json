@@ -1970,7 +1970,8 @@
       "GRANT": {
         "0": "Code d'autorisation",
         "1": "Implicite",
-        "2": "Rafraîchir le jeton"
+        "2": "Rafraîchir le jeton",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2048,6 +2049,10 @@
       "IMPLICIT": {
         "TITLE": "Implicite",
         "DESCRIPTION": "Obtenir les jetons directement à partir du point final d'autorisation"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoriser l'appareil sur un ordinateur ou un smartphone."
       },
       "CUSTOM": {
         "TITLE": "Personnalisé",

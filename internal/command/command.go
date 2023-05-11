@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/static"
@@ -29,7 +30,7 @@ import (
 type Commands struct {
 	httpClient *http.Client
 
-	checkPermission permissionCheck
+	checkPermission domain.PermissionCheck
 	newEmailCode    func(ctx context.Context, filter preparation.FilterToQueryReducer, codeAlg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error)
 
 	eventstore     *eventstore.Eventstore
@@ -50,6 +51,8 @@ type Commands struct {
 	domainVerificationAlg       crypto.EncryptionAlgorithm
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType api_http.CheckType) error
+	sessionTokenCreator         func(sessionID string) (id string, token string, err error)
+	sessionTokenVerifier        func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 
 	multifactors         domain.MultifactorConfigs
 	webauthnConfig       *webauthn_helper.Config
@@ -71,24 +74,21 @@ func StartCommands(
 	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
-	idpConfigEncryption,
-	otpEncryption,
-	smtpEncryption,
-	smsEncryption,
-	userEncryption,
-	domainVerificationEncryption,
-	oidcEncryption,
-	samlEncryption crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption crypto.EncryptionAlgorithm,
 	httpClient *http.Client,
-	membershipsResolver authz.MembershipsResolver,
+	permissionCheck domain.PermissionCheck,
+	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
 	}
+	idGenerator := id.SonyFlakeGenerator()
+	// reuse the oidcEncryption to be able to handle both tokens in the interceptor later on
+	sessionAlg := oidcEncryption
 	repo = &Commands{
 		eventstore:            es,
 		static:                staticStore,
-		idGenerator:           id.SonyFlakeGenerator(),
+		idGenerator:           idGenerator,
 		zitadelRoles:          zitadelRoles,
 		externalDomain:        externalDomain,
 		externalSecure:        externalSecure,
@@ -107,10 +107,10 @@ func StartCommands(
 		certificateAlgorithm:  samlEncryption,
 		webauthnConfig:        webAuthN,
 		httpClient:            httpClient,
-		checkPermission: func(ctx context.Context, permission, orgID, resourceID string, allowSelf bool) (err error) {
-			return authz.CheckPermission(ctx, membershipsResolver, zitadelRoles, permission, orgID, resourceID, allowSelf)
-		},
-		newEmailCode: newEmailCode,
+		checkPermission:       permissionCheck,
+		newEmailCode:          newEmailCode,
+		sessionTokenCreator:   sessionTokenCreator(idGenerator, sessionAlg),
+		sessionTokenVerifier:  sessionTokenVerifier,
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)
@@ -121,6 +121,7 @@ func StartCommands(
 	keypair.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
+	session.RegisterEventMappers(repo.eventstore)
 
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)

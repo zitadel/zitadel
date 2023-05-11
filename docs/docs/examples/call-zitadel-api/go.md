@@ -14,7 +14,7 @@ All that is required, is a service account with an Org Owner (or another role, d
 
 However, we recommend you read the guide on [how to access ZITADEL API](../../guides/integrate/access-zitadel-apis) and the associated guides for a basic knowledge of :
  - [Recommended Authorization Flows](../../guides/integrate/oauth-recommended-flows.md)
- - [Service Users](../../guides/integrate/serviceusers.md)
+ - [Service Users](../../guides/integrate/serviceusers)
 
 > Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
 

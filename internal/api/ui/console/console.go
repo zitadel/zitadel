@@ -1,9 +1,11 @@
 package console
 
 import (
+	"bytes"
 	"embed"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io/fs"
 	"net/http"
 	"os"
@@ -22,8 +24,9 @@ import (
 )
 
 type Config struct {
-	ShortCache middleware.CacheConfig
-	LongCache  middleware.CacheConfig
+	ShortCache            middleware.CacheConfig
+	LongCache             middleware.CacheConfig
+	InstanceManagementURL string
 }
 
 type spaHandler struct {
@@ -88,7 +91,7 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 	return f, nil
 }
 
-func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler func(http.Handler) http.Handler, customerPortal string) (http.Handler, error) {
+func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler, accessInterceptor func(http.Handler) http.Handler, customerPortal string) (http.Handler, error) {
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
@@ -103,10 +106,16 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 
 	handler := mux.NewRouter()
 
-	handler.Use(callDurationInterceptor, instanceHandler, security)
+	handler.Use(callDurationInterceptor, instanceHandler, security, accessInterceptor)
 	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), authz.GetInstance(r.Context()).ConsoleClientID(), customerPortal)
+		instance := authz.GetInstance(r.Context())
+		instanceMgmtURL, err := templateInstanceManagementURL(config.InstanceManagementURL, instance)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("unable to template instance management url for console: %v", err), http.StatusInternalServerError)
+			return
+		}
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return
@@ -118,6 +127,18 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 	return handler, nil
 }
 
+func templateInstanceManagementURL(templateableCookieValue string, instance authz.Instance) (string, error) {
+	cookieValueTemplate, err := template.New("cookievalue").Parse(templateableCookieValue)
+	if err != nil {
+		return templateableCookieValue, err
+	}
+	cookieValue := new(bytes.Buffer)
+	if err = cookieValueTemplate.Execute(cookieValue, instance); err != nil {
+		return templateableCookieValue, err
+	}
+	return cookieValue.String(), nil
+}
+
 func csp() *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.StyleSrc = csp.StyleSrc.AddInline()
@@ -127,17 +148,19 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createEnvironmentJSON(api, issuer, clientID, customerPortal string) ([]byte, error) {
+func createEnvironmentJSON(api, issuer, clientID, customerPortal, instanceMgmtUrl string) ([]byte, error) {
 	environment := struct {
-		API            string `json:"api,omitempty"`
-		Issuer         string `json:"issuer,omitempty"`
-		ClientID       string `json:"clientid,omitempty"`
-		CustomerPortal string `json:"customer_portal,omitempty"`
+		API                   string `json:"api,omitempty"`
+		Issuer                string `json:"issuer,omitempty"`
+		ClientID              string `json:"clientid,omitempty"`
+		CustomerPortal        string `json:"customer_portal,omitempty"`
+		InstanceManagementURL string `json:"instance_management_url,omitempty"`
 	}{
-		API:            api,
-		Issuer:         issuer,
-		ClientID:       clientID,
-		CustomerPortal: customerPortal,
+		API:                   api,
+		Issuer:                issuer,
+		ClientID:              clientID,
+		CustomerPortal:        customerPortal,
+		InstanceManagementURL: instanceMgmtUrl,
 	}
 	return json.Marshal(environment)
 }
