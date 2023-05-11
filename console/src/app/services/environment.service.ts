@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, map, of, shareReplay, switchMap, throwError } from 'rxjs';
+import { catchError, map, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
@@ -35,11 +35,24 @@ export class EnvironmentService {
 
   constructor(private http: HttpClient) {}
 
-  private environment$ = of(
+  private environment$ = of(null).pipe(
     // Delete the exhausted cookie before the enviroment is loaded
-    () => (document.cookie = `${this.exhaustedCookieKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC"`),
-  ).pipe(
+    tap(() => (document.cookie = `${this.exhaustedCookieKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC"`)),
     switchMap(() => {
+      // Wait until the browser deleted the cookie
+      return new Promise<void>((resolve) => {
+        const checkCookie = () => {
+          if (this.hasExhaustedCookie) {
+            setTimeout(checkCookie, 10);
+          } else {
+            resolve();
+          }
+        };
+        checkCookie();
+      });
+    }),
+    switchMap(() => {
+      // Get environment.json
       return this.http.get<Environment>(this.environmentJsonPath).pipe(
         map((env) => {
           return env;
