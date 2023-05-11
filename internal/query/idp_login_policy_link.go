@@ -86,21 +86,41 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	eqPolicy := sq.Eq{LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eqPolicy[LoginPolicyColumnOwnerRemoved.identifier()] = false
+	}
+	policyOwner, args, err := sq.Select(LoginPolicyColumnOrgID.identifier()).
+		From(loginPolicyTable.identifier()).
+		Where(
+			sq.And{
+				eqPolicy,
+				sq.Or{
+					sq.Eq{LoginPolicyColumnOrgID.identifier(): resourceOwner},
+					sq.Eq{LoginPolicyColumnOrgID.identifier(): authz.GetInstance(ctx).InstanceID()},
+				},
+			}).
+		PlaceholderFormat(sq.Dollar).
+		Limit(1).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-JHkj3", "Errors.Query.InvalidRequest")
+	}
 	query, scan := prepareIDPLoginPolicyLinksQuery(ctx, q.client)
 	eq := sq.Eq{
-		IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
-		IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).InstanceID(),
+		IDPLoginPolicyLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
 		eq[IDPLoginPolicyLinkOwnerRemovedCol.identifier()] = false
 	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+
+	stmt, _, err := queries.toQuery(query).Where(eq).
+		Where(IDPLoginPolicyLinkResourceOwnerCol.identifier()+" = ("+policyOwner+")", args...).
+		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")
 	}
-
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
+	if err != nil || rows.Err() != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-ZkKUc", "Errors.Internal")
 	}
 	idps, err = scan(rows)
