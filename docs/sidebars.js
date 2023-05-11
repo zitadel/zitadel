@@ -428,6 +428,20 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Settings Lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "Settings Service API (Alpha)",
+            slug: "/apis/settings_service",
+            description:
+              "This API is intended to manage settings in a ZITADEL instance.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/settings_service/sidebar.js"),
+        },
+        {
+          type: "category",
           label: "Assets",
           collapsed: true,
           items: ["apis/assets/assets"],

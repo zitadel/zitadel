@@ -33,6 +33,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
+	"github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -335,6 +336,9 @@ func startAPIs(
 		return err
 	}
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
+		return err
+	}
+	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
 		return err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
