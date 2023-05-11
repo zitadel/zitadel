@@ -110,8 +110,8 @@ func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.G
 	}
 
 	return &settings.GetActiveIdentityProvidersResponse{
+		Details:           object.ToListDetails(links.SearchResponse),
 		IdentityProviders: identityProvidersToPb(links.Links),
-		//Details:           object.ToListDetails(links.SearchResponse), //TODO: add after session PR
 	}, nil
 }
 

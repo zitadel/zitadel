@@ -154,7 +154,7 @@ func identityProvidersToPb(idps []*query.IDPLoginPolicyLink) []*settings.Identit
 func identityProviderToPb(idp *query.IDPLoginPolicyLink) *settings.IdentityProvider {
 	return &settings.IdentityProvider{
 		Id:   idp.IDPID,
-		Name: idp.IDPName,
+		Name: domain.IDPName(idp.IDPName, idp.IDPType),
 		Type: idpTypeToPb(idp.IDPType),
 	}
 }

@@ -330,7 +330,7 @@ message GetActiveIdentityProvidersRequest {
 }
 
 message GetActiveIdentityProvidersResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2alpha.ListDetails details = 1;
   repeated zitadel.settings.v2alpha.IdentityProvider identity_providers = 2;
 }
 
