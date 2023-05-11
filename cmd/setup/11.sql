@@ -1,0 +1,1 @@
+ALTER TABLE eventstore.events ADD COLUMN created_at TIMESTAMPTZ /*NOT NULL*/ DEFAULT clock_timestamp();
