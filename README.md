@@ -28,6 +28,7 @@ This repo has some additional tools:
 
 ### Useful commands
 
+- `pnpm generate` - Build proto stubs for server and client package
 - `pnpm build` - Build all packages and the login app
 - `pnpm dev` - Develop all packages and the login app
 - `pnpm lint` - Lint all packages
@@ -63,3 +64,36 @@ See [Working with the npm registry](https://docs.github.com/en/packages/working-
 - Buf setup to get grpc stub in the core package
 - Decide whether a seperate client package is required to expose public client convenience methods only or generate a grpc-web output there
 - Fix #/\* path in login application
+
+### Run Login UI
+
+To run the application make sure to install the dependencies with
+
+```sh
+pnpm install
+```
+
+then setup the environment for the login application which needs a `.env.local` in `/apps/login`.
+Go to your instance and create a service user for the application having the IAM_OWNER manager role.
+This user is required to have access to create users on your primary organization and reading policy data so it can be restricted to your personal use case but we'll stick with IAM_OWNER for convenience. Create a PAT and copy the value to paste it under the `ZITADEL_SERVICE_USER_TOKEN` key.
+The file should look as follows:
+
+```
+ZITADEL_API_URL=[yourinstanceurl]
+ZITADEL_ORG_ID=[yourprimaryorg]
+ZITADEL_SERVICE_USER_TOKEN=[yourserviceuserpersonalaccesstoken]
+```
+
+then generate the GRPC stubs with
+
+```sh
+pnpm generate
+```
+
+and then run it with
+
+```sh
+pnpm dev
+```
+
+Open the login application with your favorite browser at `localhost:3000`.

@@ -6,11 +6,11 @@ export type Item = {
 
 export const demos: { name: string; items: Item[] }[] = [
   {
-    name: "Routes",
+    name: "Login",
     items: [
       {
-        name: "Login",
-        slug: "login",
+        name: "Username",
+        slug: "username",
         description: "The entrypoint of the application",
       },
       {
@@ -47,6 +47,16 @@ export const demos: { name: string; items: Item[] }[] = [
         name: "Passwordless Create",
         slug: "passwordless/create",
         description: "The page to add a users passwordless device",
+      },
+    ],
+  },
+  {
+    name: "Register",
+    items: [
+      {
+        name: "Register",
+        slug: "register",
+        description: "Create your ZITADEL account",
       },
     ],
   },

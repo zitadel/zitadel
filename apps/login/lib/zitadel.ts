@@ -8,6 +8,8 @@ import {
   getServers,
   LabelPolicy,
   initializeServer,
+  PrivacyPolicy,
+  PasswordComplexityPolicy,
 } from "@zitadel/server";
 // import { getAuth } from "@zitadel/server/auth";
 
@@ -31,14 +33,68 @@ export function getBranding(
   return mgmt
     .getLabelPolicy(
       {},
-      { metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "") }
+      {
+        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
+      }
     )
     .then((resp) => resp.policy);
 }
 
+export function getPrivacyPolicy(
+  server: ZitadelServer
+): Promise<PrivacyPolicy | undefined> {
+  const mgmt = getManagement(server);
+  return mgmt
+    .getPrivacyPolicy(
+      {},
+      {
+        //  metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
+      }
+    )
+    .then((resp) => resp.policy);
+}
+
+export function getPasswordComplexityPolicy(
+  server: ZitadelServer
+): Promise<PasswordComplexityPolicy | undefined> {
+  const mgmt = getManagement(server);
+  return mgmt
+    .getPasswordComplexityPolicy(
+      {},
+      {
+        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
+      }
+    )
+    .then((resp) => resp.policy);
+}
+
+export type AddHumanUserData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+};
+export function addHumanUser(
+  server: ZitadelServer,
+  { email, firstName, lastName, password }: AddHumanUserData
+): Promise<string> {
+  const mgmt = getManagement(server);
+  return mgmt
+    .addHumanUser(
+      {
+        email: { email, isEmailVerified: false },
+        userName: email,
+        profile: { firstName, lastName },
+        initialPassword: password,
+      },
+      {
+        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
+      }
+    )
+    .then((resp) => {
+      console.log("added user", resp.userId);
+      return resp.userId;
+    });
+}
+
 export { server };
-// export async function getMyUser(): Promise<GetMyUserResponse> {
-//   const auth = await getAuth();
-//   const response = await auth.getMyUser({});
-//   return response;
-// }

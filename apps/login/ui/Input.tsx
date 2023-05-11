@@ -57,7 +57,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     return (
       <label className="flex flex-col text-12px text-input-light-label dark:text-input-dark-label">
         <span
-          className={`leading-14.5px mb-1 ${
+          className={`leading-3 mb-1 ${
             error ? "text-warn-light-500 dark:text-warn-dark-500" : ""
           }`}
         >

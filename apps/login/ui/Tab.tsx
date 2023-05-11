@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import type { Item } from '#/ui/TabGroup';
-import clsx from 'clsx';
-import Link from 'next/link';
-import { useSelectedLayoutSegment } from 'next/navigation';
+import type { Item } from "#/ui/TabGroup";
+import clsx from "clsx";
+import Link from "next/link";
+import { useSelectedLayoutSegment } from "next/navigation";
 
 export const Tab = ({
   path,
@@ -13,7 +13,7 @@ export const Tab = ({
   item: Item;
 }) => {
   const segment = useSelectedLayoutSegment();
-  const href = slug ? path + '/' + slug : path;
+  const href = slug ? path + "/" + slug : path;
   const isActive =
     // Example home pages e.g. `/layouts`
     (!slug && segment === null) ||
@@ -23,10 +23,10 @@ export const Tab = ({
   return (
     <Link
       href={href}
-      className={clsx('mt-2 mr-2 rounded-lg px-3 py-1 text-sm font-medium', {
-        'bg-gray-700 text-gray-100 hover:bg-gray-500 hover:text-white':
+      className={clsx("mt-2 mr-2 rounded-lg px-3 py-1 text-sm font-medium", {
+        "bg-gray-700 text-gray-100 hover:bg-gray-500 hover:text-white":
           !isActive,
-        'bg-vercel-blue text-white': isActive,
+        "bg-blue-500 text-white": isActive,
       })}
     >
       {text}

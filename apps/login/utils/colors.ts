@@ -1,5 +1,3 @@
-import { LabelPolicy } from "#/../../packages/zitadel-server/dist";
-import { secondsToMilliseconds } from "date-fns";
 import tinycolor from "tinycolor2";
 
 export interface Color {
@@ -93,12 +91,6 @@ export function setTheme(document: any, policy?: LabelPolicyColors) {
   setColorShades(dark.warn, "warn", "dark", document);
   setColorShades(light.warn, "warn", "light", document);
 
-  //   setColorShades(dark.text, "text", "dark", document);
-  //   setColorShades(light.text, "text", "light", document);
-
-  //   setColorShades(dark.link, "link", "dark", document);
-  //   setColorShades(light.link, "link", "light", document);
-
   setColorAlpha(dark.text, "text", "dark", document);
   setColorAlpha(light.text, "text", "light", document);
 
@@ -141,7 +133,7 @@ function setColorAlpha(
     );
     document.documentElement.style.setProperty(
       `--theme-${theme}-${type}-secondary-${color.name}`,
-      `${color.hex}80`
+      `${color.hex}c7`
     );
   });
 }

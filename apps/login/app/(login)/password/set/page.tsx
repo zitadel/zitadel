@@ -1,9 +1,9 @@
 "use client";
+
 import { TextInput } from "#/ui/Input";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ClientError } from "nice-grpc";
-import PasswordComplexityPolicy from "#/ui/PasswordComplexityPolicy";
 
 type Props = {
   userId?: string;
@@ -127,18 +127,6 @@ export default function Page() {
             error={errors.confirmPassword?.message}
           />
         </div>
-
-        <PasswordComplexityPolicy
-          password={watchNewPassword}
-          equals={
-            !!watchNewPassword && watchNewPassword === watchConfirmPassword
-          }
-          isValid={(valid: boolean) => {
-            if (valid !== policyValid) {
-              setPolicyValid(valid);
-            }
-          }}
-        ></PasswordComplexityPolicy>
       </form>
     </>
   );
