@@ -1965,7 +1965,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2043,6 +2044,10 @@
       "IMPLICIT": {
         "TITLE": "Implicit",
         "DESCRIPTION": "直接从授权端点获取令牌"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "在计算机或智能手机上授权设备。"
       },
       "CUSTOM": {
         "TITLE": "Custom",
