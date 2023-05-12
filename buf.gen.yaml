@@ -15,7 +15,7 @@ plugins:
   - plugin: validate
     out: .artifacts/grpc
     opt: lang=go
-  - plugin: auth
+  - plugin: authoption
     out: .artifacts/grpc
   - plugin: zitadel
     out: .artifacts/grpc
