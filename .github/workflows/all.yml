@@ -13,26 +13,27 @@ jobs:
     uses: ./.github/workflows/lint.yml
     with:
       node_version: 18
-      go_version: 1.19
+      go_version: 1.20
       buf_version: v1.15.1
+      golangci_lint_version: v1.52.2
 
-  test:
-    uses: ./.github/workflows/test.yml
+  unit-test:
+    uses: ./.github/workflows/unit-test.yml
     with:
       node_version: 18
-      go_version: 1.19
+      go_version: 1.20
       buf_version: v1.15.1
 
   build:
     uses: ./.github/workflows/build.yml
     with:
       node_version: 18
-      go_version: 1.19
+      go_version: 1.20
       buf_version: v1.15.1
 
   container:
     uses: ./.github/workflows/container.yml
-    needs: [lint, test, build]
+    needs: [lint, unit-test, build]
 
   #release
 

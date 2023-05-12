@@ -1,4 +1,4 @@
-name: Test
+name: Unit Test
 
 on:
   workflow_call:
