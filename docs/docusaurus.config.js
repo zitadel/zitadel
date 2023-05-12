@@ -83,7 +83,7 @@ module.exports = {
         },
         {
           type: "doc",
-          docId: "legal/introduction",
+          docId: "legal",
           label: "Legal",
           position: "right",
         },
