@@ -22,6 +22,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ inputs.go_version }}
+          cache: true
       - name: Source checkout
         uses: actions/checkout@v3
       - name: Start ${{ matrix.db }} database
