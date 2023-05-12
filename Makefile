@@ -7,7 +7,7 @@ grpc:
 	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption
 	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-zitadel
 	buf generate
-	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/ pkg/grpc/
+	cp -rT .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/ pkg/grpc/
 	mkdir -p openapi/v2/zitadel
 	cp .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel
 
