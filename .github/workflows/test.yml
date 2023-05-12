@@ -31,7 +31,6 @@ jobs:
   # console:
 
   core-unit-test:
-    name: core-unit-test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -47,7 +46,6 @@ jobs:
     - run: make test
 
   core-integration-test:
-    name: core-unit-test
     runs-on: ubuntu-latest
     strategy:
       matrix:
