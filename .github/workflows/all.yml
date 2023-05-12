@@ -41,7 +41,6 @@ jobs:
     uses: ./.github/workflows/integration.yml
     needs: [build]
     with:
-      tag_name: ghcr.io/zitadel/test:${{ github.sha }}
       go_version: 1.20
 
   e2e:
