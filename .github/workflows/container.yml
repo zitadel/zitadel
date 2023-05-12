@@ -2,6 +2,10 @@ name: Container
 
 on:
   workflow_call:
+    inputs:
+      tag_name:
+        required: true
+        type: string
   
 jobs:
 
@@ -21,8 +25,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/download-artifact@v3
-      - name: Display structure of downloaded files
-        run: ls -R
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
@@ -30,7 +32,7 @@ jobs:
           file: build/scratch.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/zitadel/test:${{ github.sha }}
+          tags: ${{ inputs.tag_name }}
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
@@ -38,4 +40,4 @@ jobs:
           file: build/alpine.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/zitadel/test:${{ github.sha }}-alpine
+          tags: ${{ inputs.tag_name }}-alpine

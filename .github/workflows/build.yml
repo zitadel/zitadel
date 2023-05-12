@@ -58,8 +58,16 @@ jobs:
       with:
         path: console/dist/console/
         key: console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}
-    - run: mv console/dist/console/ internal/api/ui/console/static/
-    - run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
+    - name: move console to correct folder
+      run: mv console/dist/console/ internal/api/ui/console/static/
+    - name: build executable
+      run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
+    - name: cache for integration tests
+      uses: actions/cache/save@v3
+      if: matrix.goos == 'linux' && matrix.goos == 'amd64'
+      with:
+        path: .
+        key: runnable-${{ github.sha }}
     - uses: actions/upload-artifact@v3
       with:
         name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}

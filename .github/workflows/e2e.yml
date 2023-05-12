@@ -1,16 +1,11 @@
 name: "ZITADEL e2e Tests"
 
 on:
-  workflow_run:
-    workflows: [ZITADEL Release]
-    types:
-      - completed
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      releaseversion:
-        description: 'Release version to test'
+      tag_name:
         required: true
-        default: 'latest'
+        type: string
 
 jobs:
   test:
@@ -19,21 +14,10 @@ jobs:
         browser: [firefox, chrome]
     runs-on: ubuntu-20.04
     env:
-      ZITADEL_IMAGE_REGISTRY: 'ghcr.io/zitadel/zitadel'
+      ZITADEL_IMAGE: ${{ inputs.tag_name }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Set TAG env manual trigger
-        if: github.event_name == 'workflow_dispatch'
-        run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${{ github.event.inputs.releaseversion }}" >> $GITHUB_ENV
-      - name: get latest tag
-        uses: actions-ecosystem/action-get-latest-tag@v1
-        id: get-latest-tag
-        with: 
-           semver_only: true  
-      - name: Set TAG env on ZITADEL release
-        if: github.event_name == 'workflow_run'
-        run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${{ steps.get-latest-tag.outputs.tag }}" >> $GITHUB_ENV
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
