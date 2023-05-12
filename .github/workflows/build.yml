@@ -45,16 +45,10 @@ jobs:
         goos: [linux, darwin, windows]
         goarch: [amd64, arm64]
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
+    - uses: actions/cache/restore@v3
       with:
-        go-version: ${{ inputs.go_version }}
-        cache: true
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - run: make generate
+        path: .
+        key: core-${{ github.sha }}
     - uses: actions/cache/restore@v3
       with:
         path: console/dist/console/
@@ -63,12 +57,6 @@ jobs:
       run: mv console/dist/console/ internal/api/ui/console/static/
     - name: build executable
       run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
-    # - name: cache for integration tests
-    #   uses: actions/cache/save@v3
-    #   if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
-    #   with:
-    #     path: .
-    #     key: runnable-${{ github.sha }}
     - uses: actions/upload-artifact@v3
       with:
         name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}

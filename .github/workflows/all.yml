@@ -24,8 +24,28 @@ jobs:
       go_version: '1.20'
       buf_version: v1.15.1
 
+  generate-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.20'
+          cache: true
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: v1.15.1
+          github_token: ${{ github.token }}
+      - run: make generate
+      - name: cache for integration tests
+        uses: actions/cache/save@v3
+        with:
+          path: .
+          key: core-${{ github.sha }}
+
   build:
     uses: ./.github/workflows/build.yml
+    needs: [generate-core]
     with:
       node_version: 18
       go_version: '1.20'
