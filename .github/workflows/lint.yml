@@ -12,6 +12,9 @@ on:
       buf_version:
         required: true
         type: string
+      golangci_lint_version:
+        required: true
+        type: string
 
 jobs:
 
@@ -59,7 +62,7 @@ jobs:
     - name: linting
       uses: golangci/golangci-lint-action@v3
       with:
-        version: v1.50.1
+        version: ${{ inputs.golangci_lint_version }}
         only-new-issues: true
         skip-pkg-cache: true
         args: -v
