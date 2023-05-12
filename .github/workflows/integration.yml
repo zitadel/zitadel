@@ -18,13 +18,13 @@ jobs:
       INTEGRATION_DB_FLAVOR: ${{ matrix.db }}
       ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
     steps:
+      - name: Source checkout
+        uses: actions/checkout@v3
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: ${{ inputs.go_version }}
           cache: true
-      - name: Source checkout
-        uses: actions/checkout@v3
       - name: Start ${{ matrix.db }} database
         run: docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
       - uses: actions/cache/restore@v3
