@@ -247,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Bitte fülle dieses Feld aus.",
+    "ATLEASTONE": "Geben Sie mindestens einen Wert an.",
     "TOKENINVALID": {
       "TITLE": "Du bist abgemeldet",
       "DESCRIPTION": "Klicke auf \"Einloggen\", um Dich erneut anzumelden."
@@ -1019,6 +1020,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1217,6 +1219,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1697,9 +1700,10 @@
       "2": "inaktiv"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "ADD": "Identitätsanbieter hinzufügen",
     "AZUREADTENANTTYPE": "Tenant Typ",
@@ -1937,6 +1941,8 @@
       "REGENERATESECRET": "Client Secret neu generieren",
       "DEVMODE": "Entwicklermodus",
       "DEVMODEDESC": "Bei eingeschaltetem Entwicklermodus werden die Weiterleitungs-URIs im OIDC-Flow nicht validiert.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Login Erfolgseite überspringen",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Erfolgseite nach dem Login für diese Native Applikation überspringen.",
       "REDIRECT": "Weiterleitungs-URIs",
       "REDIRECTSECTION": "Weiterleitungs-URIs",
       "POSTLOGOUTREDIRECT": "URIs für Post-Log-out",
@@ -1959,7 +1965,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2050,6 +2057,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "Erhalte die Token direkt vom authorize Endpoint"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autorisieren Sie das Gerät auf einem Computer oder Smartphone."
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "Deine Konfiguration entspricht keiner anderen Option."
@@ -2076,6 +2087,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

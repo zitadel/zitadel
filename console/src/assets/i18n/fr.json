@@ -247,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "Remplis ce champ s'il te plaît.",
+    "ATLEASTONE": "Indiquez au moins une valeur.",
     "TOKENINVALID": {
       "TITLE": "Votre jeton d'autorisation a expiré.",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
@@ -1019,6 +1020,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1217,6 +1219,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1701,9 +1704,10 @@
       "2": "inactif"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "Type de locataire",
     "AZUREADTENANTID": "ID du locataire",
@@ -1938,6 +1942,8 @@
       "REGENERATESECRET": "Régénérer le secret du client",
       "DEVMODE": "Mode développement",
       "DEVMODEDESC": "Attention",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Sauter la page de succès de connexion",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sauter la page de succès après la connexion pour cette application native",
       "REDIRECT": "Rediriger les URI",
       "REDIRECTSECTION": "URI de redirection",
       "POSTLOGOUTREDIRECT": "URIs de post-déconnexion",
@@ -1960,7 +1966,8 @@
       "GRANT": {
         "0": "Code d'autorisation",
         "1": "Implicite",
-        "2": "Rafraîchir le jeton"
+        "2": "Rafraîchir le jeton",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2039,6 +2046,10 @@
         "TITLE": "Implicite",
         "DESCRIPTION": "Obtenir les jetons directement à partir du point final d'autorisation"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoriser l'appareil sur un ordinateur ou un smartphone."
+      },
       "CUSTOM": {
         "TITLE": "Personnalisé",
         "DESCRIPTION": "Votre paramètre ne correspond à aucune autre option."
@@ -2065,6 +2076,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

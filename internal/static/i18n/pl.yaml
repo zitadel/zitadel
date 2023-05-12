@@ -81,6 +81,7 @@ Errors:
       NotChanged: Adres e-mail nie zmieniony
       Empty: Adres e-mail jest pusty
       IDMissing: Adres e-mail ID brakuje
+      InvalidURLTemplate: Szablon URL jest nieprawidłowy
     Phone:
       NotFound: Numer telefonu nie znaleziony
       Invalid: Numer telefonu jest nieprawidłowy
@@ -469,6 +470,11 @@ Errors:
     Execution:
       StorageFailed: Zapisywanie dziennika wykonania akcji do bazy danych nie powiodło się
       ScanFailed: Zapytanie o użycie dla sekund wykonania akcji nie powiodło się
+  Session:
+    NotExisting: Sesja nie istnieje
+    Terminated: Sesja już zakończona
+    Token:
+      Invalid: Token sesji jest nieprawidłowy
 
 AggregateTypes:
   action: Działanie

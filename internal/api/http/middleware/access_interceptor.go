@@ -1,15 +1,16 @@
 package middleware
 
 import (
-	"math"
+	"net"
 	"net/http"
 	"net/url"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
@@ -20,6 +21,7 @@ type AccessInterceptor struct {
 	svc           *logstore.Service
 	cookieHandler *http_utils.CookieHandler
 	limitConfig   *AccessConfig
+	storeOnly     bool
 }
 
 type AccessConfig struct {
@@ -27,14 +29,15 @@ type AccessConfig struct {
 	ExhaustedCookieMaxAge time.Duration
 }
 
-func NewAccessInterceptor(svc *logstore.Service, cookieConfig *AccessConfig) *AccessInterceptor {
+// NewAccessInterceptor intercepts all requests and stores them to the logstore.
+// If storeOnly is false, it also checks if requests are exhausted.
+// If requests are exhausted, it also returns http.StatusTooManyRequests and sets a cookie
+func NewAccessInterceptor(svc *logstore.Service, cookieHandler *http_utils.CookieHandler, cookieConfig *AccessConfig, storeOnly bool) *AccessInterceptor {
 	return &AccessInterceptor{
-		svc: svc,
-		cookieHandler: http_utils.NewCookieHandler(
-			http_utils.WithUnsecure(),
-			http_utils.WithMaxAge(int(math.Floor(cookieConfig.ExhaustedCookieMaxAge.Seconds()))),
-		),
-		limitConfig: cookieConfig,
+		svc:           svc,
+		cookieHandler: cookieHandler,
+		limitConfig:   cookieConfig,
+		storeOnly:     storeOnly,
 	}
 }
 
@@ -43,34 +46,34 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		return next
 	}
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-
 		ctx := request.Context()
-		var err error
-
-		tracingCtx, span := tracing.NewServerInterceptorSpan(ctx)
-		defer func() { span.EndWithError(err) }()
-
+		tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccess")
 		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
-
 		instance := authz.GetInstance(ctx)
-		remaining := a.svc.Limit(tracingCtx, instance.InstanceID())
-		limit := remaining != nil && *remaining == 0
-
-		a.cookieHandler.SetCookie(wrappedWriter, a.limitConfig.ExhaustedCookieKey, request.Host, strconv.FormatBool(limit))
-
-		if limit {
-			wrappedWriter.WriteHeader(http.StatusTooManyRequests)
-			wrappedWriter.ignoreWrites = true
+		limit := false
+		if !a.storeOnly {
+			remaining := a.svc.Limit(tracingCtx, instance.InstanceID())
+			limit = remaining != nil && *remaining == 0
 		}
-
-		next.ServeHTTP(wrappedWriter, request)
-
+		checkSpan.End()
+		if limit {
+			// Limit can only be true when storeOnly is false, so set the cookie and the response code
+			SetExhaustedCookie(a.cookieHandler, wrappedWriter, a.limitConfig, request)
+			http.Error(wrappedWriter, "quota for authenticated requests is exhausted", http.StatusTooManyRequests)
+		} else {
+			if !a.storeOnly {
+				// If not limited and not storeOnly, ensure the cookie is deleted
+				DeleteExhaustedCookie(a.cookieHandler, wrappedWriter, request, a.limitConfig)
+			}
+			// Always serve if not limited
+			next.ServeHTTP(wrappedWriter, request)
+		}
+		tracingCtx, writeSpan := tracing.NewNamedSpan(tracingCtx, "writeAccess")
+		defer writeSpan.End()
 		requestURL := request.RequestURI
 		unescapedURL, err := url.QueryUnescape(requestURL)
 		if err != nil {
 			logging.WithError(err).WithField("url", requestURL).Warning("failed to unescape request url")
-			// err = nil is effective because of deferred tracing span end
-			err = nil
 		}
 		a.svc.Handle(tracingCtx, &access.Record{
 			LogDate:         time.Now(),
@@ -85,6 +88,24 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			RequestedHost:   instance.RequestedHost(),
 		})
 	})
+}
+
+func SetExhaustedCookie(cookieHandler *http_utils.CookieHandler, writer http.ResponseWriter, cookieConfig *AccessConfig, request *http.Request) {
+	cookieValue := "true"
+	host := request.Header.Get(middleware.HTTP1Host)
+	domain := host
+	if strings.ContainsAny(host, ":") {
+		var err error
+		domain, _, err = net.SplitHostPort(host)
+		if err != nil {
+			logging.WithError(err).WithField("host", host).Warning("failed to extract cookie domain from request host")
+		}
+	}
+	cookieHandler.SetCookie(writer, cookieConfig.ExhaustedCookieKey, domain, cookieValue)
+}
+
+func DeleteExhaustedCookie(cookieHandler *http_utils.CookieHandler, writer http.ResponseWriter, request *http.Request, cookieConfig *AccessConfig) {
+	cookieHandler.DeleteCookie(writer, request, cookieConfig.ExhaustedCookieKey)
 }
 
 type statusRecorder struct {

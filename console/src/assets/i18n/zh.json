@@ -247,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "请填写此栏",
+    "ATLEASTONE": "P至少提供一个值。",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
@@ -1019,6 +1020,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1216,6 +1218,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1700,9 +1703,10 @@
       "2": "停用"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "租户类型",
     "AZUREADTENANTID": "租户编号",
@@ -1937,6 +1941,8 @@
       "REGENERATESECRET": "重新生成客户端密钥",
       "DEVMODE": "开发模式",
       "DEVMODEDESC": "注意：启用开发模式的重定向 URI 将不会被验证。",
+      "SKIPNATIVEAPPSUCCESSPAGE": "登录后跳过成功页面",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "登录后跳过本机应用的成功页面",
       "REDIRECT": "重定向 URLs",
       "REDIRECTSECTION": "重定向 URLs",
       "POSTLOGOUTREDIRECT": "退出登录重定向 URLs",
@@ -1959,7 +1965,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2038,6 +2045,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "直接从授权端点获取令牌"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "在计算机或智能手机上授权设备。"
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "您的设置与任何其他选项都不对应。"
@@ -2064,6 +2075,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

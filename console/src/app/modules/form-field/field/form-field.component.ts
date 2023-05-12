@@ -51,6 +51,7 @@ interface ValidationError {
     '[class.ng-valid]': '_shouldForward("valid")',
     '[class.ng-invalid]': '_shouldForward("invalid")',
     '[class.ng-pending]': '_shouldForward("pending")',
+    '[class.ng-required]': '_control.required',
     '[class.cnsl-form-field-disabled]': '_control.disabled',
     '[class.cnsl-form-field-autofilled]': '_control.autofilled',
     '[class.cnsl-focused]': '_control.focused',
@@ -69,6 +70,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   @ContentChild(MatFormFieldControl) _controlNonStatic!: MatFormFieldControl<any>;
   @ContentChild(MatFormFieldControl, { static: true }) _controlStatic!: MatFormFieldControl<any>;
   @Input() public disableValidationErrors = false;
+  @Input() public hideRequiredMarker = false;
 
   get _control(): MatFormFieldControl<any> {
     return this._explicitFormFieldControl || this._controlNonStatic || this._controlStatic;
@@ -95,7 +97,7 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
   }
 
   constructor(
-    public _elementRef: ElementRef,
+    public override _elementRef: ElementRef,
     private _changeDetectorRef: ChangeDetectorRef,
     @Inject(ElementRef)
     _labelOptions: // Use `ElementRef` here so Angular has something to inject.

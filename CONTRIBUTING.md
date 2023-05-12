@@ -199,6 +199,21 @@ When you are happy with your changes, you can cleanup your environment.
 docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ```
 
+#### Integration tests
+
+In order to run the integrations tests for the gRPC API, PostgreSQL and CockroachDB must be started and initialized:
+
+```bash
+export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
+docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
+go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+go test -tags=integration -race -parallel 1 ./internal/integration ./internal/api/grpc/...
+docker compose -f internal/integration/config/docker-compose.yaml down
+```
+
+The above can be repeated with `INTEGRATION_DB_FLAVOR="postgres"`.
+
 ### Console
 
 By executing the commands from this section, you run everything you need to develop the console locally.
@@ -315,13 +330,15 @@ docker compose down
 
 Project documentation is made with docusaurus and is located under [./docs](./docs).
 
-### Local Testing
+### Local Testing
+
 Please refer to the [README](./docs/README.md) for more information and local testing.
 
-### Style Guide
+### Style Guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
 - **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
+- **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
 ### Docs Pull Request
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.

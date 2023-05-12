@@ -10,6 +10,7 @@ import { ProjectGrantMembersDataSource } from 'src/app/pages/projects/owned-proj
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { getMembershipColor } from 'src/app/utils/color';
 
+import { Type } from 'src/app/proto/generated/zitadel/user_pb';
 import { AddMemberRolesDialogComponent } from '../add-member-roles-dialog/add-member-roles-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
@@ -43,6 +44,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
 
   private destroyed: Subject<void> = new Subject();
   public displayedColumns: string[] = ['select', 'userId', 'displayName', 'loginname', 'email', 'roles'];
+  public UserType: any = Type;
 
   constructor(private dialog: MatDialog) {
     this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {

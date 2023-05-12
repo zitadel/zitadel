@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package zitadel.settings.v2alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2alpha;settings";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+enum ResourceOwnerType {
+  RESOURCE_OWNER_TYPE_UNSPECIFIED = 0;
+  RESOURCE_OWNER_TYPE_INSTANCE = 1;
+  RESOURCE_OWNER_TYPE_ORG = 2;
+}

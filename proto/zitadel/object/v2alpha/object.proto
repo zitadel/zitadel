@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package zitadel.object.v2alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha;object";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+message Organisation {
+  oneof org {
+    string org_id = 1;
+    string org_domain = 2;
+  }
+}
+
+message RequestContext {
+  oneof resource_owner {
+    string org_id = 1;
+    bool instance = 2 [(validate.rules).bool = {const: true}];
+  }
+}
+
+message ListQuery {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      title: "General List Query"
+      description: "Object unspecific list filters like offset, limit and asc/desc."
+    }
+  };
+  uint64 offset = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"0\"";
+    }
+  ];
+  uint32 limit = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "100";
+      description: "Maximum amount of events returned. The default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If the limit exceeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
+    }
+  ];
+  bool asc = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "default is descending"
+    }
+  ];
+}
+
+message Details {
+  //sequence represents the order of events. It's always counting
+  //
+  // on read: the sequence of the last event reduced by the projection
+  //
+  // on manipulation: the timestamp of the event(s) added by the manipulation
+  uint64 sequence = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2\"";
+    }
+  ];
+  //change_date is the timestamp when the object was changed
+  //
+  // on read: the timestamp of the last event reduced by the projection
+  //
+  // on manipulation: the timestamp of the event(s) added by the manipulation
+  google.protobuf.Timestamp change_date = 2;
+  //resource_owner is the organization or instance_id an object belongs to
+  string resource_owner = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message ListDetails {
+  uint64 total_result = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2\"";
+    }
+  ];
+  uint64 processed_sequence = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"267831\"";
+    }
+  ];
+  google.protobuf.Timestamp timestamp = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the last time the projection got updated"
+    }
+  ];
+}

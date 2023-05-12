@@ -223,7 +223,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			errs := h.lock(lockCtx, h.requeueAfter, "system")
 			if err, ok := <-errs; err != nil || !ok {
 				cancelLock()
-				logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("initial lock failed for first schedule")
+				logging.WithFields("projection", h.ProjectionName).OnError(err).Debug("initial lock failed for first schedule")
 				h.triggerProjection.Reset(h.requeueAfter)
 				continue
 			}
@@ -253,7 +253,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			//wait until projection is locked
 			if err, ok := <-errs; err != nil || !ok {
 				cancelInstanceLock()
-				logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("initial lock failed")
+				logging.WithFields("projection", h.ProjectionName).OnError(err).Debug("initial lock failed")
 				failed = true
 				continue
 			}

@@ -259,6 +259,27 @@ module.exports = {
             sidebarOptions: {
               groupPathsBy: "tag",
             },
+          },
+          user: {
+            specPath: ".artifacts/openapi/zitadel/user/v2alpha/user_service.swagger.json",
+            outputDir: "docs/apis/user_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          session: {
+            specPath: ".artifacts/openapi/zitadel/session/v2alpha/session_service.swagger.json",
+            outputDir: "docs/apis/session_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          settings: {
+            specPath: ".artifacts/openapi/zitadel/settings/v2alpha/settings_service.swagger.json",
+            outputDir: "docs/apis/settings_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
           }
         }
       },

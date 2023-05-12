@@ -22,8 +22,8 @@ module.exports = {
           type: "category",
           label: "Backend",
           items: [
-            "examples/secure-api/go", 
-            "examples/secure-api/python-flask", 
+            "examples/secure-api/go",
+            "examples/secure-api/python-flask",
             "examples/secure-api/dot-net"
           ],
           collapsed: true,
@@ -108,7 +108,7 @@ module.exports = {
     {
       type: "category",
       label: "Migrate",
-      collapsed: false,
+      collapsed: true,
       items: [
         "guides/migrate/introduction",
         "guides/migrate/users",
@@ -117,7 +117,7 @@ module.exports = {
           label: "Sources",
           collapsed: true,
           items: [
-            "guides/migrate/sources/zitadel-v1",
+            "guides/migrate/sources/zitadel",
             "guides/migrate/sources/auth0",
           ]
         },
@@ -126,14 +126,14 @@ module.exports = {
     {
       type: "category",
       label: "Integrate",
-      collapsed: true,
       link: {
-        type: 'generated-index',
-        title: 'Overview',
-        slug: 'guides/integrate',
+        type: "generated-index",
+        title: "Integrate",
+        slug: "guides/integrate",
+        description:
+          "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
       },
       items: [
-        
         {
           type: "category",
           label: "Authenticate Users",
@@ -147,9 +147,22 @@ module.exports = {
         {
           type: "category",
           label: "Configure Identity Providers",
+          link: {
+            type: "generated-index",
+            title: "Let users login with their preferred identity provider",
+            slug: "/guides/integrate/identity-providers",
+            description:
+              "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
+
+          },
           collapsed: true,
           items: [
-            "guides/integrate/identity-providers/introduction",
+            "guides/integrate/identity-providers/google",
+            "guides/integrate/identity-providers/azure-ad",
+            "guides/integrate/identity-providers/github",
+            "guides/integrate/identity-providers/gitlab",
+            "guides/integrate/identity-providers/ldap",
+            "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/google-oidc",
             "guides/integrate/identity-providers/azuread-oidc",
           ],
@@ -162,9 +175,16 @@ module.exports = {
             {
               type: "category",
               label: "Authenticate Service Users",
+              link: {
+                type: "generated-index",
+                title: "Authenticate Service Users",
+                slug: "/guides/integrate/serviceusers",
+                description:
+                  "How to authenticate service users",
+              },
               collapsed: true,
               items: [
-                "guides/integrate/serviceusers",
+                "guides/integrate/private-key-jwt",
                 "guides/integrate/client-credentials",
                 "guides/integrate/pat",
               ],
@@ -186,10 +206,19 @@ module.exports = {
         {
           type: "category",
           label: "Services",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your favorite services",
+            slug: "/guides/integrate/services",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your services.",
+
+          },
           collapsed: true,
           items: [
             "guides/integrate/services/gitlab-self-hosted",
             "guides/integrate/services/aws-saml",
+            "guides/integrate/services/google-cloud",
             "guides/integrate/services/atlassian-saml",
             "guides/integrate/services/gitlab-saml",
             "guides/integrate/services/auth0-oidc",
@@ -200,6 +229,14 @@ module.exports = {
         {
           type: "category",
           label: "Tools",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your tools",
+            slug: "/guides/integrate/tools",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your favorite tools.",
+
+          },
           collapsed: true,
           items: [
             "guides/integrate/authenticated-mongodb-charts",
@@ -211,12 +248,19 @@ module.exports = {
     {
       type: "category",
       label: "Solution Scenarios",
+      link: {
+        type: "generated-index",
+        title: "Solution Scenarios",
+        slug: "guides/solution-scenarios/introduction",
+        description:
+          "Customers of an SaaS Identity and Access Management System usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into Solution Scenarios which aim to help you getting started with ZITADEL.",
+      },
       collapsed: true,
       items: [
-        "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
-        "concepts/usecases/saas",
+        "guides/solution-scenarios/saas",
+        "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
       ],
     },
@@ -234,8 +278,10 @@ module.exports = {
         "concepts/structure/users",
         "concepts/structure/managers",
         "concepts/structure/policies",
+        "concepts/features/identity-brokering",
         "concepts/structure/jwt_idp",
         "concepts/features/actions",
+        "concepts/features/audit-trail",
         "concepts/features/selfservice",
       ]
     },
@@ -266,6 +312,21 @@ module.exports = {
       items: [
         "support/troubleshooting",
         {
+          type: 'category',
+          label: "Technical Advisory",
+          link: {
+            type: 'doc',
+            id: 'support/technical_advisory',
+          },
+          collapsed: true,
+          items: [
+              {
+                type: 'autogenerated',
+                dirName: 'support/advisory',
+              },
+          ],
+        },
+        {
           type: "category",
           label: "Trainings",
           collapsed: true,
@@ -294,8 +355,8 @@ module.exports = {
             title: "Auth API",
             slug: "/apis/auth",
             description:
-                "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
-                
+              "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+
           },
           items: require("./docs/apis/auth/sidebar.js"),
         },
@@ -307,7 +368,7 @@ module.exports = {
             title: "Management API",
             slug: "/apis/mgmt",
             description:
-                "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+              "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
           },
           items: require("./docs/apis/mgmt/sidebar.js"),
         },
@@ -319,7 +380,7 @@ module.exports = {
             title: "Admin API",
             slug: "/apis/admin",
             description:
-                "This API is intended to configure and manage one ZITADEL instance itself.",
+              "This API is intended to configure and manage one ZITADEL instance itself.",
           },
           items: require("./docs/apis/admin/sidebar.js"),
         },
@@ -331,11 +392,53 @@ module.exports = {
             title: "System API",
             slug: "/apis/system",
             description:
-                "This API is intended to manage the different ZITADEL instances within the system.\n" +
-                "\n" +
-                "Checkout the guide how to access the ZITADEL System API.",
+              "This API is intended to manage the different ZITADEL instances within the system.\n" +
+              "\n" +
+              "Checkout the guide how to access the ZITADEL System API.",
           },
           items: require("./docs/apis/system/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "User Lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "User Service API (Alpha)",
+            slug: "/apis/user_service",
+            description:
+              "This API is intended to manage users in a ZITADEL instance.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/user_service/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Session Lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "Session Service API (Alpha)",
+            slug: "/apis/session_service",
+            description:
+              "This API is intended to manage sessions in a ZITADEL instance.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/session_service/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Settings Lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "Settings Service API (Alpha)",
+            slug: "/apis/settings_service",
+            description:
+              "This API is intended to manage settings in a ZITADEL instance.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/settings_service/sidebar.js"),
         },
         {
           type: "category",
@@ -396,10 +499,9 @@ module.exports = {
       items: ["apis/observability/metrics", "apis/observability/health"],
     },
     {
-      type: "category",
-      label: "Rate Limits",
-      collapsed: false,
-      items: ["apis/ratelimits/ratelimits", "legal/rate-limit-policy"],
+      type: 'link',
+      label: 'Rate Limits (Cloud)', // The link label
+      href: '/legal/rate-limit-policy', // The internal path
     },
   ],
   selfHosting: [

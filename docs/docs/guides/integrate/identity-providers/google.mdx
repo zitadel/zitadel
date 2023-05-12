@@ -1,0 +1,68 @@
+---
+title: Configure Google as Identity Provider
+sidebar_label: Google
+---
+
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
+
+<Intro provider="Google"/>
+
+## Google Configuration
+
+### Register a new client
+
+1. Go to the Google Cloud Platform and choose your project: [https://console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)
+2. Click on "+ CREATE CREDENTIALS" and choose "OAuth client ID"
+3. Choose "Web application" as application type and give a name
+4. Add the redirect uri
+ - {your-domain}/ui/login/login/externalidp/callback
+ - Example redirect url for the domain `https://acme-gzoe4x.zitadel.cloud` would look like this:  `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
+5. Save the Client ID and Client secret
+
+![Google OAuth App Registration](/img/guides/google_oauth_app_registration.png)
+
+![Google Client ID and Secret](/img/guides/google_client_id_secret.png)
+
+## ZITADEL Configuration
+
+### Add custom login policy
+
+<CustomLoginPolicy/>
+
+### Go to the IdP Providers Overview
+
+<IDPsOverview templates="Google"/>
+
+### Create a new Google Provider
+
+The Google provider template has everything you need preconfigured.
+Add the client ID and secret created before on your Google App.
+
+You can configure the following settings if you like, a useful default will be filled if you don't change anything:
+
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This information will be taken to create/update the user within ZITADEL. ZITADEL ensures that at least the `openid`-scope is always sent.
+
+
+<GeneralConfigDescription provider_account="Google account" />
+
+![Google Provider](/img/guides/zitadel_google_create_provider.png)
+
+### Activate IdP
+
+<Activate/>
+
+![Activate the Google Provider](/img/guides/zitadel_activate_google.png)
+
+## Test the setup
+
+<TestSetup loginscreen="your Google login"/>
+
+<!-- TODO: Image highlights GitHub -->
+![Google Button](/img/guides/zitadel_login_google.png)
+
+![Google Login](/img/guides/google_login.png)

@@ -2,7 +2,7 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -46,6 +46,7 @@ import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
   CUSTOM_METHOD,
+  DEVICE_CODE_METHOD,
   getAuthMethodFromPartialConfig,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
@@ -89,6 +90,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public oidcGrantTypes: OIDCGrantType[] = [
     OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
     OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT,
+    OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
     OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
   ];
   public oidcAppTypes: OIDCAppType[] = [
@@ -149,7 +151,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private http: HttpClient,
   ) {
     this.oidcForm = this.fb.group({
-      devMode: [{ value: false, disabled: true }, []],
+      devMode: [{ value: false, disabled: true }],
+      skipNativeAppSuccessPage: [{ value: false, disabled: true }],
       clientId: [{ value: '', disabled: true }],
       responseTypesList: [{ value: [], disabled: true }],
       grantTypesList: [{ value: [], disabled: true }],
@@ -273,13 +276,24 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               if (this.app.oidcConfig) {
                 this.getAuthMethodOptions('OIDC');
 
-                this.settingsList = [
-                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                  { id: 'token', i18nKey: 'APP.TOKEN' },
-                  { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
-                  { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
-                  { id: 'urls', i18nKey: 'APP.URLS' },
-                ];
+                if (
+                  this.app.oidcConfig.grantTypesList.length === 1 &&
+                  this.app.oidcConfig.grantTypesList[0] === OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE
+                ) {
+                  this.settingsList = [
+                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                    { id: 'token', i18nKey: 'APP.TOKEN' },
+                    { id: 'urls', i18nKey: 'APP.URLS' },
+                  ];
+                } else {
+                  this.settingsList = [
+                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                    { id: 'token', i18nKey: 'APP.TOKEN' },
+                    { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
+                    { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
+                    { id: 'urls', i18nKey: 'APP.URLS' },
+                  ];
+                }
 
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
                 this.currentAuthMethod = this.initialAuthMethod;
@@ -380,7 +394,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     if (type === 'OIDC') {
       switch (this.app?.oidcConfig?.appType) {
         case OIDCAppType.OIDC_APP_TYPE_NATIVE:
-          this.authMethods = [PKCE_METHOD, CUSTOM_METHOD];
+          this.authMethods = [PKCE_METHOD, DEVICE_CODE_METHOD, CUSTOM_METHOD];
           break;
         case OIDCAppType.OIDC_APP_TYPE_WEB:
           this.authMethods = [PKCE_METHOD, CODE_METHOD, PK_JWT_METHOD, POST_METHOD];
@@ -548,7 +562,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
         this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
         this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
-        this.app.oidcConfig.devMode = this.devMode?.value;
+        this.app.oidcConfig.devMode = !!this.devMode?.value;
+        this.app.oidcConfig.skipNativeAppSuccessPage = !!this.skipNativeAppSuccessPage?.value;
 
         const req = new UpdateOIDCAppConfigRequest();
         req.setProjectId(this.projectId);
@@ -571,6 +586,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
         req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
         req.setDevMode(this.app.oidcConfig.devMode);
+        req.setSkipNativeAppSuccessPage(this.app.oidcConfig.skipNativeAppSuccessPage);
 
         if (this.clockSkewSeconds?.value) {
           const dur = new Duration();
@@ -738,11 +754,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public get apiAuthMethodType(): AbstractControl | null {
-    return this.apiForm.get('authMethodType');
+    return this.apiForm.get('authMethodType') as UntypedFormControl;
   }
 
-  public get devMode(): UntypedFormControl | null {
-    return this.oidcForm.get('devMode') as UntypedFormControl;
+  public get devMode(): FormControl<boolean> | null {
+    return this.oidcForm.get('devMode') as FormControl<boolean>;
+  }
+
+  public get skipNativeAppSuccessPage(): FormControl<boolean> | null {
+    return this.oidcForm.get('skipNativeAppSuccessPage') as FormControl<boolean>;
   }
 
   public get accessTokenType(): AbstractControl | null {

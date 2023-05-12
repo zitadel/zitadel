@@ -81,6 +81,7 @@ Errors:
       NotChanged: Email wurde nicht geändert
       Empty: Email ist leer
       IDMissing: Email ID fehlt
+      InvalidURLTemplate: URL Template ist ungültig
     Phone:
       NotFound: Telefonnummer nicht gefunden
       Invalid: Telefonnummer ist ungültig
@@ -469,6 +470,11 @@ Errors:
     Execution:
       StorageFailed: Das Speichern des Action Logs in der Datenbank ist fehlgeschlagen
       ScanFailed: Das Abfragen der verbrauchten Actions Sekunden ist fehlgeschlagen
+  Session:
+    NotExisting: Session existiert nicht
+    Terminated: Session bereits beendet
+    Token:
+      Invalid: Session Token ist ungültig
 
 AggregateTypes:
   action: Action

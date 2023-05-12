@@ -291,6 +291,7 @@ h2 {
   --ifm-color-warning-dark: #4f566b;
   --ifm-toc-border-color: rgba(135, 149, 161, 0.2);
   --ifm-table-border-color: rgba(135, 149, 161, 0.2);
+  --ifm-card-background-color: #1a253c;
   --card-background: #1a253c; /* #1a1d46; */
   --list-background: #1a253c; /* #1a1d46; */
   --apiauthbackground: linear-gradient(40deg, #506e6e90 30%, #506e6e90);

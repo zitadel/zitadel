@@ -3,7 +3,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 import { UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, catchError, debounceTime, finalize, from, map, Observable, of, pipe, tap } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { Org, OrgNameQuery, OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
+import { Org, OrgNameQuery, OrgQuery, OrgState, OrgStateQuery } from 'src/app/proto/generated/zitadel/org_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
@@ -47,9 +47,12 @@ export class OrgContextComponent implements OnInit {
       }
     }
 
-    let query;
+    let query = new OrgQuery();
+    const orgStateQuery = new OrgStateQuery();
+    orgStateQuery.setState(OrgState.ORG_STATE_ACTIVE);
+    query.setStateQuery(orgStateQuery);
+
     if (filter) {
-      query = new OrgQuery();
       const orgNameQuery = new OrgNameQuery();
       orgNameQuery.setName(filter);
       orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);

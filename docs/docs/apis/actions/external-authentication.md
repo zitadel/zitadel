@@ -2,7 +2,7 @@
 title: External Authentication Flow
 ---
 
-This flow is executed if the user logs in using an [identity provider](/guides/integrate/identity-providers/introduction.md) or using a [jwt token](/concepts/structure/jwt_idp).
+This flow is executed if the user logs in using an [identity provider](/guides/integrate/identity-providers) or using a [jwt token](/concepts/structure/jwt_idp).
 
 ## Post Authentication
 

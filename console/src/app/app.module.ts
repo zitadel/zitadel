@@ -2,6 +2,7 @@ import { APP_BASE_HREF, CommonModule, registerLocaleData } from '@angular/common
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import localeEn from '@angular/common/locales/en';
+import localeEs from '@angular/common/locales/es';
 import localeFr from '@angular/common/locales/fr';
 import localeIt from '@angular/common/locales/it';
 import localeJa from '@angular/common/locales/ja';
@@ -64,6 +65,8 @@ registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
 registerLocaleData(localeEn);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'));
+registerLocaleData(localeEs);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/es.json'));
 registerLocaleData(localeFr);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/fr.json'));
 registerLocaleData(localeIt);

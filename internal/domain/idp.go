@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/zitadel/logging"
+
 type IDPState int32
 
 const (
@@ -53,6 +55,39 @@ func (t IDPType) GetCSSClass() string {
 		IDPTypeAzureAD:
 		fallthrough
 	default:
+		return ""
+	}
+}
+
+func IDPName(name string, idpType IDPType) string {
+	if name != "" {
+		return name
+	}
+	return idpType.DisplayName()
+}
+
+// DisplayName returns the name or a default
+// to be used when always a name must be displayed (e.g. login)
+func (t IDPType) DisplayName() string {
+	switch t {
+	case IDPTypeGitHub:
+		return "GitHub"
+	case IDPTypeGitLab:
+		return "GitLab"
+	case IDPTypeGoogle:
+		return "Google"
+	case IDPTypeUnspecified,
+		IDPTypeOIDC,
+		IDPTypeJWT,
+		IDPTypeOAuth,
+		IDPTypeLDAP,
+		IDPTypeAzureAD,
+		IDPTypeGitHubEnterprise,
+		IDPTypeGitLabSelfHosted:
+		fallthrough
+	default:
+		// we should never get here, so log it
+		logging.Errorf("name of provider (type %d) is empty", t)
 		return ""
 	}
 }
