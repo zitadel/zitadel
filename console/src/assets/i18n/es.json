@@ -1962,7 +1962,8 @@
       "GRANT": {
         "0": "Código de autorización",
         "1": "Implícito",
-        "2": "Token de refresco"
+        "2": "Token de refresco",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Básico",
@@ -2052,6 +2053,10 @@
       "IMPLICIT": {
         "TITLE": "Implícita",
         "DESCRIPTION": "Obtén los tokens directamente del endpoint de autorización"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autorizar el dispositivo en una computadora o teléfono."
       },
       "CUSTOM": {
         "TITLE": "Personalizada",
