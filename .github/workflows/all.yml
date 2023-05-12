@@ -9,21 +9,6 @@ permissions:
     
 jobs:
 
-  lint:
-    uses: ./.github/workflows/lint.yml
-    with:
-      node_version: 18
-      go_version: '1.20'
-      buf_version: v1.15.1
-      golangci_lint_version: v1.52.2
-
-  test:
-    uses: ./.github/workflows/test.yml
-    with:
-      node_version: 18
-      go_version: '1.20'
-      buf_version: v1.15.1
-
   generate-core:
     runs-on: ubuntu-latest
     steps:
@@ -42,6 +27,23 @@ jobs:
         with:
           path: .
           key: core-${{ github.sha }}
+
+  lint:
+    uses: ./.github/workflows/lint.yml
+    needs: [generate-core]
+    with:
+      node_version: 18
+      go_version: '1.20'
+      buf_version: v1.15.1
+      golangci_lint_version: v1.52.2
+
+  test:
+    uses: ./.github/workflows/test.yml
+    needs: [generate-core]
+    with:
+      node_version: 18
+      go_version: '1.20'
+      buf_version: v1.15.1
 
   build:
     uses: ./.github/workflows/build.yml
