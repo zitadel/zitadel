@@ -4,7 +4,7 @@ grpc:
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2
 	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
-	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-auth
+	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption
 	go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-zitadel
 	buf generate
 	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/ pkg/grpc/
