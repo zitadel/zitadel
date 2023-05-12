@@ -63,12 +63,12 @@ jobs:
       run: mv console/dist/console/ internal/api/ui/console/static/
     - name: build executable
       run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
-    - name: cache for integration tests
-      uses: actions/cache/save@v3
-      if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
-      with:
-        path: .
-        key: runnable-${{ github.sha }}
+    # - name: cache for integration tests
+    #   uses: actions/cache/save@v3
+    #   if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
+    #   with:
+    #     path: .
+    #     key: runnable-${{ github.sha }}
     - uses: actions/upload-artifact@v3
       with:
         name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}

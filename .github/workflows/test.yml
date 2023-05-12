@@ -1,0 +1,78 @@
+name: Unit Test
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      go_version:
+        required: true
+        type: string
+      buf_version:
+        required: true
+        type: string
+
+jobs:
+
+  api:
+    name: api
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf_version }}
+        github_token: ${{ github.token }}
+    - uses: bufbuild/buf-breaking-action@v1
+      with:
+        against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=main"
+
+  # console:
+
+  core-unit-test:
+    name: core-unit-test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ inputs.go_version }}
+        cache: true
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf_version }}
+        github_token: ${{ github.token }}
+    - run: make generate
+    - run: make test
+
+  core-integration-test:
+    name: core-unit-test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        db: [cockroach, postgres]
+    env:
+      DOCKER_BUILDKIT: 1
+      INTEGRATION_DB_FLAVOR: ${{ matrix.db }}
+      ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ inputs.go_version }}
+          cache: true
+      - run: make generate
+      - name: Start ${{ matrix.db }} database
+        run: docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
+      - name: Run ZITADEL init and setup
+        run: |
+          go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+          go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+      - name: Run integration tests
+        run: go test -tags=integration -race -parallel 1 -v -coverprofile=profile.cov -coverpkg=./... ./internal/integration ./internal/api/grpc/...
+      - name: Publish go coverage
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          file: profile.cov
+          name: integration-tests
