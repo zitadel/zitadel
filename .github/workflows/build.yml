@@ -49,7 +49,7 @@ jobs:
       name: restore core
       with:
         path: .
-        key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**') }}
+        key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*') }}
     - uses: actions/cache/restore@v3
       with:
         path: console/dist/console/

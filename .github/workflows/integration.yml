@@ -31,7 +31,7 @@ jobs:
         name: restore core
         with:
           path: .
-          key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**') }}
+          key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*') }}
       - name: Run ZITADEL init and setup
         run: |
           go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml

@@ -28,7 +28,7 @@ jobs:
       - uses: actions/cache/save@v3
         with:
           path: .
-          key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**') }}
+          key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*') }}
 
   lint:
     uses: ./.github/workflows/lint.yml
