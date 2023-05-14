@@ -147,7 +147,7 @@ const authConfig: AuthConfig = {
       provide: APP_INITIALIZER,
       useFactory: appInitializerFn,
       multi: true,
-      deps: [GrpcService, ExhaustedHttpInterceptor],
+      deps: [GrpcService],
     },
     {
       provide: APP_INITIALIZER,
