@@ -11,21 +11,15 @@ env:
   go_version: '1.20'
 
 jobs:
-
-  core-hash:
-    runs-on: ubuntu-latest
-    outputs:
-      hash: ${{ steps.generate.outputs.CORE_HASH }}
-    steps:
-    - uses: actions/checkout@v3
-    - id: generate
-      run: echo "CORE_HASH=${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*')}}" >> "$GITHUB_OUTPUT"
   
   generate-core:
     runs-on: ubuntu-latest
-    needs: [core-hash]
+    outputs:
+      hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
     steps:
       - uses: actions/checkout@v3
+      - id: generate-hash
+        run: echo "CORE_HASH=${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*')}}" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ env.go_version }}
@@ -38,7 +32,7 @@ jobs:
       - uses: actions/cache/save@v3
         with:
           path: .
-          key: core-${{ needs.core-hash.outputs.hash }}
+          key: core-${{ steps.generate-hash.outputs.hash }}
 
   lint:
     uses: ./.github/workflows/lint.yml
@@ -50,25 +44,25 @@ jobs:
 
   test:
     uses: ./.github/workflows/test.yml
-    needs: [core-hash, generate-core]
+    needs: [generate-core]
     with:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
-      core_hash: core-${{ needs.core-hash.outputs.hash }}
+      core_hash: core-${{ needs.generate-core.outputs.hash }}
 
   build:
     uses: ./.github/workflows/build.yml
-    needs: [core-hash, generate-core]
+    needs: [generate-core]
     with:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
-      core_hash: core-${{ needs.core-hash.outputs.hash }}
+      core_hash: core-${{ needs.generate-core.outputs.hash }}
 
   container:
     uses: ./.github/workflows/container.yml
-    needs: [core-hash, lint, test, build]
+    needs: [lint, test, build]
     with:
       tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
