@@ -12,9 +12,6 @@ on:
       buf_version:
         required: true
         type: string
-      core_hash:
-        required: true
-        type: string
 
 jobs:
 
@@ -53,7 +50,7 @@ jobs:
           cache: true
       - uses: bufbuild/buf-setup-action@v1
         with:
-          version: v1.15.1
+          version: ${{ inputs.buf_version }}
           github_token: ${{ github.token }}
       - run: make generate
       - uses: actions/cache/save@v3
