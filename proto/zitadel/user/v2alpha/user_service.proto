@@ -9,6 +9,7 @@ import "zitadel/user/v2alpha/password.proto";
 import "zitadel/user/v2alpha/user.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -153,6 +154,96 @@ service UserService {
       };
     };
   }
+
+  rpc PasskeyRegistration (PasskeyRegistrationRequest) returns (PasskeyRegistrationResponse) {
+    option (google.api.http) = {
+      post: "/users/{user_id}/passkeys"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.passkey.write" // or authenticated or have a code
+      }
+    };
+    //TODO: DOCS and examples
+  }
+  rpc PasskeyAuthentication (PasskeyAuthenticationRequest) returns (PasskeyAuthenticationResponse) {
+    option (google.api.http) = {
+      post: "/users/{user_id}/passkeys/{passkey_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.passkey.write" // or authenticated or have a code
+      }
+    };
+    //TODO: DOCS and examples
+  }
+  rpc SendPasskeyRegistrationLink (SendPasskeyRegistrationLinkRequest) returns (SendPasskeyRegistrationLinkResponse) {
+    option (google.api.http) = {
+      post: "/users/{user_id}/passkeys/{passkey_id}/send"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.passkey.write"
+      }
+    };
+    //TODO: DOCS and examples
+  }
+}
+
+message PasskeyRegistrationRequest{
+  string code = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"SomeSpecialCode\"";
+      max_length: 200;
+    }
+  ];
+  string user_id = 2;
+  PasskeyAuthenicator authenticator = 3;
+  // other zitadel options?
+}
+
+enum PasskeyAuthenicator {
+  PASSKEY_AUTHENTICATOR_UNSPECIFIED = 0;
+  PASSKEY_AUTHENTICATOR_PLATFORM = 1;
+  PASSKEY_AUTHENTICATOR_CROSS_PLATFORM = 2;
+}
+
+message PasskeyRegistrationResponse{
+  zitadel.object.v2alpha.Details details = 1;
+  string challenge = 2;
+  google.protobuf.Duration expiration = 3;
+}
+
+message PasskeyAuthenticationRequest{
+    string user_id = 1;
+    string passkey_id = 2;
+    bytes signature = 3;
+}
+
+message PasskeyAuthenticationResponse{
+    zitadel.object.v2alpha.Details details = 1;
+}
+
+message SendPasskeyRegistrationLinkRequest{
+    string user_id = 1;
+    string passkey_id = 2;
+    oneof medium {
+        string email = 3;
+        string url_template = 4;
+        string code = 5;
+    }
+}
+
+message SendPasskeyRegistrationLinkResponse{
+  zitadel.object.v2alpha.Details details = 1;
+  string code = 2;
 }
 
 message AddHumanUserRequest{
