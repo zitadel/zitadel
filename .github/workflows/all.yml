@@ -12,8 +12,14 @@ env:
 
 jobs:
 
+  core-hash:
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo "CORE_HASH=${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*')}}" >> "$GITHUB_OUTPUT"
+  
   generate-core:
     runs-on: ubuntu-latest
+    needs: [core-hash]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
@@ -28,7 +34,7 @@ jobs:
       - uses: actions/cache/save@v3
         with:
           path: .
-          key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*') }}
+          key: core-${{ needs.core-hash.outputs.CORE_HASH }}
 
   lint:
     uses: ./.github/workflows/lint.yml
@@ -40,23 +46,25 @@ jobs:
 
   test:
     uses: ./.github/workflows/test.yml
-    needs: [generate-core]
+    needs: [core-hash, generate-core]
     with:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
+      core_hash: core-${{ needs.core-hash.outputs.CORE_HASH }}
 
   build:
     uses: ./.github/workflows/build.yml
-    needs: [generate-core]
+    needs: [core-hash, generate-core]
     with:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
+      core_hash: core-${{ needs.core-hash.outputs.CORE_HASH }}
 
   container:
     uses: ./.github/workflows/container.yml
-    needs: [lint, test, build]
+    needs: [core-hash, lint, test, build]
     with:
       tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 

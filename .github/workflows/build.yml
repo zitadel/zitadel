@@ -12,6 +12,9 @@ on:
       buf_version:
         required: true
         type: string
+      core_hash:
+        required: true
+        type: string
 
 jobs:
 
@@ -49,7 +52,7 @@ jobs:
       name: restore core
       with:
         path: .
-        key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*') }}
+        key: ${{inputs.core_hash}}
     - uses: actions/cache/restore@v3
       with:
         path: console/dist/console/

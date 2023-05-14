@@ -12,6 +12,9 @@ on:
       buf_version:
         required: true
         type: string
+      core_hash:
+        required: true
+        type: string
 
 jobs:
 
@@ -42,7 +45,7 @@ jobs:
       name: restore core
       with:
         path: .
-        key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*') }}
+        key: ${{inputs.core_hash}}
     - run: make test
 
   core-integration-test:
@@ -64,7 +67,7 @@ jobs:
         name: restore core
         with:
           path: .
-          key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*') }}
+          key: ${{inputs.core_hash}}
       - name: Start ${{ matrix.db }} database
         run: docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
       - name: Run ZITADEL init and setup
