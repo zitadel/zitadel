@@ -46,9 +46,10 @@ jobs:
         goarch: [amd64, arm64]
     steps:
     - uses: actions/cache/restore@v3
+      name: restore core
       with:
         path: .
-        key: core-${{ github.sha }}
+        key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**') }}
     - uses: actions/cache/restore@v3
       with:
         path: console/dist/console/

@@ -39,9 +39,10 @@ jobs:
         go-version: ${{ inputs.go_version }}
         cache: true    
     - uses: actions/cache/restore@v3
+      name: restore core
       with:
         path: .
-        key: core-${{ github.sha }}
+        key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**') }}
     - run: make test
 
   core-integration-test:
@@ -60,9 +61,10 @@ jobs:
           go-version: ${{ inputs.go_version }}
           cache: true
       - uses: actions/cache/restore@v3
+        name: restore core
         with:
           path: .
-          key: core-${{ github.sha }}
+          key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**') }}
       - name: Start ${{ matrix.db }} database
         run: docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
       - name: Run ZITADEL init and setup

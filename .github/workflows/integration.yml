@@ -28,9 +28,10 @@ jobs:
       - name: Start ${{ matrix.db }} database
         run: docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
       - uses: actions/cache/restore@v3
+        name: restore core
         with:
           path: .
-          key: runnable-${{ github.sha }}
+          key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**') }}
       - name: Run ZITADEL init and setup
         run: |
           go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
