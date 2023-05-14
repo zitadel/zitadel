@@ -14,9 +14,12 @@ jobs:
 
   core-hash:
     runs-on: ubuntu-latest
+    outputs:
+      hash: ${{ steps.generate.outputs.CORE_HASH }}
     steps:
     - uses: actions/checkout@v3
-    - run: echo "CORE_HASH=${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*')}}" >> "$GITHUB_OUTPUT"
+    - id: generate
+      run: echo "CORE_HASH=${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*')}}" >> "$GITHUB_OUTPUT"
   
   generate-core:
     runs-on: ubuntu-latest
@@ -35,7 +38,7 @@ jobs:
       - uses: actions/cache/save@v3
         with:
           path: .
-          key: core-${{ needs.core-hash.outputs.CORE_HASH }}
+          key: core-${{ needs.core-hash.outputs.hash }}
 
   lint:
     uses: ./.github/workflows/lint.yml
@@ -52,7 +55,7 @@ jobs:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
-      core_hash: core-${{ needs.core-hash.outputs.CORE_HASH }}
+      core_hash: core-${{ needs.core-hash.outputs.hash }}
 
   build:
     uses: ./.github/workflows/build.yml
@@ -61,7 +64,7 @@ jobs:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
-      core_hash: core-${{ needs.core-hash.outputs.CORE_HASH }}
+      core_hash: core-${{ needs.core-hash.outputs.hash }}
 
   container:
     uses: ./.github/workflows/container.yml
