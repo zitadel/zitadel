@@ -41,8 +41,12 @@ jobs:
 
   generate-core:
     runs-on: ubuntu-latest
+    outputs:
+      core_hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
     steps:
       - uses: actions/checkout@v3
+      - id: generate-hash
+        run: echo "CORE_HASH=${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*')}}" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ inputs.go_version }}
@@ -55,31 +59,4 @@ jobs:
       - uses: actions/cache/save@v3
         with:
           path: .
-          key: core-${{ inputs.core_hash }}
-
-  core:
-    name: core
-    runs-on: ubuntu-latest
-    needs: [console, generate-core]
-    strategy:
-      matrix:
-        goos: [linux, darwin, windows]
-        goarch: [amd64, arm64]
-    steps:
-    - uses: actions/cache/restore@v3
-      name: restore core
-      with:
-        path: .
-        key: ${{inputs.core_hash}}
-    - uses: actions/cache/restore@v3
-      with:
-        path: console/dist/console/
-        key: console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}
-    - name: move console to correct folder
-      run: mv console/dist/console/ internal/api/ui/console/static/
-    - name: build executable
-      run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
-    - uses: actions/upload-artifact@v3
-      with:
-        name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+          key: core-${{ steps.generate-hash.outputs.CORE_HASH }}

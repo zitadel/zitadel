@@ -12,27 +12,19 @@ env:
 
 jobs:
   
-  generate-core:
-    runs-on: ubuntu-latest
-    outputs:
-      hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
-    steps:
-      - uses: actions/checkout@v3
-      - id: generate-hash
-        run: echo "CORE_HASH=${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*')}}" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.go_version }}
-          cache: true
-      - uses: bufbuild/buf-setup-action@v1
-        with:
-          version: v1.15.1
-          github_token: ${{ github.token }}
-      - run: make generate
-      - uses: actions/cache/save@v3
-        with:
-          path: .
-          key: core-${{ steps.generate-hash.outputs.hash }}
+  build:
+    uses: ./.github/workflows/build.yml
+    with:
+      node_version: 18
+      go_version: '1.20'
+      buf_version: v1.15.1
+      golangci_lint_version: v1.52.2
+  
+  compile:
+    uses: ./.github/workflows/compile.yml
+    needs: build
+    with:
+      core_hash: ${{needs.build.outputs.core_hash}}
 
   lint:
     uses: ./.github/workflows/lint.yml
@@ -44,21 +36,12 @@ jobs:
 
   test:
     uses: ./.github/workflows/test.yml
-    needs: [generate-core]
+    needs: [build]
     with:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
-      core_hash: core-${{ needs.generate-core.outputs.hash }}
-
-  build:
-    uses: ./.github/workflows/build.yml
-    needs: [generate-core]
-    with:
-      node_version: 18
-      go_version: '1.20'
-      buf_version: v1.15.1
-      core_hash: core-${{ needs.generate-core.outputs.hash }}
+      core_hash: core-${{ needs.build.outputs.hash }}
 
   container:
     uses: ./.github/workflows/container.yml

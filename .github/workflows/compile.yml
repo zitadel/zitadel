@@ -1,0 +1,36 @@
+name: Compile
+
+on:
+  workflow_call:
+    inputs:
+      core_hash:
+        required: true
+        type: string
+
+jobs:
+  executable:
+    name: core
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, darwin, windows]
+        goarch: [amd64, arm64]
+    steps:
+    - uses: actions/cache/restore@v3
+      name: restore core
+      with:
+        path: .
+        key: ${{inputs.core_hash}}
+    - uses: actions/cache/restore@v3
+      name: restore console
+      with:
+        path: internal/api/ui/console/static/
+        key: console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}
+    # - name: move console to correct folder
+    #   run: mv console/dist/console/ internal/api/ui/console/static/
+    - name: build executable
+      run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
+    - uses: actions/upload-artifact@v3
+      with:
+        name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
