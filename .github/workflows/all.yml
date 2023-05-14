@@ -6,7 +6,10 @@ on:
 permissions:
   contents: write
   packages: write
-    
+
+env:
+  go_version: '1.20'
+
 jobs:
 
   generate-core:
@@ -15,22 +18,20 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.20'
+          go-version: ${{ env.go_version }}
           cache: true
       - uses: bufbuild/buf-setup-action@v1
         with:
           version: v1.15.1
           github_token: ${{ github.token }}
       - run: make generate
-      - name: cache for integration tests
-        uses: actions/cache/save@v3
+      - uses: actions/cache/save@v3
         with:
           path: .
-          key: core-${{ github.sha }}
+          key: core-${{ hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**') }}
 
   lint:
     uses: ./.github/workflows/lint.yml
-    needs: [generate-core]
     with:
       node_version: 18
       go_version: '1.20'
