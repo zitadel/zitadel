@@ -30,37 +30,46 @@ jobs:
   console:
     name: console
     runs-on: ubuntu-latest
-    if: inputs.console_hit != 'true'
     steps:
     - uses: actions/checkout@v3
+      if: inputs.console_hit != 'true'
     - uses: actions/setup-node@v3
+      if: inputs.console_hit != 'true'
       with:
         node-version: ${{ inputs.node_version }}
         cache: 'yarn'
         cache-dependency-path: console/yarn.lock
     - run: (cd console ; yarn install --frozen-lockfile)
+      if: inputs.console_hit != 'true' 
     - run: (cd console ; yarn generate)
+      if: inputs.console_hit != 'true'
     - run: (cd console ; yarn build)
+      if: inputs.console_hit != 'true'
     - uses: actions/cache/save@v3
+      if: inputs.console_hit != 'true'
       with:
         path: console/dist/console/
         key: ${{ inputs.console_hash }}
 
   core:
     runs-on: ubuntu-latest
-    if: inputs.core_hit != 'true'
     steps:
       - uses: actions/checkout@v3
+        if: inputs.console_hit != 'true'
       - uses: actions/setup-go@v3
+        if: inputs.console_hit != 'true'
         with:
           go-version: ${{ inputs.go_version }}
           cache: true
       - uses: bufbuild/buf-setup-action@v1
+        if: inputs.console_hit != 'true'
         with:
           version: ${{ inputs.buf_version }}
           github_token: ${{ github.token }}
       - run: make generate
+        if: inputs.console_hit != 'true'
       - uses: actions/cache/save@v3
+        if: inputs.console_hit != 'true'
         with:
           path: .
           key: ${{ inputs.core_hash }}
