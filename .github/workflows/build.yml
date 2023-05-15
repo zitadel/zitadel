@@ -32,7 +32,7 @@ jobs:
   console:
     name: console
     runs-on: ubuntu-latest
-    if: !inputs.console_hit
+    if: inputs.console_hit != 'true'
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
@@ -51,7 +51,7 @@ jobs:
 
   core:
     runs-on: ubuntu-latest
-    if: !inputs.core_hit
+    if: inputs.core_hit != 'true'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
