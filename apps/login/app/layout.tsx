@@ -6,7 +6,7 @@ import Byline from "#/ui/Byline";
 import { LayoutProviders } from "#/ui/LayoutProviders";
 import { Analytics } from "@vercel/analytics/react";
 import ThemeWrapper from "#/ui/ThemeWrapper";
-import { getBranding } from "#/lib/zitadel";
+import { getBrandingSettings } from "#/lib/zitadel";
 import { server } from "../lib/zitadel";
 import { LabelPolicyColors } from "#/utils/colors";
 
@@ -25,7 +25,7 @@ export default async function RootLayout({
   // later only shown with dev mode enabled
   const showNav = true;
 
-  const branding = await getBranding(server);
+  const branding = await getBrandingSettings(server);
   let partialPolicy: LabelPolicyColors | undefined;
   console.log(branding);
   if (branding) {

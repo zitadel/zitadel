@@ -1,6 +1,7 @@
 export * from "./server";
 export * from "./middleware";
-export * from "./management";
+export * as management from "./management";
+export * as settings from "./v2/settings";
 
 // export * as auth from "./auth";
 // export * as management from "./management";

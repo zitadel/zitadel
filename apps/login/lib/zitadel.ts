@@ -2,14 +2,11 @@ import {
   management,
   ZitadelServer,
   ZitadelServerOptions,
-  getManagement,
   orgMetadata,
   getServer,
   getServers,
-  LabelPolicy,
   initializeServer,
-  PrivacyPolicy,
-  PasswordComplexityPolicy,
+  settings,
 } from "@zitadel/server";
 // import { getAuth } from "@zitadel/server/auth";
 
@@ -26,46 +23,47 @@ if (!getServers().length) {
   server = initializeServer(zitadelConfig);
 }
 
-export function getBranding(
+export function getBrandingSettings(
   server: ZitadelServer
-): Promise<LabelPolicy | undefined> {
-  const mgmt = getManagement(server);
-  return mgmt
-    .getLabelPolicy(
+): Promise<any | undefined> {
+  // settings.branding_settings.BrandingSettings
+  const settingsService = settings.getSettings(server);
+  return settingsService
+    .getBrandingSettings(
       {},
       {
         // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
       }
     )
-    .then((resp) => resp.policy);
+    .then((resp) => resp.settings);
 }
 
-export function getPrivacyPolicy(
+export function getLegalAndSupportSettings(
   server: ZitadelServer
-): Promise<PrivacyPolicy | undefined> {
-  const mgmt = getManagement(server);
-  return mgmt
-    .getPrivacyPolicy(
+): Promise<any | undefined> {
+  const settingsService = settings.getSettings(server);
+  return settingsService
+    .getLegalAndSupportSettings(
       {},
       {
         //  metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
       }
     )
-    .then((resp) => resp.policy);
+    .then((resp) => resp.settings);
 }
 
-export function getPasswordComplexityPolicy(
+export function getPasswordComplexitySettings(
   server: ZitadelServer
-): Promise<PasswordComplexityPolicy | undefined> {
-  const mgmt = getManagement(server);
-  return mgmt
-    .getPasswordComplexityPolicy(
+): Promise<any | undefined> {
+  const settingsService = settings.getSettings(server);
+  return settingsService
+    .getPasswordComplexitySettings(
       {},
       {
         // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
       }
     )
-    .then((resp) => resp.policy);
+    .then((resp) => resp.settings);
 }
 
 export type AddHumanUserData = {
@@ -78,7 +76,7 @@ export function addHumanUser(
   server: ZitadelServer,
   { email, firstName, lastName, password }: AddHumanUserData
 ): Promise<string> {
-  const mgmt = getManagement(server);
+  const mgmt = management.getManagement(server);
   return mgmt
     .addHumanUser(
       {

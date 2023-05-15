@@ -12,7 +12,7 @@ export default function Error({ error, reset }: any) {
   return (
     <Boundary labels={["Home page Error UI"]} color="pink">
       <div className="space-y-4">
-        <div className="text-sm text-pink-500">
+        <div className="text-sm text-warn-light-500 dark:text-warn-dark-500">
           <strong className="font-bold">Error:</strong> {error?.message}
         </div>
         <div>
