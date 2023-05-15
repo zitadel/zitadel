@@ -24,6 +24,7 @@ jobs:
     needs: build
     with:
       core_hash: ${{ needs.build.outputs.core_hash }}
+      console_hash: ${{ needs.build.outputs.console_hash }}
 
   lint:
     uses: ./.github/workflows/lint.yml
