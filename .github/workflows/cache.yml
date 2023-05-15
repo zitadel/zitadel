@@ -15,9 +15,9 @@ on:
       console_hit:
         description: check if already cached
         value: ${{jobs.hash.outputs.console_hit}}
-      # api_hash:
-      #   description: The cache hash of the api
-      #   value: ${{jobs.hash.outputs.api_hash}}
+      api_hash:
+        description: The cache hash of the api
+        value: ${{jobs.hash.outputs.api_hash}}
       # api_hit:
       #   description: check if already cached
       #   value: ${{jobs.hash.outputs.api_hit}}
@@ -28,6 +28,7 @@ jobs:
     outputs:
       console_hash: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
       core_hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
+      api_hash: ${{ steps.generate-hash.outputs.API_HASH }}
       console_hit: ${{ steps.console-already-exists.outputs.cache-hit }}
       core_hit: ${{ steps.core-already-exists.outputs.cache-hit }}
     steps:
@@ -36,6 +37,7 @@ jobs:
       run: |
         echo "CONSOLE_HASH=console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}" >> "$GITHUB_OUTPUT"
         echo "CORE_HASH=core-${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*', 'go.sum', 'go.mod')}}" >> "$GITHUB_OUTPUT"
+        echo "API_HASH=core-${{hashFiles('proto/**')}}" >> "$GITHUB_OUTPUT"
     - id: console-already-exists
       name: check console hit
       uses: actions/cache/restore@v3

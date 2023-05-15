@@ -29,10 +29,10 @@ jobs:
   
   compile:
     uses: ./.github/workflows/compile.yml
-    needs: build
+    needs: [cache, build]
     with:
-      core_hash: ${{ needs.build.outputs.core_hash }}
-      console_hash: ${{ needs.build.outputs.console_hash }}
+      core_hash: ${{ needs.cache.outputs.core_hash }}
+      console_hash: ${{ needs.cache.outputs.console_hash }}
 
   lint:
     uses: ./.github/workflows/lint.yml
@@ -48,12 +48,12 @@ jobs:
 
   test:
     uses: ./.github/workflows/test.yml
-    needs: [build]
+    needs: [cache, build]
     with:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
-      core_hash: ${{ needs.build.outputs.core_hash }}
+      core_hash: ${{ needs.cache.outputs.core_hash }}
 
   container:
     uses: ./.github/workflows/container.yml
