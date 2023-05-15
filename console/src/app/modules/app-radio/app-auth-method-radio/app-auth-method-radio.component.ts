@@ -14,7 +14,7 @@ export interface RadioItemAuthType {
   prefix: string;
   background: string;
   responseType?: OIDCResponseType;
-  grantType?: OIDCGrantType;
+  grantType?: OIDCGrantType[];
   authMethod?: OIDCAuthMethodType;
   apiAuthMethod?: APIAuthMethodType;
   recommended?: boolean;
