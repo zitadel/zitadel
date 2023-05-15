@@ -42,7 +42,6 @@ jobs:
     - run: (cd console ; yarn generate)
     - run: (cd console ; yarn build)
     - uses: actions/cache/save@v3
-      if: always()
       with:
         path: console/dist/console/
         key: ${{ inputs.console_hash }}
