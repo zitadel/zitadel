@@ -29,7 +29,7 @@ jobs:
     - uses: actions/checkout@v3
     - id: generate-hash
       run: |
-        echo "CONSOLE_HASH=console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}" >> "$GITHUB_OUTPUT"
+        echo "CONSOLE_HASH=console-dist-${{hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock')}}" >> "$GITHUB_OUTPUT"
         echo "CORE_HASH=core-${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*', 'go.sum', 'go.mod')}}" >> "$GITHUB_OUTPUT"
     - id: console-already-exists
       name: check console hit
@@ -37,7 +37,7 @@ jobs:
       with:
         key: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
         lookup-only: true
-        path: .
+        path: console/dist/console/
     - id: core-already-exists
       name: check core hit
       uses: actions/cache/restore@v3
