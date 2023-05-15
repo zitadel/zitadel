@@ -300,6 +300,7 @@ message VerifyEmailResponse{
 message RegisterPasskeyRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -334,6 +335,7 @@ message RegisterPasskeyResponse{
 message VerifyPasskeyRegistrationRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -342,6 +344,7 @@ message VerifyPasskeyRegistrationRequest{
   ];
   string passkey_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -350,6 +353,7 @@ message VerifyPasskeyRegistrationRequest{
   ];
   bytes public_key_credential = 3 [
     (validate.rules).bytes = {min_len: 55, max_len: 1048576},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "JSON representation of public key credential issued by the passkey client";
       min_length: 55;
@@ -358,6 +362,7 @@ message VerifyPasskeyRegistrationRequest{
   ];
   string passkey_name = 4 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -381,6 +386,7 @@ message VerifyPasskeyRegistrationResponse{
 message CreatePasskeyRegistrationLinkRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -396,5 +402,6 @@ message CreatePasskeyRegistrationLinkRequest{
 
 message CreatePasskeyRegistrationLinkResponse{
   zitadel.object.v2alpha.Details details = 1;
-  string code = 2;
+  // in case the medium was set to return_code, the code will be returned
+  optional string code = 2;
 }
