@@ -39,6 +39,7 @@ import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
 import { AdminService } from './services/admin.service';
 import { AuthenticationService } from './services/authentication.service';
 import { BreadcrumbService } from './services/breadcrumb.service';
+import { EnvironmentService } from './services/environment.service';
 import { ExhaustedService } from './services/exhausted.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
@@ -141,6 +142,7 @@ const authConfig: AuthConfig = {
     RoleGuard,
     UserGuard,
     ThemeService,
+    EnvironmentService,
     ExhaustedService,
     ExhaustedHttpInterceptor,
     {

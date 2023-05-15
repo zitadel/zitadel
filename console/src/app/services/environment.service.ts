@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
+import { catchError, Observable, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
@@ -59,37 +59,16 @@ export class EnvironmentService {
     return !!document.cookie
       .split(';')
       .map((c) => c.trim())
-      .find(this.isCookie);
+      .find(this.isExhaustedCookie);
   }
 
-  private get cookiesAreEnabled() {
-    try {
-      document.cookie = 'testcookie';
-      const canSetCookie = document.cookie.indexOf('testcookie') != -1;
-      document.cookie = 'testcookie; expires=Thu, 01 Jan 1970 00:00:00 UTC';
-      return canSetCookie;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  // isCookie needs `this` to point to the class instance, so we use an arrow function
-  private isCookie = (cookie: string) => {
+  // isExhaustedCookie needs `this` to point to the class instance, so we use an arrow function
+  private isExhaustedCookie = (cookie: string) => {
     return cookie.startsWith(`${this.exhaustedCookieKey}=`);
   };
 
   createEnvironment() {
-    return of(null).pipe(
-      // Delete the exhausted cookie before the enviroment is loaded
-      tap(() => (document.cookie = `${this.exhaustedCookieKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC"`)),
-      switchMap(() => {
-        // Wait until the browser deleted the cookie
-        return new Promise<void>((resolve, reject) => {
-          this.awaitFiveSeconds(() => !this.hasExhaustedCookie, reject);
-          resolve();
-        });
-      }),
-      switchMap(() => this.http.get<Environment>(this.environmentJsonPath, { observe: 'response' })),
+    return this.http.get<Environment>(this.environmentJsonPath, { observe: 'response' }).pipe(
       catchError((err) => {
         console.error('Getting environment.json failed', err);
         return throwError(() => err);
@@ -100,8 +79,8 @@ export class EnvironmentService {
             reject('environment.json has no body');
             return;
           }
-          const exhaustedResponseCookie = resp.headers.getAll('set-cookie')?.find(this.isCookie);
-          if (!exhaustedResponseCookie || !this.cookiesAreEnabled) {
+          const exhaustedResponseCookie = resp.headers.getAll('set-cookie')?.find(this.isExhaustedCookie);
+          if (!exhaustedResponseCookie || !navigator.cookieEnabled) {
             resolve(resp.body as Environment);
             return;
           }
