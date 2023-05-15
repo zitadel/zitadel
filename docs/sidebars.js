@@ -428,6 +428,20 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Settings Lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "Settings Service API (Alpha)",
+            slug: "/apis/settings_service",
+            description:
+              "This API is intended to manage settings in a ZITADEL instance.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/settings_service/sidebar.js"),
+        },
+        {
+          type: "category",
           label: "Assets",
           collapsed: true,
           items: ["apis/assets/assets"],
@@ -526,38 +540,50 @@ module.exports = {
   support: [
   ],
   legal: [
-    "legal/introduction",
-    "legal/terms-of-service",
-    "legal/data-processing-agreement",
     {
       type: "category",
-      label: "Service Description",
+      label: "Legal Agreements",
       collapsed: false,
+      link: {
+        type: "generated-index",
+        title: "Legal Agreements",
+        slug: "legal",
+        description:
+          "This section contains important agreements, policies and appendices relevant for users of our websites and services. All documents will be provided in English language.",
+      },
       items: [
-        "legal/cloud-service-description",
-        "legal/service-level-description",
-        "legal/support-services",
-      ],
-    },
-    {
-      type: "category",
-      label: "Additional terms",
-      collapsed: true,
-      items: [
-        "legal/terms-support-service",
-        "legal/terms-of-service-dedicated",
-      ],
-    },
-    {
-      type: "category",
-      label: "Policies",
-      collapsed: false,
-      items: [
-        "legal/privacy-policy",
-        "legal/acceptable-use-policy",
-        "legal/rate-limit-policy",
-        "legal/vulnerability-disclosure-policy",
-      ],
+        "legal/terms-of-service",
+        "legal/data-processing-agreement",
+        {
+          type: "category",
+          label: "Service Description",
+          collapsed: false,
+          items: [
+            "legal/cloud-service-description",
+            "legal/service-level-description",
+            "legal/support-services",
+          ],
+        },
+        {
+          type: "category",
+          label: "Support Program",
+          collapsed: true,
+          items: [
+            "legal/terms-support-service",
+          ],
+        },
+        {
+          type: "category",
+          label: "Policies",
+          collapsed: false,
+          items: [
+            "legal/privacy-policy",
+            "legal/acceptable-use-policy",
+            "legal/rate-limit-policy",
+            "legal/vulnerability-disclosure-policy",
+          ],
+        },
+      ]
     },
   ],
 };

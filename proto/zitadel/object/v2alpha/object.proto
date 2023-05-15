@@ -15,6 +15,13 @@ message Organisation {
   }
 }
 
+message RequestContext {
+  oneof resource_owner {
+    string org_id = 1;
+    bool instance = 2 [(validate.rules).bool = {const: true}];
+  }
+}
+
 message ListQuery {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {

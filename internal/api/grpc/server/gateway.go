@@ -16,7 +16,6 @@ import (
 
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -66,16 +65,15 @@ var (
 )
 
 type Gateway struct {
-	mux           *runtime.ServeMux
-	http1HostName string
-	connection    *grpc.ClientConn
-	cookieHandler *http_utils.CookieHandler
-	cookieConfig  *http_mw.AccessConfig
-	queries       *query.Queries
+	mux               *runtime.ServeMux
+	http1HostName     string
+	connection        *grpc.ClientConn
+	accessInterceptor *http_mw.AccessInterceptor
+	queries           *query.Queries
 }
 
 func (g *Gateway) Handler() http.Handler {
-	return addInterceptors(g.mux, g.http1HostName, g.cookieHandler, g.cookieConfig, g.queries)
+	return addInterceptors(g.mux, g.http1HostName, g.accessInterceptor, g.queries)
 }
 
 type CustomHTTPResponse interface {
@@ -89,8 +87,7 @@ func CreateGatewayWithPrefix(
 	g WithGatewayPrefix,
 	port uint16,
 	http1HostName string,
-	cookieHandler *http_utils.CookieHandler,
-	cookieConfig *http_mw.AccessConfig,
+	accessInterceptor *http_mw.AccessInterceptor,
 	queries *query.Queries,
 ) (http.Handler, string, error) {
 	runtimeMux := runtime.NewServeMux(serveMuxOptions...)
@@ -106,10 +103,10 @@ func CreateGatewayWithPrefix(
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to register grpc gateway: %w", err)
 	}
-	return addInterceptors(runtimeMux, http1HostName, cookieHandler, cookieConfig, queries), g.GatewayPathPrefix(), nil
+	return addInterceptors(runtimeMux, http1HostName, accessInterceptor, queries), g.GatewayPathPrefix(), nil
 }
 
-func CreateGateway(ctx context.Context, port uint16, http1HostName string, cookieHandler *http_utils.CookieHandler, cookieConfig *http_mw.AccessConfig) (*Gateway, error) {
+func CreateGateway(ctx context.Context, port uint16, http1HostName string, accessInterceptor *http_mw.AccessInterceptor) (*Gateway, error) {
 	connection, err := dial(ctx,
 		port,
 		[]grpc.DialOption{
@@ -121,11 +118,10 @@ func CreateGateway(ctx context.Context, port uint16, http1HostName string, cooki
 	}
 	runtimeMux := runtime.NewServeMux(append(serveMuxOptions, runtime.WithHealthzEndpoint(healthpb.NewHealthClient(connection)))...)
 	return &Gateway{
-		mux:           runtimeMux,
-		http1HostName: http1HostName,
-		connection:    connection,
-		cookieHandler: cookieHandler,
-		cookieConfig:  cookieConfig,
+		mux:               runtimeMux,
+		http1HostName:     http1HostName,
+		connection:        connection,
+		accessInterceptor: accessInterceptor,
 	}, nil
 }
 
@@ -163,8 +159,7 @@ func dial(ctx context.Context, port uint16, opts []grpc.DialOption) (*grpc.Clien
 func addInterceptors(
 	handler http.Handler,
 	http1HostName string,
-	cookieHandler *http_utils.CookieHandler,
-	cookieConfig *http_mw.AccessConfig,
+	accessInterceptor *http_mw.AccessInterceptor,
 	queries *query.Queries,
 ) http.Handler {
 	handler = http_mw.CallDurationHandler(handler)
@@ -174,7 +169,7 @@ func addInterceptors(
 	handler = http_mw.DefaultTelemetryHandler(handler)
 	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
 	// only if it follows the http_mw.DefaultTelemetryHandler
-	handler = exhaustedCookieInterceptor(handler, cookieHandler, cookieConfig, queries)
+	handler = exhaustedCookieInterceptor(handler, accessInterceptor, queries)
 	handler = http_mw.DefaultMetricsHandler(handler)
 	return handler
 }
@@ -193,35 +188,32 @@ func http1Host(next http.Handler, http1HostName string) http.Handler {
 
 func exhaustedCookieInterceptor(
 	next http.Handler,
-	cookieHandler *http_utils.CookieHandler,
-	cookieConfig *http_mw.AccessConfig,
+	accessInterceptor *http_mw.AccessInterceptor,
 	queries *query.Queries,
 ) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		next.ServeHTTP(&cookieResponseWriter{
-			ResponseWriter: writer,
-			cookieHandler:  cookieHandler,
-			cookieConfig:   cookieConfig,
-			request:        request,
-			queries:        queries,
+			ResponseWriter:    writer,
+			accessInterceptor: accessInterceptor,
+			request:           request,
+			queries:           queries,
 		}, request)
 	})
 }
 
 type cookieResponseWriter struct {
 	http.ResponseWriter
-	cookieHandler *http_utils.CookieHandler
-	cookieConfig  *http_mw.AccessConfig
-	request       *http.Request
-	queries       *query.Queries
+	accessInterceptor *http_mw.AccessInterceptor
+	request           *http.Request
+	queries           *query.Queries
 }
 
 func (r *cookieResponseWriter) WriteHeader(status int) {
 	if status >= 200 && status < 300 {
-		http_mw.DeleteExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.request, r.cookieConfig)
+		r.accessInterceptor.DeleteExhaustedCookie(r.ResponseWriter, r.request)
 	}
 	if status == http.StatusTooManyRequests {
-		http_mw.SetExhaustedCookie(r.cookieHandler, r.ResponseWriter, r.cookieConfig, r.request)
+		r.accessInterceptor.SetExhaustedCookie(r.ResponseWriter, r.request)
 	}
 	r.ResponseWriter.WriteHeader(status)
 }
