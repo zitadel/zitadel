@@ -171,7 +171,7 @@ service UserService {
   }
   rpc VerifyPasskeyRegistration (VerifyPasskeyRegistrationRequest) returns (VerifyPasskeyRegistrationResponse) {
     option (google.api.http) = {
-      put: "/users/{user_id}/passkeys/{passkey_id}"
+      post: "/users/{user_id}/passkeys/{passkey_id}"
       body: "*"
     };
 
@@ -184,7 +184,7 @@ service UserService {
   }
   rpc CreatePasskeyRegistrationLink (CreatePasskeyRegistrationLinkRequest) returns (CreatePasskeyRegistrationLinkResponse) {
     option (google.api.http) = {
-      put: "/users/{user_id}/passkeys/registration_link"
+      post: "/users/{user_id}/passkeys/registration_link"
       body: "*"
     };
 
