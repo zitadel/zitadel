@@ -4,7 +4,7 @@ services:
   traefik:
     networks:
       - 'zitadel'
-    image: "traefik:v2.7"
+    image: "traefik:v2.10.1"
     ports:
       - "80:80"
       - "443:443"

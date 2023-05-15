@@ -1,3 +1,8 @@
+log:
+  level: DEBUG
+
+accessLog: {}
+
 entrypoints:
   web:
     address: ":80"
@@ -7,7 +12,7 @@ entrypoints:
 
 tls:
   stores:
-    default: 
+    default:
       # generates self-signed certificates
       defaultCertificate:
 

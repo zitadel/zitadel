@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  cockroach:
+    extends:
+      file: '../../../e2e/config/localhost/docker-compose.yaml'
+      service: 'db'
+  
+  postgres:
+    restart: 'always'
+    image: 'postgres:15'
+    environment:
+      - POSTGRES_USER=zitadel
+      - PGUSER=zitadel
+      - POSTGRES_DB=zitadel
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+    ports:
+      - 5432:5432

@@ -267,6 +267,7 @@ Console:
   LongCache:
     MaxAge: 12h
     SharedMaxAge: 168h #7d
+  InstanceManagementURL: ""
 
 Notification:
   Repository:

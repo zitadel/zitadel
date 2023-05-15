@@ -62,7 +62,7 @@ func authorize(r *http.Request, verifier *authz.TokenVerifier, authConfig authz.
 		return nil, errors.New("auth header missing")
 	}
 
-	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), verifier, authConfig, authOpt, r.RequestURI)
+	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), "", verifier, authConfig, authOpt, r.RequestURI)
 	if err != nil {
 		return nil, err
 	}
