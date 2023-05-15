@@ -16,11 +16,9 @@ on:
         required: true
         type: string
       core_hit:
-        required: true
-        type: boolean
+        type: string
       console_hit:
-        required: true
-        type: boolean
+        type: string
 
 jobs:
 
