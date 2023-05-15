@@ -32,6 +32,7 @@ jobs:
       with:
         key: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
         lookup-only: true
+        path: .
 
   core:
     runs-on: ubuntu-latest
@@ -48,3 +49,4 @@ jobs:
       with:
         key: ${{ steps.generate-hash.outputs.CORE_HASH }}
         lookup-only: true
+        path: .
