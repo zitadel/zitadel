@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
@@ -8,7 +8,7 @@ import { GrpcAuthService } from '../services/grpc-auth.service';
 @Injectable({
   providedIn: 'root',
 })
-export class UserGuard implements CanActivate {
+export class UserGuard  {
   constructor(private authService: GrpcAuthService, private router: Router) {}
 
   public canActivate(
