@@ -5,45 +5,45 @@ on:
     outputs:
       core_hash:
         description: The cache hash of the core
-        value: ${{jobs.core.outputs.hash}}
+        value: ${{jobs.hash.outputs.core_hash}}
       core_hit:
         description: check if already cached
-        value: ${{jobs.core.outputs.hit}}
+        value: ${{jobs.hash.outputs.core_hit}}
       console_hash:
         description: The cache hash of the console
-        value: ${{jobs.console.outputs.hash}}
+        value: ${{jobs.hash.outputs.console_hash}}
       console_hit:
         description: check if already cached
-        value: ${{jobs.console.outputs.hit}}
+        value: ${{jobs.hash.outputs.console_hit}}
+      # api_hash:
+      #   description: The cache hash of the api
+      #   value: ${{jobs.hash.outputs.api_hash}}
+      # api_hit:
+      #   description: check if already cached
+      #   value: ${{jobs.hash.outputs.api_hit}}
 
 jobs:
-  console:
+  hash:
     runs-on: ubuntu-latest
     outputs:
-      hash: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
-      hit: ${{ steps.already-exists.outputs.cache-hit }}
+      console_hash: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
+      core_hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
+      console_hit: ${{ steps.console-already-exists.outputs.cache-hit }}
+      core_hit: ${{ steps.core-already-exists.outputs.cache-hit }}
     steps:
     - uses: actions/checkout@v3
     - id: generate-hash
-      run: echo "CONSOLE_HASH=console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}" >> "$GITHUB_OUTPUT"
-    - id: already-exists
+      run: |
+        echo "CONSOLE_HASH=console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}" >> "$GITHUB_OUTPUT"
+        echo "CORE_HASH=core-${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*', 'go.sum', 'go.mod')}}" >> "$GITHUB_OUTPUT"
+    - id: console-already-exists
       name: check if already built
       uses: actions/cache/restore@v3
       with:
         key: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
         lookup-only: true
         path: .
-
-  core:
-    runs-on: ubuntu-latest
-    outputs:
-      hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
-      hit: ${{ steps.already-exists.outputs.cache-hit }}
-    steps:
-    - uses: actions/checkout@v3
-    - id: generate-hash
-      run: echo "CORE_HASH=core-${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*', 'go.sum', 'go.mod')}}" >> "$GITHUB_OUTPUT"
-    - id: already-exists
+    - id: core-already-exists
       name: check if already built
       uses: actions/cache/restore@v3
       with:

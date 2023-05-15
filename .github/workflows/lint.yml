@@ -15,6 +15,12 @@ on:
       golangci_lint_version:
         required: true
         type: string
+      core_hit:
+        required: true
+        type: boolean
+      console_hit:
+        required: true
+        type: boolean
 
 jobs:
 
@@ -33,6 +39,7 @@ jobs:
 
   console:
     name: console
+    if: inputs.console_hit != 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -47,6 +54,7 @@ jobs:
 
   core:
     name: core
+    if: inputs.core_hit != 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
