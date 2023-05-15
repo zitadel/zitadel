@@ -43,6 +43,8 @@ jobs:
       go_version: '1.20'
       buf_version: v1.15.1
       golangci_lint_version: v1.52.2
+      core_hit: ${{ needs.cache.outputs.core_hit }}
+      console_hit: ${{ needs.cache.outputs.console_hit }}
 
   test:
     uses: ./.github/workflows/test.yml
