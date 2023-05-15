@@ -3,6 +3,7 @@ package domain
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"time"
 
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -93,4 +94,17 @@ func (p *PasswordlessInitCode) Link(baseURL string) string {
 
 func PasswordlessInitCodeLink(baseURL, userID, resourceOwner, codeID, code string) string {
 	return fmt.Sprintf("%s?userID=%s&orgID=%s&codeID=%s&code=%s", baseURL, userID, resourceOwner, codeID, code)
+}
+
+type PasskeyURLData struct {
+	UserID        string
+	ResourceOwner string
+	CodeID        string
+	Code          string
+}
+
+// RenderPasskeyURLTemplate parses and renders tmpl.
+// userID, resourceOwner, codeID and code are passed into the [PasskeyURLData].
+func RenderPasskeyURLTemplate(w io.Writer, tmpl, userID, resourceOwner, codeID, code string) error {
+	return renderURLTemplate(w, tmpl, &PasskeyURLData{userID, resourceOwner, codeID, code})
 }

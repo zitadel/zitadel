@@ -525,6 +525,8 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 		return nil, nil, "", err
 	}
 	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
+
+	// Why this?
 	err = c.eventstore.FilterToQueryReducer(ctx, initCode)
 	if err != nil {
 		return nil, nil, "", err
@@ -539,7 +541,7 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 	}
 	if !direct {
 		codeEventCreator = func(ctx context.Context, agg *eventstore.Aggregate, id string, cryptoCode *crypto.CryptoValue, exp time.Duration) eventstore.Command {
-			return usr_repo.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, id, cryptoCode, exp)
+			return usr_repo.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, id, cryptoCode, exp, "", false)
 		}
 	}
 	codeEvent := codeEventCreator(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID, cryptoCode, passwordlessCodeGenerator.Expiry())
