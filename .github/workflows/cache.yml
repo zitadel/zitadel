@@ -18,7 +18,7 @@ on:
       api_hash:
         description: The cache hash of the api
         value: ${{jobs.hash.outputs.api_hash}}
-      # api_hit:
+    #  api_hit:
       #   description: check if already cached
       #   value: ${{jobs.hash.outputs.api_hit}}
 
