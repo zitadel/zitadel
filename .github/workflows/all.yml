@@ -11,13 +11,21 @@ env:
   go_version: '1.20'
 
 jobs:
+
+  cache:
+    uses: ./.github/workflows/cache.yml
   
   build:
     uses: ./.github/workflows/build.yml
+    needs: cache
     with:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
+      core_hash: ${{ needs.cache.outputs.core_hash }}
+      core_hit: ${{ needs.cache.outputs.core_hit }}
+      console_hash: ${{ needs.cache.outputs.console_hash }}
+      console_hit: ${{ needs.cache.outputs.console_hit }}
   
   compile:
     uses: ./.github/workflows/compile.yml

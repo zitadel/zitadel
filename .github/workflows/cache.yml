@@ -1,0 +1,49 @@
+name: Cache
+
+on: 
+  workflow_call:
+    outputs:
+      core_hash:
+        description: The cache hash of the core
+        value: ${{jobs.core.outputs.hash}}
+      core_hit:
+        description: check if already cached
+        value: ${{jobs.core.outputs.hit}}
+      console_hash:
+        description: The cache hash of the console
+        value: ${{jobs.console.outputs.hash}}
+      console_hit:
+        description: check if already cached
+        value: ${{jobs.console.outputs.hit}}
+
+jobs:
+  console:
+    runs-on: ubuntu
+    outputs:
+      hash: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
+      hit: ${{ steps.already-exists.outputs.cache-hit }}
+    steps:
+    - uses: actions/checkout@v3
+    - id: generate-hash
+      run: echo "CONSOLE_HASH=console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}" >> "$GITHUB_OUTPUT"
+    - id: already-exists
+      name: check if already built
+      uses: actions/cache/restore@v3
+      with:
+        key: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
+        lookup-only: true
+  core:
+    runs-on: ubuntu
+    outputs:
+      hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
+      hit: ${{ steps.already-exists.outputs.cache-hit }}
+    steps:
+    - uses: actions/checkout@v3
+    - id: generate-hash
+      run: echo "CORE_HASH=core-${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*', 'go.sum', 'go.mod')}}" >> "$GITHUB_OUTPUT"
+    - id: already-exists
+      name: check if already built
+      uses: actions/cache/restore@v3
+      with:
+        key: ${{ steps.generate-hash.outputs.CORE_HASH }}
+        lookup-only: true

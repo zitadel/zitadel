@@ -2,13 +2,6 @@ name: Build
 
 on:
   workflow_call:
-    outputs:
-      core_hash:
-          description: The cache hash of the core
-          value: ${{jobs.core.outputs.hash}}
-      console_hash:
-        description: The cache hash of the console
-        value: ${{jobs.console.outputs.hash}}
     inputs:
       node_version:
         required: true
@@ -19,6 +12,18 @@ on:
       buf_version:
         required: true
         type: string
+      core_hash:
+        required: true
+        type: string
+      core_hit:
+        required: true
+        type: boolean
+      console_hash:
+        required: true
+        type: string
+      console_hit:
+        required: true
+        type: boolean
 
 jobs:
 
@@ -27,12 +32,9 @@ jobs:
   console:
     name: console
     runs-on: ubuntu-latest
-    outputs:
-      hash: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
+    if: !inputs.console_hit
     steps:
     - uses: actions/checkout@v3
-    - id: generate-hash
-      run: echo "CONSOLE_HASH=console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}" >> "$GITHUB_OUTPUT"
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node_version }}
@@ -45,16 +47,13 @@ jobs:
       if: always()
       with:
         path: console/dist/console/
-        key: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
+        key: ${{ inputs.console_hash }}
 
   core:
     runs-on: ubuntu-latest
-    outputs:
-      hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
+    if: !inputs.core_hit
     steps:
       - uses: actions/checkout@v3
-      - id: generate-hash
-        run: echo "CORE_HASH=core-${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*', 'go.sum', 'go.mod')}}" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ inputs.go_version }}
@@ -67,4 +66,4 @@ jobs:
       - uses: actions/cache/save@v3
         with:
           path: .
-          key: core-${{ steps.generate-hash.outputs.CORE_HASH }}
+          key: ${{ inputs.core_hash }}
