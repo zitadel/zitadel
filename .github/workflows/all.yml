@@ -23,7 +23,7 @@ jobs:
     uses: ./.github/workflows/compile.yml
     needs: build
     with:
-      core_hash: ${{needs.build.outputs.core_hash}}
+      core_hash: ${{ needs.build.outputs.core_hash }}
 
   lint:
     uses: ./.github/workflows/lint.yml
@@ -40,7 +40,7 @@ jobs:
       node_version: 18
       go_version: '1.20'
       buf_version: v1.15.1
-      core_hash: core-${{ needs.build.outputs.hash }}
+      core_hash: core-${{ needs.build.outputs.core_hash }}
 
   container:
     uses: ./.github/workflows/container.yml

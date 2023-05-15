@@ -6,6 +6,9 @@ on:
       core_hash:
         required: true
         type: string
+      console_hash:
+        required: true
+        type: string
 
 jobs:
   executable:
@@ -25,9 +28,7 @@ jobs:
       name: restore console
       with:
         path: internal/api/ui/console/static/
-        key: console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}
-    # - name: move console to correct folder
-    #   run: mv console/dist/console/ internal/api/ui/console/static/
+        key: ${{ inputs.console_hash }}
     - name: build executable
       run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
     - uses: actions/upload-artifact@v3

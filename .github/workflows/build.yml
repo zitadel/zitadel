@@ -2,6 +2,13 @@ name: Build
 
 on:
   workflow_call:
+    outputs:
+      core_hash:
+          description: The cache hash of the core
+          value: ${{jobs.generate-core.outputs.hash}}
+      console_hash:
+        description: The cache hash of the console
+        value: ${{jobs.console.outputs.hash}}
     inputs:
       node_version:
         required: true
@@ -20,8 +27,12 @@ jobs:
   console:
     name: console
     runs-on: ubuntu-latest
+    outputs:
+      hash: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
     steps:
     - uses: actions/checkout@v3
+    - id: generate-hash
+      run: echo "CONSOLE_HASH=console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}" >> "$GITHUB_OUTPUT"
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node_version }}
@@ -34,12 +45,12 @@ jobs:
       if: always()
       with:
         path: console/dist/console/
-        key: console-dist-${{ hashFiles('console/src/**', '!console/src/app/proto/**', 'console/yarn.lock') }}
+        key: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
 
   generate-core:
     runs-on: ubuntu-latest
     outputs:
-      core_hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
+      hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
     steps:
       - uses: actions/checkout@v3
       - id: generate-hash
