@@ -8,7 +8,7 @@ import { GrpcAuthService } from '../services/grpc-auth.service';
 @Injectable({
   providedIn: 'root',
 })
-export class UserGuard  {
+export class UserGuard {
   constructor(private authService: GrpcAuthService, private router: Router) {}
 
   public canActivate(
