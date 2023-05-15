@@ -5,7 +5,7 @@ on:
     outputs:
       core_hash:
           description: The cache hash of the core
-          value: ${{jobs.generate-core.outputs.hash}}
+          value: ${{jobs.core.outputs.hash}}
       console_hash:
         description: The cache hash of the console
         value: ${{jobs.console.outputs.hash}}
@@ -47,14 +47,14 @@ jobs:
         path: console/dist/console/
         key: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
 
-  generate-core:
+  core:
     runs-on: ubuntu-latest
     outputs:
       hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
     steps:
       - uses: actions/checkout@v3
       - id: generate-hash
-        run: echo "CORE_HASH=${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*')}}" >> "$GITHUB_OUTPUT"
+        run: echo "CORE_HASH=core-${{hashFiles('build/**', 'cmd/**', 'internal/**', 'pkg/**', 'proto/**', '!*.pb.*', 'go.sum', 'go.mod')}}" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ inputs.go_version }}
