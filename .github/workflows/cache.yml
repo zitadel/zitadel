@@ -18,7 +18,7 @@ on:
 
 jobs:
   console:
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     outputs:
       hash: ${{ steps.generate-hash.outputs.CONSOLE_HASH }}
       hit: ${{ steps.already-exists.outputs.cache-hit }}
@@ -34,7 +34,7 @@ jobs:
         lookup-only: true
 
   core:
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     outputs:
       hash: ${{ steps.generate-hash.outputs.CORE_HASH }}
       hit: ${{ steps.already-exists.outputs.cache-hit }}
