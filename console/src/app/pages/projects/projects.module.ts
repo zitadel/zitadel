@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
-import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
+import { MatLegacyTableModule } from '@angular/material/legacy-table';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { MatSortModule } from '@angular/material/sort';
 import { TranslateModule } from '@ngx-translate/core';
@@ -36,7 +36,7 @@ import { ProjectsComponent } from './projects.component';
     TranslateModule,
     FormsModule,
     HasRoleModule,
-    MatTableModule,
+    MatLegacyTableModule,
     PaginatorModule,
     InputModule,
     MatIconModule,
