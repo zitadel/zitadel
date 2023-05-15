@@ -36,6 +36,8 @@ jobs:
 
   lint:
     uses: ./.github/workflows/lint.yml
+    needs: cache
+    if: needs.cache.outputs.core_hit != 'true' || needs.cache.outputs.console_hit != 'true'
     with:
       node_version: 18
       go_version: '1.20'
