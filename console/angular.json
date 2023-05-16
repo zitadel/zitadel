@@ -45,7 +45,8 @@
                   "inline": false
                 },
                 "styles": {
-                  "inlineCritical": false
+                  "inlineCritical": false,
+                  "minify": false
                 }
               },
               "budgets": [
