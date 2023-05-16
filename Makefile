@@ -32,9 +32,9 @@ grpc:
 	# go install github.com/rakyll/statik@v0.1.7
 	buf generate
 	mkdir -p pkg/grpc
-	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
+	mv .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
 	mkdir -p openapi/v2/zitadel
-	cp .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel
+	mv .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel
 
 static:
 	go install github.com/rakyll/statik@v0.1.7
