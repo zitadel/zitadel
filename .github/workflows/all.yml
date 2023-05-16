@@ -9,6 +9,14 @@ permissions:
 
 env:
   go_version: '1.20'
+  cache_from_params: |
+    type=registry,
+    ref=ghcr.io/zitadel/build-cache
+  cache_to_params: |
+    type=registry,
+    ref=ghcr.io/zitadel/build-cache,
+    mode=max
+  tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
 jobs:
 
@@ -38,13 +46,9 @@ jobs:
           context: .
           file: ./build/workflow.Dockerfile
           target: core-build
-          push: true
-          cache-to: |
-            type=registry,
-            ref=ghcr.io/zitadel/build-cache,
-            mode=max
-          cache-from: |
-            type=registry
+          push: false
+          cache-to: ${{env.cache_to_params}}
+          cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
   
   console:
@@ -73,16 +77,11 @@ jobs:
           context: .
           file: ./build/workflow.Dockerfile
           target: console
-          push: true
-          cache-to: |
-            type=registry,
-            ref=ghcr.io/zitadel/build-cache,
-            mode=max
-          cache-from: |
-            type=registry,
-            ref=ghcr.io/zitadel/build-cache
+          push: false
+          cache-to:  ${{env.cache_to_params}}
+          cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
-          tags: ghcr.io/zitadel/test:${{ github.sha }}
+          tags: ${{env.tag_name}}
           
   
   compile:
@@ -119,16 +118,11 @@ jobs:
         context: .
         file: ./build/workflow.Dockerfile
         target: compile
-        push: true
-        cache-to: |
-          type=registry,
-          ref=ghcr.io/zitadel/build-cache,
-          mode=max
-        cache-from: |
-          type=registry,
-          ref=ghcr.io/zitadel/build-cache
+        push: false
+        cache-to: ${{env.cache_to_params}}
+        cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
-        tags: ghcr.io/zitadel/test:${{ github.sha }}
+        tags: ${{env.tag_name}}
 
   core-unit-test:
     runs-on: ubuntu-latest
@@ -157,16 +151,11 @@ jobs:
           context: .
           file: ./build/workflow.Dockerfile
           target: test-core-unit
-          push: true
-          cache-to: |
-            type=registry,
-            ref=ghcr.io/zitadel/build-cache,
-            mode=max
-          cache-from: |
-            type=registry,
-            ref=ghcr.io/zitadel/build-cache
+          push: false
+          cache-to:  ${{env.cache_to_params}}
+          cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
-          tags: ghcr.io/zitadel/test:${{ github.sha }}
+          tags: ${{env.tag_name}}
 
   core-integration-test:
     runs-on: ubuntu-latest
@@ -201,16 +190,11 @@ jobs:
           context: .
           file: ./build/workflow.Dockerfile
           target: test-core-integration
-          push: true
-          cache-to: |
-            type=registry,
-            ref=ghcr.io/zitadel/build-cache,
-            mode=max
-          cache-from: |
-            type=registry,
-            ref=ghcr.io/zitadel/build-cache
+          push: false
+          cache-to:  ${{env.cache_to_params}}
+          cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
-          tags: ghcr.io/zitadel/test:${{ github.sha }}
+          tags: ${{env.tag_name}}
 
 
   # e2e:
