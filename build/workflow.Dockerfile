@@ -174,6 +174,7 @@ ARG GOOS GOARCH
 
 COPY --from=console /zitadel/console/dist/console internal/api/ui/console/static/
 
+RUN go env && env
 RUN go build -o zitadel -ldflags="-s -w"
 
 ENTRYPOINT [ "./zitadel" ]
