@@ -10,12 +10,12 @@ permissions:
 env:
   go_version: '1.20'
   cache_from_params: |
-    type=registry
-    ref=ghcr.io/zitadel/build-cache
+    "type=registry"
+    "ref=ghcr.io/zitadel/build-cache"
   cache_to_params: |
-    type=registry
-    ref=ghcr.io/zitadel/build-cache
-    mode=max
+    "type=registry"
+    "ref=ghcr.io/zitadel/build-cache"
+    "mode=max"
   tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
 jobs:
