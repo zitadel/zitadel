@@ -103,12 +103,13 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-
-	var (
-		wm   = NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
-		aggr = UserAggregateFromWriteModel(&wm.WriteModel)
-		cmd  = user.NewHumanPasswordlessInitCodeRequestedEvent(ctx, aggr, codeID, code.Crypted, code.Expiry, urlTmpl, returnCode)
-	)
+	wm := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
+	err = c.eventstore.FilterToQueryReducer(ctx, wm)
+	if err != nil {
+		return nil, err
+	}
+	agg := UserAggregateFromWriteModel(&wm.WriteModel)
+	cmd := user.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, codeID, code.Crypted, code.Expiry, urlTmpl, returnCode)
 	err = c.pushAppendAndReduce(ctx, wm, cmd)
 	if err != nil {
 		return nil, err

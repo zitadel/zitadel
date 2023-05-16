@@ -525,8 +525,6 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 		return nil, nil, "", err
 	}
 	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
-
-	// Why this?
 	err = c.eventstore.FilterToQueryReducer(ctx, initCode)
 	if err != nil {
 		return nil, nil, "", err
