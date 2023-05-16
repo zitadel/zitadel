@@ -38,7 +38,7 @@ jobs:
           context: .
           file: ./build/workflow.Dockerfile
           target: core-build
-          push: false
+          push: true
           cache-to: |
             type=registry,
             mode=max
@@ -73,7 +73,7 @@ jobs:
           context: .
           file: ./build/workflow.Dockerfile
           target: console
-          push: false
+          push: true
           cache-to: |
             type=registry,
             mode=max
@@ -118,7 +118,7 @@ jobs:
         context: .
         file: ./build/workflow.Dockerfile
         target: compile
-        push: false
+        push: true
         cache-to: |
           type=registry,
             mode=max
@@ -155,7 +155,7 @@ jobs:
           context: .
           file: ./build/workflow.Dockerfile
           target: test-core-unit
-          push: false
+          push: true
           cache-to: |
             type=registry,
             mode=max
@@ -198,7 +198,7 @@ jobs:
           context: .
           file: ./build/workflow.Dockerfile
           target: test-core-integration
-          push: false
+          push: true
           cache-to: |
             type=registry,
             mode=max
