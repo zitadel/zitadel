@@ -46,11 +46,11 @@ RUN apk add --update make
 
 COPY go.mod .
 COPY go.sum .
-
 COPY proto proto
-COPY --from=core-api-generator /go/bin /usr/local/bin
 COPY buf.*.yaml .
 COPY Makefile Makefile
+
+COPY --from=core-api-generator /go/bin /usr/local/bin
 
 RUN make grpc
 
@@ -83,7 +83,6 @@ WORKDIR /go/src/github.com/zitadel/zitadel
 # install make
 RUN apk add --update make
 
-COPY --from=core-api /go/src/github.com/zitadel/zitadel/openapi/v2 openapi/v2
 COPY go.mod .
 COPY go.sum .
 COPY Makefile Makefile
@@ -91,6 +90,8 @@ COPY openapi/statik openapi/statik
 COPY internal/api/assets/generator internal/api/assets/generator
 COPY internal/config internal/config
 COPY internal/errors internal/errors
+
+COPY --from=core-api /go/src/github.com/zitadel/zitadel/openapi/v2 openapi/v2
 
 RUN make assets
 
@@ -134,12 +135,12 @@ FROM console-deps as console
 
 WORKDIR /zitadel/console
 
-COPY --from=console-client /zitadel/console/src/app/proto/generated src/app/proto/generated
-
 COPY console/src src
 COPY console/angular.json .
 COPY console/ngsw-config.json .
 COPY console/tsconfig* .
+
+COPY --from=console-client /zitadel/console/src/app/proto/generated src/app/proto/generated
 
 RUN yarn build
 
@@ -152,9 +153,6 @@ RUN yarn build
 # #######################################
 FROM core-deps AS core-build
 
-COPY --from=core-api /go/src/github.com/zitadel/zitadel .
-COPY --from=core-login /go/src/github.com/zitadel/zitadel .
-COPY --from=core-assets /go/src/github.com/zitadel/zitadel .
 COPY cmd cmd
 COPY internal internal
 COPY pkg pkg
@@ -162,6 +160,10 @@ COPY proto proto
 COPY openapi openapi
 COPY statik statik
 COPY main.go main.go
+
+COPY --from=core-api /go/src/github.com/zitadel/zitadel .
+COPY --from=core-login /go/src/github.com/zitadel/zitadel .
+COPY --from=core-assets /go/src/github.com/zitadel/zitadel .
 
 # #######################################
 # build executable
@@ -196,6 +198,17 @@ RUN apt update; \
         make \
         ;
 
+# default vars
+ENV DB_FLAVOR=postgres
+ENV POSTGRES_USER=zitadel
+ENV POSTGRES_DB=zitadel
+ENV POSTGRES_PASSWORD=postgres
+ENV POSTGRES_HOST_AUTH_METHOD=trust
+
+ENV PGUSER=zitadel
+ENV PGDATABASE=zitadel
+ENV PGPASSWORD=postgres
+
 # copy zitadel files
 COPY --from=core-deps /go/pkg/mod /root/go/pkg/mod
 COPY --from=core-build /go/src/github.com/zitadel/zitadel .
@@ -215,17 +228,6 @@ ENV DB_FLAVOR=cockroach
 # install cockroach
 COPY --from=cockroachdb/cockroach:latest /cockroach/cockroach /usr/local/bin/
 ENV COCKROACH_BINARY=/cockroach/cockroach
-
-# install postgres
-ENV DB_FLAVOR=postgres
-ENV POSTGRES_USER=zitadel
-ENV POSTGRES_DB=zitadel
-ENV POSTGRES_PASSWORD=postgres
-ENV POSTGRES_HOST_AUTH_METHOD=trust
-
-ENV PGUSER=zitadel
-ENV PGDATABASE=zitadel
-ENV PGPASSWORD=postgres
 
 # RUN apt install -y postgresql
 
