@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthConfig } from 'angular-oauth2-oidc';
-import { catchError, map, throwError } from 'rxjs';
+import { catchError, switchMap, tap, throwError } from 'rxjs';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
@@ -36,9 +36,12 @@ export class GrpcService {
   ) {}
 
   public loadAppEnvironment(): Promise<any> {
-    return this.envService.env
+    // We use the browser language until we can make API requests to get the users configured language.
+    return this.translate
+      .use(this.translate.getBrowserLang() || this.translate.defaultLang)
       .pipe(
-        map((env) => {
+        switchMap(() => this.envService.env),
+        tap((env) => {
           if (!env?.api || !env?.issuer) {
             return;
           }

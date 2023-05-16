@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, shareReplay, switchMap, throwError } from 'rxjs';
+import { catchError, defer, map, Observable, of, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
@@ -13,6 +13,7 @@ interface Environment {
   issuer: string;
   customer_portal?: string;
   instance_management_url?: string;
+  exhausted?: boolean;
 }
 
 interface WellKnown {
@@ -43,8 +44,8 @@ export class EnvironmentService {
 
   // env returns an `Observable<Environment>` that can be subscribed to whenever needed.
   // It makes the HTTP call exactly once and replays the cached result.
-  // If the backend sends the exhaused cookie with the Max-Age property and value 0, the exhaused dialog is shown.
-  // If the backend sends the exhaused cookie with the Max-Age property and value above 0, the exhaused dialog is shown.
+  // If the responses exhausted property is true, the exhaused dialog is shown.
+  // If it is false, the observable waits until the browser has the cookie set before emitting.
   get env() {
     return this.environment$;
   }
@@ -55,56 +56,24 @@ export class EnvironmentService {
     return this.wellKnown$;
   }
 
-  private get hasExhaustedCookie() {
-    return !!document.cookie
-      .split(';')
-      .map((c) => c.trim())
-      .find(this.isExhaustedCookie);
-  }
-
-  // isExhaustedCookie needs `this` to point to the class instance, so we use an arrow function
-  private isExhaustedCookie = (cookie: string) => {
-    return cookie.startsWith(`${this.exhaustedCookieKey}=`);
-  };
-
-  createEnvironment() {
-    return this.http.get<Environment>(this.environmentJsonPath, { observe: 'response' }).pipe(
+  private createEnvironment() {
+    return this.http.get<Environment>(this.environmentJsonPath).pipe(
       catchError((err) => {
         console.error('Getting environment.json failed', err);
         return throwError(() => err);
       }),
-      switchMap((resp) => {
-        return new Promise<Environment>((resolve, reject) => {
-          if (resp.body === null) {
-            reject('environment.json has no body');
-            return;
-          }
-          const exhaustedResponseCookie = resp.headers.getAll('set-cookie')?.find(this.isExhaustedCookie);
-          if (!exhaustedResponseCookie || !navigator.cookieEnabled) {
-            resolve(resp.body as Environment);
-            return;
-          }
-
-          // The `/i` in the end of the RegExp matches without case sentitivity
-          const maxAgeRegex = /Max-Age=(\d+)/i;
-          const match = exhaustedResponseCookie.match(maxAgeRegex);
-
-          // If there is no Max-Age, we don't know if the browser should have the cookie or not.
-          if (!match) {
-            resolve(resp.body as Environment);
-            return;
-          }
-
-          // If it is above 0, we show the exhausted dialog that either refreshes
-          // the page or redirects the user to the instance management URL.
-          if (parseInt(match[1]) > 0) {
-            this.exhaustedSvc.showExhaustedDialog(resp.body.instance_management_url);
-            return;
-          }
-
-          // If the Max age is 0 or below, the browser must not have the cookie.
-          // In this case, we wait for the browser to delete the cookie.
-          this.awaitFiveSeconds(() => !this.hasExhaustedCookie, reject);
+      switchMap((env) => {
+        if (env.exhausted) {
+          return this.exhaustedSvc.showExhaustedDialog(env.instance_management_url).pipe(map(() => env));
+        }
+        if (!navigator.cookieEnabled) {
+          return of(env);
+        }
+        return defer(() => {
+          return new Promise<Environment>((resolve, reject) => {
+            this.awaitFiveSeconds(() => !document.cookie.includes(this.exhaustedCookieKey), reject);
+            resolve(env);
+          });
         });
       }),
       // Cache the first response, then replay it
@@ -112,7 +81,7 @@ export class EnvironmentService {
     );
   }
 
-  createWellKnown(environment$: Observable<Environment>) {
+  private createWellKnown(environment$: Observable<Environment>) {
     return environment$.pipe(
       catchError((err) => {
         console.error('Getting well-known OIDC configuration failed', err);
@@ -126,7 +95,7 @@ export class EnvironmentService {
     );
   }
 
-  awaitFiveSeconds(condition: () => boolean, failWithTimeoutMessage: (msg: string) => void) {
+  private awaitFiveSeconds(condition: () => boolean, failWithTimeoutMessage: (msg: string) => void) {
     let checks = 0;
     const check = () => {
       if (condition()) {
