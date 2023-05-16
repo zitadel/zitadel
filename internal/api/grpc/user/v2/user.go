@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/idp"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -56,6 +57,14 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			Value: metadataEntry.GetValue(),
 		}
 	}
+	links := make([]*command.AddLink, len(req.Links))
+	for i, link := range req.Links {
+		links[i] = &command.AddLink{
+			IDPID:         link.IdpId,
+			IDPExternalID: link.IdpExternalId,
+			DisplayName:   link.DisplayName,
+		}
+	}
 	return &command.AddHuman{
 		ID:          req.GetUserId(),
 		Username:    username,
@@ -76,9 +85,9 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		BcryptedPassword:       bcryptedPassword,
 		PasswordChangeRequired: passwordChangeRequired,
 		Passwordless:           false,
-		ExternalIDP:            false,
 		Register:               false,
 		Metadata:               metadata,
+		Links:                  links,
 	}, nil
 }
 
@@ -106,4 +115,70 @@ func hashedPasswordToCommand(hashed *user.HashedPassword) (string, error) {
 		return "", errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.InvalidArgument")
 	}
 	return hashed.GetHash(), nil
+}
+
+func (s *Server) AddLink(ctx context.Context, req *user.AddLinkRequest) (_ *user.AddLinkResponse, err error) {
+	orgID := authz.GetCtxData(ctx).OrgID
+	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &domain.UserIDPLink{
+		IDPConfigID:    req.Link.IdpId,
+		ExternalUserID: req.Link.IdpExternalId,
+		DisplayName:    "",
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &user.AddLinkResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
+	identityProvider, err := s.query.IDPTemplateByID(ctx, false, req.IdpId, false)
+	if err != nil {
+		return nil, err
+	}
+	baseURL := s.baseURL(ctx)
+	callbackURL := baseURL + EndpointExternalLoginCallback
+	var provider idp.Provider
+	switch identityProvider.Type {
+	case domain.IDPTypeOAuth:
+		provider, err = oauthProvider(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeOIDC:
+		provider, err = oidcProvider(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeJWT:
+		provider, err = jwtProvider(identityProvider, s.idpAlg)
+	case domain.IDPTypeAzureAD:
+		provider, err = azureProvider(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGitHub:
+		provider, err = githubProvider(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGitHubEnterprise:
+		provider, err = githubEnterpriseProvider(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGitLab:
+		provider, err = gitlabProvider(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGitLabSelfHosted:
+		provider, err = gitlabSelfHostedProvider(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGoogle:
+		provider, err = googleProvider(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeLDAP:
+		provider, err = ldapProvider(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeUnspecified:
+		fallthrough
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	}
+	if err != nil {
+		return nil, err
+	}
+	session, err := provider.BeginAuth(ctx, "") //TODO generate state
+	if err != nil {
+		return nil, err
+	}
+	return &user.StartIdentityProviderFlowResponse{
+		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
+			Sequence:      identityProvider.Sequence,
+			EventDate:     identityProvider.ChangeDate,
+			ResourceOwner: identityProvider.ResourceOwner,
+		}),
+		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: session.GetAuthURL()},
+	}, nil
 }

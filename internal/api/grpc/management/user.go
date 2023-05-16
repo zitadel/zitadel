@@ -241,7 +241,6 @@ func AddHumanUserRequestToAddHuman(req *mgmt_pb.AddHumanUserRequest) *command.Ad
 		PasswordChangeRequired: true,
 		Passwordless:           false,
 		Register:               false,
-		ExternalIDP:            false,
 	}
 	if req.Phone != nil {
 		human.Phone = command.Phone{

@@ -629,7 +629,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 					ExternalUserID: userLinks.ProvidedUserId,
 					DisplayName:    userLinks.ProvidedUserName,
 				}
-				if err := s.command.AddUserIDPLink(ctx, userLinks.UserId, org.GetOrgId(), externalIDP); err != nil {
+				if _, err := s.command.AddUserIDPLink(ctx, userLinks.UserId, org.GetOrgId(), externalIDP); err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "user_link", Id: userLinks.UserId + "_" + userLinks.IdpId, Message: err.Error()})
 					if isCtxTimeout(ctx) {
 						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err

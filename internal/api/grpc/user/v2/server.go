@@ -1,10 +1,13 @@
 package user
 
 import (
+	"context"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
@@ -13,20 +16,39 @@ import (
 
 var _ user.UserServiceServer = (*Server)(nil)
 
+const (
+	EndpointLDAPLogin             = "/login/ldap"
+	QueryAuthRequestID            = "authRequestID"
+	EndpointExternalLoginCallback = "/login/externalidp/callback"
+)
+
 type Server struct {
 	user.UnimplementedUserServiceServer
-	command     *command.Commands
-	query       *query.Queries
-	userCodeAlg crypto.EncryptionAlgorithm
+	command        *command.Commands
+	query          *query.Queries
+	userCodeAlg    crypto.EncryptionAlgorithm
+	idpAlg         crypto.EncryptionAlgorithm
+	handlerPrefix  string
+	externalSecure bool
 }
 
 type Config struct{}
 
-func CreateServer(command *command.Commands, query *query.Queries, userCodeAlg crypto.EncryptionAlgorithm) *Server {
+func CreateServer(
+	command *command.Commands,
+	query *query.Queries,
+	externalSecure bool,
+	handlerPrefix string,
+	userCodeAlg crypto.EncryptionAlgorithm,
+	idpAlg crypto.EncryptionAlgorithm,
+) *Server {
 	return &Server{
-		command:     command,
-		query:       query,
-		userCodeAlg: userCodeAlg,
+		command:        command,
+		query:          query,
+		externalSecure: externalSecure,
+		handlerPrefix:  handlerPrefix,
+		idpAlg:         idpAlg,
+		userCodeAlg:    userCodeAlg,
 	}
 }
 
@@ -48,4 +70,8 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 	return user.RegisterUserServiceHandler
+}
+
+func (s *Server) baseURL(ctx context.Context) string {
+	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure) + s.handlerPrefix
 }
