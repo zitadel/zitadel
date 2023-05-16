@@ -85,9 +85,9 @@ jobs:
       name: Build
       uses: docker/build-push-action@v4
       with:
-        build-args:
-          GOOS=${{matrix.goos}}
-          GOARCH=${{matrix.goarch}}
+        build-args: |
+          "GOOS=${{matrix.goos}}"
+          "GOARCH=${{matrix.goarch}}"
         context: .
         file: ./build/workflow.Dockerfile
         target: compile
