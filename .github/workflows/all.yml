@@ -32,6 +32,8 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: core-build
           push: false
+          cache-to: gha
+          cache-from: gha
   
   console:
     runs-on: ubuntu-latest
@@ -53,6 +55,8 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: console
           push: false
+          cache-to: gha
+          cache-from: gha
   
   compile:
     runs-on: ubuntu-latest
@@ -82,23 +86,25 @@ jobs:
         file: ./build/workflow.Dockerfile
         target: compile
         push: false
+        cache-to: gha
+        cache-from: gha
 
-    - uses: actions/cache/restore@v3
-      name: restore core
-      with:
-        path: .
-        key: ${{inputs.core_hash}}
-    - uses: actions/cache/restore@v3
-      name: restore console
-      with:
-        path: internal/api/ui/console/static/
-        key: ${{ inputs.console_hash }}
-    - name: build executable
-      run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
-    - uses: actions/upload-artifact@v3
-      with:
-        name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+    # - uses: actions/cache/restore@v3
+    #   name: restore core
+    #   with:
+    #     path: .
+    #     key: ${{inputs.core_hash}}
+    # - uses: actions/cache/restore@v3
+    #   name: restore console
+    #   with:
+    #     path: internal/api/ui/console/static/
+    #     key: ${{ inputs.console_hash }}
+    # - name: build executable
+    #   run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
+    # - uses: actions/upload-artifact@v3
+    #   with:
+    #     name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+    #     path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
     
 
   # cache:
