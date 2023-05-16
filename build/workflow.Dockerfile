@@ -143,7 +143,7 @@ COPY console/ngsw-config.json .
 COPY console/tsconfig* .
 
 
-RUN npx browserlist --update-db && yarn build
+RUN npx browserslist --update-db && yarn build
 
 # ##############################################################################
 # build the executable
