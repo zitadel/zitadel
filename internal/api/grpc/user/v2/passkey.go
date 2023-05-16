@@ -18,7 +18,7 @@ func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyR
 	}
 	ctxData := authz.GetCtxData(ctx)
 	platform := passkeyAuthenticatorToDomain(req.GetAuthenticator())
-	webAuthNToken, err := s.command.HumanAddPasswordlessSetupInitCode(ctx, req.GetUserId(), ctxData.ResourceOwner, req.GetCodeId(), req.GetCode(), platform, generator)
+	webAuthNToken, err := s.command.HumanAddPasswordlessSetupInitCode(ctx, req.GetUserId(), ctxData.ResourceOwner, req.GetCode().GetId(), req.GetCode().GetCode(), platform, generator)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,9 @@ func (s *Server) CreatePasskeyRegistrationLink(ctx context.Context, req *user.Cr
 func passkeyCodeDetailsToPB(details *command.PasskeyCodeDetails) *user.CreatePasskeyRegistrationLinkResponse {
 	return &user.CreatePasskeyRegistrationLinkResponse{
 		Details: object.DomainToDetailsPb(details.ObjectDetails),
-		CodeId:  details.CodeID,
-		Code:    details.Code,
+		Code: &user.PasskeyRegistrationCode{
+			Id:   *details.CodeID,
+			Code: *details.Code,
+		},
 	}
 }
