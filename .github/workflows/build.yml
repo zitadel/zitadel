@@ -40,11 +40,8 @@ jobs:
         cache: 'yarn'
         cache-dependency-path: console/yarn.lock
     - run: (cd console ; yarn install --frozen-lockfile)
-      if: inputs.console_hit != 'true' 
     - run: (cd console ; yarn generate)
-      if: inputs.console_hit != 'true'
     - run: (cd console ; yarn build)
-      if: inputs.console_hit != 'true'
     - uses: actions/cache/save@v3
       if: inputs.console_hit != 'true'
       with:

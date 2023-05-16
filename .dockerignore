@@ -18,4 +18,4 @@ pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
 .goreleaser.yaml
 .artifacts/
-Makefile
+statik.go
