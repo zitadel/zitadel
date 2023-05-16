@@ -188,10 +188,6 @@ ENV PATH="/go/bin:/usr/local/go/bin:${PATH}"
 
 WORKDIR /go/src/github.com/zitadel/zitadel
 
-# copy zitadel files
-COPY --from=core-deps /go/pkg/mod /root/go/pkg/mod
-COPY --from=core-build /go/src/github.com/zitadel/zitadel .
-
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update; \
@@ -199,6 +195,10 @@ RUN apt update; \
         gcc \
         make \
         ;
+
+# copy zitadel files
+COPY --from=core-deps /go/pkg/mod /root/go/pkg/mod
+COPY --from=core-build /go/src/github.com/zitadel/zitadel .
 
 # #######################################
 # unit test core

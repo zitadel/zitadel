@@ -69,8 +69,8 @@ jobs:
     needs: [console, core]
     strategy:
       matrix:
-        goos: [linux, darwin, windows]
-        goarch: [amd64, arm64]
+        goos: ['linux', 'darwin', 'windows']
+        goarch: ['amd64', 'arm64']
     steps:
     -
       name: Checkout
@@ -86,8 +86,8 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         build-args:
-          GOOS=${{ matrix.goos }}
-          GOARCH=${{ matrix.goarch }}
+          GOOS=${{matrix.goos}}
+          GOARCH=${{matrix.goarch}}
         context: .
         file: ./build/workflow.Dockerfile
         target: compile
