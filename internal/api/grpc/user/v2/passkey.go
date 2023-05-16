@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
@@ -42,9 +41,8 @@ func passkeyAuthenticatorToDomain(pa user.PasskeyAuthenticator) domain.Authentic
 }
 
 func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *user.VerifyPasskeyRegistrationRequest) (*user.VerifyPasskeyRegistrationResponse, error) {
-	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, req.GetUserId(), ctxData.ResourceOwner, req.GetPasskeyName(), "", req.GetPublicKeyCredential())
-	// ------------------------------------------------------------------------------------------------------- ^ tokenName? ------ ^ UA? -----
+	resourceOwner := authz.GetCtxData(ctx).ResourceOwner
+	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, req.GetUserId(), resourceOwner, req.GetPasskeyName(), "", req.GetPublicKeyCredential())
 	if err != nil {
 		return nil, err
 	}
@@ -54,34 +52,44 @@ func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *user.Verify
 }
 
 func (s *Server) CreatePasskeyRegistrationLink(ctx context.Context, req *user.CreatePasskeyRegistrationLinkRequest) (resp *user.CreatePasskeyRegistrationLinkResponse, err error) {
-	var (
-		userID        = req.GetUserId()
-		resourceOwner = authz.GetCtxData(ctx).ResourceOwner
-		details       *command.PasskeyCodeDetails
-	)
+	resourceOwner := authz.GetCtxData(ctx).ResourceOwner
 
 	switch medium := req.Medium.(type) {
 	case nil:
-		details, err = s.command.AddUserPasskeyCode(ctx, userID, resourceOwner, s.userCodeAlg)
+		return passkeyDetailsToPb(
+			s.command.AddUserPasskeyCode(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg),
+		)
 	case *user.CreatePasskeyRegistrationLinkRequest_SendLink:
-		details, err = s.command.AddUserPasskeyCodeURLTemplate(ctx, userID, resourceOwner, s.userCodeAlg, medium.SendLink.GetUrlTemplate())
+		return passkeyDetailsToPb(
+			s.command.AddUserPasskeyCodeURLTemplate(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg, medium.SendLink.GetUrlTemplate()),
+		)
 	case *user.CreatePasskeyRegistrationLinkRequest_ReturnCode:
-		details, err = s.command.AddUserPasskeyCodeReturn(ctx, userID, resourceOwner, s.userCodeAlg)
+		return passkeyCodeDetailsToPb(
+			s.command.AddUserPasskeyCodeReturn(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg),
+		)
 	default:
-		err = caos_errs.ThrowUnimplementedf(nil, "USERv2-gaD8y", "verification oneOf %T in method CreatePasskeyRegistrationLink not implemented", medium)
+		return nil, caos_errs.ThrowUnimplementedf(nil, "USERv2-gaD8y", "verification oneOf %T in method CreatePasskeyRegistrationLink not implemented", medium)
 	}
+}
+
+func passkeyDetailsToPb(details *domain.ObjectDetails, err error) (*user.CreatePasskeyRegistrationLinkResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	return passkeyCodeDetailsToPB(details), nil
+	return &user.CreatePasskeyRegistrationLinkResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
 }
 
-func passkeyCodeDetailsToPB(details *command.PasskeyCodeDetails) *user.CreatePasskeyRegistrationLinkResponse {
+func passkeyCodeDetailsToPb(details *domain.PasskeyCodeDetails, err error) (*user.CreatePasskeyRegistrationLinkResponse, error) {
+	if err != nil {
+		return nil, err
+	}
 	return &user.CreatePasskeyRegistrationLinkResponse{
 		Details: object.DomainToDetailsPb(details.ObjectDetails),
 		Code: &user.PasskeyRegistrationCode{
-			Id:   *details.CodeID,
-			Code: *details.Code,
+			Id:   details.CodeID,
+			Code: details.Code,
 		},
-	}
+	}, nil
 }

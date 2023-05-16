@@ -108,3 +108,9 @@ type PasskeyURLData struct {
 func RenderPasskeyURLTemplate(w io.Writer, tmpl, userID, resourceOwner, codeID, code string) error {
 	return renderURLTemplate(w, tmpl, &PasskeyURLData{userID, resourceOwner, codeID, code})
 }
+
+type PasskeyCodeDetails struct {
+	*ObjectDetails
+	CodeID string
+	Code   string
+}

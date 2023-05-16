@@ -9,28 +9,24 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type PasskeyCodeDetails struct {
-	ObjectDetails *domain.ObjectDetails
-	CodeID        *string
-	Code          *string
+func (c *Commands) AddUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+	details, err := c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, "", false)
+	return details.ObjectDetails, err
 }
 
-func (c *Commands) AddUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*PasskeyCodeDetails, error) {
-	return c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, "", false)
-}
-
-func (c *Commands) AddUserPasskeyCodeURLTemplate(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, urlTmpl string) (*PasskeyCodeDetails, error) {
+func (c *Commands) AddUserPasskeyCodeURLTemplate(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, urlTmpl string) (*domain.ObjectDetails, error) {
 	if err := domain.RenderPasskeyURLTemplate(io.Discard, urlTmpl, userID, resourceOwner, "codeID", "code"); err != nil {
 		return nil, err
 	}
-	return c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, urlTmpl, false)
+	details, err := c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, urlTmpl, false)
+	return details.ObjectDetails, err
 }
 
-func (c *Commands) AddUserPasskeyCodeReturn(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*PasskeyCodeDetails, error) {
+func (c *Commands) AddUserPasskeyCodeReturn(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.PasskeyCodeDetails, error) {
 	return c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, "", true)
 }
 
-func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, urlTmpl string, returnCode bool) (*PasskeyCodeDetails, error) {
+func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, urlTmpl string, returnCode bool) (*domain.PasskeyCodeDetails, error) {
 	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode)
 	if err != nil {
 		return nil, err
@@ -60,12 +56,9 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-
-	details := &PasskeyCodeDetails{
+	return &domain.PasskeyCodeDetails{
 		ObjectDetails: writeModelToObjectDetails(&wm.WriteModel),
-	}
-	if returnCode {
-		details.CodeID, details.Code = &codeID, &code
-	}
-	return details, nil
+		CodeID:        codeID,
+		Code:          code,
+	}, nil
 }
