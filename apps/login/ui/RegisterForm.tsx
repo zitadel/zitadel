@@ -1,6 +1,9 @@
 "use client";
 
-import { PasswordComplexityPolicy, PrivacyPolicy } from "@zitadel/server";
+import {
+  LegalAndSupportSettings,
+  PasswordComplexitySettings,
+} from "@zitadel/server";
 import PasswordComplexity from "./PasswordComplexity";
 import { useState } from "react";
 import { Button, ButtonVariants } from "./Button";
@@ -27,8 +30,8 @@ type Inputs =
   | FieldValues;
 
 type Props = {
-  privacyPolicy: PrivacyPolicy;
-  passwordComplexityPolicy: PasswordComplexityPolicy;
+  privacyPolicy: LegalAndSupportSettings;
+  passwordComplexityPolicy: PasswordComplexitySettings;
 };
 
 export default function RegisterForm({
@@ -90,10 +93,10 @@ export default function RegisterForm({
 
   const policyIsValid =
     passwordComplexityPolicy &&
-    (passwordComplexityPolicy.hasLowercase ? hasLowercase : true) &&
-    (passwordComplexityPolicy.hasNumber ? hasNumber : true) &&
-    (passwordComplexityPolicy.hasUppercase ? hasUppercase : true) &&
-    (passwordComplexityPolicy.hasSymbol ? hasSymbol : true) &&
+    (passwordComplexityPolicy.requiresLowercase ? hasLowercase : true) &&
+    (passwordComplexityPolicy.requiresNumber ? hasNumber : true) &&
+    (passwordComplexityPolicy.requiresUppercase ? hasUppercase : true) &&
+    (passwordComplexityPolicy.requiresSymbol ? hasSymbol : true) &&
     hasMinLength;
 
   return (

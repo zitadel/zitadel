@@ -8,7 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import ThemeWrapper from "#/ui/ThemeWrapper";
 import { getBrandingSettings } from "#/lib/zitadel";
 import { server } from "../lib/zitadel";
-import { LabelPolicyColors } from "#/utils/colors";
+import { BrandingSettings } from "@zitadel/server";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
@@ -25,26 +25,20 @@ export default async function RootLayout({
   // later only shown with dev mode enabled
   const showNav = true;
 
-  const branding = await getBrandingSettings(server);
-  let partialPolicy: LabelPolicyColors | undefined;
-  console.log(branding);
+  //   const general = await getGeneralSettings(server);
+  const branding: BrandingSettings = await getBrandingSettings(server);
+  let partial: Partial<BrandingSettings> | undefined;
   if (branding) {
-    partialPolicy = {
-      backgroundColor: branding?.backgroundColor,
-      backgroundColorDark: branding?.backgroundColorDark,
-      primaryColor: branding?.primaryColor,
-      primaryColorDark: branding?.primaryColorDark,
-      warnColor: branding?.warnColor,
-      warnColorDark: branding?.warnColorDark,
-      fontColor: branding?.fontColor,
-      fontColorDark: branding?.fontColorDark,
+    partial = {
+      lightTheme: branding?.lightTheme,
+      darkTheme: branding?.darkTheme,
     };
   }
   return (
     <html lang="en" className={`${lato.className}`} suppressHydrationWarning>
       <head />
       <body>
-        <ThemeWrapper branding={partialPolicy}>
+        <ThemeWrapper branding={partial}>
           <LayoutProviders>
             <div className="h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600  bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
               {showNav && <GlobalNav />}

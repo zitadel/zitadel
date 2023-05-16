@@ -1,3 +1,3 @@
 export * from "./management";
 export * as management from "../proto/server/zitadel/management";
-export * from "../proto/server/zitadel/policy";
+export * as policy from "../proto/server/zitadel/policy";
