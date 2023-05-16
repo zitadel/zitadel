@@ -41,6 +41,7 @@ jobs:
           push: true
           cache-to: |
             type=registry,
+            ref=ghcr.io/zitadel/build-cache,
             mode=max
           cache-from: |
             type=registry
@@ -75,9 +76,11 @@ jobs:
           push: true
           cache-to: |
             type=registry,
+            ref=ghcr.io/zitadel/build-cache,
             mode=max
           cache-from: |
-            type=registry
+            type=registry,
+            ref=ghcr.io/zitadel/build-cache
           github-token: ${{ github.token }}
           tags: ghcr.io/zitadel/test:${{ github.sha }}
           
@@ -119,9 +122,11 @@ jobs:
         push: true
         cache-to: |
           type=registry,
-            mode=max
+          ref=ghcr.io/zitadel/build-cache,
+          mode=max
         cache-from: |
-          type=registry
+          type=registry,
+          ref=ghcr.io/zitadel/build-cache
         github-token: ${{ github.token }}
         tags: ghcr.io/zitadel/test:${{ github.sha }}
 
@@ -155,9 +160,11 @@ jobs:
           push: true
           cache-to: |
             type=registry,
+            ref=ghcr.io/zitadel/build-cache,
             mode=max
           cache-from: |
-            type=registry
+            type=registry,
+            ref=ghcr.io/zitadel/build-cache
           github-token: ${{ github.token }}
           tags: ghcr.io/zitadel/test:${{ github.sha }}
 
@@ -197,9 +204,11 @@ jobs:
           push: true
           cache-to: |
             type=registry,
+            ref=ghcr.io/zitadel/build-cache,
             mode=max
           cache-from: |
-            type=registry
+            type=registry,
+            ref=ghcr.io/zitadel/build-cache
           github-token: ${{ github.token }}
           tags: ghcr.io/zitadel/test:${{ github.sha }}
 
