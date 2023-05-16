@@ -172,7 +172,8 @@ COPY main.go main.go
 # #######################################
 FROM core-build AS compile
 
-ARG GOOS GOARCH
+ARG GOOS 
+ARG GOARCH
 
 COPY --from=console /zitadel/console/dist/console internal/api/ui/console/static/
 
