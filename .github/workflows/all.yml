@@ -93,9 +93,11 @@ jobs:
         target: compile
         push: false
         cache-to: |
-          type=gha
+          type=gha,
+          mode=max
         cache-from: |
-          type=gha
+          type=gha,
+          mode=max
         github-token: ${{ github.token }}
 
   core-unit-test:
