@@ -1957,7 +1957,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2047,6 +2048,10 @@
       "IMPLICIT": {
         "TITLE": "Implicit",
         "DESCRIPTION": "認証エンドポイントから直接トークンを取得します。"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "コンピューターまたはスマートフォンでデバイスを認証します。"
       },
       "CUSTOM": {
         "TITLE": "Custom",

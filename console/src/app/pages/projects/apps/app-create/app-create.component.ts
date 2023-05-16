@@ -32,6 +32,7 @@ import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog
 import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
+  DEVICE_CODE_METHOD,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
   PKCE_METHOD,
@@ -112,6 +113,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     { type: OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT, checked: false, disabled: true },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, checked: false, disabled: true },
+    { type: OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE, checked: false, disabled: true },
   ];
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -163,7 +165,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
           switch (this.appType?.value.oidcAppType) {
             case OIDCAppType.OIDC_APP_TYPE_NATIVE:
-              this.authMethods = [PKCE_METHOD];
+              this.authMethods = [PKCE_METHOD, DEVICE_CODE_METHOD];
 
               // automatically set to PKCE and skip step
               this.oidcAppRequest.setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE]);
@@ -473,6 +475,13 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     return this.form.get('grantTypesList');
   }
 
+  get grantTypesListContainsOnlyDeviceCode(): boolean {
+    return (
+      this.oidcAppRequest.toObject().grantTypesList.length === 1 &&
+      this.oidcAppRequest.toObject().grantTypesList[0] === OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE
+    );
+  }
+
   get formappType(): AbstractControl | null {
     return this.form.get('appType');
   }
@@ -480,9 +489,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   get formMetadataUrl(): AbstractControl | null {
     return this.form.get('metadataUrl');
   }
-  // get formapplicationType(): AbstractControl | null {
-  //     return this.form.get('applicationType');
-  // }
 
   get authMethodType(): AbstractControl | null {
     return this.form.get('authMethodType');

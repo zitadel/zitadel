@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	_ "embed"
 	"fmt"
-	"net"
+	"math"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,7 +21,6 @@ import (
 	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
-	"golang.org/x/sys/unix"
 
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
@@ -34,6 +33,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
+	"github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -301,8 +301,13 @@ func startAPIs(
 	if accessSvc.Enabled() {
 		logging.Warn("access logs are currently in beta")
 	}
-	accessInterceptor := middleware.NewAccessInterceptor(accessSvc, config.Quotas.Access)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
+	exhaustedCookieHandler := http_util.NewCookieHandler(
+		http_util.WithUnsecure(),
+		http_util.WithNonHttpOnly(),
+		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
+	)
+	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, config.Quotas.Access)
+	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, limitingAccessInterceptor)
 	if err != nil {
 		return fmt.Errorf("error creating api %w", err)
 	}
@@ -332,9 +337,12 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return err
 	}
+	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
+		return err
+	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
-	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle))
+	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources)
 	if err != nil {
@@ -355,25 +363,25 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(openapi.HandlerPrefix, openAPIHandler)
 
-	oidcProvider, err := oidc.NewProvider(config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, accessInterceptor.Handle)
+	oidcProvider, err := oidc.NewProvider(config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, limitingAccessInterceptor.Handle)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
 	apis.RegisterHandlerPrefixes(oidcProvider.HttpHandler(), "/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2")
 
-	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, accessInterceptor.Handle)
+	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor.Handle)
 	if err != nil {
 		return fmt.Errorf("unable to start saml provider: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(saml.HandlerPrefix, samlProvider.HttpHandler())
 
-	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, accessInterceptor.Handle, config.CustomerPortal)
+	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
@@ -385,20 +393,11 @@ func startAPIs(
 	return nil
 }
 
-func reusePort(network, address string, conn syscall.RawConn) error {
-	return conn.Control(func(descriptor uintptr) {
-		err := syscall.SetsockoptInt(int(descriptor), syscall.SOL_SOCKET, unix.SO_REUSEPORT, 1)
-		if err != nil {
-			panic(err)
-		}
-	})
-}
-
 func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, shutdown <-chan os.Signal) error {
 	http2Server := &http2.Server{}
 	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig}
 
-	lc := &net.ListenConfig{Control: reusePort}
+	lc := listenConfig()
 	lis, err := lc.Listen(ctx, "tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return fmt.Errorf("tcp listener on %d failed: %w", port, err)
