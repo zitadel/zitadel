@@ -19,3 +19,4 @@ pkg/grpc/*/*.swagger.json
 .goreleaser.yaml
 .artifacts/
 statik.go
+.angular

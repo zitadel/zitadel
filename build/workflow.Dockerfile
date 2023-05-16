@@ -135,12 +135,13 @@ FROM console-deps as console
 
 WORKDIR /zitadel/console
 
+COPY --from=console-client /zitadel/console/src/app/proto/generated src/app/proto/generated
+
 COPY console/src src
 COPY console/angular.json .
 COPY console/ngsw-config.json .
 COPY console/tsconfig* .
 
-COPY --from=console-client /zitadel/console/src/app/proto/generated src/app/proto/generated
 
 RUN yarn build
 
@@ -153,6 +154,10 @@ RUN yarn build
 # #######################################
 FROM core-deps AS core-build
 
+COPY --from=core-api /go/src/github.com/zitadel/zitadel .
+COPY --from=core-login /go/src/github.com/zitadel/zitadel .
+COPY --from=core-assets /go/src/github.com/zitadel/zitadel .
+
 COPY cmd cmd
 COPY internal internal
 COPY pkg pkg
@@ -161,9 +166,6 @@ COPY openapi openapi
 COPY statik statik
 COPY main.go main.go
 
-COPY --from=core-api /go/src/github.com/zitadel/zitadel .
-COPY --from=core-login /go/src/github.com/zitadel/zitadel .
-COPY --from=core-assets /go/src/github.com/zitadel/zitadel .
 
 # #######################################
 # build executable
@@ -229,8 +231,6 @@ ENV DB_FLAVOR=cockroach
 # install cockroach
 COPY --from=cockroachdb/cockroach:latest /cockroach/cockroach /usr/local/bin/
 ENV COCKROACH_BINARY=/cockroach/cockroach
-
-# RUN apt install -y postgresql
 
 ENV ZITADEL_MASTERKEY=MasterkeyNeedsToHave32Characters
 
