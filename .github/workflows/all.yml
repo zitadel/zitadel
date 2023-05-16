@@ -24,6 +24,13 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      - 
+        name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
         uses: docker/build-push-action@v4
@@ -33,9 +40,11 @@ jobs:
           target: core-build
           push: false
           cache-to: |
-            type=gha
+            type=registry,
+            mode=max
           cache-from: |
-            type=gha
+            type=registry,
+            mode=max
           github-token: ${{ github.token }}
   
   console:
@@ -50,6 +59,13 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      - 
+        name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
         uses: docker/build-push-action@v4
@@ -59,10 +75,14 @@ jobs:
           target: console
           push: false
           cache-to: |
-            type=gha
+            type=registry,
+            mode=max
           cache-from: |
-            type=gha
+            type=registry,
+            mode=max
           github-token: ${{ github.token }}
+          tags: ghcr.io/zitadel/test:${{ github.sha }}
+          
   
   compile:
     runs-on: ubuntu-latest
@@ -81,6 +101,13 @@ jobs:
     -
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
+    - 
+      name: Login to Docker registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     -
       name: Build
       uses: docker/build-push-action@v4
@@ -93,12 +120,13 @@ jobs:
         target: compile
         push: false
         cache-to: |
-          type=gha,
-          mode=max
+          type=registry,
+            mode=max
         cache-from: |
-          type=gha,
-          mode=max
+          type=registry,
+            mode=max
         github-token: ${{ github.token }}
+        tags: ghcr.io/zitadel/test:${{ github.sha }}
 
   core-unit-test:
     runs-on: ubuntu-latest
@@ -113,6 +141,13 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      - 
+        name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
         uses: docker/build-push-action@v4
@@ -122,10 +157,13 @@ jobs:
           target: test-core-unit
           push: false
           cache-to: |
-            type=gha
+            type=registry,
+            mode=max
           cache-from: |
-            type=gha
+            type=registry,
+            mode=max
           github-token: ${{ github.token }}
+          tags: ghcr.io/zitadel/test:${{ github.sha }}
 
   core-integration-test:
     runs-on: ubuntu-latest
@@ -146,6 +184,13 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      - 
+        name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
         uses: docker/build-push-action@v4
@@ -155,10 +200,13 @@ jobs:
           target: test-core-integration
           push: false
           cache-to: |
-            type=gha
+            type=registry,
+            mode=max
           cache-from: |
-            type=gha
+            type=registry,
+            mode=max
           github-token: ${{ github.token }}
+          tags: ghcr.io/zitadel/test:${{ github.sha }}
 
 
   # e2e:
