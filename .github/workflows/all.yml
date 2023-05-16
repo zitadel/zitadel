@@ -53,6 +53,7 @@ jobs:
       go_version: '1.20'
       buf_version: v1.15.1
       core_hash: ${{ needs.cache.outputs.core_hash }}
+      core_hit: ${{ needs.cache.outputs.core_hit }}
 
   container:
     uses: ./.github/workflows/container.yml
