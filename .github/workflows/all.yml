@@ -90,6 +90,7 @@ jobs:
           GOARCH=${{matrix.goarch}}
         context: .
         file: ./build/workflow.Dockerfile
+        platforms: linux/amd64,linux/arm64
         target: compile
         push: false
         cache-to: |
