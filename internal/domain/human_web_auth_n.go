@@ -114,3 +114,9 @@ type PasskeyCodeDetails struct {
 	CodeID string
 	Code   string
 }
+
+type PasskeyRegistrationDetails struct {
+	*ObjectDetails
+
+	PublicKey []byte
+}

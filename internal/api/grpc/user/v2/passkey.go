@@ -10,21 +10,19 @@ import (
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
-func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyRequest) (*user.RegisterPasskeyResponse, error) {
-	generator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.userCodeAlg)
-	if err != nil {
-		return nil, err
+func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyRequest) (resp *user.RegisterPasskeyResponse, err error) {
+	var (
+		resourceOwner = authz.GetCtxData(ctx).ResourceOwner
+		authenticator = passkeyAuthenticatorToDomain(req.GetAuthenticator())
+	)
+	if code := req.GetCode(); code != nil {
+		return passkeyRegistrationDetailsToPb(
+			s.command.RegisterUserPasskeyWithCode(ctx, req.GetUserId(), resourceOwner, authenticator, code.Id, code.Code, s.userCodeAlg),
+		)
 	}
-	ctxData := authz.GetCtxData(ctx)
-	platform := passkeyAuthenticatorToDomain(req.GetAuthenticator())
-	webAuthNToken, err := s.command.HumanAddPasswordlessSetupInitCode(ctx, req.GetUserId(), ctxData.ResourceOwner, req.GetCode().GetId(), req.GetCode().GetCode(), platform, generator)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user.RegisterPasskeyResponse{
-		PublicKeyCredential: webAuthNToken.PublicKey,
-	}, nil
+	return passkeyRegistrationDetailsToPb(
+		s.command.RegisterUserPasskey(ctx, req.GetUserId(), resourceOwner, authenticator),
+	)
 }
 
 func passkeyAuthenticatorToDomain(pa user.PasskeyAuthenticator) domain.AuthenticatorAttachment {
@@ -38,6 +36,16 @@ func passkeyAuthenticatorToDomain(pa user.PasskeyAuthenticator) domain.Authentic
 	default:
 		return domain.AuthenticatorAttachmentUnspecified
 	}
+}
+
+func passkeyRegistrationDetailsToPb(details *domain.PasskeyRegistrationDetails, err error) (*user.RegisterPasskeyResponse, error) {
+	if err != nil {
+		return nil, err
+	}
+	return &user.RegisterPasskeyResponse{
+		Details:             object.DomainToDetailsPb(details.ObjectDetails),
+		PublicKeyCredential: details.PublicKey,
+	}, nil
 }
 
 func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *user.VerifyPasskeyRegistrationRequest) (*user.VerifyPasskeyRegistrationResponse, error) {
