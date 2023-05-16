@@ -43,8 +43,7 @@ jobs:
             type=registry,
             mode=max
           cache-from: |
-            type=registry,
-            mode=max
+            type=registry
           github-token: ${{ github.token }}
   
   console:
@@ -78,8 +77,7 @@ jobs:
             type=registry,
             mode=max
           cache-from: |
-            type=registry,
-            mode=max
+            type=registry
           github-token: ${{ github.token }}
           tags: ghcr.io/zitadel/test:${{ github.sha }}
           
@@ -123,8 +121,7 @@ jobs:
           type=registry,
             mode=max
         cache-from: |
-          type=registry,
-            mode=max
+          type=registry
         github-token: ${{ github.token }}
         tags: ghcr.io/zitadel/test:${{ github.sha }}
 
@@ -160,8 +157,7 @@ jobs:
             type=registry,
             mode=max
           cache-from: |
-            type=registry,
-            mode=max
+            type=registry
           github-token: ${{ github.token }}
           tags: ghcr.io/zitadel/test:${{ github.sha }}
 
@@ -203,8 +199,7 @@ jobs:
             type=registry,
             mode=max
           cache-from: |
-            type=registry,
-            mode=max
+            type=registry
           github-token: ${{ github.token }}
           tags: ghcr.io/zitadel/test:${{ github.sha }}
 
