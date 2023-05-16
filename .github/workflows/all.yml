@@ -34,6 +34,7 @@ jobs:
           push: false
           cache-to: gha
           cache-from: gha
+          github-token: ${{ github.sha }}
   
   console:
     runs-on: ubuntu-latest
@@ -57,6 +58,7 @@ jobs:
           push: false
           cache-to: gha
           cache-from: gha
+          github-token: ${{ github.sha }}
   
   compile:
     runs-on: ubuntu-latest
@@ -88,6 +90,7 @@ jobs:
         push: false
         cache-to: gha
         cache-from: gha
+        github-token: ${{ github.sha }}
 
     # - uses: actions/cache/restore@v3
     #   name: restore core
