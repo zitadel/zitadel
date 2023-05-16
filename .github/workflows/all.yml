@@ -32,9 +32,11 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: core-build
           push: false
-          cache-to: gha
-          cache-from: gha
-          github-token: ${{ github.sha }}
+          cache-to: |
+            type=gha
+          cache-from: |
+            type=gha
+          github-token: ${{ github.token }}
   
   console:
     runs-on: ubuntu-latest
@@ -56,9 +58,11 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: console
           push: false
-          cache-to: gha
-          cache-from: gha
-          github-token: ${{ github.sha }}
+          cache-to: |
+            type=gha
+          cache-from: |
+            type=gha
+          github-token: ${{ github.token }}
   
   compile:
     runs-on: ubuntu-latest
@@ -88,76 +92,70 @@ jobs:
         file: ./build/workflow.Dockerfile
         target: compile
         push: false
-        cache-to: gha
-        cache-from: gha
-        github-token: ${{ github.sha }}
+        cache-to: |
+          type=gha
+        cache-from: |
+          type=gha
+        github-token: ${{ github.token }}
 
-    # - uses: actions/cache/restore@v3
-    #   name: restore core
-    #   with:
-    #     path: .
-    #     key: ${{inputs.core_hash}}
-    # - uses: actions/cache/restore@v3
-    #   name: restore console
-    #   with:
-    #     path: internal/api/ui/console/static/
-    #     key: ${{ inputs.console_hash }}
-    # - name: build executable
-    #   run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
-    # - uses: actions/upload-artifact@v3
-    #   with:
-    #     name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
-    #     path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
-    
+  core-unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./build/workflow.Dockerfile
+          target: test-core-unit
+          push: false
+          cache-to: |
+            type=gha
+          cache-from: |
+            type=gha
+          github-token: ${{ github.token }}
 
-  # cache:
-  #   uses: ./.github/workflows/cache.yml
-  
-  # build:
-  #   uses: ./.github/workflows/build.yml
-  #   needs: cache
-  #   with:
-  #     node_version: 18
-  #     go_version: '1.20'
-  #     buf_version: v1.15.1
-  #     core_hash: ${{ needs.cache.outputs.core_hash }}
-  #     core_hit: ${{ needs.cache.outputs.core_hit }}
-  #     console_hash: ${{ needs.cache.outputs.console_hash }}
-  #     console_hit: ${{ needs.cache.outputs.console_hit }}
-  
-  # compile:
-  #   uses: ./.github/workflows/compile.yml
-  #   needs: [cache, build]
-  #   with:
-  #     core_hash: ${{ needs.cache.outputs.core_hash }}
-  #     console_hash: ${{ needs.cache.outputs.console_hash }}
+  core-integration-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        database: [cockroach, postgres]
+    env:
+      DB_FLAVOR: ${{ matrix.database }}
+      ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./build/workflow.Dockerfile
+          target: test-core-integration
+          push: false
+          cache-to: |
+            type=gha
+          cache-from: |
+            type=gha
+          github-token: ${{ github.token }}
 
-  # lint:
-  #   uses: ./.github/workflows/lint.yml
-  #   needs: cache
-  #   with:
-  #     node_version: 18
-  #     go_version: '1.20'
-  #     buf_version: v1.15.1
-  #     golangci_lint_version: v1.52.2
-  #     core_hit: ${{ needs.cache.outputs.core_hit }}
-  #     console_hit: ${{ needs.cache.outputs.console_hit }}
-
-  # test:
-  #   uses: ./.github/workflows/test.yml
-  #   needs: [cache, build]
-  #   with:
-  #     node_version: 18
-  #     go_version: '1.20'
-  #     buf_version: v1.15.1
-  #     core_hash: ${{ needs.cache.outputs.core_hash }}
-  #     core_hit: ${{ needs.cache.outputs.core_hit }}
-
-  # container:
-  #   uses: ./.github/workflows/container.yml
-  #   needs: [lint, test, build]
-  #   with:
-  #     tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
   # e2e:
   #   uses: ./.github/workflows/e2e.yml
