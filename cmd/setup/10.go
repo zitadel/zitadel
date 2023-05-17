@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	//go:embed 10_create_temp_table.sql
+	//go:embed 10/10_create_temp_table.sql
 	correctCreationDate10CreateTable string
-	//go:embed 10_fill_table.sql
+	//go:embed 10/10_fill_table.sql
 	correctCreationDate10FillTable string
-	//go:embed 10_update.sql
+	//go:embed 10/10_update.sql
 	correctCreationDate10Update string
 )
 
