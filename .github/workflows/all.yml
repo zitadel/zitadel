@@ -82,8 +82,7 @@ jobs:
           cache-to:  ${{env.cache_to_params}}
           cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
-          tags: ${{env.tag_name}}
-          
+          tags: ${{env.tag_name}}     
   
   compile:
     runs-on: ubuntu-latest
