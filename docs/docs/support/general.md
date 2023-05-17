@@ -11,7 +11,7 @@ Also the support may differ depending on your contracts. Read more about it on o
 
 ### Supported
 
-Fully supported features are those that are guaranteed to work as intended and are fully tested by our team.
+Supported features are those that are guaranteed to work as intended and are fully tested by our team.
 If you encounter any issues with a fully supported feature, you can contact us, 
 and we will provide prompt resolution to any issues you may experience.
 
