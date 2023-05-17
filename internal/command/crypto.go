@@ -10,6 +10,8 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
+type cryptoCodeFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCodeWithExpiry, error)
+
 type CryptoCodeWithExpiry struct {
 	Crypted *crypto.CryptoValue
 	Plain   string

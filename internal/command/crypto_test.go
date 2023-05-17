@@ -10,12 +10,28 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
+
+func mockCode(code string, exp time.Duration) cryptoCodeFunc {
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCodeWithExpiry, error) {
+		return &CryptoCodeWithExpiry{
+			Crypted: &crypto.CryptoValue{
+				CryptoType: crypto.TypeEncryption,
+				Algorithm:  "enc",
+				KeyID:      "id",
+				Crypted:    []byte(code),
+			},
+			Plain:  code,
+			Expiry: exp,
+		}, nil
+	}
+}
 
 var (
 	testGeneratorConfig = crypto.GeneratorConfig{
@@ -26,9 +42,11 @@ var (
 		IncludeDigits:       true,
 		IncludeSymbols:      true,
 	}
-	testSecretGeneratorAddedEvent = instance.NewSecretGeneratorAddedEvent(context.Background(),
-		&instance.NewAggregate("inst1").Aggregate,
-		domain.SecretGeneratorTypeVerifyEmailCode,
+)
+
+func testSecretGeneratorAddedEvent(typ domain.SecretGeneratorType) *instance.SecretGeneratorAddedEvent {
+	return instance.NewSecretGeneratorAddedEvent(context.Background(),
+		&instance.NewAggregate("inst1").Aggregate, typ,
 		testGeneratorConfig.Length,
 		testGeneratorConfig.Expiry,
 		testGeneratorConfig.IncludeLowerLetters,
@@ -36,7 +54,7 @@ var (
 		testGeneratorConfig.IncludeDigits,
 		testGeneratorConfig.IncludeSymbols,
 	)
-)
+}
 
 func Test_newCryptoCode(t *testing.T) {
 	type args struct {
@@ -44,14 +62,14 @@ func Test_newCryptoCode(t *testing.T) {
 		alg crypto.Crypto
 	}
 	tests := []struct {
-		name      string
-		eventsore *eventstore.Eventstore
-		args      args
-		wantErr   error
+		name       string
+		eventstore *eventstore.Eventstore
+		args       args
+		wantErr    error
 	}{
 		{
-			name:      "filter config error",
-			eventsore: eventstoreExpect(t, expectFilterError(io.ErrClosedPipe)),
+			name:       "filter config error",
+			eventstore: eventstoreExpect(t, expectFilterError(io.ErrClosedPipe)),
 			args: args{
 				typ: domain.SecretGeneratorTypeVerifyEmailCode,
 				alg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -60,8 +78,8 @@ func Test_newCryptoCode(t *testing.T) {
 		},
 		{
 			name: "success",
-			eventsore: eventstoreExpect(t, expectFilter(
-				eventFromEventPusher(testSecretGeneratorAddedEvent),
+			eventstore: eventstoreExpect(t, expectFilter(
+				eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 			)),
 			args: args{
 				typ: domain.SecretGeneratorTypeVerifyEmailCode,
@@ -71,7 +89,7 @@ func Test_newCryptoCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newCryptoCodeWithExpiry(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg)
+			got, err := newCryptoCodeWithExpiry(context.Background(), tt.eventstore.Filter, tt.args.typ, tt.args.alg)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.wantErr == nil {
 				require.NotNil(t, got)
@@ -85,7 +103,7 @@ func Test_newCryptoCode(t *testing.T) {
 
 func Test_verifyCryptoCode(t *testing.T) {
 	es := eventstoreExpect(t, expectFilter(
-		eventFromEventPusher(testSecretGeneratorAddedEvent),
+		eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 	))
 	code, err := newCryptoCodeWithExpiry(context.Background(), es.Filter, domain.SecretGeneratorTypeVerifyEmailCode, crypto.CreateMockHashAlg(gomock.NewController(t)))
 	require.NoError(t, err)
@@ -118,7 +136,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 		{
 			name: "success",
 			eventsore: eventstoreExpect(t, expectFilter(
-				eventFromEventPusher(testSecretGeneratorAddedEvent),
+				eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 			)),
 			args: args{
 				typ:     domain.SecretGeneratorTypeVerifyEmailCode,
@@ -131,7 +149,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 		{
 			name: "wrong plain",
 			eventsore: eventstoreExpect(t, expectFilter(
-				eventFromEventPusher(testSecretGeneratorAddedEvent),
+				eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 			)),
 			args: args{
 				typ:     domain.SecretGeneratorTypeVerifyEmailCode,
@@ -180,7 +198,7 @@ func Test_secretGenerator(t *testing.T) {
 		{
 			name: "hash generator",
 			eventsore: eventstoreExpect(t, expectFilter(
-				eventFromEventPusher(testSecretGeneratorAddedEvent),
+				eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 			)),
 			args: args{
 				typ: domain.SecretGeneratorTypeVerifyEmailCode,
@@ -192,7 +210,7 @@ func Test_secretGenerator(t *testing.T) {
 		{
 			name: "encryption generator",
 			eventsore: eventstoreExpect(t, expectFilter(
-				eventFromEventPusher(testSecretGeneratorAddedEvent),
+				eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 			)),
 			args: args{
 				typ: domain.SecretGeneratorTypeVerifyEmailCode,
@@ -204,7 +222,7 @@ func Test_secretGenerator(t *testing.T) {
 		{
 			name: "unsupported type",
 			eventsore: eventstoreExpect(t, expectFilter(
-				eventFromEventPusher(testSecretGeneratorAddedEvent),
+				eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 			)),
 			args: args{
 				typ: domain.SecretGeneratorTypeVerifyEmailCode,

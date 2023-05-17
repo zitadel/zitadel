@@ -76,6 +76,9 @@ func (c *Commands) registerUserPasskey(ctx context.Context, userID, resourceOwne
 
 func (c *Commands) AddUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
 	details, err := c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, "", false)
+	if err != nil {
+		return nil, err
+	}
 	return details.ObjectDetails, err
 }
 
@@ -84,6 +87,9 @@ func (c *Commands) AddUserPasskeyCodeURLTemplate(ctx context.Context, userID, re
 		return nil, err
 	}
 	details, err := c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, urlTmpl, false)
+	if err != nil {
+		return nil, err
+	}
 	return details.ObjectDetails, err
 }
 
@@ -96,7 +102,7 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	code, err := newCryptoCodeWithExpiry(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+	code, err := c.newCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
 	if err != nil {
 		return nil, err
 	}
