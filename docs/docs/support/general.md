@@ -29,7 +29,7 @@ but we may not be able to provide immediate resolution or comprehensive support.
 ### Community Supported
 
 Community supported features are those that have been developed by our community and may not have undergone extensive testing or support from our team. 
-If you encounter issues with a community supported feature, we encourage you to seek help from our community or other online resources, where other users can provide assistance.
+If you encounter issues with a community supported feature, we encourage you to seek help from our community or other online resources, where other users can provide assistance:
 - Join our [Discord Chat](https://zitadel.com/chat)
 - Search [Github Issues](https://github.com/search?q=org%3Azitadel+&type=issues) and report a new issue
 - Search [Github Discussions](https://github.com/search?q=org%3Azitadel+&type=discussions) and open a new discussion as question or idea
