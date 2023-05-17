@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, defer, map, Observable, of, shareReplay, switchMap, throwError } from 'rxjs';
+import { catchError, from, map, Observable, of, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
@@ -27,7 +27,7 @@ interface WellKnown {
   providedIn: 'root',
 })
 export class EnvironmentService {
-  private exhaustedCookieKey = 'zitadel.quota.limiting';
+  private exhaustedCookieKey = 'zitadel.quota.exhausted';
   private environmentJsonPath = './assets/environment.json';
   private wellknownPath = '/.well-known/openid-configuration`';
   public auth!: AuthServiceClient;
@@ -69,12 +69,7 @@ export class EnvironmentService {
         if (!navigator.cookieEnabled) {
           return of(env);
         }
-        return defer(() => {
-          return new Promise<Environment>((resolve, reject) => {
-            this.awaitFiveSeconds(() => !document.cookie.includes(this.exhaustedCookieKey), reject);
-            resolve(env);
-          });
-        });
+        return from(this.awaitFiveSeconds(() => !document.cookie.includes(this.exhaustedCookieKey))).pipe(map(() => env));
       }),
       // Cache the first response, then replay it
       shareReplay(1),
@@ -95,19 +90,22 @@ export class EnvironmentService {
     );
   }
 
-  private awaitFiveSeconds(condition: () => boolean, failWithTimeoutMessage: (msg: string) => void) {
-    let checks = 0;
-    const check = () => {
-      if (condition()) {
-        return;
-      }
-      checks++;
-      if (checks > 500) {
-        failWithTimeoutMessage(`after ${checks} checks, the condition did not return true`);
-        return;
-      }
-      setTimeout(check, 10);
-    };
-    check();
+  private awaitFiveSeconds(condition: () => boolean): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let checks = 0;
+      const check = () => {
+        if (condition()) {
+          resolve();
+        } else {
+          checks++;
+          if (checks > 500) {
+            reject(`after ${checks} checks, the condition did not return true`);
+          } else {
+            setTimeout(check, 10);
+          }
+        }
+      };
+      check();
+    });
   }
 }
