@@ -7,7 +7,7 @@ title: General
 It's important to note that support may differ depending on the feature, and not all features may be fully supported. 
 We always strive to provide the best support possible for our customers and community,
 but we may not be able to provide immediate or comprehensive support for all features.
-Also the support may differ depending on your contracts. Read more about it on our [Legal Page](/docs/legal/introduction)
+Also the support may differ depending on your contracts. Read more about it on our [Legal page](/docs/legal/)
 
 ### Supported
 
