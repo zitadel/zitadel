@@ -1,32 +1,51 @@
-"use client";
-import { Button, ButtonVariants } from "#/ui/Button";
-import { TextInput } from "#/ui/Input";
+import { getSession, server } from "#/lib/zitadel";
+import PasswordForm from "#/ui/PasswordForm";
 import UserAvatar from "#/ui/UserAvatar";
-import { useRouter } from "next/navigation";
+import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
 
-export default function Page() {
-  const router = useRouter();
+async function loadSession(loginName: string) {
+  const recent = await getMostRecentCookieWithLoginname(loginName);
+  console.log("found recent cookie: ", recent);
+
+  return getSession(server, recent.id, recent.token).then(({ session }) => {
+    console.log(session);
+    return session;
+  });
+  //   const res = await fetch(
+  //     `http://localhost:3000/session?` +
+  //       new URLSearchParams({
+  //         loginName: loginName,
+  //       }),
+  //     {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     }
+  //   );
+
+  //   if (!res.ok) {
+  //     throw new Error("Failed to load session");
+  //   }
+
+  //   return res.json();
+}
+
+export default async function Page({ searchParams }: { searchParams: any }) {
+  const { loginName } = searchParams;
+  console.log(loginName);
+
+  const sessionFactors = await loadSession(loginName);
+  console.log(sessionFactors);
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1>Password</h1>
+      <h1>{sessionFactors.factors.user.displayName}</h1>
       <p className="ztdl-p mb-6 block">Enter your password.</p>
 
-      <UserAvatar name="max@zitadel.com"></UserAvatar>
+      <UserAvatar loginName={loginName} showDropdown></UserAvatar>
 
-      <div className="w-full">
-        <TextInput type="password" label="Password" />
-      </div>
-
-      <div className="flex w-full flex-row items-center justify-between">
-        <Button
-          onClick={() => router.back()}
-          variant={ButtonVariants.Secondary}
-        >
-          back
-        </Button>
-        <Button variant={ButtonVariants.Primary}>continue</Button>
-      </div>
+      <PasswordForm />
     </div>
   );
 }

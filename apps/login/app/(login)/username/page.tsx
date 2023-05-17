@@ -1,7 +1,4 @@
 "use client";
-
-import { Button, ButtonVariants } from "#/ui/Button";
-import IdentityProviders from "#/ui/IdentityProviders";
 import UsernameForm from "#/ui/UsernameForm";
 
 export default function Page() {

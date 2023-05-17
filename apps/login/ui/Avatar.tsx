@@ -1,4 +1,4 @@
-import { Color, ColorShade, getColorHash } from "#/utils/colors";
+import { ColorShade, getColorHash } from "#/utils/colors";
 import { useTheme } from "next-themes";
 import { FC } from "react";
 
@@ -23,7 +23,7 @@ export const Avatar: FC<AvatarProps> = ({
   imageUrl,
   shadow,
 }) => {
-  const { resolvedTheme } = useTheme();
+  //   const { resolvedTheme } = useTheme();
   let credentials = "";
 
   if (name) {
@@ -46,15 +46,15 @@ export const Avatar: FC<AvatarProps> = ({
 
   const color: ColorShade = getColorHash(loginName);
 
-  const avatarStyleDark = {
-    backgroundColor: color[900],
-    color: color[200],
-  };
+  //   const avatarStyleDark = {
+  //     backgroundColor: color[900],
+  //     color: color[200],
+  //   };
 
-  const avatarStyleLight = {
-    backgroundColor: color[200],
-    color: color[900],
-  };
+  //   const avatarStyleLight = {
+  //     backgroundColor: color[200],
+  //     color: color[900],
+  //   };
 
   return (
     <div
@@ -69,7 +69,7 @@ export const Avatar: FC<AvatarProps> = ({
           ? "w-[32px] h-[32px] font-bold"
           : ""
       }`}
-      style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
+      //   style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
       {imageUrl ? (
         <img

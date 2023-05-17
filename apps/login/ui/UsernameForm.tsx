@@ -41,9 +41,10 @@ export default function UsernameForm() {
     return res.json();
   }
 
-  function submitAndLink(value: Inputs): Promise<boolean | void> {
-    return submitUsername(value).then((resp: any) => {
-      return router.push(`/password`);
+  function submitUsernameAndContinue(value: Inputs): Promise<boolean | void> {
+    return submitUsername(value).then(({ factors }) => {
+      console.log(factors);
+      return router.push(`/password?loginName=${factors.user.loginName}`);
     });
   }
 
@@ -71,7 +72,7 @@ export default function UsernameForm() {
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={handleSubmit(submitAndLink)}
+          onClick={handleSubmit(submitUsernameAndContinue)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

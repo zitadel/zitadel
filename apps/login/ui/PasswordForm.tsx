@@ -11,7 +11,7 @@ type Inputs = {
   password: string;
 };
 
-export default function UsernameForm() {
+export default function PasswordForm() {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -22,7 +22,7 @@ export default function UsernameForm() {
 
   const router = useRouter();
 
-  async function submitUsername(values: Inputs) {
+  async function submitPassword(values: Inputs) {
     setLoading(true);
     const res = await fetch("/session", {
       method: "PUT",
@@ -43,9 +43,10 @@ export default function UsernameForm() {
     return res.json();
   }
 
-  function submitAndLink(value: Inputs): Promise<boolean | void> {
-    return submitUsername(value).then((resp: any) => {
-      return router.push(`/password`);
+  function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
+    console.log(value);
+    return submitPassword(value).then((resp: any) => {
+      return router.push(`/success`);
     });
   }
 
@@ -58,7 +59,7 @@ export default function UsernameForm() {
           type="password"
           autoComplete="password"
           {...register("password", { required: "This field is required" })}
-          label="Loginname"
+          label="Password"
           //   error={errors.username?.message as string}
         />
       </div>
@@ -73,7 +74,7 @@ export default function UsernameForm() {
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={handleSubmit(submitAndLink)}
+          onClick={handleSubmit(submitPasswordAndContinue)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

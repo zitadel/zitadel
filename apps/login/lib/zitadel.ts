@@ -90,10 +90,24 @@ export function createSession(
 
 export function setSession(
   server: ZitadelServer,
-  loginName: string
+  sessionId: string,
+  sessionToken: string,
+  password: string
 ): Promise<any | undefined> {
   const sessionService = session.getSession(server);
-  return sessionService.setSession({ checks: { user: { loginName } } }, {});
+  return sessionService.setSession(
+    { sessionId, sessionToken, checks: { password: { password } } },
+    {}
+  );
+}
+
+export function getSession(
+  server: ZitadelServer,
+  sessionId: string,
+  sessionToken: string
+): Promise<any | undefined> {
+  const sessionService = session.getSession(server);
+  return sessionService.getSession({ sessionId, sessionToken }, {});
 }
 
 export type AddHumanUserData = {
