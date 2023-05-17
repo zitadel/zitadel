@@ -75,7 +75,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				urlTmpl: "{{",
 			},
 			want:    &res{},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.Email.InvalidURLTemplate"),
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "template success",
