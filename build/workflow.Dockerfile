@@ -137,11 +137,10 @@ WORKDIR /zitadel/console
 
 COPY --from=console-client /zitadel/console/src/app/proto/generated src/app/proto/generated
 
-COPY console .
-# COPY console/src src
-# COPY console/angular.json .
-# COPY console/ngsw-config.json .
-# COPY console/tsconfig* .
+COPY console/src src
+COPY console/angular.json .
+COPY console/ngsw-config.json .
+COPY console/tsconfig* .
 
 
 RUN yarn build
