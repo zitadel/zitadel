@@ -43,8 +43,9 @@ func passkeyRegistrationDetailsToPb(details *domain.PasskeyRegistrationDetails, 
 		return nil, err
 	}
 	return &user.RegisterPasskeyResponse{
-		Details:             object.DomainToDetailsPb(details.ObjectDetails),
-		PublicKeyCredential: details.PublicKey,
+		Details:                            object.DomainToDetailsPb(details.ObjectDetails),
+		PasskeyId:                          string(details.KeyID),
+		PublicKeyCredentialCreationOptions: details.CredentialCreationData,
 	}, nil
 }
 

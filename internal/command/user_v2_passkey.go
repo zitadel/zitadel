@@ -71,10 +71,7 @@ func (c *Commands) registerUserPasskey(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		return nil, err
 	}
-	return &domain.PasskeyRegistrationDetails{
-		ObjectDetails: writeModelToObjectDetails(&wm.WriteModel),
-		PublicKey:     wm.PublicKey,
-	}, nil
+	return webAuthN.PasskeyRegistrationDetails(writeModelToObjectDetails(&wm.WriteModel)), nil
 }
 
 func (c *Commands) AddUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
