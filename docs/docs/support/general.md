@@ -48,7 +48,7 @@ We recommend that users exercise caution when using Alpha software and avoid usi
 ### Beta
 
 The Beta state comes after the Alpha phase and is a more stable version of the software. 
-It is feature-complete, but may still contain bugs that need to be fixed before release.
+It is feature-complete, but may still contain bugs that need to be fixed before general availability.
 While it is available to everyone, we recommend that users exercise caution when using Beta software and avoid using it for critical tasks. 
 During this phase, support is limited as we focus on testing and bug fixing. 
 
