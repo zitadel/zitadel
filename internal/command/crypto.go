@@ -59,7 +59,7 @@ func secretGenerator(ctx context.Context, filter preparation.FilterToQueryReduce
 	case crypto.EncryptionAlgorithm:
 		return crypto.NewEncryptionGenerator(*config, a), config, nil
 	default:
-		return nil, nil, errors.ThrowInternal(nil, "COMMA-RreV6", "Errors.Internal")
+		return nil, nil, errors.ThrowInternalf(nil, "COMMA-RreV6", "Errors.Internal unsupported crypto algorithm type %T", a)
 	}
 }
 
