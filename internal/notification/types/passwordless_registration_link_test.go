@@ -11,11 +11,12 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func TestNotify_SendEmailVerificationCode(t *testing.T) {
+func TestNotify_SendPasswordlessRegistrationLink(t *testing.T) {
 	type args struct {
 		user    *query.NotifyUser
 		origin  string
 		code    string
+		codeID  string
 		urlTmpl string
 	}
 	tests := []struct {
@@ -33,12 +34,12 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				},
 				origin:  "https://example.com",
 				code:    "123",
+				codeID:  "456",
 				urlTmpl: "",
 			},
 			want: &notifyResult{
-				url:                                "https://example.com/ui/login/mail/verification?userID=user1&code=123&orgID=org1",
-				args:                               map[string]interface{}{"Code": "123"},
-				messageType:                        domain.VerifyEmailMessageType,
+				url:                                "https://example.com/ui/login/login/passwordless/init?userID=user1&orgID=org1&codeID=456&code=123",
+				messageType:                        domain.PasswordlessRegistrationMessageType,
 				allowUnverifiedNotificationChannel: true,
 			},
 		},
@@ -51,6 +52,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				},
 				origin:  "https://example.com",
 				code:    "123",
+				codeID:  "456",
 				urlTmpl: "{{",
 			},
 			want:    &notifyResult{},
@@ -65,12 +67,12 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				},
 				origin:  "https://example.com",
 				code:    "123",
-				urlTmpl: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+				codeID:  "456",
+				urlTmpl: "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.ResourceOwner}}&codeID={{.CodeID}}&code={{.Code}}",
 			},
 			want: &notifyResult{
-				url:                                "https://example.com/email/verify?userID=user1&code=123&orgID=org1",
-				args:                               map[string]interface{}{"Code": "123"},
-				messageType:                        domain.VerifyEmailMessageType,
+				url:                                "https://example.com/passkey/register?userID=user1&orgID=org1&codeID=456&code=123",
+				messageType:                        domain.PasswordlessRegistrationMessageType,
 				allowUnverifiedNotificationChannel: true,
 			},
 		},
@@ -78,7 +80,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, notify := mockNotify()
-			err := notify.SendEmailVerificationCode(tt.args.user, tt.args.origin, tt.args.code, tt.args.urlTmpl)
+			err := notify.SendPasswordlessRegistrationLink(tt.args.user, tt.args.origin, tt.args.code, tt.args.codeID, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
