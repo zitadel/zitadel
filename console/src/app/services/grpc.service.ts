@@ -16,6 +16,7 @@ import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.intercep
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
+import { ThemeService } from './theme.service';
 
 @Injectable({
   providedIn: 'root',
@@ -33,9 +34,11 @@ export class GrpcService {
     private dialog: MatDialog,
     private translate: TranslateService,
     private exhaustedService: ExhaustedService,
+    private themeService: ThemeService,
   ) {}
 
   public loadAppEnvironment(): Promise<any> {
+    this.themeService.applyLabelPolicy()
     // We use the browser language until we can make API requests to get the users configured language.
     return this.translate
       .use(this.translate.getBrowserLang() || this.translate.defaultLang)

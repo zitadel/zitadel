@@ -89,7 +89,7 @@ export class WebpackTranslateLoader implements TranslateLoader {
 
 const appInitializerFn = (grpcSvc: GrpcService) => {
   return () => {
-    grpcSvc.loadAppEnvironment();
+    return grpcSvc.loadAppEnvironment();
   };
 };
 
