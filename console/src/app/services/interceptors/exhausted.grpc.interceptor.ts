@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Request, StatusCode, UnaryInterceptor, UnaryResponse } from 'grpc-web';
+import { EnvironmentService } from '../environment.service';
 import { ExhaustedService } from '../exhausted.service';
 
 /**
@@ -7,7 +8,7 @@ import { ExhaustedService } from '../exhausted.service';
  */
 @Injectable({ providedIn: 'root' })
 export class ExhaustedGrpcInterceptor<TReq = unknown, TResp = unknown> implements UnaryInterceptor<TReq, TResp> {
-  constructor(private exhaustedSvc: ExhaustedService) {}
+  constructor(private exhaustedSvc: ExhaustedService, private envSvc: EnvironmentService) {}
 
   public async intercept(
     request: Request<TReq, TResp>,
@@ -16,7 +17,7 @@ export class ExhaustedGrpcInterceptor<TReq = unknown, TResp = unknown> implement
     return invoker(request).catch((error: any) => {
       if (error.code === StatusCode.RESOURCE_EXHAUSTED) {
         return this.exhaustedSvc
-          .showExhaustedDialog()
+          .showExhaustedDialog(this.envSvc.env)
           .toPromise()
           .then(() => {
             throw error;

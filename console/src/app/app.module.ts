@@ -144,7 +144,6 @@ const authConfig: AuthConfig = {
     ThemeService,
     EnvironmentService,
     ExhaustedService,
-    ExhaustedHttpInterceptor,
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializerFn,

@@ -7,7 +7,7 @@ import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientP
 import { ManagementServiceClient } from '../proto/generated/zitadel/ManagementServiceClientPb';
 import { ExhaustedService } from './exhausted.service';
 
-interface Environment {
+export interface Environment {
   api: string;
   clientid: string;
   issuer: string;
@@ -64,7 +64,7 @@ export class EnvironmentService {
       }),
       switchMap((env) => {
         if (env.exhausted) {
-          return this.exhaustedSvc.showExhaustedDialog(env.instance_management_url).pipe(map(() => env));
+          return this.exhaustedSvc.showExhaustedDialog(of(env)).pipe(map(() => env));
         }
         if (!navigator.cookieEnabled) {
           return of(env);
