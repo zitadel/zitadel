@@ -169,7 +169,7 @@ service UserService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Start the registration of passkey for a user";
-      description: "Start the registration of a passkey for a user, as a response the public key credential is returned, which is used to verify the passkey."
+      description: "Start the registration of a passkey for a user, as a response the public key credential creation options are returned, which are used to verify the passkey."
       responses: {
         key: "200"
         value: {
@@ -191,7 +191,7 @@ service UserService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Verify a passkey for a user";
-      description: "With the public key credential try to verify a passkey for a user."
+      description: "Verify the passkey registration with the public key credential."
       responses: {
         key: "200"
         value: {
@@ -341,14 +341,19 @@ message RegisterPasskeyRequest{
   ];
   PasskeyAuthenticator authenticator = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"optionally specify the authenticator type\"";
+      description: "\"Optionally specify the authenticator type of the passkey device (platform or cross-platform). If none is provided, both values are allowed.\"";
     }
   ];
 }
 
 message RegisterPasskeyResponse{
   zitadel.object.v2alpha.Details details = 1;
-  bytes public_key_credential = 2 [
+  string passkey_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\""
+    }
+  ];
+  bytes public_key_credential_creation_options = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "json representation of public key credential creation options used by the passkey client"
       example: "\"eyJwdWJsaWNLZXkiOnsiY2hhbGxlbmdlIoplfZm4vM21qSzBPdjltN2x6VWhnclYyejFJSlVzZnpLd0Z1TytWTWtzRW1Icz0iLCJycCI6eyJuYW1lIjoiWklUQURFTCIsImlkIjoiYWNtZS1nem9lNHgueml0YWRlbC5jbG91ZCJ9LCJ1c2VyIjp7Im5hbWUiOiJ0ZXN0dXNlcjU1QGFjbWUueml0YWRlbC5jbG91ZCIsImRpc3BsYXlOYW1lIjoiVGVzdCBUZXN0IiwiaWQiOiJNVGd5TVRVMk1qWTBNakk1TXpBMk5qSTEifSwicHViS2V5Q3JlZFBhcmFtcyI6W3sidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi03fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzV9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zNn0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1N30seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OH0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTM3fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzh9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zOX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTh9XSwiYXV0aGVudGljYXRvclNlbGVjdGlvbiI6eyJ1c2VyVmVyaWZpY2F0aW9uIjoiZGlzY291cmFnZWQifn2ilGltZW91dCI6NjAwMDAsImF0dGVzdGF0aW9uIjoibm9uZSJ9fQ==\""
