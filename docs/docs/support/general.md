@@ -9,7 +9,7 @@ We always strive to provide the best support possible for our customers and comm
 but we may not be able to provide immediate or comprehensive support for all features.
 Also the support may differ depending on your contracts. Read more about it on our [Legal Page](/docs/legal/introduction)
 
-### Fully Supported
+### Supported
 
 Fully supported features are those that are guaranteed to work as intended and are fully tested by our team.
 If you encounter any issues with a fully supported feature, you can contact us, 
