@@ -17,10 +17,10 @@ and we will provide prompt resolution to any issues you may experience.
 
 ### Enterprise Supported
 
-Partially supported features are those that we support to a certain extent, 
-but may not have been fully tested or may have some limitations.
-If you encounter issues with a partially supported feature, we will make our best effort to assist you, 
-but we may not be able to provide immediate resolution or comprehensive support.
+Enterprise supported features are those where we provide support only to users eligible for enterprise [support services](/docs/legal/support-services).
+These features should be functional for eligible users, but may have some limitations for a broader use.
+
+If you encounter issues with an enterprise supported feature and you are eligible for enterprise support services, we will provide a prompt response to the issues you may experience and make our best effort to assist you to find a resolution.
 
 **Partially supported features**
 
