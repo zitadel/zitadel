@@ -38,7 +38,7 @@ export class GrpcService {
   ) {}
 
   public loadAppEnvironment(): Promise<any> {
-    this.themeService.applyLabelPolicy()
+    this.themeService.applyLabelPolicy();
     // We use the browser language until we can make API requests to get the users configured language.
     return this.translate
       .use(this.translate.getBrowserLang() || this.translate.defaultLang)

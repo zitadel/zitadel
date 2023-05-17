@@ -9,8 +9,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 })
 export class FooterComponent implements OnInit {
   public policy?: PrivacyPolicy.AsObject;
-  constructor(public authService: GrpcAuthService) {
-  }
+  constructor(public authService: GrpcAuthService) {}
 
   ngOnInit(): void {
     this.authService.getMyPrivacyPolicy().then((policyResp) => {
