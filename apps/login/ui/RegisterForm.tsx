@@ -30,12 +30,12 @@ type Inputs =
   | FieldValues;
 
 type Props = {
-  privacyPolicy: LegalAndSupportSettings;
+  legal: LegalAndSupportSettings;
   passwordComplexityPolicy: PasswordComplexitySettings;
 };
 
 export default function RegisterForm({
-  privacyPolicy,
+  legal,
   passwordComplexityPolicy,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
@@ -166,9 +166,9 @@ export default function RegisterForm({
         />
       )}
 
-      {privacyPolicy && (
+      {legal && (
         <PrivacyPolicyCheckboxes
-          privacyPolicy={privacyPolicy}
+          legal={legal}
           onChange={setTosAndPolicyAccepted}
         />
       )}

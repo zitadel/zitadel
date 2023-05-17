@@ -2,7 +2,6 @@ import { listSessions, server } from "#/lib/zitadel";
 import { Avatar, AvatarSize } from "#/ui/Avatar";
 import { getAllSessionIds } from "#/utils/cookies";
 import {
-  ChevronRightIcon,
   ExclamationTriangleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";

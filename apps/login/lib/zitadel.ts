@@ -1,7 +1,7 @@
 import {
   ZitadelServer,
   ZitadelServerOptions,
-  management,
+  user,
   settings,
   getServers,
   initializeServer,
@@ -127,18 +127,19 @@ export type AddHumanUserData = {
   email: string;
   password: string;
 };
+
 export function addHumanUser(
   server: ZitadelServer,
   { email, firstName, lastName, password }: AddHumanUserData
 ): Promise<string> {
-  const mgmt = management.getManagement(server);
+  const mgmt = user.getUser(server);
   return mgmt
     .addHumanUser(
       {
-        email: { email, isEmailVerified: false },
-        userName: email,
+        email: { email, isVerified: false },
+        username: email,
         profile: { firstName, lastName },
-        initialPassword: password,
+        password: { password },
       },
       {
         // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
@@ -148,6 +149,21 @@ export function addHumanUser(
       console.log("added user", resp.userId);
       return resp.userId;
     });
+}
+
+export function verifyEmail(
+  server: ZitadelServer,
+  userId: string,
+  verificationCode: string
+): Promise<any> {
+  const mgmt = user.getUser(server);
+  return mgmt.verifyEmail(
+    {
+      userId,
+      verificationCode,
+    },
+    {}
+  );
 }
 
 export { server };

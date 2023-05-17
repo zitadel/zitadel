@@ -2,10 +2,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Checkbox } from "./Checkbox";
-import { PrivacyPolicy } from "@zitadel/server";
+import { LegalAndSupportSettings } from "@zitadel/server";
 
 type Props = {
-  privacyPolicy: PrivacyPolicy;
+  legal: LegalAndSupportSettings;
   onChange: (allAccepted: boolean) => void;
 };
 
@@ -14,7 +14,7 @@ type AcceptanceState = {
   privacyPolicyAccepted: boolean;
 };
 
-export function PrivacyPolicyCheckboxes({ privacyPolicy, onChange }: Props) {
+export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
   const [acceptanceState, setAcceptanceState] = useState<AcceptanceState>({
     tosAccepted: false,
     privacyPolicyAccepted: false,
@@ -24,9 +24,9 @@ export function PrivacyPolicyCheckboxes({ privacyPolicy, onChange }: Props) {
     <>
       <p className="flex flex-row items-center text-text-light-secondary-500 dark:text-text-dark-secondary-500 mt-4 text-sm">
         To register you must agree to the terms and conditions
-        {privacyPolicy?.helpLink && (
+        {legal?.helpLink && (
           <span>
-            <Link href={privacyPolicy.helpLink} target="_blank">
+            <Link href={legal.helpLink} target="_blank">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -45,7 +45,7 @@ export function PrivacyPolicyCheckboxes({ privacyPolicy, onChange }: Props) {
           </span>
         )}
       </p>
-      {privacyPolicy?.tosLink && (
+      {legal?.tosLink && (
         <div className="mt-4 flex items-center">
           <Checkbox
             className="mr-4"
@@ -62,18 +62,14 @@ export function PrivacyPolicyCheckboxes({ privacyPolicy, onChange }: Props) {
           <div className="mr-4 w-[28rem]">
             <p className="text-sm text-text-light-500 dark:text-text-dark-500">
               Agree&nbsp;
-              <Link
-                href={privacyPolicy.tosLink}
-                className="underline"
-                target="_blank"
-              >
+              <Link href={legal.tosLink} className="underline" target="_blank">
                 Terms of Service
               </Link>
             </p>
           </div>
         </div>
       )}
-      {privacyPolicy?.privacyLink && (
+      {legal?.privacyPolicyLink && (
         <div className="mt-4 flex items-center">
           <Checkbox
             className="mr-4"
@@ -91,7 +87,7 @@ export function PrivacyPolicyCheckboxes({ privacyPolicy, onChange }: Props) {
             <p className="text-sm text-text-light-500 dark:text-text-dark-500">
               Agree&nbsp;
               <Link
-                href={privacyPolicy.privacyLink}
+                href={legal.privacyPolicyLink}
                 className="underline"
                 target="_blank"
               >

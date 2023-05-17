@@ -11,6 +11,8 @@ export default async function Page() {
     server
   );
 
+  console.log(legal);
+
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1>Register</h1>
@@ -18,7 +20,7 @@ export default async function Page() {
 
       {legal && passwordComplexitySettings && (
         <RegisterForm
-          privacyPolicy={legal}
+          legal={legal}
           passwordComplexityPolicy={passwordComplexitySettings}
         ></RegisterForm>
       )}

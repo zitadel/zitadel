@@ -1,6 +1,6 @@
-import * as management from "./management";
 import * as settings from "./v2/settings";
 import * as session from "./v2/session";
+import * as user from "./v2/user";
 
 import * as login from "./proto/server/zitadel/settings/v2alpha/login_settings";
 import * as password from "./proto/server/zitadel/settings/v2alpha/password_settings";
@@ -27,7 +27,7 @@ export {
   ZitadelServer,
   type ZitadelServerOptions,
   initializeServer,
-  management,
+  user,
   session,
   settings,
   login,
