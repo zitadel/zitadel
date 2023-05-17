@@ -15,7 +15,7 @@ Fully supported features are those that are guaranteed to work as intended and a
 If you encounter any issues with a fully supported feature, you can contact us, 
 and we will provide prompt resolution to any issues you may experience.
 
-### Partially Supported
+### Enterprise Supported
 
 Partially supported features are those that we support to a certain extent, 
 but may not have been fully tested or may have some limitations.
