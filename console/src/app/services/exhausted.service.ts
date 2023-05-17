@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { of, tap } from 'rxjs';
+import { map, Observable, of, switchMap, tap } from 'rxjs';
 import { WarnDialogComponent } from '../modules/warn-dialog/warn-dialog.component';
+import { Environment } from './environment.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,7 @@ export class ExhaustedService {
 
   constructor(private dialog: MatDialog) {}
 
-  public showExhaustedDialog(instanceManagementUrl?: string) {
+  public showExhaustedDialog(env$: Observable<Environment>) {
     if (!this.isClosed) {
       return of(undefined);
     }
@@ -29,10 +30,12 @@ export class ExhaustedService {
       })
       .afterClosed()
       .pipe(
-        tap(() => {
+        switchMap(() => env$),
+        tap((env) => {
           // Just reload if there is no instance management url
-          location.href = instanceManagementUrl || location.href;
+          location.href = env.instance_management_url || location.href;
         }),
+        map(() => undefined),
       );
   }
 }
