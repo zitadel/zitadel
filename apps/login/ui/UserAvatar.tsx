@@ -4,16 +4,21 @@ import Link from "next/link";
 
 type Props = {
   loginName: string;
+  displayName?: string;
   showDropdown: boolean;
 };
 
-export default function UserAvatar({ loginName, showDropdown }: Props) {
+export default function UserAvatar({
+  loginName,
+  displayName,
+  showDropdown,
+}: Props) {
   return (
     <div className="flex h-full w-full flex-row items-center rounded-full border p-[1px] dark:border-white/20">
       <div>
         <Avatar
           size={AvatarSize.SMALL}
-          name={loginName}
+          name={displayName ?? loginName}
           loginName={loginName}
         />
       </div>

@@ -41,6 +41,7 @@ importers:
       grpc-tools: 1.11.3
       lint-staged: 13.0.3
       make-dir-cli: 3.0.0
+      moment: ^2.29.4
       next: 13.4.2
       next-themes: ^0.2.1
       nice-grpc: 2.0.1
@@ -65,6 +66,7 @@ importers:
       '@zitadel/server': link:../../packages/zitadel-server
       clsx: 1.2.1
       date-fns: 2.29.3
+      moment: 2.29.4
       next: 13.4.2_krg7tz6h6n3fx3eq7tclunioeu
       next-themes: 0.2.1_cmp7sjki5xcmfyvhcokzzink7a
       nice-grpc: 2.0.1
@@ -3580,6 +3582,10 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
     dev: true
+
+  /moment/2.29.4:
+    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
+    dev: false
 
   /ms/2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}

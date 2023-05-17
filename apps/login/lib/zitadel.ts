@@ -110,6 +110,17 @@ export function getSession(
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
 
+export function listSessions(
+  server: ZitadelServer,
+  ids: string[]
+): Promise<any | undefined> {
+  const sessionService = session.getSession(server);
+  const query = { offset: 0, limit: 100, asc: true };
+  console.log(ids);
+  const queries = [{ idsQuery: { ids } }];
+  return sessionService.listSessions({ queries: queries }, {});
+}
+
 export type AddHumanUserData = {
   firstName: string;
   lastName: string;

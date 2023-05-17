@@ -46,7 +46,7 @@ export default function PasswordForm() {
   function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
     console.log(value);
     return submitPassword(value).then((resp: any) => {
-      return router.push(`/success`);
+      return router.push(`/accounts`);
     });
   }
 

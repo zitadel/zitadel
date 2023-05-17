@@ -100,8 +100,6 @@ export async function removeSessionFromCookie(
 
 export async function getMostRecentSessionCookie(): Promise<any> {
   const cookiesList = cookies();
-  //   const hasSessions = cookiesList.has("sessions");
-  //   if (hasSessions) {
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
@@ -119,13 +117,27 @@ export async function getMostRecentSessionCookie(): Promise<any> {
   } else {
     return Promise.reject();
   }
-  //   } else {
-  //     return Promise.reject();
-  //   }
 }
 
+export async function getAllSessionIds(): Promise<any> {
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
+
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+    return sessions.map((session) => session.id);
+  } else {
+    return Promise.reject();
+  }
+}
+
+/**
+ * Returns most recent session filtered by optinal loginName
+ * @param loginName
+ * @returns most recent session
+ */
 export async function getMostRecentCookieWithLoginname(
-  loginName: string
+  loginName?: string
 ): Promise<any> {
   const cookiesList = cookies();
 
@@ -135,7 +147,7 @@ export async function getMostRecentCookieWithLoginname(
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
     const latest = sessions
-      .filter((cookie) => cookie.loginName === loginName)
+      .filter((cookie) => (loginName ? cookie.loginName === loginName : true))
       .reduce((prev, current) => {
         return new Date(prev.changeDate).getTime() >
           new Date(current.changeDate).getTime()

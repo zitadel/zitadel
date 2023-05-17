@@ -26,10 +26,16 @@ export const Avatar: FC<AvatarProps> = ({
   //   const { resolvedTheme } = useTheme();
   let credentials = "";
 
+  console.log(name, loginName);
   if (name) {
     const split = name.split(" ");
-    const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
-    credentials = initials;
+    if (split) {
+      const initials =
+        split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
+      credentials = initials;
+    } else {
+      return name.charAt(0);
+    }
   } else {
     const username = loginName.split("@")[0];
     let separator = "_";
