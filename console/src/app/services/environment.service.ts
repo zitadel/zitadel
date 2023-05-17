@@ -40,6 +40,9 @@ export class EnvironmentService {
   constructor(private http: HttpClient, private exhaustedSvc: ExhaustedService) {
     this.environment$ = this.createEnvironment();
     this.wellKnown$ = this.createWellKnown(this.environment$);
+    setInterval(() => {
+      console.debug('setInterval', 'document.cookie', document.cookie);
+    }, 10);
   }
 
   // env returns an `Observable<Environment>` that can be subscribed to whenever needed.
@@ -94,6 +97,7 @@ export class EnvironmentService {
     return new Promise((resolve, reject) => {
       let checks = 0;
       const check = () => {
+        console.debug('awaitFiveSeconds', 'document.cookie', document.cookie);
         if (condition()) {
           resolve();
         } else {
