@@ -108,5 +108,6 @@ export class EnvironmentService {
       }
       setTimeout(check, 10);
     };
+    check();
   }
 }
