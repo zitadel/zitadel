@@ -9,6 +9,11 @@ permissions:
 
 env:
   go_version: '1.20'
+  cache_from_params: type=registry,ref=ghcr.io/zitadel/build-cache
+  cache_to_params: type=registry,ref=ghcr.io/zitadel/build-cache,mode=max
+  tag_name: ghcr.io/zitadel/test:${{ github.sha }}
+  buildx_driver_opts: |
+      image=moby/buildkit:v0.11.2
 
 jobs:
 
@@ -24,6 +29,15 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: ${{env.buildx_driver_opts}}
+      - 
+        name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
         uses: docker/build-push-action@v4
@@ -32,10 +46,8 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: core-build
           push: false
-          cache-to: |
-            type=gha
-          cache-from: |
-            type=gha
+          cache-to: ${{env.cache_to_params}}
+          cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
   
   console:
@@ -50,6 +62,15 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: ${{env.buildx_driver_opts}}
+      - 
+        name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
         uses: docker/build-push-action@v4
@@ -58,11 +79,11 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: console
           push: false
-          cache-to: |
-            type=gha
-          cache-from: |
-            type=gha
+          cache-to:  ${{env.cache_to_params}}
+          cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
+          tags: ${{env.tag_name}}
+          
   
   compile:
     runs-on: ubuntu-latest
@@ -81,6 +102,15 @@ jobs:
     -
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
+      with:
+        driver-opts: ${{env.buildx_driver_opts}}
+    - 
+      name: Login to Docker registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     -
       name: Build
       uses: docker/build-push-action@v4
@@ -92,13 +122,10 @@ jobs:
         file: ./build/workflow.Dockerfile
         target: compile
         push: false
-        cache-to: |
-          type=gha,
-          mode=max
-        cache-from: |
-          type=gha,
-          mode=max
+        cache-to: ${{env.cache_to_params}}
+        cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
+        tags: ${{env.tag_name}}
 
   core-unit-test:
     runs-on: ubuntu-latest
@@ -113,6 +140,15 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: ${{env.buildx_driver_opts}}
+      - 
+        name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
         uses: docker/build-push-action@v4
@@ -121,11 +157,10 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: test-core-unit
           push: false
-          cache-to: |
-            type=gha
-          cache-from: |
-            type=gha
+          cache-to:  ${{env.cache_to_params}}
+          cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
+          tags: ${{env.tag_name}}
 
   core-integration-test:
     runs-on: ubuntu-latest
@@ -146,6 +181,15 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: ${{env.buildx_driver_opts}}
+      - 
+        name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
         uses: docker/build-push-action@v4
@@ -154,11 +198,10 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: test-core-integration
           push: false
-          cache-to: |
-            type=gha
-          cache-from: |
-            type=gha
+          cache-to:  ${{env.cache_to_params}}
+          cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
+          tags: ${{env.tag_name}}
 
 
   # e2e:

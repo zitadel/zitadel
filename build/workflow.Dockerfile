@@ -102,7 +102,7 @@ RUN make assets
 # #######################################
 # download console dependencies
 # #######################################
-FROM node:alpine AS console-deps
+FROM node:18-buster AS console-deps
 
 WORKDIR /zitadel/console
 
@@ -114,7 +114,7 @@ RUN yarn install --frozen-lockfile
 # #######################################
 # generate console client
 # #######################################
-FROM node:alpine AS console-client
+FROM node:18-buster AS console-client
 
 WORKDIR /zitadel/console
 
