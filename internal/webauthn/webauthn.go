@@ -177,9 +177,13 @@ func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *
 
 func (w *Config) serverFromContext(ctx context.Context) (*webauthn.WebAuthn, error) {
 	instance := authz.GetInstance(ctx)
-	return webauthn.New(&webauthn.Config{
+	webAuthn, err := webauthn.New(&webauthn.Config{
 		RPDisplayName: w.DisplayName,
 		RPID:          instance.RequestedDomain(),
 		RPOrigin:      http.BuildOrigin(instance.RequestedHost(), w.ExternalSecure),
 	})
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "WEBAU-UX9ta", "Errors.User.WebAuthN.ServerConfig")
+	}
+	return webAuthn, nil
 }

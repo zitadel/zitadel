@@ -11,7 +11,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
-	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func (c *Commands) RegisterUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment) (*domain.PasskeyRegistrationDetails, error) {
@@ -41,37 +40,48 @@ func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOw
 		return nil, caos_errs.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid")
 	}
 	return func(ctx context.Context, userAgg *eventstore.Aggregate) eventstore.Command {
-		return usr_repo.NewHumanPasswordlessInitCodeCheckSucceededEvent(ctx, userAgg, codeID)
+		return user.NewHumanPasswordlessInitCodeCheckSucceededEvent(ctx, userAgg, codeID)
 	}, nil
 }
 
 func (c *Commands) verifyUserPasskeyCodeFailed(ctx context.Context, wm *HumanPasswordlessInitCodeWriteModel) {
 	userAgg := UserAggregateFromWriteModel(&wm.WriteModel)
-	_, err := c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, wm.CodeID))
+	_, err := c.eventstore.Push(ctx, user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, wm.CodeID))
 	logging.WithFields("userID", userAgg.ID).OnError(err).Error("RegisterUserPasskeyWithCode push failed")
 }
 
 func (c *Commands) registerUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment, events ...eventCallback) (*domain.PasskeyRegistrationDetails, error) {
+	wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, userID, resourceOwner, authenticator)
+	if err != nil {
+		return nil, err
+	}
+	return c.pushUserPasskey(ctx, wm, userAgg, webAuthN, events...)
+}
+
+func (c *Commands) createUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
 	passwordlessTokens, err := c.getHumanPasswordlessTokens(ctx, userID, resourceOwner)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
-	wm, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceOwner, false, passwordlessTokens, authenticator, domain.UserVerificationRequirementRequired)
-	if err != nil {
-		return nil, err
-	}
+	return c.addHumanWebAuthN(ctx, userID, resourceOwner, false, passwordlessTokens, authenticator, domain.UserVerificationRequirementRequired)
+}
 
+func (c *Commands) pushUserPasskey(ctx context.Context, wm *HumanWebAuthNWriteModel, userAgg *eventstore.Aggregate, webAuthN *domain.WebAuthNToken, events ...eventCallback) (*domain.PasskeyRegistrationDetails, error) {
 	cmds := make([]eventstore.Command, len(events)+1)
-	cmds[0] = usr_repo.NewHumanPasswordlessAddedEvent(ctx, userAgg, wm.WebauthNTokenID, webAuthN.Challenge)
+	cmds[0] = user.NewHumanPasswordlessAddedEvent(ctx, userAgg, wm.WebauthNTokenID, webAuthN.Challenge)
 	for i, event := range events {
 		cmds[i+1] = event(ctx, userAgg)
 	}
 
-	err = c.pushAppendAndReduce(ctx, wm, cmds...)
+	err := c.pushAppendAndReduce(ctx, wm, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	return webAuthN.PasskeyRegistrationDetails(writeModelToObjectDetails(&wm.WriteModel)), nil
+	return &domain.PasskeyRegistrationDetails{
+		ObjectDetails:                      writeModelToObjectDetails(&wm.WriteModel),
+		PasskeyID:                          wm.WebauthNTokenID,
+		PublicKeyCredentialCreationOptions: webAuthN.CredentialCreationData,
+	}, nil
 }
 
 func (c *Commands) AddUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
