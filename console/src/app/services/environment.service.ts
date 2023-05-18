@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, from, map, Observable, of, shareReplay, switchMap, throwError } from 'rxjs';
+import { catchError, map, Observable, of, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
@@ -27,7 +27,6 @@ interface WellKnown {
   providedIn: 'root',
 })
 export class EnvironmentService {
-  private exhaustedCookieKey = 'zitadel.quota.exhausted';
   private environmentJsonPath = './assets/environment.json';
   private wellknownPath = '/.well-known/openid-configuration`';
   public auth!: AuthServiceClient;
@@ -40,15 +39,11 @@ export class EnvironmentService {
   constructor(private http: HttpClient, private exhaustedSvc: ExhaustedService) {
     this.environment$ = this.createEnvironment();
     this.wellKnown$ = this.createWellKnown(this.environment$);
-    setInterval(() => {
-      console.debug('setInterval', 'document.cookie', document.cookie);
-    }, 10);
   }
 
   // env returns an `Observable<Environment>` that can be subscribed to whenever needed.
   // It makes the HTTP call exactly once and replays the cached result.
   // If the responses exhausted property is true, the exhaused dialog is shown.
-  // If it is false, the observable waits until the browser has the cookie set before emitting.
   get env() {
     return this.environment$;
   }
@@ -66,13 +61,11 @@ export class EnvironmentService {
         return throwError(() => err);
       }),
       switchMap((env) => {
+        const env$ = of(env);
         if (env.exhausted) {
-          return this.exhaustedSvc.showExhaustedDialog(of(env)).pipe(map(() => env));
+          return this.exhaustedSvc.showExhaustedDialog(env$).pipe(map(() => env));
         }
-        if (!navigator.cookieEnabled) {
-          return of(env);
-        }
-        return from(this.awaitFiveSeconds(() => !document.cookie.includes(this.exhaustedCookieKey))).pipe(map(() => env));
+        return env$;
       }),
       // Cache the first response, then replay it
       shareReplay(1),
@@ -91,25 +84,5 @@ export class EnvironmentService {
       // Cache the first response, then replay it
       shareReplay(1),
     );
-  }
-
-  private awaitFiveSeconds(condition: () => boolean): Promise<void> {
-    return new Promise((resolve, reject) => {
-      let checks = 0;
-      const check = () => {
-        console.debug('awaitFiveSeconds', 'document.cookie', document.cookie);
-        if (condition()) {
-          resolve();
-        } else {
-          checks++;
-          if (checks > 500) {
-            reject(`after ${checks} checks, the condition did not return true`);
-          } else {
-            setTimeout(check, 10);
-          }
-        }
-      };
-      check();
-    });
   }
 }
