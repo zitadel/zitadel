@@ -7,7 +7,24 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPerm string, authConfig Config, ctxData CtxData) (requestedPermissions, allPermissions []string, err error) {
+func CheckPermission(ctx context.Context, resolver MembershipsResolver, roleMappings []RoleMapping, permission, orgID, resourceID string) (err error) {
+	requestedPermissions, _, err := getUserPermissions(ctx, resolver, permission, roleMappings, GetCtxData(ctx), orgID)
+	if err != nil {
+		return err
+	}
+
+	_, userPermissionSpan := tracing.NewNamedSpan(ctx, "checkUserPermissions")
+	err = checkUserResourcePermissions(requestedPermissions, resourceID)
+	userPermissionSpan.EndWithError(err)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// getUserPermissions retrieves the memberships of the authenticated user (on instance and provided organisation level),
+// and maps them to permissions. It will return the requested permission(s) and all other granted permissions separately.
+func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requiredPerm string, roleMappings []RoleMapping, ctxData CtxData, orgID string) (requestedPermissions, allPermissions []string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -16,13 +33,13 @@ func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPer
 	}
 
 	ctx = context.WithValue(ctx, dataKey, ctxData)
-	memberships, err := t.SearchMyMemberships(ctx)
+	memberships, err := resolver.SearchMyMemberships(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
 	}
 	if len(memberships) == 0 {
 		err = retry(func() error {
-			memberships, err = t.SearchMyMemberships(ctx)
+			memberships, err = resolver.SearchMyMemberships(ctx, orgID)
 			if err != nil {
 				return err
 			}
@@ -35,24 +52,56 @@ func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPer
 			return nil, nil, nil
 		}
 	}
-	requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, memberships, authConfig)
+	requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, memberships, roleMappings)
 	return requestedPermissions, allPermissions, nil
 }
 
-func mapMembershipsToPermissions(requiredPerm string, memberships []*Membership, authConfig Config) (requestPermissions, allPermissions []string) {
+// checkUserResourcePermissions checks that if a user i granted either the requested permission globally (project.write)
+// or the specific resource (project.write:123)
+func checkUserResourcePermissions(userPerms []string, resourceID string) error {
+	if len(userPerms) == 0 {
+		return errors.ThrowPermissionDenied(nil, "AUTH-AWfge", "No matching permissions found")
+	}
+
+	if resourceID == "" {
+		return nil
+	}
+
+	if HasGlobalPermission(userPerms) {
+		return nil
+	}
+
+	if hasContextResourcePermission(userPerms, resourceID) {
+		return nil
+	}
+
+	return errors.ThrowPermissionDenied(nil, "AUTH-Swrgg2", "No matching permissions found")
+}
+
+func hasContextResourcePermission(permissions []string, resourceID string) bool {
+	for _, perm := range permissions {
+		_, ctxID := SplitPermission(perm)
+		if resourceID == ctxID {
+			return true
+		}
+	}
+	return false
+}
+
+func mapMembershipsToPermissions(requiredPerm string, memberships []*Membership, roleMappings []RoleMapping) (requestPermissions, allPermissions []string) {
 	requestPermissions = make([]string, 0)
 	allPermissions = make([]string, 0)
 	for _, membership := range memberships {
-		requestPermissions, allPermissions = mapMembershipToPerm(requiredPerm, membership, authConfig, requestPermissions, allPermissions)
+		requestPermissions, allPermissions = mapMembershipToPerm(requiredPerm, membership, roleMappings, requestPermissions, allPermissions)
 	}
 
 	return requestPermissions, allPermissions
 }
 
-func mapMembershipToPerm(requiredPerm string, membership *Membership, authConfig Config, requestPermissions, allPermissions []string) ([]string, []string) {
+func mapMembershipToPerm(requiredPerm string, membership *Membership, roleMappings []RoleMapping, requestPermissions, allPermissions []string) ([]string, []string) {
 	roleNames, roleContextID := roleWithContext(membership)
 	for _, roleName := range roleNames {
-		perms := authConfig.getPermissionsFromRole(roleName)
+		perms := getPermissionsFromRole(roleMappings, roleName)
 
 		for _, p := range perms {
 			permWithCtx := addRoleContextIDToPerm(p, roleContextID)

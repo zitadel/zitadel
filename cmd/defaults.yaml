@@ -267,6 +267,7 @@ Console:
   LongCache:
     MaxAge: 12h
     SharedMaxAge: 168h #7d
+  InstanceManagementURL: ""
 
 Notification:
   Repository:
@@ -321,6 +322,8 @@ SystemDefaults:
     ApplicationKeySize: 2048
   Multifactors:
     OTP:
+      # If this is empty, the issuer is the requested domain
+      # This is helpful in scenarios with multiple ZITADEL environments or virtual instances
       Issuer: "ZITADEL"
   DomainVerification:
     VerificationGenerator:
@@ -396,6 +399,7 @@ Quotas:
 
 Eventstore:
   PushTimeout: 15s
+  AllowOrderByCreationDate: false
 
 DefaultInstance:
   InstanceName:

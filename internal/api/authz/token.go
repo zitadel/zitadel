@@ -3,6 +3,8 @@ package authz
 import (
 	"context"
 	"crypto/rsa"
+	"encoding/base64"
+	"fmt"
 	"os"
 	"strings"
 	"sync"
@@ -17,7 +19,8 @@ import (
 )
 
 const (
-	BearerPrefix = "Bearer "
+	BearerPrefix       = "Bearer "
+	SessionTokenFormat = "sess_%s:%s"
 )
 
 type TokenVerifier struct {
@@ -27,12 +30,16 @@ type TokenVerifier struct {
 	systemJWTProfile op.JWTProfileVerifier
 }
 
+type MembershipsResolver interface {
+	SearchMyMemberships(ctx context.Context, orgID string) ([]*Membership, error)
+}
+
 type authZRepo interface {
 	VerifyAccessToken(ctx context.Context, token, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error)
 	VerifierClientID(ctx context.Context, name string) (clientID, projectID string, err error)
-	SearchMyMemberships(ctx context.Context) ([]*Membership, error)
+	SearchMyMemberships(ctx context.Context, orgID string) ([]*Membership, error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
-	ExistsOrg(ctx context.Context, orgID string) error
+	ExistsOrg(ctx context.Context, id, domain string) (string, error)
 }
 
 func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (v *TokenVerifier) {
@@ -127,10 +134,10 @@ func (v *TokenVerifier) RegisterServer(appName, methodPrefix string, mappings Me
 	}
 }
 
-func (v *TokenVerifier) SearchMyMemberships(ctx context.Context) (_ []*Membership, err error) {
+func (v *TokenVerifier) SearchMyMemberships(ctx context.Context, orgID string) (_ []*Membership, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return v.authZRepo.SearchMyMemberships(ctx)
+	return v.authZRepo.SearchMyMemberships(ctx, orgID)
 }
 
 func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (_ string, _ []string, err error) {
@@ -140,10 +147,10 @@ func (v *TokenVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clien
 	return v.authZRepo.ProjectIDAndOriginsByClientID(ctx, clientID)
 }
 
-func (v *TokenVerifier) ExistsOrg(ctx context.Context, orgID string) (err error) {
+func (v *TokenVerifier) ExistsOrg(ctx context.Context, id, domain string) (orgID string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return v.authZRepo.ExistsOrg(ctx, orgID)
+	return v.authZRepo.ExistsOrg(ctx, id, domain)
 }
 
 func (v *TokenVerifier) CheckAuthMethod(method string) (Option, bool) {
@@ -160,4 +167,21 @@ func verifyAccessToken(ctx context.Context, token string, t *TokenVerifier, meth
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
 	}
 	return t.VerifyAccessToken(ctx, parts[1], method)
+}
+
+func SessionTokenVerifier(algorithm crypto.EncryptionAlgorithm) func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+		decodedToken, err := base64.RawURLEncoding.DecodeString(sessionToken)
+		if err != nil {
+			return err
+		}
+		_, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
+		var token string
+		token, err = algorithm.DecryptString(decodedToken, algorithm.EncryptionKeyID())
+		spanPasswordComparison.EndWithError(err)
+		if err != nil || token != fmt.Sprintf(SessionTokenFormat, sessionID, tokenID) {
+			return caos_errs.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
+		}
+		return nil
+	}
 }
