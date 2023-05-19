@@ -163,6 +163,11 @@ message OIDCConfig {
             description: "all allowed origins from where the API can be used";
         }
     ];
+    bool skip_native_app_success_page = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
+        }
+    ];
 }
 
 enum OIDCResponseType {
@@ -175,6 +180,7 @@ enum OIDCGrantType{
     OIDC_GRANT_TYPE_AUTHORIZATION_CODE = 0;
     OIDC_GRANT_TYPE_IMPLICIT = 1;
     OIDC_GRANT_TYPE_REFRESH_TOKEN = 2;
+    OIDC_GRANT_TYPE_DEVICE_CODE = 3;
 }
 
 enum OIDCAppType {

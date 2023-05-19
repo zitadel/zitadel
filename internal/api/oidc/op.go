@@ -40,6 +40,7 @@ type Config struct {
 	UserAgentCookieConfig             *middleware.UserAgentCookieConfig
 	Cache                             *middleware.CacheConfig
 	CustomEndpoints                   *EndpointConfig
+	DeviceAuth                        *DeviceAuthorizationConfig
 }
 
 type EndpointConfig struct {
@@ -50,6 +51,7 @@ type EndpointConfig struct {
 	Revocation    *Endpoint
 	EndSession    *Endpoint
 	Keys          *Endpoint
+	DeviceAuth    *Endpoint
 }
 
 type Endpoint struct {
@@ -73,7 +75,7 @@ type OPStorage struct {
 	assetAPIPrefix                    func(ctx context.Context) string
 }
 
-func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *database.DB, userAgentCookie, instanceHandler, accessHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+func NewProvider(config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *database.DB, userAgentCookie, instanceHandler, accessHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
@@ -108,6 +110,7 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 		GrantTypeRefreshToken:    config.GrantTypeRefreshToken,
 		RequestObjectSupported:   config.RequestObjectSupported,
 		SupportedUILocales:       supportedLanguages,
+		DeviceAuthorization:      config.DeviceAuth.toOPConfig(),
 	}
 	if cryptoLength := len(cryptoKey); cryptoLength != 32 {
 		return nil, caos_errs.ThrowInternalf(nil, "OIDC-D43gf", "crypto key must be 32 bytes, but is %d", cryptoLength)
@@ -164,6 +167,9 @@ func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
 	}
 	if endpointConfig.Keys != nil {
 		options = append(options, op.WithCustomKeysEndpoint(op.NewEndpointWithURL(endpointConfig.Keys.Path, endpointConfig.Keys.URL)))
+	}
+	if endpointConfig.DeviceAuth != nil {
+		options = append(options, op.WithCustomDeviceAuthorizationEndpoint(op.NewEndpointWithURL(endpointConfig.DeviceAuth.Path, endpointConfig.DeviceAuth.URL)))
 	}
 	return options
 }

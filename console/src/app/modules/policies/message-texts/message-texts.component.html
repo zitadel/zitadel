@@ -46,7 +46,7 @@
 <div class="message-text-actions">
   <button
     class="reset-button"
-    *ngIf="(getCustomInitMessageTextMap$ | async) && (getCustomInitMessageTextMap$ | async)?.isDefault === false"
+    *ngIf="(getCustomInitMessageTextMap$ | async) && (getCustomInitMessageTextMap$ | async)?.['isDefault'] === false"
     [disabled]="(canWrite$ | async) === false"
     (click)="resetDefault()"
     color="message-text-warn"

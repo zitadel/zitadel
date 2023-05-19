@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -138,10 +139,12 @@ func prepareProjectGrantMembersQuery(ctx context.Context, db prepareDatabase) (s
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
+			UserTypeCol.identifier(),
 			countColumn.identifier(),
 		).From(projectGrantMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectGrantMemberUserID)).
+			LeftJoin(join(UserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(LoginNameUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID) + db.Timetravel(call.Took(ctx))).
 			Where(
@@ -162,6 +165,7 @@ func prepareProjectGrantMembersQuery(ctx context.Context, db prepareDatabase) (s
 					displayName        = sql.NullString{}
 					machineName        = sql.NullString{}
 					avatarURL          = sql.NullString{}
+					userType           = sql.NullInt32{}
 				)
 
 				err := rows.Scan(
@@ -178,6 +182,7 @@ func prepareProjectGrantMembersQuery(ctx context.Context, db prepareDatabase) (s
 					&displayName,
 					&machineName,
 					&avatarURL,
+					&userType,
 
 					&count,
 				)
@@ -196,6 +201,7 @@ func prepareProjectGrantMembersQuery(ctx context.Context, db prepareDatabase) (s
 				} else {
 					member.DisplayName = machineName.String
 				}
+				member.UserType = domain.UserType(userType.Int32)
 
 				members = append(members, member)
 			}

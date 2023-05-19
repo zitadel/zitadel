@@ -3,9 +3,10 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-
 	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -71,11 +72,14 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 	if accountName == "" {
 		accountName = string(human.EmailAddress)
 	}
-	key, secret, err := domain.NewOTPKey(c.multifactors.OTP.Issuer, accountName, c.multifactors.OTP.CryptoMFA)
+	issuer := c.multifactors.OTP.Issuer
+	if issuer == "" {
+		issuer = authz.GetInstance(ctx).RequestedDomain()
+	}
+	key, secret, err := domain.NewOTPKey(issuer, accountName, c.multifactors.OTP.CryptoMFA)
 	if err != nil {
 		return nil, err
 	}
-
 	_, err = c.eventstore.Push(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, secret))
 	if err != nil {
 		return nil, err

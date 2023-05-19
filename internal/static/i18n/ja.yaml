@@ -76,6 +76,7 @@ Errors:
       Invalid: 無効なメールアドレスです
       AlreadyVerified: メールアドレスはすでに検証済みです
       NotChanged: メールアドレスが変更されていません
+      InvalidURLTemplate: URLテンプレートが無効です
     Phone:
       NotFound: 電話番号が見つかりません
       Invalid: 無効な電話番号です
@@ -458,6 +459,11 @@ Errors:
     Execution:
       StorageFailed: アクション実行ログのデータベースへの保存に失敗しました
       ScanFailed: アクション実行時間を取得する使用状況クエリに失敗しました
+  Session:
+    NotExisting: セッションが存在しない
+    Terminated: セッションはすでに終了しています
+    Token:
+      Invalid: セッショントークンが無効です
 
 AggregateTypes:
   action: アクション

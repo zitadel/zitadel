@@ -1,6 +1,6 @@
 ---
 title: How to configure ZITADEL for your scenario
-sidebar_label: FAQ Configurations
+sidebar_label: Common configurations
 ---
 
 Each customer does have different needs and use-cases. In ZITADEL you are able to configure your settings depending on your needs.
@@ -15,7 +15,7 @@ If a user of this organization wants to login, you don't want them to enter thei
 ### Settings
 
 1. Go to the "Identity Providers" Settings of the organization
-2. Configure the needed identity provider: Read this [guide](../integrate/identity-providers/introduction.md) if you don't know how
+2. Configure the needed identity provider: Read this [guide](../integrate/identity-providers) if you don't know how
 3. Go to the "Login Behavior and Security" settings of the organization
 4. Disable "Username Password Allowed" and enable "External IDP allowed" in the Advanced Section
 
@@ -27,9 +27,9 @@ More about the [scopes](/apis/openidoauth/scopes#reserved-scopes)
 
 If you have an application that runs a dedicated domain for each customer you need to instruct ZITADEL to allow redirection for each domain specifically to safeguard against phishing attacks.
 
-Example:
-MyApplication: customer-a.app.com
-ZITADEL Login: login.app.com
+Example:  
+MyApplication: `customer-a.app.com`  
+ZITADEL Login: `login.app.com`
 
 In the OIDC Authorization request you always have to send the redirect URI to where you like to be redirected after login.
 To handle this scenario it is possible to register multiple URIs on each application in ZITADEL, the only criteria is that the requested URI has to match one of the registered URIs.

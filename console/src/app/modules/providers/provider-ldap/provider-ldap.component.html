@@ -17,12 +17,13 @@
       <div class="identity-provider-content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
-          <input cnslInput formControlName="name" />
+          <input cnslInput formControlName="name" required />
         </cnsl-form-field>
 
         <h2 class="subheader">{{ 'IDP.LDAPCONNECTION' | translate }}</h2>
 
         <cnsl-string-list
+          class="string-list-component-wrapper"
           title="{{ 'IDP.SERVERS' | translate }}"
           formControlName="serversList"
           [required]="true"
@@ -30,21 +31,31 @@
 
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.BASEDN' | translate }}</cnsl-label>
-          <input cnslInput formControlName="baseDn" />
+          <input cnslInput formControlName="baseDn" required />
         </cnsl-form-field>
 
         <div [ngClass]="{ 'identity-provider-2-col': !provider }">
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'IDP.BINDDN' | translate }}</cnsl-label>
-            <input cnslInput formControlName="bindDn" />
+            <input cnslInput formControlName="bindDn" required />
           </cnsl-form-field>
 
-          <mat-checkbox *ngIf="provider" [(ngModel)]="updateBindPassword" [ngModelOptions]="{ standalone: true }">{{
-            'IDP.UPDATEBINDPASSWORD' | translate
-          }}</mat-checkbox>
-          <cnsl-form-field *ngIf="!provider || (provider && updateBindPassword)" class="formfield">
+          <mat-checkbox
+            class="update-secret-checkbox"
+            *ngIf="provider"
+            [(ngModel)]="updateBindPassword"
+            [ngModelOptions]="{ standalone: true }"
+            >{{ 'IDP.UPDATEBINDPASSWORD' | translate }}</mat-checkbox
+          >
+          <cnsl-form-field class="formfield pwd" [ngClass]="{ show: !provider || (provider && updateBindPassword) }">
             <cnsl-label>{{ 'IDP.BINDPASSWORD' | translate }}</cnsl-label>
-            <input cnslInput formControlName="bindPassword" />
+            <input
+              cnslInput
+              formControlName="bindPassword"
+              type="password"
+              autocomplete="new-password"
+              [required]="!provider"
+            />
           </cnsl-form-field>
         </div>
 
@@ -52,16 +63,18 @@
 
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.USERBASE' | translate }}</cnsl-label>
-          <input cnslInput formControlName="userBase" />
+          <input cnslInput formControlName="userBase" required />
         </cnsl-form-field>
 
         <cnsl-string-list
+          class="string-list-component-wrapper"
           title="{{ 'IDP.USERFILTERS' | translate }}"
           formControlName="userFiltersList"
           [required]="true"
         ></cnsl-string-list>
 
         <cnsl-string-list
+          class="string-list-component-wrapper"
           title="{{ 'IDP.USEROBJECTCLASSES' | translate }}"
           formControlName="userObjectClassesList"
           [required]="true"
@@ -69,22 +82,11 @@
 
         <div class="identity-provider-optional-h-wrapper">
           <h2>{{ 'IDP.LDAPATTRIBUTES' | translate }}</h2>
-
-          <button (click)="showAttributes = !showAttributes" type="button" mat-icon-button>
-            <mat-icon *ngIf="showAttributes">keyboard_arrow_up</mat-icon>
-            <mat-icon *ngIf="!showAttributes">keyboard_arrow_down</mat-icon>
-          </button>
-
-          <span *ngIf="!provider?.config?.ldap?.attributes?.idAttribute" class="state error">{{
-            'IDP.REQUIRED' | translate
-          }}</span>
         </div>
-        <div *ngIf="showAttributes">
-          <cnsl-ldap-attributes
-            [initialAttributes]="provider?.config?.ldap?.attributes"
-            (attributesChanged)="attributes = $event"
-          ></cnsl-ldap-attributes>
-        </div>
+        <cnsl-ldap-attributes
+          [initialAttributes]="provider?.config?.ldap?.attributes"
+          (attributesChanged)="attributes = $event"
+        ></cnsl-ldap-attributes>
 
         <div class="identity-provider-optional-h-wrapper">
           <h2>{{ 'IDP.OPTIONAL' | translate }}</h2>
@@ -113,7 +115,7 @@
           color="primary"
           mat-raised-button
           class="continue-button"
-          [disabled]="(form.invalid && attributes.toObject().idAttribute !== '') || form.disabled"
+          [disabled]="!form.valid || !attributes.toObject().idAttribute || form.disabled"
           type="submit"
         >
           <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>

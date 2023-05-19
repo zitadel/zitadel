@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "你的入职过程",
+    "MOREDESCRIPTION": "更多捷径",
     "COMPLETED": "已完成",
     "DISMISS": "隐藏",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "设置你的品牌",
-        "description": "定义你的登录的颜色和形状，上传你的标志和图标。"
+        "description": "定义你的登录的颜色和形状，上传你的标志和图标。",
+        "action": "设置品牌"
       },
       "instance.smtp.config.added": {
         "title": "SMTP设置",
-        "description": "设置你自己的邮件服务器设置"
+        "description": "设置你自己的邮件服务器设置",
+        "action": "设置 SMTP 设置"
       },
       "project.added": {
         "title": "创建你的第一个项目",
-        "description": "添加你的第一个项目并定义其角色和授权。"
+        "description": "添加你的第一个项目并定义其角色和授权。",
+        "action": "创建项目"
       },
       "project.application.added": {
         "title": "创建你的第一个应用程序",
-        "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。"
+        "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。",
+        "action": "创建应用程序"
       },
       "user.human.added": {
         "title": "添加用户",
-        "description": "添加你的应用程序用户"
+        "description": "添加你的应用程序用户",
+        "action": "创建用户"
       },
       "user.grant.added": {
         "title": "授予用户",
-        "description": "允许用户访问你的应用程序并设置他们的角色。"
+        "description": "允许用户访问你的应用程序并设置他们的角色。",
+        "action": "创建授权"
       }
     }
   },
@@ -240,6 +247,7 @@
   },
   "ERRORS": {
     "REQUIRED": "请填写此栏",
+    "ATLEASTONE": "P至少提供一个值。",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
@@ -1012,6 +1020,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1209,6 +1218,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1693,9 +1703,10 @@
       "2": "停用"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "租户类型",
     "AZUREADTENANTID": "租户编号",
@@ -1930,6 +1941,8 @@
       "REGENERATESECRET": "重新生成客户端密钥",
       "DEVMODE": "开发模式",
       "DEVMODEDESC": "注意：启用开发模式的重定向 URI 将不会被验证。",
+      "SKIPNATIVEAPPSUCCESSPAGE": "登录后跳过成功页面",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "登录后跳过本机应用的成功页面",
       "REDIRECT": "重定向 URLs",
       "REDIRECTSECTION": "重定向 URLs",
       "POSTLOGOUTREDIRECT": "退出登录重定向 URLs",
@@ -1952,7 +1965,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2031,6 +2045,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "直接从授权端点获取令牌"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "在计算机或智能手机上授权设备。"
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "您的设置与任何其他选项都不对应。"
@@ -2057,6 +2075,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

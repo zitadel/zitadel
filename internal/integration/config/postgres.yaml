@@ -1,0 +1,15 @@
+Database:
+  postgres:
+    Host: localhost
+    Port: 5432
+    Database: zitadel
+    MaxOpenConns: 20
+    MaxIdleConns: 10
+    User:
+      Username: zitadel
+      SSL:
+        Mode: disable
+    Admin:
+      Username: zitadel
+      SSL:
+        Mode: disable

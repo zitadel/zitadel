@@ -40,23 +40,24 @@ type App struct {
 }
 
 type OIDCApp struct {
-	RedirectURIs           database.StringArray
-	ResponseTypes          database.EnumArray[domain.OIDCResponseType]
-	GrantTypes             database.EnumArray[domain.OIDCGrantType]
-	AppType                domain.OIDCApplicationType
-	ClientID               string
-	AuthMethodType         domain.OIDCAuthMethodType
-	PostLogoutRedirectURIs database.StringArray
-	Version                domain.OIDCVersion
-	ComplianceProblems     database.StringArray
-	IsDevMode              bool
-	AccessTokenType        domain.OIDCTokenType
-	AssertAccessTokenRole  bool
-	AssertIDTokenRole      bool
-	AssertIDTokenUserinfo  bool
-	ClockSkew              time.Duration
-	AdditionalOrigins      database.StringArray
-	AllowedOrigins         database.StringArray
+	RedirectURIs             database.StringArray
+	ResponseTypes            database.EnumArray[domain.OIDCResponseType]
+	GrantTypes               database.EnumArray[domain.OIDCGrantType]
+	AppType                  domain.OIDCApplicationType
+	ClientID                 string
+	AuthMethodType           domain.OIDCAuthMethodType
+	PostLogoutRedirectURIs   database.StringArray
+	Version                  domain.OIDCVersion
+	ComplianceProblems       database.StringArray
+	IsDevMode                bool
+	AccessTokenType          domain.OIDCTokenType
+	AssertAccessTokenRole    bool
+	AssertIDTokenRole        bool
+	AssertIDTokenUserinfo    bool
+	ClockSkew                time.Duration
+	AdditionalOrigins        database.StringArray
+	AllowedOrigins           database.StringArray
+	SkipNativeAppSuccessPage bool
 }
 
 type SAMLApp struct {
@@ -239,6 +240,10 @@ var (
 	}
 	AppOIDCConfigColumnAdditionalOrigins = Column{
 		name:  projection.AppOIDCConfigColumnAdditionalOrigins,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnSkipNativeAppSuccessPage = Column{
+		name:  projection.AppOIDCConfigColumnSkipNativeAppSuccessPage,
 		table: appOIDCConfigsTable,
 	}
 )
@@ -535,6 +540,7 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder,
 			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
+			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
 
 			AppSAMLConfigColumnAppID.identifier(),
 			AppSAMLConfigColumnEntityID.identifier(),
@@ -583,6 +589,7 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder,
 				&oidcConfig.iDTokenUserinfoAssertion,
 				&oidcConfig.clockSkew,
 				&oidcConfig.additionalOrigins,
+				&oidcConfig.skipNativeAppSuccessPage,
 
 				&samlConfig.appID,
 				&samlConfig.entityID,
@@ -703,6 +710,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
+			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
 
 			AppSAMLConfigColumnAppID.identifier(),
 			AppSAMLConfigColumnEntityID.identifier(),
@@ -754,6 +762,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 					&oidcConfig.iDTokenUserinfoAssertion,
 					&oidcConfig.clockSkew,
 					&oidcConfig.additionalOrigins,
+					&oidcConfig.skipNativeAppSuccessPage,
 
 					&samlConfig.appID,
 					&samlConfig.entityID,
@@ -825,6 +834,7 @@ type sqlOIDCConfig struct {
 	additionalOrigins        database.StringArray
 	responseTypes            database.EnumArray[domain.OIDCResponseType]
 	grantTypes               database.EnumArray[domain.OIDCGrantType]
+	skipNativeAppSuccessPage sql.NullBool
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -832,21 +842,22 @@ func (c sqlOIDCConfig) set(app *App) {
 		return
 	}
 	app.OIDCConfig = &OIDCApp{
-		Version:                domain.OIDCVersion(c.version.Int32),
-		ClientID:               c.clientID.String,
-		RedirectURIs:           c.redirectUris,
-		AppType:                domain.OIDCApplicationType(c.applicationType.Int16),
-		AuthMethodType:         domain.OIDCAuthMethodType(c.authMethodType.Int16),
-		PostLogoutRedirectURIs: c.postLogoutRedirectUris,
-		IsDevMode:              c.devMode.Bool,
-		AccessTokenType:        domain.OIDCTokenType(c.accessTokenType.Int16),
-		AssertAccessTokenRole:  c.accessTokenRoleAssertion.Bool,
-		AssertIDTokenRole:      c.iDTokenRoleAssertion.Bool,
-		AssertIDTokenUserinfo:  c.iDTokenUserinfoAssertion.Bool,
-		ClockSkew:              time.Duration(c.clockSkew.Int64),
-		AdditionalOrigins:      c.additionalOrigins,
-		ResponseTypes:          c.responseTypes,
-		GrantTypes:             c.grantTypes,
+		Version:                  domain.OIDCVersion(c.version.Int32),
+		ClientID:                 c.clientID.String,
+		RedirectURIs:             c.redirectUris,
+		AppType:                  domain.OIDCApplicationType(c.applicationType.Int16),
+		AuthMethodType:           domain.OIDCAuthMethodType(c.authMethodType.Int16),
+		PostLogoutRedirectURIs:   c.postLogoutRedirectUris,
+		IsDevMode:                c.devMode.Bool,
+		AccessTokenType:          domain.OIDCTokenType(c.accessTokenType.Int16),
+		AssertAccessTokenRole:    c.accessTokenRoleAssertion.Bool,
+		AssertIDTokenRole:        c.iDTokenRoleAssertion.Bool,
+		AssertIDTokenUserinfo:    c.iDTokenUserinfoAssertion.Bool,
+		ClockSkew:                time.Duration(c.clockSkew.Int64),
+		AdditionalOrigins:        c.additionalOrigins,
+		ResponseTypes:            c.responseTypes,
+		GrantTypes:               c.grantTypes,
+		SkipNativeAppSuccessPage: c.skipNativeAppSuccessPage.Bool,
 	}
 	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems

@@ -25,14 +25,6 @@ func projectGrantWriteModelToProjectGrant(writeModel *ProjectGrantWriteModel) *d
 	}
 }
 
-func applicationWriteModelToApplication(writeModel *ApplicationWriteModel) domain.Application {
-	return &domain.ChangeApp{
-		AppID:   writeModel.AppID,
-		AppName: writeModel.Name,
-		State:   writeModel.State,
-	}
-}
-
 func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.OIDCApp {
 	return &domain.OIDCApp{
 		ObjectRoot:               writeModelToObjectRoot(writeModel.WriteModel),
@@ -54,6 +46,7 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		IDTokenUserinfoAssertion: writeModel.IDTokenUserinfoAssertion,
 		ClockSkew:                writeModel.ClockSkew,
 		AdditionalOrigins:        writeModel.AdditionalOrigins,
+		SkipNativeAppSuccessPage: writeModel.SkipNativeAppSuccessPage,
 	}
 }
 

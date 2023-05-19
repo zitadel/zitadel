@@ -81,6 +81,7 @@ Errors:
       NotChanged: L'adresse électronique n'a pas changé
       Empty: Email est vide
       IDMissing: Email ID manquant
+      InvalidURLTemplate: Le modèle d'URL n'est pas valide
     Phone:
       Notfound: Téléphone non trouvé
       Invalid: Le téléphone n'est pas valide
@@ -469,6 +470,11 @@ Errors:
     Execution:
       StorageFailed: L'enregistrement du journal d'action dans la base de données a échoué
       ScanFailed: L'interrogation des secondes d'action consommées a échoué
+  Session:
+    NotExisting: La session n'existe pas
+    Terminated: La session est déjà terminée
+    Token:
+      Invalid: Le jeton de session n'est pas valide
 
 AggregateTypes:
   action: Action

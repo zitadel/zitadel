@@ -78,14 +78,9 @@ jobs:
         with:
           file: .artifacts/codecov/profile.cov
           name: go-codecov
-      - uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Bump Chart Version
         uses: peter-evans/repository-dispatch@v2
-        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main'
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/next'
         with:
           token: ${{ steps.generate-token.outputs.token }}
           repository: zitadel/zitadel-charts
