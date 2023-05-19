@@ -88,7 +88,7 @@ export async function removeSessionFromCookie(
 
   // @ts-ignore
   return cookiesList.set({
-    name: "sessions",
+    name: "__Secure-sessions",
     value: JSON.stringify(filteredSessions),
     httpOnly: true,
     path: "/",

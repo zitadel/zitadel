@@ -1,4 +1,4 @@
-import { Avatar, AvatarSize } from "#/ui/Avatar";
+import { Avatar } from "#/ui/Avatar";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
@@ -17,7 +17,7 @@ export default function UserAvatar({
     <div className="flex h-full w-full flex-row items-center rounded-full border p-[1px] dark:border-white/20">
       <div>
         <Avatar
-          size={AvatarSize.SMALL}
+          size="small"
           name={displayName ?? loginName}
           loginName={loginName}
         />

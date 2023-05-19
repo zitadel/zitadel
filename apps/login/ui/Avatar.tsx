@@ -1,32 +1,18 @@
+"use client";
+
 import { ColorShade, getColorHash } from "#/utils/colors";
 import { useTheme } from "next-themes";
-import { FC } from "react";
-
-export enum AvatarSize {
-  SMALL = "small",
-  BASE = "base",
-  LARGE = "large",
-}
 
 interface AvatarProps {
   name: string | null | undefined;
   loginName: string;
   imageUrl?: string;
-  size?: AvatarSize;
+  size?: "small" | "base" | "large";
   shadow?: boolean;
 }
 
-export const Avatar: FC<AvatarProps> = ({
-  size = AvatarSize.BASE,
-  name,
-  loginName,
-  imageUrl,
-  shadow,
-}) => {
-  //   const { resolvedTheme } = useTheme();
+function getCredentials(name: string, loginName: string) {
   let credentials = "";
-
-  console.log(name, loginName);
   if (name) {
     const split = name.split(" ");
     if (split) {
@@ -34,7 +20,7 @@ export const Avatar: FC<AvatarProps> = ({
         split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
       credentials = initials;
     } else {
-      return name.charAt(0);
+      credentials = name.charAt(0);
     }
   } else {
     const username = loginName.split("@")[0];
@@ -50,32 +36,51 @@ export const Avatar: FC<AvatarProps> = ({
     credentials = initials;
   }
 
+  return credentials;
+}
+
+export function Avatar({
+  size = "base",
+  name,
+  loginName,
+  imageUrl,
+  shadow,
+}: AvatarProps) {
+  const { resolvedTheme } = useTheme();
+  const credentials = getCredentials(name ?? loginName, loginName);
+
   const color: ColorShade = getColorHash(loginName);
 
-  //   const avatarStyleDark = {
-  //     backgroundColor: color[900],
-  //     color: color[200],
-  //   };
+  const avatarStyleDark = {
+    backgroundColor: color[900],
+    color: color[200],
+  };
 
-  //   const avatarStyleLight = {
-  //     backgroundColor: color[200],
-  //     color: color[900],
-  //   };
+  const avatarStyleLight = {
+    backgroundColor: color[200],
+    color: color[900],
+  };
+
+  //   const [mounted, setMounted] = useState<boolean>(false);
+  //   // useEffect only runs on the client, so now we can safely show the UI
+  //   useEffect(() => {
+  //     setMounted(true);
+  //   }, []);
 
   return (
     <div
       className={`w-full h-full flex-shrink-0 flex justify-center items-center cursor-default pointer-events-none group-focus:outline-none group-focus:ring-2 transition-colors duration-200 dark:group-focus:ring-offset-blue bg-primary-light-500 text-primary-light-contrast-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-500 group-focus:ring-primary-light-200 dark:group-focus:ring-primary-dark-400 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 dark:text-blue rounded-full ${
         shadow ? "shadow" : ""
       } ${
-        size === AvatarSize.LARGE
+        size === "large"
           ? "h-20 w-20 font-normal"
-          : size === AvatarSize.BASE
+          : size === "base"
           ? "w-[38px] h-[38px] font-bold"
-          : size === AvatarSize.SMALL
-          ? "w-[32px] h-[32px] font-bold"
+          : size === "small"
+          ? "w-[32px] h-[32px] font-bold text-[13px]"
           : ""
       }`}
-      //   style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
+      style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
       {imageUrl ? (
         <img
@@ -84,13 +89,11 @@ export const Avatar: FC<AvatarProps> = ({
         />
       ) : (
         <span
-          className={`uppercase ${
-            size === AvatarSize.LARGE ? "text-xl" : "text-13px"
-          }`}
+          className={`uppercase ${size === "large" ? "text-xl" : "text-13px"}`}
         >
           {credentials}
         </span>
       )}
     </div>
   );
-};
+}

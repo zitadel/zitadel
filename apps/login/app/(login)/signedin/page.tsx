@@ -21,16 +21,14 @@ export default async function Page({ searchParams }: { searchParams: any }) {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1>{sessionFactors.factors?.user?.displayName ?? "Password"}</h1>
-      <p className="ztdl-p mb-6 block">Enter your password.</p>
+      <h1>{`Welcome ${sessionFactors.factors?.user?.displayName}`}</h1>
+      <p className="ztdl-p mb-6 block">You are signed in.</p>
 
       <UserAvatar
         loginName={loginName ?? sessionFactors.factors?.user?.loginName}
         displayName={sessionFactors.factors?.user?.displayName}
         showDropdown
       ></UserAvatar>
-
-      <PasswordForm />
     </div>
   );
 }
