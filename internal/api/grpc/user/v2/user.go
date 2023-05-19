@@ -12,6 +12,12 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
+	"github.com/zitadel/zitadel/internal/idp/providers/github"
+	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
+	"github.com/zitadel/zitadel/internal/idp/providers/google"
+	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
+	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -133,24 +139,52 @@ func (s *Server) AddLink(ctx context.Context, req *user.AddLinkRequest) (_ *user
 }
 
 func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
+	id, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetSuccessUrl(), req.GetFailureUrl())
+	if err != nil {
+		return nil, err
+	}
+	identityProvider, err := s.query.IDPTemplateByID(ctx, false, req.GetIdpId(), false)
+	if err != nil {
+		return nil, err
+	}
+	callbackURL := s.idpCallback(ctx)
 
-
-	createEventIntentPers(
-		intentID,
-		req.IdpId,
-		intentToken = ""
-		req.SuccessUrl,
-		req.FailureUrl,
-		userID = "",
-		userInfo = {}
-		)
-
+	var provider idp.Provider
+	switch identityProvider.Type {
+	case domain.IDPTypeOAuth:
+		provider, err = oauth.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeOIDC:
+		provider, err = oidc.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeJWT:
+		//provider, err = jwt.NewFromQueryTemplate(identityProvider, s.idpAlg)
+	case domain.IDPTypeAzureAD:
+		provider, err = azuread.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGitHub:
+		provider, err = github.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGitHubEnterprise:
+		provider, err = github.NewCustomFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGitLab:
+		provider, err = gitlab.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGitLabSelfHosted:
+		provider, err = gitlab.NewCustomFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeGoogle:
+		provider, err = google.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeLDAP:
+		//provider, err = ldap.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
+	case domain.IDPTypeUnspecified:
+		fallthrough
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "USer-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	}
+	if err != nil {
+		return nil, err
+	}
+	session, err := provider.BeginAuth(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 	return &user.StartIdentityProviderFlowResponse{
-		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
-			Sequence:      identityProvider.Sequence,
-			EventDate:     identityProvider.ChangeDate,
-			ResourceOwner: identityProvider.ResourceOwner,
-		}),
+		Details:  object.DomainToDetailsPb(details),
 		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: session.GetAuthURL()},
 	}, nil
 }

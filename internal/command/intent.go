@@ -2,16 +2,14 @@ package command
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/idp"
-	"github.com/zitadel/zitadel/internal/repository/intent"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
+	"github.com/zitadel/zitadel/internal/repository/idpintent"
 )
 
 const (
@@ -21,105 +19,112 @@ const (
 	EndpointExternalLoginCallback = "/login/externalidp/callback"
 )
 
-type AddIntent struct {
-	IDPID      string
-	SuccessURL string
-	FailureURL string
-}
-
-func prepareCreateIntent(a *intent.Aggregate, addIntent *AddIntent) preparation.Validation {
+func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID string, successURL, failureURL string) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if a.ResourceOwner == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-x901m1n", "Errors.ResourceOwnerMissing")
-		}
-		if a.ID == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-ap0mbs", "Errors.Intent.IDMissing")
-		}
-		if addIntent.IDPID == "" {
+		if idpID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.Invalid")
 		}
-		if addIntent.SuccessURL == "" {
+		successURL, err := url.Parse(successURL)
+		if err != nil {
 			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-x8j3bk", "Errors.Intent.Invalid")
 		}
-		if addIntent.FailureURL == "" {
+		failureURL, err := url.Parse(failureURL)
+		if err != nil {
 			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-x8j4bk", "Errors.Intent.Invalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getIntentWriteModel(ctx, a.ID, a.ResourceOwner, filter)
+			err = getIDPIntentWriteModel(ctx, writeModel, filter)
 			if err != nil {
 				return nil, err
 			}
-
-			exists, err := ExistsIDP(ctx, filter, writeModel.IDPID, writeModel.ResourceOwner)
+			exists, err := ExistsIDP(ctx, filter, idpID, writeModel.ResourceOwner)
 			if !exists || err != nil {
 				return nil, errors.ThrowPreconditionFailed(err, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting")
 			}
 			return []eventstore.Command{
-				intent.NewIntentAddedEvent(ctx, &a.Aggregate, addIntent.IDPID, addIntent.SuccessURL, addIntent.FailureURL),
+				idpintent.NewStartedEvent(ctx, writeModel.aggregate, successURL, failureURL, idpID),
 			}, nil
 		}, nil
 	}
 }
 
-func (c *Commands) CreateIntent(ctx context.Context) (*object.Details, error) {
-	identityProvider, err := s.query.IDPTemplateByID(ctx, false, req.IdpId, false)
+func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL string) (string, *domain.ObjectDetails, error) {
+	id, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	baseURL := c.baseURL(ctx)
-	callbackURL := baseURL + EndpointExternalLoginCallback
+	resourceOwner := authz.GetCtxData(ctx).OrgID
+	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
+	if err != nil {
+		return "", nil, err
+	}
 
-	var provider idp.Provider
-	switch identityProvider.Type {
-	case domain.IDPTypeOAuth:
-		provider, err = oauthProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeOIDC:
-		provider, err = oidcProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeJWT:
-		provider, err = jwtProvider(identityProvider, s.idpAlg)
-	case domain.IDPTypeAzureAD:
-		provider, err = azureProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitHub:
-		provider, err = githubProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitHubEnterprise:
-		provider, err = githubEnterpriseProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitLab:
-		provider, err = gitlabProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitLabSelfHosted:
-		provider, err = gitlabSelfHostedProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGoogle:
-		provider, err = googleProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeLDAP:
-		provider, err = ldapProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeUnspecified:
-		fallthrough
-	default:
-		return nil, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented")
-	}
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL))
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	intentID := gen()
-	session, err := provider.BeginAuth(ctx, intentID) //TODO generate state
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
+	err = AppendAndReduce(writeModel, pushedEvents...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, writeModelToObjectDetails(&writeModel.WriteModel), nil
+	//
+	//identityProvider, err := s.query.IDPTemplateByID(ctx, false, req.IdpId, false)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//baseURL := c.baseURL(ctx)
+	//callbackURL := baseURL + EndpointExternalLoginCallback
+	//
+	//var provider idp.Provider
+	//switch identityProvider.Type {
+	//case domain.IDPTypeOAuth:
+	//	provider, err = oauthProvider(identityProvider, callbackURL, s.idpAlg)
+	//case domain.IDPTypeOIDC:
+	//	provider, err = oidcProvider(identityProvider, callbackURL, s.idpAlg)
+	//case domain.IDPTypeJWT:
+	//	provider, err = jwtProvider(identityProvider, s.idpAlg)
+	//case domain.IDPTypeAzureAD:
+	//	provider, err = azureProvider(identityProvider, callbackURL, s.idpAlg)
+	//case domain.IDPTypeGitHub:
+	//	provider, err = githubProvider(identityProvider, callbackURL, s.idpAlg)
+	//case domain.IDPTypeGitHubEnterprise:
+	//	provider, err = githubEnterpriseProvider(identityProvider, callbackURL, s.idpAlg)
+	//case domain.IDPTypeGitLab:
+	//	provider, err = gitlabProvider(identityProvider, callbackURL, s.idpAlg)
+	//case domain.IDPTypeGitLabSelfHosted:
+	//	provider, err = gitlabSelfHostedProvider(identityProvider, callbackURL, s.idpAlg)
+	//case domain.IDPTypeGoogle:
+	//	provider, err = googleProvider(identityProvider, callbackURL, s.idpAlg)
+	//case domain.IDPTypeLDAP:
+	//	provider, err = ldapProvider(identityProvider, callbackURL, s.idpAlg)
+	//case domain.IDPTypeUnspecified:
+	//	fallthrough
+	//default:
+	//	return nil, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	//}
+	//if err != nil {
+	//	return nil, err
+	//}
+	//intentID := gen()
+	//session, err := provider.BeginAuth(ctx, intentID) //TODO generate state
+	//if err != nil {
+	//	return nil, err
+	//}
 }
 
-func getIntentWriteModel(ctx context.Context, id, resourceOwner string, filter preparation.FilterToQueryReducer) (*IntentWriteModel, error) {
-	writeModel := NewIntentWriteModel(id, resourceOwner)
+func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel, filter preparation.FilterToQueryReducer) error {
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if len(events) == 0 {
-		return writeModel, nil
+		return nil
 	}
 	writeModel.AppendEvents(events...)
-	err = writeModel.Reduce()
-	return writeModel, err
-}
-
-func (c *Commands) baseURL(ctx context.Context) string {
-	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), c.externalSecure) + HandlerPrefix
+	return writeModel.Reduce()
 }

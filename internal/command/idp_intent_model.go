@@ -16,9 +16,10 @@ type IDPIntentWriteModel struct {
 	FailureURL *url.URL
 	IDPID      string
 	Token      *crypto.CryptoValue
+	UserID     string
 
-	UserID string
-	State  domain.IDPIntentState
+	State     domain.IDPIntentState
+	aggregate *eventstore.Aggregate
 }
 
 func NewIDPIntentWriteModel(id, resourceOwner string) *IDPIntentWriteModel {
@@ -27,6 +28,7 @@ func NewIDPIntentWriteModel(id, resourceOwner string) *IDPIntentWriteModel {
 			AggregateID:   id,
 			ResourceOwner: resourceOwner,
 		},
+		aggregate: &idpintent.NewAggregate(id, resourceOwner).Aggregate,
 	}
 }
 
@@ -62,11 +64,12 @@ func (wm *IDPIntentWriteModel) reduceStartedEvent(e *idpintent.StartedEvent) {
 	wm.SuccessURL = e.SuccessURL
 	wm.FailureURL = e.FailureURL
 	wm.IDPID = e.IDPID
+	wm.State = domain.IDPIntentStateStarted
 }
 
 func (wm *IDPIntentWriteModel) reduceSucceededEvent(e *idpintent.SucceededEvent) {
-	wm.Token = e.Token
 	wm.UserID = e.UserID
+	wm.State = domain.IDPIntentStateSucceeded
 }
 
 func (wm *IDPIntentWriteModel) reduceFailedEvent(e *idpintent.FailedEvent) {

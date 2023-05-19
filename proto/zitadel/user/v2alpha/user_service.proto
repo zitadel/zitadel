@@ -250,21 +250,21 @@ message StartIdentityProviderFlowRequest{
     }
   ];
   string success_url = 2[
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "URL on which the client should be redirected after a successful login"
+      description: "URL on which the user will be redirected after a successful login"
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"https://custom.com/login/idp/success\"";
     }
   ];
   string failure_url = 3[
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "URL on which the client should be redirected after a failed login"
+      description: "URL on which the user will be redirected after a failed login"
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"https://custom.com/login/idp/fail\"";
     }
   ];
 }
@@ -273,11 +273,8 @@ message StartIdentityProviderFlowResponse{
   zitadel.object.v2alpha.Details details = 1;
   oneof next_step {
     string auth_url = 2[
-      (validate.rules).string = {min_len: 1, max_len: 200},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "URL to which the client should redirect"
-        min_length: 1;
-        max_length: 200;
         example: "\"https://zitadel.cloud/saml/v2/SSO?relayState=login\"";
       }
     ];

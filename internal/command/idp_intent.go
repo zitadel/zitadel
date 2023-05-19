@@ -13,12 +13,15 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	if err != nil {
 		return "", err
 	}
-	cmd := idpintent.NewSucceededEvent(
+	cmd, err := idpintent.NewSucceededEvent(
 		ctx,
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
 		idpUser,
 		userID,
 	)
+	if err != nil {
+		return "", err
+	}
 	_, err = c.eventstore.Push(ctx, cmd)
 	if err != nil {
 		return "", err

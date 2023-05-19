@@ -38,7 +38,7 @@ type Handler struct {
 	queries             *query.Queries
 	parser              *form.Parser
 	encryptionAlgorithm crypto.EncryptionAlgorithm
-	externalSecure      bool
+	callbackURL         func(ctx context.Context) string
 }
 
 type externalIDPCallbackData struct {
@@ -58,7 +58,7 @@ func NewHandler(
 		queries:             queries,
 		parser:              form.NewParser(),
 		encryptionAlgorithm: encryptionAlgorithm,
-		externalSecure:      externalSecure,
+		callbackURL:         CallbackURL(externalSecure),
 	}
 
 	router := mux.NewRouter()
@@ -72,18 +72,26 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	err := h.parser.Parse(r, data)
 	if err != nil {
 		// TODO: ?
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	ctx := r.Context()
 	// get intent
-	i, err := h.commands.GetIntentWriteModel(ctx, data.State, "")
+	intent, err := h.commands.GetIntentWriteModel(ctx, data.State, "")
 	if err != nil {
 		// TODO: ?
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if intent.State != domain.IDPIntentStateStarted {
+		redirectToFailureURL(w, r, intent, errors.ThrowPreconditionFailed(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted"))
+		return
 	}
 	// get idp
-	idpTemplate, err := h.queries.IDPTemplateByID(ctx, false, i.IDPID, false)
+	idpTemplate, err := h.queries.IDPTemplateByID(ctx, false, intent.IDPID, false)
 	if err != nil {
 		// TODO: set failed?
-		redirectToFailureURL(w, r, i, err)
+		redirectToFailureURL(w, r, intent, err)
 		return
 	}
 
@@ -92,35 +100,43 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// on error -> redirect to failed url
 		// TODO: set failed?
-		redirectToFailureURL(w, r, i, err)
+		redirectToFailureURL(w, r, intent, err)
 		return
 	}
 	// on success
 	userID, err := h.checkExternalUser(ctx, idpTemplate.ID, idpUser.GetID())
 	if err != nil {
 		// TODO: ?
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	// create intent token
-	token, err := h.commands.SucceedIDPIntent(ctx, i, idpUser, userID)
+	token, err := h.commands.SucceedIDPIntent(ctx, intent, idpUser, userID)
 	if err != nil {
 		// TODO: ?
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	// redirect to success url with internal user id, intent id, intent token
-	redirectToSuccessURL(w, r, i, token, userID)
+	redirectToSuccessURL(w, r, intent, token, userID)
 }
 
 func redirectToSuccessURL(w http.ResponseWriter, r *http.Request, intent *command.IDPIntentWriteModel, token, userID string) {
-	intent.SuccessURL.Query().Set(paramIntentID, intent.AggregateID)
-	intent.SuccessURL.Query().Set(paramToken, token)
+	queries := intent.SuccessURL.Query()
+	queries.Set(paramIntentID, intent.AggregateID)
+	queries.Set(paramToken, token)
 	if userID != "" {
-		intent.SuccessURL.Query().Set(paramUserID, userID)
+		queries.Set(paramUserID, userID)
 	}
+	intent.SuccessURL.RawQuery = queries.Encode()
 	http.Redirect(w, r, intent.SuccessURL.String(), http.StatusFound)
 }
 
 func redirectToFailureURL(w http.ResponseWriter, r *http.Request, i *command.IDPIntentWriteModel, err error) {
-	i.FailureURL.Query().Set(paramIntentID, i.AggregateID)
-	i.FailureURL.Query().Set(paramError, err.Error())
+	queries := i.FailureURL.Query()
+	queries.Set(paramIntentID, i.AggregateID)
+	queries.Set(paramError, err.Error())
+	i.FailureURL.RawQuery = queries.Encode()
 	http.Redirect(w, r, i.FailureURL.String(), http.StatusFound)
 }
 
@@ -188,8 +204,10 @@ func (h *Handler) fetchIDPUser(w http.ResponseWriter, r *http.Request, identityP
 	return session.FetchUser(r.Context())
 }
 
-func (h *Handler) callbackURL(ctx context.Context) string {
-	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), h.externalSecure) + HandlerPrefix + callbackPath
+func CallbackURL(externalSecure bool) func(ctx context.Context) string {
+	return func(ctx context.Context) string {
+		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + callbackPath
+	}
 }
 
 func (h *Handler) checkExternalUser(ctx context.Context, idpID, externalUserID string) (userID string, err error) {

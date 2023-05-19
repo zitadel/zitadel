@@ -140,33 +140,34 @@ func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id,
 	return instanceWriteModel.State.Exists(), nil
 }
 
-func IDPWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {
-	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
-	events, err := filter(ctx, writeModel.Query())
-	if err != nil {
-		return false, err
-	}
-
-	if len(events) > 0 {
-		writeModel.AppendEvents(events...)
-		if err := writeModel.Reduce(); err != nil {
-			return false, err
-		}
-		return writeModel.State.Exists(), nil
-	}
-
-	instanceWriteModel := NewInstanceIDPRemoveWriteModel(authz.GetInstance(ctx).InstanceID(), id)
-	events, err = filter(ctx, instanceWriteModel.Query())
-	if err != nil {
-		return false, err
-	}
-
-	if len(events) == 0 {
-		return false, nil
-	}
-	instanceWriteModel.AppendEvents(events...)
-	if err := instanceWriteModel.Reduce(); err != nil {
-		return false, err
-	}
-	return instanceWriteModel, nil
-}
+// TODO: required?
+//func IDPWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {
+//	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
+//	events, err := filter(ctx, writeModel.Query())
+//	if err != nil {
+//		return false, err
+//	}
+//
+//	if len(events) > 0 {
+//		writeModel.AppendEvents(events...)
+//		if err := writeModel.Reduce(); err != nil {
+//			return false, err
+//		}
+//		return writeModel.State.Exists(), nil
+//	}
+//
+//	instanceWriteModel := NewInstanceIDPRemoveWriteModel(authz.GetInstance(ctx).InstanceID(), id)
+//	events, err = filter(ctx, instanceWriteModel.Query())
+//	if err != nil {
+//		return false, err
+//	}
+//
+//	if len(events) == 0 {
+//		return false, nil
+//	}
+//	instanceWriteModel.AppendEvents(events...)
+//	if err := instanceWriteModel.Reduce(); err != nil {
+//		return false, err
+//	}
+//	return instanceWriteModel, nil
+//}
