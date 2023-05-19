@@ -72,7 +72,7 @@ export default function RegisterForm({
 
   function submitAndLink(value: Inputs): Promise<boolean | void> {
     return submitRegister(value).then((resp: any) => {
-      return router.push(`/register/success?userid=${resp.userId}`);
+      return router.push(`/verify?userID=${resp.userId}`);
     });
   }
 

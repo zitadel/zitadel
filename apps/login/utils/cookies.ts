@@ -146,16 +146,27 @@ export async function getMostRecentCookieWithLoginname(
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
-    const latest = sessions
-      .filter((cookie) => (loginName ? cookie.loginName === loginName : true))
-      .reduce((prev, current) => {
-        return new Date(prev.changeDate).getTime() >
-          new Date(current.changeDate).getTime()
-          ? prev
-          : current;
-      });
+    console.log("sess", sessions);
+    const filtered = sessions.filter((cookie) => {
+      console.log("filtered", `${cookie.loginName}`, loginName?.toString());
+      return !!loginName ? cookie.loginName === loginName : true;
+    });
 
-    return latest;
+    const latest =
+      filtered && filtered.length
+        ? filtered.reduce((prev, current) => {
+            return new Date(prev.changeDate).getTime() >
+              new Date(current.changeDate).getTime()
+              ? prev
+              : current;
+          })
+        : undefined;
+
+    if (latest) {
+      return latest;
+    } else {
+      return Promise.reject();
+    }
   } else {
     return Promise.reject();
   }

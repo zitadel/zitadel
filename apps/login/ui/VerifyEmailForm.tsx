@@ -28,7 +28,7 @@ export default function VerifyEmailForm({ userId }: Props) {
 
   async function submitCode(values: Inputs) {
     setLoading(true);
-    const res = await fetch("/email/verify", {
+    const res = await fetch("/verifyemail", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

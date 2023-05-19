@@ -4,17 +4,22 @@ import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
 
 async function loadSession(loginName: string) {
-  const recent = await getMostRecentCookieWithLoginname(loginName);
+  try {
+    const recent = await getMostRecentCookieWithLoginname(`${loginName}`);
 
-  return getSession(server, recent.id, recent.token).then(({ session }) => {
-    console.log("ss", session);
-    return session;
-  });
+    return getSession(server, recent.id, recent.token).then(({ session }) => {
+      console.log("ss", session);
+      return session;
+    });
+  } catch (error) {
+    throw new Error("Session could not be loaded!");
+  }
 }
 
 export default async function Page({ searchParams }: { searchParams: any }) {
   const { loginName } = searchParams;
 
+  console.log(loginName);
   const sessionFactors = await loadSession(loginName);
 
   return (

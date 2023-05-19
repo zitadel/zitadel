@@ -2,7 +2,6 @@ import { createSession, getSession, server, setSession } from "#/lib/zitadel";
 import {
   SessionCookie,
   addSessionToCookie,
-  getMostRecentCookieWithLoginname,
   getMostRecentSessionCookie,
   updateSessionCookie,
 } from "#/utils/cookies";

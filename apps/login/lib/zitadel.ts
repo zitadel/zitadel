@@ -136,7 +136,7 @@ export function addHumanUser(
   return mgmt
     .addHumanUser(
       {
-        email: { email, isVerified: false },
+        email: { email },
         username: email,
         profile: { firstName, lastName },
         password: { password },
