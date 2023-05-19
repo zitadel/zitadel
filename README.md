@@ -5,6 +5,7 @@ This is an monorepo containing all typescript/javascript packages and applicatio
 **⚠️ This repo and packages are in alpha state and subject to change ⚠️**
 
 The scope of functionality of this repo and packages is limited and under active development.
+Once the package structure is set and all APIs are fully implemented we'll move this repo to beta state.
 You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute. Questions can be raised in our [Discord Channel](https://discord.gg/erh5Brh7jE) or as an issue in this repo.
 
 ## What's inside?
