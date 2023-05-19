@@ -97,19 +97,6 @@ describe('quotas', () => {
       it('only authenticated requests are limited', () => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
-            cy.intercept(
-              {
-                url: Cypress.config('baseUrl'),
-              },
-              (req) => {
-                req.continue((res) => {
-                  expect(
-                    res.headers.SetCookie,
-                    'Static assets other than the never have a SetCookie header which would disable their caching',
-                  ).to.be.undefined;
-                });
-              },
-            );
             const start = new Date();
             urls.forEach((url) => {
               cy.request({
@@ -154,6 +141,7 @@ describe('quotas', () => {
             // visit upgraded console again
             cy.visit('/users/me');
             cy.get('[data-e2e="top-view-title"]');
+            expectCookieDoesntExist();
             createHumanUser(ctx.api, testUserName);
             expectCookieDoesntExist();
           });
