@@ -28,7 +28,7 @@ These features should be functional for eligible users, but may have some limita
 
 If you encounter issues with an enterprise supported feature and you are eligible for enterprise support services, we will provide a prompt response to the issues you may experience and make our best effort to assist you to find a resolution.
 
-**Partially supported features**
+**Enterprise supported features**
 
 - Database PostgreSQL
 
