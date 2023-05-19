@@ -45,6 +45,10 @@ If you encounter issues with a community supported feature, we encourage you to 
 It's important to note that both Alpha and Beta software can have breaking changes, meaning they are not backward-compatible with previous versions of the software.
 Therefore, it's recommended to use caution when using Alpha and Beta software, and to always back up important data before installing or testing new software versions.
 
+Only features in General Availability will be covered by support services.
+
+We encourage our community to test Alpha and Beta software and provide feedback via our [Discord Chat](https://zitadel.com/chat). 
+
 ### Alpha
 
 The Alpha state is our initial testing phase. 
