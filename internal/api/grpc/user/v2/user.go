@@ -133,46 +133,18 @@ func (s *Server) AddLink(ctx context.Context, req *user.AddLinkRequest) (_ *user
 }
 
 func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
-	identityProvider, err := s.query.IDPTemplateByID(ctx, false, req.IdpId, false)
-	if err != nil {
-		return nil, err
-	}
-	baseURL := s.baseURL(ctx)
-	callbackURL := baseURL + EndpointExternalLoginCallback
-	var provider idp.Provider
-	switch identityProvider.Type {
-	case domain.IDPTypeOAuth:
-		provider, err = oauthProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeOIDC:
-		provider, err = oidcProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeJWT:
-		provider, err = jwtProvider(identityProvider, s.idpAlg)
-	case domain.IDPTypeAzureAD:
-		provider, err = azureProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitHub:
-		provider, err = githubProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitHubEnterprise:
-		provider, err = githubEnterpriseProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitLab:
-		provider, err = gitlabProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitLabSelfHosted:
-		provider, err = gitlabSelfHostedProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGoogle:
-		provider, err = googleProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeLDAP:
-		provider, err = ldapProvider(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeUnspecified:
-		fallthrough
-	default:
-		return nil, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented")
-	}
-	if err != nil {
-		return nil, err
-	}
-	session, err := provider.BeginAuth(ctx, "") //TODO generate state
-	if err != nil {
-		return nil, err
-	}
+
+
+	createEventIntentPers(
+		intentID,
+		req.IdpId,
+		intentToken = ""
+		req.SuccessUrl,
+		req.FailureUrl,
+		userID = "",
+		userInfo = {}
+		)
+
 	return &user.StartIdentityProviderFlowResponse{
 		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
 			Sequence:      identityProvider.Sequence,

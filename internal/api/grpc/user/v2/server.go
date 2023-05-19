@@ -16,18 +16,11 @@ import (
 
 var _ user.UserServiceServer = (*Server)(nil)
 
-const (
-	EndpointLDAPLogin             = "/login/ldap"
-	QueryAuthRequestID            = "authRequestID"
-	EndpointExternalLoginCallback = "/login/externalidp/callback"
-)
-
 type Server struct {
 	user.UnimplementedUserServiceServer
 	command        *command.Commands
 	query          *query.Queries
 	userCodeAlg    crypto.EncryptionAlgorithm
-	idpAlg         crypto.EncryptionAlgorithm
 	handlerPrefix  string
 	externalSecure bool
 }
@@ -40,14 +33,12 @@ func CreateServer(
 	externalSecure bool,
 	handlerPrefix string,
 	userCodeAlg crypto.EncryptionAlgorithm,
-	idpAlg crypto.EncryptionAlgorithm,
 ) *Server {
 	return &Server{
 		command:        command,
 		query:          query,
 		externalSecure: externalSecure,
 		handlerPrefix:  handlerPrefix,
-		idpAlg:         idpAlg,
 		userCodeAlg:    userCodeAlg,
 	}
 }
