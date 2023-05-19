@@ -1,7 +1,7 @@
 package eventstore
 
 import (
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
-type Version repository.Version
+type Version eventstore.AggregateType

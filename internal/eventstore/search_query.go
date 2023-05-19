@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 // SearchQueryBuilder represents the builder for your filter
@@ -49,10 +50,10 @@ const (
 )
 
 // AggregateType is the object name
-type AggregateType repository.AggregateType
+type AggregateType = eventstore.AggregateType
 
 // EventType is the description of the change
-type EventType repository.EventType
+type EventType = eventstore.EventType
 
 // NewSearchQueryBuilder creates a new builder for event filters
 // aggregateTypes must contain at least one aggregate type

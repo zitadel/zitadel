@@ -3,9 +3,11 @@ package repository
 import (
 	"database/sql"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
-//Event represents all information about a manipulation of an aggregate
+// Event represents all information about a manipulation of an aggregate
 type Event struct {
 	//ID is a generated uuid for this event
 	ID string
@@ -61,8 +63,8 @@ type Event struct {
 	InstanceID string
 }
 
-//EventType is the description of the change
-type EventType string
+// EventType is the description of the change
+type EventType = eventstore.EventType
 
-//AggregateType is the object name
-type AggregateType string
+// AggregateType is the object name
+type AggregateType = eventstore.AggregateType

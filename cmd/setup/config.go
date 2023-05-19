@@ -67,6 +67,7 @@ type Steps struct {
 	s9EventstoreIndexes2 *EventstoreIndexesNew
 	CorrectCreationDate  *CorrectCreationDate
 	s11AddEventCreatedAt *AddEventCreatedAt
+	s12ChangeEvents      *ChangeEvents
 }
 
 type encryptionKeyConfig struct {
