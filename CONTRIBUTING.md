@@ -1,38 +1,62 @@
-# Contributing to zitadel-typescript
+# Contributing
+
+:attention: In this CONTRIBUTING.md you read about contributing to this very repository.
+If you want to develop your own login UI, please refer [to the README.md](./README.md).
 
 ## Introduction
 
-Thank you for your interest about how to contribute! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
+Thank you for your interest about how to contribute!
 
-Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclose this kind of issues by contacting [security@zitadel.com](mailto:security@zitadel.com).
+:attention: If you notice a possible **security vulnerability**, please don't hesitate to disclose any concern by contacting [security@zitadel.com](mailto:security@zitadel.com).
+You don't have to be perfectly sure about the nature of the vulnerability.
+We will give them a high priority and figure them out.
 
-The strongest part of a community is the possibility to share thoughts. That's why we try to react as soon as possible to your ideas, thoughts and feedback.
-We love to discuss as much as possible in an open space like in the ZITADEL [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
+We also appreciate all your other ideas, thoughts and feedback and will take care of them as soon as possible.
+We love to discuss in an open space using [GitHub issues](https://github.com/zitadel/typescript/issues),
+[GitHub discussions in the core repo](https://github.com/zitadel/zitadel/discussions)
+or in our [chat on Discord](https://zitadel.com/chat).
+For private discussions,
+you have [more contact options on our Website](https://zitadel.com/contact).
 
-If you want to give an answer or be part of discussions please be kind. Treat others like you want to be treated. Read more about our code of conduct [here](CODE_OF_CONDUCT.md).
+## Pull Requests
 
-## How to contribute
+Please consider the following guidelines when creating a pull request.
 
-Anyone can be a contributor. Either you found a typo, or you have an awesome feature request you could implement, we encourage you to create a Pull Request.
-
-### Pull Requests
-
-- The latest changes are always in `main`, so please make your Pull Request against that branch.
-- Pull Requests should be raised for any change
-- Pull Requests need approval of a ZITADEL core engineer @zitadel/engineers before merging
+- The latest changes are always in `main`, so please make your pull request against that branch.
+- pull requests should be raised for any change
+- üull requests need approval of a ZITADEL core engineer @zitadel/engineers before merging
 - We use ESLint/Prettier for linting/formatting, so please run `pnpm lint:fix` before committing to make resolving conflicts easier (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
-- We encourage you to test your changes, and if you have the opportunity, please make those tests part of the Pull Request
-- If you add new functionality, please provide the corresponding documentation as well and make it part of the Pull Request
+- If you add new functionality, please provide the corresponding documentation as well and make it part of the pull request
+
+## Setting Up The ZITADEL API
+
+If you want to have a one-liner to get you up and running,
+or if you want to develop against a ZITADEL API with the latest features,
+or even add changes to ZITADEL itself at the same time,
+you should develop against your local ZITADEL process.
+However, it might be easier to develop against your ZITADEL Cloud instance
+if you don't have docker installed
+or have limited resources on your local machine.
+
+### Developing Against Your Local ZITADEL Instance
+
+
+
+### Developing Against Your ZITADEL Cloud Instance
+
 
 ### Setting up local environment
 
-A quick guide on how to setup your ZITADEL app locally to work on it and test out any changes:
+This guide assumes you develop against a local ZITADEL instance using docker compose.
+If you want to develop against
+
+A quick guide on how to setup your ZITADEL typescript app locally to work on it and test out any changes:
 
 1. Clone the repo:
 
 ```sh
-git clone https://github.com/zitadel/zitadel-typescript.git
-cd zitadel-typescript
+git clone https://github.com/zitadel/typescript.git
+cd typescript
 ```
 
 3. Install packages. Developing requires Node.js v16:
@@ -61,6 +85,6 @@ pnpm generate
 pnpm dev
 ```
 
-The application will be available on `http://localhost:3000`
+The application is now available at `http://localhost:3000`
 
 That's it! 🎉
