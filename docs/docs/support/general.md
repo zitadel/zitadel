@@ -12,8 +12,14 @@ Also the support may differ depending on your contracts. Read more about it on o
 ### Supported
 
 Supported features are those that are guaranteed to work as intended and are fully tested by our team.
-If you encounter any issues with a fully supported feature, you can contact us, 
-and we will provide prompt resolution to any issues you may experience.
+If you encounter any issues with a supported feature, please contact us by creating a [bug report](https://github.com/zitadel/zitadel/issues/new/choose).
+We will review the issues according to our [product management process](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management).
+
+In case you are eligible to [support services](/docs/legal/support-services) get in touch via one of our support channels and we will provide prompt response to the issues you may experience and make our best effort to assist you to find a resolution.
+
+:::info Security Issues
+Please report any security issues immediately to the indicated address in our [security.txt](https://zitadel.com/.well-known/security.txt)
+:::
 
 ### Enterprise Supported
 
