@@ -49,7 +49,13 @@ Copy `/apps/login/.env` to `/apps/login/.env.local`, and add your instance env v
 cp apps/login/.env apps/login/.env.local
 ```
 
-5. Start the developer application/server:
+5. Generate GRPC stub for the application:
+
+```sh
+pnpm generate
+```
+
+6. Start the developer application/server:
 
 ```sh
 pnpm dev
