@@ -31,6 +31,8 @@ If you encounter issues with an enterprise supported feature and you are eligibl
 **Enterprise supported features**
 
 - Database PostgreSQL
+- LDAP Identity Provider
+- [Terraform Provider](https://github.com/zitadel/terraform-provider-zitadel)
 
 ### Community Supported
 
