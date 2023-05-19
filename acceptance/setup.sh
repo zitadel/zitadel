@@ -21,7 +21,7 @@ TOKEN_RESPONSE=$(curl --request POST \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header "Host: ${AUDIENCE_HOST}" \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
-  --data scope='openid profile email' \
+  --data scope='openid profile email urn:zitadel:iam:org:project:id:zitadel:aud' \
   --data assertion="${JWT}")
 
 # Extract Token
