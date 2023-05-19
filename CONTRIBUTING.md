@@ -336,6 +336,7 @@ Please refer to the [README](./docs/README.md) for more information and local te
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
 - **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
+- **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
 - **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
 ### Docs Pull Request
