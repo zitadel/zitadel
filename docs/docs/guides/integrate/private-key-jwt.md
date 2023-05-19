@@ -92,9 +92,12 @@ curl --request POST \
   --url https://{your_domain}.zitadel.cloud/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
-  --data scope='openid profile email' \
+  --data scope='openid profile email urn:zitadel:iam:org:project:id:zitadel:aud' \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
+
+If you want to authenticate to a specific project instead of the instances default project,
+replace the scope *urn:zitadel:iam:org:project:id:zitadel:aud* above with *urn:zitadel:iam:org:project:id:<your-project-id-here>:aud*.
 
 * `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
