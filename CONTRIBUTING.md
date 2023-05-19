@@ -20,7 +20,7 @@ Anyone can be a contributor. Either you found a typo, or you have an awesome fea
 - The latest changes are always in `main`, so please make your Pull Request against that branch.
 - Pull Requests should be raised for any change
 - Pull Requests need approval of an ZITADEL core engineer @zitadel/engineers before merging
-- We use ESLint/Prettier for linting/formatting, so please run `npm run lint:fix` before committing to make resolving conflicts easier (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
+- We use ESLint/Prettier for linting/formatting, so please run `pnpm lint:fix` before committing to make resolving conflicts easier (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 - We encourage you to test your changes, and if you have the opportunity, please make those tests part of the Pull Request
 - If you add new functionality, please provide the corresponding documentation as well and make it part of the Pull Request
 
