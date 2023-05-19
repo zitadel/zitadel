@@ -7,7 +7,7 @@ title: General
 It's important to note that support may differ depending on the feature, and not all features may be fully supported. 
 We always strive to provide the best support possible for our customers and community,
 but we may not be able to provide immediate or comprehensive support for all features.
-Also the support may differ depending on your contracts. Read more about it on our [Legal page](/docs/legal/)
+Also the support may differ depending on your contracts. Read more about it on our [Legal page](/docs/legal/introduction)
 
 ### Supported
 
@@ -38,6 +38,7 @@ If you encounter issues with an enterprise supported feature and you are eligibl
 
 Community supported features are those that have been developed by our community and may not have undergone extensive testing or support from our team. 
 If you encounter issues with a community supported feature, we encourage you to seek help from our community or other online resources, where other users can provide assistance:
+
 - Join our [Discord Chat](https://zitadel.com/chat)
 - Search [Github Issues](https://github.com/search?q=org%3Azitadel+&type=issues) and report a new issue
 - Search [Github Discussions](https://github.com/search?q=org%3Azitadel+&type=discussions) and open a new discussion as question or idea
@@ -69,4 +70,3 @@ During this phase, support is limited as we focus on testing and bug fixing.
 Generally available features are available to everyone and have the appropriate test coverage to be used for critical tasks.
 The software will be backwards-compatible with previous versions, for exceptions we will publish a [technical advisory](https://zitadel.com/docs/support/technical_advisory).
 Features in General Availability are not marked explicitly.
-
