@@ -2,16 +2,9 @@
 title: Support
 ---
 
-:::caution
-PostgreSQL extension is currently in [Beta](/docs/support/general#beta).
-Beta state will be removed as soon as automated tests are implemented. [Github Issue](https://github.com/zitadel/zitadel/issues/5741)
+:::note
+We describe our [support services](/docs/legal/support-services) and information required in more detail in our legal section. Beware that not all features may be supported by your subscription and consult the [support states](/docs/support/general.md#support-states).
 :::
-
-:::caution
-Be aware that PostgreSQL is only [partially supported](/docs/support/general#partially-supported) by the ZITADEL Team.
-Make sure to read our [Production Guide](./self-hosting/manage/production#prefer-cockroachdb) before you decide to use it.
-:::
-
 In the header you can find a button for the support.
 
 Create a new support request with the following information:
