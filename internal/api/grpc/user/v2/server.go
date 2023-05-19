@@ -1,13 +1,10 @@
 package user
 
 import (
-	"context"
-
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
@@ -18,11 +15,9 @@ var _ user.UserServiceServer = (*Server)(nil)
 
 type Server struct {
 	user.UnimplementedUserServiceServer
-	command        *command.Commands
-	query          *query.Queries
-	userCodeAlg    crypto.EncryptionAlgorithm
-	handlerPrefix  string
-	externalSecure bool
+	command     *command.Commands
+	query       *query.Queries
+	userCodeAlg crypto.EncryptionAlgorithm
 }
 
 type Config struct{}
@@ -30,16 +25,12 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
-	externalSecure bool,
-	handlerPrefix string,
 	userCodeAlg crypto.EncryptionAlgorithm,
 ) *Server {
 	return &Server{
-		command:        command,
-		query:          query,
-		externalSecure: externalSecure,
-		handlerPrefix:  handlerPrefix,
-		userCodeAlg:    userCodeAlg,
+		command:     command,
+		query:       query,
+		userCodeAlg: userCodeAlg,
 	}
 }
 
@@ -61,8 +52,4 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 	return user.RegisterUserServiceHandler
-}
-
-func (s *Server) baseURL(ctx context.Context) string {
-	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure) + s.handlerPrefix
 }
