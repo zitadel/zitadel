@@ -231,7 +231,6 @@ The commands in this section are tested against the following software versions:
 - [Node version v16.17.0](https://nodejs.org/en/download/)
 - [npm version 8.18.0](https://docs.npmjs.com/try-the-latest-stable-version-of-npm)
 - [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)
-- [curl version 7.58.0](https://curl.se/download.html)
 
 <details>
   <summary>Note for WSL2 on Windows 10</summary>
@@ -269,18 +268,17 @@ To allow console access via http://localhost:4200, you have to configure the ZIT
 You can run the local console development server now.
 
 ```bash
-# Console loads its target environment from the file console/src/assets/environment.json.
-# Load it from the backend.
-curl http://localhost:8080/ui/console/assets/environment.json > ./src/assets/environment.json
+# Install npm dependencies
+npm install
 
 # Generate source files from Protos
 npm run generate
 
-# Install npm dependencies
-npm install
-
 # Start the server
 npm start
+
+# If you don't want to develop against http://localhost:8080, you can use another environment
+ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json npm start
 ```
 
 Navigate to http://localhost:4200/.
