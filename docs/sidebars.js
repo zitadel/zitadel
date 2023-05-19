@@ -353,12 +353,12 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Auth API",
-            slug: "/apis/auth",
+            slug: "/apis/resources/auth",
             description:
               "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
 
           },
-          items: require("./docs/apis/auth/sidebar.js"),
+          items: require("./docs/apis/resources/auth/sidebar.js"),
         },
         {
           type: "category",
@@ -366,11 +366,11 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Management API",
-            slug: "/apis/mgmt",
+            slug: "/apis/resources/mgmt",
             description:
               "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
           },
-          items: require("./docs/apis/mgmt/sidebar.js"),
+          items: require("./docs/apis/resources/mgmt/sidebar.js"),
         },
         {
           type: "category",
@@ -378,11 +378,11 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Admin API",
-            slug: "/apis/admin",
+            slug: "/apis/resources/admin",
             description:
               "This API is intended to configure and manage one ZITADEL instance itself.",
           },
-          items: require("./docs/apis/admin/sidebar.js"),
+          items: require("./docs/apis/resources/admin/sidebar.js"),
         },
         {
           type: "category",
@@ -390,13 +390,13 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "System API",
-            slug: "/apis/system",
+            slug: "/apis/resources/system",
             description:
               "This API is intended to manage the different ZITADEL instances within the system.\n" +
               "\n" +
               "Checkout the guide how to access the ZITADEL System API.",
           },
-          items: require("./docs/apis/system/sidebar.js"),
+          items: require("./docs/apis/resources/system/sidebar.js"),
         },
         {
           type: "category",
@@ -404,13 +404,13 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "User Service API (Alpha)",
-            slug: "/apis/user_service",
+            slug: "/apis/resources/user_service",
             description:
               "This API is intended to manage users in a ZITADEL instance.\n"+
               "\n"+
               "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
-          items: require("./docs/apis/user_service/sidebar.js"),
+          items: require("./docs/apis/resources/user_service/sidebar.js"),
         },
         {
           type: "category",
@@ -418,13 +418,13 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Session Service API (Alpha)",
-            slug: "/apis/session_service",
+            slug: "/apis/resources/session_service",
             description:
               "This API is intended to manage sessions in a ZITADEL instance.\n"+
               "\n"+
               "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
-          items: require("./docs/apis/session_service/sidebar.js"),
+          items: require("./docs/apis/resources/session_service/sidebar.js"),
         },
         {
           type: "category",
@@ -432,13 +432,13 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Settings Service API (Alpha)",
-            slug: "/apis/settings_service",
+            slug: "/apis/resources/settings_service",
             description:
               "This API is intended to manage settings in a ZITADEL instance.\n"+
               "\n"+
               "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
-          items: require("./docs/apis/settings_service/sidebar.js"),
+          items: require("./docs/apis/resources/settings_service/sidebar.js"),
         },
         {
           type: "category",

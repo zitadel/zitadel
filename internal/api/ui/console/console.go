@@ -116,15 +116,16 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 			http.Error(w, fmt.Sprintf("unable to template instance management url for console: %v", err), http.StatusInternalServerError)
 			return
 		}
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL)
+		exhausted := limitingAccessInterceptor.Limit(ctx)
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL, exhausted)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return
 		}
-		if limitingAccessInterceptor.Limit(ctx) {
+		if exhausted {
 			limitingAccessInterceptor.SetExhaustedCookie(w, r)
 		} else {
-			limitingAccessInterceptor.DeleteExhaustedCookie(w, r)
+			limitingAccessInterceptor.DeleteExhaustedCookie(w)
 		}
 		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
@@ -154,19 +155,21 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createEnvironmentJSON(api, issuer, clientID, customerPortal, instanceMgmtUrl string) ([]byte, error) {
+func createEnvironmentJSON(api, issuer, clientID, customerPortal, instanceMgmtUrl string, exhausted bool) ([]byte, error) {
 	environment := struct {
 		API                   string `json:"api,omitempty"`
 		Issuer                string `json:"issuer,omitempty"`
 		ClientID              string `json:"clientid,omitempty"`
 		CustomerPortal        string `json:"customer_portal,omitempty"`
 		InstanceManagementURL string `json:"instance_management_url,omitempty"`
+		Exhausted             bool   `json:"exhausted,omitempty"`
 	}{
 		API:                   api,
 		Issuer:                issuer,
 		ClientID:              clientID,
 		CustomerPortal:        customerPortal,
 		InstanceManagementURL: instanceMgmtUrl,
+		Exhausted:             exhausted,
 	}
 	return json.Marshal(environment)
 }
