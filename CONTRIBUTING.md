@@ -40,48 +40,29 @@ or have limited resources on your local machine.
 
 ### Developing Against Your Local ZITADEL Instance
 
-
+```sh
+docker compose --file ./acceptance/docker-compose.yaml run setup
+```
 
 ### Developing Against Your ZITADEL Cloud Instance
 
+Create the file ./apps/login/.env.local with the following content:
+```sh
+ZITADEL_API_URL=<your cloud instance URL here>
+ZITADEL_ORG_ID=<your service accounts organization id here>
+ZITADEL_SERVICE_USER_TOKEN=<your service account personal access token here>
+```
 
 ### Setting up local environment
 
-This guide assumes you develop against a local ZITADEL instance using docker compose.
-If you want to develop against
-
-A quick guide on how to setup your ZITADEL typescript app locally to work on it and test out any changes:
-
-1. Clone the repo:
-
 ```sh
-git clone https://github.com/zitadel/typescript.git
-cd typescript
-```
-
-3. Install packages. Developing requires Node.js v16:
-
-```sh
+# Install dependencies. Developing requires Node.js v16
 pnpm install
-```
 
-4. Populate `.env.local`:
-
-Copy `/apps/login/.env` to `/apps/login/.env.local`, and add your instance env variables for each entry.
-
-```sh
-cp apps/login/.env apps/login/.env.local
-```
-
-5. Generate GRPC stub for the application:
-
-```sh
+# Generate gRPC stubs
 pnpm generate
-```
 
-6. Start the developer application/server:
-
-```sh
+# Start a local development server
 pnpm dev
 ```
 

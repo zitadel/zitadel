@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 KEY=${KEY:-./machinekey/zitadel-admin-sa.json}
 echo "Using key path ${KEY} to the instance admin service account."
@@ -20,7 +20,7 @@ echo "Deferred the Host header ${AUDIENCE_HOST} which will be sent in requests t
 JWT=$(zitadel-tools key2jwt --key ${KEY} --audience ${AUDIENCE})
 echo "Created JWT from Admin service account key ${JWT}"
 
-TOKEN_RESPONSE=$(curl --request POST \
+TOKEN_RESPONSE=$(curl -s --request POST \
   --url ${SERVICE}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header "Host: ${AUDIENCE_HOST}" \
@@ -33,7 +33,7 @@ echo "${TOKEN_RESPONSE}" | jq
 TOKEN=$(echo -n ${TOKEN_RESPONSE} | jq -r '.access_token')
 echo "Extracted access token ${TOKEN}"
 
-ORG_RESPONSE=$(curl --request GET \
+ORG_RESPONSE=$(curl -s --request GET \
   --url ${SERVICE}/admin/v1/orgs/default \
   --header 'Accept: application/json' \
   --header "Authorization: Bearer ${TOKEN}" \
