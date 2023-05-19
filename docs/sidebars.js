@@ -247,7 +247,7 @@ module.exports = {
             label: "Support",
             collapsed: true,
             items: [
-                "support/general",
+                "support/software-release-cycles-support",
                 "support/troubleshooting",
                 {
                     type: "category",
