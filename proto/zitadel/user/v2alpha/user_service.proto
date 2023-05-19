@@ -298,11 +298,11 @@ message AddLinkRequest{
 }
 
 message AddLinkResponse {
-    zitadel.object.v2alpha.Details details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }
 
 message Link {
-  string idp_id = 1[
+  string idp_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "ID of the identity provider"
@@ -311,7 +311,7 @@ message Link {
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
-  string idp_external_id = 2[
+  string idp_external_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "ID of user of the identity provider"
@@ -320,7 +320,7 @@ message Link {
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
-  string display_name = 3[
+  string display_name = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Display name of user of the identity provider"

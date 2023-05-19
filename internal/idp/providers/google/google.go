@@ -3,8 +3,10 @@ package google
 import (
 	openid "github.com/zitadel/oidc/v2/pkg/oidc"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
@@ -28,6 +30,19 @@ func New(clientID, clientSecret, redirectURI string, scopes []string, opts ...oi
 	return &Provider{
 		Provider: rp,
 	}, nil
+}
+
+func NewFromQueryTemplate(template *query.IDPTemplate, callbackURL string, idpAlg crypto.EncryptionAlgorithm) (*Provider, error) {
+	secret, err := crypto.DecryptString(template.GoogleIDPTemplate.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	return New(
+		template.GoogleIDPTemplate.ClientID,
+		secret,
+		callbackURL,
+		template.GoogleIDPTemplate.Scopes,
+	)
 }
 
 var userMapper = func(info *openid.UserInfo) idp.User {

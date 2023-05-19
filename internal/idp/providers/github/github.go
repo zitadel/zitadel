@@ -4,7 +4,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
@@ -45,6 +47,36 @@ func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profil
 	return &Provider{
 		Provider: rp,
 	}, nil
+}
+
+func NewFromQueryTemplate(template *query.IDPTemplate, callbackURL string, idpAlg crypto.EncryptionAlgorithm) (*Provider, error) {
+	secret, err := crypto.DecryptString(template.GitHubIDPTemplate.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	return New(
+		template.GitHubIDPTemplate.ClientID,
+		secret,
+		callbackURL,
+		template.GitHubIDPTemplate.Scopes,
+	)
+}
+
+func NewCustomFromQueryTemplate(template *query.IDPTemplate, callbackURL string, idpAlg crypto.EncryptionAlgorithm) (*Provider, error) {
+	secret, err := crypto.DecryptString(template.GitHubEnterpriseIDPTemplate.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	return NewCustomURL(
+		template.Name,
+		template.GitHubEnterpriseIDPTemplate.ClientID,
+		secret,
+		callbackURL,
+		template.GitHubEnterpriseIDPTemplate.AuthorizationEndpoint,
+		template.GitHubEnterpriseIDPTemplate.TokenEndpoint,
+		template.GitHubEnterpriseIDPTemplate.UserEndpoint,
+		template.GitHubIDPTemplate.Scopes,
+	)
 }
 
 // Provider is the [idp.Provider] implementation for GitHub

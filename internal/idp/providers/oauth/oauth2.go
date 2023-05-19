@@ -7,7 +7,9 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 var _ idp.Provider = (*Provider)(nil)
@@ -78,6 +80,35 @@ func New(config *oauth2.Config, name, userEndpoint string, userMapper func() idp
 		return nil, err
 	}
 	return provider, nil
+}
+
+func NewFromQueryTemplate(
+	template *query.IDPTemplate,
+	callbackURL string,
+	idpAlg crypto.EncryptionAlgorithm,
+) (*Provider, error) {
+	secret, err := crypto.DecryptString(template.OAuthIDPTemplate.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	config := &oauth2.Config{
+		ClientID:     template.OAuthIDPTemplate.ClientID,
+		ClientSecret: secret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  template.OAuthIDPTemplate.AuthorizationEndpoint,
+			TokenURL: template.OAuthIDPTemplate.TokenEndpoint,
+		},
+		RedirectURL: callbackURL,
+		Scopes:      template.OAuthIDPTemplate.Scopes,
+	}
+	return New(
+		config,
+		template.Name,
+		template.OAuthIDPTemplate.UserEndpoint,
+		func() idp.User {
+			return NewUserMapper(template.OAuthIDPTemplate.IDAttribute)
+		},
+	)
 }
 
 // Name implements the [idp.Provider] interface
