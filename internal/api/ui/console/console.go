@@ -125,7 +125,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 		if exhausted {
 			limitingAccessInterceptor.SetExhaustedCookie(w, r)
 		} else {
-			limitingAccessInterceptor.DeleteExhaustedCookie(w, r)
+			limitingAccessInterceptor.DeleteExhaustedCookie(w)
 		}
 		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
