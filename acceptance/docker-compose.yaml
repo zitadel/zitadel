@@ -34,13 +34,16 @@ services:
       - zitadel
 
   setup:
+    user: '$UID'
     container_name: setup
     build: .
     environment:
       KEY: /key/zitadel-admin-sa.json
       SERVICE: http://zitadel:8080
+      WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
     volumes:
     - "./machinekey:/key"
+    - "../apps/login:/apps/login"
     depends_on:
       wait_for_zitadel:
         condition: 'service_completed_successfully'
