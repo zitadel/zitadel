@@ -247,9 +247,14 @@
   },
   "ERRORS": {
     "REQUIRED": "Compilare questo campo.",
+    "ATLEASTONE": "Inserisci almeno un valore.",
     "TOKENINVALID": {
       "TITLE": "Il tuo Access Token \u00e8 scaduto.",
       "DESCRIPTION": "Clicca il pulsante per richiedere una nuova sessione."
+    },
+    "EXHAUSTED": {
+      "TITLE": "La quota di richieste autenticate è esaurita.",
+      "DESCRIPTION": "Cancellare o aumentare il limite per questa istanza ZITADEL."
     },
     "INVALID_FORMAT": "Il formato non è valido.",
     "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail.",
@@ -1020,6 +1025,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1218,6 +1224,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1702,6 +1709,7 @@
       "2": "inattivo"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
       "2": "Consumers"
@@ -1963,7 +1971,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2054,6 +2063,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "Ottenere i token direttamente dall'endpoint di autorizzazione"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autorizza il dispositivo su un computer o uno smartphone."
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "La tua impostazione non corrisponde a nessun'altra opzione."
@@ -2080,6 +2093,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

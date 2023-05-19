@@ -247,9 +247,14 @@
   },
   "ERRORS": {
     "REQUIRED": "Remplis ce champ s'il te plaît.",
+    "ATLEASTONE": "Indiquez au moins une valeur.",
     "TOKENINVALID": {
       "TITLE": "Votre jeton d'autorisation a expiré.",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Ton quota de demandes authentifiées est épuisé.",
+      "DESCRIPTION": "Supprimez ou augmentez la limite de cette instance ZITADEL."
     },
     "INVALID_FORMAT": "Le format n'est pas valide",
     "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",
@@ -1019,6 +1024,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1217,6 +1223,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1701,6 +1708,7 @@
       "2": "inactif"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
       "2": "Consumers"
@@ -1962,7 +1970,8 @@
       "GRANT": {
         "0": "Code d'autorisation",
         "1": "Implicite",
-        "2": "Rafraîchir le jeton"
+        "2": "Rafraîchir le jeton",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2041,6 +2050,10 @@
         "TITLE": "Implicite",
         "DESCRIPTION": "Obtenir les jetons directement à partir du point final d'autorisation"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoriser l'appareil sur un ordinateur ou un smartphone."
+      },
       "CUSTOM": {
         "TITLE": "Personnalisé",
         "DESCRIPTION": "Votre paramètre ne correspond à aucune autre option."
@@ -2067,6 +2080,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

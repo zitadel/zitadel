@@ -12,27 +12,30 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/reflection"
 
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type API struct {
-	port          uint16
-	grpcServer    *grpc.Server
-	verifier      *internal_authz.TokenVerifier
-	health        healthCheck
-	router        *mux.Router
-	http1HostName string
-	grpcGateway   *server.Gateway
-	healthServer  *health.Server
+	port              uint16
+	grpcServer        *grpc.Server
+	verifier          *internal_authz.TokenVerifier
+	health            healthCheck
+	router            *mux.Router
+	http1HostName     string
+	grpcGateway       *server.Gateway
+	healthServer      *health.Server
+	accessInterceptor *http_mw.AccessInterceptor
+	queries           *query.Queries
 }
 
 type healthCheck interface {
@@ -47,18 +50,20 @@ func New(
 	verifier *internal_authz.TokenVerifier,
 	authZ internal_authz.Config,
 	tlsConfig *tls.Config, http2HostName, http1HostName string,
-	accessSvc *logstore.Service,
+	accessInterceptor *http_mw.AccessInterceptor,
 ) (_ *API, err error) {
 	api := &API{
-		port:          port,
-		verifier:      verifier,
-		health:        queries,
-		router:        router,
-		http1HostName: http1HostName,
+		port:              port,
+		verifier:          verifier,
+		health:            queries,
+		router:            router,
+		http1HostName:     http1HostName,
+		queries:           queries,
+		accessInterceptor: accessInterceptor,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessSvc)
-	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName)
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessInterceptor.AccessService())
+	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName, accessInterceptor)
 	if err != nil {
 		return nil, err
 	}
@@ -67,6 +72,7 @@ func New(
 	api.RegisterHandlerOnPrefix("/debug", api.healthHandler())
 	api.router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
 
+	reflection.Register(api.grpcServer)
 	return api, nil
 }
 
@@ -76,7 +82,14 @@ func New(
 // used for v1 api (system, admin, mgmt, auth)
 func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayPrefix) error {
 	grpcServer.RegisterServer(a.grpcServer)
-	handler, prefix, err := server.CreateGatewayWithPrefix(ctx, grpcServer, a.port, a.http1HostName)
+	handler, prefix, err := server.CreateGatewayWithPrefix(
+		ctx,
+		grpcServer,
+		a.port,
+		a.http1HostName,
+		a.accessInterceptor,
+		a.queries,
+	)
 	if err != nil {
 		return err
 	}
@@ -99,6 +112,12 @@ func (a *API) RegisterService(ctx context.Context, grpcServer server.Server) err
 	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
 	a.healthServer.SetServingStatus(grpcServer.MethodPrefix(), healthpb.HealthCheckResponse_SERVING)
 	return nil
+}
+
+// HandleFunc allows registering a [http.HandlerFunc] on an exact
+// path, instead of prefix like RegisterHandlerOnPrefix.
+func (a *API) HandleFunc(path string, f http.HandlerFunc) {
+	a.router.HandleFunc(path, f)
 }
 
 // RegisterHandlerOnPrefix registers a http handler on a path prefix
@@ -161,6 +180,7 @@ func (a *API) routeGRPCWeb() {
 			return true
 		}),
 	)
+	a.router.Use(http_mw.RobotsTagHandler)
 	a.router.NewRoute().
 		Methods(http.MethodPost, http.MethodOptions).
 		MatcherFunc(

@@ -1,0 +1,8 @@
+When you use an LDAP provider in ZITADEL, this is the login process:
+
+1. ZITADEL tries to connect to the LDAP server with or without TLS depending on the configuration
+2. If the connection fails, the next server in the list will be used to try again.
+3. ZITADEL tries a bind with the BindDN and BindPassword to check if it's possible to proceed
+4. ZITADEL does a SearchQuery to find the UserDN with the provided configuration of base, filters and objectClasses
+5. ZITADEL tries a bind with the provided loginname and password
+6. LDAP attributes get mapped to ZITADEL attributes as provided by the configuration

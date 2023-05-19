@@ -1,6 +1,5 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
@@ -10,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { Subject, Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -41,11 +40,13 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { EnvironmentService } from 'src/app/services/environment.service';
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
   CUSTOM_METHOD,
+  DEVICE_CODE_METHOD,
   getAuthMethodFromPartialConfig,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
@@ -78,8 +79,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public projectId: string = '';
   public app?: App.AsObject;
 
-  public environmentMap: { [key: string]: string } = {};
-  public wellKnownMap: { [key: string]: string } = {};
+  public environmentMap$ = this.envSvc.env.pipe(
+    map((env) => {
+      return {
+        issuer: env.issuer,
+        adminServiceUrl: `${env.api}/admin/v1`,
+        mgmtServiceUrl: `${env.api}/management/v1`,
+        authServiceUrl: `${env.api}/auth/v1`,
+      };
+    }),
+  );
+  public wellKnownMap$ = this.envSvc.wellKnown;
 
   public oidcResponseTypes: OIDCResponseType[] = [
     OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
@@ -89,6 +99,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public oidcGrantTypes: OIDCGrantType[] = [
     OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
     OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT,
+    OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
     OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
   ];
   public oidcAppTypes: OIDCAppType[] = [
@@ -136,6 +147,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public currentSetting: string | undefined = this.settingsList[0].id;
 
   constructor(
+    private envSvc: EnvironmentService,
     public translate: TranslateService,
     private route: ActivatedRoute,
     private toast: ToastService,
@@ -146,7 +158,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private authService: GrpcAuthService,
     private router: Router,
     private breadcrumbService: BreadcrumbService,
-    private http: HttpClient,
   ) {
     this.oidcForm = this.fb.group({
       devMode: [{ value: false, disabled: true }],
@@ -173,25 +184,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.samlForm = this.fb.group({
       metadataUrl: [{ value: '', disabled: true }],
       metadataXml: [{ value: '', disabled: true }],
-    });
-
-    this.http.get('./assets/environment.json').subscribe((env: any) => {
-      this.environmentMap = {
-        issuer: env.issuer,
-        adminServiceUrl: `${env.api}/admin/v1`,
-        mgmtServiceUrl: `${env.api}/management/v1`,
-        authServiceUrl: `${env.api}/auth/v1`,
-      };
-
-      this.http.get(`${env.issuer}/.well-known/openid-configuration`).subscribe((wellKnown: any) => {
-        this.wellKnownMap = {
-          authorization_endpoint: wellKnown.authorization_endpoint,
-          end_session_endpoint: wellKnown.end_session_endpoint,
-          introspection_endpoint: wellKnown.introspection_endpoint,
-          token_endpoint: wellKnown.token_endpoint,
-          userinfo_endpoint: wellKnown.userinfo_endpoint,
-        };
-      });
     });
   }
 
@@ -274,13 +266,24 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               if (this.app.oidcConfig) {
                 this.getAuthMethodOptions('OIDC');
 
-                this.settingsList = [
-                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                  { id: 'token', i18nKey: 'APP.TOKEN' },
-                  { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
-                  { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
-                  { id: 'urls', i18nKey: 'APP.URLS' },
-                ];
+                if (
+                  this.app.oidcConfig.grantTypesList.length === 1 &&
+                  this.app.oidcConfig.grantTypesList[0] === OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE
+                ) {
+                  this.settingsList = [
+                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                    { id: 'token', i18nKey: 'APP.TOKEN' },
+                    { id: 'urls', i18nKey: 'APP.URLS' },
+                  ];
+                } else {
+                  this.settingsList = [
+                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                    { id: 'token', i18nKey: 'APP.TOKEN' },
+                    { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
+                    { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
+                    { id: 'urls', i18nKey: 'APP.URLS' },
+                  ];
+                }
 
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
                 this.currentAuthMethod = this.initialAuthMethod;
@@ -381,7 +384,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     if (type === 'OIDC') {
       switch (this.app?.oidcConfig?.appType) {
         case OIDCAppType.OIDC_APP_TYPE_NATIVE:
-          this.authMethods = [PKCE_METHOD, CUSTOM_METHOD];
+          this.authMethods = [PKCE_METHOD, DEVICE_CODE_METHOD, CUSTOM_METHOD];
           break;
         case OIDCAppType.OIDC_APP_TYPE_WEB:
           this.authMethods = [PKCE_METHOD, CODE_METHOD, PK_JWT_METHOD, POST_METHOD];

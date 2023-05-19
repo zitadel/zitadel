@@ -81,6 +81,7 @@ Errors:
       NotChanged: Email non cambiata
       Empty: Email è vuota
       IDMissing: Email ID mancante
+      InvalidURLTemplate: Il modello di URL non è valido
     Phone:
       NotFound: Telefono non trovato
       Invalid: Il telefono non è valido
@@ -469,6 +470,11 @@ Errors:
     Execution:
       StorageFailed: Il salvataggio del registro delle azioni nel database non è riuscito
       ScanFailed: La query dei secondi delle azioni utilizzate non è riuscita
+  Session:
+    NotExisting: La sessione non esiste
+    Terminated: Sessione già terminata
+    Token:
+      Invalid: Il token della sessione non è valido
 
 AggregateTypes:
   action: Azione
