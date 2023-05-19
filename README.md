@@ -2,6 +2,11 @@
 
 This is an monorepo containing all typescript/javascript packages and applications for ZITADEL. Versioning and package publishing is handled by [Changesets](https://github.com/changesets/changesets) and fully automated with GitHub Actions.
 
+**⚠️ This repo and packages are in alpha state and subject to change ⚠️**
+
+The scope of functionality of this repo and packages is limited and under active development.
+You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute. Questions can be raised in our [Discord Channel](https://discord.gg/erh5Brh7jE) or as an issue in this repo.
+
 ## What's inside?
 
 This Turborepo includes the following:
