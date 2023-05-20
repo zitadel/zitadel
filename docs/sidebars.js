@@ -310,6 +310,7 @@ module.exports = {
       label: "Support",
       collapsed: true,
       items: [
+        "support/software-release-cycles-support",
         "support/troubleshooting",
         {
           type: 'category',
@@ -536,8 +537,6 @@ module.exports = {
         "self-hosting/manage/quotas"
       ],
     },
-  ],
-  support: [
   ],
   legal: [
     {
