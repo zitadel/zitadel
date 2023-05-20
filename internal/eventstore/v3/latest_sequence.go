@@ -6,6 +6,8 @@ import (
 	_ "embed"
 	"fmt"
 	"strings"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 type latestSequence struct {
@@ -23,9 +25,12 @@ func latestSequences(ctx context.Context, tx *sql.Tx, commands []Command) ([]*la
 		if searchSequenceByCommand(sequences, command) != nil {
 			continue
 		}
-		aggregate := command.Aggregate()
+
+		if command.Aggregate().InstanceID == "" {
+			command.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
+		}
 		sequences = append(sequences, &latestSequence{
-			aggregate: &aggregate,
+			aggregate: command.Aggregate(),
 		})
 	}
 

@@ -6,7 +6,7 @@ import (
 )
 
 type action interface {
-	Aggregate() Aggregate
+	Aggregate() *Aggregate
 
 	// Creator is the userid of the user which created the action
 	Creator() string
@@ -39,6 +39,9 @@ type Event interface {
 	// in the value pointed to by ptr. If ptr is nil or not a pointer,
 	// Unmarshal returns an error
 	Unmarshal(ptr any) error
+
+	// deprecated: only use for migration
+	DataAsBytes() []byte
 }
 
 // AggregateType is the object name
@@ -90,8 +93,8 @@ func (e *event) EditorUser() string {
 }
 
 // Aggregate implements [Event]
-func (e *event) Aggregate() Aggregate {
-	return *e.aggregate
+func (e *event) Aggregate() *Aggregate {
+	return e.aggregate
 }
 
 // Creator implements [Event]
@@ -124,7 +127,7 @@ func (e *event) Unmarshal(ptr any) error {
 	return json.Unmarshal(e.payload, ptr)
 }
 
-// DataAsBytes implements [eventstore.Event]
+// DataAsBytes implements [Event]
 func (e *event) DataAsBytes() []byte {
 	return e.payload
 }

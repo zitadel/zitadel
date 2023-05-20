@@ -14,7 +14,7 @@ import (
 
 type Event struct {
 	Editor       *EventEditor
-	Aggregate    eventstore.Aggregate
+	Aggregate    *eventstore.Aggregate
 	Sequence     uint64
 	CreationDate time.Time
 	Type         string

@@ -843,7 +843,7 @@ func TestSearchQuery_matches(t *testing.T) {
 			name:  "wrong aggregate type",
 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateTypes("searched"),
 			event: &BaseEvent{
-				aggregate: Aggregate{
+				aggregate: &Aggregate{
 					Type: "found",
 				},
 			},
@@ -853,7 +853,7 @@ func TestSearchQuery_matches(t *testing.T) {
 			name:  "wrong aggregate id",
 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateIDs("1", "10", "100"),
 			event: &BaseEvent{
-				aggregate: Aggregate{
+				aggregate: &Aggregate{
 					ID: "2",
 				},
 			},
@@ -873,7 +873,7 @@ func TestSearchQuery_matches(t *testing.T) {
 				SequenceLess(100).SequenceGreater(50).AggregateIDs("2").AggregateTypes("actual").EventTypes("event.actual.type"),
 			event: &BaseEvent{
 				sequence: 55,
-				aggregate: Aggregate{
+				aggregate: &Aggregate{
 					ID:   "2",
 					Type: "actual",
 				},
@@ -886,7 +886,7 @@ func TestSearchQuery_matches(t *testing.T) {
 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery(),
 			event: &BaseEvent{
 				sequence: 55,
-				aggregate: Aggregate{
+				aggregate: &Aggregate{
 					ID:   "2",
 					Type: "actual",
 				},
@@ -937,7 +937,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 			builder: NewSearchQueryBuilder(ColumnsEvent).ResourceOwner("query"),
 			args: args{
 				event: &BaseEvent{
-					aggregate: Aggregate{
+					aggregate: &Aggregate{
 						ResourceOwner: "ro",
 					},
 				},
@@ -950,7 +950,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 			builder: NewSearchQueryBuilder(ColumnsEvent).InstanceID("instance"),
 			args: args{
 				event: &BaseEvent{
-					aggregate: Aggregate{
+					aggregate: &Aggregate{
 						InstanceID: "different instance",
 					},
 				},
@@ -983,7 +983,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 				Builder(),
 			args: args{
 				event: &BaseEvent{
-					aggregate: Aggregate{
+					aggregate: &Aggregate{
 						ResourceOwner: "ro",
 						InstanceID:    "instance",
 					},
@@ -998,7 +998,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 			builder: NewSearchQueryBuilder(ColumnsEvent),
 			args: args{
 				event: &BaseEvent{
-					aggregate: Aggregate{
+					aggregate: &Aggregate{
 						ResourceOwner: "ro",
 						InstanceID:    "instance",
 					},
@@ -1013,7 +1013,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 			builder: NewSearchQueryBuilder(ColumnsEvent),
 			args: args{
 				event: &BaseEvent{
-					aggregate: Aggregate{
+					aggregate: &Aggregate{
 						ResourceOwner: "ro",
 					},
 					sequence: 1001,
@@ -1027,7 +1027,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 			builder: NewSearchQueryBuilder(ColumnsEvent),
 			args: args{
 				event: &BaseEvent{
-					aggregate: Aggregate{
+					aggregate: &Aggregate{
 						InstanceID: "instance",
 					},
 					sequence: 1001,

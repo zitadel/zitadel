@@ -510,6 +510,6 @@ func getGrantedOrgOfGrantedProject(ctx context.Context, es *eventstore.Eventstor
 	return grantAddedEvent.GrantedOrgID, nil
 }
 
-func setUserGrantContext(event eventstore.Aggregate) context.Context {
-	return authz.WithInstanceID(context.Background(), event.InstanceID)
+func setUserGrantContext(aggregate *eventstore.Aggregate) context.Context {
+	return authz.WithInstanceID(context.Background(), aggregate.InstanceID)
 }

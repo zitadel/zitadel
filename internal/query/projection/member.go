@@ -186,6 +186,6 @@ func multiReduceMemberUserOwnerRemoved(e eventstore.Event, opts ...reduceMemberO
 	)
 }
 
-func setMemberContext(event eventstore.Aggregate) context.Context {
-	return authz.WithInstanceID(context.Background(), event.InstanceID)
+func setMemberContext(aggregate *eventstore.Aggregate) context.Context {
+	return authz.WithInstanceID(context.Background(), aggregate.InstanceID)
 }

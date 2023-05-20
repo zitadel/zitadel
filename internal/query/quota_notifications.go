@@ -38,7 +38,7 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, config *quota.Ad
 				dueNotifications,
 				quota.NewNotificationDueEvent(
 					ctx,
-					&aggregate,
+					aggregate,
 					config.Unit,
 					notification.ID,
 					notification.CallURL,
@@ -53,7 +53,7 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, config *quota.Ad
 	return dueNotifications, nil
 }
 
-func (q *Queries) getQuotaNotificationsReadModel(ctx context.Context, aggregate eventstore.Aggregate, periodStart time.Time) (*quotaNotificationsReadModel, error) {
+func (q *Queries) getQuotaNotificationsReadModel(ctx context.Context, aggregate *eventstore.Aggregate, periodStart time.Time) (*quotaNotificationsReadModel, error) {
 	wm := newQuotaNotificationsReadModel(aggregate.ID, aggregate.InstanceID, aggregate.ResourceOwner, periodStart)
 	return wm, q.eventstore.FilterToQueryReducer(ctx, wm)
 }

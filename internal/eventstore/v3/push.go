@@ -39,9 +39,6 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 
 	for i, command := range commands {
 		sequence := searchSequenceByCommand(sequences, command)
-		if sequence == nil {
-			fmt.Println("asdf")
-		}
 		sequence.sequence++
 
 		events[i], err = commandToEvent(sequence, command)

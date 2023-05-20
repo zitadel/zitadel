@@ -1,11 +1,13 @@
 package eventstore
 
 import (
+	"database/sql"
 	"encoding/json"
 	"sync"
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/eventstore/v3"
@@ -61,12 +63,18 @@ func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventT
 	return sub
 }
 
-func notify(events []eventstore.Event) {
-	go v1.Notify(MapEventsToV1Events(events))
+func (es *Eventstore) notify(events []eventstore.Event) {
+	repoEvents := mapEventsToRepo(events)
+	eventReaders, err := es.mapEvents(repoEvents)
+	if err != nil {
+		logging.WithError(err).Debug("unable to map events")
+		return
+	}
+
+	go v1.Notify(MapEventsToV1Events(eventReaders))
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
-	for _, event := range events {
-		e := event.(Event)
+	for _, event := range eventReaders {
 		subs, ok := subscriptions[event.Aggregate().Type]
 		if !ok {
 			continue
@@ -75,13 +83,13 @@ func notify(events []eventstore.Event) {
 			eventTypes := sub.types[event.Aggregate().Type]
 			//subscription for all events
 			if len(eventTypes) == 0 {
-				sub.Events <- e
+				sub.Events <- event
 				continue
 			}
 			//subscription for certain events
 			for _, eventType := range eventTypes {
 				if event.Type() == eventType {
-					sub.Events <- e
+					sub.Events <- event
 					break
 				}
 			}
@@ -109,6 +117,29 @@ func (s *Subscription) Unsubscribe() {
 	if ok {
 		close(s.Events)
 	}
+}
+
+func mapEventsToRepo(events []eventstore.Event) []*repository.Event {
+	repoEvents := make([]*repository.Event, len(events))
+	for i, event := range events {
+		repoEvents[i] = &repository.Event{
+			Sequence:      event.Sequence(),
+			CreationDate:  event.CreatedAt(),
+			Type:          event.Type(),
+			EditorService: "zitadel",
+			EditorUser:    event.Creator(),
+			Version:       repository.Version(event.Aggregate().Version),
+			AggregateID:   event.Aggregate().ID,
+			AggregateType: event.Aggregate().Type,
+			ResourceOwner: sql.NullString{
+				String: event.Aggregate().ResourceOwner,
+				Valid:  true,
+			},
+			InstanceID: event.Aggregate().InstanceID,
+			Data:       event.DataAsBytes(),
+		}
+	}
+	return repoEvents
 }
 
 func MapEventsToV1Events(events []eventstore.Event) []*models.Event {

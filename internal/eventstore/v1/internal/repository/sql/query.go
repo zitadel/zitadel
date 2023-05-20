@@ -137,13 +137,15 @@ func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interf
 			var previousSequence Sequence
 			data := make(Data, 0)
 
+			var service sql.NullString
+
 			err = row(
 				&event.CreationDate,
 				&event.Type,
 				&event.Sequence,
 				&previousSequence,
 				&data,
-				&event.EditorService,
+				&service,
 				&event.EditorUser,
 				&event.ResourceOwner,
 				&event.InstanceID,
@@ -157,6 +159,7 @@ func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interf
 				return z_errors.ThrowInternal(err, "SQL-J0hFS", "unable to scan row")
 			}
 
+			event.EditorService = service.String
 			event.PreviousSequence = uint64(previousSequence)
 
 			event.Data = make([]byte, len(data))

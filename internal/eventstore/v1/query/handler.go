@@ -43,12 +43,13 @@ func ReduceEvent(ctx context.Context, handler Handler, event *models.Event) {
 				"stack", string(debug.Stack()),
 				"sequence", event.Sequence,
 				"instance", event.InstanceID,
+				"view", handler.ViewModel(),
 			).Error("reduce panicked")
 		}
 	}()
 	currentSequence, err := handler.CurrentSequence(ctx, event.InstanceID)
 	if err != nil {
-		logging.WithError(err).Warn("unable to get current sequence")
+		logging.WithFields("view", handler.ViewModel()).WithError(err).Warn("unable to get current sequence")
 		return
 	}
 
@@ -62,7 +63,7 @@ func ReduceEvent(ctx context.Context, handler Handler, event *models.Event) {
 
 	unprocessedEvents, err := handler.Eventstore().FilterEvents(ctx, searchQuery)
 	if err != nil {
-		logging.WithFields("sequence", event.Sequence).Warn("filter failed")
+		logging.WithFields("sequence", event.Sequence, "view", handler.ViewModel()).Warn("filter failed")
 		return
 	}
 
@@ -82,12 +83,12 @@ func ReduceEvent(ctx context.Context, handler Handler, event *models.Event) {
 		}
 
 		err = handler.Reduce(unprocessedEvent)
-		logging.WithFields("sequence", unprocessedEvent.Sequence).OnError(err).Warn("reduce failed")
+		logging.WithFields("sequence", unprocessedEvent.Sequence, "view", handler.ViewModel()).OnError(err).Warn("reduce failed")
 	}
 	if len(unprocessedEvents) == eventLimit {
-		logging.WithFields("sequence", event.Sequence).Warn("didnt process event")
+		logging.WithFields("sequence", event.Sequence, "view", handler.ViewModel()).Warn("didnt process event")
 		return
 	}
 	err = handler.Reduce(event)
-	logging.WithFields("sequence", event.Sequence).OnError(err).Warn("reduce failed")
+	logging.WithFields("sequence", event.Sequence, "view", handler.ViewModel()).OnError(err).Warn("reduce failed")
 }

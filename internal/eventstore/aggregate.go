@@ -45,7 +45,7 @@ func AggregateFromWriteModel(
 // Aggregate is the basic implementation of Aggregater
 type Aggregate = eventstore.Aggregate
 
-func isAggreagteTypes(a eventstore.Aggregate, types ...AggregateType) bool {
+func isAggreagteTypes(a *eventstore.Aggregate, types ...AggregateType) bool {
 	for _, typ := range types {
 		if a.Type == typ {
 			return true
@@ -54,7 +54,7 @@ func isAggreagteTypes(a eventstore.Aggregate, types ...AggregateType) bool {
 	return false
 }
 
-func isAggregateIDs(a eventstore.Aggregate, ids ...string) bool {
+func isAggregateIDs(a *eventstore.Aggregate, ids ...string) bool {
 	for _, id := range ids {
 		if a.ID == id {
 			return true

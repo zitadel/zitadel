@@ -39,8 +39,8 @@ func (e *testEvent) Sequence() uint64 {
 	return e.sequence
 }
 
-func (e *testEvent) Aggregate() eventstore.Aggregate {
-	return eventstore.Aggregate{
+func (e *testEvent) Aggregate() *eventstore.Aggregate {
+	return &eventstore.Aggregate{
 		Type:       e.aggregateType,
 		InstanceID: e.instanceID,
 	}

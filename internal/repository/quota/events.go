@@ -192,7 +192,7 @@ func NewNotifiedEvent(
 	return &NotifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			&aggregate,
+			aggregate,
 			NotifiedEventType,
 		),
 		ID:         id,

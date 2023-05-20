@@ -17,7 +17,7 @@ import (
 type BaseEvent struct {
 	EventType EventType `json:"-"`
 
-	aggregate Aggregate
+	aggregate *Aggregate
 
 	sequence                      uint64
 	creationDate                  time.Time
@@ -66,7 +66,7 @@ func (e *BaseEvent) CreatedAt() time.Time {
 }
 
 // Aggregate represents the metadata of the event's aggregate
-func (e *BaseEvent) Aggregate() Aggregate {
+func (e *BaseEvent) Aggregate() *Aggregate {
 	return e.aggregate
 }
 
@@ -96,7 +96,7 @@ func (e *BaseEvent) Unmarshal(ptr any) error {
 // BaseEventFromRepo maps a stored event to a BaseEvent
 func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 	return &BaseEvent{
-		aggregate: Aggregate{
+		aggregate: &Aggregate{
 			ID:            event.AggregateID,
 			Type:          event.AggregateType,
 			ResourceOwner: event.ResourceOwner.String,
@@ -119,7 +119,7 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 // afterwards the resource owner of the first previous events is taken
 func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventType) *BaseEvent {
 	return &BaseEvent{
-		aggregate: Aggregate(*aggregate),
+		aggregate: (*Aggregate)(aggregate),
 		User:      authz.GetCtxData(ctx).UserID,
 		Service:   service.FromContext(ctx),
 		EventType: typ,

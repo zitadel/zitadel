@@ -64,12 +64,7 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]eventstore.E
 		return nil, err
 	}
 
-	// eventReaders, err := es.mapEvents(events)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	go notify(events)
+	go es.notify(events)
 	return events, nil
 }
 

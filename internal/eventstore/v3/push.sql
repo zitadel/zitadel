@@ -11,4 +11,4 @@ INSERT INTO eventstore.events (
     , event_sequence
 ) VALUES
     %s
-RETURNING creation_date;
+RETURNING created_at;
