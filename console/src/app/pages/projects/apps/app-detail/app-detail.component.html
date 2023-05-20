@@ -331,11 +331,24 @@
               </div>
             </cnsl-info-section>
 
+            <mat-checkbox
+              *ngIf="skipNativeAppSuccessPage && appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+              class="full-width"
+              style="margin-top: 1.5rem"
+              [formControl]="skipNativeAppSuccessPage"
+              color="primary"
+            >
+              {{ 'APP.OIDC.SKIPNATIVEAPPSUCCESSPAGE' | translate }}</mat-checkbox
+            >
+            <cnsl-info-section *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE" class="full-width app-desc">
+              <span>{{ 'APP.OIDC.SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION' | translate }}</span>
+            </cnsl-info-section>
+
             <cnsl-redirect-uris
               *ngIf="appType?.value !== undefined"
               class="redirect-section"
               [disabled]="!canWrite"
-              [devMode]="devMode?.value"
+              [devMode]="!!devMode?.value"
               [(ngModel)]="redirectUrisList"
               title="{{ 'APP.OIDC.REDIRECT' | translate }}"
               [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
@@ -346,7 +359,7 @@
               *ngIf="appType?.value !== undefined"
               class="redirect-section"
               [disabled]="!canWrite"
-              [devMode]="devMode?.value"
+              [devMode]="!!devMode?.value"
               [(ngModel)]="postLogoutRedirectUrisList"
               title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
               [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
@@ -384,11 +397,11 @@
         </ng-container>
 
         <ng-container *ngIf="currentSetting === 'urls'">
-          <cnsl-card title=" {{ 'APP.URLS' | translate }}">
-            <cnsl-info-section *ngIf="environmentMap?.issuer">
+          <cnsl-card title=" {{ 'APP.URLS' | translate }}" *ngIf="environmentMap$ | async as environmentMap">
+            <cnsl-info-section *ngIf="environmentMap.issuer">
               <div
                 [innerHtml]="
-                  'APP.OIDC.WELLKNOWN' | translate : { url: environmentMap.issuer + '/.well-known/openid-configuration' }
+                  'APP.OIDC.WELLKNOWN' | translate : { url: environmentMap['issuer'] + '/.well-known/openid-configuration' }
                 "
               ></div>
             </cnsl-info-section>
@@ -413,7 +426,7 @@
             </div>
 
             <div class="app-info-row">
-              <div class="app-info-wrapper" *ngFor="let wellKnownV of wellKnownMap | keyvalue">
+              <div class="app-info-wrapper" *ngFor="let wellKnownV of wellKnownMap$ | async | keyvalue">
                 <p class="app-info-row-title cnsl-secondary-text">{{ wellKnownV.key }}</p>
                 <div class="app-copy-row">
                   <div *ngIf="wellKnownV.value" class="environment">

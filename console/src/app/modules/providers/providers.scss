@@ -1,5 +1,8 @@
+@use '@angular/material' as mat;
+
 @mixin identity-provider-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
+  $background: map-get($theme, background);
 
   .identity-provider-desc {
     font-size: 14px;
@@ -36,9 +39,21 @@
       }
     }
 
+    .update-secret-checkbox {
+      margin: 0.5rem 0 0 0;
+    }
+
     .formfield {
       display: block;
       max-width: 400px;
+
+      &.pwd {
+        display: none;
+      }
+
+      &.pwd.show {
+        display: block;
+      }
 
       .name-hint {
         font-size: 12px;
@@ -57,6 +72,10 @@
       @media only screen and (max-width: 450px) {
         max-width: none;
       }
+    }
+
+    .string-list-component-wrapper {
+      max-width: 400px;
     }
 
     .identity-provider-content {

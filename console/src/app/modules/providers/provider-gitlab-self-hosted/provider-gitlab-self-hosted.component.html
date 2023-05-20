@@ -30,9 +30,14 @@
           <input cnslInput formControlName="clientId" />
         </cnsl-form-field>
 
-        <mat-checkbox *ngIf="provider" [(ngModel)]="updateClientSecret" [ngModelOptions]="{ standalone: true }">{{
-          'IDP.UPDATECLIENTSECRET' | translate
-        }}</mat-checkbox>
+        <mat-checkbox
+          class="update-secret-checkbox"
+          *ngIf="provider"
+          [(ngModel)]="updateClientSecret"
+          [ngModelOptions]="{ standalone: true }"
+          >{{ 'IDP.UPDATECLIENTSECRET' | translate }}</mat-checkbox
+        >
+
         <cnsl-form-field *ngIf="!provider || (provider && updateClientSecret)" class="formfield">
           <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
           <input cnslInput formControlName="clientSecret" />

@@ -247,9 +247,14 @@
   },
   "ERRORS": {
     "REQUIRED": "Proszę wypełnić to pole.",
+    "ATLEASTONE": "Podaj co najmniej jedną wartość.",
     "TOKENINVALID": {
       "TITLE": "Twój token autoryzacji wygasł.",
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Twój limit uwierzytelnionych wniosków został wyczerpany.",
+      "DESCRIPTION": "Usuń lub zwiększ limit dla tej instancji ZITADEL."
     },
     "INVALID_FORMAT": "Format jest nieprawidłowy.",
     "NOTANEMAIL": "Podana wartość nie jest adresem e-mail.",
@@ -1019,6 +1024,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1217,6 +1223,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1701,9 +1708,10 @@
       "2": "nieaktywny"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "Rodzaj najemcy",
     "AZUREADTENANTID": "Identyfikator najemcy",
@@ -1938,6 +1946,8 @@
       "REGENERATESECRET": "Odtwórz sekret klienta",
       "DEVMODE": "Tryb rozwoju",
       "DEVMODEDESC": "Uwaga: przy włączonym trybie rozwoju adresy URI przekierowania nie będą sprawdzane.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Pomiń stronę sukcesu po zalogowaniu",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Pomiń stronę sukcesu po zalogowaniu dla tej Natywny aplikację",
       "REDIRECT": "Adresy URI przekierowania",
       "REDIRECTSECTION": "Adresy URI przekierowania",
       "POSTLOGOUTREDIRECT": "Adresy URI po wylogowaniu",
@@ -1960,7 +1970,8 @@
       "GRANT": {
         "0": "Kod autoryzacyjny",
         "1": "Implicite",
-        "2": "Token odświeżający"
+        "2": "Token odświeżający",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Podstawowy",
@@ -2051,6 +2062,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "Pobierz tokeny bezpośrednio z punktu autoryzacyjnego"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoryzuj urządzenie na komputerze lub smartfonie."
+      },
       "CUSTOM": {
         "TITLE": "Niestandardowy",
         "DESCRIPTION": "Twoje ustawienie nie odpowiada żadnej innej opcji."
@@ -2077,6 +2092,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

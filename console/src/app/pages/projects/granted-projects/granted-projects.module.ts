@@ -9,7 +9,6 @@ import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/mat
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
-import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { MatSortModule } from '@angular/material/sort';
 import { TranslateModule } from '@ngx-translate/core';
@@ -51,7 +50,6 @@ import { GrantedProjectsRoutingModule } from './granted-projects-routing.module'
     MatIconModule,
     MatSelectModule,
     MatButtonModule,
-    MatTabsModule,
     MatProgressSpinnerModule,
     MetaLayoutModule,
     MatProgressBarModule,

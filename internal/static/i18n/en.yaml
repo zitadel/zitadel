@@ -81,6 +81,7 @@ Errors:
       NotChanged: Email not changed
       Empty: Email is empty
       IDMissing: Email ID is missing
+      InvalidURLTemplate: URL Template is invalid
     Phone:
       NotFound: Phone not found
       Invalid: Phone is invalid
@@ -105,7 +106,7 @@ Errors:
     WrongType: Not allowed for this user type
     NotAllowedToLink: User is not allowed to link with external login provider
     Username:
-      AlreadyExists:  Username already taken
+      AlreadyExists: Username already taken
       Reserved: Username is already taken
       Empty: Username is empty
     Code:
@@ -120,14 +121,14 @@ Errors:
       NotSet: User has not set a password
     PasswordComplexityPolicy:
       NotFound: Password policy not found
-      MinLength: Password is to short
+      MinLength: Password is too short
       MinLengthNotAllowed: Given minimum length is not allowed
       HasLower: Password must contain lower case
       HasUpper: Password must contain upper case
       HasNumber: Password must contain number
       HasSymbol: Password must contain symbol
     ExternalIDP:
-      Invalid: Externer IDP invalid
+      Invalid: External IDP invalid
       IDPConfigNotExisting: IDP provider invalid for this organization
       NotAllowed: External IDP not allowed on this organization
       MinimumExternalIDPNeeded: At least one IDP must be added
@@ -469,7 +470,11 @@ Errors:
     Execution:
       StorageFailed: Storing action execution log to database failed
       ScanFailed: Querying usage for action execution seconds failed
-
+  Session:
+    NotExisting: Session does not exist
+    Terminated: Session already terminated
+    Token:
+      Invalid: Session Token is invalid
 
 AggregateTypes:
   action: Action
@@ -557,10 +562,10 @@ EventTypes:
         check:
           succeeded: External login succeeded
       externalidp:
-        added: Externer IDP added
-        removed: Externer IDP removed
+        added: External IDP added
+        removed: External IDP removed
         cascade:
-          removed: Externer IDP cascade removed
+          removed: External IDP cascade removed
       phone:
         changed: Phone number changed
         verified: Phone number verified
@@ -929,7 +934,7 @@ EventTypes:
       jwt:
         config:
           added: JWT configuration to identity provider added
-          changed: JWT configuration from identity provider remvoed
+          changed: JWT configuration from identity provider removed
     customtext:
       set: Text was set
       removed: Text was removed
@@ -1061,7 +1066,7 @@ EventTypes:
         changed: Label policy changed
         font:
           added: Font added to label policy
-          removed: Font remvoed from label policy
+          removed: Font removed from label policy
         icon:
           added: Icon added to label policy
           removed: Icon removed from label policy
@@ -1089,8 +1094,8 @@ EventTypes:
           added: Multifactor added to login policy
           removed: Multifactor removed from login policy
         secondfactor:
-          added: Secondfactor added to login policy
-          removed: Secondfactor removed from login policy
+          added: Second factor added to login policy
+          removed: Second factor removed from login policy
       password:
         age:
           added: Password age policy added

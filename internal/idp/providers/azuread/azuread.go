@@ -16,6 +16,8 @@ const (
 	authURLTemplate  string = "https://login.microsoftonline.com/%s/oauth2/v2.0/authorize"
 	tokenURLTemplate string = "https://login.microsoftonline.com/%s/oauth2/v2.0/token"
 	userinfoURL      string = "https://graph.microsoft.com/v1.0/me"
+
+	ScopeUserRead string = "User.Read"
 )
 
 // TenantType are the well known tenant types to scope the users that can authenticate. TenantType is not an
@@ -99,7 +101,7 @@ func New(name, clientID, clientSecret, redirectURI string, scopes []string, opts
 }
 
 func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes []string) *oauth2.Config {
-	c := &oauth2.Config{
+	return &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: secret,
 		RedirectURL:  callbackURL,
@@ -107,13 +109,34 @@ func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes [
 			AuthURL:  fmt.Sprintf(authURLTemplate, tenant),
 			TokenURL: fmt.Sprintf(tokenURLTemplate, tenant),
 		},
-		Scopes: []string{oidc.ScopeOpenID},
+		Scopes: ensureMinimalScope(scopes),
 	}
-	if len(scopes) > 0 {
-		c.Scopes = scopes
-	}
+}
 
-	return c
+// ensureMinimalScope ensures that at least openid and `User.Read` ist set
+// if none is provided it will request `openid profile email phone User.Read`
+func ensureMinimalScope(scopes []string) []string {
+	if len(scopes) == 0 {
+		return []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopePhone, ScopeUserRead}
+	}
+	var openIDSet, userReadSet bool
+	for _, scope := range scopes {
+		if scope == oidc.ScopeOpenID {
+			openIDSet = true
+			continue
+		}
+		if scope == ScopeUserRead {
+			userReadSet = true
+			continue
+		}
+	}
+	if !openIDSet {
+		scopes = append(scopes, oidc.ScopeOpenID)
+	}
+	if !userReadSet {
+		scopes = append(scopes, ScopeUserRead)
+	}
+	return scopes
 }
 
 // User represents the structure return on the userinfo endpoint and implements the [idp.User] interface

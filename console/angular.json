@@ -22,6 +22,7 @@
             "main": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets", "src/manifest.webmanifest"],
             "styles": ["src/styles.scss"],
             "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],
@@ -33,59 +34,25 @@
               "@angular/common/locales/de",
               "codemirror/mode/javascript/javascript",
               "codemirror/mode/xml/xml",
-              "src/app/proto/generated/zitadel/admin_pb",
-              "src/app/proto/generated/zitadel/org_pb",
-              "src/app/proto/generated/zitadel/management_pb",
-              "src/app/proto/generated/zitadel/user_pb",
-              "src/app/proto/generated/**",
-              "google-protobuf/google/protobuf/empty_pb",
               "file-saver",
-              "qrcode"
-            ],
-            "vendorChunk": true,
-            "extractLicenses": false,
-            "buildOptimizer": false,
-            "sourceMap": true,
-            "optimization": {
-              "scripts": true,
-              "fonts": {
-                "inline": true
-              },
-              "styles": {
-                "minify": true,
-                "inlineCritical": false
-              }
-            },
-            "namedChunks": true
+              "qrcode",
+              "codemirror"
+            ]
           },
           "configurations": {
             "production": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
               "optimization": {
-                "scripts": true,
                 "fonts": {
                   "inline": false
                 },
                 "styles": {
-                  "minify": true,
                   "inlineCritical": false
                 }
               },
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "7mb",
+                  "maximumWarning": "6mb",
                   "maximumError": "7mb"
                 },
                 {
@@ -94,16 +61,21 @@
                   "maximumError": "10kb"
                 }
               ],
-              "serviceWorker": false,
-              "ngswConfigPath": "ngsw-config.json"
+              "outputHashing": "all"
             },
-            "development": {}
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {},
           "configurations": {
             "production": {
               "browserTarget": "console:build:production"
@@ -123,13 +95,12 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "src/test.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "assets": ["src/favicon.ico", "src/assets", "src/manifest.webmanifest"],
-            "styles": ["./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css", "src/styles.scss"],
-            "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"]
+            "inlineStyleLanguage": "scss",
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
+            "scripts": []
           }
         },
         "lint": {
@@ -137,35 +108,12 @@
           "options": {
             "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "console:serve:production"
-            },
-            "development": {
-              "devServerTarget": "console:serve:development"
-            }
-          },
-          "defaultConfiguration": "development"
         }
       }
     }
   },
   "cli": {
-    "analytics": "2b4e8e6c-f053-4562-b7a6-00c6c06a6791",
+    "analytics": false,
     "schematicCollections": ["@angular-eslint/schematics"]
-  },
-  "schematics": {
-    "@angular-eslint/schematics:application": {
-      "setParserOptionsProject": true
-    },
-    "@angular-eslint/schematics:library": {
-      "setParserOptionsProject": true
-    }
   }
 }

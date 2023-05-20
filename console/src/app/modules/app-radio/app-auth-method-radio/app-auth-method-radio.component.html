@@ -30,19 +30,23 @@
       <span class="fill-space"></span>
       <div class="app-specs cnsl-secondary-text">
         <div class="row" *ngIf="isOIDC && method && method.responseType !== undefined">
-          <span>{{ 'APP.OIDC.RESPONSETYPE' | translate }}</span>
+          <span class="row-entry">{{ 'APP.OIDC.RESPONSETYPE' | translate }}</span>
           <span>{{ 'APP.OIDC.RESPONSE.' + method.responseType.toString() | translate }}</span>
         </div>
         <div class="row" *ngIf="isOIDC && method.grantType !== undefined">
-          <span>{{ 'APP.GRANT' | translate }}</span>
-          <span>{{ 'APP.OIDC.GRANT.' + method.grantType.toString() | translate }}</span>
+          <span class="row-entry">{{ 'APP.GRANT' | translate }}</span>
+          <span
+            ><span class="space" *ngFor="let grant of method.grantType">{{
+              'APP.OIDC.GRANT.' + grant.toString() | translate
+            }}</span></span
+          >
         </div>
         <div class="row" *ngIf="isOIDC && method.authMethod !== undefined">
-          <span>{{ 'APP.AUTHMETHOD' | translate }}</span>
+          <span class="row-entry">{{ 'APP.AUTHMETHOD' | translate }}</span>
           <span>{{ 'APP.OIDC.AUTHMETHOD.' + method.authMethod.toString() | translate }}</span>
         </div>
         <div class="row" *ngIf="!isOIDC && method.apiAuthMethod !== undefined">
-          <span>{{ 'APP.AUTHMETHOD' | translate }}</span>
+          <span class="row-entry">{{ 'APP.AUTHMETHOD' | translate }}</span>
           <span>{{ 'APP.API.AUTHMETHOD.' + method.apiAuthMethod.toString() | translate }}</span>
         </div>
       </div>
