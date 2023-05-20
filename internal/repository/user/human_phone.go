@@ -28,7 +28,7 @@ type HumanPhoneChangedEvent struct {
 	PhoneNumber domain.PhoneNumber `json:"phone,omitempty"`
 }
 
-func (e *HumanPhoneChangedEvent) Data() interface{} {
+func (e *HumanPhoneChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -63,7 +63,7 @@ type HumanPhoneRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanPhoneRemovedEvent) Data() interface{} {
+func (e *HumanPhoneRemovedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -93,7 +93,7 @@ type HumanPhoneVerifiedEvent struct {
 	IsPhoneVerified bool `json:"-"`
 }
 
-func (e *HumanPhoneVerifiedEvent) Data() interface{} {
+func (e *HumanPhoneVerifiedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -122,7 +122,7 @@ type HumanPhoneVerificationFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanPhoneVerificationFailedEvent) Data() interface{} {
+func (e *HumanPhoneVerificationFailedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -153,7 +153,7 @@ type HumanPhoneCodeAddedEvent struct {
 	Expiry time.Duration       `json:"expiry,omitempty"`
 }
 
-func (e *HumanPhoneCodeAddedEvent) Data() interface{} {
+func (e *HumanPhoneCodeAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -194,7 +194,7 @@ type HumanPhoneCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanPhoneCodeSentEvent) Data() interface{} {
+func (e *HumanPhoneCodeSentEvent) Payload() interface{} {
 	return e
 }
 

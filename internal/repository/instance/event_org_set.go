@@ -20,7 +20,7 @@ type DefaultOrgSetEvent struct {
 	OrgID string `json:"orgId"`
 }
 
-func (e *DefaultOrgSetEvent) Data() interface{} {
+func (e *DefaultOrgSetEvent) Payload() interface{} {
 	return e
 }
 

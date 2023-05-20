@@ -40,7 +40,7 @@ type OrgAddedEvent struct {
 	Name string `json:"name,omitempty"`
 }
 
-func (e *OrgAddedEvent) Data() interface{} {
+func (e *OrgAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -78,7 +78,7 @@ type OrgChangedEvent struct {
 	oldName string `json:"-"`
 }
 
-func (e *OrgChangedEvent) Data() interface{} {
+func (e *OrgChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -117,7 +117,7 @@ type OrgDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *OrgDeactivatedEvent) Data() interface{} {
+func (e *OrgDeactivatedEvent) Payload() interface{} {
 	return e
 }
 
@@ -145,7 +145,7 @@ type OrgReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *OrgReactivatedEvent) Data() interface{} {
+func (e *OrgReactivatedEvent) Payload() interface{} {
 	return e
 }
 
@@ -179,7 +179,7 @@ type OrgRemovedEvent struct {
 	samlEntityIDs        []string
 }
 
-func (e *OrgRemovedEvent) Data() interface{} {
+func (e *OrgRemovedEvent) Payload() interface{} {
 	return nil
 }
 

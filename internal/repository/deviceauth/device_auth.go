@@ -31,7 +31,7 @@ func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *AddedEvent) Data() any {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -65,7 +65,7 @@ func (e *ApprovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *ApprovedEvent) Data() any {
+func (e *ApprovedEvent) Payload() any {
 	return e
 }
 
@@ -95,7 +95,7 @@ func (e *CanceledEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *CanceledEvent) Data() any {
+func (e *CanceledEvent) Payload() any {
 	return e
 }
 
@@ -119,7 +119,7 @@ func (e *RemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *RemovedEvent) Data() any {
+func (e *RemovedEvent) Payload() any {
 	return e
 }
 

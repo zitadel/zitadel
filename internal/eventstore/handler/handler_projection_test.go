@@ -1045,7 +1045,7 @@ func newTestEvent(id, description string, data func() interface{}) *testEvent {
 	}
 }
 
-func (e *testEvent) Data() interface{} {
+func (e *testEvent) Payload() interface{} {
 	if e.data == nil {
 		return nil
 	}

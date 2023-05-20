@@ -59,10 +59,15 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []Command
 		}
 	}
 
-	_, err := tx.ExecContext(ctx, fmt.Sprintf(deleteConstraintStmt, strings.Join(deletePlaceholders, " OR ")), deleteArgs...)
-	if err != nil {
+	if len(deletePlaceholders) > 0 {
+		_, err := tx.ExecContext(ctx, fmt.Sprintf(deleteConstraintStmt, strings.Join(deletePlaceholders, " OR ")), deleteArgs...)
+		if err != nil {
+			return err
+		}
+	}
+	if len(addPlaceholders) > 0 {
+		_, err := tx.ExecContext(ctx, fmt.Sprintf(addConstraintStmt, strings.Join(addPlaceholders, " OR ")), addArgs...)
 		return err
 	}
-	_, err = tx.ExecContext(ctx, fmt.Sprintf(addConstraintStmt, strings.Join(addPlaceholders, " OR ")), addArgs...)
-	return err
+	return nil
 }

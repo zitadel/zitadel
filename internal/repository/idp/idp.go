@@ -74,7 +74,7 @@ func NewRemovedEvent(
 	}
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Payload() interface{} {
 	return e
 }
 

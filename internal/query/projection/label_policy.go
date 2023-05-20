@@ -244,8 +244,8 @@ func (p *labelPolicyProjection) reduceAdded(event eventstore.Event) (*handler.St
 	return crdb.NewCreateStatement(
 		&policyEvent,
 		[]handler.Column{
-			handler.NewCol(LabelPolicyCreationDateCol, policyEvent.CreationDate()),
-			handler.NewCol(LabelPolicyChangeDateCol, policyEvent.CreationDate()),
+			handler.NewCol(LabelPolicyCreationDateCol, policyEvent.CreatedAt()),
+			handler.NewCol(LabelPolicyChangeDateCol, policyEvent.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, policyEvent.Sequence()),
 			handler.NewCol(LabelPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCol(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
@@ -277,7 +277,7 @@ func (p *labelPolicyProjection) reduceChanged(event eventstore.Event) (*handler.
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyChangedEventType, instance.LabelPolicyChangedEventType})
 	}
 	cols := []handler.Column{
-		handler.NewCol(LabelPolicyChangeDateCol, policyEvent.CreationDate()),
+		handler.NewCol(LabelPolicyChangeDateCol, policyEvent.CreatedAt()),
 		handler.NewCol(LabelPolicySequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.PrimaryColor != nil {
@@ -351,7 +351,7 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyStateCol, nil),
 		},
 		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(LabelPolicyStateCol, domain.LabelPolicyStateActive),
 			handler.NewCol(LabelPolicyCreationDateCol, nil),
@@ -427,7 +427,7 @@ func (p *labelPolicyProjection) reduceLogoAdded(event eventstore.Event) (*handle
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			storeKey,
 		},
@@ -456,7 +456,7 @@ func (p *labelPolicyProjection) reduceLogoRemoved(event eventstore.Event) (*hand
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(col, nil),
 		},
@@ -485,7 +485,7 @@ func (p *labelPolicyProjection) reduceIconAdded(event eventstore.Event) (*handle
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			storeKey,
 		},
@@ -514,7 +514,7 @@ func (p *labelPolicyProjection) reduceIconRemoved(event eventstore.Event) (*hand
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(col, nil),
 		},
@@ -539,7 +539,7 @@ func (p *labelPolicyProjection) reduceFontAdded(event eventstore.Event) (*handle
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			storeKey,
 		},
@@ -564,7 +564,7 @@ func (p *labelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*hand
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(col, nil),
 		},
@@ -586,7 +586,7 @@ func (p *labelPolicyProjection) reduceAssetsRemoved(event eventstore.Event) (*ha
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(LabelPolicyLightLogoURLCol, nil),
 			handler.NewCol(LabelPolicyLightIconURLCol, nil),
@@ -610,7 +610,7 @@ func (p *labelPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(LabelPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(LabelPolicyChangeDateCol, e.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, e.Sequence()),
 			handler.NewCol(LabelPolicyOwnerRemovedCol, true),
 		},

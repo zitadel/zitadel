@@ -24,7 +24,7 @@ type JWTConfigAddedEvent struct {
 	HeaderName   string `json:"headerName,omitempty"`
 }
 
-func (e *JWTConfigAddedEvent) Data() interface{} {
+func (e *JWTConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -74,7 +74,7 @@ type JWTConfigChangedEvent struct {
 	HeaderName   *string `json:"headerName,omitempty"`
 }
 
-func (e *JWTConfigChangedEvent) Data() interface{} {
+func (e *JWTConfigChangedEvent) Payload() interface{} {
 	return e
 }
 

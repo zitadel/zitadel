@@ -24,7 +24,7 @@ type SAMLConfigAddedEvent struct {
 	MetadataURL string `json:"metadata_url,omitempty"`
 }
 
-func (e *SAMLConfigAddedEvent) Data() interface{} {
+func (e *SAMLConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -89,7 +89,7 @@ type SAMLConfigChangedEvent struct {
 	oldEntityID string
 }
 
-func (e *SAMLConfigChangedEvent) Data() interface{} {
+func (e *SAMLConfigChangedEvent) Payload() interface{} {
 	return e
 }
 

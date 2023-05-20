@@ -21,7 +21,7 @@ type AddedCertificateEvent struct {
 	Certificate *Key `json:"certificate"`
 }
 
-func (e *AddedCertificateEvent) Data() interface{} {
+func (e *AddedCertificateEvent) Payload() interface{} {
 	return e
 }
 

@@ -46,7 +46,7 @@ func NewAzureADIDPAddedEvent(
 	}
 }
 
-func (e *AzureADIDPAddedEvent) Data() interface{} {
+func (e *AzureADIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -142,7 +142,7 @@ func ChangeAzureADIsEmailVerified(isEmailVerified bool) func(*AzureADIDPChangedE
 	}
 }
 
-func (e *AzureADIDPChangedEvent) Data() interface{} {
+func (e *AzureADIDPChangedEvent) Payload() interface{} {
 	return e
 }
 

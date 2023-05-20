@@ -1,10 +1,14 @@
 package eventstore
 
 import (
+	"encoding/json"
 	"sync"
+
+	"github.com/zitadel/logging"
 
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 var (
@@ -17,7 +21,7 @@ type Subscription struct {
 	types  map[AggregateType][]EventType
 }
 
-//SubscribeAggregates subscribes for all events on the given aggregates
+// SubscribeAggregates subscribes for all events on the given aggregates
 func SubscribeAggregates(eventQueue chan Event, aggregates ...AggregateType) *Subscription {
 	types := make(map[AggregateType][]EventType, len(aggregates))
 	for _, aggregate := range aggregates {
@@ -38,7 +42,7 @@ func SubscribeAggregates(eventQueue chan Event, aggregates ...AggregateType) *Su
 	return sub
 }
 
-//SubscribeEventTypes subscribes for the given event types
+// SubscribeEventTypes subscribes for the given event types
 // if no event types are provided the subscription is for all events of the aggregate
 func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventType) *Subscription {
 	aggregates := make([]AggregateType, len(types))
@@ -57,11 +61,12 @@ func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventT
 	return sub
 }
 
-func notify(events []Event) {
+func notify(events []eventstore.Event) {
 	go v1.Notify(MapEventsToV1Events(events))
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
 	for _, event := range events {
+		e := event.(Event)
 		subs, ok := subscriptions[event.Aggregate().Type]
 		if !ok {
 			continue
@@ -70,13 +75,13 @@ func notify(events []Event) {
 			eventTypes := sub.types[event.Aggregate().Type]
 			//subscription for all events
 			if len(eventTypes) == 0 {
-				sub.Events <- event
+				sub.Events <- e
 				continue
 			}
 			//subscription for certain events
 			for _, eventType := range eventTypes {
 				if event.Type() == eventType {
-					sub.Events <- event
+					sub.Events <- e
 					break
 				}
 			}
@@ -106,7 +111,7 @@ func (s *Subscription) Unsubscribe() {
 	}
 }
 
-func MapEventsToV1Events(events []Event) []*models.Event {
+func MapEventsToV1Events(events []eventstore.Event) []*models.Event {
 	v1Events := make([]*models.Event, len(events))
 	for i, event := range events {
 		v1Events[i] = mapEventToV1Event(event)
@@ -114,17 +119,23 @@ func MapEventsToV1Events(events []Event) []*models.Event {
 	return v1Events
 }
 
-func mapEventToV1Event(event Event) *models.Event {
+func mapEventToV1Event(event eventstore.Event) *models.Event {
+	payload := make(map[string]any)
+	err := event.Unmarshal(&payload)
+	logging.OnError(err).Debug("unmarshal failed")
+	data, err := json.Marshal(payload)
+	logging.OnError(err).Debug("marshal failed")
+
 	return &models.Event{
 		Sequence:      event.Sequence(),
-		CreationDate:  event.CreationDate(),
+		CreationDate:  event.CreatedAt(),
 		Type:          models.EventType(event.Type()),
 		AggregateType: models.AggregateType(event.Aggregate().Type),
 		AggregateID:   event.Aggregate().ID,
 		ResourceOwner: event.Aggregate().ResourceOwner,
 		InstanceID:    event.Aggregate().InstanceID,
-		EditorService: event.EditorService(),
-		EditorUser:    event.EditorUser(),
-		Data:          event.DataAsBytes(),
+		EditorService: "zitadel",
+		EditorUser:    event.Creator(),
+		Data:          data,
 	}
 }

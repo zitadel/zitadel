@@ -43,7 +43,7 @@ type GrantAddedEvent struct {
 	RoleKeys     []string `json:"roleKeys,omitempty"`
 }
 
-func (e *GrantAddedEvent) Data() interface{} {
+func (e *GrantAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -90,7 +90,7 @@ type GrantChangedEvent struct {
 	RoleKeys []string `json:"roleKeys,omitempty"`
 }
 
-func (e *GrantChangedEvent) Data() interface{} {
+func (e *GrantChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -135,7 +135,7 @@ type GrantCascadeChangedEvent struct {
 	RoleKeys []string `json:"roleKeys,omitempty"`
 }
 
-func (e *GrantCascadeChangedEvent) Data() interface{} {
+func (e *GrantCascadeChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -179,7 +179,7 @@ type GrantDeactivateEvent struct {
 	GrantID string `json:"grantId,omitempty"`
 }
 
-func (e *GrantDeactivateEvent) Data() interface{} {
+func (e *GrantDeactivateEvent) Payload() interface{} {
 	return e
 }
 
@@ -221,7 +221,7 @@ type GrantReactivatedEvent struct {
 	GrantID string `json:"grantId,omitempty"`
 }
 
-func (e *GrantReactivatedEvent) Data() interface{} {
+func (e *GrantReactivatedEvent) Payload() interface{} {
 	return e
 }
 
@@ -264,7 +264,7 @@ type GrantRemovedEvent struct {
 	grantedOrgID string
 }
 
-func (e *GrantRemovedEvent) Data() interface{} {
+func (e *GrantRemovedEvent) Payload() interface{} {
 	return e
 }
 

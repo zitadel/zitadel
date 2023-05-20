@@ -62,7 +62,7 @@ type AddedEventNotification struct {
 	CallURL string `json:"callUrl"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -118,7 +118,7 @@ type NotificationDueEvent struct {
 	Usage                uint64    `json:"usage"`
 }
 
-func (n *NotificationDueEvent) Data() interface{} {
+func (n *NotificationDueEvent) Payload() interface{} {
 	return n
 }
 
@@ -175,7 +175,7 @@ type NotifiedEvent struct {
 	DueEventID           string    `json:"dueEventID"`
 }
 
-func (e *NotifiedEvent) Data() interface{} {
+func (e *NotifiedEvent) Payload() interface{} {
 	return e
 }
 
@@ -228,7 +228,7 @@ type RemovedEvent struct {
 	Unit                 Unit `json:"unit"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Payload() interface{} {
 	return e
 }
 

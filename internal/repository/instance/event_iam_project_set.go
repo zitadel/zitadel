@@ -21,7 +21,7 @@ type ProjectSetEvent struct {
 	ProjectID string `json:"iamProjectId"`
 }
 
-func (e *ProjectSetEvent) Data() interface{} {
+func (e *ProjectSetEvent) Payload() interface{} {
 	return e
 }
 
@@ -63,7 +63,7 @@ type ConsoleSetEvent struct {
 	AppID    string `json:"appId"`
 }
 
-func (e *ConsoleSetEvent) Data() interface{} {
+func (e *ConsoleSetEvent) Payload() interface{} {
 	return e
 }
 

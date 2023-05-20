@@ -42,7 +42,7 @@ func NewJWTIDPAddedEvent(
 	}
 }
 
-func (e *JWTIDPAddedEvent) Data() interface{} {
+func (e *JWTIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -131,7 +131,7 @@ func ChangeJWTOptions(options OptionChanges) func(*JWTIDPChangedEvent) {
 	}
 }
 
-func (e *JWTIDPChangedEvent) Data() interface{} {
+func (e *JWTIDPChangedEvent) Payload() interface{} {
 	return e
 }
 

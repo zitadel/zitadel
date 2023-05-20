@@ -1,24 +1,15 @@
 package eventstore
 
-type EventUniqueConstraint struct {
-	// UniqueType is the table name for the unique constraint
-	UniqueType string
-	//UniqueField is the unique key
-	UniqueField string
-	//Action defines if unique constraint should be added or removed
-	Action UniqueConstraintAction
-	//ErrorMessage defines the translation file key for the error message
-	ErrorMessage string
-	//IsGlobal defines if the unique constraint is globally unique or just within a single instance
-	IsGlobal bool
-}
+import "github.com/zitadel/zitadel/internal/eventstore/v3"
 
-type UniqueConstraintAction int32
+type EventUniqueConstraint = eventstore.UniqueConstraint
+
+type UniqueConstraintAction = eventstore.UniqueConstraintAction
 
 const (
-	UniqueConstraintAdd UniqueConstraintAction = iota
-	UniqueConstraintRemove
-	UniqueConstraintInstanceRemove
+	UniqueConstraintAdd            = eventstore.UniqueConstraintAdd
+	UniqueConstraintRemove         = eventstore.UniqueConstraintRemove
+	UniqueConstraintInstanceRemove = eventstore.UniqueConstraintInstanceRemove
 )
 
 func NewAddEventUniqueConstraint(

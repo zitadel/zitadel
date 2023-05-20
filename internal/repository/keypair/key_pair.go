@@ -31,7 +31,7 @@ type Key struct {
 	Expiry time.Time           `json:"expiry"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 

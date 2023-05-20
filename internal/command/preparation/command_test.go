@@ -167,7 +167,7 @@ type testCommand struct {
 	eventstore.BaseEvent
 }
 
-func (c *testCommand) Data() interface{} {
+func (c *testCommand) Payload() interface{} {
 	return nil
 }
 

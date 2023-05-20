@@ -38,7 +38,7 @@ func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, userLoginMustB
 	// returning the values of the first event as this is the one from the instance
 	return &domain.ObjectDetails{
 		Sequence:      pushedEvents[0].Sequence(),
-		EventDate:     pushedEvents[0].CreationDate(),
+		EventDate:     pushedEvents[0].CreatedAt(),
 		ResourceOwner: pushedEvents[0].Aggregate().ResourceOwner,
 	}, nil
 }

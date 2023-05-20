@@ -51,7 +51,7 @@ func NewSMSConfigTwilioAddedEvent(
 	}
 }
 
-func (e *SMSConfigTwilioAddedEvent) Data() interface{} {
+func (e *SMSConfigTwilioAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -116,7 +116,7 @@ func ChangeSMSConfigTwilioSenderNumber(senderNumber string) func(event *SMSConfi
 	}
 }
 
-func (e *SMSConfigTwilioChangedEvent) Data() interface{} {
+func (e *SMSConfigTwilioChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -160,7 +160,7 @@ func NewSMSConfigTokenChangedEvent(
 	}
 }
 
-func (e *SMSConfigTwilioTokenChangedEvent) Data() interface{} {
+func (e *SMSConfigTwilioTokenChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -200,7 +200,7 @@ func NewSMSConfigTwilioActivatedEvent(
 	}
 }
 
-func (e *SMSConfigActivatedEvent) Data() interface{} {
+func (e *SMSConfigActivatedEvent) Payload() interface{} {
 	return e
 }
 
@@ -240,7 +240,7 @@ func NewSMSConfigDeactivatedEvent(
 	}
 }
 
-func (e *SMSConfigDeactivatedEvent) Data() interface{} {
+func (e *SMSConfigDeactivatedEvent) Payload() interface{} {
 	return e
 }
 
@@ -280,7 +280,7 @@ func NewSMSConfigRemovedEvent(
 	}
 }
 
-func (e *SMSConfigRemovedEvent) Data() interface{} {
+func (e *SMSConfigRemovedEvent) Payload() interface{} {
 	return e
 }
 

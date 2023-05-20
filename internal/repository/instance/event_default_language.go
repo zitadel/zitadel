@@ -21,7 +21,7 @@ type DefaultLanguageSetEvent struct {
 	Language language.Tag `json:"language"`
 }
 
-func (e *DefaultLanguageSetEvent) Data() interface{} {
+func (e *DefaultLanguageSetEvent) Payload() interface{} {
 	return e
 }
 

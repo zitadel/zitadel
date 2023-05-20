@@ -23,7 +23,7 @@ type DomainPolicyAddedEvent struct {
 	SMTPSenderAddressMatchesInstanceDomain bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
 }
 
-func (e *DomainPolicyAddedEvent) Data() interface{} {
+func (e *DomainPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -67,7 +67,7 @@ type DomainPolicyChangedEvent struct {
 	SMTPSenderAddressMatchesInstanceDomain *bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
 }
 
-func (e *DomainPolicyChangedEvent) Data() interface{} {
+func (e *DomainPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -128,7 +128,7 @@ type DomainPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DomainPolicyRemovedEvent) Data() interface{} {
+func (e *DomainPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 

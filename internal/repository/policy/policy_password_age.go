@@ -21,7 +21,7 @@ type PasswordAgePolicyAddedEvent struct {
 	MaxAgeDays     uint64 `json:"maxAgeDays,omitempty"`
 }
 
-func (e *PasswordAgePolicyAddedEvent) Data() interface{} {
+func (e *PasswordAgePolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -62,7 +62,7 @@ type PasswordAgePolicyChangedEvent struct {
 	MaxAgeDays     *uint64 `json:"maxAgeDays,omitempty"`
 }
 
-func (e *PasswordAgePolicyChangedEvent) Data() interface{} {
+func (e *PasswordAgePolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -117,7 +117,7 @@ type PasswordAgePolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *PasswordAgePolicyRemovedEvent) Data() interface{} {
+func (e *PasswordAgePolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 

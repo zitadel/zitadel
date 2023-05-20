@@ -52,7 +52,7 @@ func NewOAuthIDPAddedEvent(
 	}
 }
 
-func (e *OAuthIDPAddedEvent) Data() interface{} {
+func (e *OAuthIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -161,7 +161,7 @@ func ChangeOAuthIDAttribute(idAttribute string) func(*OAuthIDPChangedEvent) {
 	}
 }
 
-func (e *OAuthIDPChangedEvent) Data() interface{} {
+func (e *OAuthIDPChangedEvent) Payload() interface{} {
 	return e
 }
 

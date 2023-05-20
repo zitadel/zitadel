@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -9,6 +10,8 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
+
+// var _ eventstore.Event = (*BaseEvent)(nil)
 
 // BaseEvent represents the minimum metadata of an event
 type BaseEvent struct {
@@ -38,6 +41,10 @@ func (e *BaseEvent) EditorUser() string {
 	return e.User
 }
 
+func (e *BaseEvent) Creator() string {
+	return e.EditorUser()
+}
+
 // Type implements Command
 func (e *BaseEvent) Type() EventType {
 	return e.EventType
@@ -51,6 +58,11 @@ func (e *BaseEvent) Sequence() uint64 {
 // CreationDate is the the time, the event is inserted into the eventstore
 func (e *BaseEvent) CreationDate() time.Time {
 	return e.creationDate
+}
+
+// CreationDate is the the time, the event is inserted into the eventstore
+func (e *BaseEvent) CreatedAt() time.Time {
+	return e.CreationDate()
 }
 
 // Aggregate represents the metadata of the event's aggregate
@@ -71,6 +83,14 @@ func (e *BaseEvent) PreviousAggregateSequence() uint64 {
 // PreviousAggregateTypeSequence implements EventReader
 func (e *BaseEvent) PreviousAggregateTypeSequence() uint64 {
 	return e.previousAggregateTypeSequence
+}
+
+func (*BaseEvent) Revision() uint16 {
+	return 0
+}
+
+func (e *BaseEvent) Unmarshal(ptr any) error {
+	return json.Unmarshal(e.Data, ptr)
 }
 
 // BaseEventFromRepo maps a stored event to a BaseEvent
@@ -99,7 +119,7 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 // afterwards the resource owner of the first previous events is taken
 func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventType) *BaseEvent {
 	return &BaseEvent{
-		aggregate: *aggregate,
+		aggregate: Aggregate(*aggregate),
 		User:      authz.GetCtxData(ctx).UserID,
 		Service:   service.FromContext(ctx),
 		EventType: typ,

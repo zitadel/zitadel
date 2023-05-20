@@ -314,7 +314,7 @@ type ProjectionSucceededEvent struct {
 	Name                 string `json:"name"`
 }
 
-func (p *ProjectionSucceededEvent) Data() interface{} {
+func (p *ProjectionSucceededEvent) Payload() interface{} {
 	return p
 }
 

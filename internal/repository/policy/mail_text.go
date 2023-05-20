@@ -43,7 +43,7 @@ type MailTextAddedEvent struct {
 	ButtonText   string `json:"buttonText,omitempty"`
 }
 
-func (e *MailTextAddedEvent) Data() interface{} {
+func (e *MailTextAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -101,7 +101,7 @@ type MailTextChangedEvent struct {
 	ButtonText   *string `json:"buttonText,omitempty"`
 }
 
-func (e *MailTextChangedEvent) Data() interface{} {
+func (e *MailTextChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -187,7 +187,7 @@ type MailTextRemovedEvent struct {
 	Language     string `json:"language,omitempty"`
 }
 
-func (e *MailTextRemovedEvent) Data() interface{} {
+func (e *MailTextRemovedEvent) Payload() interface{} {
 	return nil
 }
 

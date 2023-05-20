@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"reflect"
 	"sort"
@@ -12,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 // Eventstore abstracts all functions needed to store valid events
@@ -23,6 +23,8 @@ type Eventstore struct {
 	eventTypes        []string
 	aggregateTypes    []string
 	PushTimeout       time.Duration
+
+	es eventstore.Eventstore
 }
 
 type eventTypeInterceptors struct {
@@ -35,41 +37,40 @@ func NewEventstore(config *Config) *Eventstore {
 		eventInterceptors: map[EventType]eventTypeInterceptors{},
 		interceptorMutex:  sync.Mutex{},
 		PushTimeout:       config.PushTimeout,
+
+		es: *eventstore.NewEventstore(config.Client),
 	}
 }
 
 // Health checks if the eventstore can properly work
 // It checks if the repository can serve load
 func (es *Eventstore) Health(ctx context.Context) error {
-	return es.repo.Health(ctx)
+	if err := es.repo.Health(ctx); err != nil {
+		return err
+	}
+	return es.es.Health(ctx)
 }
 
 // Push pushes the events in a single transaction
 // an event needs at least an aggregate
-func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
-	events, constraints, err := commandsToRepository(authz.GetInstance(ctx).InstanceID(), cmds)
-	if err != nil {
-		return nil, err
-	}
-
+func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]eventstore.Event, error) {
 	if es.PushTimeout > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
 		defer cancel()
 	}
-
-	err = es.repo.Push(ctx, events, constraints...)
+	events, err := es.es.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
 
-	eventReaders, err := es.mapEvents(events)
-	if err != nil {
-		return nil, err
-	}
+	// eventReaders, err := es.mapEvents(events)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	go notify(eventReaders)
-	return eventReaders, nil
+	go notify(events)
+	return events, nil
 }
 
 func (es *Eventstore) NewInstance(ctx context.Context, instanceID string) error {
@@ -82,62 +83,6 @@ func (es *Eventstore) EventTypes() []string {
 
 func (es *Eventstore) AggregateTypes() []string {
 	return es.aggregateTypes
-}
-
-func commandsToRepository(instanceID string, cmds []Command) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
-	events = make([]*repository.Event, len(cmds))
-	for i, cmd := range cmds {
-		data, err := EventData(cmd)
-		if err != nil {
-			return nil, nil, err
-		}
-		if cmd.Aggregate().ID == "" {
-			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Afdfe", "aggregate id must not be empty")
-		}
-		if cmd.Aggregate().Type == "" {
-			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Dfg32", "aggregate type must not be empty")
-		}
-		if cmd.Type() == "" {
-			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Drg34", "event type must not be empty")
-		}
-		if cmd.Aggregate().Version == "" {
-			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Dgfg4", "aggregate version must not be empty")
-		}
-		events[i] = &repository.Event{
-			AggregateID:   cmd.Aggregate().ID,
-			AggregateType: repository.AggregateType(cmd.Aggregate().Type),
-			ResourceOwner: sql.NullString{String: cmd.Aggregate().ResourceOwner, Valid: cmd.Aggregate().ResourceOwner != ""},
-			InstanceID:    instanceID,
-			EditorService: cmd.EditorService(),
-			EditorUser:    cmd.EditorUser(),
-			Type:          repository.EventType(cmd.Type()),
-			Version:       repository.Version(cmd.Aggregate().Version),
-			Data:          data,
-		}
-		if len(cmd.UniqueConstraints()) > 0 {
-			constraints = append(constraints, uniqueConstraintsToRepository(instanceID, cmd.UniqueConstraints())...)
-		}
-	}
-
-	return events, constraints, nil
-}
-
-func uniqueConstraintsToRepository(instanceID string, constraints []*EventUniqueConstraint) (uniqueConstraints []*repository.UniqueConstraint) {
-	uniqueConstraints = make([]*repository.UniqueConstraint, len(constraints))
-	for i, constraint := range constraints {
-		var id string
-		if !constraint.IsGlobal {
-			id = instanceID
-		}
-		uniqueConstraints[i] = &repository.UniqueConstraint{
-			UniqueType:   constraint.UniqueType,
-			UniqueField:  constraint.UniqueField,
-			InstanceID:   id,
-			Action:       uniqueConstraintActionToRepository(constraint.Action),
-			ErrorMessage: constraint.ErrorMessage,
-		}
-	}
-	return uniqueConstraints
 }
 
 // Filter filters the stored events based on the searchQuery
@@ -269,7 +214,7 @@ func (es *Eventstore) appendAggregateType(typ AggregateType) {
 }
 
 func EventData(event Command) ([]byte, error) {
-	switch data := event.Data().(type) {
+	switch data := event.Payload().(type) {
 	case nil:
 		return nil, nil
 	case []byte:
@@ -278,12 +223,12 @@ func EventData(event Command) ([]byte, error) {
 		}
 		return nil, errors.ThrowInvalidArgument(nil, "V2-6SbbS", "data bytes are not json")
 	}
-	dataType := reflect.TypeOf(event.Data())
+	dataType := reflect.TypeOf(event.Payload())
 	if dataType.Kind() == reflect.Ptr {
 		dataType = dataType.Elem()
 	}
 	if dataType.Kind() == reflect.Struct {
-		dataBytes, err := json.Marshal(event.Data())
+		dataBytes, err := json.Marshal(event.Payload())
 		if err != nil {
 			return nil, errors.ThrowInvalidArgument(err, "V2-xG87M", "could  not marshal data")
 		}

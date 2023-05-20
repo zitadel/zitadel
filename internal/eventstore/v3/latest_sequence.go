@@ -23,12 +23,9 @@ func latestSequences(ctx context.Context, tx *sql.Tx, commands []Command) ([]*la
 		if searchSequenceByCommand(sequences, command) != nil {
 			continue
 		}
+		aggregate := command.Aggregate()
 		sequences = append(sequences, &latestSequence{
-			aggregate: NewAggregate(ctx,
-				command.Aggregate().ID,
-				command.Aggregate().Type,
-				command.Aggregate().Version,
-			),
+			aggregate: &aggregate,
 		})
 	}
 

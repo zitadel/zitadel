@@ -95,7 +95,7 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAcce
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
@@ -144,7 +144,7 @@ func (c *Commands) RemovePersonalAccessToken(ctx context.Context, pat *PersonalA
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }

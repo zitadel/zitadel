@@ -17,7 +17,7 @@ type HumanMFAInitSkippedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanMFAInitSkippedEvent) Data() interface{} {
+func (e *HumanMFAInitSkippedEvent) Payload() interface{} {
 	return e
 }
 

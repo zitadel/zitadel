@@ -585,7 +585,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 }
 
 func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, event eventstore.Event, expiry time.Duration, data map[string]interface{}, eventTypes ...eventstore.EventType) (bool, error) {
-	if event.CreationDate().Add(expiry).Before(time.Now().UTC()) {
+	if event.CreatedAt().Add(expiry).Before(time.Now().UTC()) {
 		return true, nil
 	}
 	return u.queries.IsAlreadyHandled(ctx, event, data, eventTypes...)

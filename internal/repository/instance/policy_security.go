@@ -59,7 +59,7 @@ func ChangeSecurityPolicyAllowedOrigins(allowedOrigins []string) func(event *Sec
 	}
 }
 
-func (e *SecurityPolicySetEvent) Data() interface{} {
+func (e *SecurityPolicySetEvent) Payload() interface{} {
 	return e
 }
 

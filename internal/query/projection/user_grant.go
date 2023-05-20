@@ -205,8 +205,8 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantID, e.Aggregate().ID),
 			handler.NewCol(UserGrantResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(UserGrantInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(UserGrantCreationDate, e.CreationDate()),
-			handler.NewCol(UserGrantChangeDate, e.CreationDate()),
+			handler.NewCol(UserGrantCreationDate, e.CreatedAt()),
+			handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
 			handler.NewCol(UserGrantSequence, e.Sequence()),
 			handler.NewCol(UserGrantUserID, e.UserID),
 			handler.NewCol(UserGrantResourceOwnerUser, userOwner),
@@ -235,7 +235,7 @@ func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.St
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(UserGrantChangeDate, event.CreationDate()),
+			handler.NewCol(UserGrantChangeDate, event.CreatedAt()),
 			handler.NewCol(UserGrantRoles, roles),
 			handler.NewCol(UserGrantSequence, event.Sequence()),
 		},
@@ -271,7 +271,7 @@ func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handle
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(UserGrantChangeDate, event.CreationDate()),
+			handler.NewCol(UserGrantChangeDate, event.CreatedAt()),
 			handler.NewCol(UserGrantState, domain.UserGrantStateInactive),
 			handler.NewCol(UserGrantSequence, event.Sequence()),
 		},
@@ -290,7 +290,7 @@ func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handle
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(UserGrantChangeDate, event.CreationDate()),
+			handler.NewCol(UserGrantChangeDate, event.CreatedAt()),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 			handler.NewCol(UserGrantSequence, event.Sequence()),
 		},
@@ -398,7 +398,7 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 		e,
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(UserGrantChangeDate, e.CreationDate()),
+				handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
 				handler.NewCol(UserGrantSequence, e.Sequence()),
 				handler.NewCol(UserGrantOwnerRemoved, true),
 			},
@@ -409,7 +409,7 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(UserGrantChangeDate, e.CreationDate()),
+				handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
 				handler.NewCol(UserGrantSequence, e.Sequence()),
 				handler.NewCol(UserGrantUserOwnerRemoved, true),
 			},
@@ -420,7 +420,7 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(UserGrantChangeDate, e.CreationDate()),
+				handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
 				handler.NewCol(UserGrantSequence, e.Sequence()),
 				handler.NewCol(UserGrantProjectOwnerRemoved, true),
 			},
@@ -431,7 +431,7 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(UserGrantChangeDate, e.CreationDate()),
+				handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
 				handler.NewCol(UserGrantSequence, e.Sequence()),
 				handler.NewCol(UserGrantGrantedOrgRemoved, true),
 			},

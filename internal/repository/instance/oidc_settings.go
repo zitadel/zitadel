@@ -46,7 +46,7 @@ func NewOIDCSettingsAddedEvent(
 	}
 }
 
-func (e *OIDCSettingsAddedEvent) Data() interface{} {
+func (e *OIDCSettingsAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -75,7 +75,7 @@ type OIDCSettingsChangedEvent struct {
 	RefreshTokenExpiration     *time.Duration `json:"refreshTokenExpiration,omitempty"`
 }
 
-func (e *OIDCSettingsChangedEvent) Data() interface{} {
+func (e *OIDCSettingsChangedEvent) Payload() interface{} {
 	return e
 }
 

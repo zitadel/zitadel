@@ -45,7 +45,7 @@ type UserGrantAddedEvent struct {
 	RoleKeys       []string `json:"roleKeys,omitempty"`
 }
 
-func (e *UserGrantAddedEvent) Data() interface{} {
+func (e *UserGrantAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -91,7 +91,7 @@ type UserGrantChangedEvent struct {
 	RoleKeys             []string `json:"roleKeys"`
 }
 
-func (e *UserGrantChangedEvent) Data() interface{} {
+func (e *UserGrantChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -131,7 +131,7 @@ type UserGrantCascadeChangedEvent struct {
 	RoleKeys             []string `json:"roleKeys,omitempty"`
 }
 
-func (e *UserGrantCascadeChangedEvent) Data() interface{} {
+func (e *UserGrantCascadeChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -173,7 +173,7 @@ type UserGrantRemovedEvent struct {
 	projectGrantID       string `json:"-"`
 }
 
-func (e *UserGrantRemovedEvent) Data() interface{} {
+func (e *UserGrantRemovedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -213,7 +213,7 @@ type UserGrantCascadeRemovedEvent struct {
 	projectGrantID       string `json:"-"`
 }
 
-func (e *UserGrantCascadeRemovedEvent) Data() interface{} {
+func (e *UserGrantCascadeRemovedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -250,7 +250,7 @@ type UserGrantDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserGrantDeactivatedEvent) Data() interface{} {
+func (e *UserGrantDeactivatedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -278,7 +278,7 @@ type UserGrantReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserGrantReactivatedEvent) Data() interface{} {
+func (e *UserGrantReactivatedEvent) Payload() interface{} {
 	return nil
 }
 

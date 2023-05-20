@@ -855,7 +855,7 @@ func NewIDPRemovedEvent(
 	}
 }
 
-func (e *IDPRemovedEvent) Data() interface{} {
+func (e *IDPRemovedEvent) Payload() interface{} {
 	return e
 }
 

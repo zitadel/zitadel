@@ -150,8 +150,8 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 		},
 		[]handler.Column{
 			handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
-			handler.NewCol(UserAuthMethodCreationDateCol, event.CreationDate()),
-			handler.NewCol(UserAuthMethodChangeDateCol, event.CreationDate()),
+			handler.NewCol(UserAuthMethodCreationDateCol, event.CreatedAt()),
+			handler.NewCol(UserAuthMethodChangeDateCol, event.CreatedAt()),
 			handler.NewCol(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
 			handler.NewCol(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 			handler.NewCol(UserAuthMethodUserIDCol, event.Aggregate().ID),
@@ -187,7 +187,7 @@ func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(UserAuthMethodChangeDateCol, event.CreationDate()),
+			handler.NewCol(UserAuthMethodChangeDateCol, event.CreatedAt()),
 			handler.NewCol(UserAuthMethodSequenceCol, event.Sequence()),
 			handler.NewCol(UserAuthMethodNameCol, name),
 			handler.NewCol(UserAuthMethodStateCol, domain.MFAStateReady),
@@ -242,7 +242,7 @@ func (p *userAuthMethodProjection) reduceOwnerRemoved(event eventstore.Event) (*
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(UserAuthMethodChangeDateCol, e.CreationDate()),
+			handler.NewCol(UserAuthMethodChangeDateCol, e.CreatedAt()),
 			handler.NewCol(UserAuthMethodSequenceCol, e.Sequence()),
 			handler.NewCol(UserAuthMethodOwnerRemovedCol, true),
 		},

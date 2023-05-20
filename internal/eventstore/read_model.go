@@ -39,9 +39,9 @@ func (rm *ReadModel) Reduce() error {
 	}
 
 	if rm.CreationDate.IsZero() {
-		rm.CreationDate = rm.Events[0].CreationDate()
+		rm.CreationDate = rm.Events[0].CreatedAt()
 	}
-	rm.ChangeDate = rm.Events[len(rm.Events)-1].CreationDate()
+	rm.ChangeDate = rm.Events[len(rm.Events)-1].CreatedAt()
 	rm.ProcessedSequence = rm.Events[len(rm.Events)-1].Sequence()
 	// all events processed and not needed anymore
 	rm.Events = nil

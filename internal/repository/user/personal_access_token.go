@@ -24,7 +24,7 @@ type PersonalAccessTokenAddedEvent struct {
 	Scopes     []string  `json:"scopes"`
 }
 
-func (e *PersonalAccessTokenAddedEvent) Data() interface{} {
+func (e *PersonalAccessTokenAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -69,7 +69,7 @@ type PersonalAccessTokenRemovedEvent struct {
 	TokenID string `json:"tokenId"`
 }
 
-func (e *PersonalAccessTokenRemovedEvent) Data() interface{} {
+func (e *PersonalAccessTokenRemovedEvent) Payload() interface{} {
 	return e
 }
 

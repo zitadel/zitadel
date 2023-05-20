@@ -22,7 +22,7 @@ type LockoutPolicyAddedEvent struct {
 	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
 }
 
-func (e *LockoutPolicyAddedEvent) Data() interface{} {
+func (e *LockoutPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -63,7 +63,7 @@ type LockoutPolicyChangedEvent struct {
 	ShowLockOutFailures *bool   `json:"showLockOutFailures,omitempty"`
 }
 
-func (e *LockoutPolicyChangedEvent) Data() interface{} {
+func (e *LockoutPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -118,7 +118,7 @@ type LockoutPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LockoutPolicyRemovedEvent) Data() interface{} {
+func (e *LockoutPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 

@@ -16,7 +16,7 @@ type HumanWebAuthNAddedEvent struct {
 	Challenge       string `json:"challenge"`
 }
 
-func (e *HumanWebAuthNAddedEvent) Data() interface{} {
+func (e *HumanWebAuthNAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -60,7 +60,7 @@ type HumanWebAuthNVerifiedEvent struct {
 	UserAgentID       string `json:"userAgentID,omitempty"`
 }
 
-func (e *HumanWebAuthNVerifiedEvent) Data() interface{} {
+func (e *HumanWebAuthNVerifiedEvent) Payload() interface{} {
 	return e
 }
 
@@ -110,7 +110,7 @@ type HumanWebAuthNSignCountChangedEvent struct {
 	SignCount       uint32 `json:"signCount"`
 }
 
-func (e *HumanWebAuthNSignCountChangedEvent) Data() interface{} {
+func (e *HumanWebAuthNSignCountChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -148,7 +148,7 @@ type HumanWebAuthNRemovedEvent struct {
 	State           domain.MFAState `json:"-"`
 }
 
-func (e *HumanWebAuthNRemovedEvent) Data() interface{} {
+func (e *HumanWebAuthNRemovedEvent) Payload() interface{} {
 	return e
 }
 
@@ -186,7 +186,7 @@ type HumanWebAuthNBeginLoginEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanWebAuthNBeginLoginEvent) Data() interface{} {
+func (e *HumanWebAuthNBeginLoginEvent) Payload() interface{} {
 	return e
 }
 
@@ -220,7 +220,7 @@ type HumanWebAuthNCheckSucceededEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanWebAuthNCheckSucceededEvent) Data() interface{} {
+func (e *HumanWebAuthNCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
@@ -253,7 +253,7 @@ type HumanWebAuthNCheckFailedEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanWebAuthNCheckFailedEvent) Data() interface{} {
+func (e *HumanWebAuthNCheckFailedEvent) Payload() interface{} {
 	return e
 }
 

@@ -52,7 +52,7 @@ type UserLockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserLockedEvent) Data() interface{} {
+func (e *UserLockedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -80,7 +80,7 @@ type UserUnlockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserUnlockedEvent) Data() interface{} {
+func (e *UserUnlockedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -108,7 +108,7 @@ type UserDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserDeactivatedEvent) Data() interface{} {
+func (e *UserDeactivatedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -136,7 +136,7 @@ type UserReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *UserReactivatedEvent) Data() interface{} {
+func (e *UserReactivatedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -168,7 +168,7 @@ type UserRemovedEvent struct {
 	loginMustBeDomain bool
 }
 
-func (e *UserRemovedEvent) Data() interface{} {
+func (e *UserRemovedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -221,7 +221,7 @@ type UserTokenAddedEvent struct {
 	PreferredLanguage string    `json:"preferredLanguage"`
 }
 
-func (e *UserTokenAddedEvent) Data() interface{} {
+func (e *UserTokenAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -276,7 +276,7 @@ type UserTokenRemovedEvent struct {
 	TokenID string `json:"tokenId"`
 }
 
-func (e *UserTokenRemovedEvent) Data() interface{} {
+func (e *UserTokenRemovedEvent) Payload() interface{} {
 	return e
 }
 
@@ -319,7 +319,7 @@ type DomainClaimedEvent struct {
 	userLoginMustBeDomain bool
 }
 
-func (e *DomainClaimedEvent) Data() interface{} {
+func (e *DomainClaimedEvent) Payload() interface{} {
 	return e
 }
 
@@ -365,7 +365,7 @@ type DomainClaimedSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DomainClaimedSentEvent) Data() interface{} {
+func (e *DomainClaimedSentEvent) Payload() interface{} {
 	return nil
 }
 
@@ -401,7 +401,7 @@ type UsernameChangedEvent struct {
 	oldUserLoginMustBeDomain bool
 }
 
-func (e *UsernameChangedEvent) Data() interface{} {
+func (e *UsernameChangedEvent) Payload() interface{} {
 	return e
 }
 

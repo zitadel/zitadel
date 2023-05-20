@@ -29,7 +29,7 @@ type ApplicationKeyAddedEvent struct {
 	PublicKey      []byte              `json:"publicKey,omitempty"`
 }
 
-func (e *ApplicationKeyAddedEvent) Data() interface{} {
+func (e *ApplicationKeyAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -81,7 +81,7 @@ type ApplicationKeyRemovedEvent struct {
 	KeyID string `json:"keyId,omitempty"`
 }
 
-func (e *ApplicationKeyRemovedEvent) Data() interface{} {
+func (e *ApplicationKeyRemovedEvent) Payload() interface{} {
 	return e
 }
 

@@ -40,7 +40,7 @@ func NewGitLabIDPAddedEvent(
 	}
 }
 
-func (e *GitLabIDPAddedEvent) Data() interface{} {
+func (e *GitLabIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -122,7 +122,7 @@ func ChangeGitLabOptions(options OptionChanges) func(*GitLabIDPChangedEvent) {
 	}
 }
 
-func (e *GitLabIDPChangedEvent) Data() interface{} {
+func (e *GitLabIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -177,7 +177,7 @@ func NewGitLabSelfHostedIDPAddedEvent(
 	}
 }
 
-func (e *GitLabSelfHostedIDPAddedEvent) Data() interface{} {
+func (e *GitLabSelfHostedIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -266,7 +266,7 @@ func ChangeGitLabSelfHostedOptions(options OptionChanges) func(*GitLabSelfHosted
 	}
 }
 
-func (e *GitLabSelfHostedIDPChangedEvent) Data() interface{} {
+func (e *GitLabSelfHostedIDPChangedEvent) Payload() interface{} {
 	return e
 }
 

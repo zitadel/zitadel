@@ -26,7 +26,7 @@ type CustomTextSetEvent struct {
 	Text     string       `json:"text,omitempty"`
 }
 
-func (e *CustomTextSetEvent) Data() interface{} {
+func (e *CustomTextSetEvent) Payload() interface{} {
 	return e
 }
 
@@ -71,7 +71,7 @@ type CustomTextRemovedEvent struct {
 	Language language.Tag `json:"language,omitempty"`
 }
 
-func (e *CustomTextRemovedEvent) Data() interface{} {
+func (e *CustomTextRemovedEvent) Payload() interface{} {
 	return e
 }
 
@@ -108,7 +108,7 @@ type CustomTextTemplateRemovedEvent struct {
 	Language language.Tag `json:"language,omitempty"`
 }
 
-func (e *CustomTextTemplateRemovedEvent) Data() interface{} {
+func (e *CustomTextTemplateRemovedEvent) Payload() interface{} {
 	return e
 }
 

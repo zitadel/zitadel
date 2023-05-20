@@ -33,7 +33,7 @@ type HumanRefreshTokenAddedEvent struct {
 	PreferredLanguage     string        `json:"preferredLanguage"`
 }
 
-func (e *HumanRefreshTokenAddedEvent) Data() interface{} {
+func (e *HumanRefreshTokenAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -98,7 +98,7 @@ type HumanRefreshTokenRenewedEvent struct {
 	IdleExpiration time.Duration `json:"idleExpiration"`
 }
 
-func (e *HumanRefreshTokenRenewedEvent) Data() interface{} {
+func (e *HumanRefreshTokenRenewedEvent) Payload() interface{} {
 	return e
 }
 
@@ -147,7 +147,7 @@ type HumanRefreshTokenRemovedEvent struct {
 	TokenID string `json:"tokenId"`
 }
 
-func (e *HumanRefreshTokenRemovedEvent) Data() interface{} {
+func (e *HumanRefreshTokenRemovedEvent) Payload() interface{} {
 	return e
 }
 

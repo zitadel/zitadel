@@ -52,7 +52,7 @@ type HumanAddedEvent struct {
 	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
-func (e *HumanAddedEvent) Data() interface{} {
+func (e *HumanAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -153,7 +153,7 @@ type HumanRegisteredEvent struct {
 	ChangeRequired        bool                `json:"changeRequired,omitempty"`
 }
 
-func (e *HumanRegisteredEvent) Data() interface{} {
+func (e *HumanRegisteredEvent) Payload() interface{} {
 	return e
 }
 
@@ -239,7 +239,7 @@ type HumanInitialCodeAddedEvent struct {
 	Expiry               time.Duration       `json:"expiry,omitempty"`
 }
 
-func (e *HumanInitialCodeAddedEvent) Data() interface{} {
+func (e *HumanInitialCodeAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -280,7 +280,7 @@ type HumanInitialCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanInitialCodeSentEvent) Data() interface{} {
+func (e *HumanInitialCodeSentEvent) Payload() interface{} {
 	return nil
 }
 
@@ -308,7 +308,7 @@ type HumanInitializedCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanInitializedCheckSucceededEvent) Data() interface{} {
+func (e *HumanInitializedCheckSucceededEvent) Payload() interface{} {
 	return nil
 }
 
@@ -336,7 +336,7 @@ type HumanInitializedCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanInitializedCheckFailedEvent) Data() interface{} {
+func (e *HumanInitializedCheckFailedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -366,7 +366,7 @@ type HumanSignedOutEvent struct {
 	UserAgentID string `json:"userAgentID"`
 }
 
-func (e *HumanSignedOutEvent) Data() interface{} {
+func (e *HumanSignedOutEvent) Payload() interface{} {
 	return e
 }
 

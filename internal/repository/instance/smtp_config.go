@@ -54,7 +54,7 @@ func NewSMTPConfigAddedEvent(
 	}
 }
 
-func (e *SMTPConfigAddedEvent) Data() interface{} {
+func (e *SMTPConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -84,7 +84,7 @@ type SMTPConfigChangedEvent struct {
 	User        *string `json:"user,omitempty"`
 }
 
-func (e *SMTPConfigChangedEvent) Data() interface{} {
+func (e *SMTPConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -179,7 +179,7 @@ func NewSMTPConfigPasswordChangedEvent(
 	}
 }
 
-func (e *SMTPConfigPasswordChangedEvent) Data() interface{} {
+func (e *SMTPConfigPasswordChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -216,7 +216,7 @@ func NewSMTPConfigRemovedEvent(
 	}
 }
 
-func (e *SMTPConfigRemovedEvent) Data() interface{} {
+func (e *SMTPConfigRemovedEvent) Payload() interface{} {
 	return e
 }
 

@@ -21,7 +21,7 @@ type SetEvent struct {
 	Value []byte `json:"value"`
 }
 
-func (e *SetEvent) Data() interface{} {
+func (e *SetEvent) Payload() interface{} {
 	return e
 }
 
@@ -60,7 +60,7 @@ type RemovedEvent struct {
 	Key string `json:"key"`
 }
 
-func (e *RemovedEvent) Data() interface{} {
+func (e *RemovedEvent) Payload() interface{} {
 	return e
 }
 
@@ -96,7 +96,7 @@ type RemovedAllEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *RemovedAllEvent) Data() interface{} {
+func (e *RemovedAllEvent) Payload() interface{} {
 	return nil
 }
 

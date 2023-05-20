@@ -2,7 +2,10 @@ package query
 
 import (
 	"context"
+	"encoding/json"
 	"time"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -48,7 +51,7 @@ func filterAuditLogRetention(ctx context.Context, events []eventstore.Event, aud
 	}
 	filteredEvents := make([]eventstore.Event, 0, len(events))
 	for _, event := range events {
-		if event.CreationDate().After(callTime.Add(-auditLogRetention)) {
+		if event.CreatedAt().After(callTime.Add(-auditLogRetention)) {
 			filteredEvents = append(filteredEvents, event)
 		}
 	}
@@ -77,25 +80,31 @@ func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event, user
 	var err error
 	defer func() { span.EndWithError(err) }()
 
-	editor, ok := users[event.EditorUser()]
+	editor, ok := users[event.Creator()]
 	if !ok {
-		editor = q.editorUserByID(ctx, event.EditorUser())
-		users[event.EditorUser()] = editor
+		editor = q.editorUserByID(ctx, event.Creator())
+		users[event.Creator()] = editor
 	}
+
+	payload := make(map[string]any)
+	err = event.Unmarshal(&payload)
+	logging.OnError(err).Debug("unmarshal failed")
+	data, err := json.Marshal(payload)
+	logging.OnError(err).Debug("marshal failed")
 
 	return &Event{
 		Editor: &EventEditor{
-			ID:                event.EditorUser(),
-			Service:           event.EditorService(),
+			ID:                event.Creator(),
+			Service:           "zitadel",
 			DisplayName:       editor.DisplayName,
 			PreferedLoginName: editor.PreferedLoginName,
 			AvatarKey:         editor.AvatarKey,
 		},
 		Aggregate:    event.Aggregate(),
 		Sequence:     event.Sequence(),
-		CreationDate: event.CreationDate(),
+		CreationDate: event.CreatedAt(),
 		Type:         string(event.Type()),
-		Payload:      event.DataAsBytes(),
+		Payload:      data,
 	}
 }
 

@@ -29,7 +29,7 @@ type APIConfigAddedEvent struct {
 	AuthMethodType domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
-func (e *APIConfigAddedEvent) Data() interface{} {
+func (e *APIConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -98,7 +98,7 @@ type APIConfigChangedEvent struct {
 	AuthMethodType *domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
-func (e *APIConfigChangedEvent) Data() interface{} {
+func (e *APIConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -158,7 +158,7 @@ type APIConfigSecretChangedEvent struct {
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 }
 
-func (e *APIConfigSecretChangedEvent) Data() interface{} {
+func (e *APIConfigSecretChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -202,7 +202,7 @@ type APIConfigSecretCheckSucceededEvent struct {
 	AppID string `json:"appId"`
 }
 
-func (e *APIConfigSecretCheckSucceededEvent) Data() interface{} {
+func (e *APIConfigSecretCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
@@ -244,7 +244,7 @@ type APIConfigSecretCheckFailedEvent struct {
 	AppID string `json:"appId"`
 }
 
-func (e *APIConfigSecretCheckFailedEvent) Data() interface{} {
+func (e *APIConfigSecretCheckFailedEvent) Payload() interface{} {
 	return e
 }
 

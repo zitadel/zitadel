@@ -46,7 +46,7 @@ func NewOIDCIDPAddedEvent(
 	}
 }
 
-func (e *OIDCIDPAddedEvent) Data() interface{} {
+func (e *OIDCIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -142,7 +142,7 @@ func ChangeOIDCIsIDTokenMapping(idTokenMapping bool) func(*OIDCIDPChangedEvent) 
 	}
 }
 
-func (e *OIDCIDPChangedEvent) Data() interface{} {
+func (e *OIDCIDPChangedEvent) Payload() interface{} {
 	return e
 }
 

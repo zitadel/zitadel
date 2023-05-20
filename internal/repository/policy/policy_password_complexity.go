@@ -25,7 +25,7 @@ type PasswordComplexityPolicyAddedEvent struct {
 	HasSymbol    bool   `json:"hasSymbol,omitempty"`
 }
 
-func (e *PasswordComplexityPolicyAddedEvent) Data() interface{} {
+func (e *PasswordComplexityPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -74,7 +74,7 @@ type PasswordComplexityPolicyChangedEvent struct {
 	HasSymbol    *bool   `json:"hasSymbol,omitempty"`
 }
 
-func (e *PasswordComplexityPolicyChangedEvent) Data() interface{} {
+func (e *PasswordComplexityPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -147,7 +147,7 @@ type PasswordComplexityPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *PasswordComplexityPolicyRemovedEvent) Data() interface{} {
+func (e *PasswordComplexityPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 

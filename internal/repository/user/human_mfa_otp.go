@@ -26,7 +26,7 @@ type HumanOTPAddedEvent struct {
 	Secret *crypto.CryptoValue `json:"otpSecret,omitempty"`
 }
 
-func (e *HumanOTPAddedEvent) Data() interface{} {
+func (e *HumanOTPAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -65,7 +65,7 @@ type HumanOTPVerifiedEvent struct {
 	UserAgentID          string `json:"userAgentID,omitempty"`
 }
 
-func (e *HumanOTPVerifiedEvent) Data() interface{} {
+func (e *HumanOTPVerifiedEvent) Payload() interface{} {
 	return e
 }
 
@@ -98,7 +98,7 @@ type HumanOTPRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanOTPRemovedEvent) Data() interface{} {
+func (e *HumanOTPRemovedEvent) Payload() interface{} {
 	return nil
 }
 
@@ -130,7 +130,7 @@ type HumanOTPCheckSucceededEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPCheckSucceededEvent) Data() interface{} {
+func (e *HumanOTPCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
@@ -169,7 +169,7 @@ type HumanOTPCheckFailedEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPCheckFailedEvent) Data() interface{} {
+func (e *HumanOTPCheckFailedEvent) Payload() interface{} {
 	return e
 }
 

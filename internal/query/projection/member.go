@@ -68,8 +68,8 @@ func reduceMemberAdded(e member.MemberAddedEvent, userResourceOwner string, opts
 			handler.NewCol(MemberUserResourceOwner, userResourceOwner),
 			handler.NewCol(MemberUserOwnerRemoved, false),
 			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
-			handler.NewCol(MemberCreationDate, e.CreationDate()),
-			handler.NewCol(MemberChangeDate, e.CreationDate()),
+			handler.NewCol(MemberCreationDate, e.CreatedAt()),
+			handler.NewCol(MemberChangeDate, e.CreatedAt()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 			handler.NewCol(MemberResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(MemberInstanceID, e.Aggregate().InstanceID),
@@ -87,7 +87,7 @@ func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (
 	config := reduceMemberConfig{
 		cols: []handler.Column{
 			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
-			handler.NewCol(MemberChangeDate, e.CreationDate()),
+			handler.NewCol(MemberChangeDate, e.CreatedAt()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 		},
 		conds: []handler.Condition{
@@ -141,7 +141,7 @@ func multiReduceMemberOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) 
 	}
 	return crdb.AddUpdateStatement(
 		[]handler.Column{
-			handler.NewCol(MemberChangeDate, e.CreationDate()),
+			handler.NewCol(MemberChangeDate, e.CreatedAt()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 			handler.NewCol(MemberOwnerRemoved, true),
 		},
@@ -165,7 +165,7 @@ func memberUserOwnerRemovedConds(e eventstore.Event, opts ...reduceMemberOpt) []
 
 func memberUserOwnerRemovedCols(e eventstore.Event) []handler.Column {
 	return []handler.Column{
-		handler.NewCol(MemberChangeDate, e.CreationDate()),
+		handler.NewCol(MemberChangeDate, e.CreatedAt()),
 		handler.NewCol(MemberSequence, e.Sequence()),
 		handler.NewCol(MemberUserOwnerRemoved, true),
 	}

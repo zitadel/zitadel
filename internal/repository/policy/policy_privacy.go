@@ -24,7 +24,7 @@ type PrivacyPolicyAddedEvent struct {
 	SupportEmail domain.EmailAddress `json:"supportEmail,omitempty"`
 }
 
-func (e *PrivacyPolicyAddedEvent) Data() interface{} {
+func (e *PrivacyPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -69,7 +69,7 @@ type PrivacyPolicyChangedEvent struct {
 	SupportEmail *domain.EmailAddress `json:"supportEmail,omitempty"`
 }
 
-func (e *PrivacyPolicyChangedEvent) Data() interface{} {
+func (e *PrivacyPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -136,7 +136,7 @@ type PrivacyPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *PrivacyPolicyRemovedEvent) Data() interface{} {
+func (e *PrivacyPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 

@@ -43,7 +43,7 @@ type UserIDPLinkAddedEvent struct {
 	DisplayName    string `json:"displayName,omitempty"`
 }
 
-func (e *UserIDPLinkAddedEvent) Data() interface{} {
+func (e *UserIDPLinkAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -90,7 +90,7 @@ type UserIDPLinkRemovedEvent struct {
 	ExternalUserID string `json:"userId,omitempty"`
 }
 
-func (e *UserIDPLinkRemovedEvent) Data() interface{} {
+func (e *UserIDPLinkRemovedEvent) Payload() interface{} {
 	return e
 }
 
@@ -135,7 +135,7 @@ type UserIDPLinkCascadeRemovedEvent struct {
 	ExternalUserID string `json:"userId,omitempty"`
 }
 
-func (e *UserIDPLinkCascadeRemovedEvent) Data() interface{} {
+func (e *UserIDPLinkCascadeRemovedEvent) Payload() interface{} {
 	return e
 }
 
@@ -178,7 +178,7 @@ type UserIDPCheckSucceededEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *UserIDPCheckSucceededEvent) Data() interface{} {
+func (e *UserIDPCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 

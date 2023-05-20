@@ -21,7 +21,6 @@ type Command interface {
 	// Payload returns the payload of the event. It represent the changed fields by the event
 	// valid types are:
 	// * nil (no payload),
-	// * json byte array
 	// * struct which can be marshalled to json
 	// * pointer to struct which can be marshalled to json
 	Payload() any
@@ -62,7 +61,7 @@ type event struct {
 	payload   []byte
 }
 
-func commandToEvent(aggregate *Aggregate, command Command) (_ *event, err error) {
+func commandToEvent(sequence *latestSequence, command Command) (_ *event, err error) {
 	var payload []byte
 	if command.Payload() != nil {
 		payload, err = json.Marshal(command.Payload())
@@ -71,11 +70,12 @@ func commandToEvent(aggregate *Aggregate, command Command) (_ *event, err error)
 		}
 	}
 	return &event{
-		aggregate: aggregate,
+		aggregate: sequence.aggregate,
 		creator:   command.Creator(),
 		revision:  command.Revision(),
 		typ:       command.Type(),
 		payload:   payload,
+		sequence:  sequence.sequence,
 	}, nil
 }
 
@@ -84,24 +84,9 @@ func (e *event) CreationDate() time.Time {
 	return e.CreatedAt()
 }
 
-// DataAsBytes implements [eventstore.Event]
-func (e *event) DataAsBytes() []byte {
-	return e.payload
-}
-
 // EditorUser implements [eventstore.Event]
 func (e *event) EditorUser() string {
 	return e.Creator()
-}
-
-// PreviousAggregateSequence implements [eventstore.Event]
-func (e *event) PreviousAggregateSequence() uint64 {
-	panic("unimplemented")
-}
-
-// PreviousAggregateTypeSequence implements [eventstore.Event]
-func (e *event) PreviousAggregateTypeSequence() uint64 {
-	panic("unimplemented")
 }
 
 // Aggregate implements [Event]
@@ -137,4 +122,9 @@ func (e *event) Sequence() uint64 {
 // Unmarshal implements [Event]
 func (e *event) Unmarshal(ptr any) error {
 	return json.Unmarshal(e.payload, ptr)
+}
+
+// DataAsBytes implements [eventstore.Event]
+func (e *event) DataAsBytes() []byte {
+	return e.payload
 }

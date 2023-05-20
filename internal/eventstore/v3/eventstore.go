@@ -1,9 +1,19 @@
 package eventstore
 
 import (
-	"database/sql"
+	"context"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 type Eventstore struct {
-	client *sql.DB
+	client *database.DB
+}
+
+func NewEventstore(client *database.DB) *Eventstore {
+	return &Eventstore{client: client}
+}
+
+func (es *Eventstore) Health(ctx context.Context) error {
+	return es.client.PingContext(ctx)
 }

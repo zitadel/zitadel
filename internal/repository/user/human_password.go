@@ -31,7 +31,7 @@ type HumanPasswordChangedEvent struct {
 	UserAgentID    string              `json:"userAgentID,omitempty"`
 }
 
-func (e *HumanPasswordChangedEvent) Data() interface{} {
+func (e *HumanPasswordChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -78,7 +78,7 @@ type HumanPasswordCodeAddedEvent struct {
 	NotificationType domain.NotificationType `json:"notificationType,omitempty"`
 }
 
-func (e *HumanPasswordCodeAddedEvent) Data() interface{} {
+func (e *HumanPasswordCodeAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -121,7 +121,7 @@ type HumanPasswordCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanPasswordCodeSentEvent) Data() interface{} {
+func (e *HumanPasswordCodeSentEvent) Payload() interface{} {
 	return nil
 }
 
@@ -149,7 +149,7 @@ type HumanPasswordChangeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanPasswordChangeSentEvent) Data() interface{} {
+func (e *HumanPasswordChangeSentEvent) Payload() interface{} {
 	return nil
 }
 
@@ -178,7 +178,7 @@ type HumanPasswordCheckSucceededEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanPasswordCheckSucceededEvent) Data() interface{} {
+func (e *HumanPasswordCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
@@ -218,7 +218,7 @@ type HumanPasswordCheckFailedEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanPasswordCheckFailedEvent) Data() interface{} {
+func (e *HumanPasswordCheckFailedEvent) Payload() interface{} {
 	return e
 }
 

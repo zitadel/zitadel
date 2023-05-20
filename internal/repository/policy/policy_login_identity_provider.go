@@ -23,7 +23,7 @@ type IdentityProviderAddedEvent struct {
 	IDPProviderType domain.IdentityProviderType `json:"idpProviderType,omitempty"`
 }
 
-func (e *IdentityProviderAddedEvent) Data() interface{} {
+func (e *IdentityProviderAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -63,7 +63,7 @@ type IdentityProviderRemovedEvent struct {
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *IdentityProviderRemovedEvent) Data() interface{} {
+func (e *IdentityProviderRemovedEvent) Payload() interface{} {
 	return e
 }
 
@@ -100,7 +100,7 @@ type IdentityProviderCascadeRemovedEvent struct {
 	IDPConfigID string `json:"idpConfigId"`
 }
 
-func (e *IdentityProviderCascadeRemovedEvent) Data() interface{} {
+func (e *IdentityProviderCascadeRemovedEvent) Payload() interface{} {
 	return e
 }
 

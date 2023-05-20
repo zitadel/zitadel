@@ -24,7 +24,7 @@ type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *AddedEvent) Data() interface{} {
+func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -63,7 +63,7 @@ type UserCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *UserCheckedEvent) Data() interface{} {
+func (e *UserCheckedEvent) Payload() interface{} {
 	return e
 }
 
@@ -106,7 +106,7 @@ type PasswordCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *PasswordCheckedEvent) Data() interface{} {
+func (e *PasswordCheckedEvent) Payload() interface{} {
 	return e
 }
 
@@ -147,7 +147,7 @@ type TokenSetEvent struct {
 	TokenID string `json:"tokenID"`
 }
 
-func (e *TokenSetEvent) Data() interface{} {
+func (e *TokenSetEvent) Payload() interface{} {
 	return e
 }
 
@@ -188,7 +188,7 @@ type MetadataSetEvent struct {
 	Metadata map[string][]byte `json:"metadata"`
 }
 
-func (e *MetadataSetEvent) Data() interface{} {
+func (e *MetadataSetEvent) Payload() interface{} {
 	return e
 }
 
@@ -227,7 +227,7 @@ type TerminateEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *TerminateEvent) Data() interface{} {
+func (e *TerminateEvent) Payload() interface{} {
 	return e
 }
 

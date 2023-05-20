@@ -24,7 +24,7 @@ type MachineSecretSetEvent struct {
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 }
 
-func (e *MachineSecretSetEvent) Data() interface{} {
+func (e *MachineSecretSetEvent) Payload() interface{} {
 	return e
 }
 
@@ -63,7 +63,7 @@ type MachineSecretRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MachineSecretRemovedEvent) Data() interface{} {
+func (e *MachineSecretRemovedEvent) Payload() interface{} {
 	return e
 }
 
@@ -100,7 +100,7 @@ type MachineSecretCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MachineSecretCheckSucceededEvent) Data() interface{} {
+func (e *MachineSecretCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
@@ -137,7 +137,7 @@ type MachineSecretCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MachineSecretCheckFailedEvent) Data() interface{} {
+func (e *MachineSecretCheckFailedEvent) Payload() interface{} {
 	return e
 }
 

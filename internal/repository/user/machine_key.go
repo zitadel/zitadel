@@ -26,7 +26,7 @@ type MachineKeyAddedEvent struct {
 	PublicKey      []byte              `json:"publicKey,omitempty"`
 }
 
-func (e *MachineKeyAddedEvent) Data() interface{} {
+func (e *MachineKeyAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -78,7 +78,7 @@ type MachineKeyRemovedEvent struct {
 	KeyID string `json:"keyId,omitempty"`
 }
 
-func (e *MachineKeyRemovedEvent) Data() interface{} {
+func (e *MachineKeyRemovedEvent) Payload() interface{} {
 	return e
 }
 

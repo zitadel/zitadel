@@ -38,7 +38,7 @@ type DomainAddedEvent struct {
 	Generated bool   `json:"generated,omitempty"`
 }
 
-func (e *DomainAddedEvent) Data() interface{} {
+func (e *DomainAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -76,7 +76,7 @@ type DomainPrimarySetEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainPrimarySetEvent) Data() interface{} {
+func (e *DomainPrimarySetEvent) Payload() interface{} {
 	return e
 }
 
@@ -113,7 +113,7 @@ type DomainRemovedEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainRemovedEvent) Data() interface{} {
+func (e *DomainRemovedEvent) Payload() interface{} {
 	return e
 }
 

@@ -28,7 +28,7 @@ type MachineAddedEvent struct {
 	AccessTokenType domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
-func (e *MachineAddedEvent) Data() interface{} {
+func (e *MachineAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -79,7 +79,7 @@ type MachineChangedEvent struct {
 	AccessTokenType *domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
-func (e *MachineChangedEvent) Data() interface{} {
+func (e *MachineChangedEvent) Payload() interface{} {
 	return e
 }
 

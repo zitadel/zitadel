@@ -85,7 +85,7 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (*domain.Ob
 
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
@@ -104,7 +104,7 @@ func (c *Commands) ChangeMachine(ctx context.Context, machine *Machine) (*domain
 
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }

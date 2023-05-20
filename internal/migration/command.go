@@ -74,7 +74,7 @@ func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstor
 	return s
 }
 
-func (s *SetupStep) Data() interface{} {
+func (s *SetupStep) Payload() interface{} {
 	return s
 }
 

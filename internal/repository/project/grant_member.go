@@ -42,7 +42,7 @@ type GrantMemberAddedEvent struct {
 	GrantID string   `json:"grantId"`
 }
 
-func (e *GrantMemberAddedEvent) Data() interface{} {
+func (e *GrantMemberAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -90,7 +90,7 @@ type GrantMemberChangedEvent struct {
 	UserID  string   `json:"userId"`
 }
 
-func (e *GrantMemberChangedEvent) Data() interface{} {
+func (e *GrantMemberChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -137,7 +137,7 @@ type GrantMemberRemovedEvent struct {
 	GrantID string `json:"grantId"`
 }
 
-func (e *GrantMemberRemovedEvent) Data() interface{} {
+func (e *GrantMemberRemovedEvent) Payload() interface{} {
 	return e
 }
 
@@ -182,7 +182,7 @@ type GrantMemberCascadeRemovedEvent struct {
 	GrantID string `json:"grantId"`
 }
 
-func (e *GrantMemberCascadeRemovedEvent) Data() interface{} {
+func (e *GrantMemberCascadeRemovedEvent) Payload() interface{} {
 	return e
 }
 

@@ -13,17 +13,18 @@ func (es *Eventstore) Push(ctx context.Context, commands ...Command) (_ []Event,
 	defer func() {
 		if err != nil {
 			_ = tx.Rollback()
+			return
 		}
 		err = tx.Commit()
 	}()
-	aggregates, err := latestSequences(ctx, tx, commands)
+	sequences, err := latestSequences(ctx, tx, commands)
 
 	err = handleUniqueConstraints(ctx, tx, commands)
 	if err != nil {
 		return nil, err
 	}
 
-	return insertEvents(ctx, tx, aggregates, commands)
+	return insertEvents(ctx, tx, sequences, commands)
 }
 
 //go:embed push.sql
@@ -38,7 +39,12 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 
 	for i, command := range commands {
 		sequence := searchSequenceByCommand(sequences, command)
-		events[i], err = commandToEvent(sequence.aggregate, command)
+		if sequence == nil {
+			fmt.Println("asdf")
+		}
+		sequence.sequence++
+
+		events[i], err = commandToEvent(sequence, command)
 		if err != nil {
 			return nil, err
 		}
@@ -55,8 +61,6 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 			i*argsPerCommand+9,
 		)
 
-		sequence.sequence++
-
 		args = append(args,
 			events[i].(*event).aggregate.InstanceID,
 			events[i].(*event).aggregate.ResourceOwner,
@@ -66,7 +70,7 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 			events[i].(*event).creator,
 			events[i].(*event).typ,
 			events[i].(*event).payload,
-			sequence.sequence,
+			events[i].(*event).sequence,
 		)
 	}
 

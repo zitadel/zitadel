@@ -43,7 +43,7 @@ type OIDCConfigAddedEvent struct {
 	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 }
 
-func (e *OIDCConfigAddedEvent) Data() interface{} {
+func (e *OIDCConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
@@ -219,7 +219,7 @@ type OIDCConfigChangedEvent struct {
 	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 }
 
-func (e *OIDCConfigChangedEvent) Data() interface{} {
+func (e *OIDCConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -363,7 +363,7 @@ type OIDCConfigSecretChangedEvent struct {
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 }
 
-func (e *OIDCConfigSecretChangedEvent) Data() interface{} {
+func (e *OIDCConfigSecretChangedEvent) Payload() interface{} {
 	return e
 }
 
@@ -407,7 +407,7 @@ type OIDCConfigSecretCheckSucceededEvent struct {
 	AppID string `json:"appId"`
 }
 
-func (e *OIDCConfigSecretCheckSucceededEvent) Data() interface{} {
+func (e *OIDCConfigSecretCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
@@ -449,7 +449,7 @@ type OIDCConfigSecretCheckFailedEvent struct {
 	AppID string `json:"appId"`
 }
 
-func (e *OIDCConfigSecretCheckFailedEvent) Data() interface{} {
+func (e *OIDCConfigSecretCheckFailedEvent) Payload() interface{} {
 	return e
 }
 
