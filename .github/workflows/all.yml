@@ -48,7 +48,7 @@ jobs:
         with:
           context: .
           file: ./build/workflow.Dockerfile
-          target: core-build
+          target: core-gathered
           push: false
           cache-to: type=registry,ref=ghcr.io/zitadel/build-cache:core,mode=max
           cache-from: ${{env.cache_from_params}}
