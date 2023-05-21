@@ -57,8 +57,14 @@ module.exports = {
         {
           type: "category",
           label: "Cloud",
+          link: {
+            type: "generated-index",
+            title: "Overview",
+            slug: "guides/manage/cloud/overview",
+            description:
+              "Our customer portal is used to manage all your  ZITADEL instances. You can also manage your subscriptions, billing, newsletters and support requests.",
+          },
           items: [
-            "guides/manage/cloud/overview",
             "guides/manage/cloud/start",
             "guides/manage/cloud/instances",
             "guides/manage/cloud/billing",
