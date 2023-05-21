@@ -128,10 +128,13 @@ jobs:
         cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
-        outputs: type=local,dest=/tmp/
+        outputs: type=local,dest=/tmp/zitadel
     -
       name: can i see the exectuable
-      run: ls -la /tmp/.artifacts
+      run: ls -la /tmp/zitadel
+    -
+      name: can i see the exectuable
+      run: ls -la /tmp/zitadel/.artifacts
 
   core-unit-test:
     runs-on: ubuntu-latest
