@@ -128,8 +128,7 @@ jobs:
         cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
-        load: true
-        outputs: '/tmp/compiled'
+        outputs: type=local,dest
     -
       name: can i see the exectuable
       run: ls -la /tmp/compiled
