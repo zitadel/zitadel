@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -31,6 +32,7 @@ type Config struct {
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
 	Projections     projection.Config
+	Eventstore      *eventstore.Config
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -64,7 +66,6 @@ type Steps struct {
 	s6OwnerRemoveColumns *OwnerRemoveColumns
 	s7LogstoreTables     *LogstoreTables
 	s8AuthTokens         *AuthTokenIndexes
-	s9EventstoreIndexes2 *EventstoreIndexesNew
 	CorrectCreationDate  *CorrectCreationDate
 	s11AddEventCreatedAt *AddEventCreatedAt
 	s12ChangeEvents      *ChangeEvents

@@ -121,14 +121,14 @@ func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
 	if len(keys.Keys) > 0 {
 		return o.privateKeyToSigningKey(selectSigningKey(keys.Keys))
 	}
-	var sequence uint64
+	var sequence time.Time
 	if keys.LatestState != nil {
-		sequence = keys.LatestState.Sequence
+		sequence = keys.LatestState.EventTimestamp
 	}
 	return nil, o.refreshSigningKey(ctx, o.signingKeyAlgorithm, sequence)
 }
 
-func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, sequence uint64) error {
+func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, sequence time.Time) error {
 	ok, err := o.ensureIsLatestKey(ctx, sequence)
 	if err != nil || !ok {
 		return errors.ThrowInternal(err, "OIDC-ASfh3", "cannot ensure that projection is up to date")
@@ -140,12 +140,12 @@ func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, seq
 	return errors.ThrowInternal(nil, "OIDC-Df1bh", "")
 }
 
-func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence uint64) (bool, error) {
+func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence time.Time) (bool, error) {
 	maxSequence, err := o.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence == maxSequence, nil
+	return sequence.Equal(maxSequence), nil
 }
 
 func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {
@@ -183,7 +183,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), algorithm)
 }
 
-func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
+func (o *OPStorage) getMaxKeySequence(ctx context.Context) (time.Time, error) {
 	return o.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).

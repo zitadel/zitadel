@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
@@ -231,13 +232,10 @@ func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery)
 }
 
 // LatestSequence returns the latest sequence found by the search query
-func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (uint64, error) {
-	var seq Sequence
-	err := query(ctx, db, searchQuery, &seq)
-	if err != nil {
-		return 0, err
-	}
-	return uint64(seq), nil
+func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (time.Time, error) {
+	var createdAt sql.NullTime
+	err := query(ctx, db, searchQuery, &createdAt)
+	return createdAt.Time, err
 }
 
 // InstanceIDs returns the instance ids found by the search query
@@ -257,10 +255,10 @@ func (db *CRDB) db() *sql.DB {
 func (db *CRDB) orderByEventSequence(desc bool) string {
 	if db.AllowOrderByCreationDate {
 		if desc {
-			return " ORDER BY creation_date DESC, event_sequence DESC"
+			return " ORDER BY created_at DESC, event_sequence DESC"
 		}
 
-		return " ORDER BY creation_date, event_sequence"
+		return " ORDER BY created_at, event_sequence"
 	}
 
 	if desc {
@@ -272,7 +270,7 @@ func (db *CRDB) orderByEventSequence(desc bool) string {
 
 func (db *CRDB) eventQuery() string {
 	return "SELECT" +
-		" creation_date" +
+		" created_at" +
 		", event_type" +
 		", event_sequence" +
 		", previous_aggregate_sequence" +
@@ -289,7 +287,7 @@ func (db *CRDB) eventQuery() string {
 }
 
 func (db *CRDB) maxSequenceQuery() string {
-	return "SELECT MAX(event_sequence) FROM eventstore.events"
+	return "SELECT MAX(created_at) FROM eventstore.events"
 }
 
 func (db *CRDB) instanceIDsQuery() string {
@@ -317,7 +315,7 @@ func (db *CRDB) columnName(col repository.Field) string {
 	case repository.FieldEventData:
 		return "event_data"
 	case repository.FieldCreationDate:
-		return "creation_date"
+		return "created_at"
 	default:
 		return ""
 	}

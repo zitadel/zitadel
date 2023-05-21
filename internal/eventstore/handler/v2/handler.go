@@ -179,7 +179,6 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 	}
 
 	defer func() {
-		h.log().OnError(err).Debug("commit should still work")
 		commitErr := tx.Commit()
 		h.log().OnError(commitErr).Debug("commit failed")
 		if err == nil {

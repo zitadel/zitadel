@@ -77,9 +77,9 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 		return p.certificateToCertificateAndKey(selectCertificate(certs.Certificates))
 	}
 
-	var sequence uint64
+	var sequence time.Time
 	if certs.LatestState != nil {
-		sequence = certs.LatestState.Sequence
+		sequence = certs.LatestState.EventTimestamp
 	}
 
 	return nil, p.refreshCertificate(ctx, usage, sequence)
@@ -88,7 +88,7 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 func (p *Storage) refreshCertificate(
 	ctx context.Context,
 	usage domain.KeyUsage,
-	sequence uint64,
+	sequence time.Time,
 ) error {
 	ok, err := p.ensureIsLatestCertificate(ctx, sequence)
 	if err != nil {
@@ -99,20 +99,20 @@ func (p *Storage) refreshCertificate(
 		logging.Warn("view not up to date, retrying later")
 		return err
 	}
-	err = p.lockAndGenerateCertificateAndKey(ctx, usage, sequence)
+	err = p.lockAndGenerateCertificateAndKey(ctx, usage)
 	logging.OnError(err).Warn("could not create signing key")
 	return nil
 }
 
-func (p *Storage) ensureIsLatestCertificate(ctx context.Context, sequence uint64) (bool, error) {
+func (p *Storage) ensureIsLatestCertificate(ctx context.Context, sequence time.Time) (bool, error) {
 	maxSequence, err := p.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence == maxSequence, nil
+	return sequence.Equal(maxSequence), nil
 }
 
-func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage, sequence uint64) error {
+func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	ctx = setSAMLCtx(ctx)
@@ -152,7 +152,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 	}
 }
 
-func (p *Storage) getMaxKeySequence(ctx context.Context) (uint64, error) {
+func (p *Storage) getMaxKeySequence(ctx context.Context) (time.Time, error) {
 	return p.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).

@@ -53,9 +53,10 @@ type keyProjection struct {
 }
 
 func newKeyProjection(ctx context.Context, config handler.Config, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) *handler.Handler {
-	p := new(keyProjection)
-	p.encryptionAlgorithm = keyEncryptionAlgorithm
-	p.certEncryptionAlgorithm = certEncryptionAlgorithm
+	p := &keyProjection{
+		encryptionAlgorithm:     keyEncryptionAlgorithm,
+		certEncryptionAlgorithm: certEncryptionAlgorithm,
+	}
 	return handler.NewHandler(ctx, &config, p)
 }
 

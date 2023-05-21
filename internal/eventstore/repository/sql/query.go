@@ -102,7 +102,7 @@ func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string
 }
 
 func maxSequenceScanner(row scan, dest interface{}) (err error) {
-	sequence, ok := dest.(*Sequence)
+	sequence, ok := dest.(*sql.NullTime)
 	if !ok {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-NBjA9", "type must be sequence")
 	}

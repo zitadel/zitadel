@@ -1,6 +1,6 @@
 BEGIN;
 -- create table with empty created_at
-ALTER TABLE eventstore.events ADD COLUMN created_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE eventstore.events ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NULL;
 COMMIT;
 
 BEGIN;

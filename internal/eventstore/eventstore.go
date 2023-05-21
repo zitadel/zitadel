@@ -139,10 +139,10 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 }
 
 // LatestSequence filters the latest sequence for the given search query
-func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
+func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (time.Time, error) {
 	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
 	if err != nil {
-		return 0, err
+		return time.Time{}, err
 	}
 	return es.repo.LatestSequence(ctx, query)
 }

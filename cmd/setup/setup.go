@@ -65,7 +65,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	eventstoreClient, err := eventstore.Start(&eventstore.Config{Client: dbClient})
+	config.Eventstore.Client = dbClient
+	eventstoreClient, err := eventstore.Start(config.Eventstore)
 	logging.OnError(err).Fatal("unable to start eventstore")
 	migration.RegisterMappers(eventstoreClient)
 
@@ -89,7 +90,6 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
 	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
 	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
-	steps.s9EventstoreIndexes2 = New09(dbClient)
 	steps.CorrectCreationDate.dbClient = dbClient
 	steps.s11AddEventCreatedAt = &AddEventCreatedAt{dbClient: dbClient, step10: steps.CorrectCreationDate}
 	steps.s12ChangeEvents = &ChangeEvents{dbClient: dbClient}
@@ -112,31 +112,29 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	}
 
 	err = migration.Migrate(ctx, eventstoreClient, steps.s4EventstoreIndexes)
-	logging.OnError(err).Fatal("unable to migrate step 4")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s9EventstoreIndexes2)
-	logging.OnError(err).Fatal("unable to migrate step 9")
+	logging.WithFields("name", steps.s4EventstoreIndexes.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s11AddEventCreatedAt)
-	logging.OnError(err).Fatal("unable to migrate step 11")
+	logging.WithFields("name", steps.s11AddEventCreatedAt.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s12ChangeEvents)
-	logging.OnError(err).Fatal("unable to migrate step 12")
+	logging.WithFields("name", steps.s12ChangeEvents.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
-	logging.OnError(err).Fatal("unable to migrate step 1")
+	logging.WithFields("name", steps.s1ProjectionTable.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
-	logging.OnError(err).Fatal("unable to migrate step 2")
+	logging.WithFields("name", steps.s2AssetsTable.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.FirstInstance)
-	logging.OnError(err).Fatal("unable to migrate step 3")
+	logging.WithFields("name", steps.FirstInstance.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s5LastFailed)
-	logging.OnError(err).Fatal("unable to migrate step 5")
+	logging.WithFields("name", steps.s5LastFailed.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s6OwnerRemoveColumns)
-	logging.OnError(err).Fatal("unable to migrate step 6")
+	logging.WithFields("name", steps.s6OwnerRemoveColumns.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s7LogstoreTables)
-	logging.OnError(err).Fatal("unable to migrate step 7")
+	logging.WithFields("name", steps.s7LogstoreTables.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s8AuthTokens)
-	logging.OnError(err).Fatal("unable to migrate step 8")
+	logging.WithFields("name", steps.s8AuthTokens.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.CorrectCreationDate)
-	logging.OnError(err).Fatal("unable to migrate step 10")
+	logging.WithFields("name", steps.CorrectCreationDate.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s13CurrentStates)
-	logging.OnError(err).Fatal("unable to migrate step 13")
+	logging.WithFields("name", steps.s13CurrentStates.String()).OnError(err).Fatal("migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

@@ -48,10 +48,10 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 
 	logging.WithFields("name", migration.String()).Info("starting migration")
 	err = migration.Execute(ctx)
-	logging.OnError(err).Error("migration failed")
+	logging.WithFields("name", migration.String()).OnError(err).Error("migration failed")
 
 	_, pushErr := es.Push(ctx, setupDoneCmd(ctx, migration, err))
-	logging.OnError(pushErr).Error("migration failed")
+	logging.WithFields("name", migration.String()).OnError(pushErr).Error("migration finish failed")
 	if err != nil {
 		return err
 	}

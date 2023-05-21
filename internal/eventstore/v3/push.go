@@ -34,7 +34,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...Command) (_ []Event,
 var pushStmt string
 
 func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []Command) (events []Event, err error) {
-	const argsPerCommand = 10
+	const argsPerCommand = 9
 
 	events = make([]Event, len(commands))
 	args := make([]any, 0, len(commands)*argsPerCommand)
@@ -42,6 +42,9 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 
 	for i, command := range commands {
 		sequence := searchSequenceByCommand(sequences, command)
+		if sequence == nil {
+			panic("asdf")
+		}
 		sequence.sequence++
 
 		events[i], err = commandToEvent(sequence, command)
@@ -49,7 +52,7 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 			return nil, err
 		}
 
-		placeHolders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+		placeHolders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
 			i*argsPerCommand+1,
 			i*argsPerCommand+2,
 			i*argsPerCommand+3,
@@ -59,7 +62,6 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 			i*argsPerCommand+7,
 			i*argsPerCommand+8,
 			i*argsPerCommand+9,
-			i*argsPerCommand+10,
 		)
 
 		args = append(args,
@@ -69,7 +71,6 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 			events[i].(*event).aggregate.ID,
 			events[i].(*event).aggregate.Version,
 			events[i].(*event).creator,
-			"zitadel",
 			events[i].(*event).typ,
 			events[i].(*event).payload,
 			events[i].(*event).sequence,

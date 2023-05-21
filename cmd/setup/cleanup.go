@@ -32,7 +32,8 @@ func Cleanup(config *Config) {
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	es, err := eventstore.Start(&eventstore.Config{Client: dbClient})
+	config.Eventstore.Client = dbClient
+	es, err := eventstore.Start(config.Eventstore)
 	logging.OnError(err).Fatal("unable to start eventstore")
 	migration.RegisterMappers(es)
 

@@ -6,10 +6,9 @@ INSERT INTO eventstore.events (
     , aggregate_version
 
     , editor_user
-    , editor_service
     , event_type
     , event_data
     , event_sequence
 ) VALUES
     %s
-RETURNING creation_date;
+RETURNING created_at;

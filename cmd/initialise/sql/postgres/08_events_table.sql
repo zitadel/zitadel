@@ -8,18 +8,12 @@ CREATE TABLE IF NOT EXISTS eventstore.events (
 	, previous_aggregate_sequence BIGINT
 	, previous_aggregate_type_sequence INT8
 	, creation_date TIMESTAMPTZ NOT NULL DEFAULT now()
+	, created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 	, event_data JSONB
 	, editor_user TEXT NOT NULL 
-	, editor_service TEXT NOT NULL
+	, editor_service TEXT
 	, resource_owner TEXT NOT NULL
 	, instance_id TEXT NOT NULL
 
-	, PRIMARY KEY (event_sequence, instance_id)
-	, CONSTRAINT previous_sequence_unique UNIQUE(previous_aggregate_sequence, instance_id)
-	, CONSTRAINT prev_agg_type_seq_unique UNIQUE(previous_aggregate_type_sequence, instance_id)
+	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence)
 );
-
-CREATE INDEX IF NOT EXISTS agg_type_agg_id ON eventstore.events (aggregate_type, aggregate_id, instance_id);
-CREATE INDEX IF NOT EXISTS agg_type ON eventstore.events (aggregate_type, instance_id);
-CREATE INDEX IF NOT EXISTS agg_type_seq ON eventstore.events (aggregate_type, event_sequence DESC, instance_id);
-CREATE INDEX IF NOT EXISTS max_sequence ON eventstore.events (aggregate_type, aggregate_id, event_sequence DESC, instance_id);
