@@ -127,7 +127,7 @@ jobs:
         cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
-        load: true
+        # load: true
         outputs: /go/src/github.com/zitadel/zitadel/zitadel .
     -
       name: can i see the exectuable

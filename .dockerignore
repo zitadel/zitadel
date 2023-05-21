@@ -20,3 +20,4 @@ SECURITY.md
 **/console/src/app/proto/generated/
 **/console/tmp/
 **/.vscode
+**/build
