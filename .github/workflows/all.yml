@@ -129,10 +129,10 @@ jobs:
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
         load: true
-        # outputs: '.'
+        outputs: '/tmp/compiled'
     -
       name: can i see the exectuable
-      run: ls -R
+      run: ls -la /tmp/compiled
 
   core-unit-test:
     runs-on: ubuntu-latest
