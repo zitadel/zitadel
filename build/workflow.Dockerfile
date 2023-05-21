@@ -293,4 +293,4 @@ FROM core-gathered AS lint-core
 COPY .golangci.yaml .
 COPY .git/ .git/
 COPY --from=golangci/golangci-lint:latest /usr/bin/golangci-lint /usr/bin/golangci-lint
-RUN golangci-lint run --timeout 1m
+RUN golangci-lint run --timeout 10m
