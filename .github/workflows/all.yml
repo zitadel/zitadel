@@ -135,9 +135,6 @@ jobs:
       with:
         name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
         path: /tmp/zitadel/.artifacts/zitadel
-    -
-      name: can i see the exectuable
-      run: ls -la /tmp/zitadel/.artifacts
 
   core-unit-test:
     runs-on: ubuntu-latest
@@ -167,12 +164,19 @@ jobs:
         with:
           context: .
           file: ./build/workflow.Dockerfile
-          target: test-core-unit
+          target: test-core-unit-coverage
           push: false
           cache-to:  ${{env.cache_to_params}}
           cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
           tags: ${{env.tag_name}}
+          outputs: type=local,dest=/tmp/zitadel
+      - name: Publish coverage
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          file: /tmp/zitadel/coverage/profile.cov
+          name: core-integration-tests
+          flags: core-integration-tests
 
   core-integration-test:
     runs-on: ubuntu-latest
@@ -208,12 +212,19 @@ jobs:
         with:
           context: .
           file: ./build/workflow.Dockerfile
-          target: test-core-integration
+          target: test-core-integration-coverage
           push: false
           cache-to:  ${{env.cache_to_params}}
           cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
           tags: ${{env.tag_name}}
+          outputs: type=local,dest=/tmp/zitadel
+      - name: Publish coverage
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          file: /tmp/zitadel/coverage/profile.cov
+          name: core-unit-tests
+          flags: core-unit-tests
 
 
   # e2e:

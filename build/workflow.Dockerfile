@@ -177,7 +177,8 @@ ARG GOARCH
 
 COPY --from=console /zitadel/console/dist/console internal/api/ui/console/static/
 
-RUN go build -o zitadel -ldflags="-s -w"
+RUN go build -o zitadel -ldflags="-s -w" \
+    && chmod +x zitadel
 
 ENTRYPOINT [ "./zitadel" ]
 
@@ -230,6 +231,9 @@ COPY --from=core-build /go/src/github.com/zitadel/zitadel .
 FROM test-core-base AS test-core-unit
 RUN go test -race -v -coverprofile=profile.cov ./...
 
+FROM scratch AS core-test-unit-coverage
+COPY --from=core-test-unit /go/src/github.com/zitadel/zitadel/profile.cov /coverage/
+
 # #######################################
 # integration test core
 # #######################################
@@ -246,3 +250,6 @@ COPY build/core-integration-test.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN entrypoint.sh
+
+FROM scratch AS core-test-integration-coverage
+COPY --from=core-test-integration /go/src/github.com/zitadel/zitadel/profile.cov /coverage/
