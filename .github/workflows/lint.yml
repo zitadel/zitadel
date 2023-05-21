@@ -39,7 +39,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Build
+        name: Lint
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -71,7 +71,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     -
-      name: Build
+      name: Lint
       uses: docker/build-push-action@v4
       with:
         context: .
@@ -103,7 +103,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     -
-      name: Build
+      name: Lint
       uses: docker/build-push-action@v4
       with:
         context: .
