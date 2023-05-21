@@ -128,6 +128,10 @@ jobs:
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
         load: true
+        outputs: /go/src/github.com/zitadel/zitadel/zitadel .
+    -
+      name: can i see the exectuable
+      run: ls -la
 
   core-unit-test:
     runs-on: ubuntu-latest
