@@ -71,6 +71,7 @@ func Test_getCondition(t *testing.T) {
 }
 
 func Test_prepareColumns(t *testing.T) {
+	now := time.Now()
 	type fields struct {
 		dbRow []interface{}
 	}
@@ -102,14 +103,14 @@ func Test_prepareColumns(t *testing.T) {
 			name: "max column",
 			args: args{
 				columns: repository.ColumnsMaxSequence,
-				dest:    new(Sequence),
+				dest:    new(sql.NullTime),
 			},
 			res: res{
-				query:    "SELECT MAX(event_sequence) FROM eventstore.events",
-				expected: Sequence(5),
+				query:    "SELECT MAX(created_at) FROM eventstore.events",
+				expected: now,
 			},
 			fields: fields{
-				dbRow: []interface{}{Sequence(5)},
+				dbRow: []interface{}{sql.NullTime{Time: now, Valid: true}},
 			},
 		},
 		{
@@ -119,7 +120,7 @@ func Test_prepareColumns(t *testing.T) {
 				dest:    new(uint64),
 			},
 			res: res{
-				query: "SELECT MAX(event_sequence) FROM eventstore.events",
+				query: "SELECT MAX(created_at) FROM eventstore.events",
 				dbErr: errors.IsErrorInvalidArgument,
 			},
 		},
@@ -130,13 +131,13 @@ func Test_prepareColumns(t *testing.T) {
 				dest:    &[]*repository.Event{},
 			},
 			res: res{
-				query: "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+				query: "SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
 				expected: []*repository.Event{
 					{AggregateID: "hodor", AggregateType: "user", Sequence: 5, Data: make(Data, 0)},
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, repository.EventType(""), uint64(5), Sequence(0), Sequence(0), Data(nil), "", "", sql.NullString{String: ""}, "", repository.AggregateType("user"), "hodor", repository.Version("")},
+				dbRow: []interface{}{time.Time{}, repository.EventType(""), uint64(5), Sequence(0), Sequence(0), Data(nil), sql.NullString{}, "", sql.NullString{}, "", repository.AggregateType("user"), "hodor", repository.Version("")},
 			},
 		},
 		{
@@ -146,7 +147,7 @@ func Test_prepareColumns(t *testing.T) {
 				dest:    []*repository.Event{},
 			},
 			res: res{
-				query: "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+				query: "SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
 				dbErr: errors.IsErrorInvalidArgument,
 			},
 		},
@@ -158,7 +159,7 @@ func Test_prepareColumns(t *testing.T) {
 				dbErr:   sql.ErrConnDone,
 			},
 			res: res{
-				query: "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+				query: "SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
 				dbErr: errors.IsInternal,
 			},
 		},
@@ -184,8 +185,12 @@ func Test_prepareColumns(t *testing.T) {
 			if tt.res.dbErr != nil && tt.res.dbErr(err) {
 				return
 			}
-			if !reflect.DeepEqual(reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface(), tt.res.expected) {
-				t.Errorf("unexpected result from rowScanner \nwant: %+v \ngot: %+v", tt.fields.dbRow, reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface())
+			if equaler, ok := tt.res.expected.(interface{ Equal(time.Time) bool }); ok {
+				equaler.Equal(tt.args.dest.(*sql.NullTime).Time)
+			} else {
+				if !reflect.DeepEqual(reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface(), tt.res.expected) {
+					t.Errorf("unexpected result from rowScanner \nwant: %+v \ngot: %+v", tt.fields.dbRow, reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface())
+				}
 			}
 		})
 	}
@@ -546,7 +551,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
+			if err := db.push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -596,7 +601,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY creation_date DESC, event_sequence DESC`,
+					`SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY created_at DESC, event_sequence DESC`,
 					[]driver.Value{repository.AggregateType("user")},
 				),
 			},
@@ -625,7 +630,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY creation_date, event_sequence LIMIT \$2`,
+					`SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY created_at, event_sequence LIMIT \$2`,
 					[]driver.Value{repository.AggregateType("user"), uint64(5)},
 				),
 			},
@@ -654,7 +659,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY creation_date DESC, event_sequence DESC LIMIT \$2`,
+					`SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY created_at DESC, event_sequence DESC LIMIT \$2`,
 					[]driver.Value{repository.AggregateType("user"), uint64(5)},
 				),
 			},
@@ -684,7 +689,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events AS OF SYSTEM TIME '-1 ms' WHERE \( aggregate_type = \$1 \) ORDER BY creation_date DESC, event_sequence DESC LIMIT \$2`,
+					`SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events AS OF SYSTEM TIME '-1 ms' WHERE \( aggregate_type = \$1 \) ORDER BY created_at DESC, event_sequence DESC LIMIT \$2`,
 					[]driver.Value{repository.AggregateType("user"), uint64(5)},
 				),
 			},
@@ -713,7 +718,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQueryErr(t,
-					`SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY creation_date DESC, event_sequence DESC`,
+					`SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY created_at DESC, event_sequence DESC`,
 					[]driver.Value{repository.AggregateType("user")},
 					sql.ErrConnDone),
 			},
@@ -742,7 +747,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY creation_date DESC, event_sequence DESC`,
+					`SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY created_at DESC, event_sequence DESC`,
 					[]driver.Value{repository.AggregateType("user")},
 					&repository.Event{Sequence: 100}),
 			},
@@ -810,7 +815,7 @@ func Test_query_events_mocked(t *testing.T) {
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
-					`SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) OR \( aggregate_type = \$2 AND aggregate_id = \$3 \) ORDER BY creation_date DESC, event_sequence DESC LIMIT \$4`,
+					`SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) OR \( aggregate_type = \$2 AND aggregate_id = \$3 \) ORDER BY created_at DESC, event_sequence DESC LIMIT \$4`,
 					[]driver.Value{repository.AggregateType("user"), repository.AggregateType("org"), "asdf42", uint64(5)},
 				),
 			},

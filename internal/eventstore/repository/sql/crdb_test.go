@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -449,7 +450,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					return
 				}
 			}
-			if err := db.Push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
+			if err := db.push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -569,7 +570,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 					Database: new(testDB),
 				},
 			}
-			if err := db.Push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
+			if err := db.push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
@@ -794,7 +795,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			for _, events := range tt.args.events {
 				wg.Add(1)
 				go func(events []*repository.Event) {
-					err := db.Push(context.Background(), events, nil)
+					err := db.push(context.Background(), events, nil)
 					if err != nil {
 						errsMu.Lock()
 						errs = append(errs, err)
@@ -913,7 +914,7 @@ func TestCRDB_Filter(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
+			if err := db.push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -938,7 +939,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 		existingEvents []*repository.Event
 	}
 	type res struct {
-		sequence uint64
+		sequence time.Time
 	}
 	tests := []struct {
 		name    string
@@ -967,7 +968,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 				},
 			},
 			res: res{
-				sequence: 0,
+				sequence: time.Time{},
 			},
 			wantErr: false,
 		},
@@ -991,7 +992,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 				},
 			},
 			res: res{
-				sequence: 3,
+				sequence: time.Time{},
 			},
 			wantErr: false,
 		},
@@ -1006,7 +1007,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
+			if err := db.push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -1015,9 +1016,8 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
 			}
-
-			if sequence < tt.res.sequence {
-				t.Errorf("CRDB.query() expected sequence: %d got %d", tt.res.sequence, sequence)
+			if tt.res.sequence.After(sequence) {
+				t.Errorf("CRDB.query() expected sequence: %v got %v", tt.res.sequence, sequence)
 			}
 		})
 	}
@@ -1151,7 +1151,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 					Database: new(testDB),
 				},
 			}
-			if err := db.Push(context.Background(), tt.args.events); err != nil {
+			if err := db.push(context.Background(), tt.args.events); err != nil {
 				t.Errorf("CRDB.Push() error = %v", err)
 			}
 

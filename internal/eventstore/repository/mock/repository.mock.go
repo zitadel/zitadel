@@ -7,6 +7,7 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	gomock "github.com/golang/mock/gomock"
 	repository "github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -94,10 +95,10 @@ func (mr *MockRepositoryMockRecorder) InstanceIDs(arg0, arg1 interface{}) *gomoc
 }
 
 // LatestSequence mocks base method.
-func (m *MockRepository) LatestSequence(arg0 context.Context, arg1 *repository.SearchQuery) (uint64, error) {
+func (m *MockRepository) LatestSequence(arg0 context.Context, arg1 *repository.SearchQuery) (time.Time, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LatestSequence", arg0, arg1)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(time.Time)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

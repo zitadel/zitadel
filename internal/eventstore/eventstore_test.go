@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
@@ -344,7 +345,7 @@ func Test_eventData(t *testing.T) {
 
 type testRepo struct {
 	events    []*repository.Event
-	sequence  uint64
+	sequence  time.Time
 	instances []string
 	err       error
 	t         *testing.T
@@ -384,9 +385,9 @@ func (repo *testRepo) Filter(ctx context.Context, searchQuery *repository.Search
 	return repo.events, nil
 }
 
-func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *repository.SearchQuery) (uint64, error) {
+func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *repository.SearchQuery) (time.Time, error) {
 	if repo.err != nil {
-		return 0, repo.err
+		return time.Time{}, repo.err
 	}
 	return repo.sequence, nil
 }
@@ -886,7 +887,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			},
 			fields: fields{
 				repo: &testRepo{
-					sequence: 50,
+					sequence: time.Now(),
 					t:        t,
 				},
 			},

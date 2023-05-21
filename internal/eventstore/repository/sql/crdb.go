@@ -109,9 +109,9 @@ func NewCRDB(client *database.DB, allowOrderByCreationDate bool) *CRDB {
 
 func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
 
-// Push adds all events to the eventstreams of the aggregates.
+// push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
-func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+func (db *CRDB) push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.DB.DB, nil, func(tx *sql.Tx) error {
 
 		var (
