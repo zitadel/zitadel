@@ -11,6 +11,7 @@ README.md
 SECURITY.md
 **/.dockerignore
 **/Dockerfile
+**/*.Dockerfile
 **/pkg/grpc/*/*.pb.*
 **/pkg/grpc/*/*.swagger.json
 **/.artifacts
