@@ -199,7 +199,8 @@ RUN apt update; \
     apt install -y \
         gcc \
         make \
-        ;
+        ; \
+    sudo update-ca-certificates;
 
 # default vars
 ENV DB_FLAVOR=postgres
