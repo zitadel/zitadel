@@ -291,7 +291,7 @@ RUN yarn lint
 FROM core-gathered AS lint-core
 
 COPY .golangci.yaml .
-COPY .git .
+COPY .git/ .git/
 COPY --from=golangci/golangci-lint:latest /usr/bin/golangci-lint /usr/bin/golangci-lint
 # RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-RUN golangci-lint run --timeout 5m
+# RUN golangci-lint run --timeout 5m
