@@ -9,11 +9,14 @@ permissions:
 
 env:
   go_version: '1.20'
-  cache_from_params: type=registry,ref=ghcr.io/zitadel/build-cache
+  cache_from_params: |
+    type=registry,ref=ghcr.io/zitadel/build-cache
+    type=registry,ref=ghcr.io/zitadel/build-cache:console
+    type=registry,ref=ghcr.io/zitadel/build-cache:core
   cache_to_params: type=registry,ref=ghcr.io/zitadel/build-cache,mode=max
   tag_name: ghcr.io/zitadel/test:${{ github.sha }}
   buildx_driver_opts: |
-      image=moby/buildkit:v0.11.2
+      image=moby/buildkit:v0.11.6
 
 jobs:
 
@@ -46,7 +49,7 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: core-build
           push: false
-          cache-to: ${{env.cache_to_params}}
+          cache-to: type=registry,ref=ghcr.io/zitadel/build-cache:core,mode=max
           cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
   
@@ -79,7 +82,7 @@ jobs:
           file: ./build/workflow.Dockerfile
           target: console
           push: false
-          cache-to:  ${{env.cache_to_params}}
+          cache-to:  type=registry,ref=ghcr.io/zitadel/build-cache:console,mode=max
           cache-from: ${{env.cache_from_params}}
           github-token: ${{ github.token }}
           tags: ${{env.tag_name}}
@@ -125,7 +128,7 @@ jobs:
         cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
-        outputs: '.'
+        # outputs: '.'
     -
       name: can i see the exectuable
       run: ls -R
