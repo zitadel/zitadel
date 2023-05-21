@@ -164,7 +164,7 @@ jobs:
         with:
           context: .
           file: ./build/workflow.Dockerfile
-          target: test-core-unit-coverage
+          target: coverage-core-unit
           push: false
           cache-to:  ${{env.cache_to_params}}
           cache-from: ${{env.cache_from_params}}
@@ -212,7 +212,7 @@ jobs:
         with:
           context: .
           file: ./build/workflow.Dockerfile
-          target: test-core-integration-coverage
+          target: coverage-core-integration
           push: false
           cache-to:  ${{env.cache_to_params}}
           cache-from: ${{env.cache_from_params}}
