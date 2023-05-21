@@ -130,8 +130,11 @@ jobs:
         tags: ${{env.tag_name}}
         outputs: type=local,dest=/tmp/zitadel
     -
-      name: can i see the exectuable
-      run: ls -la /tmp/zitadel
+      name: upload executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: /tmp/zitadel/.artifacts/zitadel
     -
       name: can i see the exectuable
       run: ls -la /tmp/zitadel/.artifacts
