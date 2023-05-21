@@ -125,10 +125,9 @@ jobs:
         cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
-        outputs: type=local,dest=.
     -
       name: can i see the exectuable
-      run: ls -la
+      run: ls -R
 
   core-unit-test:
     runs-on: ubuntu-latest
