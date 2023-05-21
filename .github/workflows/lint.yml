@@ -3,21 +3,17 @@ name: Lint
 on:
   workflow_call:
     inputs:
-      node_version:
+      buildx_driver_opts:
         required: true
         type: string
-      go_version:
+      cache_from_params:
         required: true
         type: string
-      buf_version:
+      cache_to_params:
         required: true
         type: string
-      golangci_lint_version:
+      tag_name:
         required: true
-        type: string
-      core_hit:
-        type: string
-      console_hit:
         type: string
 
 jobs:
@@ -27,49 +23,94 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-    - uses: actions/checkout@v3
-    - uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - uses: bufbuild/buf-lint-action@v1
-    ## TODO add comment action with report
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: ${{inputs.buildx_driver_opts}}
+      - 
+        name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./build/workflow.Dockerfile
+          target: lint-api
+          push: false
+          cache-to: ${{inputs.cache_to_params}}
+          cache-from: ${{inputs.cache_from_params}}
+          github-token: ${{ github.token }}
+          tags: ${{inputs.tag_name}}
 
   console:
     name: console
-    if: inputs.console_hit != 'true'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    -
+      name: Checkout
+      uses: actions/checkout@v3
+    -
+      name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
       with:
-        node-version: ${{ inputs.node_version }}
-        cache: 'yarn'
-        cache-dependency-path: console/yarn.lock
-    - run: (cd console ; yarn install --frozen-lockfile)
-    - run: (cd console ; yarn generate)
-    - run: (cd console ; yarn lint)
+        driver-opts: ${{inputs.buildx_driver_opts}}
+    - 
+      name: Login to Docker registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    -
+      name: Build
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./build/workflow.Dockerfile
+        target: lint-console
+        push: false
+        cache-to: ${{inputs.cache_to_params}}
+        cache-from: ${{inputs.cache_from_params}}
+        github-token: ${{ github.token }}
+        tags: ${{inputs.tag_name}}
 
   core:
     name: core
-    if: inputs.core_hit != 'true'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    -
+      name: Checkout
+      uses: actions/checkout@v3
+    -
+      name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
       with:
-        fetch-depth: '0'
-    - uses: actions/setup-go@v3
+        driver-opts: ${{inputs.buildx_driver_opts}}
+    - 
+      name: Login to Docker registry
+      uses: docker/login-action@v2
       with:
-        go-version: ${{ inputs.go_version }}
-        cache: true
-    - uses: bufbuild/buf-setup-action@v1
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    -
+      name: Build
+      uses: docker/build-push-action@v4
       with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - name: linting
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: ${{ inputs.golangci_lint_version }}
-        only-new-issues: true
-        skip-pkg-cache: true
-        args: -v
+        context: .
+        file: ./build/workflow.Dockerfile
+        target: lint-api
+        push: false
+        cache-to: ${{inputs.cache_to_params}}
+        cache-from: ${{inputs.cache_from_params}}
+        github-token: ${{ github.token }}
+        tags: ${{inputs.tag_name}}

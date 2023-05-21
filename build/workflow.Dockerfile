@@ -95,6 +95,23 @@ COPY --from=core-api /go/src/github.com/zitadel/zitadel/openapi/v2 openapi/v2
 
 RUN make assets
 
+# #######################################
+# Gather all core files
+# #######################################
+FROM core-deps AS core-gathered
+
+COPY --from=core-api /go/src/github.com/zitadel/zitadel .
+COPY --from=core-login /go/src/github.com/zitadel/zitadel .
+COPY --from=core-assets /go/src/github.com/zitadel/zitadel .
+
+COPY cmd cmd
+COPY internal internal
+COPY pkg pkg
+COPY proto proto
+COPY openapi openapi
+COPY statik statik
+COPY main.go main.go
+
 # ##############################################################################
 # build console
 # ##############################################################################
@@ -129,11 +146,9 @@ COPY proto ../proto
 RUN yarn generate
 
 # #######################################
-# compile
+# Gather all console files
 # #######################################
-FROM console-deps as console
-
-WORKDIR /zitadel/console
+FROM console-deps as console-gathered
 
 COPY --from=console-client /zitadel/console/src/app/proto/generated src/app/proto/generated
 
@@ -142,7 +157,10 @@ COPY console/angular.json .
 COPY console/ngsw-config.json .
 COPY console/tsconfig* .
 
-
+# #######################################
+# Build console
+# #######################################
+FROM console-gathered AS console
 RUN yarn build
 
 # ##############################################################################
@@ -150,27 +168,9 @@ RUN yarn build
 # ##############################################################################
 
 # #######################################
-# Gather all core files
-# #######################################
-FROM core-deps AS core-build
-
-COPY --from=core-api /go/src/github.com/zitadel/zitadel .
-COPY --from=core-login /go/src/github.com/zitadel/zitadel .
-COPY --from=core-assets /go/src/github.com/zitadel/zitadel .
-
-COPY cmd cmd
-COPY internal internal
-COPY pkg pkg
-COPY proto proto
-COPY openapi openapi
-COPY statik statik
-COPY main.go main.go
-
-
-# #######################################
 # build executable
 # #######################################
-FROM core-build AS compile
+FROM core-gathered AS compile
 
 ARG GOOS 
 ARG GOARCH
@@ -182,6 +182,9 @@ RUN go build -o zitadel -ldflags="-s -w" \
 
 ENTRYPOINT [ "./zitadel" ]
 
+# #######################################
+# copy executable
+# #######################################
 FROM scratch AS copy-executable
 ARG GOOS 
 ARG GOARCH
@@ -191,7 +194,6 @@ COPY --from=compile /go/src/github.com/zitadel/zitadel/zitadel /.artifacts/zitad
 # ##############################################################################
 #  tests
 # ##############################################################################
-
 FROM ubuntu/postgres:latest AS test-core-base
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -223,7 +225,7 @@ ENV PGPASSWORD=postgres
 
 # copy zitadel files
 COPY --from=core-deps /go/pkg/mod /root/go/pkg/mod
-COPY --from=core-build /go/src/github.com/zitadel/zitadel .
+COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 
 # #######################################
 # unit test core
@@ -231,6 +233,9 @@ COPY --from=core-build /go/src/github.com/zitadel/zitadel .
 FROM test-core-base AS test-core-unit
 RUN go test -race -v -coverprofile=profile.cov ./...
 
+# #######################################
+# coverage output
+# #######################################
 FROM scratch AS coverage-core-unit
 COPY --from=test-core-unit /go/src/github.com/zitadel/zitadel/profile.cov /coverage/
 
@@ -246,10 +251,46 @@ ENV COCKROACH_BINARY=/cockroach/cockroach
 
 ENV ZITADEL_MASTERKEY=MasterkeyNeedsToHave32Characters
 
-COPY build/core-integration-test.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY build/core-integration-test.sh /usr/local/bin/run-tests.sh
+RUN chmod +x /usr/local/bin/run-tests.sh
 
-RUN entrypoint.sh
+RUN run-tests.sh
 
+# #######################################
+# coverage output
+# #######################################
 FROM scratch AS coverage-core-integration
 COPY --from=test-core-integration /go/src/github.com/zitadel/zitadel/profile.cov /coverage/
+
+# ##############################################################################
+#  linting
+# ##############################################################################
+
+# #######################################
+# api
+# #######################################
+FROM bufbuild/buf:latest AS lint-api
+
+COPY proto proto
+COPY buf.*.yaml .
+
+RUN buf lint
+
+# #######################################
+# console
+# #######################################
+FROM console-gathered AS lint-console
+
+COPY console/.eslintrc.js .
+COPY console/.prettier* .
+RUN yarn lint
+
+# #######################################
+# core
+# #######################################
+FROM core-gathered AS lint-core
+
+COPY .golangci.yaml .
+COPY --from=golangci/golangci-lint:latest /usr/bin/golangci-lint /usr/bin/golangci-lint
+# RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+RUN golangci-lint run --timeout 5m
