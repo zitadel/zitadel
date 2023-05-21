@@ -187,12 +187,6 @@ ENTRYPOINT [ "./zitadel" ]
 
 FROM ubuntu/postgres:latest AS test-core-base
 
-# install go
-COPY --from=golang:latest /usr/local/go/ /usr/local/go/
-ENV PATH="/go/bin:/usr/local/go/bin:${PATH}"
-
-WORKDIR /go/src/github.com/zitadel/zitadel
-
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update; \
@@ -202,6 +196,12 @@ RUN apt update; \
         ca-certificates \
         ; \
     update-ca-certificates;
+
+# install go
+COPY --from=golang:latest /usr/local/go/ /usr/local/go/
+ENV PATH="/go/bin:/usr/local/go/bin:${PATH}"
+
+WORKDIR /go/src/github.com/zitadel/zitadel
 
 # default vars
 ENV DB_FLAVOR=postgres
