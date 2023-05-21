@@ -232,7 +232,7 @@ FROM test-core-base AS test-core-unit
 RUN go test -race -v -coverprofile=profile.cov ./...
 
 FROM scratch AS coverage-core-unit
-COPY --from=core-test-unit /go/src/github.com/zitadel/zitadel/profile.cov /coverage/
+COPY --from=test-core-unit /go/src/github.com/zitadel/zitadel/profile.cov /coverage/
 
 # #######################################
 # integration test core
@@ -252,4 +252,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN entrypoint.sh
 
 FROM scratch AS coverage-core-integration
-COPY --from=core-test-integration /go/src/github.com/zitadel/zitadel/profile.cov /coverage/
+COPY --from=test-core-integration /go/src/github.com/zitadel/zitadel/profile.cov /coverage/
