@@ -181,6 +181,10 @@ RUN go build -o zitadel-${GOOS}-${GOARCH} -ldflags="-s -w"
 
 ENTRYPOINT [ "./zitadel-${GOOS}-${GOARCH}" ]
 
+FROM scratch AS copy-executable
+
+COPY --from=compile /go/src/github.com/zitadel/zitadel/zitadel /zitadel
+
 # ##############################################################################
 #  tests
 # ##############################################################################

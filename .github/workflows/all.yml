@@ -122,7 +122,7 @@ jobs:
           "GOARCH=${{matrix.goarch}}"
         context: .
         file: ./build/workflow.Dockerfile
-        target: compile
+        target: copy-executable
         push: false
         cache-to: ${{env.cache_to_params}}
         cache-from: ${{env.cache_from_params}}
