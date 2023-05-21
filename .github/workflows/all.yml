@@ -131,7 +131,7 @@ jobs:
         outputs: type=local,dest=/tmp/compiled
     -
       name: can i see the exectuable
-      run: ls -la /tmp/compiled
+      run: ls -R /tmp/compiled/
 
   core-unit-test:
     runs-on: ubuntu-latest
