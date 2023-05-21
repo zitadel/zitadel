@@ -128,7 +128,7 @@ jobs:
         cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
-        outputs: type=local,dest=/tmp
+        outputs: type=local,dest=/tmp/
     -
       name: can i see the exectuable
       run: ls -la /tmp/.artifacts
