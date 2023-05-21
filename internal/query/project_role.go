@@ -110,7 +110,7 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 	if err != nil {
 		return nil, err
 	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projectRolesTable)
+	projects.LatestState, err = q.latestState(ctx, projectRolesTable)
 	return projects, err
 }
 
@@ -146,7 +146,7 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	if err != nil {
 		return nil, err
 	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projectRolesTable)
+	projects.LatestState, err = q.latestState(ctx, projectRolesTable)
 	return projects, err
 }
 

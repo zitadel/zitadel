@@ -65,7 +65,7 @@ func Start(
 		metricFailedDeliveriesEmail,
 		metricSuccessfulDeliveriesSMS,
 		metricFailedDeliveriesSMS,
-	).Start()
+	).Start(ctx)
 	handlers.NewQuotaNotifier(
 		ctx,
 		projection.ApplyCustomConfig(quotaHandlerCustomConfig),
@@ -73,5 +73,5 @@ func Start(
 		q,
 		metricSuccessfulDeliveriesJSON,
 		metricFailedDeliveriesJSON,
-	).Start()
+	).Start(ctx)
 }

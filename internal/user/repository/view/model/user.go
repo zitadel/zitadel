@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
@@ -232,12 +231,12 @@ func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mode
 	}
 }
 
-func (u *UserView) AppendEvent(event *models.Event) (err error) {
-	u.ChangeDate = event.CreationDate
-	u.Sequence = event.Sequence
-	switch eventstore.EventType(event.Type) {
+func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
+	u.ChangeDate = event.CreatedAt()
+	u.Sequence = event.Sequence()
+	switch eventstore.EventType(event.Type()) {
 	case user.MachineAddedEventType:
-		u.CreationDate = event.CreationDate
+		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
 		u.Type = userTypeMachine
 		err = u.setData(event)
@@ -248,7 +247,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		user.UserV1RegisteredType,
 		user.HumanRegisteredType,
 		user.HumanAddedType:
-		u.CreationDate = event.CreationDate
+		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
 		u.Type = userTypeHuman
 		err = u.setData(event)
@@ -311,14 +310,14 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case user.UserV1MFAOTPAddedType,
 		user.HumanMFAOTPAddedType:
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
+			logging.WithFields("sequence", event.Sequence, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return errors.ThrowInvalidArgument(nil, "MODEL-p2BXx", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
 		user.HumanMFAOTPVerifiedType:
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
+			logging.WithFields("sequence", event.Sequence, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return errors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateReady)
@@ -338,7 +337,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		err = u.removeU2FToken(event)
 	case user.UserV1MFAInitSkippedType,
 		user.HumanMFAInitSkippedType:
-		u.MFAInitSkipped = event.CreationDate
+		u.MFAInitSkipped = event.CreatedAt()
 	case user.UserV1InitialCodeAddedType,
 		user.HumanInitialCodeAddedType:
 		u.InitRequired = true
@@ -360,34 +359,34 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	return err
 }
 
-func (u *UserView) setRootData(event *models.Event) {
-	u.ID = event.AggregateID
-	u.ResourceOwner = event.ResourceOwner
-	u.InstanceID = event.InstanceID
+func (u *UserView) setRootData(event eventstore.Event) {
+	u.ID = event.Aggregate().ID
+	u.ResourceOwner = event.Aggregate().ResourceOwner
+	u.InstanceID = event.Aggregate().InstanceID
 }
 
-func (u *UserView) setData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, u); err != nil {
+func (u *UserView) setData(event eventstore.Event) error {
+	if err := json.Unmarshal(event.DataAsBytes(), u); err != nil {
 		logging.Log("MODEL-lso9e").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
 	}
 	return nil
 }
 
-func (u *UserView) setPasswordData(event *models.Event) error {
+func (u *UserView) setPasswordData(event eventstore.Event) error {
 	password := new(es_model.Password)
-	if err := json.Unmarshal(event.Data, password); err != nil {
+	if err := json.Unmarshal(event.DataAsBytes(), password); err != nil {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.PasswordSet = password.Secret != nil
 	u.PasswordInitRequired = !u.PasswordSet
 	u.PasswordChangeRequired = password.ChangeRequired
-	u.PasswordChanged = event.CreationDate
+	u.PasswordChanged = event.CreatedAt()
 	return nil
 }
 
-func (u *UserView) addPasswordlessToken(event *models.Event) error {
+func (u *UserView) addPasswordlessToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -403,7 +402,7 @@ func (u *UserView) addPasswordlessToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) updatePasswordlessToken(event *models.Event) error {
+func (u *UserView) updatePasswordlessToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -418,7 +417,7 @@ func (u *UserView) updatePasswordlessToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) removePasswordlessToken(event *models.Event) error {
+func (u *UserView) removePasswordlessToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -434,7 +433,7 @@ func (u *UserView) removePasswordlessToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) addU2FToken(event *models.Event) error {
+func (u *UserView) addU2FToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -450,7 +449,7 @@ func (u *UserView) addU2FToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) updateU2FToken(event *models.Event) error {
+func (u *UserView) updateU2FToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -465,7 +464,7 @@ func (u *UserView) updateU2FToken(event *models.Event) error {
 	return nil
 }
 
-func (u *UserView) removeU2FToken(event *models.Event) error {
+func (u *UserView) removeU2FToken(event eventstore.Event) error {
 	token, err := webAuthNViewFromEvent(event)
 	if err != nil {
 		return err
@@ -480,9 +479,9 @@ func (u *UserView) removeU2FToken(event *models.Event) error {
 	return nil
 }
 
-func webAuthNViewFromEvent(event *models.Event) (*WebAuthNView, error) {
+func webAuthNViewFromEvent(event eventstore.Event) (*WebAuthNView, error) {
 	token := new(WebAuthNView)
-	err := json.Unmarshal(event.Data, token)
+	err := json.Unmarshal(event.DataAsBytes(), token)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
 	}

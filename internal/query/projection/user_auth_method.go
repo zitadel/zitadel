@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -29,38 +29,39 @@ const (
 	UserAuthMethodOwnerRemovedCol  = "owner_removed"
 )
 
-type userAuthMethodProjection struct {
-	crdb.StatementHandler
+type userAuthMethodProjection struct{}
+
+func newUserAuthMethodProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(userAuthMethodProjection))
 }
 
-func newUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userAuthMethodProjection {
-	p := new(userAuthMethodProjection)
-	config.ProjectionName = UserAuthMethodTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(UserAuthMethodUserIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(UserAuthMethodTokenIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(UserAuthMethodCreationDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(UserAuthMethodChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(UserAuthMethodSequenceCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(UserAuthMethodStateCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(UserAuthMethodResourceOwnerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(UserAuthMethodInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(UserAuthMethodNameCol, crdb.ColumnTypeText),
-			crdb.NewColumn(UserAuthMethodOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*userAuthMethodProjection) Name() string {
+	return UserAuthMethodTable
+}
+
+func (*userAuthMethodProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(UserAuthMethodUserIDCol, handler.ColumnTypeText),
+			handler.NewColumn(UserAuthMethodTypeCol, handler.ColumnTypeEnum),
+			handler.NewColumn(UserAuthMethodTokenIDCol, handler.ColumnTypeText),
+			handler.NewColumn(UserAuthMethodCreationDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(UserAuthMethodChangeDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(UserAuthMethodSequenceCol, handler.ColumnTypeInt64),
+			handler.NewColumn(UserAuthMethodStateCol, handler.ColumnTypeEnum),
+			handler.NewColumn(UserAuthMethodResourceOwnerCol, handler.ColumnTypeText),
+			handler.NewColumn(UserAuthMethodInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(UserAuthMethodNameCol, handler.ColumnTypeText),
+			handler.NewColumn(UserAuthMethodOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(UserAuthMethodInstanceIDCol, UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
-			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{UserAuthMethodResourceOwnerCol})),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{UserAuthMethodOwnerRemovedCol})),
+			handler.NewPrimaryKey(UserAuthMethodInstanceIDCol, UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
+			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserAuthMethodResourceOwnerCol})),
+			handler.WithIndex(handler.NewIndex("owner_removed", []string{UserAuthMethodOwnerRemovedCol})),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *userAuthMethodProjection) reducers() []handler.AggregateReducer {
+func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -140,7 +141,7 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
 	}
 
-	return crdb.NewUpsertStatement(
+	return handler.NewUpsertStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(UserAuthMethodInstanceIDCol, nil),
@@ -184,7 +185,7 @@ func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(UserAuthMethodChangeDateCol, event.CreatedAt()),
@@ -227,7 +228,7 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 	if tokenID != "" {
 		conditions = append(conditions, handler.NewCond(UserAuthMethodTokenIDCol, tokenID))
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		event,
 		conditions,
 	), nil
@@ -239,7 +240,7 @@ func (p *userAuthMethodProjection) reduceOwnerRemoved(event eventstore.Event) (*
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-FwDZ8", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(UserAuthMethodChangeDateCol, e.CreatedAt()),

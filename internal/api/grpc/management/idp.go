@@ -29,7 +29,7 @@ func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsReques
 	}
 	return &mgmt_pb.ListOrgIDPsResponse{
 		Result:  idp_grpc.IDPViewsToPb(resp.IDPs),
-		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.LastUpdated),
 	}, nil
 }
 
@@ -166,7 +166,7 @@ func (s *Server) ListProviders(ctx context.Context, req *mgmt_pb.ListProvidersRe
 	}
 	return &mgmt_pb.ListProvidersResponse{
 		Result:  idp_grpc.ProvidersToPb(resp.Templates),
-		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.LastUpdated),
 	}, nil
 }
 

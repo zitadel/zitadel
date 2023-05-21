@@ -168,7 +168,8 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 	if err != nil {
 		return nil, err
 	}
-	sessions.LatestSequence, err = q.latestSequence(ctx, sessionsTable)
+
+	sessions.LatestState, err = q.latestState(ctx, sessionsTable)
 	return sessions, err
 }
 

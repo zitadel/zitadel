@@ -4,37 +4,30 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/authz/repository"
-	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
 	authz_view "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
 type EsRepository struct {
-	eventstore.UserMembershipRepo
-	eventstore.TokenVerifierRepo
+	authz_es.UserMembershipRepo
+	authz_es.TokenVerifierRepo
 }
 
-func Start(queries *query.Queries, dbClient *database.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure, allowOrderByCreationDate bool) (repository.Repository, error) {
-	es, err := v1.Start(dbClient, allowOrderByCreationDate)
-	if err != nil {
-		return nil, err
-	}
-
-	idGenerator := id.SonyFlakeGenerator()
-	view, err := authz_view.StartView(dbClient, idGenerator, queries)
+func Start(queries *query.Queries, es *eventstore.Eventstore, dbClient *database.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
+	view, err := authz_view.StartView(dbClient, queries)
 	if err != nil {
 		return nil, err
 	}
 
 	return &EsRepository{
-		eventstore.UserMembershipRepo{
+		authz_es.UserMembershipRepo{
 			Queries: queries,
 		},
-		eventstore.TokenVerifierRepo{
+		authz_es.TokenVerifierRepo{
 			TokenVerificationKey: keyEncryptionAlgorithm,
 			Eventstore:           es,
 			View:                 view,

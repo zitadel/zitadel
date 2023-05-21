@@ -97,7 +97,7 @@ func StartQueries(
 	if err != nil {
 		return nil, err
 	}
-	projection.Start()
+	projection.Start(ctx)
 
 	return repo, nil
 }

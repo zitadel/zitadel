@@ -68,6 +68,7 @@ type Steps struct {
 	CorrectCreationDate  *CorrectCreationDate
 	s11AddEventCreatedAt *AddEventCreatedAt
 	s12ChangeEvents      *ChangeEvents
+	s13CurrentStates     *CurrentProjectionState
 }
 
 type encryptionKeyConfig struct {

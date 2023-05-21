@@ -111,7 +111,7 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	if err != nil {
 		return nil, err
 	}
-	idps.LatestSequence, err = q.latestSequence(ctx, idpUserLinkTable)
+	idps.LatestState, err = q.latestState(ctx, idpUserLinkTable)
 	return idps, err
 }
 

@@ -46,9 +46,9 @@ type UserMembershipView struct {
 
 func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {
 	u.ChangeDate = event.CreationDate
-	u.Sequence = event.Sequence
+	u.Sequence = event.Seq
 
-	switch eventstore.EventType(event.Type) {
+	switch eventstore.EventType(event.Typ) {
 	case instance.MemberAddedEventType:
 		u.setRootData(event, model.MemberTypeIam)
 		err = u.setIamMemberData(event)

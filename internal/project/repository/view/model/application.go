@@ -82,7 +82,7 @@ func OIDCGrantTypesToModel(granttypes []domain.OIDCGrantType) []model.OIDCGrantT
 
 func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 	view := new(ApplicationView)
-	switch eventstore.EventType(event.Type) {
+	switch eventstore.EventType(event.Typ) {
 	case project.ApplicationAddedType:
 		err = view.SetData(event)
 		if err != nil {
@@ -120,9 +120,9 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 }
 
 func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
-	a.Sequence = event.Sequence
+	a.Sequence = event.Seq
 	a.ChangeDate = event.CreationDate
-	switch eventstore.EventType(event.Type) {
+	switch eventstore.EventType(event.Typ) {
 	case project.ApplicationAddedType:
 		a.setRootData(event)
 		a.CreationDate = event.CreationDate

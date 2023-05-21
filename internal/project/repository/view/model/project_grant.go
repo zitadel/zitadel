@@ -47,8 +47,8 @@ type ProjectGrant struct {
 
 func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
-	p.Sequence = event.Sequence
-	switch eventstore.EventType(event.Type) {
+	p.Sequence = event.Seq
+	switch eventstore.EventType(event.Typ) {
 	case project.GrantAddedType:
 		p.State = int32(model.ProjectStateActive)
 		p.CreationDate = event.CreationDate

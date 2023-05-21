@@ -41,9 +41,9 @@ type ProjectMemberView struct {
 }
 
 func (r *ProjectMemberView) AppendEvent(event *models.Event) (err error) {
-	r.Sequence = event.Sequence
+	r.Sequence = event.Seq
 	r.ChangeDate = event.CreationDate
-	switch eventstore.EventType(event.Type) {
+	switch eventstore.EventType(event.Typ) {
 	case project.MemberAddedType:
 		r.setRootData(event)
 		r.CreationDate = event.CreationDate

@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
@@ -23,7 +22,6 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 const unknownUserID = "UNKNOWN"
@@ -33,7 +31,6 @@ type AuthRequestRepo struct {
 	Query        *query.Queries
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
-	Eventstore   v1.Eventstore
 	UserCodeAlg  crypto.EncryptionAlgorithm
 
 	LabelPolicyProvider       labelPolicyProvider
@@ -65,7 +62,7 @@ type privacyPolicyProvider interface {
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error)
 	UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error)
-	GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error)
+	// GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.LatestState, error)
 }
 
 type userViewProvider interface {
@@ -89,7 +86,7 @@ type idpUserLinksProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
+	UserEventsByID(ctx context.Context, id string, changeDate time.Time) ([]eventstore.Event, error)
 }
 
 type userCommandProvider interface {
@@ -1307,23 +1304,16 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		if !errors.IsNotFound(err) {
 			return nil, err
 		}
-		sequence, err := provider.GetLatestUserSessionSequence(ctx, instanceID)
-		logging.WithFields("instanceID", instanceID, "userID", user.ID).
-			OnError(err).
-			Errorf("could not get current sequence for userSessionByIDs")
 		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
-		if sequence != nil {
-			session.Sequence = sequence.CurrentSequence
-		}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.ChangeDate)
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
 	}
 	sessionCopy := *session
 	for _, event := range events {
-		switch eventstore.EventType(event.Type) {
+		switch event.Type() {
 		case user_repo.UserV1PasswordCheckSucceededType,
 			user_repo.UserV1PasswordCheckFailedType,
 			user_repo.UserV1MFAOTPCheckSucceededType,
@@ -1397,7 +1387,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	} else if user == nil {
 		user = new(user_view_model.UserView)
 	}
-	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, userID, user.ChangeDate)
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil

@@ -3,15 +3,12 @@ package view
 import (
 	"context"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 const (
@@ -98,21 +95,14 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 	}
 
 	if err != nil {
-		sequence, err := v.GetLatestUserSequence(ctx, instanceID)
-		logging.WithFields("instanceID", instanceID).
-			OnError(err).
-			Errorf("could not get current sequence for userByID")
 		user = new(model.UserView)
-		if sequence != nil {
-			user.Sequence = sequence.CurrentSequence
-		}
 	}
 
-	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.Sequence)
+	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.ChangeDate)
 	if err != nil {
 		return nil, err
 	}
-	events, err := v.es.FilterEvents(ctx, query)
+	events, err := v.es.Filter(ctx, query)
 	if err != nil && user.Sequence == 0 {
 		return nil, err
 	} else if err != nil {
@@ -138,82 +128,42 @@ func (v *View) UsersByOrgID(orgID, instanceID string) ([]*model.UserView, error)
 	return view.UsersByOrgID(v.Db, userTable, orgID, instanceID)
 }
 
-func (v *View) UserIDsByDomain(domain, instanceID string) ([]string, error) {
-	return view.UserIDsByDomain(v.Db, userTable, domain, instanceID)
-}
-
-func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
-	return view.SearchUsers(v.Db, userTable, request)
-}
-
-func (v *View) GetGlobalUserByLoginName(email, instanceID string) (*model.UserView, error) {
-	return view.GetGlobalUserByLoginName(v.Db, userTable, email, instanceID)
-}
-
-func (v *View) UserMFAs(userID, instanceID string) ([]*usr_model.MultiFactor, error) {
-	return view.UserMFAs(v.Db, userTable, userID, instanceID)
-}
-
-func (v *View) PutUser(user *model.UserView, event *models.Event) error {
+func (v *View) PutUser(user *model.UserView, event eventstore.Event) error {
 	err := view.PutUser(v.Db, userTable, user)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserSequence(event)
+	return nil
 }
 
-func (v *View) PutUsers(users []*model.UserView, event *models.Event) error {
+func (v *View) PutUsers(users []*model.UserView, event eventstore.Event) error {
 	err := view.PutUsers(v.Db, userTable, users...)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserSequence(event)
+	return nil
 }
 
-func (v *View) DeleteUser(userID, instanceID string, event *models.Event) error {
+func (v *View) DeleteUser(userID, instanceID string, event eventstore.Event) error {
 	err := view.DeleteUser(v.Db, userTable, userID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedUserSequence(event)
+	return nil
 }
 
-func (v *View) DeleteInstanceUsers(event *models.Event) error {
-	err := view.DeleteInstanceUsers(v.Db, userTable, event.InstanceID)
+func (v *View) DeleteInstanceUsers(event eventstore.Event) error {
+	err := view.DeleteInstanceUsers(v.Db, userTable, event.Aggregate().InstanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedUserSequence(event)
+	return nil
 }
 
-func (v *View) UpdateOrgOwnerRemovedUsers(event *models.Event) error {
-	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.InstanceID, event.AggregateID)
+func (v *View) UpdateOrgOwnerRemovedUsers(event eventstore.Event) error {
+	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.Aggregate().InstanceID, event.Aggregate().ID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedUserSequence(event)
-}
-
-func (v *View) GetLatestUserSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(ctx, userTable, instanceID)
-}
-
-func (v *View) GetLatestUserSequences(ctx context.Context, instanceIDs []string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(ctx, userTable, instanceIDs)
-}
-
-func (v *View) ProcessedUserSequence(event *models.Event) error {
-	return v.saveCurrentSequence(userTable, event)
-}
-
-func (v *View) UpdateUserSpoolerRunTimestamp(instanceIDs []string) error {
-	return v.updateSpoolerRunSequence(userTable, instanceIDs)
-}
-
-func (v *View) GetLatestUserFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(userTable, instanceID, sequence)
-}
-
-func (v *View) ProcessedUserFailedEvent(failedEvent *repository.FailedEvent) error {
-	return v.saveFailedEvent(failedEvent)
+	return nil
 }

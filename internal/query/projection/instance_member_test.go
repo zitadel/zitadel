@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -40,24 +40,26 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				), instance.MemberAddedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{
-				StatementHandler: getStatementHandlerWithFilters(
-					user.NewHumanAddedEvent(context.Background(),
-						&user.NewAggregate("user-id", "org1").Aggregate,
-						"username1",
-						"firstname1",
-						"lastname1",
-						"nickname1",
-						"displayname1",
-						language.German,
-						domain.GenderMale,
-						"email1",
-						true,
-					),
-				)(t)}).reduceAdded,
+				es: newMockEventStore().appendFilterResponse(
+					[]eventstore.Event{
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user-id", "org1").Aggregate,
+							"username1",
+							"firstname1",
+							"lastname1",
+							"nickname1",
+							"displayname1",
+							language.German,
+							domain.GenderMale,
+							"email1",
+							true,
+						),
+					},
+				),
+			}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    instance.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: instance.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -94,9 +96,8 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceMemberProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType:    instance.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: instance.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -126,9 +127,8 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType:    instance.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: instance.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -155,9 +155,8 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceMemberProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    instance.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: instance.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -182,9 +181,8 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -209,9 +207,8 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceMemberProjection{}).reduceUserOwnerRemoved,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -239,9 +236,8 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

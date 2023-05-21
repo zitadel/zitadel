@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type AuthRequest struct {
@@ -23,8 +23,8 @@ type BrowserInfo struct {
 	RemoteIP       net.IP `json:"remoteIP,omitempty"`
 }
 
-func (a *AuthRequest) SetData(event *es_models.Event) error {
-	if err := json.Unmarshal(event.Data, a); err != nil {
+func (a *AuthRequest) SetData(event eventstore.Event) error {
+	if err := json.Unmarshal(event.DataAsBytes(), a); err != nil {
 		logging.Log("EVEN-T5df6").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-yGmhh", "could not unmarshal event")
 	}

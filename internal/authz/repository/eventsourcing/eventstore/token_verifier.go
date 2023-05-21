@@ -17,8 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
@@ -29,7 +28,7 @@ import (
 type TokenVerifierRepo struct {
 	TokenVerificationKey crypto.EncryptionAlgorithm
 	IAMID                string
-	Eventstore           v1.Eventstore
+	Eventstore           *eventstore.Eventstore
 	View                 *view.View
 	Query                *query.Queries
 	ExternalSecure       bool
@@ -44,12 +43,13 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 	defer func() { span.EndWithError(err) }()
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
+
 	token, viewErr := repo.View.TokenByIDs(tokenID, userID, instanceID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
 	if caos_errs.IsNotFound(viewErr) {
-		sequence, err := repo.View.GetLatestTokenSequence(ctx, instanceID)
+		sequence, err := repo.View.GetLatestState(ctx)
 		logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
 			OnError(err).
 			Errorf("could not get current sequence for token check")
@@ -58,11 +58,12 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		token.ID = tokenID
 		token.UserID = userID
 		if sequence != nil {
-			token.Sequence = sequence.CurrentSequence
+			token.Sequence = sequence.EventSequence
+			token.ChangeDate = sequence.EventCreationDate
 		}
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.ChangeDate)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -136,14 +137,14 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	return clientID, app.ProjectID, nil
 }
 
-func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) (_ []*models.Event, err error) {
+func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, creationDate time.Time) (_ []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
+	query, err := usr_view.UserByIDQuery(userID, instanceID, creationDate)
 	if err != nil {
 		return nil, err
 	}
-	return repo.Eventstore.FilterEvents(ctx, query)
+	return repo.Eventstore.Filter(ctx, query)
 }
 
 // getTokenIDAndSubject returns the TokenID and Subject of both opaque tokens and JWTs

@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
 	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
@@ -47,9 +46,9 @@ type UserSessionView struct {
 	InstanceID                   string    `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
-func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
+func UserSessionFromEvent(event eventstore.Event) (*UserSessionView, error) {
 	v := new(UserSessionView)
-	if err := json.Unmarshal(event.Data, v); err != nil {
+	if err := json.Unmarshal(event.DataAsBytes(), v); err != nil {
 		logging.Log("EVEN-lso9e").WithError(err).Error("could not unmarshal event data")
 		return nil, caos_errs.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
@@ -88,13 +87,13 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 	return result
 }
 
-func (v *UserSessionView) AppendEvent(event *models.Event) error {
-	v.Sequence = event.Sequence
-	v.ChangeDate = event.CreationDate
-	switch eventstore.EventType(event.Type) {
+func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
+	v.Sequence = event.Sequence()
+	v.ChangeDate = event.CreatedAt()
+	switch eventstore.EventType(event.Type()) {
 	case user.UserV1PasswordCheckSucceededType,
 		user.HumanPasswordCheckSucceededType:
-		v.PasswordVerification = event.CreationDate
+		v.PasswordVerification = event.CreatedAt()
 		v.State = int32(domain.UserSessionStateActive)
 	case user.UserIDPLoginCheckSucceededType:
 		data := new(es_model.AuthRequest)
@@ -102,12 +101,12 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		if err != nil {
 			return err
 		}
-		v.ExternalLoginVerification = event.CreationDate
+		v.ExternalLoginVerification = event.CreatedAt()
 		v.SelectedIDPConfigID = data.SelectedIDPConfigID
 		v.State = int32(domain.UserSessionStateActive)
 	case user.HumanPasswordlessTokenCheckSucceededType:
-		v.PasswordlessVerification = event.CreationDate
-		v.MultiFactorVerification = event.CreationDate
+		v.PasswordlessVerification = event.CreatedAt()
+		v.MultiFactorVerification = event.CreatedAt()
 		v.MultiFactorVerificationType = int32(domain.MFATypeU2FUserVerification)
 		v.State = int32(domain.UserSessionStateActive)
 	case user.HumanPasswordlessTokenCheckFailedType,
@@ -134,11 +133,11 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 			return err
 		}
 		if v.UserAgentID == data.UserAgentID {
-			v.setSecondFactorVerification(event.CreationDate, domain.MFATypeOTP)
+			v.setSecondFactorVerification(event.CreatedAt(), domain.MFATypeOTP)
 		}
 	case user.UserV1MFAOTPCheckSucceededType,
 		user.HumanMFAOTPCheckSucceededType:
-		v.setSecondFactorVerification(event.CreationDate, domain.MFATypeOTP)
+		v.setSecondFactorVerification(event.CreatedAt(), domain.MFATypeOTP)
 	case user.UserV1MFAOTPCheckFailedType,
 		user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPCheckFailedType,
@@ -153,10 +152,10 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 			return err
 		}
 		if v.UserAgentID == data.UserAgentID {
-			v.setSecondFactorVerification(event.CreationDate, domain.MFATypeU2F)
+			v.setSecondFactorVerification(event.CreatedAt(), domain.MFATypeU2F)
 		}
 	case user.HumanU2FTokenCheckSucceededType:
-		v.setSecondFactorVerification(event.CreationDate, domain.MFATypeU2F)
+		v.setSecondFactorVerification(event.CreatedAt(), domain.MFATypeU2F)
 	case user.UserV1SignedOutType,
 		user.HumanSignedOutType,
 		user.UserLockedType,
@@ -190,9 +189,9 @@ func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time
 	v.State = int32(domain.UserSessionStateActive)
 }
 
-func avatarKeyFromEvent(event *models.Event) (string, error) {
+func avatarKeyFromEvent(event eventstore.Event) (string, error) {
 	data := make(map[string]string)
-	if err := json.Unmarshal(event.Data, &data); err != nil {
+	if err := json.Unmarshal(event.DataAsBytes(), &data); err != nil {
 		logging.Log("EVEN-Sfew2").WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(err, "MODEL-SFw2q", "could not unmarshal event")
 	}

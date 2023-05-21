@@ -47,13 +47,13 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []Command
 		for _, constraint := range command.UniqueConstraints() {
 			switch constraint.Action {
 			case UniqueConstraintAdd:
-				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addPlaceholders)+1, len(addPlaceholders)+2, len(addPlaceholders)+3))
+				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
 				addArgs = append(addArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 			case UniqueConstraintRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d AND unique_type = $%d AND unique_field = $%d)", len(addPlaceholders)+1, len(addPlaceholders)+2, len(addPlaceholders)+3))
+				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d AND unique_type = $%d AND unique_field = $%d)", len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 			case UniqueConstraintInstanceRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d)", len(addPlaceholders)+1))
+				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d)", len(deleteArgs)+1))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID)
 			}
 		}
@@ -66,7 +66,7 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []Command
 		}
 	}
 	if len(addPlaceholders) > 0 {
-		_, err := tx.ExecContext(ctx, fmt.Sprintf(addConstraintStmt, strings.Join(addPlaceholders, " OR ")), addArgs...)
+		_, err := tx.ExecContext(ctx, fmt.Sprintf(addConstraintStmt, strings.Join(addPlaceholders, ", ")), addArgs...)
 		return err
 	}
 	return nil

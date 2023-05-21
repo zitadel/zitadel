@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -40,7 +40,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				), org.MemberAddedEventMapper),
 			},
 			reduce: (&orgMemberProjection{
-				StatementHandler: getStatementHandlerWithFilters(
+				es: newMockEventStore().appendFilterResponse([]eventstore.Event{
 					user.NewHumanAddedEvent(context.Background(),
 						&user.NewAggregate("user-id", "org1").Aggregate,
 						"username1",
@@ -53,11 +53,11 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 						"email1",
 						true,
 					),
-				)(t)}).reduceAdded,
+				}),
+			}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -94,9 +94,8 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgMemberProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -127,9 +126,8 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -157,9 +155,8 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgMemberProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -185,9 +182,8 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -212,9 +208,8 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgMemberProjection{}).reduceOrgRemoved,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -252,9 +247,8 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{

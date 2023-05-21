@@ -27,7 +27,7 @@ func TestObjectRoot_AppendEvent(t *testing.T) {
 			args{
 				&Event{
 					AggregateID:  "aggID",
-					Sequence:     34555,
+					Seq:          34555,
 					CreationDate: time.Now(),
 				},
 				true,
@@ -44,7 +44,7 @@ func TestObjectRoot_AppendEvent(t *testing.T) {
 			args{
 				&Event{
 					AggregateID:      "agg",
-					Sequence:         34555425,
+					Seq:              34555425,
 					CreationDate:     time.Now(),
 					PreviousSequence: 22,
 				},
@@ -70,8 +70,8 @@ func TestObjectRoot_AppendEvent(t *testing.T) {
 					t.Error("creationDate and changedate should differ")
 				}
 			}
-			if o.Sequence != tt.args.event.Sequence {
-				t.Errorf("sequence not equal to event: event: %d root: %d", tt.args.event.Sequence, o.Sequence)
+			if o.Sequence != tt.args.event.Seq {
+				t.Errorf("sequence not equal to event: event: %d root: %d", tt.args.event.Seq, o.Sequence)
 			}
 			if !o.ChangeDate.Equal(tt.args.event.CreationDate) {
 				t.Errorf("changedate should be equal to event creation date:  event: %v root: %v", tt.args.event.CreationDate, o.ChangeDate)

@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 )
@@ -71,9 +70,9 @@ func RefreshTokenViewToModel(token *RefreshTokenView) *usr_model.RefreshTokenVie
 	}
 }
 
-func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event *es_models.Event) (err error) {
+func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event eventstore.Event) (err error) {
 	view := new(RefreshTokenView)
-	switch eventstore.EventType(event.Type) {
+	switch eventstore.EventType(event.Type()) {
 	case user_repo.HumanRefreshTokenAddedType:
 		view.setRootData(event)
 		err = view.appendAddedEvent(event)
@@ -100,10 +99,10 @@ func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event *es_models.Event) (
 	return nil
 }
 
-func (t *RefreshTokenView) AppendEvent(event *es_models.Event) error {
-	t.ChangeDate = event.CreationDate
-	t.Sequence = event.Sequence
-	switch eventstore.EventType(event.Type) {
+func (t *RefreshTokenView) AppendEvent(event eventstore.Event) error {
+	t.ChangeDate = event.CreatedAt()
+	t.Sequence = event.Sequence()
+	switch eventstore.EventType(event.Type()) {
 	case user_repo.HumanRefreshTokenAddedType:
 		t.setRootData(event)
 		return t.appendAddedEvent(event)
@@ -114,44 +113,44 @@ func (t *RefreshTokenView) AppendEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (t *RefreshTokenView) setRootData(event *es_models.Event) {
-	t.UserID = event.AggregateID
-	t.ResourceOwner = event.ResourceOwner
-	t.InstanceID = event.InstanceID
+func (t *RefreshTokenView) setRootData(event eventstore.Event) {
+	t.UserID = event.Aggregate().ID
+	t.ResourceOwner = event.Aggregate().ResourceOwner
+	t.InstanceID = event.Aggregate().InstanceID
 }
 
-func (t *RefreshTokenView) appendAddedEvent(event *es_models.Event) error {
+func (t *RefreshTokenView) appendAddedEvent(event eventstore.Event) error {
 	e := new(user_repo.HumanRefreshTokenAddedEvent)
-	if err := json.Unmarshal(event.Data, e); err != nil {
+	if err := json.Unmarshal(event.DataAsBytes(), e); err != nil {
 		logging.Log("EVEN-Dbb31").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Bbr42", "could not unmarshal event")
 	}
 	t.ID = e.TokenID
-	t.CreationDate = event.CreationDate
+	t.CreationDate = event.CreatedAt()
 	t.AuthMethodsReferences = e.AuthMethodsReferences
 	t.AuthTime = e.AuthTime
 	t.Audience = e.Audience
 	t.ClientID = e.ClientID
-	t.Expiration = event.CreationDate.Add(e.Expiration)
-	t.IdleExpiration = event.CreationDate.Add(e.IdleExpiration)
+	t.Expiration = event.CreatedAt().Add(e.Expiration)
+	t.IdleExpiration = event.CreatedAt().Add(e.IdleExpiration)
 	t.Scopes = e.Scopes
 	t.Token = e.TokenID
 	t.UserAgentID = e.UserAgentID
 	return nil
 }
 
-func (t *RefreshTokenView) appendRenewedEvent(event *es_models.Event) error {
+func (t *RefreshTokenView) appendRenewedEvent(event eventstore.Event) error {
 	e := new(user_repo.HumanRefreshTokenRenewedEvent)
-	if err := json.Unmarshal(event.Data, e); err != nil {
+	if err := json.Unmarshal(event.DataAsBytes(), e); err != nil {
 		logging.Log("EVEN-Vbbn2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Bbrn4", "could not unmarshal event")
 	}
 	t.ID = e.TokenID
-	t.IdleExpiration = event.CreationDate.Add(e.IdleExpiration)
+	t.IdleExpiration = event.CreatedAt().Add(e.IdleExpiration)
 	t.Token = e.RefreshToken
 	return nil
 }
 
-func (t *RefreshTokenView) appendRemovedEvent(event *es_models.Event) {
-	t.Expiration = event.CreationDate
+func (t *RefreshTokenView) appendRemovedEvent(event eventstore.Event) {
+	t.Expiration = event.CreatedAt()
 }

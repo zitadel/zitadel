@@ -2,14 +2,11 @@ package eventstore
 
 import (
 	"database/sql"
-	"encoding/json"
 	"sync"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
@@ -71,7 +68,6 @@ func (es *Eventstore) notify(events []eventstore.Event) {
 		return
 	}
 
-	go v1.Notify(MapEventsToV1Events(eventReaders))
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
 	for _, event := range eventReaders {
@@ -140,33 +136,4 @@ func mapEventsToRepo(events []eventstore.Event) []*repository.Event {
 		}
 	}
 	return repoEvents
-}
-
-func MapEventsToV1Events(events []eventstore.Event) []*models.Event {
-	v1Events := make([]*models.Event, len(events))
-	for i, event := range events {
-		v1Events[i] = mapEventToV1Event(event)
-	}
-	return v1Events
-}
-
-func mapEventToV1Event(event eventstore.Event) *models.Event {
-	payload := make(map[string]any)
-	err := event.Unmarshal(&payload)
-	logging.OnError(err).Debug("unmarshal failed")
-	data, err := json.Marshal(payload)
-	logging.OnError(err).Debug("marshal failed")
-
-	return &models.Event{
-		Sequence:      event.Sequence(),
-		CreationDate:  event.CreatedAt(),
-		Type:          models.EventType(event.Type()),
-		AggregateType: models.AggregateType(event.Aggregate().Type),
-		AggregateID:   event.Aggregate().ID,
-		ResourceOwner: event.Aggregate().ResourceOwner,
-		InstanceID:    event.Aggregate().InstanceID,
-		EditorService: "zitadel",
-		EditorUser:    event.Creator(),
-		Data:          data,
-	}
 }

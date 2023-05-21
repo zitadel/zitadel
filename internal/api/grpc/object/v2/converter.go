@@ -27,8 +27,8 @@ func ToListDetails(response query.SearchResponse) *object.ListDetails {
 		TotalResult:       response.Count,
 		ProcessedSequence: response.Sequence,
 	}
-	if !response.Timestamp.IsZero() {
-		details.Timestamp = timestamppb.New(response.Timestamp)
+	if !response.EventTimestamp.IsZero() {
+		details.Timestamp = timestamppb.New(response.EventTimestamp)
 	}
 
 	return details
