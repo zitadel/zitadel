@@ -268,8 +268,14 @@ module.exports = {
       type: "category",
       label: "Concepts",
       collapsed: true,
+      link: {
+        type: "generated-index",
+        title: "Concepts and Features",
+        slug: "concepts",
+        description:
+          "This part of our documentation contains ZITADEL specific or general concepts required to understand the system or our guides.",
+      },
       items: [
-        "concepts/introduction",
         "concepts/structure/instance",
         "concepts/structure/organizations",
         "concepts/structure/projects",
