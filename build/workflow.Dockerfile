@@ -177,13 +177,15 @@ ARG GOARCH
 
 COPY --from=console /zitadel/console/dist/console internal/api/ui/console/static/
 
-RUN go build -o zitadel-${GOOS}-${GOARCH} -ldflags="-s -w"
+RUN go build -o zitadel -ldflags="-s -w"
 
-ENTRYPOINT [ "./zitadel-${GOOS}-${GOARCH}" ]
+ENTRYPOINT [ "./zitadel" ]
 
 FROM scratch AS copy-executable
+ARG GOOS 
+ARG GOARCH
 
-COPY --from=compile /go/src/github.com/zitadel/zitadel/zitadel /zitadel
+COPY --from=compile /go/src/github.com/zitadel/zitadel/zitadel /.artifacts/zitadel-${GOOS}-${GOARCH}
 
 # ##############################################################################
 #  tests
