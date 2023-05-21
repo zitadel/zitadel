@@ -125,6 +125,7 @@ jobs:
         cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
+        outputs: '.'
     -
       name: can i see the exectuable
       run: ls -R

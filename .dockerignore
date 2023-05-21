@@ -17,7 +17,7 @@ SECURITY.md
 **/.artifacts
 console/.angular
 console/node_modules
-# console/src/app/proto/generated/
+console/src/app/proto/generated/
 console/tmp/
 .vscode
 build/*.Dockerfile

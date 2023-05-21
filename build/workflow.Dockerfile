@@ -177,9 +177,9 @@ ARG GOARCH
 
 COPY --from=console /zitadel/console/dist/console internal/api/ui/console/static/
 
-RUN go build -o zitadel -ldflags="-s -w"
+RUN go build -o zitadel-${GOOS}-${GOARCH} -ldflags="-s -w"
 
-ENTRYPOINT [ "./zitadel" ]
+ENTRYPOINT [ "./zitadel-${GOOS}-${GOARCH}" ]
 
 # ##############################################################################
 #  tests
