@@ -199,6 +199,7 @@ RUN apt update; \
     apt install -y \
         gcc \
         make \
+        ca-certificates \
         ; \
     update-ca-certificates;
 
