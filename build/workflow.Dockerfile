@@ -239,4 +239,4 @@ ENV ZITADEL_MASTERKEY=MasterkeyNeedsToHave32Characters
 COPY build/core-integration-test.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-ENTRYPOINT entrypoint.sh
+RUN entrypoint.sh
