@@ -77,8 +77,8 @@ func (a *AccessInterceptor) SetExhaustedCookie(writer http.ResponseWriter, reque
 	a.cookieHandler.SetCookie(writer, a.limitConfig.ExhaustedCookieKey, domain, cookieValue)
 }
 
-func (a *AccessInterceptor) DeleteExhaustedCookie(writer http.ResponseWriter, request *http.Request) {
-	a.cookieHandler.DeleteCookie(writer, request, a.limitConfig.ExhaustedCookieKey)
+func (a *AccessInterceptor) DeleteExhaustedCookie(writer http.ResponseWriter) {
+	a.cookieHandler.DeleteCookie(writer, a.limitConfig.ExhaustedCookieKey)
 }
 
 func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
@@ -96,7 +96,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			http.Error(wrappedWriter, "quota for authenticated requests is exhausted", http.StatusTooManyRequests)
 		}
 		if !limited && !a.storeOnly {
-			a.DeleteExhaustedCookie(wrappedWriter, request)
+			a.DeleteExhaustedCookie(wrappedWriter)
 		}
 		if !limited {
 			next.ServeHTTP(wrappedWriter, request)

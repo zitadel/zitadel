@@ -9,7 +9,6 @@ import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-m
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
-import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
@@ -53,7 +52,6 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     MatIconModule,
     InfoRowModule,
     ContributorsModule,
-    MatTabsModule,
     WarnDialogModule,
     MatTooltipModule,
     ProjectRolesTableModule,
