@@ -108,7 +108,7 @@ jobs:
       with:
         context: .
         file: ./build/workflow.Dockerfile
-        target: lint-api
+        target: lint-core
         push: false
         cache-to: ${{inputs.cache_to_params}}
         cache-from: ${{inputs.cache_from_params}}
