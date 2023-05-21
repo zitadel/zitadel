@@ -20,4 +20,4 @@ console/node_modules
 console/src/app/proto/generated/
 console/tmp/
 .vscode
-build
+build/*.Dockerfile
