@@ -128,10 +128,10 @@ jobs:
         cache-from: ${{env.cache_from_params}}
         github-token: ${{ github.token }}
         tags: ${{env.tag_name}}
-        outputs: type=local,dest=/tmp/compiled
+        outputs: type=local,dest=/tmp
     -
       name: can i see the exectuable
-      run: ls -R /tmp/compiled/
+      run: ls -la /tmp/.artifacts
 
   core-unit-test:
     runs-on: ubuntu-latest
