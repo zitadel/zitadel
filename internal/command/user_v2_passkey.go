@@ -40,7 +40,7 @@ type eventCallback func(context.Context, *eventstore.Aggregate) eventstore.Comma
 // A code can only be used once.
 // Upon success an event callback is returned, which must be called after
 // all other events for the current request are created.
-// This prevent consuming a code when another error occured after verification.
+// This prevent consuming a code when another error occurred after verification.
 func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOwner, codeID, code string, alg crypto.EncryptionAlgorithm) (eventCallback, error) {
 	wm := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, wm)
