@@ -41,6 +41,10 @@ or have limited resources on your local machine.
 ### Developing Against Your Local ZITADEL Instance
 
 ```sh
+# Backup your ./apps/login/.env.local if it exists to ./apps/login/.env.local.bak
+mv ./apps/login/.env.local ./apps/login/.env.local.bak
+
+# Run ZITADEL and configure ./apps/login/.env.local
 docker compose --file ./acceptance/docker-compose.yaml run setup
 ```
 
