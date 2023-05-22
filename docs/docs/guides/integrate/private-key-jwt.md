@@ -96,7 +96,7 @@ curl --request POST \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
-If you want to access the ZITADEL API with this access token, you have to add *urn:zitadel:iam:org:project:id:zitadel:aud* to the list of scopes.
+If you want to access the ZITADEL API with this access token, you have to add `urn:zitadel:iam:org:project:id:zitadel:aud` to the list of scopes.
 
 * `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
