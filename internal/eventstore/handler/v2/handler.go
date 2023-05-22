@@ -203,8 +203,8 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 			break
 		}
 
-		statements, err := h.eventsToStatements(tx, events, currentState)
-		if err != nil {
+		statements, index, err := h.eventsToStatements(tx, events, currentState)
+		if index == -1 {
 			return err
 		}
 
@@ -213,10 +213,15 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 		}
 
 		hasChanged = true
-		currentState.aggregateID = events[len(events)-1].Aggregate().ID
-		currentState.aggregateType = events[len(events)-1].Aggregate().Type
-		currentState.eventSequence = events[len(events)-1].Sequence()
-		currentState.eventTimestamp = events[len(events)-1].CreatedAt()
+		currentState.aggregateID = statements[len(statements)-1].AggregateID
+		currentState.aggregateType = statements[len(statements)-1].AggregateType
+		currentState.eventSequence = statements[len(statements)-1].Sequence
+		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
+
+		// retry imediatly if statements failed
+		if len(statements) < len(events) {
+			continue
+		}
 
 		if len(events) < int(h.bulkLimit) {
 			break

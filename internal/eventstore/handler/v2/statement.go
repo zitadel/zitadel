@@ -15,17 +15,20 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
-	statements = make([]*Statement, len(events))
+func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, index int, err error) {
+	statements = make([]*Statement, 0, len(events))
 	for i, event := range events {
-		statements[i], err = h.reduce(event)
+		statement, err := h.reduce(event)
 		if err != nil {
 			h.logEvent(event).WithError(err).Error("reduce failed")
-			h.handleFailedStmt(tx, currentState, failureFromEvent(event, err))
-			return nil, err
+			if shouldContinue := h.handleFailedStmt(tx, currentState, failureFromEvent(event, err)); shouldContinue {
+				continue
+			}
+			return statements, i - 1, err
 		}
+		statements = append(statements, statement)
 	}
-	return statements, nil
+	return statements, len(statements) - 1, nil
 }
 
 func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
