@@ -94,7 +94,7 @@ jobs:
         fetch-depth: 0
     - 
       name: pull main
-      run: git pull origin main  --rebase
+      run: git fetch origin main
     -
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
