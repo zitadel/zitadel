@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -20,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
-	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
@@ -81,68 +80,83 @@ func NewHandler(
 }
 
 func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
-	data := new(externalIDPCallbackData)
-	err := h.parser.Parse(r, data)
+	data, err := h.parseCallbackRequest(r)
 	if err != nil {
-		// TODO: ?
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	ctx := r.Context()
-	if data.State == "" {
-		// TODO: ?
-		http.Error(w, z_errs.ThrowInvalidArgument(nil, "IDP-Hk38e", "Errors.Intent.StateMissing").Error(), http.StatusBadRequest)
-		return
-	}
-	intent, err := h.commands.GetIntentWriteModel(ctx, data.State, "")
-	if err != nil {
-		// TODO: ?
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if intent.State == domain.IDPIntentStateUnspecified {
-		// TODO: ?
-		http.Error(w, z_errs.ThrowInvalidArgument(nil, "IDP-Hk38e", "Errors.Intent.NotStarted").Error(), http.StatusBadRequest)
-		return
-	}
-	if intent.State != domain.IDPIntentStateStarted {
-		redirectToFailureURL(w, r, intent, "IDP-Sfrgs", "Errors.Intent.NotStarted")
+	intent := h.getActiveIntent(w, r, data.State)
+	if intent == nil {
+		// if we didn't get an active intent the error was already handled (either redirected or display directly)
 		return
 	}
 
+	ctx := r.Context()
 	idpTemplate, err := h.queries.IDPTemplateByID(ctx, false, intent.IDPID, false)
 	if err != nil {
-		// TODO: set failed?
-		redirectToFailureURLError(w, r, intent, err)
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
 		return
 	}
 
-	if data.Error != "" || data.ErrorDescription != "" {
-		// TODO: set failed?
+	if data.Error != "" {
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, reason(data.Error, data.ErrorDescription))
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
 		redirectToFailureURL(w, r, intent, data.Error, data.ErrorDescription)
 		return
 	}
 
-	idpUser, idpTokens, err := h.fetchIDPUser(ctx, idpTemplate, data.Code)
+	idpUser, idpSession, err := h.fetchIDPUser(ctx, idpTemplate, data.Code)
 	if err != nil {
-		// TODO: set failed?
-		redirectToFailureURLError(w, r, intent, err)
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
 		return
 	}
 	userID, err := h.checkExternalUser(ctx, idpTemplate.ID, idpUser.GetID())
 	if err != nil {
 		// TODO: ignore?
-		redirectToFailureURLError(w, r, intent, err)
+		redirectToFailureURLErr(w, r, intent, err)
 		return
 	}
 
-	token, err := h.commands.SucceedIDPIntent(ctx, intent, idpUser, userID, idpTokens)
+	token, err := h.commands.SucceedIDPIntent(ctx, intent, idpUser, idpSession, userID)
 	if err != nil {
 		// TODO: ?
-		redirectToFailureURLError(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
+		redirectToFailureURLErr(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
 		return
 	}
 	redirectToSuccessURL(w, r, intent, token, userID)
+}
+
+func (h *Handler) parseCallbackRequest(r *http.Request) (*externalIDPCallbackData, error) {
+	data := new(externalIDPCallbackData)
+	err := h.parser.Parse(r, data)
+	if err != nil {
+		return nil, err
+	}
+	if data.State == "" {
+		return nil, z_errs.ThrowInvalidArgument(nil, "IDP-Hk38e", "Errors.Intent.StateMissing")
+	}
+	return data, nil
+}
+
+func (h *Handler) getActiveIntent(w http.ResponseWriter, r *http.Request, state string) *command.IDPIntentWriteModel {
+	intent, err := h.commands.GetIntentWriteModel(r.Context(), state, "")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil
+	}
+	if intent.State == domain.IDPIntentStateUnspecified {
+		http.Error(w, reason("IDP-Hk38e", "Errors.Intent.NotStarted"), http.StatusBadRequest)
+		return nil
+	}
+	if intent.State != domain.IDPIntentStateStarted {
+		redirectToFailureURL(w, r, intent, "IDP-Sfrgs", "Errors.Intent.NotStarted")
+		return nil
+	}
+	return intent
 }
 
 func redirectToSuccessURL(w http.ResponseWriter, r *http.Request, intent *command.IDPIntentWriteModel, token, userID string) {
@@ -156,7 +170,7 @@ func redirectToSuccessURL(w http.ResponseWriter, r *http.Request, intent *comman
 	http.Redirect(w, r, intent.SuccessURL.String(), http.StatusFound)
 }
 
-func redirectToFailureURLError(w http.ResponseWriter, r *http.Request, i *command.IDPIntentWriteModel, err error) {
+func redirectToFailureURLErr(w http.ResponseWriter, r *http.Request, i *command.IDPIntentWriteModel, err error) {
 	msg := err.Error()
 	var description string
 	zErr := new(z_errs.CaosError)
@@ -176,7 +190,7 @@ func redirectToFailureURL(w http.ResponseWriter, r *http.Request, i *command.IDP
 	http.Redirect(w, r, i.FailureURL.String(), http.StatusFound)
 }
 
-func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider *query.IDPTemplate, code string) (user idp.User, idpTokens *oidc.Tokens[*oidc.IDTokenClaims], err error) {
+func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider *query.IDPTemplate, code string) (user idp.User, idpTokens idp.Session, err error) {
 	var provider idp.Provider
 	var session idp.Session
 	callback := h.callbackURL(ctx)
@@ -241,20 +255,7 @@ func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider *query.IDPT
 	if err != nil {
 		return nil, nil, err
 	}
-	return user, tokens(session), nil
-}
-
-// tokens extracts the oidc.Tokens for backwards compatibility of PostExternalAuthenticationActions
-func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
-	switch s := session.(type) {
-	case *oauth.Session:
-		return s.Tokens
-	case *openid.Session:
-		return s.Tokens
-	case *jwt.Session:
-		return s.Tokens
-	}
-	return nil
+	return user, session, nil
 }
 
 func (h *Handler) checkExternalUser(ctx context.Context, idpID, externalUserID string) (userID string, err error) {
@@ -277,4 +278,11 @@ func (h *Handler) checkExternalUser(ctx context.Context, idpID, externalUserID s
 		return "", nil
 	}
 	return links.Links[0].UserID, nil
+}
+
+func reason(err, description string) string {
+	if description == "" {
+		return err
+	}
+	return err + ": " + description
 }

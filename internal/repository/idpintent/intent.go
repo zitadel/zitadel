@@ -123,11 +123,14 @@ func SucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 type FailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	Reason string `json:"reason,omitempty"`
 }
 
 func NewFailedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	reason string,
 ) *FailedEvent {
 	return &FailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -135,6 +138,7 @@ func NewFailedEvent(
 			aggregate,
 			FailedEventType,
 		),
+		Reason: reason,
 	}
 }
 
@@ -147,7 +151,14 @@ func (e *FailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 }
 
 func FailedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	return &FailedEvent{
+	e := &FailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-Sfer3", "unable to unmarshal event")
+	}
+
+	return e, nil
 }

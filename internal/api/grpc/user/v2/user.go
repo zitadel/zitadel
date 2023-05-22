@@ -198,13 +198,17 @@ func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *u
 	if intent.State != domain.IDPIntentStateSucceeded {
 		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
 	}
+	return intentToIDPInformationPb(intent, s.idpAlg)
+}
+
+func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
 	var idToken *string
 	if intent.IDPIDToken != "" {
 		idToken = &intent.IDPIDToken
 	}
 	var accessToken string
 	if intent.IDPAccessToken != nil {
-		accessToken, err = crypto.DecryptString(intent.IDPAccessToken, s.idpAlg)
+		accessToken, err = crypto.DecryptString(intent.IDPAccessToken, alg)
 		if err != nil {
 			return nil, err
 		}
