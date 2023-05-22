@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/url"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -68,8 +69,10 @@ func StartedEventMapper(event *repository.Event) (eventstore.Event, error) {
 type SucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPUser []byte `json:"idpUser"`
-	UserID  string `json:"userId,omitempty"`
+	IDPUser        []byte              `json:"idpUser"`
+	UserID         string              `json:"userId,omitempty"`
+	IDPAccessToken *crypto.CryptoValue `json:"idpAccessToken,omitempty"`
+	IDPIDToken     string              `json:"idpIdToken,omitempty"`
 }
 
 func NewSucceededEvent(
@@ -77,6 +80,8 @@ func NewSucceededEvent(
 	aggregate *eventstore.Aggregate,
 	idpUser idp.User,
 	userID string,
+	idpAccessToken *crypto.CryptoValue,
+	idpIDToken string,
 ) (*SucceededEvent, error) {
 	idpInfo, err := json.Marshal(idpUser)
 	if err != nil {
@@ -88,8 +93,10 @@ func NewSucceededEvent(
 			aggregate,
 			SucceededEventType,
 		),
-		IDPUser: idpInfo,
-		UserID:  userID,
+		IDPUser:        idpInfo,
+		UserID:         userID,
+		IDPAccessToken: idpAccessToken,
+		IDPIDToken:     idpIDToken,
 	}, nil
 }
 

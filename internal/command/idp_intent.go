@@ -4,20 +4,34 @@ import (
 	"context"
 	"encoding/base64"
 
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 )
 
-func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string) (string, error) {
+func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, tokens *oidc.Tokens[*oidc.IDTokenClaims]) (string, error) {
 	token, err := c.idpConfigEncryption.Encrypt([]byte(writeModel.AggregateID))
 	if err != nil {
 		return "", err
+	}
+	var idToken string
+	var accessToken *crypto.CryptoValue
+	if tokens != nil {
+		accessToken, err = crypto.Encrypt([]byte(tokens.AccessToken), c.idpConfigEncryption)
+		if err != nil {
+			return "", err
+		}
+		idToken = tokens.IDToken
 	}
 	cmd, err := idpintent.NewSucceededEvent(
 		ctx,
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
 		idpUser,
 		userID,
+		accessToken,
+		idToken,
 	)
 	if err != nil {
 		return "", err

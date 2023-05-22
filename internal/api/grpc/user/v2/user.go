@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/idp"
@@ -63,12 +64,12 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			Value: metadataEntry.GetValue(),
 		}
 	}
-	links := make([]*command.AddLink, len(req.Links))
-	for i, link := range req.Links {
+	links := make([]*command.AddLink, len(req.GetIdpLinks()))
+	for i, link := range req.GetIdpLinks() {
 		links[i] = &command.AddLink{
-			IDPID:         link.IdpId,
-			IDPExternalID: link.IdpExternalId,
-			DisplayName:   link.DisplayName,
+			IDPID:         link.GetIdpId(),
+			IDPExternalID: link.GetIdpExternalId(),
+			DisplayName:   link.GetDisplayName(),
 		}
 	}
 	return &command.AddHuman{
@@ -123,17 +124,17 @@ func hashedPasswordToCommand(hashed *user.HashedPassword) (string, error) {
 	return hashed.GetHash(), nil
 }
 
-func (s *Server) AddLink(ctx context.Context, req *user.AddLinkRequest) (_ *user.AddLinkResponse, err error) {
+func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
 	orgID := authz.GetCtxData(ctx).OrgID
 	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &domain.UserIDPLink{
-		IDPConfigID:    req.Link.IdpId,
-		ExternalUserID: req.Link.IdpExternalId,
-		DisplayName:    "",
+		IDPConfigID:    req.GetIdpLink().GetIdpId(),
+		ExternalUserID: req.GetIdpLink().GetIdpExternalId(),
+		DisplayName:    req.GetIdpLink().GetDisplayName(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	return &user.AddLinkResponse{
+	return &user.AddIDPLinkResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
@@ -186,5 +187,38 @@ func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartI
 	return &user.StartIdentityProviderFlowResponse{
 		Details:  object.DomainToDetailsPb(details),
 		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: session.GetAuthURL()},
+	}, nil
+}
+
+func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *user.RetrieveIdentityProviderInformationRequest) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIntentId(), "")
+	if err != nil {
+		return nil, err
+	}
+	if intent.State != domain.IDPIntentStateSucceeded {
+		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
+	}
+	var idToken *string
+	if intent.IDPIDToken != "" {
+		idToken = &intent.IDPIDToken
+	}
+	var accessToken string
+	if intent.IDPAccessToken != nil {
+		accessToken, err = crypto.DecryptString(intent.IDPAccessToken, s.idpAlg)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &user.RetrieveIdentityProviderInformationResponse{
+		IdpInformation: &user.IDPInformation{
+			Access: &user.IDPInformation_Oauth{
+				Oauth: &user.IDPOAuthAccessInformation{
+					AccessToken: accessToken,
+					IdToken:     idToken,
+				},
+			},
+			IdpInformation:      intent.IDPUser,
+			IdpInformationPlain: string(intent.IDPUser),
+		},
 	}, nil
 }

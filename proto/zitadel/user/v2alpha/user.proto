@@ -89,7 +89,7 @@ message SetMetadataEntry {
   ];
 }
 
-message Link {
+message IDPLink {
   string idp_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

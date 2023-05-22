@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -19,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
+	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
@@ -121,7 +123,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idpUser, err := h.fetchIDPUser(ctx, idpTemplate, data.Code)
+	idpUser, idpTokens, err := h.fetchIDPUser(ctx, idpTemplate, data.Code)
 	if err != nil {
 		// TODO: set failed?
 		redirectToFailureURLError(w, r, intent, err)
@@ -134,7 +136,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.commands.SucceedIDPIntent(ctx, intent, idpUser, userID)
+	token, err := h.commands.SucceedIDPIntent(ctx, intent, idpUser, userID, idpTokens)
 	if err != nil {
 		// TODO: ?
 		redirectToFailureURLError(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
@@ -174,7 +176,7 @@ func redirectToFailureURL(w http.ResponseWriter, r *http.Request, i *command.IDP
 	http.Redirect(w, r, i.FailureURL.String(), http.StatusFound)
 }
 
-func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider *query.IDPTemplate, code string) (user idp.User, err error) {
+func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider *query.IDPTemplate, code string) (user idp.User, idpTokens *oidc.Tokens[*oidc.IDTokenClaims], err error) {
 	var provider idp.Provider
 	var session idp.Session
 	callback := h.callbackURL(ctx)
@@ -182,49 +184,49 @@ func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider *query.IDPT
 	case domain.IDPTypeOAuth:
 		provider, err = oauth.NewFromQueryTemplate(identityProvider, callback, h.encryptionAlgorithm)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		session = &oauth.Session{Provider: provider.(*oauth.Provider), Code: code}
 	case domain.IDPTypeOIDC:
 		provider, err = openid.NewFromQueryTemplate(identityProvider, callback, h.encryptionAlgorithm)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		session = &openid.Session{Provider: provider.(*openid.Provider), Code: code}
 	case domain.IDPTypeAzureAD:
 		provider, err = azuread.NewFromQueryTemplate(identityProvider, callback, h.encryptionAlgorithm)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		session = &oauth.Session{Provider: provider.(*azuread.Provider).Provider, Code: code}
 	case domain.IDPTypeGitHub:
 		provider, err = github.NewFromQueryTemplate(identityProvider, callback, h.encryptionAlgorithm)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: code}
 	case domain.IDPTypeGitHubEnterprise:
 		provider, err = github.NewCustomFromQueryTemplate(identityProvider, callback, h.encryptionAlgorithm)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: code}
 	case domain.IDPTypeGitLab:
 		provider, err = gitlab.NewFromQueryTemplate(identityProvider, callback, h.encryptionAlgorithm)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: code}
 	case domain.IDPTypeGitLabSelfHosted:
 		provider, err = gitlab.NewCustomFromQueryTemplate(identityProvider, callback, h.encryptionAlgorithm)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: code}
 	case domain.IDPTypeGoogle:
 		provider, err = google.NewFromQueryTemplate(identityProvider, callback, h.encryptionAlgorithm)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: code}
 	case domain.IDPTypeJWT,
@@ -232,10 +234,27 @@ func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider *query.IDPT
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
-		return nil, z_errs.ThrowInvalidArgument(nil, "IDP-SSDg", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		return nil, nil, z_errs.ThrowInvalidArgument(nil, "IDP-SSDg", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	}
 
-	return session.FetchUser(ctx)
+	user, err = session.FetchUser(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return user, tokens(session), nil
+}
+
+// tokens extracts the oidc.Tokens for backwards compatibility of PostExternalAuthenticationActions
+func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
+	switch s := session.(type) {
+	case *oauth.Session:
+		return s.Tokens
+	case *openid.Session:
+		return s.Tokens
+	case *jwt.Session:
+		return s.Tokens
+	}
+	return nil
 }
 
 func (h *Handler) checkExternalUser(ctx context.Context, idpID, externalUserID string) (userID string, err error) {

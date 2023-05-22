@@ -169,7 +169,31 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Start flow with an identity provider";
-      description: "Start a flow with an identity provider, for external login, registration or linking"
+      description: "Start a flow with an identity provider, for external login, registration or linking";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc RetrieveIdentityProviderInformation (RetrieveIdentityProviderInformationRequest) returns (RetrieveIdentityProviderInformationResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/intents/{intent_id}/information"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Retrieve the information returned by the identity provider";
+      description: "Retrieve the information returned by the identity provider for registration or updating an existing user with new information";
       responses: {
         key: "200"
         value: {
@@ -180,9 +204,9 @@ service UserService {
   }
 
   // Link an IDP to an existing user
-  rpc LinkIDP (LinkIDPRequest) returns (LinkIDPResponse) {
+  rpc AddIDPLink (AddIDPLinkRequest) returns (AddIDPLinkResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/link"
+      post: "/v2alpha/users/{user_id}/links"
       body: "*"
     };
 
@@ -194,7 +218,7 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Add link to an identity provider to an user";
-      description: "Add link to an identity provider to an user"
+      description: "Add link to an identity provider to an user";
       responses: {
         key: "200"
         value: {
@@ -238,7 +262,7 @@ message AddHumanUserRequest{
     Password password = 7;
     HashedPassword hashed_password = 8;
   }
-  repeated Link links = 9;
+  repeated IDPLink idp_links = 9;
 }
 
 message AddHumanUserResponse {
@@ -342,13 +366,52 @@ message StartIdentityProviderFlowResponse{
     string auth_url = 2 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "URL to which the client should redirect"
-        example: "\"https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&callback=https%3A%2F%2Fzitadel.cloud%2Fidps%2Fcallback";
+        example: "\"https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&callback=https%3A%2F%2Fzitadel.cloud%2Fidps%2Fcallback\"";
       }
     ];
   }
 }
 
-message LinkIDPRequest{
+message RetrieveIdentityProviderInformationRequest{
+  string intent_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the intent, previously returned on the success response of the IDP callback"
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string token = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "token of the intent, previously returned on the success response of the IDP callback"
+      min_length: 1;
+      max_length: 200;
+      example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
+}
+
+message RetrieveIdentityProviderInformationResponse{
+  zitadel.object.v2alpha.Details details = 1;
+  IDPInformation idp_information = 2;
+}
+
+message IDPInformation{
+  oneof access{
+    IDPOAuthAccessInformation oauth = 1;
+  }
+  bytes idp_information = 2;
+  string idp_information_plain = 3;
+}
+
+message IDPOAuthAccessInformation{
+  string access_token = 1;
+  optional string id_token = 2;
+}
+
+message AddIDPLinkRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -358,9 +421,9 @@ message LinkIDPRequest{
       example: "\"69629026806489455\"";
     }
   ];
-  Link link = 2;
+  IDPLink idp_link = 2;
 }
 
-message LinkIDPResponse {
+message AddIDPLinkResponse {
   zitadel.object.v2alpha.Details details = 1;
 }
