@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/idp"
 )
 
 const (
@@ -78,22 +77,18 @@ type SucceededEvent struct {
 func NewSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	idpUser idp.User,
+	idpUser []byte,
 	userID string,
 	idpAccessToken *crypto.CryptoValue,
 	idpIDToken string,
 ) (*SucceededEvent, error) {
-	idpInfo, err := json.Marshal(idpUser)
-	if err != nil {
-		return nil, err
-	}
 	return &SucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			SucceededEventType,
 		),
-		IDPUser:        idpInfo,
+		IDPUser:        idpUser,
 		UserID:         userID,
 		IDPAccessToken: idpAccessToken,
 		IDPIDToken:     idpIDToken,

@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
@@ -23,10 +24,14 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	if err != nil {
 		return "", err
 	}
+	idpInfo, err := json.Marshal(idpUser)
+	if err != nil {
+		return "", err
+	}
 	cmd, err := idpintent.NewSucceededEvent(
 		ctx,
 		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
-		idpUser,
+		idpInfo,
 		userID,
 		accessToken,
 		idToken,
@@ -61,7 +66,7 @@ func (c *Commands) GetIntentWriteModel(ctx context.Context, id, resourceOwner st
 }
 
 // tokensForSucceededIDPIntent extracts the oidc.Tokens if available (and encrypts the access_token) for the succeeded event payload
-func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.EncryptionAlgorithm) (accessToken *crypto.CryptoValue, idToken string, err error) {
+func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.EncryptionAlgorithm) (*crypto.CryptoValue, string, error) {
 	var tokens *oidc.Tokens[*oidc.IDTokenClaims]
 	switch s := session.(type) {
 	case *oauth.Session:
@@ -73,9 +78,9 @@ func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.Encry
 	default:
 		return nil, "", nil
 	}
-	accessToken, err = crypto.Encrypt([]byte(tokens.AccessToken), encryptionAlg)
-	if err != nil {
-		return nil, "", err
+	if tokens.Token == nil || tokens.AccessToken == "" {
+		return nil, tokens.IDToken, nil
 	}
-	return accessToken, tokens.IDToken, nil
+	accessToken, err := crypto.Encrypt([]byte(tokens.AccessToken), encryptionAlg)
+	return accessToken, tokens.IDToken, err
 }
