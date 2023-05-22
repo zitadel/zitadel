@@ -146,11 +146,12 @@ export async function getMostRecentCookieWithLoginname(
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
-    console.log("sess", sessions);
     const filtered = sessions.filter((cookie) => {
-      console.log("filtered", `${cookie.loginName}`, loginName?.toString());
+      console.log(!!loginName);
       return !!loginName ? cookie.loginName === loginName : true;
     });
+
+    console.log(filtered);
 
     const latest =
       filtered && filtered.length

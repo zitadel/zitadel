@@ -34,7 +34,7 @@ export default function UsernameForm() {
 
     if (!res.ok) {
       setLoading(false);
-      throw new Error("Failed to register user");
+      throw new Error("Failed to set user");
     }
 
     setLoading(false);

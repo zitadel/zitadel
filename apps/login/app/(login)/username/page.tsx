@@ -1,4 +1,3 @@
-"use client";
 import UsernameForm from "#/ui/UsernameForm";
 
 export default function Page() {

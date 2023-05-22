@@ -6,12 +6,17 @@ import { TextInput } from "./Input";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
+import Alert from "./Alert";
 
 type Inputs = {
   password: string;
 };
 
-export default function PasswordForm() {
+type Props = {
+  loginName: string;
+};
+
+export default function PasswordForm({ loginName }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -34,17 +39,20 @@ export default function PasswordForm() {
       }),
     });
 
+    const response = await res.json();
+
     if (!res.ok) {
       setLoading(false);
-      throw new Error("Failed to register user");
+      console.log(response);
+      setError(response.details);
+      return Promise.reject(response.details);
+    } else {
+      setLoading(false);
+      return response;
     }
-
-    setLoading(false);
-    return res.json();
   }
 
   function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
-    console.log(value);
     return submitPassword(value).then((resp: any) => {
       return router.push(`/accounts`);
     });
@@ -62,7 +70,17 @@ export default function PasswordForm() {
           label="Password"
           //   error={errors.username?.message as string}
         />
+
+        {loginName && (
+          <input type="hidden" name="loginName" value={loginName} />
+        )}
       </div>
+
+      {error && (
+        <div className="py-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
 
       <div className="mt-8 flex w-full flex-row items-center">
         {/* <Button type="button" variant={ButtonVariants.Secondary}>

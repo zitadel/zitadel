@@ -87,7 +87,7 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
   function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
     console.log(value);
     return submitCode(value).then((resp: any) => {
-      return router.push(`/accounts`);
+      return router.push(`/username`);
     });
   }
 
