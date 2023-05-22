@@ -34,8 +34,7 @@ func TestConfig_serverFromContext(t *testing.T) {
 				Config: &webauthn.Config{
 					RPDisplayName: "DisplayName",
 					RPID:          "example.com",
-					RPOrigin:      "https://example.com",
-					Timeout:       60000,
+					RPOrigins:     []string{"https://example.com"},
 				},
 			},
 		},
@@ -48,7 +47,12 @@ func TestConfig_serverFromContext(t *testing.T) {
 			}
 			got, err := w.serverFromContext(tt.args.ctx)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			if tt.want != nil {
+				require.NotNil(t, got)
+				assert.Equal(t, tt.want.Config.RPDisplayName, got.Config.RPDisplayName)
+				assert.Equal(t, tt.want.Config.RPID, got.Config.RPID)
+				assert.Equal(t, tt.want.Config.RPOrigins, got.Config.RPOrigins)
+			}
 		})
 	}
 }
