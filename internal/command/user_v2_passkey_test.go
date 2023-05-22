@@ -25,7 +25,9 @@ import (
 )
 
 func TestCommands_RegisterUserPasskey(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := authz.NewMockContextWithPermissions("instance1", "org1", "user1", nil)
+	ctx = authz.WithRequestedDomain(ctx, "example.com")
+
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
 		ExternalSecure: true,
@@ -48,11 +50,25 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 		wantErr error
 	}{
 		{
+			name: "wrong user",
+			args: args{
+				userID:        "foo",
+				resourceOwner: "org1",
+				authenticator: domain.AuthenticatorAttachmentCrossPlattform,
+			},
+			wantErr: caos_errs.ThrowUnauthenticated(nil, "AUTH-Bohd2", "request user not equal to authenticated user"),
+		},
+		{
 			name: "get human passwordless error",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
 					expectFilterError(io.ErrClosedPipe),
 				),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				authenticator: domain.AuthenticatorAttachmentCrossPlattform,
 			},
 			wantErr: io.ErrClosedPipe,
 		},

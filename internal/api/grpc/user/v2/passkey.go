@@ -20,9 +20,6 @@ func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyR
 			s.command.RegisterUserPasskeyWithCode(ctx, req.GetUserId(), resourceOwner, authenticator, code.Id, code.Code, s.userCodeAlg),
 		)
 	}
-	if err := authz.RequestEqualsCTXUser(ctx, req); err != nil {
-		return nil, err
-	}
 	return passkeyRegistrationDetailsToPb(
 		s.command.RegisterUserPasskey(ctx, req.GetUserId(), resourceOwner, authenticator),
 	)
