@@ -154,6 +154,7 @@ service UserService {
     };
   }
 
+  // Start an IDP authentication (for external login, registration or linking)
   rpc StartIdentityProviderFlow (StartIdentityProviderFlowRequest) returns (StartIdentityProviderFlowResponse) {
     option (google.api.http) = {
       post: "/v2alpha/idps/{idp_id}/start"
@@ -168,7 +169,7 @@ service UserService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Start flow with an identity provider";
-      description: "Start a flow with an identity provider, for external login, linking and registration"
+      description: "Start a flow with an identity provider, for external login, registration or linking"
       responses: {
         key: "200"
         value: {
@@ -178,7 +179,8 @@ service UserService {
     };
   }
 
-  rpc AddLink (AddLinkRequest) returns (AddLinkResponse) {
+  // Link an IDP to an existing user
+  rpc LinkIDP (LinkIDPRequest) returns (LinkIDPResponse) {
     option (google.api.http) = {
       post: "/v2alpha/users/{user_id}/link"
       body: "*"
@@ -237,95 +239,6 @@ message AddHumanUserRequest{
     HashedPassword hashed_password = 8;
   }
   repeated Link links = 9;
-}
-
-message StartIdentityProviderFlowRequest{
-  string idp_id = 1[
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID for existing identity provider"
-      min_length: 1;
-      max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
-    }
-  ];
-  string success_url = 2[
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "URL on which the user will be redirected after a successful login"
-      min_length: 1;
-      max_length: 200;
-      example: "\"https://custom.com/login/idp/success\"";
-    }
-  ];
-  string failure_url = 3[
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "URL on which the user will be redirected after a failed login"
-      min_length: 1;
-      max_length: 200;
-      example: "\"https://custom.com/login/idp/fail\"";
-    }
-  ];
-}
-
-message StartIdentityProviderFlowResponse{
-  zitadel.object.v2alpha.Details details = 1;
-  oneof next_step {
-    string auth_url = 2[
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "URL to which the client should redirect"
-        example: "\"https://zitadel.cloud/saml/v2/SSO?relayState=login\"";
-      }
-    ];
-  }
-}
-
-message AddLinkRequest{
-  string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629026806489455\"";
-    }
-  ];
-  Link link = 2;
-}
-
-message AddLinkResponse {
-  zitadel.object.v2alpha.Details details = 1;
-}
-
-message Link {
-  string idp_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the identity provider"
-      min_length: 1;
-      max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
-    }
-  ];
-  string idp_external_id = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of user of the identity provider"
-      min_length: 1;
-      max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
-    }
-  ];
-  string display_name = 3 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Display name of user of the identity provider"
-      min_length: 1;
-      max_length: 200;
-      example: "\"Firstname Lastname\"";
-    }
-  ];
 }
 
 message AddHumanUserResponse {
@@ -390,5 +303,64 @@ message VerifyEmailRequest{
 }
 
 message VerifyEmailResponse{
+  zitadel.object.v2alpha.Details details = 1;
+}
+
+message StartIdentityProviderFlowRequest{
+  string idp_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID for existing identity provider"
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string success_url = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "URL on which the user will be redirected after a successful login"
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://custom.com/login/idp/success\"";
+    }
+  ];
+  string failure_url = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "URL on which the user will be redirected after a failed login"
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://custom.com/login/idp/fail\"";
+    }
+  ];
+}
+
+message StartIdentityProviderFlowResponse{
+  zitadel.object.v2alpha.Details details = 1;
+  oneof next_step {
+    string auth_url = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "URL to which the client should redirect"
+        example: "\"https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&callback=https%3A%2F%2Fzitadel.cloud%2Fidps%2Fcallback";
+      }
+    ];
+  }
+}
+
+message LinkIDPRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  Link link = 2;
+}
+
+message LinkIDPResponse {
   zitadel.object.v2alpha.Details details = 1;
 }

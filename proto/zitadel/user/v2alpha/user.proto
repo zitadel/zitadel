@@ -88,3 +88,33 @@ message SetMetadataEntry {
     }
   ];
 }
+
+message Link {
+  string idp_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the identity provider"
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string idp_external_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of user of the identity provider"
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string display_name = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Display name of user of the identity provider"
+      min_length: 1;
+      max_length: 200;
+      example: "\"Firstname Lastname\"";
+    }
+  ];
+}
