@@ -12,8 +12,11 @@ export default function Page() {
       <h1>Password</h1>
       <p className="ztdl-p mb-6 block">Enter your password.</p>
 
-      <UserAvatar name="max@zitadel.com"></UserAvatar>
-
+      <UserAvatar
+        showDropdown
+        displayName="Max Peintner"
+        loginName="max@zitadel.com"
+      ></UserAvatar>
       <div className="w-full">
         <TextInput type="password" label="Password" />
       </div>
