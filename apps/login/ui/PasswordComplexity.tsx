@@ -4,10 +4,10 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "#/utils/validators";
-import { PasswordComplexityPolicy } from "@zitadel/server";
+import { PasswordComplexitySettings } from "@zitadel/server";
 
 type Props = {
-  passwordComplexityPolicy: PasswordComplexityPolicy;
+  passwordComplexitySettings: PasswordComplexitySettings;
   password: string;
   equals: boolean;
 };
@@ -48,11 +48,11 @@ const desc =
   "text-14px leading-4 text-input-light-label dark:text-input-dark-label";
 
 export default function PasswordComplexity({
-  passwordComplexityPolicy,
+  passwordComplexitySettings,
   password,
   equals,
 }: Props) {
-  const hasMinLength = password?.length >= passwordComplexityPolicy.minLength;
+  const hasMinLength = password?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(password);
   const hasNumber = numberValidator(password);
   const hasUppercase = upperCaseValidator(password);
@@ -63,7 +63,7 @@ export default function PasswordComplexity({
       <div className="flex flex-row items-center">
         {hasMinLength ? check : cross}
         <span className={desc}>
-          Password length {passwordComplexityPolicy.minLength}
+          Password length {passwordComplexitySettings.minLength}
         </span>
       </div>
       <div className="flex flex-row items-center">
