@@ -135,7 +135,7 @@ func (c Config) String(useAdmin bool) string {
 		fields = append(fields, "dbname="+c.Database)
 	}
 	if user.SSL.Mode != sslDisabledMode {
-		if user.SSL.RootCert == "" {
+		if user.SSL.RootCert != "" {
 			fields = append(fields, "sslrootcert="+user.SSL.RootCert)
 		}
 		if user.SSL.Cert != "" {
