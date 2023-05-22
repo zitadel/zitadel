@@ -252,6 +252,10 @@
       "TITLE": "Du bist abgemeldet",
       "DESCRIPTION": "Klicke auf \"Einloggen\", um Dich erneut anzumelden."
     },
+    "EXHAUSTED": {
+      "TITLE": "Dein Kontingent an authentifizierten Anfragen is erschöpft.",
+      "DESCRIPTION": "Lösche oder erhöhe die Grenze für diese ZITADEL Instanz."
+    },
     "INVALID_FORMAT": "Das Format is ungültig.",
     "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
     "MINLENGTH": "Muss mindestens {{requiredLength}} Zeichen lang sein.",
