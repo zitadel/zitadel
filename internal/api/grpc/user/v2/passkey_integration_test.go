@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/webauthn"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -21,6 +22,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
 	})
 	require.NoError(t, err)
+	client := webauthn.NewClient(Tester.Config.WebAuthNName, Tester.Config.ExternalDomain, "https://"+Tester.Host())
 
 	type args struct {
 		ctx context.Context
@@ -123,6 +125,8 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			if tt.want != nil {
 				assert.NotEmpty(t, got.GetPasskeyId())
 				assert.NotEmpty(t, got.GetPublicKeyCredentialCreationOptions())
+				_, err := client.CreateAttestationResponse(got.GetPublicKeyCredentialCreationOptions())
+				require.NoError(t, err)
 			}
 		})
 	}
@@ -143,27 +147,9 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 	require.NotEmpty(t, pkr.GetPasskeyId())
 	require.NotEmpty(t, pkr.GetPublicKeyCredentialCreationOptions())
 
-	/*
-		The following is copied from https://github.com/descope/virtualwebauthn,
-		but I din't manage to make it work (yet). There are some decoding errors
-		between the libraries.
-
-			// The relying party settings should mirror those on the actual WebAuthn server
-			rp := virtualwebauthn.RelyingParty{Name: "Example Corp", ID: "example.com", Origin: "https://example.com"}
-
-			// A mock authenticator that represents a security key or biometrics module
-			authenticator := virtualwebauthn.NewAuthenticator()
-
-			// Create a new credential that we'll try to register with the relying party
-			credential := virtualwebauthn.NewCredential(virtualwebauthn.KeyTypeEC2)
-
-			// Parses the attestation options we got from the relying party to ensure they're valid
-			parsedAttestationOptions, err := virtualwebauthn.ParseAttestationOptions(string(pkr.GetPublicKeyCredentialCreationOptions()))
-			require.NoError(t, err)
-			// Creates an attestation response that we can send to the relying party as if it came from
-			// an actual browser and authenticator.
-			attestationResponse := virtualwebauthn.CreateAttestationResponse(rp, authenticator, credential, *parsedAttestationOptions)
-	*/
+	client := webauthn.NewClient(Tester.Config.WebAuthNName, Tester.Config.ExternalDomain, "https://"+Tester.Host())
+	attestationResponse, err := client.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
+	require.NoError(t, err)
 
 	type args struct {
 		ctx context.Context
@@ -179,25 +165,44 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 			name: "missing user id",
 			args: args{
 				ctx: CTX,
-				req: &user.VerifyPasskeyRegistrationRequest{},
+				req: &user.VerifyPasskeyRegistrationRequest{
+					PasskeyId:           pkr.GetPasskeyId(),
+					PublicKeyCredential: []byte(attestationResponse),
+					PasskeyName:         "nice name",
+				},
 			},
 			wantErr: true,
 		},
-		/*
-			{
-				name: "success",
-				args: args{
-					ctx: CTX,
-					req: &user.VerifyPasskeyRegistrationRequest{
-						UserId:              userID,
-						PasskeyId:           pkr.GetPasskeyId(),
-						PublicKeyCredential: []byte(attestationResponse),
-						PasskeyName:         "nice name",
-					},
+		{
+			name: "success",
+			args: args{
+				ctx: CTX,
+				req: &user.VerifyPasskeyRegistrationRequest{
+					UserId:              userID,
+					PasskeyId:           pkr.GetPasskeyId(),
+					PublicKeyCredential: attestationResponse,
+					PasskeyName:         "nice name",
 				},
-				//wantErr: true,
 			},
-		*/
+			want: &user.VerifyPasskeyRegistrationResponse{
+				Details: &object.Details{
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "wrong credential",
+			args: args{
+				ctx: CTX,
+				req: &user.VerifyPasskeyRegistrationRequest{
+					UserId:              userID,
+					PasskeyId:           pkr.GetPasskeyId(),
+					PublicKeyCredential: []byte("attestationResponseattestationResponseattestationResponse"),
+					PasskeyName:         "nice name",
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

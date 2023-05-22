@@ -15,6 +15,7 @@ require (
 	github.com/benbjohnson/clock v1.3.0
 	github.com/boombuler/barcode v1.0.1
 	github.com/cockroachdb/cockroach-go/v2 v2.3.3
+	github.com/descope/virtualwebauthn v1.0.2
 	github.com/dop251/goja v0.0.0-20230402114112-623f9dda9079
 	github.com/dop251/goja_nodejs v0.0.0-20230322100729-2550c7b6c124
 	github.com/drone/envsubst v1.0.3
