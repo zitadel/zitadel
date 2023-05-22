@@ -8,6 +8,8 @@
     "e2e:golang": "npm run e2e --",
     "open:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 npm run open --",
     "e2e:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 npm run e2e --",
+    "open:angulargolang": "npm run open:golangangular --",
+    "e2e:angulargolang": "npm run e2e:golangangular --",
     "open:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal npm run open --",
     "e2e:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal npm run e2e --",
     "lint": "prettier --check cypress",
