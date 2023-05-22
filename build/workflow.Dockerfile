@@ -292,6 +292,7 @@ FROM golangci/golangci-lint:latest AS lint-core
 
 WORKDIR /go/src/github.com/zitadel/zitadel
 COPY .golangci.yaml .
+COPY .git/ .git/
 COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 
 RUN golangci-lint run --timeout 10m
