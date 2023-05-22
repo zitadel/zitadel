@@ -1,4 +1,5 @@
 import { listSessions, server } from "#/lib/zitadel";
+import Alert from "#/ui/Alert";
 import { Avatar } from "#/ui/Avatar";
 import { getAllSessionIds } from "#/utils/cookies";
 import {
@@ -35,11 +36,12 @@ export default async function Page() {
 
       <div className="flex flex-col w-full space-y-1">
         {sessions ? (
-          sessions.map((session: any) => {
+          sessions.map((session: any, index: number) => {
             const validPassword = session.factors.password?.verifiedAt;
             console.log(session);
             return (
               <Link
+                key={"session-" + index}
                 href={
                   validPassword
                     ? `/signedin?` +
@@ -87,10 +89,7 @@ export default async function Page() {
             );
           })
         ) : (
-          <div className="flex flex-row items-center justify-center border border-yellow-600/40 dark:border-yellow-500/20 bg-yellow-200/30 text-yellow-600 dark:bg-yellow-700/20 dark:text-yellow-200 rounded-md py-2 scroll-px-40">
-            <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
-            <span className="text-center text-sm">No Sessions available!</span>
-          </div>
+          <Alert>No Sessions available!</Alert>
         )}
       </div>
     </div>

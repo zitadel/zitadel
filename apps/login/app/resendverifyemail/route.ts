@@ -1,4 +1,4 @@
-import { server, verifyEmail } from "#/lib/zitadel";
+import { setEmail, server } from "#/lib/zitadel";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -6,7 +6,8 @@ export async function POST(request: NextRequest) {
   if (body) {
     const { userId, code } = body;
 
-    return verifyEmail(server, userId, code)
+    // replace with resend Mail method once its implemented
+    return setEmail(server, userId)
       .then((resp) => {
         return NextResponse.json(resp);
       })

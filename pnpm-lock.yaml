@@ -156,6 +156,7 @@ importers:
       '@types/react': ^17.0.13
       '@types/react-dom': ^17.0.8
       '@zitadel/tsconfig': workspace:*
+      autoprefixer: 10.4.13
       eslint: ^7.32.0
       eslint-config-zitadel: workspace:*
       postcss: 8.4.21
@@ -171,6 +172,7 @@ importers:
       '@types/react': 17.0.52
       '@types/react-dom': 17.0.18
       '@zitadel/tsconfig': link:../zitadel-tsconfig
+      autoprefixer: 10.4.13_postcss@8.4.21
       eslint: 7.32.0
       eslint-config-zitadel: link:../eslint-config-zitadel
       postcss: 8.4.21
@@ -1356,7 +1358,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.5
-      caniuse-lite: 1.0.30001434
+      caniuse-lite: 1.0.30001473
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -1483,6 +1485,7 @@ packages:
 
   /caniuse-lite/1.0.30001434:
     resolution: {integrity: sha512-aOBHrLmTQw//WFa2rcF1If9fa3ypkC1wzqqiKHgfdrXTWcU8C4gKVZT77eQAPWN1APys3+uQ0Df07rKauXGEYA==}
+    dev: false
 
   /caniuse-lite/1.0.30001473:
     resolution: {integrity: sha512-ewDad7+D2vlyy+E4UJuVfiBsU69IL+8oVmTuZnH5Q6CIUbxNfI50uVpRHbUPDD6SUaN2o0Lh4DhTrvLG/Tn1yg==}

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
+import Alert from "#/ui/Alert";
 
 type Inputs = {
   code: string;
@@ -13,12 +14,23 @@ type Inputs = {
 
 type Props = {
   userId: string;
+  code: string;
+  submit: boolean;
 };
 
-export default function VerifyEmailForm({ userId }: Props) {
+export default function VerifyEmailForm({ userId, code, submit }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
+    defaultValues: {
+      code: code ?? "",
+    },
   });
+
+  useEffect(() => {
+    if (submit && code && userId) {
+      submitCode({ code });
+    }
+  }, []);
 
   const [error, setError] = useState<string>("");
 
@@ -39,13 +51,37 @@ export default function VerifyEmailForm({ userId }: Props) {
       }),
     });
 
+    const response = await res.json();
+
     if (!res.ok) {
       setLoading(false);
-      throw new Error("Failed to verify email");
+      setError(response.details);
+      return Promise.reject(response);
+    } else {
+      setLoading(false);
+      return response;
     }
+  }
 
-    setLoading(false);
-    return res.json();
+  async function resendCode() {
+    setLoading(true);
+    const res = await fetch("/resendverifyemail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const response = await res.json();
+
+    if (!res.ok) {
+      setLoading(false);
+      setError(response.details);
+      return Promise.reject(response);
+    } else {
+      setLoading(false);
+      return response;
+    }
   }
 
   function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
@@ -54,8 +90,6 @@ export default function VerifyEmailForm({ userId }: Props) {
       return router.push(`/accounts`);
     });
   }
-
-  const { errors } = formState;
 
   return (
     <form className="w-full">
@@ -69,10 +103,20 @@ export default function VerifyEmailForm({ userId }: Props) {
         />
       </div>
 
+      {error && (
+        <div className="py-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
+
       <div className="mt-8 flex w-full flex-row items-center">
-        {/* <Button type="button" variant={ButtonVariants.Secondary}>
-          back
-        </Button> */}
+        <Button
+          type="button"
+          onClick={() => resendCode()}
+          variant={ButtonVariants.Secondary}
+        >
+          resend code
+        </Button>
         <span className="flex-grow"></span>
         <Button
           type="submit"

@@ -6,6 +6,11 @@ import {
   getServers,
   initializeServer,
   session,
+  GetGeneralSettingsResponse,
+  GetBrandingSettingsResponse,
+  GetPasswordComplexitySettingsResponse,
+  GetLegalAndSupportSettingsResponse,
+  AddHumanUserResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -33,7 +38,7 @@ export function getBrandingSettings(
         // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
       }
     )
-    .then((resp) => resp.settings);
+    .then((resp: GetBrandingSettingsResponse) => resp.settings);
 }
 
 export function getGeneralSettings(
@@ -48,7 +53,7 @@ export function getGeneralSettings(
         // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
       }
     )
-    .then((resp) => resp.supportedLanguages);
+    .then((resp: GetGeneralSettingsResponse) => resp.supportedLanguages);
 }
 
 export function getLegalAndSupportSettings(
@@ -62,7 +67,7 @@ export function getLegalAndSupportSettings(
         //  metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
       }
     )
-    .then((resp) => resp.settings);
+    .then((resp: GetLegalAndSupportSettingsResponse) => resp.settings);
 }
 
 export function getPasswordComplexitySettings(
@@ -77,7 +82,7 @@ export function getPasswordComplexitySettings(
         // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
       }
     )
-    .then((resp) => resp.settings);
+    .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
 }
 
 export function createSession(
@@ -145,7 +150,7 @@ export function addHumanUser(
         // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
       }
     )
-    .then((resp) => {
+    .then((resp: AddHumanUserResponse) => {
       console.log("added user", resp.userId);
       return resp.userId;
     });
@@ -156,11 +161,27 @@ export function verifyEmail(
   userId: string,
   verificationCode: string
 ): Promise<any> {
-  const mgmt = user.getUser(server);
-  return mgmt.verifyEmail(
+  const userservice = user.getUser(server);
+  return userservice.verifyEmail(
     {
       userId,
       verificationCode,
+    },
+    {}
+  );
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @returns the newly set email
+ */
+export function setEmail(server: ZitadelServer, userId: string): Promise<any> {
+  const userservice = user.getUser(server);
+  return userservice.setEmail(
+    {
+      userId,
     },
     {}
   );

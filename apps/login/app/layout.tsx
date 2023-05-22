@@ -34,6 +34,10 @@ export default async function RootLayout({
       darkTheme: branding?.darkTheme,
     };
   }
+
+  let domain = process.env.ZITADEL_API_URL;
+  domain = domain ? domain.replace("https://", "") : "acme.com";
+
   return (
     <html lang="en" className={`${lato.className}`} suppressHydrationWarning>
       <head />
@@ -48,7 +52,7 @@ export default async function RootLayout({
                   {showNav && (
                     <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
                       <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
-                        <AddressBar />
+                        <AddressBar domain={domain} />
                       </div>
                     </div>
                   )}
