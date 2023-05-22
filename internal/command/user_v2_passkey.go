@@ -122,6 +122,7 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 	agg := UserAggregateFromWriteModel(&wm.WriteModel)
+
 	cmd := user.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, codeID, code.Crypted, code.Expiry, urlTmpl, returnCode)
 	err = c.pushAppendAndReduce(ctx, wm, cmd)
 	if err != nil {
