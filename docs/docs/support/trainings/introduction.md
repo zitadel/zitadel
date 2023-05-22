@@ -1,5 +1,6 @@
 ---
-title: Introduction
+title: Trainings
+sidebar_label: Introduction
 ---
 
 The following pages describe the the trainings provided by ZITADEL. These trainings are intended for onboarding and during the course of a Support Program.
