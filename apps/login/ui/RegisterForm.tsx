@@ -31,12 +31,12 @@ type Inputs =
 
 type Props = {
   legal: LegalAndSupportSettings;
-  passwordComplexityPolicy: PasswordComplexitySettings;
+  passwordComplexitySettings: PasswordComplexitySettings;
 };
 
 export default function RegisterForm({
   legal,
-  passwordComplexityPolicy,
+  passwordComplexitySettings,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -84,19 +84,19 @@ export default function RegisterForm({
   const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
 
   const hasMinLength =
-    passwordComplexityPolicy &&
-    watchPassword?.length >= passwordComplexityPolicy.minLength;
+    passwordComplexitySettings &&
+    watchPassword?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(watchPassword);
   const hasNumber = numberValidator(watchPassword);
   const hasUppercase = upperCaseValidator(watchPassword);
   const hasLowercase = lowerCaseValidator(watchPassword);
 
   const policyIsValid =
-    passwordComplexityPolicy &&
-    (passwordComplexityPolicy.requiresLowercase ? hasLowercase : true) &&
-    (passwordComplexityPolicy.requiresNumber ? hasNumber : true) &&
-    (passwordComplexityPolicy.requiresUppercase ? hasUppercase : true) &&
-    (passwordComplexityPolicy.requiresSymbol ? hasSymbol : true) &&
+    passwordComplexitySettings &&
+    (passwordComplexitySettings.requiresLowercase ? hasLowercase : true) &&
+    (passwordComplexitySettings.requiresNumber ? hasNumber : true) &&
+    (passwordComplexitySettings.requiresUppercase ? hasUppercase : true) &&
+    (passwordComplexitySettings.requiresSymbol ? hasSymbol : true) &&
     hasMinLength;
 
   return (
@@ -158,9 +158,9 @@ export default function RegisterForm({
         </div>
       </div>
 
-      {passwordComplexityPolicy && (
+      {passwordComplexitySettings && (
         <PasswordComplexity
-          passwordComplexityPolicy={passwordComplexityPolicy}
+          passwordComplexitySettings={passwordComplexitySettings}
           password={watchPassword}
           equals={!!watchPassword && watchPassword === watchConfirmPassword}
         />

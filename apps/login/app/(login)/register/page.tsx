@@ -21,7 +21,7 @@ export default async function Page() {
       {legal && passwordComplexitySettings && (
         <RegisterForm
           legal={legal}
-          passwordComplexityPolicy={passwordComplexitySettings}
+          passwordComplexitySettings={passwordComplexitySettings}
         ></RegisterForm>
       )}
     </div>
