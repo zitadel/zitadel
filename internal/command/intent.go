@@ -12,13 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 )
 
-const (
-	HandlerPrefix                 = ""
-	EndpointLDAPLogin             = "/login/ldap"
-	QueryAuthRequestID            = "authRequestID"
-	EndpointExternalLoginCallback = "/login/externalidp/callback"
-)
-
 func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID string, successURL, failureURL string) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if idpID == "" {

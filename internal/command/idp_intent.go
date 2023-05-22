@@ -29,6 +29,15 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	return base64.RawURLEncoding.EncodeToString(token), nil
 }
 
+func (c *Commands) FailIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel) error {
+	cmd := idpintent.NewFailedEvent(
+		ctx,
+		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+	)
+	_, err := c.eventstore.Push(ctx, cmd)
+	return err
+}
+
 func (c *Commands) GetIntentWriteModel(ctx context.Context, id, resourceOwner string) (*IDPIntentWriteModel, error) {
 	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)

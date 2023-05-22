@@ -475,6 +475,10 @@ Errors:
     Terminated: Session already terminated
     Token:
       Invalid: Session Token is invalid
+  Intent:
+    StateMissing: State parameter is missing in the request
+    NotStarted: Intent is not started or already terminated
+    TokenCreationFailed: Token creation failed
 
 AggregateTypes:
   action: Action

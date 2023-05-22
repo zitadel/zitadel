@@ -73,5 +73,5 @@ func (wm *IDPIntentWriteModel) reduceSucceededEvent(e *idpintent.SucceededEvent)
 }
 
 func (wm *IDPIntentWriteModel) reduceFailedEvent(e *idpintent.FailedEvent) {
-
+	wm.State = domain.IDPIntentStateFailed
 }
