@@ -24,7 +24,7 @@ Please consider the following guidelines when creating a pull request.
 
 - The latest changes are always in `main`, so please make your pull request against that branch.
 - pull requests should be raised for any change
-- üull requests need approval of a ZITADEL core engineer @zitadel/engineers before merging
+- Pull requests need approval of a ZITADEL core engineer @zitadel/engineers before merging
 - We use ESLint/Prettier for linting/formatting, so please run `pnpm lint:fix` before committing to make resolving conflicts easier (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 - If you add new functionality, please provide the corresponding documentation as well and make it part of the pull request
 
