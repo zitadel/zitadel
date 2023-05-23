@@ -1604,27 +1604,49 @@ func NewIDPTypeWriteModel(id string) *IDPTypeWriteModel {
 func (wm *IDPTypeWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *idp.OAuthIDPAddedEvent:
+		case *instance.OAuthIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeOAuth, e.Aggregate())
-		case *idp.OIDCIDPAddedEvent:
+		case *org.OAuthIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeOAuth, e.Aggregate())
+		case *instance.OIDCIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeOIDC, e.Aggregate())
-		case *idp.JWTIDPAddedEvent:
+		case *org.OIDCIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeOIDC, e.Aggregate())
+		case *instance.JWTIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeJWT, e.Aggregate())
-		case *idp.AzureADIDPAddedEvent:
+		case *org.JWTIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeJWT, e.Aggregate())
+		case *instance.AzureADIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeAzureAD, e.Aggregate())
-		case *idp.GitHubIDPAddedEvent:
+		case *org.AzureADIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeAzureAD, e.Aggregate())
+		case *instance.GitHubIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeGitHub, e.Aggregate())
-		case *idp.GitHubEnterpriseIDPAddedEvent:
+		case *org.GitHubIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGitHub, e.Aggregate())
+		case *instance.GitHubEnterpriseIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeGitHubEnterprise, e.Aggregate())
-		case *idp.GitLabIDPAddedEvent:
+		case *org.GitHubEnterpriseIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGitHubEnterprise, e.Aggregate())
+		case *instance.GitLabIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeGitLab, e.Aggregate())
-		case *idp.GitLabSelfHostedIDPAddedEvent:
+		case *org.GitLabIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGitLab, e.Aggregate())
+		case *instance.GitLabSelfHostedIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeGitLabSelfHosted, e.Aggregate())
-		case *idp.GoogleIDPAddedEvent:
+		case *org.GitLabSelfHostedIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGitLabSelfHosted, e.Aggregate())
+		case *instance.GoogleIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeGoogle, e.Aggregate())
-		case *idp.LDAPIDPAddedEvent:
+		case *org.GoogleIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGoogle, e.Aggregate())
+		case *instance.LDAPIDPAddedEvent:
 			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
-		case *idp.RemovedEvent:
+		case *org.LDAPIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
+		case *instance.IDPRemovedEvent:
+			wm.reduceRemoved(e.ID)
+		case *org.IDPRemovedEvent:
 			wm.reduceRemoved(e.ID)
 		case *instance.IDPConfigAddedEvent:
 			if e.Typ == domain.IDPConfigTypeOIDC {
