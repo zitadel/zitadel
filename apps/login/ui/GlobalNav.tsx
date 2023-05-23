@@ -13,7 +13,7 @@ export function GlobalNav() {
   const close = () => setIsOpen(false);
 
   return (
-    <div className="fixed top-0 z-10 flex w-full flex-col border-b border-divider-light dark:border-divider-dark bg-background-light-700 dark:bg-background-dark-700 lg:bottom-0 lg:z-auto lg:w-72 lg:border-r">
+    <div className="fixed top-0 z-10 flex w-full flex-col border-b border-divider-light dark:border-divider-dark bg-white/80 dark:bg-black/80 lg:bottom-0 lg:z-auto lg:w-72 lg:border-r">
       <div className="flex h-14 items-center py-4 px-4 lg:h-auto">
         <Link
           href="/"
@@ -46,7 +46,7 @@ export function GlobalNav() {
 
       <div
         className={clsx("overflow-y-auto lg:static lg:block", {
-          "fixed inset-x-0 bottom-0 top-14 mt-px bg-background-light-500 dark:bg-background-dark-500":
+          "fixed inset-x-0 bottom-0 top-14 mt-px bg-white/80 dark:bg-black/80 backdrop-blur-lg":
             isOpen,
           hidden: !isOpen,
         })}

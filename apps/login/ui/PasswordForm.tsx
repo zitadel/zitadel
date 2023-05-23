@@ -28,6 +28,7 @@ export default function PasswordForm({ loginName }: Props) {
   const router = useRouter();
 
   async function submitPassword(values: Inputs) {
+    setError("");
     setLoading(true);
     const res = await fetch("/session", {
       method: "PUT",
@@ -62,7 +63,7 @@ export default function PasswordForm({ loginName }: Props) {
 
   return (
     <form className="w-full">
-      <div className="">
+      <div className={`${error && "transform-gpu animate-shake"}`}>
         <TextInput
           type="password"
           autoComplete="password"
