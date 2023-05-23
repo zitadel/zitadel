@@ -1,8 +1,8 @@
 import Image from "next/image";
 
 type Props = {
-  darkSrc: string;
-  lightSrc: string;
+  darkSrc?: string;
+  lightSrc?: string;
   height?: number;
   width?: number;
 };
