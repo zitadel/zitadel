@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
@@ -184,7 +184,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           case PolicyComponentServiceType.MGMT:
             return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
           case PolicyComponentServiceType.ADMIN:
-            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData, this.org.id));
+            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData));
         }
       }
     }

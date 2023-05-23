@@ -34,14 +34,25 @@ func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string)
 }
 
 func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error) {
-	token, viewErr := repo.View.TokenByIDs(tokenID, userID, authz.GetInstance(ctx).InstanceID())
+	instanceID := authz.GetInstance(ctx).InstanceID()
+
+	token, viewErr := repo.View.TokenByIDs(tokenID, userID, instanceID)
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
 	if errors.IsNotFound(viewErr) {
+		sequence, err := repo.View.GetLatestTokenSequence(ctx, instanceID)
+		logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
+			OnError(err).
+			Errorf("could not get current sequence for TokenByIDs")
+
 		token = new(model.TokenView)
 		token.ID = tokenID
 		token.UserID = userID
+		token.InstanceID = instanceID
+		if sequence != nil {
+			token.Sequence = sequence.CurrentSequence
+		}
 	}
 
 	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence)

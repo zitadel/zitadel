@@ -1,58 +1,70 @@
 module.exports = {
-  examples: [
-    "examples/introduction",
-    {
-      type: "category",
-      label: "Integrate ZITADEL Login in your App",
-      items: [
-        "examples/login/angular",
-        "examples/login/react",
-        "examples/login/flutter",
-        "examples/login/nextjs",
-        "examples/login/nextjs-b2b",
-      ],
-      collapsed: false,
-    },
-    {
-      type: "category",
-      label: "Secure your API",
-      items: ["examples/secure-api/go", "examples/secure-api/dot-net"],
-      collapsed: false,
-    },
-    {
-      type: "category",
-      label: "Call the ZITADEL API",
-      items: [
-        "examples/call-zitadel-api/go",
-        "examples/call-zitadel-api/dot-net",
-      ],
-      collapsed: false,
-    },
-    {
-      type: "category",
-      label: "Identity Aware Proxy",
-      items: ["examples/identity-proxy/oauth2-proxy"],
-      collapsed: false,
-    },
-  ],
   guides: [
     "guides/overview",
     {
       type: "category",
       label: "Get started",
       collapsed: false,
-      items: ["guides/start/quickstart"],
+      items: [
+        "guides/start/quickstart",
+        {
+          type: "category",
+          label: "Frontend",
+          items: [
+            "examples/login/angular",
+            "examples/login/react",
+            "examples/login/flutter",
+            "examples/login/nextjs",
+          ],
+          collapsed: true,
+        },
+        {
+          type: "category",
+          label: "Backend",
+          items: [
+            "examples/secure-api/go",
+            "examples/secure-api/python-flask",
+            "examples/secure-api/dot-net"
+          ],
+          collapsed: true,
+        },
+      ],
+    },
+    "examples/sdks",
+    {
+      type: "category",
+      label: "Example applications",
+      items: [
+        "examples/introduction",
+        {
+          type: 'link',
+          label: 'Frontend', // The link label
+          href: '/examples/introduction#frontend', // The internal path
+        },
+        {
+          type: 'link',
+          label: 'Backend', // The link label
+          href: '/examples/introduction#backend', // The internal path
+        }
+      ],
+      collapsed: true,
     },
     {
       type: "category",
       label: "Manage",
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: "category",
           label: "Cloud",
+          link: {
+            type: "generated-index",
+            title: "Overview",
+            slug: "guides/manage/cloud/overview",
+            description:
+              "Our customer portal is used to manage all your  ZITADEL instances. You can also manage your subscriptions, billing, newsletters and support requests.",
+          },
           items: [
-            "guides/manage/cloud/overview",
             "guides/manage/cloud/start",
             "guides/manage/cloud/instances",
             "guides/manage/cloud/billing",
@@ -82,7 +94,6 @@ module.exports = {
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
-            "guides/manage/customize/user-metadata",
           ],
         },
         {
@@ -90,138 +101,391 @@ module.exports = {
           label: "Terraform",
           items: ["guides/manage/terraform/basics"],
         },
-        "guides/manage/user/reg-create-user",
+        {
+          type: "category",
+          label: "Users",
+          items: [
+            "guides/manage/user/reg-create-user",
+            "guides/manage/customize/user-metadata",
+          ],
+        },
       ],
+    },
+    {
+      type: "category",
+      label: "Migrate",
+      collapsed: true,
+      items: [
+        "guides/migrate/introduction",
+        "guides/migrate/users",
+        {
+          type: "category",
+          label: "Sources",
+          collapsed: true,
+          items: [
+            "guides/migrate/sources/zitadel",
+            "guides/migrate/sources/auth0",
+          ]
+        },
+      ]
     },
     {
       type: "category",
       label: "Integrate",
-      collapsed: false,
+      link: {
+        type: "generated-index",
+        title: "Integrate",
+        slug: "guides/integrate",
+        description:
+          "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
+      },
       items: [
-        "guides/integrate/login-users",
-        "guides/integrate/identity-brokering",
+        {
+          type: "category",
+          label: "Authenticate users",
+          collapsed: true,
+          items: [
+            "guides/integrate/login-users",
+            "guides/integrate/oauth-recommended-flows",
+            "guides/integrate/logout",
+          ],
+        },
+        {
+          type: "category",
+          label: "Configure identity providers",
+          link: {
+            type: "generated-index",
+            title: "Let users login with their preferred identity provider",
+            slug: "/guides/integrate/identity-providers",
+            description:
+              "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
+
+          },
+          collapsed: true,
+          items: [
+            "guides/integrate/identity-providers/google",
+            "guides/integrate/identity-providers/azure-ad",
+            "guides/integrate/identity-providers/github",
+            "guides/integrate/identity-providers/gitlab",
+            "guides/integrate/identity-providers/ldap",
+            "guides/integrate/identity-providers/openldap",
+            "guides/integrate/identity-providers/google-oidc",
+            "guides/integrate/identity-providers/azuread-oidc",
+          ],
+        },
         {
           type: "category",
           label: "Access ZITADEL APIs",
-          collapsed: false,
+          collapsed: true,
           items: [
-            "guides/integrate/serviceusers",
+            {
+              type: "category",
+              label: "Authenticate service users",
+              link: {
+                type: "generated-index",
+                title: "Authenticate Service Users",
+                slug: "/guides/integrate/serviceusers",
+                description:
+                  "How to authenticate service users",
+              },
+              collapsed: true,
+              items: [
+                "guides/integrate/private-key-jwt",
+                "guides/integrate/client-credentials",
+                "guides/integrate/pat",
+              ],
+            },
             "guides/integrate/access-zitadel-apis",
-            "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
-            "guides/integrate/export-and-import",
+            "guides/integrate/event-api",
+            {
+              type: "category",
+              label: "Example code",
+              items: [
+                "examples/call-zitadel-api/go",
+                "examples/call-zitadel-api/dot-net",
+              ],
+              collapsed: true,
+            },
           ],
         },
         {
           type: "category",
-          label: "OpenID Connect 1.0 Clients",
-          collapsed: false,
+          label: "Services",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your favorite services",
+            slug: "/guides/integrate/services",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your services.",
+
+          },
+          collapsed: true,
           items: [
-            "guides/integrate/oauth-recommended-flows",
-            "guides/integrate/auth0-oidc",
-            "guides/integrate/azuread-oidc",
+            "guides/integrate/services/gitlab-self-hosted",
+            "guides/integrate/services/aws-saml",
+            "guides/integrate/services/google-cloud",
+            "guides/integrate/services/atlassian-saml",
+            "guides/integrate/services/gitlab-saml",
+            "guides/integrate/services/auth0-oidc",
+            "guides/integrate/services/auth0-saml",
+            "guides/integrate/services/pingidentity-saml",
+          ],
+        },
+        {
+          type: "category",
+          label: "Tools",
+          link: {
+            type: "generated-index",
+            title: "Integrate ZITADEL with your tools",
+            slug: "/guides/integrate/tools",
+            description:
+              "With the guides in this section you will learn how to integrate ZITADEL with your favorite tools.",
+
+          },
+          collapsed: true,
+          items: [
             "guides/integrate/authenticated-mongodb-charts",
-            "guides/integrate/gitlab-self-hosted",
+            "examples/identity-proxy/oauth2-proxy"
           ],
         },
-        {
-          type: "category",
-          label: "SAML 2.0 Clients",
-          collapsed: false,
-          items: [
-            "guides/integrate/auth0-saml",
-            "guides/integrate/aws-saml",
-            "guides/integrate/pingidentity-saml",
-            "guides/integrate/atlassian-saml",
-            "guides/integrate/gitlab-saml",
-          ],
-        },
-        "guides/integrate/logout",
       ],
     },
     {
       type: "category",
-      label: "Solution Scenarios",
-      collapsed: false,
+      label: "Solution scenarios",
+      link: {
+        type: "generated-index",
+        title: "Solution scenarios",
+        slug: "guides/solution-scenarios/introduction",
+        description:
+          "Customers of an SaaS Identity and access management system usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into solution scenarios which aim to help you getting started with ZITADEL.",
+      },
+      collapsed: true,
       items: [
-        "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
+        "guides/solution-scenarios/saas",
+        "guides/solution-scenarios/domain-discovery",
         "guides/solution-scenarios/configurations",
       ],
     },
     {
       type: "category",
-      label: "Trainings",
+      label: "Concepts",
+      collapsed: true,
+      link: {
+        type: "generated-index",
+        title: "Concepts and Features",
+        slug: "concepts",
+        description:
+          "This part of our documentation contains ZITADEL specific or general concepts required to understand the system or our guides.",
+      },
+      items: [
+        "concepts/structure/instance",
+        "concepts/structure/organizations",
+        "concepts/structure/projects",
+        "concepts/structure/applications",
+        "concepts/structure/granted_projects",
+        "concepts/structure/users",
+        "concepts/structure/managers",
+        "concepts/structure/policies",
+        "concepts/features/identity-brokering",
+        "concepts/structure/jwt_idp",
+        "concepts/features/actions",
+        "concepts/features/audit-trail",
+        "concepts/features/selfservice",
+      ]
+    },
+    {
+      type: "category",
+      label: "Architecture",
       collapsed: true,
       items: [
-        "guides/trainings/introduction",
-        "guides/trainings/application",
-        "guides/trainings/recurring",
-        "guides/trainings/project",
-      ],
+        "concepts/architecture/software",
+        "concepts/architecture/solution",
+        "concepts/architecture/secrets",
+        "concepts/principles",
+        {
+          type: "category",
+          label: "Eventstore",
+          collapsed: true,
+          items: [
+            "concepts/eventstore/overview",
+            "concepts/eventstore/implementation",
+          ],
+        },
+      ]
+    },
+    {
+      type: "category",
+      label: "Support",
+      collapsed: true,
+      items: [
+        "support/software-release-cycles-support",
+        "support/troubleshooting",
+        {
+          type: 'category',
+          label: "Technical advisory",
+          link: {
+            type: 'doc',
+            id: 'support/technical_advisory',
+          },
+          collapsed: true,
+          items: [
+              {
+                type: 'autogenerated',
+                dirName: 'support/advisory',
+              },
+          ],
+        },
+        {
+          type: "category",
+          label: "Trainings",
+          collapsed: true,
+          items: [
+            "support/trainings/introduction",
+            "support/trainings/application",
+            "support/trainings/recurring",
+            "support/trainings/project",
+          ],
+        },
+      ]
     },
   ],
   apis: [
     "apis/introduction",
     {
       type: "category",
-      label: "API Definition",
+      label: "Core Resources",
       collapsed: false,
       items: [
-        "apis/statuscodes",
         {
           type: "category",
-          label: "Proto",
+          label: "Authenticated user",
+          link: {
+            type: "generated-index",
+            title: "Auth API",
+            slug: "/apis/resources/auth",
+            description:
+              "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+
+          },
+          items: require("./docs/apis/resources/auth/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Organization objects",
+          link: {
+            type: "generated-index",
+            title: "Management API",
+            slug: "/apis/resources/mgmt",
+            description:
+              "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+          },
+          items: require("./docs/apis/resources/mgmt/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Instance objects",
+          link: {
+            type: "generated-index",
+            title: "Admin API",
+            slug: "/apis/resources/admin",
+            description:
+              "This API is intended to configure and manage one ZITADEL instance itself.",
+          },
+          items: require("./docs/apis/resources/admin/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Instance lifecycle",
+          link: {
+            type: "generated-index",
+            title: "System API",
+            slug: "/apis/resources/system",
+            description:
+              "This API is intended to manage the different ZITADEL instances within the system.\n" +
+              "\n" +
+              "Checkout the guide how to access the ZITADEL System API.",
+          },
+          items: require("./docs/apis/resources/system/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "User lifecycle (alpha)",
+          link: {
+            type: "generated-index",
+            title: "User service API (Alpha)",
+            slug: "/apis/resources/user_service",
+            description:
+              "This API is intended to manage users in a ZITADEL instance.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/resources/user_service/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Session lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "Session service API (Alpha)",
+            slug: "/apis/resources/session_service",
+            description:
+              "This API is intended to manage sessions in a ZITADEL instance.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/resources/session_service/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Settings lifecycle (alpha)",
+          link: {
+            type: "generated-index",
+            title: "Settings service API (Alpha)",
+            slug: "/apis/resources/settings_service",
+            description:
+              "This API is intended to manage settings in a ZITADEL instance.\n"+
+              "\n"+
+              "This project is in alpha state. It can AND will continue to break until the services provide the same functionality as the current login.",
+          },
+          items: require("./docs/apis/resources/settings_service/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Assets",
+          collapsed: true,
+          items: ["apis/assets/assets"],
+        },
+      ]
+    },
+    {
+      type: "category",
+      label: "Sign In Users ",
+      collapsed: false,
+      items: [
+        {
+          type: "category",
+          label: "OpenID Connect & OAuth",
           collapsed: true,
           items: [
-            "apis/proto/auth",
-            "apis/proto/management",
-            "apis/proto/admin",
-            "apis/proto/system",
-            "apis/proto/instance",
-            "apis/proto/org",
-            "apis/proto/user",
-            "apis/proto/app",
-            "apis/proto/policy",
-            "apis/proto/auth_n_key",
-            "apis/proto/change",
-            "apis/proto/idp",
-            "apis/proto/member",
-            "apis/proto/metadata",
-            "apis/proto/message",
-            "apis/proto/text",
-            "apis/proto/action",
-            "apis/proto/object",
-            "apis/proto/options",
+            "apis/openidoauth/endpoints",
+            "apis/openidoauth/authrequest",
+            "apis/openidoauth/scopes",
+            "apis/openidoauth/claims",
+            "apis/openidoauth/authn-methods",
+            "apis/openidoauth/grant-types",
           ],
         },
         {
           type: "category",
-          label: "Assets API",
+          label: "SAML 2.0",
           collapsed: true,
-          items: ["apis/assets/assets"],
+          items: ["apis/saml/endpoints"],
         },
       ],
-    },
-    {
-      type: "category",
-      label: "OpenID Connect & OAuth",
-      collapsed: false,
-      items: [
-        "apis/openidoauth/endpoints",
-        "apis/openidoauth/authrequest",
-        "apis/openidoauth/scopes",
-        "apis/openidoauth/claims",
-        "apis/openidoauth/authn-methods",
-        "apis/openidoauth/grant-types",
-      ],
-    },
-    {
-      type: "category",
-      label: "SAML",
-      collapsed: false,
-      items: ["apis/saml/endpoints"],
     },
     {
       type: "category",
@@ -230,10 +494,16 @@ module.exports = {
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
-        "apis/actions/login-flow",
-        "apis/actions/register-flow",
+        "apis/actions/internal-authentication",
+        "apis/actions/external-authentication",
+        "apis/actions/complement-token",
         "apis/actions/objects",
       ]
+    },
+    {
+      type: "doc",
+      label: "gRPC status codes",
+      id: "apis/statuscodes"
     },
     {
       type: "category",
@@ -242,10 +512,9 @@ module.exports = {
       items: ["apis/observability/metrics", "apis/observability/health"],
     },
     {
-      type: "category",
-      label: "Rate Limits",
-      collapsed: false,
-      items: ["apis/ratelimits/ratelimits", "legal/rate-limit-policy"],
+      type: 'link',
+      label: 'Rate limits (cloud)', // The link label
+      href: '/legal/rate-limit-policy', // The internal path
     },
   ],
   selfHosting: [
@@ -260,7 +529,7 @@ module.exports = {
         "self-hosting/deploy/compose",
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
+        "self-hosting/deploy/loadbalancing-example/loadbalancing-example"
       ],
     },
     {
@@ -269,6 +538,7 @@ module.exports = {
       collapsed: false,
       items: [
         "self-hosting/manage/production",
+        "self-hosting/manage/productionchecklist",
         "self-hosting/manage/configure/configure",
         "self-hosting/manage/reverseproxy/reverse_proxy",
         "self-hosting/manage/custom-domain",
@@ -276,99 +546,55 @@ module.exports = {
         "self-hosting/manage/tls_modes",
         "self-hosting/manage/database/database",
         "self-hosting/manage/updating_scaling",
+        "self-hosting/manage/quotas"
       ],
     },
-  ],
-  concepts: [
-    "concepts/introduction",
-    "concepts/principles",
-    {
-      type: "category",
-      label: "Eventstore",
-      collapsed: false,
-      items: [
-        "concepts/eventstore/overview",
-        "concepts/eventstore/implementation",
-      ],
-    },
-    {
-      type: "category",
-      label: "Architecture",
-      collapsed: false,
-      items: [
-        "concepts/architecture/software",
-        "concepts/architecture/solution",
-        "concepts/architecture/secrets",
-      ],
-    },
-    {
-      type: "category",
-      label: "Structure",
-      collapsed: false,
-      items: [
-        "concepts/structure/overview",
-        "concepts/structure/instance",
-        "concepts/structure/organizations",
-        "concepts/structure/projects",
-        "concepts/structure/applications",
-        "concepts/structure/granted_projects",
-        "concepts/structure/users",
-        "concepts/structure/managers",
-        "concepts/structure/policies",
-        "concepts/structure/jwt_idp",
-      ],
-    },
-    {
-      type: "category",
-      label: "Use Cases",
-      collapsed: false,
-      items: ["concepts/usecases/saas"],
-    },
-    {
-      type: "category",
-      label: "Features",
-      collapsed: false,
-      items: ["concepts/features/actions", "concepts/features/selfservice"],
-    },
-  ],
-  manuals: [
-    "manuals/introduction",
-    "manuals/user-profile",
-    "manuals/user-login",
-    "manuals/troubleshooting",
   ],
   legal: [
-    "legal/introduction",
-    "legal/terms-of-service",
-    "legal/data-processing-agreement",
     {
       type: "category",
-      label: "Service Description",
+      label: "Legal agreements",
       collapsed: false,
+      link: {
+        type: "generated-index",
+        title: "Legal agreements",
+        slug: "legal",
+        description:
+          "This section contains important agreements, policies and appendices relevant for users of our websites and services. All documents will be provided in English language.",
+      },
       items: [
-        "legal/cloud-service-description",
-        "legal/service-level-description",
-        "legal/support-services",
-      ],
-    },
-    {
-      type: "category",
-      label: "Additional terms",
-      collapsed: true,
-      items: [
-        "legal/terms-support-service",
-        "legal/terms-of-service-dedicated",
-      ],
-    },
-    {
-      type: "category",
-      label: "Policies",
-      collapsed: false,
-      items: [
-        "legal/privacy-policy",
-        "legal/acceptable-use-policy",
-        "legal/rate-limit-policy",
-      ],
+        "legal/terms-of-service",
+        "legal/data-processing-agreement",
+        {
+          type: "category",
+          label: "Service description",
+          collapsed: false,
+          items: [
+            "legal/cloud-service-description",
+            "legal/service-level-description",
+            "legal/support-services",
+          ],
+        },
+        {
+          type: "category",
+          label: "Support program",
+          collapsed: true,
+          items: [
+            "legal/terms-support-service",
+          ],
+        },
+        {
+          type: "category",
+          label: "Policies",
+          collapsed: false,
+          items: [
+            "legal/privacy-policy",
+            "legal/acceptable-use-policy",
+            "legal/rate-limit-policy",
+            "legal/vulnerability-disclosure-policy",
+          ],
+        },
+      ]
     },
   ],
 };

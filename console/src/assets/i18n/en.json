@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Previous",
     "NEXT": "Next",
-    "COUNT": "Total Results"
+    "COUNT": "Total Results",
+    "MORE": "More"
   },
   "FOOTER": {
     "LINKS": {
@@ -41,6 +42,48 @@
       "ADD": "Hold and drag a tile to add"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Your onboarding process",
+    "MOREDESCRIPTION": "more shortcuts",
+    "COMPLETED": "completed",
+    "DISMISS": "No thanks, I'm a pro.",
+    "CARD": {
+      "TITLE": "Get your ZITADEL running",
+      "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Setup your brand",
+        "description": "Define coloring and shape of your login and upload your logo and icons.",
+        "action": "Setup branding"
+      },
+      "instance.smtp.config.added": {
+        "title": "Setup your SMTP settings",
+        "description": "Set your own mail server settings.",
+        "action": "Setup SMTP"
+      },
+      "project.added": {
+        "title": "Create a project",
+        "description": "Add a project and define its roles and authorizations.",
+        "action": "Create project"
+      },
+      "project.application.added": {
+        "title": "Create an application",
+        "description": "Create a web, native, api or saml application and setup your authentication flow.",
+        "action": "Create app"
+      },
+      "user.human.added": {
+        "title": "Add users",
+        "description": "Add your application users",
+        "action": "Add user"
+      },
+      "user.grant.added": {
+        "title": "Grant users",
+        "description": "Allow users to access your application and setup their role.",
+        "action": "Grant user"
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Instance",
     "DASHBOARD": "Home",
@@ -49,6 +92,7 @@
     "INSTANCEOVERVIEW": "Instance",
     "ORGS": "Organizations",
     "VIEWS": "Views",
+    "EVENTS": "Events",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
     "DOMAINS": "Domains",
@@ -122,6 +166,8 @@
     "NEXT": "Next",
     "MORE": "more",
     "STEP": "Step",
+    "SETUP": "Setup",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -201,11 +247,25 @@
     "NOROWS": "No data"
   },
   "ERRORS": {
-    "REQUIRED": "Some required fields are missing.",
+    "REQUIRED": "Please fill in this field.",
+    "ATLEASTONE": "Provide at least one value.",
     "TOKENINVALID": {
       "TITLE": "Your authorization token has expired.",
       "DESCRIPTION": "Click the button below to log in again."
-    }
+    },
+    "EXHAUSTED": {
+      "TITLE": "Your quota for authenticated requests is exhausted.",
+      "DESCRIPTION": "Remove or increase the quota limit for this ZITADEL instance."
+    },
+    "INVALID_FORMAT": "The formatting is invalid.",
+    "NOTANEMAIL": "The given value is not an e-mail address.",
+    "MINLENGTH": "Must be at least {{requiredLength}} characters long.",
+    "UPPERCASEMISSING": "Must include an uppercase character.",
+    "LOWERCASEMISSING": "Must include a lowercase character.",
+    "SYMBOLERROR": "Must include a symbol or punctuation mark.",
+    "NUMBERERROR": "Must include a digit.",
+    "PWNOTEQUAL": "The passwords provided do not match.",
+    "PHONE": "The phone number must start with 00 or +."
   },
   "USER": {
     "SETTINGS": {
@@ -231,6 +291,7 @@
       "CREATE": "Create",
       "MY": "My Information",
       "LOGINNAMES": "Login names",
+      "LOGINMETHODS": "Login methods",
       "LOGINNAMESDESC": "These are your login names:",
       "NOUSER": "No associated user.",
       "REACTIVATE": "Reactivate",
@@ -239,6 +300,8 @@
       "STATE": "Status",
       "DELETE": "Delete User",
       "UNLOCK": "Unlock User",
+      "GENERATESECRET": "Generate Client Secret",
+      "REMOVESECRET": "Remove Client Secret",
       "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again.",
       "DELETEACCOUNT": "Delete Account",
       "DELETEACCOUNT_DESC": "If you perform this action, you will be logged out and will no longer have access to your account. This action is not reversible, so please continue with caution.",
@@ -263,6 +326,10 @@
       "TITLE": "Send Email Notification",
       "DESCRIPTION": "Click the button below to send a notification to the current email address or change the email address in the field.",
       "NEWEMAIL": "New email address"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed."
     },
     "TABLE": {
       "DEACTIVATE": "Deactivate",
@@ -404,6 +471,7 @@
       "TITLE": "Profile",
       "EMAIL": "E-mail",
       "PHONE": "Phone number",
+      "PHONE_HINT": "Use 00 or the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
       "USERNAME": "User Name",
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
@@ -423,7 +491,8 @@
         "PREVIEW": "Preview",
         "DELETESUCCESS": "Deleted successfully!",
         "CROPPERERROR": "An error while uploading your file occurred. Try a different format and size if necessary."
-      }
+      },
+      "COUNTRY": "Country"
     },
     "MACHINE": {
       "TITLE": "Service User Details",
@@ -441,6 +510,11 @@
       "CHOOSEEXPIRY": "Select an expiration date",
       "CREATIONDATE": "Creation Date",
       "KEYDETAILS": "Key Details",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Add Key",
         "DESCRIPTION": "Select your key type and choose an optional expiration date."
@@ -472,8 +546,7 @@
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Send Password Reset Link",
       "REQUIRED": "Some required fields are missing.",
-      "MINLENGTHERROR": "Has to be at least {{value}} characters long.",
-      "NOTEQUAL": "The passwords provided do not match."
+      "MINLENGTHERROR": "Has to be at least {{value}} characters long."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -483,7 +556,7 @@
     "EMAILVERIFIED": "Email verified",
     "NOTVERIFIED": "not verified",
     "PREFERRED_LOGINNAME": "Preferred Loginname",
-    "ISINITIAL": "This users email is not verified yet.",
+    "ISINITIAL": "User is not active, yet.",
     "LOGINMETHODS": {
       "TITLE": "Contact Information",
       "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -527,17 +600,6 @@
         "3": "filter for rolename"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "The password does not fulfil the defined rules.",
-      "NOTANEMAIL": "The given value is not an e-mail address",
-      "REQUIRED": "The input field is empty.",
-      "MINLENGTH": "The password has to be at least {{requiredLength}} characters long.",
-      "NOEMAIL": "The user name cannot be an e-mail address.",
-      "UPPERCASEMISSING": "Must include an uppercase character.",
-      "LOWERCASEMISSING": "Must include a lowercase character.",
-      "SYMBOLERROR": "Must include a symbol or punctuation mark.",
-      "NUMBERERROR": "Must include a digit."
-    },
     "STATE": {
       "0": "Unknown",
       "1": "Active",
@@ -560,7 +622,7 @@
     "SIGNEDOUT_BTN": "Sign In",
     "EDITACCOUNT": "Edit Account",
     "ADDACCOUNT": "Log in With Another Account",
-    "RESENDINITIALEMAIL": "Send new initialization mail",
+    "RESENDINITIALEMAIL": "Resend activation mail",
     "RESENDEMAILNOTIFICATION": "Resend Email notification",
     "TOAST": {
       "CREATED": "User created successfully.",
@@ -588,7 +650,9 @@
       "MACHINEADDED": "Service User created!",
       "DELETED": "User deleted successfully!",
       "UNLOCKED": "User unlocked successfully!",
-      "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully."
+      "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully.",
+      "SECRETGENERATED": "Secret generated successfully!",
+      "SECRETREMOVED": "Secret removed successfully!"
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager Roles",
@@ -749,6 +813,56 @@
       "DELETE": "Remove",
       "DELETESUCCESS": "Failed events removed."
     },
+    "EVENTS": {
+      "TITLE": "Events",
+      "DESCRIPTION": "This view shows all occured events.",
+      "EDITOR": "Editor",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "Aggregate",
+      "AGGREGATEID": "Aggregate ID",
+      "AGGREGATETYPE": "Aggregate Type",
+      "RESOURCEOWNER": "Resource Owner",
+      "SEQUENCE": "Sequence",
+      "CREATIONDATE": "Created At",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filter",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by Editor"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by Aggregate"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filter by Type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filter by Resource Owner"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequence",
+          "CHECKBOX": "Filter by Sequence",
+          "SORT": "Sorting",
+          "ASC": "Ascending",
+          "DESC": "Descending"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Creation Date",
+          "CHECKBOX": "Filter by Creation Date"
+        },
+        "OTHER": "other",
+        "OTHERS": "others"
+      },
+      "DIALOG": {
+        "TITLE": "Event Detail"
+      }
+    },
     "TOAST": {
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERSADDED": "Managers added.",
@@ -780,6 +894,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
       "ORGDETAILUSER_TITLE": "Configure Organization Owner",
       "DELETE": "Delete organization",
+      "DEFAULTLABEL": "Default",
+      "SETASDEFAULT": "Set as default organization",
+      "DEFAULTORGSET": "Default organization changed successfully",
       "RENAME": {
         "ACTION": "Rename",
         "TITLE": "Rename Organization",
@@ -882,7 +999,7 @@
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
-      "NOTIFICATIONS": "Notification providers and SMTP",
+      "NOTIFICATIONS": "Notification settings",
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
@@ -907,16 +1024,19 @@
     "DEFAULTLANGUAGE": "Default Language",
     "LANGUAGE": {
       "de": "Deutsch",
-      "it": "Italiano",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
       "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
-      "SENDERADDRESS": "Sender Email address",
+      "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
-      "HOST": "Host",
+      "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
       "SETPASSWORD": "Set SMTP Password",
@@ -1006,6 +1126,11 @@
       "NUMBERERROR": "Must include a digit.",
       "PATTERNERROR": "The password does not meet the required pattern."
     },
+    "NOTIFICATION": {
+      "TITLE": "Notification",
+      "DESCRIPTION": "Determines on which changes, notifications will be sent.",
+      "PASSWORDCHANGE": "Password change"
+    },
     "PRIVATELABELING": {
       "TITLE": "Branding",
       "DESCRIPTION": "Give the login your personalized style and modify its behavior.",
@@ -1030,6 +1155,10 @@
       "MAXSIZEEXCEEDED": "Maximum size of 524kB exceeded.",
       "NOSVGSUPPORTED": "SVG are not supported!",
       "FONTINLOGINONLY": "The font is currently only displayed in the login interface.",
+      "BACKGROUNDCOLOR": "Background color",
+      "PRIMARYCOLOR": "Primary color",
+      "WARNCOLOR": "Warning color",
+      "FONTCOLOR": "Font color",
       "VIEWS": {
         "PREVIEW": "Preview",
         "CURRENT": "Current Configuration"
@@ -1074,6 +1203,7 @@
       "TOSLINK": "Link to Terms of Service",
       "POLICYLINK": "Link to Privacy Policy",
       "HELPLINK": "Link to Help",
+      "SUPPORTEMAIL": "Support Email",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
@@ -1089,13 +1219,16 @@
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?",
       "UNSAVED_TITLE": "Continue without saving?",
-      "UNSAVED_DESCRIPTION": "Your have made changes without saving. Do you want to save now?",
+      "UNSAVED_DESCRIPTION": "You have made changes without saving. Do you want to save now?",
       "LOCALE": "Locale Code",
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
+        "es": "Español",
         "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
         "zh": "简体中文"
       },
       "KEYS": {
@@ -1145,7 +1278,8 @@
         "VP": "Verify Phone",
         "PR": "Password Reset",
         "DC": "Domain Claim",
-        "PL": "Passwordless"
+        "PL": "Passwordless",
+        "PC": "Password Change"
       },
       "CHIPS": {
         "firstname": "Firstname",
@@ -1484,6 +1618,12 @@
       "DELETED": "Project deleted."
     }
   },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Delete role",
+      "DELETE_DESCRIPTION": "You are about to delete a role. Are you sure?"
+    }
+  },
   "NEXTSTEPS": {
     "TITLE": "Next Steps"
   },
@@ -1494,45 +1634,98 @@
       "ACTIVETITLE": "Active Identity Providers"
     },
     "CREATE": {
-      "TITLE": "New Identity Provider",
-      "DESCRIPTION": "Choose one of the following Identity Provider types."
+      "TITLE": "Add provider",
+      "DESCRIPTION": "Select one ore more of the following providers.",
+      "STEPPERTITLE": "Create Provider",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Enter the required data for your OIDC provider."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Enter the required data for your OAuth provider."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Enter the required data for your JWT provider."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Enter the credentials for your Google Identity Provider"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Enter the credentials for your Gitlab Identity Provider"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Enter the credentials for your Gitlab Self Hosted Identity Provider"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Enter the credentials for your GitHub Enterprise Server Identity Provider"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Enter the credentials for your Github Identity Provider"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Enter the credentials for your Microsoft Identity Provider"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Enter the credentials for your LDAP Provider"
+      }
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
-      "DESCRIPTION": "General Configuration of your identity provider.",
+      "DESCRIPTION": "Update your provider configuration",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatic creation",
+      "ISAUTOCREATION_DESC": "If selected, an account will be created if it does not exist yet.",
+      "ISAUTOUPDATE": "Automatic update",
+      "ISAUTOUPDATE_DESC": "If selected, accounts are updated on reauthentication.",
+      "ISCREATIONALLOWED": "Account creation allowed",
+      "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
+      "ISLINKINGALLOWED": "Account linking allowed",
+      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
     },
     "OWNERTYPES": {
       "0": "unknown",
       "1": "Instance",
       "2": "Organization"
     },
-    "TYPES": {
-      "0": "unknown",
-      "1": "OIDC",
-      "3": "JWT"
-    },
     "STATES": {
       "1": "active",
       "2": "inactive"
     },
-    "MAPPINGFIELD": {
-      "1": "Preferred Username",
-      "2": "Email"
+    "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
     },
-    "STYLE": "Style",
-    "STYLEFIELD": {
-      "0": "No Styling",
-      "1": "Google"
-    },
+    "AZUREADTENANTTYPE": "Tenant Type",
+    "AZUREADTENANTID": "Tenant ID",
+    "EMAILVERIFIED": "Email verified",
+    "NAMEHINT": "If specified it will be shown in the login interface.",
+    "OPTIONAL": "optional",
+    "LDAPATTRIBUTES": "LDAP Attributes",
+    "UPDATEBINDPASSWORD": "update Bind Password",
+    "UPDATECLIENTSECRET": "update client secret",
     "ADD": "Add Identity Provider",
-    "AUTOREGISTER": "Auto Register",
-    "AUTOREGISTER_DESC": "If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
     "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Name",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "ID Attribute",
     "AVAILABILITY": "Availability",
     "AVAILABLE": "available",
     "AVAILABLEBUTINACTIVE": "available but inactive",
@@ -1544,6 +1737,31 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "Connection",
+    "LDAPUSERBINDING": "User binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "required",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP Display Name Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Dates",
@@ -1632,7 +1850,7 @@
   "APP": {
     "LIST": "Applications",
     "COMPLIANCE": "OIDC Compliance",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "Configuration",
     "TOKEN": "Token Settings",
     "PAGES": {
@@ -1640,12 +1858,14 @@
       "ID": "ID",
       "DESCRIPTION": "Here you can edit your application data and it's configuration.",
       "CREATE": "Create application",
+      "CREATE_SELECT_PROJECT": "Select your project first",
+      "CREATE_NEW_PROJECT": "or create a new one <a href='{{url}}' title='Create project'>here</a>.",
       "CREATE_DESC_TITLE": "Enter Your Application Details Step by Step",
       "CREATE_DESC_SUB": "A recommended configuration will be automatically generated.",
       "STATE": "Status",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed",
-      "URLS": "Urls",
+      "URLS": "URLs",
       "DELETE": "Delete App",
       "DETAIL": {
         "TITLE": "Detail",
@@ -1722,6 +1942,8 @@
       "REGENERATESECRET": "Regenerate Client Secret",
       "DEVMODE": "Development Mode",
       "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Skip Login Success Page",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Skip the success page after a login for this native app.",
       "REDIRECT": "Redirect URIs",
       "REDIRECTSECTION": "Redirect URIs",
       "POSTLOGOUTREDIRECT": "Post Logout URIs",
@@ -1744,7 +1966,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -1835,6 +2058,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "Get the tokens directly from the authorization endpoint"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Authorize the device on a computer or smartphone."
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "Your setting doesn't correspond to any other option."
@@ -1861,8 +2088,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
+    "es": "Español",
     "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
     "zh": "简体中文"
   },
   "MEMBER": {

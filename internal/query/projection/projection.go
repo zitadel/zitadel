@@ -2,9 +2,9 @@ package projection
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
@@ -37,6 +37,7 @@ var (
 	AppProjection                       *appProjection
 	IDPUserLinkProjection               *idpUserLinkProjection
 	IDPLoginPolicyLinkProjection        *idpLoginPolicyLinkProjection
+	IDPTemplateProjection               *idpTemplateProjection
 	MailTemplateProjection              *mailTemplateProjection
 	MessageTextProjection               *messageTextProjection
 	CustomTextProjection                *customTextProjection
@@ -60,7 +61,11 @@ var (
 	DebugNotificationProviderProjection *debugNotificationProviderProjection
 	KeyProjection                       *keyProjection
 	SecurityPolicyProjection            *securityPolicyProjection
+	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
+	NotificationsQuotaProjection        interface{}
+	DeviceAuthProjection                *deviceAuthProjection
+	SessionProjection                   *sessionProjection
 )
 
 type projection interface {
@@ -72,16 +77,17 @@ var (
 	projections []projection
 )
 
-func Create(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
+func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
 	projectionConfig = crdb.StatementHandlerConfig{
 		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 			HandlerConfig: handler.HandlerConfig{
 				Eventstore: es,
 			},
-			RequeueEvery:        config.RequeueEvery,
-			RetryFailedAfter:    config.RetryFailedAfter,
-			Retries:             config.MaxFailureCount,
-			ConcurrentInstances: config.ConcurrentInstances,
+			RequeueEvery:          config.RequeueEvery,
+			RetryFailedAfter:      config.RetryFailedAfter,
+			Retries:               config.MaxFailureCount,
+			ConcurrentInstances:   config.ConcurrentInstances,
+			HandleActiveInstances: config.HandleActiveInstances,
 		},
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,
@@ -110,6 +116,7 @@ func Create(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, c
 	AppProjection = newAppProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["apps"]))
 	IDPUserLinkProjection = newIDPUserLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_user_links"]))
 	IDPLoginPolicyLinkProjection = newIDPLoginPolicyLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_login_policy_links"]))
+	IDPTemplateProjection = newIDPTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates"]))
 	MailTemplateProjection = newMailTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["mail_templates"]))
 	MessageTextProjection = newMessageTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["message_texts"]))
 	CustomTextProjection = newCustomTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["custom_texts"]))
@@ -133,6 +140,9 @@ func Create(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, c
 	DebugNotificationProviderProjection = newDebugNotificationProviderProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_notification_provider"]))
 	KeyProjection = newKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	SecurityPolicyProjection = newSecurityPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["security_policies"]))
+	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
+	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
+	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
 	newProjectionsList()
 	return nil
 }
@@ -154,7 +164,6 @@ func Start() {
 
 func ApplyCustomConfig(customConfig CustomConfig) crdb.StatementHandlerConfig {
 	return applyCustomConfig(projectionConfig, customConfig)
-
 }
 
 func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomConfig) crdb.StatementHandlerConfig {
@@ -169,6 +178,9 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 	}
 	if customConfig.RetryFailedAfter != nil {
 		config.RetryFailedAfter = *customConfig.RetryFailedAfter
+	}
+	if customConfig.HandleActiveInstances != nil {
+		config.HandleActiveInstances = *customConfig.HandleActiveInstances
 	}
 
 	return config
@@ -198,6 +210,7 @@ func newProjectionsList() {
 		OrgDomainProjection,
 		LoginPolicyProjection,
 		IDPProjection,
+		IDPTemplateProjection,
 		AppProjection,
 		IDPUserLinkProjection,
 		IDPLoginPolicyLinkProjection,
@@ -224,5 +237,8 @@ func newProjectionsList() {
 		DebugNotificationProviderProjection,
 		KeyProjection,
 		SecurityPolicyProjection,
+		NotificationPolicyProjection,
+		DeviceAuthProjection,
+		SessionProjection,
 	}
 }

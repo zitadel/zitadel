@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
@@ -236,7 +236,7 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
-  public emitFilter(): void {
+  public override emitFilter(): void {
     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
     this.showFilter = false;
     this.filterOpen.emit(false);

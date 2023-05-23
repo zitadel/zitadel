@@ -3,9 +3,11 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"runtime/debug"
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -16,16 +18,19 @@ type Querier interface {
 }
 
 func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQueryFactory) (events []*es_models.Event, err error) {
-	return filter(db.client, searchQuery)
+	if !searchQuery.InstanceFiltered {
+		logging.WithFields("stack", string(debug.Stack())).Warn("instanceid not filtered")
+	}
+	return db.filter(ctx, db.client, searchQuery)
 }
 
-func filter(querier Querier, searchQuery *es_models.SearchQueryFactory) (events []*es_models.Event, err error) {
-	query, limit, values, rowScanner := buildQuery(searchQuery)
+func (sql *SQL) filter(ctx context.Context, db *database.DB, searchQuery *es_models.SearchQueryFactory) (events []*es_models.Event, err error) {
+	query, limit, values, rowScanner := sql.buildQuery(ctx, db, searchQuery)
 	if query == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
 
-	rows, err := querier.Query(query, values...)
+	rows, err := db.Query(query, values...)
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
 		return nil, errors.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
@@ -48,7 +53,7 @@ func filter(querier Querier, searchQuery *es_models.SearchQueryFactory) (events 
 }
 
 func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.SearchQueryFactory) (uint64, error) {
-	query, _, values, rowScanner := buildQuery(queryFactory)
+	query, _, values, rowScanner := db.buildQuery(ctx, db.client, queryFactory)
 	if query == "" {
 		return 0, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
@@ -63,7 +68,7 @@ func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.Searc
 }
 
 func (db *SQL) InstanceIDs(ctx context.Context, queryFactory *es_models.SearchQueryFactory) ([]string, error) {
-	query, _, values, rowScanner := buildQuery(queryFactory)
+	query, _, values, rowScanner := db.buildQuery(ctx, db.client, queryFactory)
 	if query == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "SQL-Sfwg2", "invalid query factory")
 	}

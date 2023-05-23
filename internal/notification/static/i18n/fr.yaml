@@ -2,41 +2,48 @@ InitCode:
   Title: ZITADEL - Initialiser l'utilisateur
   PreHeader: Initialiser l'utilisateur
   Subject: Initialiser l'utilisateur
-  Greeting: Bonjour {{.FirstName}} {{.LastName}},
+  Greeting: Bonjour {{.DisplayName}},
   Text: Cet utilisateur a été créé dans ZITADEL. Utilisez le nom d'utilisateur {{.PreferredLoginName}} pour vous connecter. Veuillez cliquer sur le bouton ci-dessous pour terminer le processus d'initialisation. (Code {{.Code}}) Si vous n'avez pas demandé ce courrier, veuillez l'ignorer.
   ButtonText: Terminer l'initialisation
 PasswordReset:
   Title: ZITADEL - Réinitialiser le mot de passe
   PreHeader: Réinitialiser le mot de passe
   Subject: Réinitialiser le mot de passe
-  Greeting: Bonjour {{.FirstName}} {{.LastName}},
+  Greeting: Bonjour {{.DisplayName}},
   Text: Nous avons reçu une demande de réinitialisation du mot de passe. Veuillez utiliser le bouton ci-dessous pour réinitialiser votre mot de passe. (Code {{.Code}}) Si vous n'avez pas demandé cet e-mail, veuillez l'ignorer.
   ButtonText: Réinitialiser le mot de passe
 VerifyEmail:
   Title: ZITADEL - Vérifier l'email
   PreHeader: Vérifier l'email
   Subject: Vérifier l'email
-  Greeting: Bonjour {{.FirstName}} {{.LastName}},
+  Greeting: Bonjour {{.DisplayName}},
   Text: Un nouveau courriel a été ajouté. Veuillez utiliser le bouton ci-dessous pour vérifier votre e-mail. (Code {{.Code}}) Si vous n'avez pas ajouté de nouvelle adresse e-mail, veuillez ignorer cet e-mail.
   ButtonText: Vérifier l'email
 VerifyPhone:
   Title: ZITADEL - Vérifier le téléphone
   PreHeader: Vérifier le téléphone
   Subject: Vérifier le téléphone
-  Greeting: Bonjour {{.FirstName}} {{.LastName}},
+  Greeting: Bonjour {{.DisplayName}},
   Text: Un nouveau numéro de téléphone a été ajouté. Veuillez utiliser le code suivant pour le vérifier {{.Code}}
   ButtonText: Vérifier le téléphone
 DomainClaimed:
   Title: ZITADEL - Le domaine a été réclamé
   PreHeader: Modifier l'email / le nom d'utilisateur
   Subject: Le domaine a été réclamé
-  Greeting: Bonjour {{.FirstName}} {{.LastName}},
+  Greeting: Bonjour {{.DisplayName}},
   Text: Le domaine {{.Domain}} a été revendiqué par une organisation. Votre utilisateur actuel {{.Username}} ne fait pas partie de cette organisation. Par conséquent, vous devrez changer votre adresse électronique lors de votre connexion. Nous avons créé un nom d'utilisateur temporaire ({{.TempUsername}}) pour cette connexion.
   ButtonText: Connexion
 PasswordlessRegistration:
   Title: ZITADEL - Ajouter une connexion sans mot de passe
   PreHeader: Ajouter une connexion sans mot de passe
   Subject: Ajouter une connexion sans mot de passe
-  Greeting: Bonjour {{.FirstName}} {{.LastName}},
+  Greeting: Bonjour {{.DisplayName}},
   Text: Nous avons reçu une demande d'ajout d'un jeton pour la connexion sans mot de passe. Veuillez utiliser le bouton ci-dessous pour ajouter votre jeton ou dispositif pour la connexion sans mot de passe.
   ButtonText: Ajouter une connexion sans mot de passe
+PasswordChange:
+  Title: ZITADEL - Le mot de passe de l'utilisateur a changé
+  PreHeader: Modifier le mot de passe
+  Subject: Le mot de passe de l'utilisateur a changé
+  Greeting: Bonjour {{.DisplayName}},
+  Text: Le mot de passe de votre utilisateur a changé, si ce changement n'a pas été fait par vous, nous vous conseillons de réinitialiser immédiatement votre mot de passe.
+  ButtonText: Login

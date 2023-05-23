@@ -64,9 +64,15 @@
                     </option>
                     <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "ExternalNotFound.English"}}
                     </option>
-                    <option value="it" id="it" {{if (selectedLanguage "it")}} selected {{end}}>{{t "ExternalNotFound.Italian"}}
+                    <option value="es" id="es" {{if (selectedLanguage "es")}} selected {{end}}>{{t "ExternalNotFound.Spanish"}}
                     </option>
                     <option value="fr" id="fr" {{if (selectedLanguage "fr")}} selected {{end}}>{{t "ExternalNotFound.French"}}
+                    </option>
+                    <option value="it" id="it" {{if (selectedLanguage "it")}} selected {{end}}>{{t "ExternalNotFound.Italian"}}
+                    </option>
+                    <option value="ja" id="ja" {{if (selectedLanguage "ja")}} selected {{end}}>{{t "ExternalNotFound.Japanese"}}
+                    </option>
+                    <option value="pl" id="pl" {{if (selectedLanguage "pl")}} selected {{end}}>{{t "ExternalNotFound.Polish"}}
                     </option>
                     <option value="zh" id="zh" {{if (selectedLanguage "zh")}} selected {{end}}>{{t "ExternalNotFound.Chinese"}}
                     </option>
@@ -116,13 +122,17 @@
             <i class="lgn-icon-arrow-left-solid"></i>
         </button>
 
+        {{ if .IsLinkingAllowed }}
         <button type="submit" formaction="{{ externalNotFoundOptionUrl "linkbutton"}}" class="lgn-raised-button lgn-primary" name="linkbutton" value="true">
             {{t "ExternalNotFound.LinkButtonText"}}
         </button>
-            <span class="fill-space"></span>
+        {{ end }}
+        <span class="fill-space"></span>
+        {{ if .IsCreationAllowed }}
         <button type="submit" formaction="{{ externalNotFoundOptionUrl "autoregisterbutton"}}" class="lgn-raised-button lgn-primary" name="autoregisterbutton" value="true">
             {{t "ExternalNotFound.AutoRegisterButtonText"}}
         </button>
+        {{ end }}
     </div>
 </form>
 

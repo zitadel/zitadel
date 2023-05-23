@@ -33,7 +33,8 @@ func (mig *externalConfigChange) Check() bool {
 }
 
 func (mig *externalConfigChange) Execute(ctx context.Context) error {
-	cmd, err := command.StartCommands(mig.es,
+	cmd, err := command.StartCommands(
+		mig.es,
 		systemdefaults.SystemDefaults{},
 		nil,
 		nil,
@@ -41,6 +42,8 @@ func (mig *externalConfigChange) Execute(ctx context.Context) error {
 		mig.ExternalDomain,
 		mig.ExternalSecure,
 		mig.ExternalPort,
+		nil,
+		nil,
 		nil,
 		nil,
 		nil,

@@ -7,6 +7,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -14,9 +15,10 @@ import (
 )
 
 type IDPLoginPolicyLink struct {
-	IDPID   string
-	IDPName string
-	IDPType domain.IDPConfigType
+	IDPID     string
+	IDPName   string
+	IDPType   domain.IDPType
+	OwnerType domain.IdentityProviderType
 }
 
 type IDPLoginPolicyLinks struct {
@@ -78,27 +80,33 @@ var (
 		name:  projection.IDPLoginPolicyLinkOwnerRemovedCol,
 		table: idpLoginPolicyLinkTable,
 	}
+
+	idpLoginPolicyOwnerTable           = loginPolicyTable.setAlias("login_policy_owner")
+	idpLoginPolicyOwnerIDCol           = LoginPolicyColumnOrgID.setTable(idpLoginPolicyOwnerTable)
+	idpLoginPolicyOwnerInstanceIDCol   = LoginPolicyColumnInstanceID.setTable(idpLoginPolicyOwnerTable)
+	idpLoginPolicyOwnerIsDefaultCol    = LoginPolicyColumnIsDefault.setTable(idpLoginPolicyOwnerTable)
+	idpLoginPolicyOwnerOwnerRemovedCol = LoginPolicyColumnOwnerRemoved.setTable(idpLoginPolicyOwnerTable)
 )
 
 func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string, queries *IDPLoginPolicyLinksSearchQuery, withOwnerRemoved bool) (idps *IDPLoginPolicyLinks, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPLoginPolicyLinksQuery()
+	query, scan := prepareIDPLoginPolicyLinksQuery(ctx, q.client, resourceOwner)
 	eq := sq.Eq{
-		IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
-		IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).InstanceID(),
+		IDPLoginPolicyLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
 		eq[IDPLoginPolicyLinkOwnerRemovedCol.identifier()] = false
+		eq[idpLoginPolicyOwnerOwnerRemovedCol.identifier()] = false
 	}
+
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")
 	}
-
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
+	if err != nil || rows.Err() != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-ZkKUc", "Errors.Internal")
 	}
 	idps, err = scan(rows)
@@ -109,27 +117,40 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	return idps, err
 }
 
-func prepareIDPLoginPolicyLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase, resourceOwner string) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+	resourceOwnerQuery, resourceOwnerArgs, err := prepareIDPLoginPolicyLinksResourceOwnerQuery(ctx, resourceOwner)
+	if err != nil {
+		return sq.SelectBuilder{}, nil
+	}
 	return sq.Select(
 			IDPLoginPolicyLinkIDPIDCol.identifier(),
-			IDPNameCol.identifier(),
-			IDPTypeCol.identifier(),
+			IDPTemplateNameCol.identifier(),
+			IDPTemplateTypeCol.identifier(),
+			IDPTemplateOwnerTypeCol.identifier(),
 			countColumn.identifier()).
 			From(idpLoginPolicyLinkTable.identifier()).
-			LeftJoin(join(IDPIDCol, IDPLoginPolicyLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
+			LeftJoin(join(IDPTemplateIDCol, IDPLoginPolicyLinkIDPIDCol)).
+			RightJoin("("+resourceOwnerQuery+") AS "+idpLoginPolicyOwnerTable.alias+" ON "+
+				idpLoginPolicyOwnerIDCol.identifier()+" = "+IDPLoginPolicyLinkResourceOwnerCol.identifier()+" AND "+
+				idpLoginPolicyOwnerInstanceIDCol.identifier()+" = "+IDPLoginPolicyLinkInstanceIDCol.identifier()+
+				" "+db.Timetravel(call.Took(ctx)),
+				resourceOwnerArgs...).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPLoginPolicyLinks, error) {
 			links := make([]*IDPLoginPolicyLink, 0)
 			var count uint64
 			for rows.Next() {
 				var (
-					idpName = sql.NullString{}
-					idpType = sql.NullInt16{}
-					link    = new(IDPLoginPolicyLink)
+					idpName      = sql.NullString{}
+					idpType      = sql.NullInt16{}
+					idpOwnerType = sql.NullInt16{}
+					link         = new(IDPLoginPolicyLink)
 				)
 				err := rows.Scan(
 					&link.IDPID,
 					&idpName,
 					&idpType,
+					&idpOwnerType,
 					&count,
 				)
 				if err != nil {
@@ -138,10 +159,11 @@ func prepareIDPLoginPolicyLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPL
 				link.IDPName = idpName.String
 				//IDPType 0 is oidc so we have to set unspecified manually
 				if idpType.Valid {
-					link.IDPType = domain.IDPConfigType(idpType.Int16)
+					link.IDPType = domain.IDPType(idpType.Int16)
 				} else {
-					link.IDPType = domain.IDPConfigTypeUnspecified
+					link.IDPType = domain.IDPTypeUnspecified
 				}
+				link.OwnerType = domain.IdentityProviderType(idpOwnerType.Int16)
 				links = append(links, link)
 			}
 
@@ -156,4 +178,23 @@ func prepareIDPLoginPolicyLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPL
 				},
 			}, nil
 		}
+}
+
+func prepareIDPLoginPolicyLinksResourceOwnerQuery(ctx context.Context, resourceOwner string) (string, []interface{}, error) {
+	eqPolicy := sq.Eq{idpLoginPolicyOwnerInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	return sq.Select(
+		idpLoginPolicyOwnerIDCol.identifier(),
+		idpLoginPolicyOwnerInstanceIDCol.identifier(),
+		idpLoginPolicyOwnerOwnerRemovedCol.identifier(),
+	).
+		From(idpLoginPolicyOwnerTable.identifier()).
+		Where(
+			sq.And{
+				eqPolicy,
+				sq.Or{
+					sq.Eq{idpLoginPolicyOwnerIDCol.identifier(): resourceOwner},
+					sq.Eq{idpLoginPolicyOwnerIDCol.identifier(): authz.GetInstance(ctx).InstanceID()},
+				},
+			}).
+		Limit(1).OrderBy(idpLoginPolicyOwnerIsDefaultCol.identifier()).ToSql()
 }

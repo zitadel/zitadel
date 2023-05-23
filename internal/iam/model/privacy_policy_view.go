@@ -10,6 +10,7 @@ type PrivacyPolicyView struct {
 	AggregateID string
 	TOSLink     string
 	PrivacyLink string
+	SupportEmail string
 	Default     bool
 
 	CreationDate time.Time

@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/authn"
 	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
+	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
@@ -58,7 +59,7 @@ func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defau
 func createInstancePbToAddHuman(req *system_pb.CreateInstanceRequest_Human, defaultHuman command.AddHuman, userLoginMustBeDomain bool, org, externalDomain string) *command.AddHuman {
 	user := defaultHuman
 	if req.Email != nil {
-		user.Email.Address = req.Email.Email
+		user.Email.Address = domain.EmailAddress(req.Email.Email)
 		user.Email.Verified = req.Email.IsEmailVerified
 	}
 	if req.Profile != nil {
@@ -163,7 +164,7 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 		instance.Org.Human = new(command.AddHuman)
 	}
 	if req.OwnerEmail.Email != "" {
-		instance.Org.Human.Email.Address = req.OwnerEmail.Email
+		instance.Org.Human.Email.Address = domain.EmailAddress(req.OwnerEmail.Email)
 		instance.Org.Human.Email.Verified = req.OwnerEmail.IsEmailVerified
 	}
 	if req.OwnerProfile != nil {
@@ -259,4 +260,23 @@ func fieldNameToInstanceDomainColumn(fieldName instance_pb.DomainFieldName) quer
 	default:
 		return query.Column{}
 	}
+}
+
+func ListIAMMembersRequestToQuery(req *system_pb.ListIAMMembersRequest) (*query.IAMMembersQuery, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &query.IAMMembersQuery{
+		MembersQuery: query.MembersQuery{
+			SearchRequest: query.SearchRequest{
+				Offset: offset,
+				Limit:  limit,
+				Asc:    asc,
+				// SortingColumn: model.IAMMemberSearchKey, //TOOD: not implemented in proto
+			},
+			Queries: queries,
+		},
+	}, nil
 }

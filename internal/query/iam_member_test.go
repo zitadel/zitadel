@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 var (
@@ -20,20 +21,24 @@ var (
 		", members.user_id" +
 		", members.roles" +
 		", projections.login_names2.login_name" +
-		", projections.users6_humans.email" +
-		", projections.users6_humans.first_name" +
-		", projections.users6_humans.last_name" +
-		", projections.users6_humans.display_name" +
-		", projections.users6_machines.name" +
-		", projections.users6_humans.avatar_key" +
+		", projections.users8_humans.email" +
+		", projections.users8_humans.first_name" +
+		", projections.users8_humans.last_name" +
+		", projections.users8_humans.display_name" +
+		", projections.users8_machines.name" +
+		", projections.users8_humans.avatar_key" +
+		", projections.users8.type" +
 		", COUNT(*) OVER () " +
 		"FROM projections.instance_members3 AS members " +
-		"LEFT JOIN projections.users6_humans " +
-		"ON members.user_id = projections.users6_humans.user_id AND members.instance_id = projections.users6_humans.instance_id " +
-		"LEFT JOIN projections.users6_machines " +
-		"ON members.user_id = projections.users6_machines.user_id AND members.instance_id = projections.users6_machines.instance_id " +
+		"LEFT JOIN projections.users8_humans " +
+		"ON members.user_id = projections.users8_humans.user_id AND members.instance_id = projections.users8_humans.instance_id " +
+		"LEFT JOIN projections.users8_machines " +
+		"ON members.user_id = projections.users8_machines.user_id AND members.instance_id = projections.users8_machines.instance_id " +
+		"LEFT JOIN projections.users8 " +
+		"ON members.user_id = projections.users8.id AND members.instance_id = projections.users8.instance_id " +
 		"LEFT JOIN projections.login_names2 " +
 		"ON members.user_id = projections.login_names2.user_id AND members.instance_id = projections.login_names2.instance_id " +
+		"AS OF SYSTEM TIME '-1 ms' " +
 		"WHERE projections.login_names2.is_primary = $1")
 	instanceMembersColumns = []string{
 		"creation_date",
@@ -49,6 +54,7 @@ var (
 		"display_name",
 		"name",
 		"avatar_key",
+		"type",
 		"count",
 	}
 )
@@ -100,6 +106,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							"display name",
 							nil,
 							nil,
+							domain.UserTypeHuman,
 						},
 					},
 				),
@@ -122,6 +129,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 						LastName:           "last-name",
 						DisplayName:        "display name",
 						AvatarURL:          "",
+						UserType:           domain.UserTypeHuman,
 					},
 				},
 			},
@@ -148,6 +156,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							nil,
 							"machine-name",
 							nil,
+							domain.UserTypeMachine,
 						},
 					},
 				),
@@ -170,6 +179,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 						LastName:           "",
 						DisplayName:        "machine-name",
 						AvatarURL:          "",
+						UserType:           domain.UserTypeMachine,
 					},
 				},
 			},
@@ -196,6 +206,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							"display name",
 							nil,
 							nil,
+							domain.UserTypeHuman,
 						},
 						{
 							testNow,
@@ -211,6 +222,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							nil,
 							"machine-name",
 							nil,
+							domain.UserTypeMachine,
 						},
 					},
 				),
@@ -233,6 +245,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 						LastName:           "last-name",
 						DisplayName:        "display name",
 						AvatarURL:          "",
+						UserType:           domain.UserTypeHuman,
 					},
 					{
 						CreationDate:       testNow,
@@ -247,6 +260,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 						LastName:           "",
 						DisplayName:        "machine-name",
 						AvatarURL:          "",
+						UserType:           domain.UserTypeMachine,
 					},
 				},
 			},
@@ -271,7 +285,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

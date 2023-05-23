@@ -261,7 +261,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 	if err != nil {
 		return nil, nil, err
 	}
-	if !isUserStateExists(userWriteModel.UserState) {
+	if userWriteModel.UserState != domain.UserStateActive {
 		return nil, nil, errors.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
 
@@ -439,7 +439,7 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 	return exists, nil
 }
 
-func newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, expiry time.Duration, err error) {
+func newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error) {
 	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
 }
 

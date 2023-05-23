@@ -57,6 +57,8 @@ func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 		return query.UserTypeCol
 	case user.UserFieldName_USER_FIELD_NAME_NICK_NAME:
 		return query.HumanNickNameCol
+	case user.UserFieldName_USER_FIELD_NAME_CREATION_DATE:
+		return query.UserCreationDateCol
 	default:
 		return query.UserIDCol
 	}
@@ -89,37 +91,6 @@ func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) (*query.User
 	}, nil
 }
 
-func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human {
-	h := &domain.Human{
-		Username: req.UserName,
-	}
-	preferredLanguage, err := language.Parse(req.Profile.PreferredLanguage)
-	logging.Log("MANAG-M029f").OnError(err).Debug("language malformed")
-	h.Profile = &domain.Profile{
-		FirstName:         req.Profile.FirstName,
-		LastName:          req.Profile.LastName,
-		NickName:          req.Profile.NickName,
-		DisplayName:       req.Profile.DisplayName,
-		PreferredLanguage: preferredLanguage,
-		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
-	}
-	h.Email = &domain.Email{
-		EmailAddress:    req.Email.Email,
-		IsEmailVerified: req.Email.IsEmailVerified,
-	}
-	if req.Phone != nil {
-		h.Phone = &domain.Phone{
-			PhoneNumber:     req.Phone.Phone,
-			IsPhoneVerified: req.Phone.IsPhoneVerified,
-		}
-	}
-	if req.InitialPassword != "" {
-		h.Password = &domain.Password{SecretString: req.InitialPassword, ChangeRequired: true}
-	}
-
-	return h
-}
-
 func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool, links []*domain.UserIDPLink) {
 	human = &domain.Human{
 		Username: req.UserName,
@@ -135,12 +106,12 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 		Gender:            user_grpc.GenderToDomain(req.Profile.Gender),
 	}
 	human.Email = &domain.Email{
-		EmailAddress:    req.Email.Email,
+		EmailAddress:    domain.EmailAddress(req.Email.Email),
 		IsEmailVerified: req.Email.IsEmailVerified,
 	}
 	if req.Phone != nil {
 		human.Phone = &domain.Phone{
-			PhoneNumber:     req.Phone.Phone,
+			PhoneNumber:     domain.PhoneNumber(req.Phone.Phone),
 			IsPhoneVerified: req.Phone.IsPhoneVerified,
 		}
 	}
@@ -170,9 +141,10 @@ func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resource
 		ObjectRoot: models.ObjectRoot{
 			ResourceOwner: resourceowner,
 		},
-		Username:    req.UserName,
-		Name:        req.Name,
-		Description: req.Description,
+		Username:        req.UserName,
+		Name:            req.Name,
+		Description:     req.Description,
+		AccessTokenType: user_grpc.AccessTokenTypeToDomain(req.AccessTokenType),
 	}
 }
 
@@ -196,7 +168,7 @@ func UpdateHumanEmailRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateHum
 			AggregateID:   req.UserId,
 			ResourceOwner: authz.GetCtxData(ctx).OrgID,
 		},
-		EmailAddress:    req.Email,
+		EmailAddress:    domain.EmailAddress(req.Email),
 		IsEmailVerified: req.IsEmailVerified,
 	}
 }
@@ -204,7 +176,7 @@ func UpdateHumanEmailRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateHum
 func UpdateHumanPhoneRequestToDomain(req *mgmt_pb.UpdateHumanPhoneRequest) *domain.Phone {
 	return &domain.Phone{
 		ObjectRoot:      models.ObjectRoot{AggregateID: req.UserId},
-		PhoneNumber:     req.Phone,
+		PhoneNumber:     domain.PhoneNumber(req.Phone),
 		IsPhoneVerified: req.IsPhoneVerified,
 	}
 }
@@ -226,8 +198,9 @@ func UpdateMachineRequestToCommand(req *mgmt_pb.UpdateMachineRequest, orgID stri
 			AggregateID:   req.UserId,
 			ResourceOwner: orgID,
 		},
-		Name:        req.Name,
-		Description: req.Description,
+		Name:            req.Name,
+		Description:     req.Description,
+		AccessTokenType: user_grpc.AccessTokenTypeToDomain(req.AccessTokenType),
 	}
 }
 

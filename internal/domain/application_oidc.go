@@ -45,6 +45,7 @@ type OIDCApp struct {
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
 	AdditionalOrigins        []string
+	SkipNativeAppSuccessPage bool
 
 	State AppState
 }
@@ -89,6 +90,7 @@ const (
 	OIDCGrantTypeAuthorizationCode OIDCGrantType = iota
 	OIDCGrantTypeImplicit
 	OIDCGrantTypeRefreshToken
+	OIDCGrantTypeDeviceCode
 )
 
 type OIDCApplicationType int32

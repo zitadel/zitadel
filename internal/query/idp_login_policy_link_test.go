@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -8,20 +9,28 @@ import (
 	"regexp"
 	"testing"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
 var (
-	loginPolicyIDPLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_login_policy_links4.idp_id,` +
-		` projections.idps3.name,` +
-		` projections.idps3.type,` +
+	loginPolicyIDPLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_login_policy_links5.idp_id,` +
+		` projections.idp_templates5.name,` +
+		` projections.idp_templates5.type,` +
+		` projections.idp_templates5.owner_type,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.idp_login_policy_links4` +
-		` LEFT JOIN projections.idps3 ON projections.idp_login_policy_links4.idp_id = projections.idps3.id`)
+		` FROM projections.idp_login_policy_links5` +
+		` LEFT JOIN projections.idp_templates5 ON projections.idp_login_policy_links5.idp_id = projections.idp_templates5.id AND projections.idp_login_policy_links5.instance_id = projections.idp_templates5.instance_id` +
+		` RIGHT JOIN (SELECT login_policy_owner.aggregate_id, login_policy_owner.instance_id, login_policy_owner.owner_removed FROM projections.login_policies4 AS login_policy_owner` +
+		` WHERE (login_policy_owner.instance_id = $1 AND (login_policy_owner.aggregate_id = $2 OR login_policy_owner.aggregate_id = $3)) ORDER BY login_policy_owner.is_default LIMIT 1) AS login_policy_owner` +
+		` ON login_policy_owner.aggregate_id = projections.idp_login_policy_links5.resource_owner AND login_policy_owner.instance_id = projections.idp_login_policy_links5.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'`)
 	loginPolicyIDPLinksCols = []string{
 		"idp_id",
 		"name",
 		"type",
+		"owner_type",
 		"count",
 	}
 )
@@ -38,8 +47,10 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareIDPsQuery found",
-			prepare: prepareIDPLoginPolicyLinksQuery,
+			name: "prepareIDPsQuery found",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+				return prepareIDPLoginPolicyLinksQuery(ctx, db, "resourceOwner")
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					loginPolicyIDPLinksQuery,
@@ -48,7 +59,8 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 						{
 							"idp-id",
 							"idp-name",
-							domain.IDPConfigTypeJWT,
+							domain.IDPTypeJWT,
+							domain.IdentityProviderTypeSystem,
 						},
 					},
 				),
@@ -59,16 +71,19 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 				},
 				Links: []*IDPLoginPolicyLink{
 					{
-						IDPID:   "idp-id",
-						IDPName: "idp-name",
-						IDPType: domain.IDPConfigTypeJWT,
+						IDPID:     "idp-id",
+						IDPName:   "idp-name",
+						IDPType:   domain.IDPTypeJWT,
+						OwnerType: domain.IdentityProviderTypeSystem,
 					},
 				},
 			},
 		},
 		{
-			name:    "prepareIDPsQuery no idp",
-			prepare: prepareIDPLoginPolicyLinksQuery,
+			name: "prepareIDPsQuery no idp",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+				return prepareIDPLoginPolicyLinksQuery(ctx, db, "resourceOwner")
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					loginPolicyIDPLinksQuery,
@@ -76,6 +91,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"idp-id",
+							nil,
 							nil,
 							nil,
 						},
@@ -90,14 +106,16 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 					{
 						IDPID:   "idp-id",
 						IDPName: "",
-						IDPType: domain.IDPConfigTypeUnspecified,
+						IDPType: domain.IDPTypeUnspecified,
 					},
 				},
 			},
 		},
 		{
-			name:    "prepareIDPsQuery sql err",
-			prepare: prepareIDPLoginPolicyLinksQuery,
+			name: "prepareIDPsQuery sql err",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+				return prepareIDPLoginPolicyLinksQuery(ctx, db, "resourceOwner")
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					loginPolicyIDPLinksQuery,
@@ -115,7 +133,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

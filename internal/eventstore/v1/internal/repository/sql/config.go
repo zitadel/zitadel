@@ -1,11 +1,12 @@
 package sql
 
 import (
-	"database/sql"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
-func Start(client *sql.DB) *SQL {
+func Start(client *database.DB, allowOrderByCreationDate bool) *SQL {
 	return &SQL{
-		client: client,
+		client:                   client,
+		allowOrderByCreationDate: allowOrderByCreationDate,
 	}
 }

@@ -119,6 +119,7 @@ const (
 	ColumnTypeJSONB
 	ColumnTypeBytes
 	ColumnTypeTimestamp
+	ColumnTypeInterval
 	ColumnTypeEnum
 	ColumnTypeEnumArray
 	ColumnTypeInt64
@@ -376,6 +377,8 @@ func defaultValue(value interface{}) string {
 	switch v := value.(type) {
 	case string:
 		return "'" + v + "'"
+	case fmt.Stringer:
+		return fmt.Sprintf("%#v", v)
 	default:
 		return fmt.Sprintf("%v", v)
 	}
@@ -389,6 +392,8 @@ func columnType(columnType ColumnType) string {
 		return "TEXT[]"
 	case ColumnTypeTimestamp:
 		return "TIMESTAMPTZ"
+	case ColumnTypeInterval:
+		return "INTERVAL"
 	case ColumnTypeEnum:
 		return "SMALLINT"
 	case ColumnTypeEnumArray:

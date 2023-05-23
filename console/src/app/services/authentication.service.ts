@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, lastValueFrom, Observable } from 'rxjs';
-import { GrpcAuthService } from './grpc-auth.service';
 
 import { StatehandlerService } from './statehandler/statehandler.service';
 
@@ -36,10 +35,8 @@ export class AuthenticationService {
       Object.assign(this.authConfig, partialConfig);
     }
     this.oauthService.configure(this.authConfig);
-
     this.oauthService.strictDiscoveryDocumentValidation = false;
     await this.oauthService.loadDiscoveryDocumentAndTryLogin();
-
     this._authenticated = this.oauthService.hasValidAccessToken();
     if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {
       const newState = await lastValueFrom(this.statehandler.createState());

@@ -55,14 +55,20 @@ type IDPProvider struct {
 	Type        IdentityProviderType
 	IDPConfigID string
 
-	Name          string
-	StylingType   IDPConfigStylingType
-	IDPConfigType IDPConfigType
-	IDPState      IDPConfigState
+	Name        string
+	StylingType IDPConfigStylingType // deprecated
+	IDPType     IDPType
+	IDPState    IDPConfigState
 }
 
 func (p IDPProvider) IsValid() bool {
 	return p.IDPConfigID != ""
+}
+
+// DisplayName returns the name or a default
+// to be used when always a name must be displayed (e.g. login)
+func (p IDPProvider) DisplayName() string {
+	return IDPName(p.Name, p.IDPType)
 }
 
 type PasswordlessType int32

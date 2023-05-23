@@ -1,9 +1,13 @@
 ---
-title: Production Checklist
+title: Production Setup
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/self-hosting/deploy/overview),
 you are ready to configure ZITADEL for production usage.
+
+
+## TL;DR
+We created a [Production Checklist](./productionchecklist.md) as a technical step by step guide.
 
 ## High Availability
 
@@ -41,6 +45,22 @@ Tracing:
   MetricPrefix: zitadel
 ```
 
+## Logging
+
+ZITADEL follows the principles that guide cloud-native and twelve factor applications.
+Logs are a stream of time-ordered events collected from all running processes.
+
+ZITADEL processes write the following events to the standard output:
+
+- Runtime Logs: Define the log level and record format [in the Log configuration section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L1-L4)
+- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L366) 
+- Actions Exectution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L387) .
+
+Log file management should not be in each business apps responsibility.
+Instead, your execution environment should provide tooling for managing logs in a generic way.
+This includes tasks like rotating files, routing, collecting, archiving and cleaning-up.
+For example, systemd has journald and kubernetes has fluentd and fluentbit.
+
 ## Database
 
 ### Prefer CockroachDB
@@ -50,6 +70,11 @@ We highly recommend using CockroachDB,
 as horizontal scaling is much easier than with PostgreSQL.
 Also, if you are concerned about multi-regional data locality,
 [the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).
+
+The indexes for the database are optimized using load tests from [ZITADEL Cloud](https://zitadel.com), 
+which runs with CockroachDB.
+If you identify problems with your Postgresql during load tests that indicate that the indexes are not optimized,
+please create an issue in our [github repository](https://github.com/zitadel/zitadel).
 
 ### Configure ZITADEL
 
@@ -72,16 +97,39 @@ Database:
 You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
 ```yaml
+# The Projections section defines the behaviour for the scheduled and synchronous events projections.
 Projections:
+  # Time interval between scheduled projections
   RequeueEvery: 60s
+  # Time between retried database statements resulting from projected events
   RetryFailedAfter: 1s
+  # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5
+  # Number of concurrent projection routines. Values of 0 and below are overwritten to 1
   ConcurrentInstances: 1
+  # Limit of returned events per query
   BulkLimit: 200
-  MaxIterators: 1
+  # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+  # from HandleActiveInstances duration in the past until the projections current time
+  # Defaults to twice the RequeueEvery duration
+  HandleActiveInstances: 120s
+  # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
-    projects:
+    Projects:
       BulkLimit: 2000
+    # The Notifications projection is used for sending emails and SMS to users
+    Notifications:
+      # As notification projections don't result in database statements, retries don't have an effect
+      MaxFailureCount: 0
+    # The NotificationsQuotas projection is used for calling quota webhooks
+    NotificationsQuotas:
+      # Delivery guarantee requirements are probably higher for quota webhooks
+      # Defaults to 45 days
+      HandleActiveInstances: 1080h
+      # As quota notification projections don't result in database statements, retries don't have an effect
+      MaxFailureCount: 0
+      # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
+      RequeueEvery: 300s
 ```
 
 ### Manage your Data
@@ -135,3 +183,8 @@ DefaultInstance:
 - Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/overview).
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform/basics).
+
+## Quotas
+
+If you host ZITADEL as a service,
+you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/quotas).

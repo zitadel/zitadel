@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatTable } from '@angular/material/table';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatLegacyTable as MatTable } from '@angular/material/legacy-table';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { InstanceMembersDataSource } from 'src/app/pages/instance/instance-members/instance-members-datasource';
@@ -10,6 +10,7 @@ import { ProjectGrantMembersDataSource } from 'src/app/pages/projects/owned-proj
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { getMembershipColor } from 'src/app/utils/color';
 
+import { Type } from 'src/app/proto/generated/zitadel/user_pb';
 import { AddMemberRolesDialogComponent } from '../add-member-roles-dialog/add-member-roles-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
@@ -43,6 +44,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
 
   private destroyed: Subject<void> = new Subject();
   public displayedColumns: string[] = ['select', 'userId', 'displayName', 'loginname', 'email', 'roles'];
+  public UserType: any = Type;
 
   constructor(private dialog: MatDialog) {
     this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {
@@ -69,27 +71,32 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   }
 
   public removeRole(member: Member.AsObject, role: string) {
-    const dialogRef = this.dialog.open(WarnDialogComponent, {
-      data: {
-        confirmKey: 'ACTIONS.DELETE',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'GRANTS.DIALOG.DELETE_TITLE',
-        descriptionKey: 'GRANTS.DIALOG.DELETE_DESCRIPTION',
-      },
-      width: '400px',
-    });
+    if (member.rolesList.length === 1) {
+      this.triggerDeleteMember(member);
+    } else {
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.DELETE',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'ROLES.DIALOG.DELETE_TITLE',
+          descriptionKey: 'ROLES.DIALOG.DELETE_DESCRIPTION',
+        },
+        width: '400px',
+      });
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-        const newRoles = Object.assign([], member.rolesList);
-        const index = newRoles.findIndex((r) => r === role);
-        if (index > -1) {
-          newRoles.splice(index, 1);
-          member.rolesList = newRoles;
-          this.updateRoles.emit({ member: member, change: newRoles });
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          const newRoles = Object.assign([], member.rolesList);
+
+          const index = newRoles.findIndex((r) => r === role);
+          if (index > -1) {
+            newRoles.splice(index, 1);
+            member.rolesList = newRoles;
+            this.updateRoles.emit({ member: member, change: newRoles });
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   public addRole(member: Member.AsObject) {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { UpdateSecretGeneratorRequest, UpdateSecretGeneratorResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCSettings, SecretGenerator, SecretGeneratorType } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -38,7 +38,6 @@ export class SecretGeneratorComponent implements OnInit {
       .then((generators) => {
         if (generators.resultList) {
           this.generators = generators.resultList;
-          console.log(this.generators);
         }
       })
       .catch((error) => {

@@ -65,10 +65,10 @@ type ExternalUser struct {
 	FirstName         string
 	LastName          string
 	NickName          string
-	Email             string
+	Email             EmailAddress
 	IsEmailVerified   bool
 	PreferredLanguage language.Tag
-	Phone             string
+	Phone             PhoneNumber
 	IsPhoneVerified   bool
 	Metadatas         []*Metadata
 }
@@ -122,6 +122,8 @@ func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
 		return &AuthRequest{Request: &AuthRequestOIDC{}}, nil
 	case AuthRequestTypeSAML:
 		return &AuthRequest{Request: &AuthRequestSAML{}}, nil
+	case AuthRequestTypeDevice:
+		return &AuthRequest{Request: &AuthRequestDevice{}}, nil
 	}
 	return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
 }
@@ -183,4 +185,13 @@ func (a *AuthRequest) GetScopeOrgID() string {
 		}
 	}
 	return ""
+}
+
+func (a *AuthRequest) Done() bool {
+	for _, step := range a.PossibleSteps {
+		if step.Type() == NextStepRedirectToCallback {
+			return true
+		}
+	}
+	return false
 }

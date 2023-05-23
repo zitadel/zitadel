@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -94,7 +95,7 @@ func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 		eq[LockoutPolicyOwnerRemoved.identifier()] = false
 	}
 
-	stmt, scan := prepareLockoutPolicyQuery()
+	stmt, scan := prepareLockoutPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(
 		sq.And{
 			eq,
@@ -117,7 +118,7 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (_ *LockoutPolicy, e
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareLockoutPolicyQuery()
+	stmt, scan := prepareLockoutPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		LockoutColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		LockoutColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -132,7 +133,7 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (_ *LockoutPolicy, e
 	return scan(row)
 }
 
-func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPolicy, error)) {
+func prepareLockoutPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*LockoutPolicy, error)) {
 	return sq.Select(
 			LockoutColID.identifier(),
 			LockoutColSequence.identifier(),
@@ -144,7 +145,8 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 			LockoutColIsDefault.identifier(),
 			LockoutColState.identifier(),
 		).
-			From(lockoutTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(lockoutTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LockoutPolicy, error) {
 			policy := new(LockoutPolicy)
 			err := row.Scan(

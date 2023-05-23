@@ -14,7 +14,7 @@ All that is required, is a service account with an Org Owner (or another role, d
 
 However, we recommend you read the guide on [how to access ZITADEL API](../../guides/integrate/access-zitadel-apis) and the associated guides for a basic knowledge of :
  - [Recommended Authorization Flows](../../guides/integrate/oauth-recommended-flows.md)
- - [Service Users](../../guides/integrate/serviceusers.md)
+ - [Service Users](../../guides/integrate/serviceusers)
 
 > Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
 
@@ -152,6 +152,6 @@ Now you can proceed implementing our APIs by adding more calls or trying to over
     log.Printf("%s was created on: %s", respOverwrite.Org.Name, respOverwrite.Org.Details.CreationDate.AsTime())
 }
 ```
-Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
+Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example) or refer to our [API Docs](/apis/introduction).
 
 > This guide will be updated soon to show you how to use the SDK for your own API as well.

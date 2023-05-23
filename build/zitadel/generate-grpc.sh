@@ -15,17 +15,12 @@ protoc \
   -I=/proto/include/ \
   --go_out $GOPATH/src \
   --go-grpc_out $GOPATH/src \
+  --validate_out=lang=go:${GOPATH}/src \
   $(find ${PROTO_PATH} -iname *.proto)
 
-# generate authoptions code from templates
-go-bindata \
-  -pkg main \
-  -prefix internal/protoc/protoc-gen-authoption \
-  -o ${ZITADEL_PATH}/internal/protoc/protoc-gen-authoption/templates.gen.go \
-  ${ZITADEL_PATH}/internal/protoc/protoc-gen-authoption/templates
-
-# install authoption proto compiler
-go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-authoption
+# install authoption and zitadel proto compiler
+go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-auth
+go install ${ZITADEL_PATH}/internal/protoc/protoc-gen-zitadel
 
 # output folder for openapi v2
 mkdir -p ${OPENAPI_PATH}
@@ -39,13 +34,9 @@ protoc \
   --grpc-gateway_opt logtostderr=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
-  --authoption_out ${GRPC_PATH}/system \
+  --auth_out ${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/system.proto
-
-# authoptions are generated into the wrong folder
-mv ${ZITADEL_PATH}/pkg/grpc/system/zitadel/* ${ZITADEL_PATH}/pkg/grpc/system
-rm -r ${ZITADEL_PATH}/pkg/grpc/system/zitadel
 
 protoc \
   -I=/proto/include \
@@ -53,13 +44,9 @@ protoc \
   --grpc-gateway_opt logtostderr=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
-  --authoption_out ${GRPC_PATH}/admin \
+  --auth_out ${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/admin.proto
-
-# authoptions are generated into the wrong folder
-mv ${ZITADEL_PATH}/pkg/grpc/admin/zitadel/* ${ZITADEL_PATH}/pkg/grpc/admin
-rm -r ${ZITADEL_PATH}/pkg/grpc/admin/zitadel
 
 protoc \
   -I=/proto/include \
@@ -69,13 +56,9 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --authoption_out ${GRPC_PATH}/management \
+  --auth_out ${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/management.proto
-
-# authoptions are generated into the wrong folder
-mv ${ZITADEL_PATH}/pkg/grpc/management/zitadel/* ${ZITADEL_PATH}/pkg/grpc/management
-rm -r ${ZITADEL_PATH}/pkg/grpc/management/zitadel
 
 protoc \
   -I=/proto/include \
@@ -85,106 +68,44 @@ protoc \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
   --openapiv2_opt allow_delete_body=true \
-  --authoption_out=${GRPC_PATH}/auth \
+  --auth_out=${GOPATH}/src \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/auth.proto
 
-# authoptions are generated into the wrong folder
-mv ${ZITADEL_PATH}/pkg/grpc/auth/zitadel/* ${ZITADEL_PATH}/pkg/grpc/auth
-rm -r ${ZITADEL_PATH}/pkg/grpc/auth/zitadel
+protoc \
+  -I=/proto/include \
+  --grpc-gateway_out ${GOPATH}/src \
+  --grpc-gateway_opt logtostderr=true \
+  --grpc-gateway_opt allow_delete_body=true \
+  --openapiv2_out ${OPENAPI_PATH} \
+  --openapiv2_opt logtostderr=true \
+  --openapiv2_opt allow_delete_body=true \
+  --zitadel_out=${GOPATH}/src \
+  --validate_out=lang=go:${GOPATH}/src \
+  ${PROTO_PATH}/user/v2alpha/user_service.proto
 
-## generate docs
 protoc \
   -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,system.md \
-  ${PROTO_PATH}/system.proto
+  --grpc-gateway_out ${GOPATH}/src \
+  --grpc-gateway_opt logtostderr=true \
+  --grpc-gateway_opt allow_delete_body=true \
+  --openapiv2_out ${OPENAPI_PATH} \
+  --openapiv2_opt logtostderr=true \
+  --openapiv2_opt allow_delete_body=true \
+  --zitadel_out=${GOPATH}/src \
+  --validate_out=lang=go:${GOPATH}/src \
+  ${PROTO_PATH}/session/v2alpha/session_service.proto
+
 protoc \
   -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,auth.md \
-  ${PROTO_PATH}/auth.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,management.md \
-  ${PROTO_PATH}/management.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,admin.md \
-  ${PROTO_PATH}/admin.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,action.md \
-  ${PROTO_PATH}/action.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,app.md \
-  ${PROTO_PATH}/app.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,auth_n_key.md \
-  ${PROTO_PATH}/auth_n_key.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,change.md \
-  ${PROTO_PATH}/change.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,idp.md \
-  ${PROTO_PATH}/idp.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,instance.md \
-  ${PROTO_PATH}/instance.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,member.md \
-  ${PROTO_PATH}/member.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,message.md \
-  ${PROTO_PATH}/message.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,metadata.md \
-  ${PROTO_PATH}/metadata.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,object.md \
-  ${PROTO_PATH}/object.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,options.md \
-  ${PROTO_PATH}/options.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,org.md \
-  ${PROTO_PATH}/org.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,policy.md \
-  ${PROTO_PATH}/policy.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,project.md \
-  ${PROTO_PATH}/project.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,settings.md \
-  ${PROTO_PATH}/settings.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,text.md \
-  ${PROTO_PATH}/text.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,user.md \
-  ${PROTO_PATH}/user.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,settings.md \
-  ${PROTO_PATH}/settings.proto
-protoc \
-  -I=/proto/include \
-  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,v1.md \
-  ${PROTO_PATH}/v1.proto
+  --grpc-gateway_out ${GOPATH}/src \
+  --grpc-gateway_opt logtostderr=true \
+  --grpc-gateway_opt allow_delete_body=true \
+  --openapiv2_out ${OPENAPI_PATH} \
+  --openapiv2_opt logtostderr=true \
+  --openapiv2_opt allow_delete_body=true \
+  --zitadel_out=${GOPATH}/src \
+  --validate_out=lang=go:${GOPATH}/src \
+  ${PROTO_PATH}/settings/v2alpha/settings_service.proto
 
 echo "done generating grpc"

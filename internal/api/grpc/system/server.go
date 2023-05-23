@@ -4,7 +4,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/admin/repository"
-
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -60,15 +59,15 @@ func (s *Server) AppName() string {
 }
 
 func (s *Server) MethodPrefix() string {
-	return system.SystemService_MethodPrefix
+	return system.SystemService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
 	return system.SystemService_AuthMethods
 }
 
-func (s *Server) RegisterGateway() server.GatewayFunc {
-	return system.RegisterSystemServiceHandlerFromEndpoint
+func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
+	return system.RegisterSystemServiceHandler
 }
 
 func (s *Server) GatewayPathPrefix() string {

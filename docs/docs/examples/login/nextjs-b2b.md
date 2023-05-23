@@ -4,7 +4,7 @@ title: Next.js B2B Scenario
 
 This is our Zitadel [Next.js](https://nextjs.org/) B2B template. It shows how to authenticate as a user with multiple organizations. The application shows your users roles on the selected organizations, other projects your organization is allowed to use and other users having a grant to use the application.
 
-If you need more info on B2B use cases consider reading our guide for the [B2B solution scenario](../../guides/solution-scenarios/b2b.mdx).
+If you need more info on B2B use cases consider reading our guide for the [B2B solution scenario](/guides/solution-scenarios/b2b.mdx).
 
 > You can follow along with the template code in our [zitadel-nextjs-b2b](https://github.com/zitadel/zitadel-nextjs-b2b) repo.
 
@@ -93,7 +93,7 @@ Replace the values as follows
 
 `NEXTAUTH_URL`: Base url of this demo app (B2B portal); runs per default on [http://localhost:3000](http://localhost:3000)
 
-`NEXT_PUBLIC_ZITADEL_ISSUER`: The url to your zitadel instance. When using zitadel.cloud for this demo you can find the domain of your ZITADEL instance in the customer portal. You can also find this information by going to your application `portal-web` and click 'Urls' in the navigation. The variable is prefixed with `NEXT_PUBLIC_` such that it can be accessed from the client.
+`NEXT_PUBLIC_ZITADEL_ISSUER`: The url to your zitadel instance. When using zitadel.cloud for this demo you can find the domain of your ZITADEL instance in the customer portal. You can also find this information by going to your application `portal-web` and click 'URLs' in the navigation. The variable is prefixed with `NEXT_PUBLIC_` such that it can be accessed from the client.
 
 `ZITADEL_API`: URL of the Management API. Typically the same as `ZITADEL_ISSUER`.
 
@@ -134,7 +134,7 @@ Let's call this new organization `Demo-Customer`.
 
 ### Users
 
-Now switch back to the organization `Demo-Customer` and [create a new user](/manuals/user-register) in this organization.
+Now switch back to the organization `Demo-Customer` and [create a new user](/guides/manage/console/users#create-user) in this organization.
 Let's call the first user `Alice Admin`. Create a second user called `Eric Employee`.
 
 ### Manager Role

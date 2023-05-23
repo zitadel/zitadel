@@ -2,13 +2,14 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Buffer } from 'buffer';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
+import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import {
   APIAuthMethodType,
   OIDCAppType,
@@ -31,10 +32,11 @@ import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog
 import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
+  DEVICE_CODE_METHOD,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
-  PK_JWT_METHOD,
   PKCE_METHOD,
+  PK_JWT_METHOD,
   POST_METHOD,
 } from '../authmethods';
 import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
@@ -111,6 +113,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     { type: OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT, checked: false, disabled: true },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, checked: false, disabled: true },
+    { type: OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE, checked: false, disabled: true },
   ];
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -127,8 +130,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     private breadcrumbService: BreadcrumbService,
   ) {
     this.form = this.fb.group({
-      name: ['', [Validators.required]],
-      appType: ['', [Validators.required]],
+      name: ['', [requiredValidator]],
+      appType: ['', [requiredValidator]],
       // apptype OIDC
       responseTypesList: ['', []],
       grantTypesList: ['', []],
@@ -140,8 +143,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     this.initForm();
 
     this.firstFormGroup = this.fb.group({
-      name: ['', [Validators.required]],
-      appType: [WEB_TYPE, [Validators.required]],
+      name: ['', [requiredValidator]],
+      appType: [WEB_TYPE, [requiredValidator]],
     });
 
     this.samlConfigForm = this.fb.group({
@@ -162,7 +165,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
           switch (this.appType?.value.oidcAppType) {
             case OIDCAppType.OIDC_APP_TYPE_NATIVE:
-              this.authMethods = [PKCE_METHOD];
+              this.authMethods = [PKCE_METHOD, DEVICE_CODE_METHOD];
 
               // automatically set to PKCE and skip step
               this.oidcAppRequest.setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE]);
@@ -192,7 +195,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     });
 
     this.secondFormGroup = this.fb.group({
-      authMethod: [this.authMethods[0].key, [Validators.required]],
+      authMethod: [this.authMethods[0].key, [requiredValidator]],
     });
 
     this.secondFormGroup.valueChanges.subscribe((form) => {
@@ -218,6 +221,22 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.samlAppRequest.setMetadataUrl(form.metadataUrl);
       }
     });
+  }
+
+  public get redirectUris() {
+    return this.oidcAppRequest.toObject().redirectUrisList;
+  }
+
+  public set redirectUris(value: string[]) {
+    this.oidcAppRequest.setRedirectUrisList(value);
+  }
+
+  public get postLogoutUrisList() {
+    return this.oidcAppRequest.toObject().postLogoutRedirectUrisList;
+  }
+
+  public set postLogoutUrisList(value: string[]) {
+    this.oidcAppRequest.setPostLogoutRedirectUrisList(value);
   }
 
   public ngOnInit(): void {
@@ -276,8 +295,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public setDevFormValidators(): void {
     if (this.isDevOIDC) {
-      const grantTypesControl = new UntypedFormControl('', [Validators.required]);
-      const responseTypesControl = new UntypedFormControl('', [Validators.required]);
+      const grantTypesControl = new UntypedFormControl('', [requiredValidator]);
+      const responseTypesControl = new UntypedFormControl('', [requiredValidator]);
 
       this.form.addControl('grantTypesList', grantTypesControl);
       this.form.addControl('responseTypesList', responseTypesControl);
@@ -456,6 +475,13 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     return this.form.get('grantTypesList');
   }
 
+  get grantTypesListContainsOnlyDeviceCode(): boolean {
+    return (
+      this.oidcAppRequest.toObject().grantTypesList.length === 1 &&
+      this.oidcAppRequest.toObject().grantTypesList[0] === OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE
+    );
+  }
+
   get formappType(): AbstractControl | null {
     return this.form.get('appType');
   }
@@ -463,9 +489,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   get formMetadataUrl(): AbstractControl | null {
     return this.form.get('metadataUrl');
   }
-  // get formapplicationType(): AbstractControl | null {
-  //     return this.form.get('applicationType');
-  // }
 
   get authMethodType(): AbstractControl | null {
     return this.form.get('authMethodType');

@@ -1,36 +1,23 @@
 package setup
 
 import (
-	"context"
-	"database/sql"
 	"embed"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
 	//go:embed 04/cockroach/index.sql
 	//go:embed 04/postgres/index.sql
-	stmts embed.FS
+	stmts04 embed.FS
 )
 
-type EventstoreIndexes struct {
-	dbClient *sql.DB
-	dbType   string
-}
-
-func (mig *EventstoreIndexes) Execute(ctx context.Context) error {
-	stmt, err := readStmt(mig.dbType)
-	if err != nil {
-		return err
+func New04(db *database.DB) *EventstoreIndexesNew {
+	return &EventstoreIndexesNew{
+		dbClient: db,
+		name:     "04_eventstore_indexes",
+		step:     "04",
+		fileName: "index.sql",
+		stmts:    stmts04,
 	}
-	_, err = mig.dbClient.ExecContext(ctx, stmt)
-	return err
-}
-
-func (mig *EventstoreIndexes) String() string {
-	return "04_eventstore_indexes"
-}
-
-func readStmt(typ string) (string, error) {
-	stmt, err := stmts.ReadFile("04/" + typ + "/index.sql")
-	return string(stmt), err
 }

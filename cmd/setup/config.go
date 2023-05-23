@@ -59,9 +59,14 @@ type Steps struct {
 	s1ProjectionTable    *ProjectionTable
 	s2AssetsTable        *AssetTable
 	FirstInstance        *FirstInstance
-	s4EventstoreIndexes  *EventstoreIndexes
+	s4EventstoreIndexes  *EventstoreIndexesNew
 	s5LastFailed         *LastFailed
 	s6OwnerRemoveColumns *OwnerRemoveColumns
+	s7LogstoreTables     *LogstoreTables
+	s8AuthTokens         *AuthTokenIndexes
+	s9EventstoreIndexes2 *EventstoreIndexesNew
+	CorrectCreationDate  *CorrectCreationDate
+	s11AddEventCreatedAt *AddEventCreatedAt
 }
 
 type encryptionKeyConfig struct {

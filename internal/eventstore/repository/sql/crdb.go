@@ -13,13 +13,14 @@ import (
 	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
 	//as soon as stored procedures are possible in crdb
-	// we could move the code to migrations and coll the procedure
+	// we could move the code to migrations and call the procedure
 	// traking issue: https://github.com/cockroachdb/cockroach/issues/17511
 	//
 	//previous_data selects the needed data of the latest event of the aggregate
@@ -66,7 +67,7 @@ const (
 		" $2::VARCHAR AS aggregate_type," +
 		" $3::VARCHAR AS aggregate_id," +
 		" $4::VARCHAR AS aggregate_version," +
-		" NOW() AS creation_date," +
+		" statement_timestamp() AS creation_date," +
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
@@ -97,19 +98,20 @@ const (
 )
 
 type CRDB struct {
-	client *sql.DB
+	*database.DB
+	AllowOrderByCreationDate bool
 }
 
-func NewCRDB(client *sql.DB) *CRDB {
-	return &CRDB{client}
+func NewCRDB(client *database.DB, allowOrderByCreationDate bool) *CRDB {
+	return &CRDB{client, allowOrderByCreationDate}
 }
 
-func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
+func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
 
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
-	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
+	err := crdb.ExecuteTx(ctx, db.DB.DB, nil, func(tx *sql.Tx) error {
 
 		var (
 			previousAggregateSequence     Sequence
@@ -159,7 +161,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
 
 func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
-	row := db.client.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID)
+	row := db.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID)
 	if row.Err() != nil {
 		return caos_errs.ThrowInvalidArgument(row.Err(), "SQL-7gtFA", "Errors.InvalidArgument")
 	}
@@ -168,7 +170,7 @@ func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
 		return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
 	}
 
-	if _, err := db.client.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
+	if _, err := db.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
 		return caos_errs.ThrowInternal(err, "SQL-7gtFA", "Errors.Internal")
 	}
 
@@ -249,10 +251,18 @@ func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQ
 }
 
 func (db *CRDB) db() *sql.DB {
-	return db.client
+	return db.DB.DB
 }
 
 func (db *CRDB) orderByEventSequence(desc bool) string {
+	if db.AllowOrderByCreationDate {
+		if desc {
+			return " ORDER BY creation_date DESC, event_sequence DESC"
+		}
+
+		return " ORDER BY creation_date, event_sequence"
+	}
+
 	if desc {
 		return " ORDER BY event_sequence DESC"
 	}

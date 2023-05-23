@@ -20,7 +20,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -73,13 +75,38 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 }
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	res, err := s.query.UserChanges(ctx, req.UserId, sequence, limit, asc, s.auditLogRetention)
+	var (
+		limit    uint64
+		sequence uint64
+		asc      bool
+	)
+	if req.Query != nil {
+		limit = uint64(req.Query.Limit)
+		sequence = req.Query.Sequence
+		asc = req.Query.Asc
+	}
+
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AllowTimeTravel().
+		Limit(limit).
+		OrderDesc().
+		ResourceOwner(authz.GetCtxData(ctx).OrgID).
+		AddQuery().
+		SequenceGreater(sequence).
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(req.UserId).
+		Builder()
+	if asc {
+		query.OrderAsc()
+	}
+
+	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
+
 	return &mgmt_pb.ListUserChangesResponse{
-		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix(ctx)),
+		Result: change_grpc.EventsToChangesPb(changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
@@ -183,17 +210,14 @@ func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRe
 }
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
-	details, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToAddHuman(req))
+	human := AddHumanUserRequestToAddHuman(req)
+	err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human, true)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddHumanUserResponse{
-		UserId: details.ID,
-		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner,
-		),
+		UserId:  human.ID,
+		Details: obj_grpc.DomainToAddDetailsPb(human.Details),
 	}, nil
 }
 
@@ -208,7 +232,7 @@ func AddHumanUserRequestToAddHuman(req *mgmt_pb.AddHumanUserRequest) *command.Ad
 		NickName:    req.Profile.NickName,
 		DisplayName: req.Profile.DisplayName,
 		Email: command.Email{
-			Address:  req.Email.Email,
+			Address:  domain.EmailAddress(req.Email.Email),
 			Verified: req.Email.IsEmailVerified,
 		},
 		PreferredLanguage:      lang,
@@ -221,7 +245,7 @@ func AddHumanUserRequestToAddHuman(req *mgmt_pb.AddHumanUserRequest) *command.Ad
 	}
 	if req.Phone != nil {
 		human.Phone = command.Phone{
-			Number:   req.Phone.Phone,
+			Number:   domain.PhoneNumber(req.Phone.Phone),
 			Verified: req.Phone.IsPhoneVerified,
 		}
 	}
@@ -342,7 +366,7 @@ func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
-	}, true)
+	}, true, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -446,7 +470,7 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.ResendInitialMail(ctx, req.UserId, req.Email, authz.GetCtxData(ctx).OrgID, initCodeGenerator)
+	details, err := s.command.ResendInitialMail(ctx, req.UserId, domain.EmailAddress(req.Email), authz.GetCtxData(ctx).OrgID, initCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -752,6 +776,34 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 		return nil, err
 	}
 	return &mgmt_pb.RemoveMachineKeyResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.GenerateMachineSecretRequest) (*mgmt_pb.GenerateMachineSecretResponse, error) {
+	// use SecretGeneratorTypeAppSecret as the secrets will be used in the client_credentials grant like a client secret
+	secretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	set := new(command.GenerateMachineSecret)
+	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, secretGenerator, set)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GenerateMachineSecretResponse{
+		ClientId:     set.ClientID,
+		ClientSecret: set.ClientSecret,
+		Details:      obj_grpc.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) RemoveMachineSecret(ctx context.Context, req *mgmt_pb.RemoveMachineSecretRequest) (*mgmt_pb.RemoveMachineSecretResponse, error) {
+	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveMachineSecretResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

@@ -1,6 +1,6 @@
 import { Component, EventEmitter } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator';
 import { ActivatedRoute } from '@angular/router';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
@@ -49,19 +49,19 @@ export class ProjectGrantDetailComponent {
     private breadcrumbService: BreadcrumbService,
   ) {
     this.route.params.subscribe((params) => {
-      this.projectid = params.projectid;
-      this.grantid = params.grantid;
+      this.projectid = params['projectid'];
+      this.grantid = params['grantid'];
 
       this.dataSource = new ProjectGrantMembersDataSource(this.mgmtService);
-      this.dataSource.loadMembers(params.projectid, params.grantid, 0, this.INITIALPAGESIZE);
+      this.dataSource.loadMembers(params['projectid'], params['grantid'], 0, this.INITIALPAGESIZE);
 
-      this.getRoleOptions(params.projectid);
+      this.getRoleOptions(params['projectid']);
       this.getMemberRoleOptions();
 
       this.changePageFactory = (event?: PageEvent) => {
         return this.dataSource.loadMembers(
-          params.projectid,
-          params.grantid,
+          params['projectid'],
+          params['grantid'],
           event?.pageIndex ?? 0,
           event?.pageSize ?? this.INITIALPAGESIZE,
         );
@@ -70,7 +70,6 @@ export class ProjectGrantDetailComponent {
       this.mgmtService
         .getProjectGrantByID(this.grantid, this.projectid)
         .then((resp) => {
-          console.log(resp);
           if (resp.projectGrant) {
             this.grant = resp.projectGrant;
 
@@ -112,9 +111,13 @@ export class ProjectGrantDetailComponent {
         .then(() => {
           this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
           this.grant.state = newState;
+          setTimeout(() => {
+            this.changePage.emit();
+          }, 1000);
         })
         .catch((error) => {
           this.toast.showError(error);
+          this.changePage.emit();
         });
     }
   }
@@ -141,9 +144,13 @@ export class ProjectGrantDetailComponent {
       .updateProjectGrant(this.grant.grantId, this.grant.projectId, selectionChange)
       .then(() => {
         this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
+        setTimeout(() => {
+          this.changePage.emit();
+        }, 1000);
       })
       .catch((error) => {
         this.toast.showError(error);
+        this.changePage.emit();
       });
   }
 
@@ -159,6 +166,7 @@ export class ProjectGrantDetailComponent {
             }, 1000);
           })
           .catch((error) => {
+            this.changePage.emit();
             this.toast.showError(error);
           });
       }),
@@ -175,6 +183,7 @@ export class ProjectGrantDetailComponent {
         }, 1000);
       })
       .catch((error) => {
+        this.changePage.emit();
         this.toast.showError(error);
       });
   }
@@ -203,9 +212,10 @@ export class ProjectGrantDetailComponent {
               this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERADDED', true);
               setTimeout(() => {
                 this.changePage.emit();
-              }, 3000);
+              }, 1000);
             })
             .catch((error) => {
+              this.changePage.emit();
               this.toast.showError(error);
             });
         }
@@ -217,9 +227,13 @@ export class ProjectGrantDetailComponent {
     this.mgmtService
       .updateProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId, selectionChange)
       .then(() => {
+        setTimeout(() => {
+          this.changePage.emit();
+        }, 1000);
         this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERCHANGED', true);
       })
       .catch((error) => {
+        this.changePage.emit();
         this.toast.showError(error);
       });
   }
@@ -232,9 +246,13 @@ export class ProjectGrantDetailComponent {
       this.mgmtService
         .updateProjectGrant(this.grant.grantId, this.grant.projectId, this.grant.grantedRoleKeysList)
         .then(() => {
+          setTimeout(() => {
+            this.changePage.emit();
+          }, 1000);
           this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
         })
         .catch((error) => {
+          this.changePage.emit();
           this.toast.showError(error);
         });
     }
@@ -257,8 +275,12 @@ export class ProjectGrantDetailComponent {
           .then(() => {
             this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
             this.grant.grantedRoleKeysList = resp.roles;
+            setTimeout(() => {
+              this.changePage.emit();
+            }, 1000);
           })
           .catch((error) => {
+            this.changePage.emit();
             this.toast.showError(error);
           });
       }

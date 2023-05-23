@@ -2,41 +2,48 @@ InitCode:
   Title: ZITADEL - 初始化用户
   PreHeader: 初始化用户
   Subject: 初始化用户
-  Greeting: 你好 {{.FirstName}} {{.LastName}},
+  Greeting: 你好 {{.DisplayName}},
   Text: 此用户是在 ZITADEL 中创建的。使用用户名 {{.PreferredLoginName}} 登录。请单击下面的按钮完成初始化过程。（代码 {{.Code}}）如果不是您本人操作，请忽略它。
   ButtonText: 完成初始化
 PasswordReset:
   Title: ZITADEL - 重置密码
   PreHeader: 重置密码
   Subject: 重置密码
-  Greeting: 你好 {{.FirstName}} {{.LastName}},
+  Greeting: 你好 {{.DisplayName}},
   Text: 我们收到了密码重置请求。请使用下面的按钮重置您的密码。（验证码 {{.Code}}）如果不是您本人操作，请忽略它。
   ButtonText: 重置密码
 VerifyEmail:
   Title: ZITADEL - 验证电子邮箱
   PreHeader: 验证电子邮箱
   Subject: 验证电子邮箱
-  Greeting: 你好 {{.FirstName}} {{.LastName}},
+  Greeting: 你好 {{.DisplayName}},
   Text: 已添加新电子邮件。请使用下面的按钮来验证您的邮件。（验证码 {{.Code}}）如果不是您本人操作，请忽略此电子邮件。
   ButtonText: 验证电子邮箱
 VerifyPhone:
   Title: ZITADEL - 验证手机号码
   PreHeader: 验证手机号码
   Subject: 验证手机号码
-  Greeting: 你好 {{.FirstName}} {{.LastName}},
+  Greeting: 你好 {{.DisplayName}},
   Text: 您的用户中添加了一个新的手机号码，请使用以下验证码进行验证 {{.Code}}
   ButtonText: 验证手机号码
 DomainClaimed:
   Title: ZITADEL - 域名所有权验证
   PreHeader: 更改电子邮件/用户名
   Subject: 域名所有权验证
-  Greeting: 你好 {{.FirstName}} {{.LastName}},
+  Greeting: 你好 {{.DisplayName}},
   Text: 域 {{.Domain}} 已被组织使用。您当前的用户 {{.Username}} 不属于此组织。因此，您必须在登录时更改您的电子邮件。我们为此登录创建了一个临时用户名 ({{.TempUsername}})。
   ButtonText: 登录
 PasswordlessRegistration:
   Title: ZITADEL - 添加无密码登录
   PreHeader: 添加无密码登录
   Subject: 添加无密码登录
-  Greeting: 你好 {{.FirstName}} {{.LastName}},
+  Greeting: 你好 {{.DisplayName}},
   Text: 我们收到了为无密码登录添加令牌的请求。请使用下面的按钮添加您的令牌或设备以进行无密码登录。
   ButtonText: 添加无密码登录
+PasswordChange:
+  Title: ZITADEL - 用户的密码已经改变
+  PreHeader: 更改密码
+  Subject: 用户的密码已经改变
+  Greeting: 你好 {{.DisplayName}},
+  Text: 您的用户的密码已经改变，如果这个改变不是由您做的，请注意立即重新设置您的密码。
+  ButtonText: 登录

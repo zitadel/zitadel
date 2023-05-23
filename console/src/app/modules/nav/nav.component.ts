@@ -1,17 +1,20 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { HttpClient } from '@angular/common/http';
+import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, forkJoin, map, merge, Observable, Subject, switchMap, take } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { AdminService } from 'src/app/services/admin.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { EnvironmentService } from 'src/app/services/environment.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { KeyboardShortcutsService } from 'src/app/services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 
 @Component({
   selector: 'cnsl-nav',
@@ -73,6 +76,7 @@ export class NavComponent implements OnDestroy {
 
   @Input() public isDarkTheme: boolean = true;
   @Input() public user!: User.AsObject;
+  public showInstanceProgress: boolean = false;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
       return result.matches;
@@ -83,45 +87,39 @@ export class NavComponent implements OnDestroy {
   public filterControl: UntypedFormControl = new UntypedFormControl('');
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public showAccount: boolean = false;
-  public hideAdminWarn: boolean = true;
   private destroy$: Subject<void> = new Subject();
 
   public BreadcrumbType: any = BreadcrumbType;
-  public customerPortalLink: string = '';
+  public customerPortalLink$ = this.envService.env.pipe(map((env) => env.customer_portal));
+
+  public positions: ConnectedPosition[] = [
+    new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
+    new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
+  ];
 
   constructor(
+    private envService: EnvironmentService,
     public authService: GrpcAuthService,
+    public adminService: AdminService,
     public authenticationService: AuthenticationService,
     public breadcrumbService: BreadcrumbService,
     public mgmtService: ManagementService,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
-    private http: HttpClient,
     private shortcutService: KeyboardShortcutsService,
-  ) {
-    this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
-    this.loadEnvironment();
-  }
-
-  public loadEnvironment(): void {
-    this.http
-      .get('./assets/environment.json')
-      .pipe(take(1))
-      .subscribe((data: any) => {
-        if (data && data.customer_portal) {
-          this.customerPortalLink = data.customer_portal;
-        }
-      });
-  }
-
-  public toggleAdminHide(): void {
-    this.hideAdminWarn = !this.hideAdminWarn;
-    localStorage.setItem('hideAdministratorWarning', this.hideAdminWarn.toString());
-  }
+    private storageService: StorageService,
+  ) {}
 
   public ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  public dismissOnboarding(): void {
+    this.showInstanceProgress = false;
+    this.adminService.hideOnboarding = true;
+    this.storageService.setItem('onboarding-dismissed', 'true', StorageLocation.local);
+    this.adminService.progressAllDone.next(true);
   }
 
   public get isUserLinkActive(): boolean {

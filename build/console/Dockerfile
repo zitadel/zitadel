@@ -1,4 +1,4 @@
-ARG NODE_VERSION=16
+ARG NODE_VERSION=18
 
 #######################
 ## With this step we prepare all node_modules, this helps caching the build
@@ -14,24 +14,14 @@ RUN npm ci
 
 # Sources
 COPY console .
-COPY --from=zitadel-base:local /proto /proto
-COPY --from=zitadel-base:local /usr/local/bin /usr/local/bin/.
-COPY build/console build/console/
-RUN build/console/generate-grpc.sh
-
-#######################
-## copy for local dev
-#######################
-FROM scratch as npm-copy
-COPY --from=npm-base /console/src/app/proto/generated /console/src/app/proto/generated
+COPY proto/ /proto/
 
 #######################
 ## angular lint workspace and prod build
 #######################
 FROM npm-base as angular-build
-
 RUN npm run lint
-RUN npm run prodbuild
+RUN npm run build
 
 #######################
 ## Only Copy Assets

@@ -521,9 +521,10 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *managem
 	}
 	if !queriedPrivacy.IsDefault {
 		return &management_pb.AddCustomPrivacyPolicyRequest{
-			TosLink:     queriedPrivacy.TOSLink,
-			PrivacyLink: queriedPrivacy.PrivacyLink,
-			HelpLink:    queriedPrivacy.HelpLink,
+			TosLink:      queriedPrivacy.TOSLink,
+			PrivacyLink:  queriedPrivacy.PrivacyLink,
+			HelpLink:     queriedPrivacy.HelpLink,
+			SupportEmail: string(queriedPrivacy.SupportEmail),
 		}, nil
 	}
 	return nil, nil
@@ -564,13 +565,13 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			}
 			if user.Human.Email != "" {
 				dataUser.User.Email = &management_pb.ImportHumanUserRequest_Email{
-					Email:           user.Human.Email,
+					Email:           string(user.Human.Email),
 					IsEmailVerified: user.Human.IsEmailVerified,
 				}
 			}
 			if user.Human.Phone != "" {
 				dataUser.User.Phone = &management_pb.ImportHumanUserRequest_Phone{
-					Phone:           user.Human.Phone,
+					Phone:           string(user.Human.Phone),
 					IsPhoneVerified: user.Human.IsPhoneVerified,
 				}
 			}
@@ -659,7 +660,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) (_ []*management_pb.SetTriggerActionsRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	flowTypes := []domain.FlowType{domain.FlowTypeExternalAuthentication}
+	flowTypes := []domain.FlowType{domain.FlowTypeExternalAuthentication, domain.FlowTypeInternalAuthentication}
 	triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
 
 	for _, flowType := range flowTypes {
@@ -799,6 +800,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 						IdTokenUserinfoAssertion: app.OIDCConfig.AssertIDTokenUserinfo,
 						ClockSkew:                durationpb.New(app.OIDCConfig.ClockSkew),
 						AdditionalOrigins:        app.OIDCConfig.AdditionalOrigins,
+						SkipNativeAppSuccessPage: app.OIDCConfig.SkipNativeAppSuccessPage,
 					},
 				})
 			}
@@ -966,7 +968,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 		return nil, err
 	}
 
-	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}}, false)
+	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}}, true, false)
 	if err != nil {
 		return nil, err
 	}

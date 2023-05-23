@@ -8,7 +8,10 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -17,13 +20,15 @@ import (
 )
 
 type UserGrant struct {
+	// ID represents the aggregate id (id of the user grant)
 	ID           string
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
 	Roles        database.StringArray
-	GrantID      string
-	State        domain.UserGrantState
+	// GrantID represents the project grant id
+	GrantID string
+	State   domain.UserGrantState
 
 	UserID             string
 	Username           string
@@ -68,6 +73,14 @@ func NewUserGrantUserIDSearchQuery(id string) (SearchQuery, error) {
 
 func NewUserGrantProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantProjectID, id, TextEquals)
+}
+
+func NewUserGrantProjectIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(UserGrantProjectID, list, ListIn)
 }
 
 func NewUserGrantProjectOwnerSearchQuery(id string) (SearchQuery, error) {
@@ -225,7 +238,7 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 		projection.UserGrantProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareUserGrantQuery()
+	query, scan := prepareUserGrantQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -242,11 +255,17 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 	return scan(row)
 }
 
-func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, withOwnerRemoved bool) (_ *UserGrants, err error) {
+func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk, withOwnerRemoved bool) (_ *UserGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserGrantsQuery()
+	if shouldTriggerBulk {
+		logging.OnError(
+			projection.UserGrantProjection.Trigger(ctx),
+		).Debug("unable to trigger")
+	}
+
+	query, scan := prepareUserGrantsQuery(ctx, q.client)
 	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		addUserGrantWithoutOwnerRemoved(eq)
@@ -274,7 +293,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, wi
 	return grants, nil
 }
 
-func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, error)) {
+func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserGrant, error)) {
 	return sq.Select(
 			UserGrantID.identifier(),
 			UserGrantCreationDate.identifier(),
@@ -307,7 +326,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
@@ -382,7 +401,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 		}
 }
 
-func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, error)) {
+func prepareUserGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, error)) {
 	return sq.Select(
 			UserGrantID.identifier(),
 			UserGrantCreationDate.identifier(),
@@ -417,7 +436,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

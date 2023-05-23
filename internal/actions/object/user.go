@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
+
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -11,9 +12,23 @@ import (
 )
 
 func UserFromExternalUser(c *actions.FieldConfig, user *domain.ExternalUser) goja.Value {
-	return c.Runtime.ToValue(&externalUser{
+	return c.Runtime.ToValue(externalUserFromDomain(user))
+}
+
+func externalUsersFromDomain(users []*domain.ExternalUser) []*externalUser {
+	externalUsers := make([]*externalUser, len(users))
+
+	for i, user := range users {
+		externalUsers[i] = externalUserFromDomain(user)
+	}
+
+	return externalUsers
+}
+
+func externalUserFromDomain(user *domain.ExternalUser) *externalUser {
+	return &externalUser{
 		ExternalId:    user.ExternalUserID,
-		ExternalIdpId: user.ExternalUserID,
+		ExternalIdpId: user.IDPConfigID,
 		Human: human{
 			FirstName:         user.FirstName,
 			LastName:          user.LastName,
@@ -25,7 +40,7 @@ func UserFromExternalUser(c *actions.FieldConfig, user *domain.ExternalUser) goj
 			Phone:             user.Phone,
 			IsPhoneVerified:   user.IsPhoneVerified,
 		},
-	})
+	}
 }
 
 func UserFromHuman(c *actions.FieldConfig, user *domain.Human) goja.Value {
@@ -95,6 +110,7 @@ func humanFromQuery(c *actions.FieldConfig, user *query.User) goja.Value {
 		},
 	})
 }
+
 func machineFromQuery(c *actions.FieldConfig, user *query.User) goja.Value {
 	return c.Runtime.ToValue(&machineUser{
 		Id:                 user.ID,
@@ -140,9 +156,9 @@ type human struct {
 	AvatarKey         string
 	PreferredLanguage string
 	Gender            domain.Gender
-	Email             string
+	Email             domain.EmailAddress
 	IsEmailVerified   bool
-	Phone             string
+	Phone             domain.PhoneNumber
 	IsPhoneVerified   bool
 }
 

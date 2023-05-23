@@ -36,7 +36,7 @@
             [checked]="selection.isSelected(row)"
           >
             <cnsl-avatar
-              *ngIf="row?.displayName && row.firstName && row.lastName; else cog"
+              *ngIf="row?.userType === UserType.TYPE_HUMAN; else cog"
               class="avatar"
               [name]="row.displayName"
               [avatarUrl]="row.avatarUrl || ''"
@@ -99,7 +99,7 @@
             </button>
 
             <button menuActions mat-menu-item [routerLink]="['/users', member.userId]">
-              {{ 'ACTIONS.TABLE.SHOWUSER' | translate: { value: member.displayName } }}
+              {{ 'ACTIONS.TABLE.SHOWUSER' | translate : { value: member.displayName } }}
             </button>
           </cnsl-table-actions>
         </td>

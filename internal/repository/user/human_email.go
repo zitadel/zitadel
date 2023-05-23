@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -19,12 +19,13 @@ const (
 	HumanEmailVerificationFailedType = emailEventPrefix + "verification.failed"
 	HumanEmailCodeAddedType          = emailEventPrefix + "code.added"
 	HumanEmailCodeSentType           = emailEventPrefix + "code.sent"
+	HumanEmailConfirmURLAddedType    = emailEventPrefix + "confirm_url.added"
 )
 
 type HumanEmailChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	EmailAddress string `json:"email,omitempty"`
+	EmailAddress domain.EmailAddress `json:"email,omitempty"`
 }
 
 func (e *HumanEmailChangedEvent) Data() interface{} {
@@ -35,7 +36,7 @@ func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
-func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress string) *HumanEmailChangedEvent {
+func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress domain.EmailAddress) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -121,8 +122,10 @@ func HumanEmailVerificationFailedEventMapper(event *repository.Event) (eventstor
 type HumanEmailCodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Code   *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry time.Duration       `json:"expiry,omitempty"`
+	Code         *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry       time.Duration       `json:"expiry,omitempty"`
+	URLTemplate  string              `json:"url_template,omitempty"`
+	CodeReturned bool                `json:"code_returned,omitempty"`
 }
 
 func (e *HumanEmailCodeAddedEvent) Data() interface{} {
@@ -137,15 +140,29 @@ func NewHumanEmailCodeAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
-	expiry time.Duration) *HumanEmailCodeAddedEvent {
+	expiry time.Duration,
+) *HumanEmailCodeAddedEvent {
+	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, "", false)
+}
+
+func NewHumanEmailCodeAddedEventV2(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	code *crypto.CryptoValue,
+	expiry time.Duration,
+	urlTemplate string,
+	codeReturned bool,
+) *HumanEmailCodeAddedEvent {
 	return &HumanEmailCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanEmailCodeAddedType,
 		),
-		Code:   code,
-		Expiry: expiry,
+		Code:         code,
+		Expiry:       expiry,
+		URLTemplate:  urlTemplate,
+		CodeReturned: codeReturned,
 	}
 }
 

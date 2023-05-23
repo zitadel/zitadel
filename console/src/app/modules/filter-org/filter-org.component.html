@@ -22,5 +22,28 @@
         </cnsl-form-field>
       </div>
     </div>
+
+    <div class="name-query">
+      <mat-checkbox
+        id="state"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.STATE)"
+        (change)="changeCheckbox(SubQuery.STATE, $event)"
+        >{{ 'FILTER.STATE' | translate }}
+      </mat-checkbox>
+      <div class="subquery" *ngIf="getSubFilter(SubQuery.STATE) as sq">
+        <span class="nomethod cnsl-secondary-text">
+          {{ 'FILTER.METHODS.1' | translate }}
+        </span>
+
+        <cnsl-form-field class="filter-select-value">
+          <mat-select [value]="sq.getState()" (selectionChange)="setValue(SubQuery.STATE, sq, $event)">
+            <mat-option *ngFor="let state of states" [value]="state">
+              {{ 'USER.STATE.' + state | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+      </div>
+    </div>
   </div>
 </cnsl-filter>

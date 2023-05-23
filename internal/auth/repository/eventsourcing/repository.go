@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/spooler"
@@ -11,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	eventstore2 "github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	es_spol "github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
@@ -34,8 +34,8 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
-	es, err := v1.Start(dbClient)
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *database.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm, allowOrderByCreationDate bool) (*EsRepository, error) {
+	es, err := v1.Start(dbClient, allowOrderByCreationDate)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 
 	authReq := cache.Start(dbClient)
 
-	spool := spooler.StartSpooler(ctx, conf.Spooler, es, esV2, view, dbClient, systemDefaults, queries)
+	spool := spooler.StartSpooler(ctx, conf.Spooler, es, esV2, view, dbClient, queries)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,
@@ -80,7 +80,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			UserViewProvider:          view,
 			UserCommandProvider:       command,
 			UserEventProvider:         &userRepo,
-			IDPProviderViewProvider:   view,
+			IDPProviderViewProvider:   queries,
 			IDPUserLinksProvider:      queries,
 			LockoutPolicyViewProvider: queries,
 			LoginPolicyViewProvider:   queries,
@@ -127,7 +127,7 @@ func (q queryViewWrapper) UserGrantsByProjectAndUserID(ctx context.Context, proj
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID}}
-	grants, err := q.Queries.UserGrants(ctx, queries, false)
+	grants, err := q.Queries.UserGrants(ctx, queries, true, false)
 	if err != nil {
 		return nil, err
 	}

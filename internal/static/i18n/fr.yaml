@@ -70,16 +70,24 @@ Errors:
     Profile:
       NotFound: Profil non trouvé
       NotChanged: Le profil n'a pas changé
-      Invalid: Données de profil non valides
+      Empty: Profil est vide
+      FirstNameEmpty: Le prénom dans le profil est vide
+      LastNameEmpty: Le nom de famille dans le profil est vide
+      IDMissing: Profil ID manquant
     Email:
       NotFound: Email non trouvé
       Invalid: L'email n'est pas valide
       AlreadyVerified: L'adresse électronique est déjà vérifiée
       NotChanged: L'adresse électronique n'a pas changé
+      Empty: Email est vide
+      IDMissing: Email ID manquant
+      InvalidURLTemplate: Le modèle d'URL n'est pas valide
     Phone:
       Notfound: Téléphone non trouvé
       Invalid: Le téléphone n'est pas valide
       AlreadyVerified: Téléphone déjà vérifié
+      Empty: Téléphone est vide
+      NotChanged: Téléphone n'a pas changé
     Address:
       NotFound: Adresse non trouvée
       NotChanged: L'adresse n'a pas changé
@@ -87,6 +95,10 @@ Errors:
       Key:
         NotFound: Clé de la machine non trouvée
         AlreadyExisting: Clé de la machine déjà existante
+      Secret:
+        NotExisting: Secret n'existe pas
+        Invalid: Secret n'est pas valide
+        CouldNotGenerate: Secret n'a pas pu être généré
     PAT:
       NotFound: Token d'accès personnel non trouvé
     NotHuman: L'utilisateur doit être personnel
@@ -96,6 +108,7 @@ Errors:
     Username:
       AlreadyExists: Nom d'utilisateur déjà pris
       Reserved: Le nom d'utilisateur est déjà pris
+      Empty: Le nom d'utilisateur est vide
     Code:
       Empty: Le code est vide
       NotFound: Code non trouvé
@@ -225,6 +238,13 @@ Errors:
       Empty: La politique IAM d'Org est vide
       NotExisting: La politique Org IAM n'existe pas
       AlreadyExists: La politique IAM d'Org existe déjà
+    NotificationPolicy:
+      NotFound: La politique notification n'a pas été trouvée
+      NotChanged: La politique notification n'a pas été modifiée
+      AlreadyExists: La politique notification existe déjà
+    LabelPolicy:
+      NotFound: La politique d'étiquetage privé n'a pas été trouvée
+      NotChanged: La politique en matière de marques privées n'a pas été modifiée
   Project:
     ProjectIDMissing: Id de projet manquant
     AlreadyExists: Le projet existe déjà dans l'organisation
@@ -351,6 +371,10 @@ Errors:
       NotExisting: La politique IAM d'Org n'existe pas
       AlreadyExists: La politique IAM d'Org existe déjà
       NotChanged: La politique IAM d'Org n'a pas été modifiée
+    NotificationPolicy:
+      NotFound: La politique de notification par défaut n'a pas été trouvée
+      NotChanged: La politique de notification par défaut n'a pas été modifiée
+      AlreadyExists: La ppolitique de notification par défaut existe déjà
   Policy:
     AlreadyExists: La politique existe déjà
     Label:
@@ -425,6 +449,43 @@ Errors:
     CloseRows: L'instruction SQL n'a pas pu être terminée
     SQLStatement: L'instruction SQL n'a pas pu être créée
     InvalidRequest: La requête n'est pas valide
+  Quota:
+    AlreadyExists: Contingent existe déjà pour cette unité
+    NotFound: Contingent non trouvé pour cette unité
+    Invalid:
+      CallURL: L'URL d'appel du contingent n'est pas valide
+      Percent: Pourcent du contingent est inférieure à 1
+      Unimplemented: Les contingents ne sont pas implémentés pour cette unité
+      Amount: Quantité contingentée est inférieure à 1
+      ResetInterval: L'intervalle de réinitialisation entre les contingents est inférieur à une minute
+      Noop: Un contingent illimité sans notifications n'a aucun effet
+    Access:
+      Exhausted: Le quota de requêtes authentifiées est épuisé
+    Execution:
+      Exhausted: Le quota de secondes d'action est épuisé
+  LogStore:
+    Access:
+      StorageFailed: L'enregistrement du journal d'accès dans la base de données a échoué
+      ScanFailed: L'interrogation des requêtes authentifiées consommées a échoué
+    Execution:
+      StorageFailed: L'enregistrement du journal d'action dans la base de données a échoué
+      ScanFailed: L'interrogation des secondes d'action consommées a échoué
+  Session:
+    NotExisting: La session n'existe pas
+    Terminated: La session est déjà terminée
+    Token:
+      Invalid: Le jeton de session n'est pas valide
+
+AggregateTypes:
+  action: Action
+  instance: Instance
+  key_pair: Paire de clés
+  org: Organisation
+  project: Projet
+  user: Utilisateur
+  usergrant: Subvention de l'utilisateur
+  quota: Contingent
+
 EventTypes:
   user:
     added: Utilisateur ajouté
@@ -457,6 +518,12 @@ EventTypes:
       key:
         added: Clé ajoutée
         removed: Clé supprimée
+      secret:
+        set: Secret défini
+        removed: Secret supprimée
+        check:
+          succeeded: La vérification de Secret réussie
+          failed: La vérification de Secret a échoué
     human:
       added: Personne ajoutée
       selfregistered: La personne s'est enregistrée elle-même
@@ -715,6 +782,10 @@ EventTypes:
         added: Politique de confidentialité et CGU ajoutés
         changed: Politique de confidentialité et CGU modifiées
         removed: Politique de confidentialité et conditions d'utilisation supprimées
+      notification:
+        added: Politique de notification ajoutée
+        changed: Politique de notification modifiée
+        removed: Politique de notification supprimée
     flow:
       trigger_actions:
         set: Action set
@@ -924,6 +995,7 @@ Action:
       Unspecified: Non spécifié
       ExternalAuthentication: Authentification externe
       CustomiseToken: Compléter Token
+      InternalAuthentication: Authentification interne
   TriggerType:
     Unspecified: Non spécifié
     PostAuthentication: Authentification postérieure

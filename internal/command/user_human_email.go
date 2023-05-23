@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -13,8 +14,11 @@ import (
 )
 
 func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, emailCodeGenerator crypto.Generator) (*domain.Email, error) {
-	if !email.IsValid() || email.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
+	if email.AggregateID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
+	}
+	if err := email.Validate(); err != nil {
+		return nil, err
 	}
 
 	existingEmail, err := c.emailWriteModel(ctx, email.AggregateID, email.ResourceOwner)
@@ -38,7 +42,7 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, em
 	if email.IsEmailVerified {
 		events = append(events, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 	} else {
-		emailCode, err := domain.NewEmailCode(emailCodeGenerator)
+		emailCode, _, err := domain.NewEmailCode(emailCodeGenerator)
 		if err != nil {
 			return nil, err
 		}
@@ -110,7 +114,7 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.User.Email.AlreadyVerified")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
-	emailCode, err := domain.NewEmailCode(emailCodeGenerator)
+	emailCode, _, err := domain.NewEmailCode(emailCodeGenerator)
 	if err != nil {
 		return nil, err
 	}

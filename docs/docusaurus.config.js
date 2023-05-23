@@ -3,7 +3,7 @@ module.exports = {
   title: "ZITADEL Docs",
   trailingSlash: false,
   url: "https://zitadel.com",
-  baseUrl: "/docs/",
+  baseUrl: "/docs",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
@@ -29,6 +29,22 @@ module.exports = {
         content:
           "zitadel, documentation, jwt, saml, oauth2, authentication, serverless, login, auth, authorization, sso, openid-connect, oidc, mfa, 2fa, passkeys, fido2, docker",
       },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      { property: "og:url", content: "https://www.zitadel.com/docs" },
+      {
+        property: "og:image",
+        content: "https://www.zitadel.com/docs/img/preview.png",
+      },
+      { property: "twitter:card", content: "summary_large_image" },
+      { property: "twitter:url", content: "https://www.zitadel.com/docs" },
+      { property: "twitter:title", content: "ZITADEL Docs" },
+      {
+        property: "twitter:image",
+        content: "https://www.zitadel.com/docs/img/preview.png",
+      },
     ],
     zoom: {
       selector: ".markdown :not(em) > img",
@@ -49,16 +65,10 @@ module.exports = {
       items: [
         {
           type: "doc",
-          label: "Guides",
+          label: "Documentation",
           docId: "guides/overview",
           position: "left",
-        },
-        {
-          type: "doc",
-          label: "Examples",
-          docId: "examples/introduction",
-          position: "left",
-        },
+        }, 
         {
           type: "doc",
           label: "APIs",
@@ -73,21 +83,9 @@ module.exports = {
         },
         {
           type: "doc",
-          docId: "concepts/introduction",
-          label: "Concepts",
-          position: "left",
-        },
-        {
-          type: "doc",
-          docId: "manuals/introduction",
-          label: "Help",
-          position: "left",
-        },
-        {
-          type: "doc",
-          docId: "legal/introduction",
+          docId: "legal",
           label: "Legal",
-          position: "left",
+          position: "right",
         },
         {
           type: "html",
@@ -167,11 +165,7 @@ module.exports = {
             {
               label: "Status",
               href: "https://status.zitadel.com/",
-            },
-            {
-              label: "Docs v1 (deprecated)",
-              href: "https://docs-v1.zitadel.com/",
-            },
+            }
           ],
         },
       ],
@@ -192,10 +186,28 @@ module.exports = {
       respectPrefersColorScheme: true,
     },
   },
+  webpack: {
+    jsLoader: (isServer) => ({
+      loader: require.resolve('swc-loader'),
+      options: {
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+          },
+          target: 'es2017',
+        },
+        module: {
+          type: isServer ? 'commonjs' : 'es6',
+        },
+      },
+    }),
+  },
   presets: [
     [
-      "@docusaurus/preset-classic",
-      {
+      "classic",
+      /** @type {import('@docusaurus/preset-classic').Options} */
+      ({
         docs: {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
@@ -203,14 +215,75 @@ module.exports = {
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
+          docLayoutComponent: "@theme/DocPage",
+          docItemComponent:  '@theme/ApiItem'
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
-      },
+      })
     ],
+
   ],
   plugins: [
+    [
+      'docusaurus-plugin-openapi-docs',
+      {
+        id: "apiDocs",
+        docsPluginId: "classic",
+        config: {
+          auth: {
+            specPath: ".artifacts/openapi/zitadel/auth.swagger.json",
+            outputDir: "docs/apis/resources/auth",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          mgmt: {
+            specPath: ".artifacts/openapi/zitadel/management.swagger.json",
+            outputDir: "docs/apis/resources/mgmt",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          admin: {
+            specPath: ".artifacts/openapi/zitadel/admin.swagger.json",
+            outputDir: "docs/apis/resources/admin",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          system: {
+            specPath: ".artifacts/openapi/zitadel/system.swagger.json",
+            outputDir: "docs/apis/resources/system",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          user: {
+            specPath: ".artifacts/openapi/zitadel/user/v2alpha/user_service.swagger.json",
+            outputDir: "docs/apis/resources/user_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          session: {
+            specPath: ".artifacts/openapi/zitadel/session/v2alpha/session_service.swagger.json",
+            outputDir: "docs/apis/resources/session_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          settings: {
+            specPath: ".artifacts/openapi/zitadel/settings/v2alpha/settings_service.swagger.json",
+            outputDir: "docs/apis/resources/settings_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          }
+        }
+      },
+    ],
     require.resolve("docusaurus-plugin-image-zoom"),
     async function myPlugin(context, options) {
       return {
@@ -224,5 +297,5 @@ module.exports = {
       };
     },
   ],
-  themes: ["@saucelabs/theme-github-codeblock"],
+  themes: ["@saucelabs/theme-github-codeblock", "docusaurus-theme-openapi-docs"],
 };

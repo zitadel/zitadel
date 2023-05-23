@@ -4,17 +4,16 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type HumanEmailWriteModel struct {
 	eventstore.WriteModel
 
-	Email           string
+	Email           domain.EmailAddress
 	IsEmailVerified bool
 
 	Code             *crypto.CryptoValue
@@ -95,7 +94,7 @@ func (wm *HumanEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *HumanEmailWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	email string,
+	email domain.EmailAddress,
 ) (*user.HumanEmailChangedEvent, bool) {
 	if wm.Email == email {
 		return nil, false

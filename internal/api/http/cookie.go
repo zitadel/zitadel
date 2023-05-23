@@ -72,7 +72,9 @@ func WithPath(path string) CookieHandlerOpt {
 func WithMaxAge(maxAge int) CookieHandlerOpt {
 	return func(c *CookieHandler) {
 		c.maxAge = maxAge
-		c.securecookie.MaxAge(maxAge)
+		if c.securecookie != nil {
+			c.securecookie.MaxAge(maxAge)
+		}
 	}
 }
 
@@ -121,8 +123,8 @@ func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name, domain s
 	return nil
 }
 
-func (c *CookieHandler) DeleteCookie(w http.ResponseWriter, r *http.Request, name string) {
-	c.httpSet(w, name, r.Host, "", -1)
+func (c *CookieHandler) DeleteCookie(w http.ResponseWriter, name string) {
+	c.httpSet(w, name, "", "", -1)
 }
 
 func (c *CookieHandler) httpSet(w http.ResponseWriter, name, domain, value string, maxage int) {

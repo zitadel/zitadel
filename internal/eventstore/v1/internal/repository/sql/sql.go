@@ -2,11 +2,13 @@ package sql
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 type SQL struct {
-	client *sql.DB
+	client                   *database.DB
+	allowOrderByCreationDate bool
 }
 
 func (db *SQL) Health(ctx context.Context) error {

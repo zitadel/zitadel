@@ -22,6 +22,8 @@ const (
 	ForwardedFor    = "x-forwarded-for"
 	XUserAgent      = "x-user-agent"
 	XGrpcWeb        = "x-grpc-web"
+	XRequestedWith  = "x-requested-with"
+	XRobotsTag      = "x-robots-tag"
 	IfNoneMatch     = "If-None-Match"
 	LastModified    = "Last-Modified"
 	Etag            = "Etag"

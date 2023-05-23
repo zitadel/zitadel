@@ -4,7 +4,8 @@ import (
 	"context"
 	"html"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
@@ -13,24 +14,44 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func generateEmail(ctx context.Context, user *query.NotifyUser, subject, content string, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastEmail bool) error {
+func generateEmail(
+	ctx context.Context,
+	user *query.NotifyUser,
+	subject,
+	content string,
+	smtpConfig func(ctx context.Context) (*smtp.Config, error),
+	getFileSystemProvider func(ctx context.Context) (*fs.Config, error),
+	getLogProvider func(ctx context.Context) (*log.Config, error),
+	lastEmail bool,
+	triggeringEvent eventstore.Event,
+	successMetricName,
+	failureMetricName string,
+) error {
 	content = html.UnescapeString(content)
 	message := &messages.Email{
-		Recipients: []string{user.VerifiedEmail},
-		Subject:    subject,
-		Content:    content,
+		Recipients:      []string{user.VerifiedEmail},
+		Subject:         subject,
+		Content:         content,
+		TriggeringEvent: triggeringEvent,
 	}
 	if lastEmail {
 		message.Recipients = []string{user.LastEmail}
 	}
 
-	channelChain, err := senders.EmailChannels(ctx, smtpConfig, getFileSystemProvider, getLogProvider)
+	channelChain, err := senders.EmailChannels(
+		ctx,
+		smtpConfig,
+		getFileSystemProvider,
+		getLogProvider,
+		successMetricName,
+		failureMetricName,
+	)
 	if err != nil {
 		return err
 	}
 
 	if channelChain.Len() == 0 {
-		return caos_errors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
+		return errors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
 	}
 	return channelChain.HandleMessage(message)
 }

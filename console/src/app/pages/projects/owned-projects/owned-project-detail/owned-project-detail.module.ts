@@ -1,16 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
-import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
+import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
+import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
+import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
@@ -32,9 +31,8 @@ import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
-
-import { ProjectGrantsModule } from '../project-grants/project-grants.module';
-import { ProjectRolesModule } from '../project-roles/project-roles.module';
+import ProjectGrantsModule from '../project-grants/project-grants.module';
+import ProjectRolesModule from '../project-roles/project-roles.module';
 import { ApplicationGridComponent } from './application-grid/application-grid.component';
 import { ApplicationsComponent } from './applications/applications.component';
 import { OwnedProjectDetailRoutingModule } from './owned-project-detail-routing.module';
@@ -54,11 +52,9 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     MatIconModule,
     InfoRowModule,
     ContributorsModule,
-    MatTabsModule,
     WarnDialogModule,
     MatTooltipModule,
     ProjectRolesTableModule,
-    ProjectRolesModule,
     HasRolePipeModule,
     UserGrantsModule,
     TimestampToDatePipeModule,
@@ -67,8 +63,9 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     InputModule,
     CardModule,
     PaginatorModule,
-    MatRippleModule,
     ProjectGrantsModule,
+    ProjectRolesModule,
+    MatRippleModule,
     TopViewModule,
     MatCheckboxModule,
     MatSelectModule,
@@ -82,4 +79,4 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     LocalizedDatePipeModule,
   ],
 })
-export class OwnedProjectDetailModule {}
+export default class OwnedProjectDetailModule {}

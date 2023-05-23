@@ -11,6 +11,31 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
+var (
+	prepareOrgDomainsStmt = `SELECT projections.org_domains2.creation_date,` +
+		` projections.org_domains2.change_date,` +
+		` projections.org_domains2.sequence,` +
+		` projections.org_domains2.domain,` +
+		` projections.org_domains2.org_id,` +
+		` projections.org_domains2.is_verified,` +
+		` projections.org_domains2.is_primary,` +
+		` projections.org_domains2.validation_type,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.org_domains2` +
+		` AS OF SYSTEM TIME '-1 ms'`
+	prepareOrgDomainsCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"org_state",
+		"sequence",
+		"name",
+		"primary_domain",
+		"count",
+	}
+)
+
 func Test_OrgDomainPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -27,16 +52,7 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.org_domains2.creation_date,`+
-						` projections.org_domains2.change_date,`+
-						` projections.org_domains2.sequence,`+
-						` projections.org_domains2.domain,`+
-						` projections.org_domains2.org_id,`+
-						` projections.org_domains2.is_verified,`+
-						` projections.org_domains2.is_primary,`+
-						` projections.org_domains2.validation_type,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.org_domains2`),
+					regexp.QuoteMeta(prepareOrgDomainsStmt),
 					nil,
 					nil,
 				),
@@ -48,27 +64,8 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.org_domains2.creation_date,`+
-						` projections.org_domains2.change_date,`+
-						` projections.org_domains2.sequence,`+
-						` projections.org_domains2.domain,`+
-						` projections.org_domains2.org_id,`+
-						` projections.org_domains2.is_verified,`+
-						` projections.org_domains2.is_primary,`+
-						` projections.org_domains2.validation_type,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.org_domains2`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"org_state",
-						"sequence",
-						"name",
-						"primary_domain",
-						"count",
-					},
+					regexp.QuoteMeta(prepareOrgDomainsStmt),
+					prepareOrgDomainsCols,
 					[][]driver.Value{
 						{
 							testNow,
@@ -106,27 +103,8 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.org_domains2.creation_date,`+
-						` projections.org_domains2.change_date,`+
-						` projections.org_domains2.sequence,`+
-						` projections.org_domains2.domain,`+
-						` projections.org_domains2.org_id,`+
-						` projections.org_domains2.is_verified,`+
-						` projections.org_domains2.is_primary,`+
-						` projections.org_domains2.validation_type,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.org_domains2`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"org_state",
-						"sequence",
-						"name",
-						"primary_domain",
-						"count",
-					},
+					regexp.QuoteMeta(prepareOrgDomainsStmt),
+					prepareOrgDomainsCols,
 					[][]driver.Value{
 						{
 							testNow,
@@ -184,16 +162,7 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.org_domains2.creation_date,`+
-						` projections.org_domains2.change_date,`+
-						` projections.org_domains2.sequence,`+
-						` projections.org_domains2.domain,`+
-						` projections.org_domains2.org_id,`+
-						` projections.org_domains2.is_verified,`+
-						` projections.org_domains2.is_primary,`+
-						` projections.org_domains2.validation_type,`+
-						` COUNT(*) OVER ()`+
-						` FROM projections.org_domains2`),
+					regexp.QuoteMeta(prepareOrgDomainsStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -208,7 +177,7 @@ func Test_OrgDomainPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

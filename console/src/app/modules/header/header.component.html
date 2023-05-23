@@ -110,8 +110,6 @@
             <ng-template
               cdkConnectedOverlay
               [cdkConnectedOverlayOrigin]="trigger"
-              [flexibleDimensions]="true"
-              [lockPosition]="true"
               [cdkConnectedOverlayOffsetY]="10"
               [cdkConnectedOverlayHasBackdrop]="true"
               [cdkConnectedOverlayPositions]="positions"
@@ -197,9 +195,7 @@
       </a>
     </div>
 
-    <ng-container
-      *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
-    >
+    <ng-container *ngIf="user">
       <div class="account-card-wrapper">
         <button
           cdkOverlayOrigin
@@ -214,11 +210,7 @@
             [active]="showAccount"
             [avatarUrl]="user.human?.profile?.avatarUrl || ''"
             [forColor]="user.preferredLoginName || ''"
-            [name]="
-              user.human?.profile?.displayName
-                ? user.human?.profile?.displayName ?? ''
-                : user.human?.profile?.firstName + ' ' + user.human?.profile?.lastName
-            "
+            [name]="user.human?.profile?.displayName ?? ''"
             [size]="38"
           >
           </cnsl-avatar>
@@ -227,8 +219,6 @@
       <ng-template
         cdkConnectedOverlay
         [cdkConnectedOverlayOrigin]="accounttrigger"
-        [flexibleDimensions]="true"
-        [lockPosition]="true"
         [cdkConnectedOverlayOffsetY]="10"
         [cdkConnectedOverlayHasBackdrop]="true"
         [cdkConnectedOverlayPositions]="accountCardPositions"
@@ -238,7 +228,6 @@
         (detach)="showAccount = false"
       >
         <cnsl-accounts-card
-          @accounts
           class="a_card"
           *ngIf="showAccount"
           (closedCard)="showAccount = false"

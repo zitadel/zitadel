@@ -16,6 +16,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -29,6 +30,7 @@ type MessageTexts struct {
 	VerifyPhone              MessageText
 	DomainClaimed            MessageText
 	PasswordlessRegistration MessageText
+	PasswordChange           MessageText
 }
 
 type MessageText struct {
@@ -126,7 +128,7 @@ func (q *Queries) DefaultMessageText(ctx context.Context) (_ *MessageText, err e
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMessageTextQuery()
+	stmt, scan := prepareMessageTextQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
@@ -159,7 +161,7 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareMessageTextQuery()
+	stmt, scan := prepareMessageTextQuery(ctx, q.client)
 	eq := sq.Eq{
 		MessageTextColLanguage.identifier():    language,
 		MessageTextColType.identifier():        messageType,
@@ -239,7 +241,7 @@ func (q *Queries) readNotificationTextMessages(ctx context.Context, language str
 	return contents, nil
 }
 
-func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {
+func prepareMessageTextQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {
 	return sq.Select(
 			MessageTextColAggregateID.identifier(),
 			MessageTextColSequence.identifier(),
@@ -256,7 +258,8 @@ func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, 
 			MessageTextColButtonText.identifier(),
 			MessageTextColFooter.identifier(),
 		).
-			From(messageTextTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(messageTextTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MessageText, error) {
 			msg := new(MessageText)
 			lang := ""
@@ -330,6 +333,8 @@ func (m *MessageTexts) GetMessageTextByType(msgType string) *MessageText {
 		return &m.DomainClaimed
 	case domain.PasswordlessRegistrationMessageType:
 		return &m.PasswordlessRegistration
+	case domain.PasswordChangeMessageType:
+		return &m.PasswordChange
 	}
 	return nil
 }

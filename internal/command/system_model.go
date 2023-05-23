@@ -59,12 +59,16 @@ func (wm *SystemConfigWriteModel) Reduce() error {
 			}
 			wm.Instances[e.Aggregate().InstanceID].Domains = append(wm.Instances[e.Aggregate().InstanceID].Domains, e.Domain)
 		case *instance.DomainRemovedEvent:
-			domains := wm.Instances[e.Aggregate().InstanceID].Domains
-			for i, domain := range domains {
+			instance, ok := wm.Instances[e.Aggregate().InstanceID]
+			if !ok {
+				continue
+			}
+
+			for i, domain := range instance.Domains {
 				if domain == e.Domain {
-					domains[i] = domains[len(domains)-1]
-					domains[len(domains)-1] = ""
-					wm.Instances[e.Aggregate().InstanceID].Domains = domains[:len(domains)-1]
+					instance.Domains[i] = instance.Domains[len(instance.Domains)-1]
+					instance.Domains[len(instance.Domains)-1] = ""
+					wm.Instances[e.Aggregate().InstanceID].Domains = instance.Domains[:len(instance.Domains)-1]
 					break
 				}
 			}

@@ -17,34 +17,20 @@ const routes: Routes = [
   },
   {
     path: 'members',
-    loadChildren: () => import('./instance-members/instance-members.module').then((m) => m.InstanceMembersModule),
+    loadChildren: () => import('./instance-members/instance-members.module'),
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['iam.member.read'],
     },
   },
   {
-    path: 'idp',
-    children: [
-      {
-        path: 'create',
-        loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then((m) => m.IdpCreateModule),
-        canActivate: [AuthGuard, RoleGuard],
-        data: {
-          roles: ['iam.idp.write'],
-          serviceType: PolicyComponentServiceType.ADMIN,
-        },
-      },
-      {
-        path: ':id',
-        loadChildren: () => import('src/app/modules/idp/idp.module').then((m) => m.IdpModule),
-        canActivate: [AuthGuard, RoleGuard],
-        data: {
-          roles: ['iam.idp.read'],
-          serviceType: PolicyComponentServiceType.ADMIN,
-        },
-      },
-    ],
+    path: 'provider',
+    canActivate: [AuthGuard, RoleGuard],
+    loadChildren: () => import('src/app/modules/providers/providers.module'),
+    data: {
+      roles: ['iam.idp.read'],
+      serviceType: PolicyComponentServiceType.ADMIN,
+    },
   },
 ];
 

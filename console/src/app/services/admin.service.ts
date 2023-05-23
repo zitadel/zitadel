@@ -1,22 +1,43 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
 
 import {
   ActivateLabelPolicyRequest,
   ActivateLabelPolicyResponse,
   ActivateSMSProviderRequest,
   ActivateSMSProviderResponse,
+  AddAzureADProviderRequest,
+  AddAzureADProviderResponse,
   AddCustomDomainPolicyRequest,
   AddCustomOrgIAMPolicyResponse,
+  AddGenericOAuthProviderRequest,
+  AddGenericOAuthProviderResponse,
+  AddGenericOIDCProviderRequest,
+  AddGenericOIDCProviderResponse,
+  AddGitHubEnterpriseServerProviderRequest,
+  AddGitHubEnterpriseServerProviderResponse,
+  AddGitHubProviderRequest,
+  AddGitHubProviderResponse,
+  AddGitLabProviderRequest,
+  AddGitLabProviderResponse,
+  AddGitLabSelfHostedProviderRequest,
+  AddGitLabSelfHostedProviderResponse,
+  AddGoogleProviderRequest,
+  AddGoogleProviderResponse,
   AddIAMMemberRequest,
   AddIAMMemberResponse,
   AddIDPToLoginPolicyRequest,
   AddIDPToLoginPolicyResponse,
-  AddJWTIDPRequest,
-  AddJWTIDPResponse,
+  AddJWTProviderRequest,
+  AddJWTProviderResponse,
+  AddLDAPProviderRequest,
+  AddLDAPProviderResponse,
   AddMultiFactorToLoginPolicyRequest,
   AddMultiFactorToLoginPolicyResponse,
-  AddOIDCIDPRequest,
-  AddOIDCIDPResponse,
+  AddNotificationPolicyRequest,
+  AddNotificationPolicyResponse,
+  AddOIDCSettingsRequest,
+  AddOIDCSettingsResponse,
   AddSecondFactorToLoginPolicyRequest,
   AddSecondFactorToLoginPolicyResponse,
   AddSMSProviderTwilioRequest,
@@ -27,6 +48,8 @@ import {
   DeactivateIDPResponse,
   DeactivateSMSProviderRequest,
   DeactivateSMSProviderResponse,
+  DeleteProviderRequest,
+  DeleteProviderResponse,
   GetCustomDomainClaimedMessageTextRequest,
   GetCustomDomainClaimedMessageTextResponse,
   GetCustomDomainPolicyRequest,
@@ -35,6 +58,8 @@ import {
   GetCustomInitMessageTextResponse,
   GetCustomLoginTextsRequest,
   GetCustomLoginTextsResponse,
+  GetCustomPasswordChangeMessageTextRequest,
+  GetCustomPasswordChangeMessageTextResponse,
   GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordlessRegistrationMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
@@ -51,6 +76,8 @@ import {
   GetDefaultLanguageResponse,
   GetDefaultLoginTextsRequest,
   GetDefaultLoginTextsResponse,
+  GetDefaultPasswordChangeMessageTextRequest,
+  GetDefaultPasswordChangeMessageTextResponse,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultPasswordlessRegistrationMessageTextResponse,
   GetDefaultPasswordResetMessageTextRequest,
@@ -63,8 +90,6 @@ import {
   GetDomainPolicyResponse,
   GetFileSystemNotificationProviderRequest,
   GetFileSystemNotificationProviderResponse,
-  GetIDPByIDRequest,
-  GetIDPByIDResponse,
   GetLabelPolicyRequest,
   GetLabelPolicyResponse,
   GetLockoutPolicyRequest,
@@ -75,6 +100,8 @@ import {
   GetLogNotificationProviderResponse,
   GetMyInstanceRequest,
   GetMyInstanceResponse,
+  GetNotificationPolicyRequest,
+  GetNotificationPolicyResponse,
   GetOIDCSettingsRequest,
   GetOIDCSettingsResponse,
   GetPasswordAgePolicyRequest,
@@ -85,29 +112,38 @@ import {
   GetPreviewLabelPolicyResponse,
   GetPrivacyPolicyRequest,
   GetPrivacyPolicyResponse,
+  GetProviderByIDRequest,
+  GetProviderByIDResponse,
   GetSecretGeneratorRequest,
   GetSecretGeneratorResponse,
+  GetSecurityPolicyRequest,
+  GetSecurityPolicyResponse,
   GetSMSProviderRequest,
   GetSMSProviderResponse,
   GetSMTPConfigRequest,
   GetSMTPConfigResponse,
   GetSupportedLanguagesRequest,
   GetSupportedLanguagesResponse,
-  IDPQuery,
+  ListAggregateTypesRequest,
+  ListAggregateTypesResponse,
+  ListEventsRequest,
+  ListEventsResponse,
+  ListEventTypesRequest,
+  ListEventTypesResponse,
   ListFailedEventsRequest,
   ListFailedEventsResponse,
   ListIAMMemberRolesRequest,
   ListIAMMemberRolesResponse,
   ListIAMMembersRequest,
   ListIAMMembersResponse,
-  ListIDPsRequest,
-  ListIDPsResponse,
   ListLoginPolicyIDPsRequest,
   ListLoginPolicyIDPsResponse,
   ListLoginPolicyMultiFactorsRequest,
   ListLoginPolicyMultiFactorsResponse,
   ListLoginPolicySecondFactorsRequest,
   ListLoginPolicySecondFactorsResponse,
+  ListProvidersRequest,
+  ListProvidersResponse,
   ListSecretGeneratorsRequest,
   ListSecretGeneratorsResponse,
   ListSMSProvidersRequest,
@@ -122,8 +158,6 @@ import {
   RemoveIAMMemberResponse,
   RemoveIDPFromLoginPolicyRequest,
   RemoveIDPFromLoginPolicyResponse,
-  RemoveIDPRequest,
-  RemoveIDPResponse,
   RemoveLabelPolicyFontRequest,
   RemoveLabelPolicyFontResponse,
   RemoveLabelPolicyIconDarkRequest,
@@ -152,6 +186,10 @@ import {
   SetDefaultInitMessageTextResponse,
   SetDefaultLanguageRequest,
   SetDefaultLanguageResponse,
+  SetDefaultOrgRequest,
+  SetDefaultOrgResponse,
+  SetDefaultPasswordChangeMessageTextRequest,
+  SetDefaultPasswordChangeMessageTextResponse,
   SetDefaultPasswordlessRegistrationMessageTextRequest,
   SetDefaultPasswordlessRegistrationMessageTextResponse,
   SetDefaultPasswordResetMessageTextRequest,
@@ -160,28 +198,44 @@ import {
   SetDefaultVerifyEmailMessageTextResponse,
   SetDefaultVerifyPhoneMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextResponse,
+  SetSecurityPolicyRequest,
+  SetSecurityPolicyResponse,
   SetUpOrgRequest,
   SetUpOrgResponse,
+  UpdateAzureADProviderRequest,
+  UpdateAzureADProviderResponse,
   UpdateCustomDomainPolicyRequest,
   UpdateCustomDomainPolicyResponse,
   UpdateDomainPolicyRequest,
   UpdateDomainPolicyResponse,
+  UpdateGenericOAuthProviderRequest,
+  UpdateGenericOAuthProviderResponse,
+  UpdateGenericOIDCProviderRequest,
+  UpdateGenericOIDCProviderResponse,
+  UpdateGitHubEnterpriseServerProviderRequest,
+  UpdateGitHubEnterpriseServerProviderResponse,
+  UpdateGitHubProviderRequest,
+  UpdateGitHubProviderResponse,
+  UpdateGitLabProviderRequest,
+  UpdateGitLabProviderResponse,
+  UpdateGitLabSelfHostedProviderRequest,
+  UpdateGitLabSelfHostedProviderResponse,
+  UpdateGoogleProviderRequest,
+  UpdateGoogleProviderResponse,
   UpdateIAMMemberRequest,
   UpdateIAMMemberResponse,
-  UpdateIDPJWTConfigRequest,
-  UpdateIDPJWTConfigResponse,
-  UpdateIDPOIDCConfigRequest,
-  UpdateIDPOIDCConfigResponse,
-  UpdateIDPRequest,
-  UpdateIDPResponse,
+  UpdateJWTProviderRequest,
+  UpdateJWTProviderResponse,
   UpdateLabelPolicyRequest,
   UpdateLabelPolicyResponse,
+  UpdateLDAPProviderRequest,
+  UpdateLDAPProviderResponse,
   UpdateLockoutPolicyRequest,
   UpdateLockoutPolicyResponse,
   UpdateLoginPolicyRequest,
   UpdateLoginPolicyResponse,
-  AddOIDCSettingsRequest,
-  AddOIDCSettingsResponse,
+  UpdateNotificationPolicyRequest,
+  UpdateNotificationPolicyResponse,
   UpdateOIDCSettingsRequest,
   UpdateOIDCSettingsResponse,
   UpdatePasswordAgePolicyRequest,
@@ -200,20 +254,131 @@ import {
   UpdateSMTPConfigPasswordResponse,
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
-  GetSecurityPolicyRequest,
-  GetSecurityPolicyResponse,
-  SetSecurityPolicyRequest,
-  SetSecurityPolicyResponse,
 } from '../proto/generated/zitadel/admin_pb';
+import { Event } from '../proto/generated/zitadel/event_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
+import { StorageLocation, StorageService } from './storage.service';
+
+export interface OnboardingActions {
+  order: number;
+  eventType: string;
+  oneof: string[];
+  link: string | string[];
+  fragment?: string | undefined;
+  iconClasses?: string;
+  darkcolor: string;
+  lightcolor: string;
+}
+
+type OnboardingEvent = {
+  order: number;
+  link: string;
+  fragment: string | undefined;
+  event: Event.AsObject | undefined;
+  iconClasses?: string;
+  darkcolor: string;
+  lightcolor: string;
+};
+type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
-  constructor(private readonly grpcService: GrpcService) {}
+  public hideOnboarding: boolean = false;
+  public loadEvents: Subject<OnboardingActions[]> = new Subject();
+  public onboardingLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public progressEvents$: Observable<OnboardingEventEntries> = this.loadEvents.pipe(
+    tap(() => this.onboardingLoading.next(true)),
+    switchMap((actions) => {
+      const searchForTypes = actions.map((oe) => oe.oneof).flat();
+      const eventsReq = new ListEventsRequest().setAsc(true).setEventTypesList(searchForTypes).setAsc(false);
+      return from(this.listEvents(eventsReq)).pipe(
+        map((events) => {
+          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API' && e.editor?.userId);
+
+          let obj: { [type: string]: OnboardingEvent } = {};
+          actions.map((action) => {
+            const filtered = el.filter((event) => event.type?.type && action.oneof.includes(event.type.type));
+            (obj as any)[action.eventType] = filtered.length
+              ? {
+                  order: action.order,
+                  link: action.link,
+                  fragment: action.fragment,
+                  event: filtered[0],
+                  iconClasses: action.iconClasses,
+                  darkcolor: action.darkcolor,
+                  lightcolor: action.lightcolor,
+                }
+              : {
+                  order: action.order,
+                  link: action.link,
+                  fragment: action.fragment,
+                  event: undefined,
+                  iconClasses: action.iconClasses,
+                  darkcolor: action.darkcolor,
+                  lightcolor: action.lightcolor,
+                };
+          });
+
+          const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
+
+          const toDo = toArray.filter(([key, value]) => value.event === undefined);
+          const done = toArray.filter(([key, value]) => !!value.event);
+
+          return [...toDo, ...done];
+        }),
+        tap((events) => {
+          const total = events.length;
+          const done = events.map(([type, value]) => value.event !== undefined).filter((res) => !!res).length;
+          const percentage = Math.round((done / total) * 100);
+          this.progressDone.next(done);
+          this.progressTotal.next(total);
+          this.progressPercentage.next(percentage);
+          this.progressAllDone.next(done === total);
+        }),
+        catchError((error) => {
+          console.error(error);
+          return of([]);
+        }),
+        finalize(() => this.onboardingLoading.next(false)),
+      );
+    }),
+  );
+
+  public progressEvents: BehaviorSubject<OnboardingEventEntries> = new BehaviorSubject<OnboardingEventEntries>([]);
+  public progressPercentage: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressDone: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressTotal: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressAllDone: BehaviorSubject<boolean> = new BehaviorSubject(true);
+
+  constructor(private readonly grpcService: GrpcService, private storageService: StorageService) {
+    this.progressEvents$.subscribe(this.progressEvents);
+
+    this.hideOnboarding =
+      this.storageService.getItem('onboarding-dismissed', StorageLocation.local) === 'true' ? true : false;
+  }
+
+  public setDefaultOrg(orgId: string): Promise<SetDefaultOrgResponse.AsObject> {
+    const req = new SetDefaultOrgRequest();
+    req.setOrgId(orgId);
+
+    return this.grpcService.admin.setDefaultOrg(req, null).then((resp) => resp.toObject());
+  }
+
+  public listEvents(req: ListEventsRequest): Promise<ListEventsResponse> {
+    return this.grpcService.admin.listEvents(req, null).then((resp) => resp);
+  }
+
+  public listEventTypes(req: ListEventTypesRequest): Promise<ListEventTypesResponse.AsObject> {
+    return this.grpcService.admin.listEventTypes(req, null).then((resp) => resp.toObject());
+  }
+
+  public listAggregateTypes(req: ListAggregateTypesRequest): Promise<ListAggregateTypesResponse.AsObject> {
+    return this.grpcService.admin.listAggregateTypes(req, null).then((resp) => resp.toObject());
+  }
 
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
@@ -344,6 +509,24 @@ export class AdminService {
     req: SetDefaultPasswordlessRegistrationMessageTextRequest,
   ): Promise<SetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultPasswordlessRegistrationMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultPasswordChangeMessageText(
+    req: GetDefaultPasswordChangeMessageTextRequest,
+  ): Promise<GetDefaultPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomPasswordChangeMessageText(
+    req: GetCustomPasswordChangeMessageTextRequest,
+  ): Promise<GetCustomPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getCustomPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setDefaultPasswordChangeMessageText(
+    req: SetDefaultPasswordChangeMessageTextRequest,
+  ): Promise<SetDefaultPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
   }
 
   public SetUpOrg(org: SetUpOrgRequest.Org, human: SetUpOrgRequest.Human): Promise<SetUpOrgResponse.AsObject> {
@@ -482,6 +665,21 @@ export class AdminService {
     req.setLanguage(language);
 
     return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  /* notification policy */
+
+  public getNotificationPolicy(): Promise<GetNotificationPolicyResponse.AsObject> {
+    const req = new GetNotificationPolicyRequest();
+    return this.grpcService.admin.getNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateNotificationPolicy(req: UpdateNotificationPolicyRequest): Promise<UpdateNotificationPolicyResponse.AsObject> {
+    return this.grpcService.admin.updateNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public addNotificationPolicy(req: AddNotificationPolicyRequest): Promise<AddNotificationPolicyResponse.AsObject> {
+    return this.grpcService.admin.addNotificationPolicy(req, null).then((resp) => resp.toObject());
   }
 
   /* security policy */
@@ -729,47 +927,6 @@ export class AdminService {
     return this.grpcService.admin.listLoginPolicyIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public listIDPs(limit?: number, offset?: number, queriesList?: IDPQuery[]): Promise<ListIDPsResponse.AsObject> {
-    const req = new ListIDPsRequest();
-    const query = new ListQuery();
-
-    if (limit) {
-      query.setLimit(limit);
-    }
-    if (offset) {
-      query.setOffset(offset);
-    }
-    if (queriesList) {
-      req.setQueriesList(queriesList);
-    }
-    req.setQuery(query);
-    return this.grpcService.admin.listIDPs(req, null).then((resp) => resp.toObject());
-  }
-
-  public getIDPByID(id: string): Promise<GetIDPByIDResponse.AsObject> {
-    const req = new GetIDPByIDRequest();
-    req.setId(id);
-    return this.grpcService.admin.getIDPByID(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateIDP(req: UpdateIDPRequest): Promise<UpdateIDPResponse.AsObject> {
-    return this.grpcService.admin.updateIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public addOIDCIDP(req: AddOIDCIDPRequest): Promise<AddOIDCIDPResponse.AsObject> {
-    return this.grpcService.admin.addOIDCIDP(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateIDPOIDCConfig(req: UpdateIDPOIDCConfigRequest): Promise<UpdateIDPOIDCConfigResponse.AsObject> {
-    return this.grpcService.admin.updateIDPOIDCConfig(req, null).then((resp) => resp.toObject());
-  }
-
-  public removeIDP(id: string): Promise<RemoveIDPResponse.AsObject> {
-    const req = new RemoveIDPRequest();
-    req.setIdpId(id);
-    return this.grpcService.admin.removeIDP(req, null).then((resp) => resp.toObject());
-  }
-
   public deactivateIDP(id: string): Promise<DeactivateIDPResponse.AsObject> {
     const req = new DeactivateIDPRequest();
     req.setIdpId(id);
@@ -782,12 +939,116 @@ export class AdminService {
     return this.grpcService.admin.reactivateIDP(req, null).then((resp) => resp.toObject());
   }
 
-  public addJWTIDP(req: AddJWTIDPRequest): Promise<AddJWTIDPResponse.AsObject> {
-    return this.grpcService.admin.addJWTIDP(req, null).then((resp) => resp.toObject());
+  //   idp templates
+
+  public addAzureADProvider(req: AddAzureADProviderRequest): Promise<AddAzureADProviderResponse.AsObject> {
+    return this.grpcService.admin.addAzureADProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public updateIDPJWTConfig(req: UpdateIDPJWTConfigRequest): Promise<UpdateIDPJWTConfigResponse.AsObject> {
-    return this.grpcService.admin.updateIDPJWTConfig(req, null).then((resp) => resp.toObject());
+  public updateAzureADProvider(req: UpdateAzureADProviderRequest): Promise<UpdateAzureADProviderResponse.AsObject> {
+    return this.grpcService.admin.updateAzureADProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGoogleProvider(req: AddGoogleProviderRequest): Promise<AddGoogleProviderResponse.AsObject> {
+    return this.grpcService.admin.addGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGoogleProvider(req: UpdateGoogleProviderRequest): Promise<UpdateGoogleProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGoogleProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addLDAPProvider(req: AddLDAPProviderRequest): Promise<AddLDAPProviderResponse.AsObject> {
+    return this.grpcService.admin.addLDAPProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateLDAPProvider(req: UpdateLDAPProviderRequest): Promise<UpdateLDAPProviderResponse.AsObject> {
+    return this.grpcService.admin.updateLDAPProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitLabProvider(req: AddGitLabProviderRequest): Promise<AddGitLabProviderResponse.AsObject> {
+    return this.grpcService.admin.addGitLabProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitLabProvider(req: UpdateGitLabProviderRequest): Promise<UpdateGitLabProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGitLabProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitLabSelfHostedProvider(
+    req: AddGitLabSelfHostedProviderRequest,
+  ): Promise<AddGitLabSelfHostedProviderResponse.AsObject> {
+    return this.grpcService.admin.addGitLabSelfHostedProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitLabSelfHostedProvider(
+    req: UpdateGitLabSelfHostedProviderRequest,
+  ): Promise<UpdateGitLabSelfHostedProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGitLabSelfHostedProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitHubProvider(req: AddGitHubProviderRequest): Promise<AddGitHubProviderResponse.AsObject> {
+    return this.grpcService.admin.addGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitHubProvider(req: UpdateGitHubProviderRequest): Promise<UpdateGitHubProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGitHubProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGenericOIDCProvider(req: AddGenericOIDCProviderRequest): Promise<AddGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.admin.addGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOIDCProvider(
+    req: UpdateGenericOIDCProviderRequest,
+  ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGenericOAuthProvider(req: AddGenericOAuthProviderRequest): Promise<AddGenericOAuthProviderResponse.AsObject> {
+    return this.grpcService.admin.addGenericOAuthProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGenericOAuthProvider(
+    req: UpdateGenericOAuthProviderRequest,
+  ): Promise<UpdateGenericOAuthProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGenericOAuthProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addJWTProvider(req: AddJWTProviderRequest): Promise<AddJWTProviderResponse.AsObject> {
+    return this.grpcService.admin.addJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateJWTProvider(req: UpdateJWTProviderRequest): Promise<UpdateJWTProviderResponse.AsObject> {
+    return this.grpcService.admin.updateJWTProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addGitHubEnterpriseServerProvider(
+    req: AddGitHubEnterpriseServerProviderRequest,
+  ): Promise<AddGitHubEnterpriseServerProviderResponse.AsObject> {
+    return this.grpcService.admin.addGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateGitHubEnterpriseServerProvider(
+    req: UpdateGitHubEnterpriseServerProviderRequest,
+  ): Promise<UpdateGitHubEnterpriseServerProviderResponse.AsObject> {
+    return this.grpcService.admin.updateGitHubEnterpriseServerProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public deleteProvider(id: string): Promise<DeleteProviderResponse.AsObject> {
+    const req = new DeleteProviderRequest();
+    req.setId(id);
+    return this.grpcService.admin.deleteProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public listProviders(req: ListProvidersRequest): Promise<ListProvidersResponse.AsObject> {
+    return this.grpcService.admin.listProviders(req, null).then((resp) => resp.toObject());
+  }
+
+  public getProviderByID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse.AsObject> {
+    return this.grpcService.admin.getProviderByID(req, null).then((resp) => resp.toObject());
+  }
+
+  public getProviderID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse> {
+    return this.grpcService.admin.getProviderByID(req, null);
   }
 
   public listIAMMembers(

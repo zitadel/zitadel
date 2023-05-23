@@ -166,6 +166,16 @@ export class AppComponent implements OnDestroy {
     );
 
     this.matIconRegistry.addSvgIcon(
+      'mdi_shield_check',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/shield-check.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_arrow_expand',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-expand.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
       'mdi_numeric',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/numeric.svg'),
     );
@@ -191,7 +201,7 @@ export class AppComponent implements OnDestroy {
       }
     });
 
-    this.activatedRoute.queryParams.pipe(filter((params) => !!params.org)).subscribe((params) => {
+    this.activatedRoute.queryParams.pipe(filter((params) => !!params['org'])).subscribe((params) => {
       const { org } = params;
       this.authService.getActiveOrg(org);
     });
@@ -202,7 +212,6 @@ export class AppComponent implements OnDestroy {
           .getActiveOrg()
           .then(async (org) => {
             this.org = org;
-
             // TODO add when console storage is implemented
             // this.startIntroWorkflow();
           })
@@ -243,7 +252,7 @@ export class AppComponent implements OnDestroy {
   }
 
   public prepareRoute(outlet: RouterOutlet): boolean {
-    return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
+    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
   }
 
   public onSetTheme(theme: string): void {
@@ -258,15 +267,15 @@ export class AppComponent implements OnDestroy {
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['en', 'de', 'zh']);
+    this.translate.addLangs(['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh']);
     this.translate.setDefaultLang('en');
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de|it|zh/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/de|en|es|fr|it|ja|pl|zh/) ? cropped : 'en';
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it|zh/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/de|en|es|fr|it|ja|pl|zh/)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);

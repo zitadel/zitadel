@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -23,9 +24,10 @@ type PrivacyPolicy struct {
 	ResourceOwner string
 	State         domain.PolicyState
 
-	TOSLink     string
-	PrivacyLink string
-	HelpLink    string
+	TOSLink      string
+	PrivacyLink  string
+	HelpLink     string
+	SupportEmail domain.EmailAddress
 
 	IsDefault bool
 }
@@ -71,6 +73,10 @@ var (
 		name:  projection.PrivacyPolicyHelpLinkCol,
 		table: privacyTable,
 	}
+	PrivacyColSupportEmail = Column{
+		name:  projection.PrivacyPolicySupportEmailCol,
+		table: privacyTable,
+	}
 	PrivacyColIsDefault = Column{
 		name:  projection.PrivacyPolicyIsDefaultCol,
 		table: privacyTable,
@@ -96,7 +102,7 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 	if !withOwnerRemoved {
 		eq[PrivacyColOwnerRemoved.identifier()] = false
 	}
-	stmt, scan := preparePrivacyPolicyQuery()
+	stmt, scan := preparePrivacyPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(
 		sq.And{
 			eq,
@@ -122,7 +128,7 @@ func (q *Queries) DefaultPrivacyPolicy(ctx context.Context, shouldTriggerBulk bo
 		projection.PrivacyPolicyProjection.Trigger(ctx)
 	}
 
-	stmt, scan := preparePrivacyPolicyQuery()
+	stmt, scan := preparePrivacyPolicyQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		PrivacyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		PrivacyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -137,7 +143,7 @@ func (q *Queries) DefaultPrivacyPolicy(ctx context.Context, shouldTriggerBulk bo
 	return scan(row)
 }
 
-func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPolicy, error)) {
+func preparePrivacyPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*PrivacyPolicy, error)) {
 	return sq.Select(
 			PrivacyColID.identifier(),
 			PrivacyColSequence.identifier(),
@@ -147,10 +153,12 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 			PrivacyColPrivacyLink.identifier(),
 			PrivacyColTOSLink.identifier(),
 			PrivacyColHelpLink.identifier(),
+			PrivacyColSupportEmail.identifier(),
 			PrivacyColIsDefault.identifier(),
 			PrivacyColState.identifier(),
 		).
-			From(privacyTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(privacyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PrivacyPolicy, error) {
 			policy := new(PrivacyPolicy)
 			err := row.Scan(
@@ -162,6 +170,7 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 				&policy.PrivacyLink,
 				&policy.TOSLink,
 				&policy.HelpLink,
+				&policy.SupportEmail,
 				&policy.IsDefault,
 				&policy.State,
 			)
@@ -177,9 +186,10 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 
 func (p *PrivacyPolicy) ToDomain() *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
-		TOSLink:     p.TOSLink,
-		PrivacyLink: p.PrivacyLink,
-		HelpLink:    p.HelpLink,
-		Default:     p.IsDefault,
+		TOSLink:      p.TOSLink,
+		PrivacyLink:  p.PrivacyLink,
+		HelpLink:     p.HelpLink,
+		SupportEmail: p.SupportEmail,
+		Default:      p.IsDefault,
 	}
 }

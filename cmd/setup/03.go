@@ -76,6 +76,8 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		nil,
 		nil,
 		nil,
+		nil,
+		nil,
 	)
 
 	if err != nil {
@@ -91,11 +93,11 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 	if !mig.instanceSetup.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(mig.instanceSetup.Org.Human.Username, "@") {
 		mig.instanceSetup.Org.Human.Username = mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
 	}
-	mig.instanceSetup.Org.Human.Email.Address = strings.TrimSpace(mig.instanceSetup.Org.Human.Email.Address)
+	mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Email.Address.Normalize()
 	if mig.instanceSetup.Org.Human.Email.Address == "" {
-		mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Username
-		if !strings.Contains(mig.instanceSetup.Org.Human.Email.Address, "@") {
-			mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+		mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username)
+		if !strings.Contains(string(mig.instanceSetup.Org.Human.Email.Address), "@") {
+			mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain))
 		}
 	}
 
@@ -110,8 +112,8 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+		defer f.Close()
 	}
-	defer f.Close()
 
 	keyDetails, err := key.Detail()
 	if err != nil {

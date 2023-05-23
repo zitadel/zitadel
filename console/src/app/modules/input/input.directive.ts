@@ -17,8 +17,15 @@ import {
 } from '@angular/core';
 import { FormGroupDirective, NgControl, NgForm } from '@angular/forms';
 import { CanUpdateErrorState, ErrorStateMatcher, mixinErrorState } from '@angular/material/core';
-import { MAT_FORM_FIELD, MatFormField, MatFormFieldControl } from '@angular/material/form-field';
-import { getMatInputUnsupportedTypeError, MAT_INPUT_VALUE_ACCESSOR } from '@angular/material/input';
+import {
+  MatLegacyFormField as MatFormField,
+  MatLegacyFormFieldControl as MatFormFieldControl,
+  MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD,
+} from '@angular/material/legacy-form-field';
+import {
+  getMatLegacyInputUnsupportedTypeError as getMatInputUnsupportedTypeError,
+  MAT_LEGACY_INPUT_VALUE_ACCESSOR as MAT_INPUT_VALUE_ACCESSOR,
+} from '@angular/material/legacy-input';
 import { Subject } from 'rxjs';
 
 // Invalid input type. Using one of these will throw an MatInputUnsupportedTypeError.
@@ -192,7 +199,7 @@ export class InputDirective
   protected _type: string = 'text';
 
   /** An object used to control when error messages are shown. */
-  @Input() errorStateMatcher!: ErrorStateMatcher;
+  @Input() override errorStateMatcher!: ErrorStateMatcher;
 
   /**
    * Implemented as part of MatFormFieldControl.
@@ -234,7 +241,7 @@ export class InputDirective
     protected _elementRef: ElementRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     protected _platform: Platform,
     /** @docs-private */
-    @Optional() @Self() public ngControl: NgControl,
+    @Optional() @Self() public override ngControl: NgControl,
     @Optional() _parentForm: NgForm,
     @Optional() _parentFormGroup: FormGroupDirective,
     _defaultErrorStateMatcher: ErrorStateMatcher,

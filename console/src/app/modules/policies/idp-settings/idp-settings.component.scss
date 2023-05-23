@@ -1,3 +1,109 @@
-.cnsl-idp-table-wrapper {
-  display: block;
+@use '@angular/material' as mat;
+
+@mixin idp-settings-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+
+  .cnsl-idp-table-wrapper {
+    display: block;
+  }
+
+  .new-idp-wrapper {
+    display: grid;
+    row-gap: 1.5rem;
+    column-gap: 1.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    grid-template-columns: 1fr;
+
+    @media only screen and (min-width: 700px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media only screen and (min-width: 1000px) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    @media only screen and (min-width: 1300px) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+
+    .item {
+      position: relative;
+      z-index: 100;
+      display: flex;
+      text-decoration: none;
+      cursor: pointer;
+      padding-top: 1rem;
+      padding-right: 1rem;
+      padding-bottom: 1rem;
+      padding-left: 1rem;
+      border-radius: 0.5rem;
+      box-sizing: border-box;
+      transition: box-shadow 0.1s ease-in;
+      align-items: center;
+      color: map-get($foreground, text);
+
+      .coming-soon-label {
+        position: absolute;
+        top: 0;
+        right: 1rem;
+        transform: translateY(-50%);
+        width: fit-content;
+      }
+
+      &:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+      }
+
+      .idp-logo {
+        margin-right: 1rem;
+        height: 36px;
+        width: 36px;
+
+        &.dark {
+          display: if($is-dark-theme, block, none);
+        }
+
+        &.light {
+          display: if($is-dark-theme, none, block);
+        }
+      }
+
+      .idp-icon {
+        margin-right: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 36px;
+        width: 36px;
+
+        .icon {
+          font-size: 2.25rem;
+          height: 2.25rem;
+          width: 2.25rem;
+        }
+      }
+
+      .text-container {
+        display: flex;
+        flex-direction: column;
+
+        .title {
+        }
+      }
+
+      &.coming-soon {
+        filter: grayscale(1);
+        cursor: not-allowed;
+
+        &:hover {
+          box-shadow: none;
+        }
+      }
+    }
+  }
 }

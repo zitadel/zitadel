@@ -69,17 +69,25 @@ Errors:
     UsernameNotChanged: Benutzername wurde nicht verändert
     Profile:
       NotFound: Profil nicht gefunden
-      NotChanged: Profile nicht verändert
-      Invalid: Profildaten sind ungültig
+      NotChanged: Profil nicht verändert
+      Empty: Profil ist leer
+      FirstNameEmpty: Vorname im Profil ist leer
+      LastNameEmpty: Nachname im Profil ist leer
+      IDMissing: Profil ID fehlt
     Email:
       NotFound: Email nicht gefunden
       Invalid: Email ist ungültig
       AlreadyVerified: Email ist bereits verifiziert
       NotChanged: Email wurde nicht geändert
+      Empty: Email ist leer
+      IDMissing: Email ID fehlt
+      InvalidURLTemplate: URL Template ist ungültig
     Phone:
       NotFound: Telefonnummer nicht gefunden
       Invalid: Telefonnummer ist ungültig
       AlreadyVerified: Telefonnummer bereits verifiziert
+      Empty: Telefonnummer ist leer
+      NotChanged: Telefonnummer wurde nicht geändert
     Address:
       NotFound: Adresse nicht gefunden
       NotChanged: Adresse wurde nicht geändert
@@ -87,6 +95,10 @@ Errors:
       Key:
         NotFound: Maschinen Schlüssel nicht gefunden
         AlreadyExisting: Machine Schlüssel exisiert bereits
+      Secret:
+        NotExisting: Secret existiert nicht
+        Invalid: Secret ist ungültig
+        CouldNotGenerate: Secret konnte nicht generiert werden
     PAT:
       NotFound: Persönliches Access Token nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
@@ -96,6 +108,7 @@ Errors:
     Username:
       AlreadyExists: Benutzername ist bereits vergeben
       Reserved: Benutzername ist bereits vergeben
+      Empty: Benutzername ist leer
     Code:
       Empty: Code ist leer
       NotFound: Code konnte nicht gefunden werden
@@ -188,8 +201,8 @@ Errors:
       RedirectURIInvalid: Default Redirect URI ist ungültig
       NotExisting: Login Policy existiert nicht auf dieser Organisation
       AlreadyExists: Login Policy existiert bereits
-      IdpProviderAlreadyExisting: Idp Provider existiert bereits
-      IdpProviderNotExisting: Idp Provider existiert nicht
+      IdpProviderAlreadyExisting: Identity Provider existiert bereits
+      IdpProviderNotExisting: Identity Provider existiert nicht
       RegistrationNotAllowed: Registrierung ist nicht erlaubt
       UsernamePasswordNotAllowed: Login mit Username / Passwort nicht erlaubt
       MFA:
@@ -225,6 +238,13 @@ Errors:
       Empty: Org IAM Policy ist leer
       NotExisting: Org IAM Policy existiert nicht
       AlreadyExists: Org IAM Policy existiert bereits
+    NotificationPolicy:
+      NotFound: Notification Policy konnte nicht gefunden werden
+      NotChanged: Notification Policy wurde nicht verändert
+      AlreadyExists: Notification Policy existiert bereits
+    LabelPolicy:
+      NotFound: Private Label Policy konnte nicht gefunden
+      NotChanged: Private Label Policy wurde nicht verändert
   Project:
     ProjectIDMissing: Project ID fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
@@ -351,6 +371,10 @@ Errors:
       AlreadyExists: Default Org IAM Policy existiert bereits
       Empty: Default Org IAM Policy leer
       NotChanged: Default Org IAM Policy wurde nicht verändert
+    NotificationPolicy:
+      NotFound: Default Notification Policy konnte nicht gefunden werden
+      NotChanged: Default Notification Policy wurde nicht verändert
+      AlreadyExists: Default Notification Policy existiert bereits
   Policy:
     AlreadyExists: Policy existiert bereits
     Label:
@@ -425,6 +449,43 @@ Errors:
     CloseRows: SQL Statement konnte nicht abgeschlossen werden
     SQLStatement: SQL Statement konnte nicht erstellt werden
     InvalidRequest: Anfrage ist ungültig
+  Quota:
+    AlreadyExists: Das Kontingent existiert bereits für diese Einheit
+    NotFound: Kontingent für diese Einheit nicht gefunden
+    Invalid:
+      CallURL: Aufruf URL für Kontingent ist ungültig
+      Percent: Kontingent Prozent is unter 1
+      Unimplemented: Kontingente sind für diese Einheit nicht implementiert
+      Amount: Kontingent Menge ist kleiner als 1
+      ResetInterval: Das Rücksetzungsintervall für das Kontingent ist kürzer als eine Minute
+      Noop: Ein unlimitiertes Kontingent ohne Benachrichtigungen hat keinen Effekt
+    Access:
+      Exhausted: Das Kontingent für authentifizierte Requests ist aufgebraucht
+    Execution:
+      Exhausted: Das Kontingent für Action Sekunden ist aufgebraucht
+  LogStore:
+    Access:
+      StorageFailed: Das Speichern des Access Logs in der Datenbank ist fehlgeschlagen
+      ScanFailed: Das Abfragen der verbrauchten authentifizierten Requests ist fehlgeschlagen
+    Execution:
+      StorageFailed: Das Speichern des Action Logs in der Datenbank ist fehlgeschlagen
+      ScanFailed: Das Abfragen der verbrauchten Actions Sekunden ist fehlgeschlagen
+  Session:
+    NotExisting: Session existiert nicht
+    Terminated: Session bereits beendet
+    Token:
+      Invalid: Session Token ist ungültig
+
+AggregateTypes:
+  action: Action
+  instance: Instanz
+  key_pair: Schlüsselpaar
+  org: Organisation
+  project: Projekt
+  user: Benutzer
+  usergrant: Benutzerberechtigung
+  quota: Kontingent
+
 EventTypes:
   user:
     added: Benutzer hinzugefügt
@@ -438,9 +499,11 @@ EventTypes:
         failed: Benutzerinitialisierung fehlgeschlagen
     token:
       added: Access Token ausgestellt
+      removed: Access Token gelöscht
     username:
       reserved: Benutzername reserviert
       released: Benutzername freigegeben
+      changed: Benutzername geändert
     email:
       reserved: E-Mail-Adresse reserviert
       released: E-Mail-Adresse freigegeben
@@ -455,8 +518,14 @@ EventTypes:
       added: Technischer Benutzer hinzugefügt
       changed: Technischer Benutzer geändert
       key:
-        added: Key added
-        removed: Key removed
+        added: Key hinzugefügt
+        removed: Key entfernt
+      secret:
+        set: Secret gesetzt
+        removed: Secret entfernt
+        check:
+          succeeded: Secret Überprüfung erfolgreich
+          failed: Secret Überprüfung fehlgeschlagen
     human:
       added: Benutzer hinzugefügt
       selfregistered: Benutzer hat sich selbst registriert
@@ -580,6 +649,7 @@ EventTypes:
       code:
         added: Telefon Code hinzugefügt
         sent: Telefon Code versendet
+      removed: Telefonnummer gelöscht
     profile:
       changed: Benutzerprofil geändert
     address:
@@ -592,6 +662,8 @@ EventTypes:
         check:
           succeeded: Multifaktor OTP Verifikation erfolgreich
           failed: Multifaktor OTP Verifikation fehlgeschlagen
+        init:
+          skipped: Multifaktor OTP übersprungen
       init:
         skipped: Multifaktor Initialisierung übersprungen
     signed:
@@ -607,10 +679,16 @@ EventTypes:
       cascade:
         removed: Berechtigung entfernt
         changed: Berechtigung geändert
-      metadata:
-        set: Benutzer Metadaten gesetzt
-        removed: Benutzer Metadaten gelöscht
-        removed.all: Alle Benutzer Metadaten gelöscht
+    metadata:
+      set: Benutzer Metadaten gesetzt
+      removed: Benutzer Metadaten gelöscht
+      removed.all: Alle Benutzer Metadaten gelöscht
+    domain:
+      claimed: Domain beansprucht
+      claimed.sent: Domain Beanspruchungs Information gesendet
+    pat:
+      added: Personal Access Token hinzugefügt
+      removed: Personal Access Token gelöscht
   org:
     added: Organisation hinzugefügt
     changed: Organisation geändert
@@ -657,6 +735,10 @@ EventTypes:
         config:
           added: SAML IDP Konfiguration hinzugefügt
           changed: SAML IDP Konfiguration geändert
+      jwt:
+        config:
+          added: JWT IDP Konfiguration hinzugefügt
+          changed: JWT IDP Konfiguration geändert
     customtext:
       set: Kundenspezifischer Text wurde gesetzt
       removed: Kundenspezifischer Text wurde entfernt
@@ -668,8 +750,10 @@ EventTypes:
         changed: Login Richtlinie geändert
         removed: Login Richtlinie gelöscht
         idpprovider:
-          added: Idp Provider zu Login Richtlinie hinzugefügt
-          removed: Idp Provider aus Login Richtlinie gelöscht
+          added: Identity Provider zu Login Richtlinie hinzugefügt
+          removed: Identity Provider aus Login Richtlinie gelöscht
+          cascade:
+            removed: Login Richtlinie kaskadiert gelöscht
         secondfactor:
           added: Zweitfaktor zu Login Richtlinie hinzugefügt
           removed: Zweitfaktor aus Login Richtlinie gelöscht
@@ -715,12 +799,38 @@ EventTypes:
         added: Datenschutzbestimmung und AGB hinzugefügt
         changed: Datenschutzbestimmung und AGB geändert
         removed: Datenschutzbestimmung und AGB entfernt
+      domain:
+        added: Domain Richtlinie hinzugefügt
+        changed: Domain Richtlinie geändert
+        removed: Domain Richtlinie gelöscht
+      lockout:
+        added: Passwortaussperrrichtlinie hinzugefügt
+        changed: Passwortaussperrrichtlinie geändert
+        removed: Passwortaussperrrichtlinie gelöscht
+      notification:
+        added: Notifikation Richtlinie hinzugefügt
+        changed: Notifikation Richtlinie geändert
+        removed: Notifikation Richtlinie entfernt
     flow:
       trigger_actions:
         set: Aktionen festgelegt
         cascade:
           removed: Aktionen kaskadiert entfernt
         removed: Aktionen entfernt
+      cleared: Flow zurückgesetzt
+    mail:
+      template:
+        added: E-Mail Vorlage hinzugefügt
+        changed: E-Mail Vorlage geändert
+        removed: E-Mail Vorlage gelöscht
+      text:
+        added: E-Mail Text hinzugefügt
+        changed: E-Mail Text geändert
+        removed: E-Mail Text gelöscht
+    metadata:
+      removed: Metadaten gelöscht
+      removed.all: Alle Metadaten gelöscht
+      set: Metadaten gesetzt
   project:
     added: Projekt hinzugefügt
     changed: Project geändert
@@ -821,6 +931,10 @@ EventTypes:
         config:
           added: SAML IDP Konfiguration hinzugefügt
           changed: SAML IDP Konfiguration geändert
+      jwt:
+        config:
+          added: JWT IDP Konfiguration hizugefügt
+          changed: JWT IDP Konfiguration geändert
     customtext:
       set: Text wurde gesetzt
       removed: Text wurde entfernt
@@ -829,8 +943,8 @@ EventTypes:
         added: Default Login Policy hinzugefügt
         changed: Default Login Policy geändert
         idpprovider:
-          added: Idp Provider zu Default Login Policy hinzugefügt
-          removed: Idp Provider aus Default Login Policy gelöscht
+          added: Identity Provider zu Default Login Policy hinzugefügt
+          removed: Identity Provider aus Default Login Policy gelöscht
       label:
         added: Label Richtlinie hinzugefügt
         changed: Label Richtlinie geändert
@@ -883,12 +997,140 @@ EventTypes:
           deactivated: Twilio SMS Provider deaktiviert
   key_pair:
     added: Schlüsselpaar hinzugefügt
+    certificate:
+      added: Zertifikat hinzugefügt
   action:
     added: Aktion hinzugefügt
     changed: Aktion geändert
     deactivated: Aktion deaktiviert
     reactivated: Aktion reaktiviert
     removed: Aktion gelöscht
+  instance:
+    added: Instanz hinzugefügt
+    changed: Instanz gelöscht
+    customtext:
+      removed: Kundenspezifischer Text gelöscht
+      set: Kundenspezifischer Text gelöscht
+      template:
+        removed: Kundenspezifische Textvorlage gelöscht
+    default:
+      language:
+        set: Standard Sprache gesetzt
+      org:
+        set: Standard Organisation gesetzt
+    domain:
+      added: Domain hinzugefügt
+      primary:
+        set: Primäre Domain gesetzt
+      removed: Domain gelöscht
+    iam:
+      console:
+        set: ZITADEL Console Applikation gesetzt
+      project:
+        set: ZITADEL Projekt gesetzt
+    mail:
+      template:
+        added: E-Mail Vorlage hinzugefügt
+        changed: E-Mail Vorlage geändert
+      text:
+        added: E-Mail Text hinzugefügt
+        changed: E-Mail Text geändert
+    member:
+      added: Instanzmitglied hinzugefügt
+      changed: Instanzmitglied geändert
+      removed: Instanzmitglied gelöscht
+      cascade:
+        removed: Instanzmitglied kaskadierend gelöscht
+    notification:
+      provider:
+        debug:
+          fileadded: Datei zu Debug Notification Provider hinzugefügt
+          filechanged: Datei von Debug Notification Provider geändert
+          fileremoved: Datei von Debug Notification Provider gelöscht
+          logadded: Log von Debug Notification Provider hinzugefügt
+          logchanged: Log von Debug Notification Provider geändert
+          logremoved: Log von Debug Notification Provider gelöscht
+    oidc:
+      settings:
+        added: OIDC Einstellung hinzugefügt
+        changed: OIDC Einstellung geändert
+    policy:
+      domain:
+        added: Domain Richtlinie hinzugefügt
+        changed: Domain Richtlinie geändert
+      label:
+        activated: Label Richtlinie aktiviert
+        added: Label Richtlinie hinzugefügt
+        assets:
+          removed: Assets von Label Richtlinie gelöscht
+        changed: Label Richtlinie geändert
+        font:
+          added: Schriftart zu Label Richtlinie hinzugefügt
+          removed: Schriftart von Label Richtlinie gelöscht
+        icon:
+          added: Icon zu Label Richtlinie hinzugefügt
+          removed: Icon von Label Richtlinie gelöscht
+          dark:
+            added: Icon (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Icon (dunkler Modus) von Label Richtlinie gelöscht
+        logo:
+          added: Logo zu Label Richtlinie hinzugefügt
+          removed: Logo von Label Richtlinie gelöscht
+          dark:
+            added: Logo (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Logo (dunkler Modus) von Label Richtlinie gelöscht
+      lockout:
+        added: Passwortaussperrrichtlinie hinzugefügt
+        changed: Passwortaussperrrichtlinie geändert
+      login:
+        added: Login Richtlinie hinzugefügt
+        changed: Login Richtlinie geändert
+        idpprovider:
+          added: Identity Provider zu Login Richtlinie hinzugefügt
+          cascade:
+            removed: Identity Provider kaskadierend von Login Richtlinie gelöscht
+          removed: Identity Provider von Login Richtlinie gelöscht
+        multifactor:
+          added: Multifaktor zu Login Richtlinie hinzugefügt
+          removed: Multifaktor zu Login Richtlinie gelöscht
+        secondfactor:
+          added: Zweitfaktor zu Login Richtlinie hinzugefügt
+          removed: Zweitfaktor von Login Richtlinie gelöscht
+      password:
+        age:
+          added: Passwort Alterungsrichtlinie hinzugefügt
+          changed: Passwort Alterungsrichtlinie geändert
+        complexity:
+          added: Passwort Komplexitätsrichtlinie hinzugefügt
+          changed: Passwort Komplexitätsrichtlinie geändert
+      privacy:
+        added: Datenschutzrichtlinie hinzugefügt
+        changed: Datenschutzrichtlinie geändert
+      security:
+        set: Sicherheitsrichtlinie gesetzt
+
+    removed: Instanz gelöscht
+    secret:
+      generator:
+        added: Passwortgenerator hinzugefügt
+        changed: Passwortgenerator geändert
+        removed: Passwortgenerator gelöscht
+    sms:
+      configtwilio:
+        activated: Twilio SMS Konfiguration aktiviert
+        added: Twilio SMS Konfiguration hinzugefügt
+        changed: Twilio SMS Konfiguration geändert
+        deactivated: Twilio SMS Konfiguration deaktiviert
+        removed: Twilio SMS Konfiguration gelöscht
+        token:
+          changed: Token zu Twilio SMS Konfiguration hinzugefügt
+    smtp:
+      config:
+        added: SMTP Konfiguration hinzugefügt
+        changed: SMTP Konfiguration geändert
+        password:
+          changed: Passwort von SMTP Konfiguration geändert
+        removed: SMTP Konfiguration gelöscht
 
 Application:
   OIDC:
@@ -924,6 +1166,7 @@ Action:
       Unspecified: Unspezifiziert
       ExternalAuthentication:  Externe Authentifizierung
       CustomiseToken: Token ergänzen
+      InternalAuthentication:  Interne Authentifizierung
   TriggerType:
     Unspecified: Unspezifiziert
     PostAuthentication: Nach Authentifizierung

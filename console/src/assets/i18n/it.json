@@ -3,13 +3,14 @@
   "PAGINATOR": {
     "PREVIOUS": "Precedente",
     "NEXT": "Avanti",
-    "COUNT": "Risultati totali"
+    "COUNT": "Risultati totali",
+    "MORE": "avanti"
   },
   "FOOTER": {
     "LINKS": {
-      "CONTACT": "Kontakt",
-      "TOS": "Terms of Service",
-      "PP": "Privacy Policy"
+      "CONTACT": "Contatto",
+      "TOS": "Termini di servizio",
+      "PP": "Informativa sulla privacy"
     },
     "THEME": {
       "DARK": "Scuro",
@@ -41,6 +42,48 @@
       "ADD": "Per aggiungere, tieni premuto e trascina il riquadro"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Il tuo processo di onboarding",
+    "MOREDESCRIPTION": "più scorciatoie",
+    "COMPLETED": "completato",
+    "DISMISS": "chiudi",
+    "CARD": {
+      "TITLE": "Fate funzionare il vostro ZITADEL",
+      "DESCRIPTION": "Questa lista di azioni aiuta a configurare la vostra istanza e vi guida attraverso i passaggi più essenziali."
+    },
+    "EVENTS": {
+      "instance.policy.label.added": {
+        "title": "Imposta il tuo marchio",
+        "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone.",
+        "action": "Imposta marchio"
+      },
+      "instance.smtp.config.added": {
+        "title": "Configura le impostazioni SMTP",
+        "description": "Imposta il proprio server di posta",
+        "action": "Configura SMTP"
+      },
+      "project.added": {
+        "title": "Crea il tuo primo progetto",
+        "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni.",
+        "action": "Crea progetto"
+      },
+      "project.application.added": {
+        "title": "Crea la tua prima applicazione",
+        "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione.",
+        "action": "Crea applicazione"
+      },
+      "user.human.added": {
+        "title": "Aggiungi utenti",
+        "description": "Aggiungi gli utenti dell'applicazione",
+        "action": "Aggiungi utente"
+      },
+      "user.grant.added": {
+        "title": "Crea autorizzazioni per gli utenti",
+        "description": "Consenti agli utenti di accedere alla tua applicazione e imposta il loro ruolo.",
+        "action": "Crea autorizzazione"
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Istanza",
     "DASHBOARD": "Pagina iniziale",
@@ -49,6 +92,7 @@
     "INSTANCEOVERVIEW": "Istanza",
     "ORGS": "Organizzazioni",
     "VIEWS": "Views",
+    "EVENTS": "Eventi",
     "FAILEDEVENTS": "Eventi falliti",
     "ORGANIZATION": "Organizzazione",
     "DOMAINS": "Domini",
@@ -122,6 +166,7 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
+    "COMINGSOON": "Coming soon",
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     }
@@ -201,17 +246,31 @@
     "NOROWS": "Nessun dato"
   },
   "ERRORS": {
-    "REQUIRED": "Mancano alcuni campi obbligatori.",
+    "REQUIRED": "Compilare questo campo.",
+    "ATLEASTONE": "Inserisci almeno un valore.",
     "TOKENINVALID": {
       "TITLE": "Il tuo Access Token \u00e8 scaduto.",
       "DESCRIPTION": "Clicca il pulsante per richiedere una nuova sessione."
-    }
+    },
+    "EXHAUSTED": {
+      "TITLE": "La quota di richieste autenticate è esaurita.",
+      "DESCRIPTION": "Cancellare o aumentare il limite per questa istanza ZITADEL."
+    },
+    "INVALID_FORMAT": "Il formato non è valido.",
+    "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail.",
+    "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
+    "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
+    "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
+    "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
+    "NUMBERERROR": "Deve includere una cifra.",
+    "PWNOTEQUAL": "Le password fornite non corrispondono.",
+    "PHONE": "Il numero di telefono deve iniziare con 00 o +."
   },
   "USER": {
     "SETTINGS": {
       "TITLE": "Impostazioni",
       "GENERAL": "Generale",
-      "IDP": "Identity Providers",
+      "IDP": "Fornitori di identità",
       "SECURITY": "Password e sicurezza",
       "KEYS": "Chiavi",
       "PAT": "Personal Access Tokens",
@@ -231,6 +290,7 @@
       "CREATE": "Crea",
       "MY": "Le mie informazioni",
       "LOGINNAMES": "Loginnames",
+      "LOGINMETHODS": "Metodi di accesso",
       "LOGINNAMESDESC": "Questi sono i nomi di accesso:",
       "NOUSER": "Nessun utente associato.",
       "REACTIVATE": "Riattiva",
@@ -239,6 +299,8 @@
       "STATE": "Stato",
       "DELETE": "Elimina utente",
       "UNLOCK": "Sblocca utente",
+      "GENERATESECRET": "Genera Client Secret",
+      "REMOVESECRET": "Elimina Client Secret",
       "LOCKEDDESCRIPTION": "Questo utente \u00e8 stato bloccato a causa del superamento dei tentativi massimi di accesso e deve essere sbloccato per essere utilizzato di nuovo.",
       "DELETEACCOUNT": "Elimina account personale",
       "DELETEACCOUNT_DESC": "Se esegui questa azione, sarai disconnesso e non avrai più accesso al tuo account. Questa azione non può essere invertita.",
@@ -263,6 +325,10 @@
       "TITLE": "Invia una notifica via e-mail",
       "DESCRIPTION": "Clicca il pulsante qui sotto per inviare una notifica all'indirizzo email corrente o cambiare l'indirizzo email nel campo.",
       "NEWEMAIL": "Nuovo indirizzo e-mail"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Salvate il Client Secret in un luogo sicuro, perch\u00e9 non sarà più disponibile dopo aver chiuso la finestra di dialogo"
     },
     "TABLE": {
       "DEACTIVATE": "Disattiva",
@@ -372,7 +438,7 @@
       "EMPTY": "Nessun IDP esterno trovato",
       "DIALOG": {
         "DELETE_TITLE": "Rimuovere l'IDP",
-        "DELETE_DESCRIPTION": "Stai per eliminare un Identity Provider da un utente. Vuoi continuare?"
+        "DELETE_DESCRIPTION": "Stai per eliminare un fornitore di identità da un utente. Vuoi continuare?"
       }
     },
     "CREATE": {
@@ -404,6 +470,7 @@
       "TITLE": "Profilo",
       "EMAIL": "E-mail",
       "PHONE": "Numero di telefono",
+      "PHONE_HINT": "Utilizza 00 o il simbolo + seguito dal prefisso del paese, o seleziona il paese ed inserisci il numero di telefono",
       "USERNAME": "Nome utente",
       "CHANGEUSERNAME": "cambia",
       "CHANGEUSERNAME_TITLE": "Cambia nome utente",
@@ -423,7 +490,8 @@
         "PREVIEW": "Anteprima",
         "DELETESUCCESS": "Rimosso con successo!",
         "CROPPERERROR": "È successo un errore durante il caricamento del tuo file. Prova un formato e una dimensione diversi, se necessario."
-      }
+      },
+      "COUNTRY": "Paese"
     },
     "MACHINE": {
       "TITLE": "Dettagli dell'utente del servizio",
@@ -441,6 +509,11 @@
       "CHOOSEEXPIRY": "Seleziona una data di scadenza",
       "CREATIONDATE": "Data di creazione",
       "KEYDETAILS": "Dettagli chiave",
+      "ACCESSTOKENTYPE": "Tipo Access Token",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Aggiungi chiave",
         "DESCRIPTION": "Seleziona il tuo tipo di chiave e scegli una data di scadenza opzionale."
@@ -472,8 +545,7 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
-      "NOTEQUAL": "Le password fornite non corrispondono."
+      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri."
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -483,7 +555,7 @@
     "EMAILVERIFIED": "Email verificata",
     "NOTVERIFIED": "non verificato",
     "PREFERRED_LOGINNAME": "Loginname preferito",
-    "ISINITIAL": "L'e-mail di questo utente non è ancora stata verificata.",
+    "ISINITIAL": "L'utente non è ancora attivo.",
     "LOGINMETHODS": {
       "TITLE": "Informazioni di contatto",
       "DESCRIPTION": "Le informazioni fornite sono utilizzate per inviare informazioni importanti, come le e-mail di reset della password.",
@@ -527,17 +599,6 @@
         "3": "filtro per rolename"
       }
     },
-    "VALIDATION": {
-      "INVALIDPATTERN": "La password non soddisfa le regole definite.",
-      "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail",
-      "REQUIRED": "Il campo di input \u00e8 vuoto.",
-      "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
-      "NOEMAIL": "Il nome utente non pu\u00f2 essere un indirizzo e-mail.",
-      "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
-      "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
-      "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
-      "NUMBERERROR": "Deve includere una cifra."
-    },
     "STATE": {
       "0": "Sconosciuto",
       "1": "Attivo",
@@ -560,7 +621,7 @@
     "SIGNEDOUT_BTN": "Accedi",
     "EDITACCOUNT": "Modifica account",
     "ADDACCOUNT": "Accedi con un altro account",
-    "RESENDINITIALEMAIL": "Invia una nuova mail di inizializzazione",
+    "RESENDINITIALEMAIL": "Invia nuovamente la mail di attivazione",
     "RESENDEMAILNOTIFICATION": "Invia di nuovo la notifica via e-mail",
     "TOAST": {
       "CREATED": "Utente creato con successo.",
@@ -588,7 +649,9 @@
       "MACHINEADDED": "Utente di servizio creato!",
       "DELETED": "Utente cancellato con successo!",
       "UNLOCKED": "Utente sbloccato con successo!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link per la registrazione inviato con successo."
+      "PASSWORDLESSREGISTRATIONSENT": "Link per la registrazione inviato con successo.",
+      "SECRETGENERATED": "Secret generato con successo!",
+      "SECRETREMOVED": "Secret rimosso con successo!"
     },
     "MEMBERSHIPS": {
       "TITLE": "Memberships di ZITADEL",
@@ -749,6 +812,56 @@
       "DELETE": "Rimuovi",
       "DELETESUCCESS": "Eventi falliti rimossi."
     },
+    "EVENTS": {
+      "TITLE": "Eventi",
+      "DESCRIPTION": "Questa vista mostra tutti gli eventi in arrivo",
+      "EDITOR": "Editore",
+      "EDITORID": "ID Editore",
+      "AGGREGATE": "Aggregato",
+      "AGGREGATEID": "ID aggregato",
+      "AGGREGATETYPE": "Tipo aggregato",
+      "RESOURCEOWNER": "Resouce owner",
+      "SEQUENCE": "Sequenza",
+      "CREATIONDATE": "Creato",
+      "TYPE": "Tipo",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtra",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "filtra per editore"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "filtra per aggregato"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtra per tipo"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filter per Resource Owner"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequence",
+          "CHECKBOX": "Filter per sequenza",
+          "SORT": "",
+          "ASC": "Ascending",
+          "DESC": "Descending"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Creation Date",
+          "CHECKBOX": "Filter by Creation Date"
+        },
+        "OTHER": "altro",
+        "OTHERS": "altri"
+      },
+      "DIALOG": {
+        "TITLE": "Dettaglio dell'evento"
+      }
+    },
     "TOAST": {
       "MEMBERREMOVED": "Manager rimosso.",
       "MEMBERSADDED": "I manager sono stati aggiunti con successo.",
@@ -781,6 +894,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
       "DELETE": "Elimina organizzazione",
+      "DEFAULTLABEL": "Standard",
+      "SETASDEFAULT": "Imposta come organizzazione predefinita",
+      "DEFAULTORGSET": "Organizzazione predefinita cambiata con successo",
       "RENAME": {
         "ACTION": "Rinomina",
         "TITLE": "Rinomina organizzazione",
@@ -883,10 +999,10 @@
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "Complessità della password",
-      "NOTIFICATIONS": "Notifiche",
+      "NOTIFICATIONS": "Impostazioni di notifica",
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
-      "IDP": "Identity Providers",
+      "IDP": "Fornitori di identità",
       "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
@@ -900,7 +1016,7 @@
       "LOGIN": "Accesso e login",
       "DOMAIN": "Dominio",
       "TEXTS": "Testi e lingue",
-      "APPEARANCE": "Aussehen",
+      "APPEARANCE": "Aspetto",
       "OTHER": "Altro"
     }
   },
@@ -909,15 +1025,18 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
-      "it": "Italiano",
+      "es": "Español",
       "fr": "Français",
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
       "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
       "SENDERADDRESS": "Indirizzo email del mittente",
       "SENDERNAME": "Nome del mittente",
-      "HOST": "Host",
+      "HOSTANDPORT": "Host e porta",
       "USER": "Utente",
       "PASSWORD": "Password",
       "SETPASSWORD": "Imposta SMTP Password",
@@ -1007,6 +1126,11 @@
       "NUMBERERROR": "Deve includere una cifra.",
       "PATTERNERROR": "La password non corrisponde al modello richiesto."
     },
+    "NOTIFICATION": {
+      "TITLE": "Notifiche",
+      "DESCRIPTION": "Determina su quali modifiche verranno inviate le notifiche",
+      "PASSWORDCHANGE": "Cambiamento della password"
+    },
     "PRIVATELABELING": {
       "TITLE": "Branding",
       "DESCRIPTION": "Dai al login il tuo stile personalizzato e modifica il suo comportamento.",
@@ -1031,6 +1155,10 @@
       "MAXSIZEEXCEEDED": "Dimensione massima di 524kB superata.",
       "NOSVGSUPPORTED": "SVG non sono supportati",
       "FONTINLOGINONLY": "Il carattere \u00e8 attualmente visualizzato solo nell'interfaccia di accesso.",
+      "BACKGROUNDCOLOR": "Colore di sfondo",
+      "PRIMARYCOLOR": "Colore primario",
+      "WARNCOLOR": "Colore di avviso",
+      "FONTCOLOR": "Colore del testo",
       "VIEWS": {
         "PREVIEW": "Anteprima",
         "CURRENT": "Configurazione attuale"
@@ -1062,7 +1190,7 @@
     },
     "LOGIN_POLICY": {
       "TITLE": "Impostazioni di accesso",
-      "DESCRIPTION": "Definisci come gli utenti possono essere autenticati e configura gli Identity Provider",
+      "DESCRIPTION": "Definisci come gli utenti possono essere autenticati e configura i fornitori di identità",
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
       "ADVANCED": "Impostazioni avanzate",
@@ -1075,6 +1203,7 @@
       "TOSLINK": "Link ai termini di servizio",
       "POLICYLINK": "Link all'informativa sulla privacy",
       "HELPLINK": "link per l'aiuto",
+      "SUPPORTEMAIL": "e-mail di supporto",
       "SAVED": "Salvato con successo!",
       "RESET_TITLE": "Ripristina i valori predefiniti",
       "RESET_DESCRIPTION": "Stai per ripristinare i link predefiniti per i TOS e l'informativa sulla privacy. Vuoi davvero continuare?"
@@ -1095,8 +1224,11 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
-        "it": "Italiano",
+        "es": "Español",
         "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
         "zh": "简体中文"
       },
       "KEYS": {
@@ -1146,7 +1278,8 @@
         "VP": "Verificazione del telefono",
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
-        "PL": "Autenticazione Passwordless"
+        "PL": "Autenticazione Passwordless",
+        "PC": "Cambiamento della password"
       },
       "CHIPS": {
         "firstname": "Nome",
@@ -1279,10 +1412,10 @@
         "GRANTED_SINGULAR": "Progetto delegato"
       },
       "PRIVATELABEL": {
-        "TITLE": "Impostazione Branding",
+        "TITLE": "Impostazione branding",
         "0": {
           "TITLE": "Non specificato",
-          "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione Branding dell'organizzazione, prima che venga mostrato il default del sistema."
+          "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione branding dell'organizzazione, prima che venga mostrato il default del sistema."
         },
         "1": {
           "TITLE": "Applica l'impostazione del progetto",
@@ -1290,10 +1423,10 @@
         },
         "2": {
           "TITLE": "Applica l'impostazione dell' organizzazione dell' utente",
-          "DESC": "Verr\u00e0 mostrata l'impostazione Branding dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
+          "DESC": "Verr\u00e0 mostrata l'impostazione branding dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
         },
         "DIALOG": {
-          "TITLE": "Impostazione Branding",
+          "TITLE": "Impostazione branding",
           "DESCRIPTION": "Seleziona il comportamento del login, quando usi il progetto."
         }
       },
@@ -1485,24 +1618,81 @@
       "DELETED": "Progetto eliminato con successo."
     }
   },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Elima ruolo",
+      "DELETE_DESCRIPTION": "Stai per eliminare un ruolo. Vuoi davvero continuare?"
+    }
+  },
   "NEXTSTEPS": {
     "TITLE": "Passi successivi"
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Identity Providers",
-      "DESCRIPTION": "Definisci ulteriori Identity Provider, che possono essere utilizzati per l'autenticazione nelle tue organizzazioni.",
-      "ACTIVETITLE": "Identity Providers"
+      "TITLE": "Fornitori di identità",
+      "DESCRIPTION": "Definisci ulteriori fornitori di identità, che possono essere utilizzati per l'autenticazione nelle tue organizzazioni.",
+      "ACTIVETITLE": "Fornitori di identità"
     },
     "CREATE": {
-      "TITLE": "Nuovo IDP",
-      "DESCRIPTION": "Configura l'endpoint del tuo nuovo IDP."
+      "TITLE": "Aggiungi provider",
+      "DESCRIPTION": "Seleziona uno dei seguenti provider.",
+      "STEPPERTITLE": "Create Provider",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider OIDC."
+      },
+      "OAuth": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider OAuth."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Google provider."
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Gitlab provider."
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Gitlab Self Hosted provider."
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo GitHub Enterprise Server provider."
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Github provider."
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo Microsoft provider."
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Inserisci i dati necessari per il tuo provider LDAP."
+      }
     },
     "DETAIL": {
-      "TITLE": "Identity Provider",
-      "DESCRIPTION": "Configurazione generale del tuo fornitore di identit\u00e0.",
+      "TITLE": "Fornitore di identità",
+      "DESCRIPTION": "Aggiorna la configurazione del tuo fornitore di identit\u00e0.",
       "DATECREATED": "Creato",
       "DATECHANGED": "Cambiato"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Creazione automatica",
+      "ISAUTOCREATION_DESC": "Se selezionato, verrà creato un account se non esiste ancora.",
+      "ISAUTOUPDATE": "Aggiornamento automatico",
+      "ISAUTOUPDATE_DESC": "Se selezionato, gli account vengono aggiornati alla riautenticazione.",
+      "ISCREATIONALLOWED": "Creazione consentita",
+      "ISCREATIONALLOWED_DESC": "Determina se i conti possono essere creati.",
+      "ISLINKINGALLOWED": "Collegamento consentito",
+      "ISLINKINGALLOWED_DESC": "Determina se un'identità può essere collegata a un account esistente."
     },
     "OWNERTYPES": {
       "0": "sconosciuto",
@@ -1518,22 +1708,29 @@
       "1": "attivo",
       "2": "inattivo"
     },
-    "MAPPINGFIELD": {
-      "1": "Nome utente preferito",
-      "2": "Email"
+    "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
     },
-    "STYLE": "Stile",
-    "STYLEFIELD": {
-      "0": "No Styling",
-      "1": "Google"
-    },
-    "ADD": "Aggiungi Identity Provider",
-    "AUTOREGISTER": "Registrazione automatica",
-    "AUTOREGISTER_DESC": "Se \u00e8 selezionato e non esiste ancora un account, ne verr\u00e0 creato uno.",
+    "ADD": "Aggiungi fornitore di identità",
+    "AZUREADTENANTTYPE": "Tipo tenant",
+    "AZUREADTENANTID": "tenant ID",
+    "EMAILVERIFIED": "Email verificata",
+    "NAMEHINT": "Se specificato, verrà mostrato nell'interfaccia di accesso.",
+    "OPTIONAL": "opzionale",
+    "LDAPATTRIBUTES": "Attributi LDAP",
+    "UPDATEBINDPASSWORD": "aggiorna Bind Password",
+    "UPDATECLIENTSECRET": "Aggiorna secret",
     "TYPE": "Tipo",
     "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Nome",
+    "AUTHORIZATIONENDPOINT": "Authorization Endpoint",
+    "TOKENENDPOINT": "Token Endpoint",
+    "USERENDPOINT": "User Endpoint",
+    "IDATTRIBUTE": "Attributo ID",
     "AVAILABILITY": "Disponibilità",
     "AVAILABLE": "disponibile",
     "AVAILABLEBUTINACTIVE": "disponible ma inattivo",
@@ -1545,6 +1742,31 @@
     "SCOPESLIST": "Scope list",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "Connessione",
+    "LDAPUSERBINDING": "User binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "necessario",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "Mapping del nome di visualizzazione IDP",
     "USERNAMEMAPPING": "Mapping del nome utente",
     "DATES": "Date",
@@ -1618,11 +1840,11 @@
       "TITLE": "Impostazioni di accesso",
       "DESCRIPTION": "Definisci come i tuoi utenti possono essere autenticati nella tua organizzazione."
     },
-    "IDPS": "Identity Providers",
+    "IDPS": "Fornitori di identità",
     "ADDIDP": {
       "TITLE": "Aggiungi un IDP",
       "DESCRIPTION": "\u00c8 possibile selezionare IDPs dell'organizzazione o del sistema.",
-      "SELECTIDPS": "Identity Providers"
+      "SELECTIDPS": "Fornitori di identità"
     },
     "PASSWORDLESS": "Autenticazione passwordless",
     "PASSWORDLESSTYPE": {
@@ -1633,7 +1855,7 @@
   "APP": {
     "LIST": "Applicazioni",
     "COMPLIANCE": "Conformità con OIDC",
-    "URLS": "Urls",
+    "URLS": "URLs",
     "CONFIGURATION": "Configurazione",
     "TOKEN": "Impostazioni Token",
     "PAGES": {
@@ -1641,6 +1863,8 @@
       "ID": "ID",
       "DESCRIPTION": "Qui puoi modificare i dati della tua applicazione e la sua configurazione.",
       "CREATE": "Crea Applicazione",
+      "CREATE_SELECT_PROJECT": "Seleziona il tuo progetto",
+      "CREATE_NEW_PROJECT": "o crea uno nuovo <a href='{{url}}' title='Crea progetto'>qui</a>.",
       "CREATE_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",
       "CREATE_DESC_SUB": "Una configurazione raccomandata sar\u00e0 generata automaticamente.",
       "STATE": "Stato",
@@ -1723,6 +1947,8 @@
       "REGENERATESECRET": "Rigenera il Client Secret",
       "DEVMODE": "Modalit\u00e0 di sviluppo (DEV Mode)",
       "DEVMODEDESC": "Attenzione: Con la modalit\u00e0 di sviluppo abilitata, gli URI di reindirizzamento non saranno convalidati.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Salta la pagina di successo dopo il login",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Salta la pagina di successo dopo il login per questa applicazione nativa",
       "REDIRECT": "URI per il reindrizzamento",
       "REDIRECTSECTION": "Reindirizzamento",
       "POSTLOGOUTREDIRECT": "URI post logout",
@@ -1745,7 +1971,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -1836,6 +2063,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "Ottenere i token direttamente dall'endpoint di autorizzazione"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autorizza il dispositivo su un computer o uno smartphone."
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "La tua impostazione non corrisponde a nessun'altra opzione."
@@ -1862,8 +2093,11 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
-    "it": "Italiano",
+    "es": "Español",
     "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
     "zh": "简体中文"
   },
   "MEMBER": {

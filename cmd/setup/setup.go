@@ -2,6 +2,7 @@ package setup
 
 import (
 	"context"
+	"embed"
 	_ "embed"
 
 	"github.com/spf13/cobra"
@@ -44,6 +45,8 @@ Requirements:
 		},
 	}
 
+	cmd.AddCommand(NewCleanup())
+
 	Flags(cmd)
 
 	return cmd
@@ -66,14 +69,14 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to start eventstore")
 	migration.RegisterMappers(eventstoreClient)
 
-	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient}
-	steps.s2AssetsTable = &AssetTable{dbClient: dbClient}
+	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient.DB}
+	steps.s2AssetsTable = &AssetTable{dbClient: dbClient.DB}
 
 	steps.FirstInstance.instanceSetup = config.DefaultInstance
 	steps.FirstInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
 	steps.FirstInstance.masterKey = masterKey
-	steps.FirstInstance.db = dbClient
+	steps.FirstInstance.db = dbClient.DB
 	steps.FirstInstance.es = eventstoreClient
 	steps.FirstInstance.defaults = config.SystemDefaults
 	steps.FirstInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
@@ -81,9 +84,14 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
 
-	steps.s4EventstoreIndexes = &EventstoreIndexes{dbClient: dbClient, dbType: config.Database.Type()}
-	steps.s5LastFailed = &LastFailed{dbClient: dbClient}
-	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient}
+	steps.s4EventstoreIndexes = New04(dbClient)
+	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
+	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
+	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
+	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
+	steps.s9EventstoreIndexes2 = New09(dbClient)
+	steps.CorrectCreationDate.dbClient = dbClient
+	steps.s11AddEventCreatedAt = &AddEventCreatedAt{dbClient: dbClient, step10: steps.CorrectCreationDate}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -113,9 +121,24 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 5")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s6OwnerRemoveColumns)
 	logging.OnError(err).Fatal("unable to migrate step 6")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s7LogstoreTables)
+	logging.OnError(err).Fatal("unable to migrate step 7")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s8AuthTokens)
+	logging.OnError(err).Fatal("unable to migrate step 8")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s9EventstoreIndexes2)
+	logging.OnError(err).Fatal("unable to migrate step 9")
+	err = migration.Migrate(ctx, eventstoreClient, steps.CorrectCreationDate)
+	logging.OnError(err).Fatal("unable to migrate step 10")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s11AddEventCreatedAt)
+	logging.OnError(err).Fatal("unable to migrate step 11")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
 		logging.OnError(err).Fatalf("unable to migrate repeatable step: %s", repeatableStep.String())
 	}
+}
+
+func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
+	stmt, err := fs.ReadFile(folder + "/" + typ + "/" + filename)
+	return string(stmt), err
 }

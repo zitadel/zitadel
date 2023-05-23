@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -82,10 +83,14 @@ type InstanceSetup struct {
 		SecondFactorCheckLifetime  time.Duration
 		MultiFactorCheckLifetime   time.Duration
 	}
+	NotificationPolicy struct {
+		PasswordChange bool
+	}
 	PrivacyPolicy struct {
-		TOSLink     string
-		PrivacyLink string
-		HelpLink    string
+		TOSLink      string
+		PrivacyLink  string
+		HelpLink     string
+		SupportEmail domain.EmailAddress
 	}
 	LabelPolicy struct {
 		PrimaryColor        string
@@ -106,12 +111,15 @@ type InstanceSetup struct {
 	}
 	EmailTemplate     []byte
 	MessageTexts      []*domain.CustomMessageText
-	SMTPConfiguration *smtp.EmailConfig
+	SMTPConfiguration *smtp.Config
 	OIDCSettings      *struct {
 		AccessTokenLifetime        time.Duration
 		IdTokenLifetime            time.Duration
 		RefreshTokenIdleExpiration time.Duration
 		RefreshTokenExpiration     time.Duration
+	}
+	Quotas *struct {
+		Items []*AddQuota
 	}
 }
 
@@ -235,7 +243,8 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
-		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink, setup.PrivacyPolicy.SupportEmail),
+		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
 		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
 		prepareAddDefaultLabelPolicy(
@@ -255,6 +264,19 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareActivateDefaultLabelPolicy(instanceAgg),
 
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
+	}
+
+	if setup.Quotas != nil {
+		for _, q := range setup.Quotas.Items {
+			quotaId, err := c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+
+			quotaAggregate := quota.NewAggregate(quotaId, instanceID, instanceID)
+
+			validations = append(validations, c.AddQuotaCommand(quotaAggregate, q))
+		}
 	}
 
 	for _, msg := range setup.MessageTexts {
@@ -311,8 +333,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			validations = append(validations, prepareAddUserMachineKey(machineKey, c.machineKeySize))
 		}
 	} else if setup.Org.Human != nil {
+		setup.Org.Human.ID = userID
 		validations = append(validations,
-			AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+			c.AddHumanCommand(setup.Org.Human, orgID, c.userPasswordAlg, c.userEncryption, true),
 		)
 	}
 
