@@ -18,7 +18,7 @@ We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth
 
 ![Create app in console](/img/angular/app-create.png)
 
------============
+
 ### Redirect URIs
 
 The Redirect URIs field tells ZITADEL where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
