@@ -45,7 +45,7 @@ export default async function Page() {
                         loginName: session.factors.user.loginName,
                       })
                 }
-                className="group flex flex-row items-center border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
+                className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
               >
                 <div className="pr-4">
                   <Avatar
