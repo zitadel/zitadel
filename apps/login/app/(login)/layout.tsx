@@ -20,12 +20,14 @@ export default async function Layout({
   return (
     <div className="mx-auto flex flex-col items-center space-y-4">
       <div className="relative">
-        <Logo
-          lightSrc={branding.lightTheme?.logoUrl}
-          darkSrc={branding.darkTheme?.logoUrl}
-          height={150}
-          width={150}
-        />
+        {branding && (
+          <Logo
+            lightSrc={branding.lightTheme?.logoUrl}
+            darkSrc={branding.darkTheme?.logoUrl}
+            height={150}
+            width={150}
+          />
+        )}
       </div>
 
       <div className="w-full">{children}</div>
