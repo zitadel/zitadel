@@ -33,7 +33,7 @@ module.exports = {
     "examples/sdks",
     {
       type: "category",
-      label: "Example Applications",
+      label: "Example applications",
       items: [
         "examples/introduction",
         {
@@ -142,7 +142,7 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "Authenticate Users",
+          label: "Authenticate users",
           collapsed: true,
           items: [
             "guides/integrate/login-users",
@@ -152,7 +152,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Configure Identity Providers",
+          label: "Configure identity providers",
           link: {
             type: "generated-index",
             title: "Let users login with their preferred identity provider",
@@ -180,7 +180,7 @@ module.exports = {
           items: [
             {
               type: "category",
-              label: "Authenticate Service Users",
+              label: "Authenticate service users",
               link: {
                 type: "generated-index",
                 title: "Authenticate Service Users",
@@ -200,7 +200,7 @@ module.exports = {
             "guides/integrate/event-api",
             {
               type: "category",
-              label: "Example Code",
+              label: "Example code",
               items: [
                 "examples/call-zitadel-api/go",
                 "examples/call-zitadel-api/dot-net",
@@ -253,13 +253,13 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Solution Scenarios",
+      label: "Solution scenarios",
       link: {
         type: "generated-index",
-        title: "Solution Scenarios",
+        title: "Solution scenarios",
         slug: "guides/solution-scenarios/introduction",
         description:
-          "Customers of an SaaS Identity and Access Management System usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into Solution Scenarios which aim to help you getting started with ZITADEL.",
+          "Customers of an SaaS Identity and access management system usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into solution scenarios which aim to help you getting started with ZITADEL.",
       },
       collapsed: true,
       items: [
@@ -326,7 +326,7 @@ module.exports = {
         "support/troubleshooting",
         {
           type: 'category',
-          label: "Technical Advisory",
+          label: "Technical advisory",
           link: {
             type: 'doc',
             id: 'support/technical_advisory',
@@ -362,7 +362,7 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "Authenticated User",
+          label: "Authenticated user",
           link: {
             type: "generated-index",
             title: "Auth API",
@@ -375,7 +375,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Organization Objects",
+          label: "Organization objects",
           link: {
             type: "generated-index",
             title: "Management API",
@@ -387,7 +387,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Instance Objects",
+          label: "Instance objects",
           link: {
             type: "generated-index",
             title: "Admin API",
@@ -399,7 +399,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Instance Lifecycle",
+          label: "Instance lifecycle",
           link: {
             type: "generated-index",
             title: "System API",
@@ -413,10 +413,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "User Lifecycle (Alpha)",
+          label: "User lifecycle (alpha)",
           link: {
             type: "generated-index",
-            title: "User Service API (Alpha)",
+            title: "User service API (Alpha)",
             slug: "/apis/resources/user_service",
             description:
               "This API is intended to manage users in a ZITADEL instance.\n"+
@@ -427,10 +427,10 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Session Lifecycle (Alpha)",
+          label: "Session lifecycle (Alpha)",
           link: {
             type: "generated-index",
-            title: "Session Service API (Alpha)",
+            title: "Session service API (Alpha)",
             slug: "/apis/resources/session_service",
             description:
               "This API is intended to manage sessions in a ZITADEL instance.\n"+
@@ -441,15 +441,15 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Settings Lifecycle (Alpha)",
+          label: "Settings lifecycle (alpha)",
           link: {
             type: "generated-index",
-            title: "Settings Service API (Alpha)",
+            title: "Settings service API (Alpha)",
             slug: "/apis/resources/settings_service",
             description:
               "This API is intended to manage settings in a ZITADEL instance.\n"+
               "\n"+
-              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+              "This project is in alpha state. It can AND will continue to break until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/settings_service/sidebar.js"),
         },
@@ -502,7 +502,7 @@ module.exports = {
     },
     {
       type: "doc",
-      label: "gRPC Status Codes",
+      label: "gRPC status codes",
       id: "apis/statuscodes"
     },
     {
@@ -513,7 +513,7 @@ module.exports = {
     },
     {
       type: 'link',
-      label: 'Rate Limits (Cloud)', // The link label
+      label: 'Rate limits (cloud)', // The link label
       href: '/legal/rate-limit-policy', // The internal path
     },
   ],
@@ -553,11 +553,11 @@ module.exports = {
   legal: [
     {
       type: "category",
-      label: "Legal Agreements",
+      label: "Legal agreements",
       collapsed: false,
       link: {
         type: "generated-index",
-        title: "Legal Agreements",
+        title: "Legal agreements",
         slug: "legal",
         description:
           "This section contains important agreements, policies and appendices relevant for users of our websites and services. All documents will be provided in English language.",
@@ -567,7 +567,7 @@ module.exports = {
         "legal/data-processing-agreement",
         {
           type: "category",
-          label: "Service Description",
+          label: "Service description",
           collapsed: false,
           items: [
             "legal/cloud-service-description",
@@ -577,7 +577,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Support Program",
+          label: "Support program",
           collapsed: true,
           items: [
             "legal/terms-support-service",
