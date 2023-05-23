@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -16,6 +17,11 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 	}
 	if err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
 		return nil, err
+	}
+	if userID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 
 	linkWriteModel := NewUserIDPLinkWriteModel(userID, link.IDPConfigID, link.ExternalUserID, resourceOwner)
