@@ -197,16 +197,8 @@ func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider idp.Provide
 		session = &oauth.Session{Provider: provider.Provider, Code: code}
 	case *github.Provider:
 		session = &oauth.Session{Provider: provider.Provider, Code: code}
-	//case *github.Provider:
-	//	session = &oauth.Session{Provider: provider.Provider, Code: code}
 	case *gitlab.Provider:
 		session = &openid.Session{Provider: provider.Provider, Code: code}
-	//case domain.IDPTypeGitLabSelfHosted:
-	//	provider, err = gitlab.NewCustomFromQueryTemplate(identityProvider, callback, h.encryptionAlgorithm)
-	//	if err != nil {
-	//		return nil, nil, err
-	//	}
-	//	session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: code}
 	case *google.Provider:
 		session = &openid.Session{Provider: provider.Provider, Code: code}
 	default:

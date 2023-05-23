@@ -1586,8 +1586,6 @@ func (wm *IDPRemoveWriteModel) reduceRemoved(id string) {
 
 type IDPTypeWriteModel struct {
 	eventstore.WriteModel
-	ResourceOwner string
-	InstanceID    string
 
 	ID    string
 	Type  domain.IDPType
@@ -1596,7 +1594,6 @@ type IDPTypeWriteModel struct {
 
 func NewIDPTypeWriteModel(id string) *IDPTypeWriteModel {
 	return &IDPTypeWriteModel{
-		//WriteModel: eventstore.WriteModel{},
 		ID: id,
 	}
 }
@@ -1660,7 +1657,9 @@ func (wm *IDPTypeWriteModel) Reduce() error {
 			} else if e.Typ == domain.IDPConfigTypeJWT {
 				wm.reduceAdded(e.ConfigID, domain.IDPTypeJWT, e.Aggregate())
 			}
-		case *idpconfig.IDPConfigRemovedEvent:
+		case *instance.IDPConfigRemovedEvent:
+			wm.reduceRemoved(e.ConfigID)
+		case *org.IDPConfigRemovedEvent:
 			wm.reduceRemoved(e.ConfigID)
 		}
 	}

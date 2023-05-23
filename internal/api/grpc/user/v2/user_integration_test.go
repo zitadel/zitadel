@@ -6,16 +6,20 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -310,6 +314,89 @@ func TestServer_AddHumanUser(t *testing.T) {
 			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
 			if tt.want.GetEmailCode() != "" {
 				assert.NotEmpty(t, got.GetEmailCode())
+			}
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
+func createProvider(t *testing.T) string {
+	id, _, err := Tester.Commands.AddOrgGenericOAuthProvider(CTX, Tester.Organisation.ID, command.GenericOAuthProvider{
+		"idp",
+		"clientID",
+		"clientSecret",
+		"https://example.com/oauth/v2/authorize",
+		"https://example.com/oauth/v2/token",
+		"https://api.example.com/user",
+		[]string{"openid", "profile", "email"},
+		"id",
+		idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+		},
+	})
+	require.NoError(t, err)
+	return id
+}
+
+func TestServer_StartIdentityProviderFlow(t *testing.T) {
+	idpID := createProvider(t)
+	type args struct {
+		ctx context.Context
+		req *user.StartIdentityProviderFlowRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.StartIdentityProviderFlowResponse
+		wantErr bool
+	}{
+		{
+			name: "missing urls",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderFlowRequest{
+					IdpId: idpID,
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "next step auth url",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderFlowRequest{
+					IdpId:      idpID,
+					SuccessUrl: "https://example.com/success",
+					FailureUrl: "https://example.com/failure",
+				},
+			},
+			want: &user.StartIdentityProviderFlowResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+				NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{
+					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.StartIdentityProviderFlow(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			if nextStep := tt.want.GetNextStep(); nextStep != nil {
+				assert.True(t, strings.HasPrefix(got.GetAuthUrl(), tt.want.GetAuthUrl()))
 			}
 			integration.AssertDetails(t, tt.want, got)
 		})
