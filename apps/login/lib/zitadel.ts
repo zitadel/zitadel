@@ -121,7 +121,6 @@ export function listSessions(
 ): Promise<any | undefined> {
   const sessionService = session.getSession(server);
   const query = { offset: 0, limit: 100, asc: true };
-  console.log(ids);
   const queries = [{ idsQuery: { ids } }];
   return sessionService.listSessions({ queries: queries }, {});
 }
@@ -151,7 +150,6 @@ export function addHumanUser(
       }
     )
     .then((resp: AddHumanUserResponse) => {
-      console.log("added user", resp.userId);
       return resp.userId;
     });
 }

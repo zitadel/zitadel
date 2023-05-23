@@ -43,7 +43,6 @@ export default function UsernameForm() {
 
   function submitUsernameAndContinue(value: Inputs): Promise<boolean | void> {
     return submitUsername(value).then(({ factors }) => {
-      console.log(factors);
       return router.push(
         `/password?` +
           new URLSearchParams({ loginName: `${factors.user.loginName}` })
