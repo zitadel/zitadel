@@ -44,6 +44,27 @@ echo "${ORG_RESPONSE}" | jq
 ORG_ID=$(echo -n ${ORG_RESPONSE} | jq -r '.org.id')
 echo "Extracted default org id ${ORG_ID}"
 
+ENVIRONMENT_BACKUP_FILE=${WRITE_ENVIRONMENT_FILE}
+# If the original file already exists, rename it
+if [[ -e ${WRITE_ENVIRONMENT_FILE} ]]; then
+    if grep -q 'localhost' ${WRITE_ENVIRONMENT_FILE}; then
+      echo "Current environment file ${WRITE_ENVIRONMENT_FILE} contains localhost. Overwriting:"
+      cat ${WRITE_ENVIRONMENT_FILE}
+    else
+      i=0
+      # If a backup file already exists, increment counter until a free filename is found
+      while [[ -e ${ENVIRONMENT_BACKUP_FILE}.${i}.bak ]]; do
+          let "i++"
+          if [[ ${i} -eq 50 ]]; then
+              echo "Warning: Too many backup files (limit is 50), overwriting ${ENVIRONMENT_BACKUP_FILE}.${i}.bak"
+              break
+          fi
+      done
+      mv ${WRITE_ENVIRONMENT_FILE} ${ENVIRONMENT_BACKUP_FILE}.${i}.bak
+      echo "Renamed existing environment file to ${ENVIRONMENT_BACKUP_FILE}.${i}.bak"
+    fi
+fi
+
 echo "ZITADEL_API_URL=${AUDIENCE}
 ZITADEL_ORG_ID=${ORG_ID}
 ZITADEL_SERVICE_USER_TOKEN=${TOKEN}" > ${WRITE_ENVIRONMENT_FILE}
