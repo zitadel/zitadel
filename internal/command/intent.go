@@ -65,49 +65,22 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 		return "", nil, err
 	}
 	return id, writeModelToObjectDetails(&writeModel.WriteModel), nil
-	//
-	//identityProvider, err := s.query.IDPTemplateByID(ctx, false, req.IdpId, false)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//baseURL := c.baseURL(ctx)
-	//callbackURL := baseURL + EndpointExternalLoginCallback
-	//
-	//var provider idp.Provider
-	//switch identityProvider.Type {
-	//case domain.IDPTypeOAuth:
-	//	provider, err = oauthProvider(identityProvider, callbackURL, s.idpAlg)
-	//case domain.IDPTypeOIDC:
-	//	provider, err = oidcProvider(identityProvider, callbackURL, s.idpAlg)
-	//case domain.IDPTypeJWT:
-	//	provider, err = jwtProvider(identityProvider, s.idpAlg)
-	//case domain.IDPTypeAzureAD:
-	//	provider, err = azureProvider(identityProvider, callbackURL, s.idpAlg)
-	//case domain.IDPTypeGitHub:
-	//	provider, err = githubProvider(identityProvider, callbackURL, s.idpAlg)
-	//case domain.IDPTypeGitHubEnterprise:
-	//	provider, err = githubEnterpriseProvider(identityProvider, callbackURL, s.idpAlg)
-	//case domain.IDPTypeGitLab:
-	//	provider, err = gitlabProvider(identityProvider, callbackURL, s.idpAlg)
-	//case domain.IDPTypeGitLabSelfHosted:
-	//	provider, err = gitlabSelfHostedProvider(identityProvider, callbackURL, s.idpAlg)
-	//case domain.IDPTypeGoogle:
-	//	provider, err = googleProvider(identityProvider, callbackURL, s.idpAlg)
-	//case domain.IDPTypeLDAP:
-	//	provider, err = ldapProvider(identityProvider, callbackURL, s.idpAlg)
-	//case domain.IDPTypeUnspecified:
-	//	fallthrough
-	//default:
-	//	return nil, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented")
-	//}
-	//if err != nil {
-	//	return nil, err
-	//}
-	//intentID := gen()
-	//session, err := provider.BeginAuth(ctx, intentID) //TODO generate state
-	//if err != nil {
-	//	return nil, err
-	//}
+}
+
+func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state, callbackURL string) (string, error) {
+	writeModel, err := IDPProviderWriteModel(ctx, c.eventstore.Filter, idpID)
+	if err != nil {
+		return "", err
+	}
+	provider, err := writeModel.ToProvider(callbackURL, c.idpConfigEncryption)
+	if err != nil {
+		return "", err
+	}
+	session, err := provider.BeginAuth(ctx, state)
+	if err != nil {
+		return "", err
+	}
+	return session.GetAuthURL(), nil
 }
 
 func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel, filter preparation.FilterToQueryReducer) error {

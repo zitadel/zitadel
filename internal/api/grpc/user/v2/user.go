@@ -13,13 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/idp"
-	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
-	"github.com/zitadel/zitadel/internal/idp/providers/github"
-	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
-	"github.com/zitadel/zitadel/internal/idp/providers/google"
-	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
-	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -146,49 +139,13 @@ func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartI
 	if err != nil {
 		return nil, err
 	}
-	identityProvider, err := s.query.IDPTemplateByID(ctx, false, req.GetIdpId(), false)
-	if err != nil {
-		return nil, err
-	}
-	callbackURL := s.idpCallback(ctx)
-
-	var provider idp.Provider
-	switch identityProvider.Type {
-	case domain.IDPTypeOAuth:
-		provider, err = oauth.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeOIDC:
-		provider, err = oidc.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeJWT:
-		//provider, err = jwt.NewFromQueryTemplate(identityProvider, s.idpAlg)
-	case domain.IDPTypeAzureAD:
-		provider, err = azuread.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitHub:
-		provider, err = github.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitHubEnterprise:
-		provider, err = github.NewCustomFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitLab:
-		provider, err = gitlab.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGitLabSelfHosted:
-		provider, err = gitlab.NewCustomFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeGoogle:
-		provider, err = google.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeLDAP:
-		//provider, err = ldap.NewFromQueryTemplate(identityProvider, callbackURL, s.idpAlg)
-	case domain.IDPTypeUnspecified:
-		fallthrough
-	default:
-		return nil, errors.ThrowInvalidArgument(nil, "USer-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented")
-	}
-	if err != nil {
-		return nil, err
-	}
-	session, err := provider.BeginAuth(ctx, id)
+	authURL, err := s.command.AuthURLFromProvider(ctx, req.GetIdpId(), id, s.idpCallback(ctx))
 	if err != nil {
 		return nil, err
 	}
 	return &user.StartIdentityProviderFlowResponse{
 		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: session.GetAuthURL()},
+		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
 	}, nil
 }
 

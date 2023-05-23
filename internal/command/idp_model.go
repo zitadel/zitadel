@@ -4,11 +4,19 @@ import (
 	"reflect"
 	"time"
 
+	"golang.org/x/oauth2"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	providers "github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
+	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type OAuthIDPWriteModel struct {
@@ -131,6 +139,31 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 		changes = append(changes, idp.ChangeOAuthOptions(opts))
 	}
 	return changes, nil
+}
+
+func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	config := &oauth2.Config{
+		ClientID:     wm.ClientID,
+		ClientSecret: secret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  wm.AuthorizationEndpoint,
+			TokenURL: wm.TokenEndpoint,
+		},
+		RedirectURL: callbackURL,
+		Scopes:      wm.Scopes,
+	}
+	return oauth.New(
+		config,
+		wm.Name,
+		wm.UserEndpoint,
+		func() providers.User {
+			return oauth.NewUserMapper(wm.IDAttribute)
+		},
+	)
 }
 
 type OIDCIDPWriteModel struct {
@@ -286,6 +319,28 @@ func (wm *OIDCIDPWriteModel) reduceOIDCConfigChangedEvent(e *idpconfig.OIDCConfi
 	}
 }
 
+func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]oidc.ProviderOpts, 1, 2)
+	opts[0] = oidc.WithSelectAccount()
+	if wm.IsIDTokenMapping {
+		opts = append(opts, oidc.WithIDTokenMapping())
+	}
+	return oidc.New(
+		wm.Name,
+		wm.Issuer,
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.Scopes,
+		oidc.DefaultMapper,
+		opts...,
+	)
+}
+
 type JWTIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -421,6 +476,17 @@ func (wm *JWTIDPWriteModel) reduceJWTConfigChangedEvent(e *idpconfig.JWTConfigCh
 	if e.HeaderName != nil {
 		wm.HeaderName = *e.HeaderName
 	}
+}
+
+func (wm *JWTIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	return jwt.New(
+		wm.Name,
+		wm.Issuer,
+		wm.JWTEndpoint,
+		wm.KeysEndpoint,
+		wm.HeaderName,
+		idpAlg,
+	)
 }
 
 type AzureADIDPWriteModel struct {
@@ -1210,4 +1276,212 @@ func (wm *IDPRemoveWriteModel) reduceRemoved(id string) {
 		return
 	}
 	wm.State = domain.IDPStateRemoved
+}
+
+type IDPTypeWriteModel struct {
+	eventstore.WriteModel
+	ResourceOwner string
+	InstanceID    string
+
+	ID    string
+	Type  domain.IDPType
+	State domain.IDPState
+}
+
+func NewIDPTypeWriteModel(id string) *IDPTypeWriteModel {
+	return &IDPTypeWriteModel{
+		//WriteModel: eventstore.WriteModel{},
+		ID: id,
+	}
+}
+
+func (wm *IDPTypeWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.OAuthIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeOAuth, e.Aggregate())
+		case *idp.OIDCIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeOIDC, e.Aggregate())
+		case *idp.JWTIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeJWT, e.Aggregate())
+		case *idp.AzureADIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeAzureAD, e.Aggregate())
+		case *idp.GitHubIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGitHub, e.Aggregate())
+		case *idp.GitHubEnterpriseIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGitHubEnterprise, e.Aggregate())
+		case *idp.GitLabIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGitLab, e.Aggregate())
+		case *idp.GitLabSelfHostedIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGitLabSelfHosted, e.Aggregate())
+		case *idp.GoogleIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeGoogle, e.Aggregate())
+		case *idp.LDAPIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeLDAP, e.Aggregate())
+		case *idp.RemovedEvent:
+			wm.reduceRemoved(e.ID)
+		case *instance.IDPConfigAddedEvent:
+			if e.Typ == domain.IDPConfigTypeOIDC {
+				wm.reduceAdded(e.ConfigID, domain.IDPTypeOIDC, e.Aggregate())
+			} else if e.Typ == domain.IDPConfigTypeJWT {
+				wm.reduceAdded(e.ConfigID, domain.IDPTypeJWT, e.Aggregate())
+			}
+		case *org.IDPConfigAddedEvent:
+			if e.Typ == domain.IDPConfigTypeOIDC {
+				wm.reduceAdded(e.ConfigID, domain.IDPTypeOIDC, e.Aggregate())
+			} else if e.Typ == domain.IDPConfigTypeJWT {
+				wm.reduceAdded(e.ConfigID, domain.IDPTypeJWT, e.Aggregate())
+			}
+		case *idpconfig.IDPConfigRemovedEvent:
+			wm.reduceRemoved(e.ConfigID)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *IDPTypeWriteModel) reduceAdded(id string, t domain.IDPType, agg eventstore.Aggregate) {
+	if wm.ID != id {
+		return
+	}
+	wm.Type = t
+	wm.State = domain.IDPStateActive
+	wm.ResourceOwner = agg.ResourceOwner
+	wm.InstanceID = agg.InstanceID
+}
+
+func (wm *IDPTypeWriteModel) reduceRemoved(id string) {
+	if wm.ID != id {
+		return
+	}
+	wm.Type = domain.IDPTypeUnspecified
+	wm.State = domain.IDPStateRemoved
+	wm.ResourceOwner = ""
+	wm.InstanceID = ""
+}
+
+func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		EventTypes(
+			instance.OAuthIDPAddedEventType,
+			instance.OIDCIDPAddedEventType,
+			instance.JWTIDPAddedEventType,
+			instance.AzureADIDPAddedEventType,
+			instance.GitHubIDPAddedEventType,
+			instance.GitHubEnterpriseIDPAddedEventType,
+			instance.GitLabIDPAddedEventType,
+			instance.GitLabSelfHostedIDPAddedEventType,
+			instance.GoogleIDPAddedEventType,
+			instance.LDAPIDPAddedEventType,
+			instance.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Or().
+		AggregateTypes(org.AggregateType).
+		EventTypes(
+			org.OAuthIDPAddedEventType,
+			org.OIDCIDPAddedEventType,
+			org.JWTIDPAddedEventType,
+			org.AzureADIDPAddedEventType,
+			org.GitHubIDPAddedEventType,
+			org.GitHubEnterpriseIDPAddedEventType,
+			org.GitLabIDPAddedEventType,
+			org.GitLabSelfHostedIDPAddedEventType,
+			org.GoogleIDPAddedEventType,
+			org.LDAPIDPAddedEventType,
+			org.IDPRemovedEventType,
+		).
+		EventData(map[string]interface{}{"id": wm.ID}).
+		Or(). // old events
+		AggregateTypes(instance.AggregateType).
+		EventTypes(
+			instance.IDPConfigAddedEventType,
+			instance.IDPConfigRemovedEventType,
+		).
+		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
+		Or().
+		AggregateTypes(org.AggregateType).
+		EventTypes(
+			org.IDPConfigAddedEventType,
+			org.IDPConfigRemovedEventType,
+		).
+		EventData(map[string]interface{}{"idpConfigId": wm.ID}).
+		Builder()
+}
+
+type IDP interface {
+	eventstore.QueryReducer
+	ToProvider(string, crypto.EncryptionAlgorithm) (providers.Provider, error)
+}
+
+type AllIDPWriteModel struct {
+	model IDP
+
+	ID            string
+	IDPType       domain.IDPType
+	ResourceOwner string
+	Instance      bool
+}
+
+func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idpType domain.IDPType) *AllIDPWriteModel {
+	writeModel := &AllIDPWriteModel{
+		ID:            id,
+		IDPType:       idpType,
+		ResourceOwner: resourceOwner,
+		Instance:      instanceBool,
+	}
+
+	if instanceBool {
+		switch idpType {
+		case domain.IDPTypeOIDC:
+			writeModel.model = NewOIDCInstanceIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeJWT:
+			writeModel.model = NewJWTInstanceIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeOAuth:
+			writeModel.model = NewOAuthInstanceIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeLDAP:
+		case domain.IDPTypeAzureAD:
+		case domain.IDPTypeGitHub:
+		case domain.IDPTypeGitHubEnterprise:
+		case domain.IDPTypeGitLab:
+		case domain.IDPTypeGitLabSelfHosted:
+		case domain.IDPTypeGoogle:
+			break
+		}
+	} else {
+		switch idpType {
+		case domain.IDPTypeOIDC:
+			writeModel.model = NewOIDCOrgIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeJWT:
+			writeModel.model = NewJWTOrgIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeOAuth:
+			writeModel.model = NewOAuthOrgIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeLDAP:
+		case domain.IDPTypeAzureAD:
+		case domain.IDPTypeGitHub:
+		case domain.IDPTypeGitHubEnterprise:
+		case domain.IDPTypeGitLab:
+		case domain.IDPTypeGitLabSelfHosted:
+		case domain.IDPTypeGoogle:
+			break
+		}
+	}
+	return writeModel
+}
+
+func (wm *AllIDPWriteModel) Reduce() error {
+	return wm.model.Reduce()
+}
+
+func (wm *AllIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return wm.model.Query()
+}
+
+func (wm *AllIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	wm.model.AppendEvents(events...)
+}
+
+func (wm *AllIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	return wm.model.ToProvider(callbackURL, idpAlg)
 }
