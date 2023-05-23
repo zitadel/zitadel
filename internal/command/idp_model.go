@@ -1,16 +1,25 @@
 package command
 
 import (
+	"net/http"
 	"reflect"
 	"time"
 
+	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"golang.org/x/oauth2"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	providers "github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
+	"github.com/zitadel/zitadel/internal/idp/providers/github"
+	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
+	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idp"
@@ -156,6 +165,19 @@ func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 		RedirectURL: callbackURL,
 		Scopes:      wm.Scopes,
 	}
+	opts := make([]oauth.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		opts = append(opts, oauth.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, oauth.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, oauth.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, oauth.WithAutoUpdate())
+	}
 	return oauth.New(
 		config,
 		wm.Name,
@@ -163,6 +185,7 @@ func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 		func() providers.User {
 			return oauth.NewUserMapper(wm.IDAttribute)
 		},
+		opts...,
 	)
 }
 
@@ -324,10 +347,22 @@ func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]oidc.ProviderOpts, 1, 2)
+	opts := make([]oidc.ProviderOpts, 1, 6)
 	opts[0] = oidc.WithSelectAccount()
 	if wm.IsIDTokenMapping {
 		opts = append(opts, oidc.WithIDTokenMapping())
+	}
+	if wm.IsCreationAllowed {
+		opts = append(opts, oidc.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, oidc.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, oidc.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, oidc.WithAutoUpdate())
 	}
 	return oidc.New(
 		wm.Name,
@@ -479,6 +514,19 @@ func (wm *JWTIDPWriteModel) reduceJWTConfigChangedEvent(e *idpconfig.JWTConfigCh
 }
 
 func (wm *JWTIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	opts := make([]jwt.ProviderOpts, 0)
+	if wm.IsCreationAllowed {
+		opts = append(opts, jwt.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, jwt.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, jwt.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, jwt.WithAutoUpdate())
+	}
 	return jwt.New(
 		wm.Name,
 		wm.Issuer,
@@ -486,6 +534,7 @@ func (wm *JWTIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encrypt
 		wm.KeysEndpoint,
 		wm.HeaderName,
 		idpAlg,
+		opts...,
 	)
 }
 
@@ -593,6 +642,43 @@ func (wm *AzureADIDPWriteModel) NewChanges(
 	}
 	return changes, nil
 }
+func (wm *AzureADIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]azuread.ProviderOptions, 0, 3)
+	if wm.IsEmailVerified {
+		opts = append(opts, azuread.WithEmailVerified())
+	}
+	if wm.Tenant != "" {
+		opts = append(opts, azuread.WithTenant(azuread.TenantType(wm.Tenant)))
+	}
+	oauthOpts := make([]oauth.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		oauthOpts = append(oauthOpts, oauth.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		oauthOpts = append(oauthOpts, oauth.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		oauthOpts = append(oauthOpts, oauth.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		oauthOpts = append(oauthOpts, oauth.WithAutoUpdate())
+	}
+	if len(oauthOpts) > 0 {
+		opts = append(opts, azuread.WithOAuthOptions(oauthOpts...))
+	}
+	return azuread.New(
+		wm.Name,
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.Scopes,
+		opts...,
+	)
+}
 
 type GitHubIDPWriteModel struct {
 	eventstore.WriteModel
@@ -679,6 +765,32 @@ func (wm *GitHubIDPWriteModel) NewChanges(
 		changes = append(changes, idp.ChangeGitHubOptions(opts))
 	}
 	return changes, nil
+}
+func (wm *GitHubIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	oauthOpts := make([]oauth.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		oauthOpts = append(oauthOpts, oauth.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		oauthOpts = append(oauthOpts, oauth.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		oauthOpts = append(oauthOpts, oauth.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		oauthOpts = append(oauthOpts, oauth.WithAutoUpdate())
+	}
+	return github.New(
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.Scopes,
+		oauthOpts...,
+	)
 }
 
 type GitHubEnterpriseIDPWriteModel struct {
@@ -794,6 +906,37 @@ func (wm *GitHubEnterpriseIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
+func (wm *GitHubEnterpriseIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	oauthOpts := make([]oauth.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		oauthOpts = append(oauthOpts, oauth.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		oauthOpts = append(oauthOpts, oauth.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		oauthOpts = append(oauthOpts, oauth.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		oauthOpts = append(oauthOpts, oauth.WithAutoUpdate())
+	}
+	return github.NewCustomURL(
+		wm.Name,
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.AuthorizationEndpoint,
+		wm.TokenEndpoint,
+		wm.UserEndpoint,
+		wm.Scopes,
+		oauthOpts...,
+	)
+}
+
 type GitLabIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -879,6 +1022,33 @@ func (wm *GitLabIDPWriteModel) NewChanges(
 		changes = append(changes, idp.ChangeGitLabOptions(opts))
 	}
 	return changes, nil
+}
+
+func (wm *GitLabIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]oidc.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		opts = append(opts, oidc.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, oidc.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, oidc.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, oidc.WithAutoUpdate())
+	}
+	return gitlab.New(
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.Scopes,
+		opts...,
+	)
 }
 
 type GitLabSelfHostedIDPWriteModel struct {
@@ -976,6 +1146,35 @@ func (wm *GitLabSelfHostedIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
+func (wm *GitLabSelfHostedIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]oidc.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		opts = append(opts, oidc.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, oidc.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, oidc.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, oidc.WithAutoUpdate())
+	}
+	return gitlab.NewCustomIssuer(
+		wm.Name,
+		wm.Issuer,
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.Scopes,
+		opts...,
+	)
+}
+
 type GoogleIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -1061,6 +1260,38 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 		changes = append(changes, idp.ChangeGoogleOptions(opts))
 	}
 	return changes, nil
+}
+
+func (wm *GoogleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	errorHandler := func(w http.ResponseWriter, r *http.Request, errorType string, errorDesc string, state string) {
+		logging.Errorf("token exchanged failed: %s - %s (state: %s)", errorType, errorType, state)
+		rp.DefaultErrorHandler(w, r, errorType, errorDesc, state)
+	}
+	oidc.WithRelyingPartyOption(rp.WithErrorHandler(errorHandler))
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]oidc.ProviderOpts, 0, 4)
+	if wm.IsCreationAllowed {
+		opts = append(opts, oidc.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, oidc.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, oidc.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, oidc.WithAutoUpdate())
+	}
+	return google.New(
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.Scopes,
+		opts...,
+	)
 }
 
 type LDAPIDPWriteModel struct {
@@ -1221,6 +1452,81 @@ func (wm *LDAPIDPWriteModel) NewChanges(
 		changes = append(changes, idp.ChangeLDAPOptions(opts))
 	}
 	return changes, nil
+}
+
+func (wm *LDAPIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+	password, err := crypto.DecryptString(wm.BindPassword, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	var opts []ldap.ProviderOpts
+	if !wm.StartTLS {
+		opts = append(opts, ldap.WithoutStartTLS())
+	}
+	if wm.LDAPAttributes.IDAttribute != "" {
+		opts = append(opts, ldap.WithCustomIDAttribute(wm.LDAPAttributes.IDAttribute))
+	}
+	if wm.LDAPAttributes.FirstNameAttribute != "" {
+		opts = append(opts, ldap.WithFirstNameAttribute(wm.LDAPAttributes.FirstNameAttribute))
+	}
+	if wm.LDAPAttributes.LastNameAttribute != "" {
+		opts = append(opts, ldap.WithLastNameAttribute(wm.LDAPAttributes.LastNameAttribute))
+	}
+	if wm.LDAPAttributes.DisplayNameAttribute != "" {
+		opts = append(opts, ldap.WithDisplayNameAttribute(wm.LDAPAttributes.DisplayNameAttribute))
+	}
+	if wm.LDAPAttributes.NickNameAttribute != "" {
+		opts = append(opts, ldap.WithNickNameAttribute(wm.LDAPAttributes.NickNameAttribute))
+	}
+	if wm.LDAPAttributes.PreferredUsernameAttribute != "" {
+		opts = append(opts, ldap.WithPreferredUsernameAttribute(wm.LDAPAttributes.PreferredUsernameAttribute))
+	}
+	if wm.LDAPAttributes.EmailAttribute != "" {
+		opts = append(opts, ldap.WithEmailAttribute(wm.LDAPAttributes.EmailAttribute))
+	}
+	if wm.LDAPAttributes.EmailVerifiedAttribute != "" {
+		opts = append(opts, ldap.WithEmailVerifiedAttribute(wm.LDAPAttributes.EmailVerifiedAttribute))
+	}
+	if wm.LDAPAttributes.PhoneAttribute != "" {
+		opts = append(opts, ldap.WithPhoneAttribute(wm.LDAPAttributes.PhoneAttribute))
+	}
+	if wm.LDAPAttributes.PhoneVerifiedAttribute != "" {
+		opts = append(opts, ldap.WithPhoneVerifiedAttribute(wm.LDAPAttributes.PhoneVerifiedAttribute))
+	}
+	if wm.LDAPAttributes.PreferredLanguageAttribute != "" {
+		opts = append(opts, ldap.WithPreferredLanguageAttribute(wm.LDAPAttributes.PreferredLanguageAttribute))
+	}
+	if wm.LDAPAttributes.AvatarURLAttribute != "" {
+		opts = append(opts, ldap.WithAvatarURLAttribute(wm.LDAPAttributes.AvatarURLAttribute))
+	}
+	if wm.LDAPAttributes.ProfileAttribute != "" {
+		opts = append(opts, ldap.WithProfileAttribute(wm.LDAPAttributes.ProfileAttribute))
+	}
+	if wm.IsCreationAllowed {
+		opts = append(opts, ldap.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, ldap.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, ldap.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, ldap.WithAutoUpdate())
+	}
+	return ldap.New(
+		wm.Name,
+		wm.Servers,
+		wm.BaseDN,
+		wm.BindDN,
+		password,
+		wm.UserBase,
+		wm.UserObjectClasses,
+		wm.UserFilters,
+		wm.Timeout,
+		callbackURL,
+		opts...,
+	), nil
 }
 
 type IDPRemoveWriteModel struct {
@@ -1424,7 +1730,7 @@ type AllIDPWriteModel struct {
 	Instance      bool
 }
 
-func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idpType domain.IDPType) *AllIDPWriteModel {
+func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idpType domain.IDPType) (*AllIDPWriteModel, error) {
 	writeModel := &AllIDPWriteModel{
 		ID:            id,
 		IDPType:       idpType,
@@ -1441,13 +1747,23 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 		case domain.IDPTypeOAuth:
 			writeModel.model = NewOAuthInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeLDAP:
+			writeModel.model = NewLDAPInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeAzureAD:
+			writeModel.model = NewAzureADInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGitHub:
+			writeModel.model = NewGitHubInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGitHubEnterprise:
+			writeModel.model = NewGitHubEnterpriseInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGitLab:
+			writeModel.model = NewGitLabInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGitLabSelfHosted:
+			writeModel.model = NewGitLabSelfHostedInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGoogle:
-			break
+			writeModel.model = NewGoogleInstanceIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeUnspecified:
+			fallthrough
+		default:
+			return nil, errors.ThrowInternal(nil, "COMMAND-xw921211", "Errors.IDPConfig.NotExisting")
 		}
 	} else {
 		switch idpType {
@@ -1458,16 +1774,26 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 		case domain.IDPTypeOAuth:
 			writeModel.model = NewOAuthOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeLDAP:
+			writeModel.model = NewLDAPOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeAzureAD:
+			writeModel.model = NewAzureADOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGitHub:
+			writeModel.model = NewGitHubOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGitHubEnterprise:
+			writeModel.model = NewGitHubEnterpriseOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGitLab:
+			writeModel.model = NewGitLabOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGitLabSelfHosted:
+			writeModel.model = NewGitLabSelfHostedOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeGoogle:
-			break
+			writeModel.model = NewGoogleOrgIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeUnspecified:
+			fallthrough
+		default:
+			return nil, errors.ThrowInternal(nil, "COMMAND-xw921111", "Errors.IDPConfig.NotExisting")
 		}
 	}
-	return writeModel
+	return writeModel, nil
 }
 
 func (wm *AllIDPWriteModel) Reduce() error {
