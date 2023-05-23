@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -19,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
@@ -214,6 +216,11 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 		}
 	}
 	return &user.RetrieveIdentityProviderInformationResponse{
+		Details: &object_pb.Details{
+			Sequence:      intent.ProcessedSequence,
+			ChangeDate:    timestamppb.New(intent.ChangeDate),
+			ResourceOwner: intent.ResourceOwner,
+		},
 		IdpInformation: &user.IDPInformation{
 			Access: &user.IDPInformation_Oauth{
 				Oauth: &user.IDPOAuthAccessInformation{
