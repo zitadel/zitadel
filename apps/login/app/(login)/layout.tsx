@@ -21,8 +21,8 @@ export default async function Layout({
     <div className="mx-auto flex flex-col items-center space-y-4">
       <div className="relative">
         <Logo
-          lightSrc={branding.lightTheme?.logoUrl ?? "/zitadel-logo-dark.svg"}
-          darkSrc={branding.darkTheme?.logoUrl ?? "/zitadel-logo-light.svg"}
+          lightSrc={branding.lightTheme?.logoUrl}
+          darkSrc={branding.darkTheme?.logoUrl}
           height={150}
           width={150}
         />
