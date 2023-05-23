@@ -2,25 +2,18 @@ import { listSessions, server } from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
 import { Avatar } from "#/ui/Avatar";
 import { getAllSessionIds } from "#/utils/cookies";
-import {
-  ExclamationTriangleIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/outline";
+import { UserPlusIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
 
 async function loadSessions() {
-  const ids = await getAllSessionIds().catch((error) => {
-    console.log("err", error);
-  });
+  const ids = await getAllSessionIds();
 
   if (ids && ids.length) {
     return listSessions(
       server,
       ids.filter((id: string | undefined) => !!id)
-    ).then((sessions) => {
-      return sessions;
-    });
+    );
   } else {
     return [];
   }
@@ -38,7 +31,6 @@ export default async function Page() {
         {sessions ? (
           sessions.map((session: any, index: number) => {
             const validPassword = session.factors.password?.verifiedAt;
-            console.log(session);
             return (
               <Link
                 key={"session-" + index}
@@ -91,6 +83,14 @@ export default async function Page() {
         ) : (
           <Alert>No Sessions available!</Alert>
         )}
+        <Link href="/username">
+          <div className="flex flex-row items-center py-3 px-4 hover:bg-black/10 dark:hover:bg-white/10 rounded-md">
+            <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">
+              <UserPlusIcon className="h-5 w-5" />
+            </div>
+            <span className="text-sm">Add another account</span>
+          </div>
+        </Link>
       </div>
     </div>
   );

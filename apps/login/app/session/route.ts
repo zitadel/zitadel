@@ -45,35 +45,42 @@ export async function PUT(request: NextRequest) {
     const { password } = body;
 
     const recent = await getMostRecentSessionCookie();
-    const session = await setSession(server, recent.id, recent.token, password);
 
-    const sessionCookie: SessionCookie = {
-      id: recent.id,
-      token: session.sessionToken,
-      changeDate: session.details.changeDate,
-      loginName: recent.loginName,
-    };
-
-    return getSession(server, sessionCookie.id, sessionCookie.token).then(
-      ({ session }) => {
-        const newCookie: SessionCookie = {
-          id: sessionCookie.id,
-          token: sessionCookie.token,
-          changeDate: session.changeDate,
-          loginName: session.factors.user.loginName,
+    return setSession(server, recent.id, recent.token, password)
+      .then((session) => {
+        const sessionCookie: SessionCookie = {
+          id: recent.id,
+          token: session.sessionToken,
+          changeDate: session.details.changeDate,
+          loginName: recent.loginName,
         };
 
-        return updateSessionCookie(sessionCookie.id, sessionCookie)
-          .then(() => {
-            console.log("updatedRecent:", sessionCookie);
-            return NextResponse.json({ factors: session.factors });
-          })
-          .catch((error) => {
-            console.error("errr", error);
-            return NextResponse.json(error, { status: 500 });
-          });
-      }
-    );
+        return getSession(server, sessionCookie.id, sessionCookie.token).then(
+          ({ session }) => {
+            const newCookie: SessionCookie = {
+              id: sessionCookie.id,
+              token: sessionCookie.token,
+              changeDate: session.changeDate,
+              loginName: session.factors.user.loginName,
+            };
+
+            return updateSessionCookie(sessionCookie.id, newCookie)
+              .then(() => {
+                return NextResponse.json({ factors: session.factors });
+              })
+              .catch((error) => {
+                return NextResponse.json(
+                  { details: "could not set cookie" },
+                  { status: 500 }
+                );
+              });
+          }
+        );
+      })
+      .catch((error) => {
+        console.error("erasd", error);
+        return NextResponse.json(error, { status: 500 });
+      });
   } else {
     return NextResponse.error();
   }
