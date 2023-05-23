@@ -339,6 +339,8 @@ Please refer to the [README](./docs/README.md) for more information and local te
 - **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
 - **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
+Following the [Google style guide](https://developers.google.com/style) is highly recommended. Its clear and concise guidelines ensure consistency and effective communication within the wider developer community.
+
 ### Docs Pull Request
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
 Scope can be left empty (omit the brackets) or refer to the top navigation sections.
