@@ -27,7 +27,7 @@ export default async function Page() {
       <h1>Accounts</h1>
       <p className="ztdl-p mb-6 block">Use your ZITADEL Account</p>
 
-      <div className="flex flex-col w-full space-y-1">
+      <div className="flex flex-col w-full space-y-2">
         {sessions ? (
           sessions.map((session: any, index: number) => {
             const validPassword = session.factors.password?.verifiedAt;
@@ -45,7 +45,7 @@ export default async function Page() {
                         loginName: session.factors.user.loginName,
                       })
                 }
-                className="group flex flex-row items-center hover:bg-black/10 dark:hover:bg-white/10 py-3 px-4 rounded-md"
+                className="group flex flex-row items-center border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
               >
                 <div className="pr-4">
                   <Avatar
@@ -84,7 +84,7 @@ export default async function Page() {
           <Alert>No Sessions available!</Alert>
         )}
         <Link href="/username">
-          <div className="flex flex-row items-center py-3 px-4 hover:bg-black/10 dark:hover:bg-white/10 rounded-md">
+          <div className="flex flex-row items-center py-3 px-4 hover:bg-black/10 dark:hover:bg-white/10 rounded-md transition-all">
             <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">
               <UserPlusIcon className="h-5 w-5" />
             </div>
