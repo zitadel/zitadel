@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 )
 
@@ -67,12 +68,16 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	return id, writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state, callbackURL string) (string, error) {
+func (c *Commands) GetProvider(ctx context.Context, idpID, callbackURL string) (idp.Provider, error) {
 	writeModel, err := IDPProviderWriteModel(ctx, c.eventstore.Filter, idpID)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	provider, err := writeModel.ToProvider(callbackURL, c.idpConfigEncryption)
+	return writeModel.ToProvider(callbackURL, c.idpConfigEncryption)
+}
+
+func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state, callbackURL string) (string, error) {
+	provider, err := c.GetProvider(ctx, idpID, callbackURL)
 	if err != nil {
 		return "", err
 	}
