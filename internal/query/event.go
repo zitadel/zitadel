@@ -2,10 +2,7 @@ package query
 
 import (
 	"context"
-	"encoding/json"
 	"time"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -86,12 +83,6 @@ func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event, user
 		users[event.Creator()] = editor
 	}
 
-	payload := make(map[string]any)
-	err = event.Unmarshal(&payload)
-	logging.OnError(err).Debug("unmarshal failed")
-	data, err := json.Marshal(payload)
-	logging.OnError(err).Debug("marshal failed")
-
 	return &Event{
 		Editor: &EventEditor{
 			ID:                event.Creator(),
@@ -104,7 +95,7 @@ func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event, user
 		Sequence:     event.Sequence(),
 		CreationDate: event.CreatedAt(),
 		Type:         string(event.Type()),
-		Payload:      data,
+		Payload:      event.DataAsBytes(),
 	}
 }
 

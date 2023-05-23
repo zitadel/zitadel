@@ -21,13 +21,21 @@ func (es *Eventstore) Push(ctx context.Context, commands ...Command) (_ []Event,
 		err = tx.Commit()
 	}()
 	sequences, err := latestSequences(ctx, tx, commands)
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := insertEvents(ctx, tx, sequences, commands)
+	if err != nil {
+		return nil, err
+	}
 
 	err = handleUniqueConstraints(ctx, tx, commands)
 	if err != nil {
 		return nil, err
 	}
 
-	return insertEvents(ctx, tx, sequences, commands)
+	return events, nil
 }
 
 //go:embed push.sql
