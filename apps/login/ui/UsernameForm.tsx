@@ -32,12 +32,10 @@ export default function UsernameForm() {
       }),
     });
 
+    setLoading(false);
     if (!res.ok) {
-      setLoading(false);
       throw new Error("Failed to set user");
     }
-
-    setLoading(false);
     return res.json();
   }
 
