@@ -1,5 +1,4 @@
 import { BrandingSettings } from "@zitadel/server";
-import { ZitadelLogo } from "#/ui/ZitadelLogo";
 import React from "react";
 import { getBrandingSettings, server } from "#/lib/zitadel";
 import { Logo } from "#/ui/Logo";
@@ -9,7 +8,7 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const branding: BrandingSettings = await getBrandingSettings(server);
+  const branding = await getBrandingSettings(server);
   let partial: Partial<BrandingSettings> | undefined;
   if (branding) {
     partial = {
