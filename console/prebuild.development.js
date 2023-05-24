@@ -1,12 +1,17 @@
 var fs = require('fs');
 var path = require('path')
+var http = require('http');
 var https = require('https');
+var urlModule = require('url');
 
 var defaultEnvironmentJsonURL = 'http://localhost:8080/ui/console/assets/environment.json'
 var devEnvFile = path.join(__dirname, "src", "assets", "environment.json")
 var url = process.env["ENVIRONMENT_JSON_URL"] || defaultEnvironmentJsonURL;
 
-https.get(url, function (res) {
+var protocol = urlModule.parse(url).protocol;
+var getter = protocol === 'https:' ? https.get : http.get;
+
+getter(url, function (res) {
     var body = '';
 
     res.on('data', function (chunk) {
