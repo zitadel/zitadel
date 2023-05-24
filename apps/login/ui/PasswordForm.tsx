@@ -42,15 +42,12 @@ export default function PasswordForm({ loginName }: Props) {
 
     const response = await res.json();
 
+    setLoading(false);
     if (!res.ok) {
-      setLoading(false);
-      console.log(response);
       setError(response.details);
       return Promise.reject(response.details);
-    } else {
-      setLoading(false);
-      return response;
     }
+    return response;
   }
 
   function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
