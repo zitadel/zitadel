@@ -1,20 +1,30 @@
 # ZITADEL typescript with Turborepo and Changesets
 
-This is an monorepo containing all typescript/javascript packages and applications for ZITADEL. Versioning and package publishing is handled by [Changesets](https://github.com/changesets/changesets) and fully automated with GitHub Actions.
+This repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL Login UI.
+The repo makes use of the [build system Turbo](https://turbo.build/repo) and the [Changesets CLI for versioning the packages](https://github.com/changesets/changesets).
 
 **⚠️ This repo and packages are in alpha state and subject to change ⚠️**
 
 The scope of functionality of this repo and packages is limited and under active development.
 Once the package structure is set and all APIs are fully implemented we'll move this repo to beta state.
-You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute. Questions can be raised in our [Discord Channel](https://discord.gg/erh5Brh7jE) or as an issue in this repo.
+You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
+Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as a [GitHub issue](https://github.com/zitadel/typescript/issues).
 
-## What's inside?
+## Developing Your Own ZITADEL Login UI
 
-This Turborepo includes the following:
+We think the easiest path of getting up and running, is the following:
 
-### Apps and Packages
+1. Fork and clone this repository
+1. [Run the ZITADEL Cloud login UI locally](#run-login-ui)
+1. Make changes to the code and see the effects live on your local machine
+1. Study the rest of this README.md and get familiar and comfortable with how everything works.
+1. Decide on a way of how you want to build and run your login UI.
+   You can reuse ZITADEL Clouds way.
+   But if you need more freedom, you can also import the packages you need into your self built application.
 
-- `login`: The new login UI powered by Next.js
+## Included Apps And Packages
+
+- `login`: The login UI used by ZITADEL Cloud, powered by Next.js
 - `@zitadel/server`: core components for establishing node client connection, grpc stub
 - `@zitadel/client`: core components for establishing web client connection, grpc stub
 - `@zitadel/react`: shared React utilities and components built with tailwindcss
@@ -24,15 +34,13 @@ This Turborepo includes the following:
 
 Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
 
-### Utilities
-
-This repo has some additional tools:
+## Tooling
 
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
 - [ESLint](https://eslint.org/) for code linting
 - [Prettier](https://prettier.io) for code formatting
 
-### Useful commands
+## Useful Commands
 
 - `pnpm generate` - Build proto stubs for server and client package
 - `pnpm build` - Build all packages and the login app
@@ -41,17 +49,18 @@ This repo has some additional tools:
 - `pnpm changeset` - Generate a changeset
 - `pnpm clean` - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
 
-## Versioning and Publishing packages
+## Versioning And Publishing Packages
 
-Package publishing has been configured using [Changesets](https://github.com/changesets/changesets). Here is their [documentation](https://github.com/changesets/changesets#documentation) for more information about the workflow.
+Package publishing has been configured using [Changesets](https://github.com/changesets/changesets).
+Here is their [documentation](https://github.com/changesets/changesets#documentation) for more information about the workflow.
 
 The [GitHub Action](https://github.com/changesets/action) needs an `NPM_TOKEN` and `GITHUB_TOKEN` in the repository settings. The [Changesets bot](https://github.com/apps/changeset-bot) should also be installed on the GitHub repository.
 
 Read the [changesets documentation](https://github.com/changesets/changesets/blob/main/docs/automating-changesets.md) for more information about this automation
 
-### npm
+### NPM
 
-If you want to publish package to the public npm registry and make them publicly available, this is already setup.
+If you want to publish a package to the public npm registry and make them publicly available, this is already setup.
 
 To publish packages to a private npm organization scope, **remove** the following from each of the `package.json`'s
 
@@ -63,13 +72,7 @@ To publish packages to a private npm organization scope, **remove** the followin
 
 ### GitHub Package Registry
 
-See [Working with the npm registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#publishing-a-package-using-publishconfig-in-the-packagejson-file)
-
-### TODOs
-
-- Buf setup to get grpc stub in the core package
-- Decide whether a seperate client package is required to expose public client convenience methods only or generate a grpc-web output there
-- Fix #/\* path in login application
+See [working with the npm registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#publishing-a-package-using-publishconfig-in-the-packagejson-file)
 
 ### Run Login UI
 
