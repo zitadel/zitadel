@@ -11,7 +11,7 @@ interface AvatarProps {
   shadow?: boolean;
 }
 
-function getCredentials(name: string, loginName: string) {
+function getInitials(name: string, loginName: string) {
   let credentials = "";
   if (name) {
     const split = name.split(" ");
@@ -47,7 +47,7 @@ export function Avatar({
   shadow,
 }: AvatarProps) {
   const { resolvedTheme } = useTheme();
-  const credentials = getCredentials(name ?? loginName, loginName);
+  const credentials = getInitials(name ?? loginName, loginName);
 
   const color: ColorShade = getColorHash(loginName);
 
