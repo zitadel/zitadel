@@ -9,7 +9,6 @@ CONTRIBUTING.md
 LICENSE
 README.md
 SECURITY.md
-**/.dockerignore
 **/Dockerfile
 **/*.Dockerfile
 pkg/grpc/*/*.pb.*
