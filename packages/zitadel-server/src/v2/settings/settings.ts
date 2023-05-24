@@ -8,7 +8,6 @@ import {
 import { ZitadelServer, createClient, getServers } from "../../server";
 
 export const getSettings = (server?: string | ZitadelServer) => {
-  console.log("init settings");
   let config;
   if (server && typeof server === "string") {
     const apps = getServers();
