@@ -9,6 +9,15 @@ export type SessionCookie = {
   changeDate: string;
 };
 
+function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
+    // @ts-ignore
+  return cookiesList.set({
+    name: "sessions",
+    value: JSON.stringify(sessions),
+    httpOnly: true,
+    path: "/",
+  });
+}
 export async function addSessionToCookie(session: SessionCookie): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -27,13 +36,7 @@ export async function addSessionToCookie(session: SessionCookie): Promise<any> {
     currentSessions = [...currentSessions, session];
   }
 
-  // @ts-ignore
-  return cookiesList.set({
-    name: "sessions",
-    value: JSON.stringify(currentSessions),
-    httpOnly: true,
-    path: "/",
-  });
+  setSessionHttpOnlyCookie(value: string);
 }
 
 export async function updateSessionCookie(
@@ -51,13 +54,7 @@ export async function updateSessionCookie(
   const foundIndex = sessions.findIndex((session) => session.id === id);
   sessions[foundIndex] = session;
 
-  // @ts-ignore
-  return cookiesList.set({
-    name: "sessions",
-    value: JSON.stringify(sessions),
-    httpOnly: true,
-    path: "/",
-  });
+  return setSessionHttpOnlyCookie(sessions);
 }
 
 export async function removeSessionFromCookie(
@@ -72,13 +69,7 @@ export async function removeSessionFromCookie(
 
   const filteredSessions = sessions.filter((s) => s.id !== session.id);
 
-  // @ts-ignore
-  return cookiesList.set({
-    name: "sessions",
-    value: JSON.stringify(filteredSessions),
-    httpOnly: true,
-    path: "/",
-  });
+  return setSessionHttpOnlyCookie(filteredSessions);
 }
 
 export async function getMostRecentSessionCookie(): Promise<any> {
