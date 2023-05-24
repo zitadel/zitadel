@@ -7,11 +7,9 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
-	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
@@ -100,28 +98,6 @@ func New(name, clientID, clientSecret, redirectURI string, scopes []string, opts
 	}
 	provider.Provider = rp
 	return provider, nil
-}
-
-func NewFromQueryTemplate(template *query.IDPTemplate, callbackURL string, idpAlg crypto.EncryptionAlgorithm) (*Provider, error) {
-	secret, err := crypto.DecryptString(template.AzureADIDPTemplate.ClientSecret, idpAlg)
-	if err != nil {
-		return nil, err
-	}
-	opts := make([]ProviderOptions, 0, 2)
-	if template.AzureADIDPTemplate.IsEmailVerified {
-		opts = append(opts, WithEmailVerified())
-	}
-	if template.AzureADIDPTemplate.Tenant != "" {
-		opts = append(opts, WithTenant(TenantType(template.AzureADIDPTemplate.Tenant)))
-	}
-	return New(
-		template.Name,
-		template.AzureADIDPTemplate.ClientID,
-		secret,
-		callbackURL,
-		template.AzureADIDPTemplate.Scopes,
-		opts...,
-	)
 }
 
 func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes []string) *oauth2.Config {

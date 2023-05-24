@@ -6,9 +6,7 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
-	"github.com/zitadel/zitadel/internal/query"
 )
 
 var _ idp.Provider = (*Provider)(nil)
@@ -99,27 +97,6 @@ func New(name, issuer, clientID, clientSecret, redirectURI string, scopes []stri
 		return nil, err
 	}
 	return provider, nil
-}
-
-func NewFromQueryTemplate(template *query.IDPTemplate, callbackURL string, idpAlg crypto.EncryptionAlgorithm) (*Provider, error) {
-	secret, err := crypto.DecryptString(template.OIDCIDPTemplate.ClientSecret, idpAlg)
-	if err != nil {
-		return nil, err
-	}
-	opts := make([]ProviderOpts, 1, 2)
-	opts[0] = WithSelectAccount()
-	if template.OIDCIDPTemplate.IsIDTokenMapping {
-		opts = append(opts, WithIDTokenMapping())
-	}
-	return New(template.Name,
-		template.OIDCIDPTemplate.Issuer,
-		template.OIDCIDPTemplate.ClientID,
-		secret,
-		callbackURL,
-		template.OIDCIDPTemplate.Scopes,
-		DefaultMapper,
-		opts...,
-	)
 }
 
 // setDefaultScope ensures that at least openid ist set

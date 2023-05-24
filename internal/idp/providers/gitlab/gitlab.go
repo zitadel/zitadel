@@ -3,10 +3,8 @@ package gitlab
 import (
 	openid "github.com/zitadel/oidc/v2/pkg/oidc"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
-	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
@@ -44,32 +42,4 @@ func NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI string, s
 	return &Provider{
 		Provider: rp,
 	}, nil
-}
-
-func NewFromQueryTemplate(template *query.IDPTemplate, callbackURL string, idpAlg crypto.EncryptionAlgorithm) (*Provider, error) {
-	secret, err := crypto.DecryptString(template.GitLabIDPTemplate.ClientSecret, idpAlg)
-	if err != nil {
-		return nil, err
-	}
-	return New(
-		template.GitLabIDPTemplate.ClientID,
-		secret,
-		callbackURL,
-		template.GitLabIDPTemplate.Scopes,
-	)
-}
-
-func NewCustomFromQueryTemplate(template *query.IDPTemplate, callbackURL string, idpAlg crypto.EncryptionAlgorithm) (*Provider, error) {
-	secret, err := crypto.DecryptString(template.GitLabSelfHostedIDPTemplate.ClientSecret, idpAlg)
-	if err != nil {
-		return nil, err
-	}
-	return NewCustomIssuer(
-		template.Name,
-		template.GitLabSelfHostedIDPTemplate.Issuer,
-		template.GitLabSelfHostedIDPTemplate.ClientID,
-		secret,
-		callbackURL,
-		template.GitLabSelfHostedIDPTemplate.Scopes,
-	)
 }
