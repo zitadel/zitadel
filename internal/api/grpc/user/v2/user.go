@@ -185,8 +185,7 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 					IdToken:     idToken,
 				},
 			},
-			IdpInformation:      intent.IDPUser,
-			IdpInformationPlain: string(intent.IDPUser),
+			IdpInformation: intent.IDPUser,
 		},
 	}, nil
 }
