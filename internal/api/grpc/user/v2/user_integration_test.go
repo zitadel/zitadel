@@ -76,7 +76,7 @@ func createIntent(t *testing.T, idpID string) string {
 	return id
 }
 
-func createSuccessfulIntent(t *testing.T, idpID string) (string, string, time.Time) {
+func createSuccessfulIntent(t *testing.T, idpID string) (string, string, time.Time, uint64) {
 	ctx := authz.WithInstance(context.Background(), Tester.Instance)
 	intentID := createIntent(t, idpID)
 	writeModel, err := Tester.Commands.GetIntentWriteModel(ctx, intentID, Tester.Organisation.ID)
@@ -96,7 +96,7 @@ func createSuccessfulIntent(t *testing.T, idpID string) (string, string, time.Ti
 	}
 	token, err := Tester.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, "")
 	require.NoError(t, err)
-	return intentID, token, writeModel.ChangeDate
+	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
 func TestServer_AddHumanUser(t *testing.T) {
@@ -623,7 +623,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 	idpID := createProvider(t)
 	intentID := createIntent(t, idpID)
-	successfulID, token, changeDate := createSuccessfulIntent(t, idpID)
+	successfulID, token, changeDate, sequence := createSuccessfulIntent(t, idpID)
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderInformationRequest
@@ -669,6 +669,7 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(changeDate),
 					ResourceOwner: Tester.Organisation.ID,
+					Sequence:      sequence,
 				},
 				IdpInformation: &user.IDPInformation{
 					Access: &user.IDPInformation_Oauth{
@@ -692,7 +693,7 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			integration.AssertDetails(t, tt.want, got)
+			require.Equal(t, tt.want.GetDetails(), got.GetDetails())
 			require.Equal(t, tt.want.GetIdpInformation(), got.GetIdpInformation())
 		})
 	}

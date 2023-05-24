@@ -130,7 +130,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	if err != nil {
 		return "", err
 	}
-	_, err = c.eventstore.Push(ctx, cmd)
+	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
 	if err != nil {
 		return "", err
 	}
