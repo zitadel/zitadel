@@ -465,6 +465,15 @@ Errors:
     Terminated: セッションはすでに終了しています
     Token:
       Invalid: セッショントークンが無効です
+  Intent:
+    IDPMissing: リクエストにIDP IDが含まれていません
+    SuccessURLMissing: リクエストに成功時の URL がありません
+    FailureURLMissing: リクエストに失敗の URL がありません
+    StateMissing: リクエストに State パラメータがありません
+    NotStarted: インテントが開始されなかったか、既に終了している
+    NotSucceeded: インテントが成功しなかった
+    TokenCreationFailed: トークンの作成に失敗しました
+    InvalidToken: インテントのトークンが無効である
 
 AggregateTypes:
   action: アクション

@@ -80,7 +80,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				failureURL: "https://failure.url",
 			},
 			res{
-				err: z_errors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.Invalid"),
+				err: z_errors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing"),
 			},
 		},
 		{
@@ -96,7 +96,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				failureURL: "https://failure.url",
 			},
 			res{
-				err: z_errors.ThrowInvalidArgument(nil, "COMMAND-x8j3bk", "Errors.Intent.Invalid"),
+				err: z_errors.ThrowInvalidArgument(nil, "COMMAND-x8j3bk", "Errors.Intent.SuccessURLMissing"),
 			},
 		},
 		{
@@ -112,7 +112,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				failureURL: ":",
 			},
 			res{
-				err: z_errors.ThrowInvalidArgument(nil, "COMMAND-x8j4bk", "Errors.Intent.Invalid"),
+				err: z_errors.ThrowInvalidArgument(nil, "COMMAND-x8j4bk", "Errors.Intent.FailureURLMissing"),
 			},
 		},
 		{

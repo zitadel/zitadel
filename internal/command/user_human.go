@@ -58,7 +58,7 @@ type AddHuman struct {
 	Register               bool
 	Metadata               []*AddMetadataEntry
 
-	//Links is optional
+	// Links are optional
 	Links []*AddLink
 
 	// Details are set after a successful execution of the command

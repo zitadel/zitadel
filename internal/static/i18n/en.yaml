@@ -477,9 +477,14 @@ Errors:
     Token:
       Invalid: Session Token is invalid
   Intent:
+    IDPMissing: IDP ID is missing in the request
+    SuccessURLMissing: Success URL is missing in the request
+    FailureURLMissing: Failure URL is missing in the request
     StateMissing: State parameter is missing in the request
-    NotStarted: Intent is not started or already terminated
+    NotStarted: Intent is not started or was already terminated
+    NotSucceeded: Intent has not succeeded
     TokenCreationFailed: Token creation failed
+    InvalidToken: Intent Token is invalid
 
 AggregateTypes:
   action: Action

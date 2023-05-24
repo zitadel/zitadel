@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	StartedEventType   eventstore.EventType = "idpintent.started"
-	SucceededEventType eventstore.EventType = "idpintent.succeeded"
-	FailedEventType    eventstore.EventType = "idpintent.failed"
+	StartedEventType   = instanceEventTypePrefix + "started"
+	SucceededEventType = instanceEventTypePrefix + "succeeded"
+	FailedEventType    = instanceEventTypePrefix + "failed"
 )
 
 type StartedEvent struct {
