@@ -67,6 +67,7 @@ Errors:
     NoChanges: 未发现任何更改
     InitCodeNotFound: 未找到初始化验证码
     UsernameNotChanged: 用户名未更改
+    InvalidURLTemplate: URL模板无效
     Profile:
       NotFound: 未找到个人资料
       NotChanged: 个人资料未更改
@@ -81,7 +82,6 @@ Errors:
       NotChanged: 电子邮件未更改
       Empty: 电子邮件是空的
       IDMissing: 电子邮件ID丢失
-      InvalidURLTemplate: URL模板无效
     Phone:
       NotFound: 手机号码未找到
       Invalid: 手机号码无效

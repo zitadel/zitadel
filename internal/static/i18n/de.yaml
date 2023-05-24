@@ -67,6 +67,7 @@ Errors:
     NoChanges: Keine Änderungen gefunden
     InitCodeNotFound: Kein Initialisierungs-Code gefunden
     UsernameNotChanged: Benutzername wurde nicht verändert
+    InvalidURLTemplate: URL Template ist ungültig
     Profile:
       NotFound: Profil nicht gefunden
       NotChanged: Profil nicht verändert
@@ -81,7 +82,6 @@ Errors:
       NotChanged: Email wurde nicht geändert
       Empty: Email ist leer
       IDMissing: Email ID fehlt
-      InvalidURLTemplate: URL Template ist ungültig
     Phone:
       NotFound: Telefonnummer nicht gefunden
       Invalid: Telefonnummer ist ungültig
