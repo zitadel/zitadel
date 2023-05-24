@@ -849,7 +849,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
-        - "user.passkey.write" #???
+        - "user.passkey.write"
         - "project.read"
         - "project.member.read"
         - "project.role.read"
