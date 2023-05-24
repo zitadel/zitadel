@@ -1,10 +1,16 @@
 ## Postgres
 
 :::caution
-Postgres extension is currently in beta.
+PostgreSQL extension is currently in [Beta](/docs/support/software-release-cycles-support#beta).
+Beta state will be removed as soon as automated tests are implemented. [Github Issue](https://github.com/zitadel/zitadel/issues/5741)
+:::
+
+:::caution
+Be aware that PostgreSQL is only [Enterprise Supported](/docs/support/software-release-cycles-support#partially-supported).
 :::
 
 If you want to use a PostgreSQL database instead of CockroachDB you can [overwrite the default configuration](../configure/configure.mdx).
+Make sure to read our [Production Guide](./self-hosting/manage/production#prefer-cockroachdb) before you decide to use it.
 
 Currently versions >= 14 are supported.
 

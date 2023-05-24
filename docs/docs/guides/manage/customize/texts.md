@@ -5,6 +5,7 @@ title: Customized Texts
 You are able to customize the texts used from ZITADEL. This is possibly on the instance or organization level.
 
 ## Message Texts
+
 Sometimes the users will get an email or phone message from ZITADEL (e.g Password Reset Request).
 ZITADEL already has some good standard texts, but maybe you would like to customize it for your organization.
 
@@ -29,7 +30,7 @@ You will see the default texts in the input field and you can overwrite them by 
 If you don't like your customization anymore click the "reset policy" button.
 All your settings will be removed and the default settings of the system will trigger.
 
-## Internationalization
+## Internationalization / i18n
 
 ZITADEL is available in the following languages
 
