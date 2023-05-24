@@ -88,6 +88,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     -
+      name: Checkout main
+      uses: actions/checkout@v3
+      with:
+        ref: main
+    -
       name: Checkout
       uses: actions/checkout@v3
       with:
