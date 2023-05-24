@@ -31,57 +31,61 @@ export default async function Page() {
 
       <div className="flex flex-col w-full space-y-2">
         {sessions ? (
-          sessions.map((session: any, index: number) => {
-            const validPassword = session.factors.password?.verifiedAt;
-            return (
-              <Link
-                key={"session-" + index}
-                href={
-                  validPassword
-                    ? `/signedin?` +
-                      new URLSearchParams({
-                        loginName: session.factors.user.loginName,
-                      })
-                    : `/password?` +
-                      new URLSearchParams({
-                        loginName: session.factors.user.loginName,
-                      })
-                }
-                className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
-              >
-                <div className="pr-4">
-                  <Avatar
-                    size="small"
-                    loginName={session.factors.user.loginName}
-                    name={session.factors.user.displayName}
-                  />
-                </div>
+          sessions
+            .filter((session) => session?.factors?.user?.loginName)
+            .map((session, index) => {
+              const validPassword = session?.factors?.password?.verifiedAt;
+              return (
+                <Link
+                  key={"session-" + index}
+                  href={
+                    validPassword
+                      ? `/signedin?` +
+                        new URLSearchParams({
+                          loginName: session.factors?.user?.loginName as string,
+                        })
+                      : `/password?` +
+                        new URLSearchParams({
+                          loginName: session.factors?.user?.loginName as string,
+                        })
+                  }
+                  className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
+                >
+                  <div className="pr-4">
+                    <Avatar
+                      size="small"
+                      loginName={session.factors?.user?.loginName as string}
+                      name={session.factors?.user?.displayName ?? ""}
+                    />
+                  </div>
 
-                <div className="flex flex-col">
-                  <span className="">{session.factors.user.displayName}</span>
-                  <span className="text-xs opacity-80">
-                    {session.factors.user.loginName}
-                  </span>
-                  {validPassword && (
-                    <span className="text-xs opacity-80">
-                      {moment(new Date(validPassword)).fromNow()}
+                  <div className="flex flex-col">
+                    <span className="">
+                      {session.factors?.user?.displayName}
                     </span>
-                  )}
-                </div>
+                    <span className="text-xs opacity-80">
+                      {session.factors?.user?.loginName}
+                    </span>
+                    {validPassword && (
+                      <span className="text-xs opacity-80">
+                        {moment(new Date(validPassword)).fromNow()}
+                      </span>
+                    )}
+                  </div>
 
-                <span className="flex-grow"></span>
-                <div className="relative flex flex-row items-center">
-                  {validPassword ? (
-                    <div className="absolute h-2 w-2 bg-green-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
-                  ) : (
-                    <div className="absolute h-2 w-2 bg-red-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
-                  )}
+                  <span className="flex-grow"></span>
+                  <div className="relative flex flex-row items-center">
+                    {validPassword ? (
+                      <div className="absolute h-2 w-2 bg-green-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
+                    ) : (
+                      <div className="absolute h-2 w-2 bg-red-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
+                    )}
 
-                  <XCircleIcon className="hidden group-hover:block h-5 w-5 transition-all opacity-50 hover:opacity-100" />
-                </div>
-              </Link>
-            );
-          })
+                    <XCircleIcon className="hidden group-hover:block h-5 w-5 transition-all opacity-50 hover:opacity-100" />
+                  </div>
+                </Link>
+              );
+            })
         ) : (
           <Alert>No Sessions available!</Alert>
         )}
