@@ -31,7 +31,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		idGenerator     id.Generator
 		userPasswordAlg crypto.HashAlgorithm
 		codeAlg         crypto.EncryptionAlgorithm
-		newEmailCode    func(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error)
+		newCode         cryptoCodeFunc
 	}
 	type args struct {
 		ctx             context.Context
@@ -446,7 +446,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newEmailCode:    mockEmailCode("emailCode", time.Hour),
+				newCode:         mockCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -526,7 +526,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newEmailCode:    mockEmailCode("emailCode", time.Hour),
+				newCode:         mockCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1202,7 +1202,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userPasswordAlg: tt.fields.userPasswordAlg,
 				userEncryption:  tt.fields.codeAlg,
 				idGenerator:     tt.fields.idGenerator,
-				newEmailCode:    tt.fields.newEmailCode,
+				newCode:         tt.fields.newCode,
 			}
 			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {
@@ -3990,20 +3990,5 @@ func TestAddHumanCommand(t *testing.T) {
 			}
 			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.human, tt.args.orgID, tt.args.passwordAlg, tt.args.codeAlg, tt.args.allowInitMail), tt.args.filter, tt.want)
 		})
-	}
-}
-
-func mockEmailCode(code string, exp time.Duration) func(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error) {
-	return func(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error) {
-		return &CryptoCodeWithExpiry{
-			Crypted: &crypto.CryptoValue{
-				CryptoType: crypto.TypeEncryption,
-				Algorithm:  "enc",
-				KeyID:      "id",
-				Crypted:    []byte(code),
-			},
-			Plain:  code,
-			Expiry: exp,
-		}, nil
 	}
 }
