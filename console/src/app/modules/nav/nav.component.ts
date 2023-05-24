@@ -1,16 +1,16 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, Observable, Subject, take } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { EnvironmentService } from 'src/app/services/environment.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { KeyboardShortcutsService } from 'src/app/services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -90,7 +90,7 @@ export class NavComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
 
   public BreadcrumbType: any = BreadcrumbType;
-  public customerPortalLink: string = '';
+  public customerPortalLink$ = this.envService.env.pipe(map((env) => env.customer_portal));
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
@@ -98,6 +98,7 @@ export class NavComponent implements OnDestroy {
   ];
 
   constructor(
+    private envService: EnvironmentService,
     public authService: GrpcAuthService,
     public adminService: AdminService,
     public authenticationService: AuthenticationService,
@@ -105,23 +106,9 @@ export class NavComponent implements OnDestroy {
     public mgmtService: ManagementService,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
-    private http: HttpClient,
     private shortcutService: KeyboardShortcutsService,
     private storageService: StorageService,
-  ) {
-    this.loadEnvironment();
-  }
-
-  public loadEnvironment(): void {
-    this.http
-      .get('./assets/environment.json')
-      .pipe(take(1))
-      .subscribe((data: any) => {
-        if (data && data.customer_portal) {
-          this.customerPortalLink = data.customer_portal;
-        }
-      });
-  }
+  ) {}
 
   public ngOnDestroy() {
     this.destroy$.next();

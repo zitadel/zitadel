@@ -36,7 +36,7 @@ We strongly recommend to [talk to us](https://zitadel.com/contact) before you st
 
 We accept contributions through pull requests. You need a github account for that. If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork). Please draft the pull request as soon as possible. Go through the following checklist before you submit the final pull request:
 
-### Submit a Pull Request (PR)
+### Submit a pull request (PR)
 
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
@@ -59,14 +59,14 @@ We accept contributions through pull requests. You need a github account for tha
 
 8. On GitHub, [send a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) to `zitadel:main`. Request review from one of the maintainers.
 
-### Reviewing a Pull Request
+### Review a pull request
 
 The reviewers will provide you feedback and approve your changes as soon as they are satisfied. If we ask you for changes in the code, you can follow the [GitHub Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
 
 <!-- TODO: how to do this via git -->
 <!-- TODO: change commit message via git -->
 
-### Commit Messages
+### Commit messages
 
 Make sure you use [semantic release messages format](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type).
 
@@ -84,7 +84,7 @@ Must be one of the following:
 
 This is optional to indicate which component is affected. In doubt, leave blank (`<type>: <short summary>`)
 
-#### Short Summary
+#### Short summary
 
 Provide a brief description of the change.
 
@@ -107,7 +107,7 @@ We add the label "good first issue" for problems we think are a good starting po
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
 
-### Backend / Login
+### Backend/login
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
 Using [Docker Compose](https://docs.docker.com/compose/), you run a [CockroachDB](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker-mac.html) on your local machine.
@@ -231,7 +231,6 @@ The commands in this section are tested against the following software versions:
 - [Node version v16.17.0](https://nodejs.org/en/download/)
 - [npm version 8.18.0](https://docs.npmjs.com/try-the-latest-stable-version-of-npm)
 - [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)
-- [curl version 7.58.0](https://curl.se/download.html)
 
 <details>
   <summary>Note for WSL2 on Windows 10</summary>
@@ -269,18 +268,17 @@ To allow console access via http://localhost:4200, you have to configure the ZIT
 You can run the local console development server now.
 
 ```bash
-# Console loads its target environment from the file console/src/assets/environment.json.
-# Load it from the backend.
-curl http://localhost:8080/ui/console/assets/environment.json > ./src/assets/environment.json
+# Install npm dependencies
+npm install
 
 # Generate source files from Protos
 npm run generate
 
-# Install npm dependencies
-npm install
-
 # Start the server
 npm start
+
+# If you don't want to develop against http://localhost:8080, you can use another environment
+ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json npm start
 ```
 
 Navigate to http://localhost:4200/.
@@ -326,26 +324,26 @@ When you are happy with your changes, you can format your code and cleanup your 
 docker compose down
 ```
 
-## Contribute Docs
+## Contribute docs
 
 Project documentation is made with docusaurus and is located under [./docs](./docs).
 
-### Local Testing
+### Local testing
 
 Please refer to the [README](./docs/README.md) for more information and local testing.
 
-### Style Guide
+### Style guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
 - **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
 - **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
 - **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
-### Docs Pull Request
+### Docs pull request
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
 Scope can be left empty (omit the brackets) or refer to the top navigation sections.
 
-## Contribute Internationalization
+## Contribute internationalization
 
 ZITADEL loads translations from four files:
 
@@ -365,7 +363,7 @@ You can find an installation guide for all the different environments here:
 
 - Please read [Security Policy](./SECURITY.md).
 
-## Product Management
+## Product management
 
 The ZITADEL Team works with an agile product management methodology.
 You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/2/views/1).
@@ -389,10 +387,10 @@ The state should reflect the progress of the issue and what is going on right no
 
 - **No status**: Issue just got added and has to be looked at.
 - **🧐 Investigating**: We are currently investigating to find out what the problem is, which priority it should have and what has to be implemented. Or we need some more information from the author.
-- **📨 Product Backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be worked on in the future. Issues with this state do not have to be completely defined yet.
-- **📝 Prioritized Product Backlog**: An issue with the state "Prioritized Backlog" is ready for the refinement from the perspective of the product owner (PO) to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
+- **📨 Product backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be worked on in the future. Issues with this state do not have to be completely defined yet.
+- **📝 Prioritized product backlog**: An issue with the state "Prioritized Backlog" is ready for the refinement from the perspective of the product owner (PO) to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
 - **🔖 Ready**: The issue is ready to take into a sprint. Difference to "prioritized..." is that the complexity is defined by the team.
-- **📋 Sprint Backlog**: The issue is scheduled for the current sprint.
+- **📋 Sprint backlog**: The issue is scheduled for the current sprint.
 - **🏗 In progress**: Someone is working on this issue right now. The issue will get an assignee as soon as it is in progress.
 - **👀 In review**: The issue is in review. Please add someone to review your issue or let us know that it is ready to review with a comment on your pull request.
 - **✅ Done**: The issue is implemented and merged to main.
