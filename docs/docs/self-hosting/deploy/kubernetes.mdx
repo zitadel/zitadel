@@ -37,6 +37,9 @@ helm install my-zitadel zitadel/zitadel \
   --set zitadel.configmapConfig.TLS.Enabled=false \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
   --set replicaCount=1
+
+# Make ZITADEL locally accessible
+kubectl port-forward svc/my-zitadel 8080
 ```
 
 <DefaultUser components={props.components} />
