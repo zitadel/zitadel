@@ -590,7 +590,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 			args: args{
 				userID:        "user1",
 				resourceOwner: "org1",
-				urlTmpl:       "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.ResourceOwner}}&codeID={{.CodeID}}&code={{.Code}}",
+				urlTmpl:       "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}",
 			},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -624,7 +624,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 									Crypted:    []byte("passkey1"),
 								},
 								time.Minute,
-								"https://example.com/passkey/register?userID={{.UserID}}&orgID={{.ResourceOwner}}&codeID={{.CodeID}}&code={{.Code}}",
+								"https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}",
 								false,
 							),
 						),
@@ -635,7 +635,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 			args: args{
 				userID:        "user1",
 				resourceOwner: "org1",
-				urlTmpl:       "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.ResourceOwner}}&codeID={{.CodeID}}&code={{.Code}}",
+				urlTmpl:       "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}",
 			},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "org1",

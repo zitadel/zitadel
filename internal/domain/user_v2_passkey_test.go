@@ -12,11 +12,11 @@ import (
 
 func TestRenderPasskeyURLTemplate(t *testing.T) {
 	type args struct {
-		tmpl          string
-		userID        string
-		resourceOwner string
-		codeID        string
-		code          string
+		tmpl   string
+		userID string
+		orgID  string
+		codeID string
+		code   string
 	}
 	tests := []struct {
 		name    string
@@ -34,11 +34,11 @@ func TestRenderPasskeyURLTemplate(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				tmpl:          "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.ResourceOwner}}&codeID={{.CodeID}}&code={{.Code}}",
-				userID:        "user1",
-				resourceOwner: "org1",
-				codeID:        "99",
-				code:          "123",
+				tmpl:   "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}",
+				userID: "user1",
+				orgID:  "org1",
+				codeID: "99",
+				code:   "123",
 			},
 			wantW: "https://example.com/passkey/register?userID=user1&orgID=org1&codeID=99&code=123",
 		},
@@ -46,7 +46,7 @@ func TestRenderPasskeyURLTemplate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := &bytes.Buffer{}
-			err := RenderPasskeyURLTemplate(w, tt.args.tmpl, tt.args.userID, tt.args.resourceOwner, tt.args.codeID, tt.args.code)
+			err := RenderPasskeyURLTemplate(w, tt.args.tmpl, tt.args.userID, tt.args.orgID, tt.args.codeID, tt.args.code)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantW, w.String())
 		})

@@ -262,7 +262,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 					UserId: userID,
 					Medium: &user.CreatePasskeyRegistrationLinkRequest_SendLink{
 						SendLink: &user.SendPasskeyRegistrationLink{
-							UrlTemplate: gu.Ptr("https://example.com/passkey/register?userID={{.UserID}}&orgID={{.ResourceOwner}}&codeID={{.CodeID}}&code={{.Code}}"),
+							UrlTemplate: gu.Ptr("https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}"),
 						},
 					},
 				},
