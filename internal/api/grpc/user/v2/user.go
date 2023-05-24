@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"encoding/base64"
 	"io"
 
 	"golang.org/x/text/language"
@@ -154,6 +155,9 @@ func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *u
 	if err != nil {
 		return nil, err
 	}
+	if err := s.checkIntentToken(req.GetToken(), intent.AggregateID); err != nil {
+		return nil, err
+	}
 	if intent.State != domain.IDPIntentStateSucceeded {
 		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
 	}
@@ -188,4 +192,22 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 			IdpInformation: intent.IDPUser,
 		},
 	}, nil
+}
+
+func (s *Server) checkIntentToken(token string, intentID string) error {
+	if token == "" {
+		return errors.ThrowPermissionDenied(nil, "IDP-Sfefs", "Errors.Intent.InvalidToken")
+	}
+	data, err := base64.RawURLEncoding.DecodeString(token)
+	if err != nil {
+		return errors.ThrowPermissionDenied(err, "IDP-Swg31", "Errors.Intent.InvalidToken")
+	}
+	decryptedToken, err := s.idpAlg.Decrypt(data, s.idpAlg.EncryptionKeyID())
+	if err != nil {
+		return errors.ThrowPermissionDenied(err, "IDP-Sf4gt", "Errors.Intent.InvalidToken")
+	}
+	if string(decryptedToken) != intentID {
+		return errors.ThrowPermissionDenied(nil, "IDP-dkje3", "Errors.Intent.InvalidToken")
+	}
+	return nil
 }
