@@ -44,6 +44,22 @@ func TestCommands_CreateIntent(t *testing.T) {
 		res    res
 	}{
 		{
+			"error no id generator",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: mock.NewIDGeneratorExpectError(t, errors.ThrowInternal(nil, "", "error id")),
+			},
+			args{
+				ctx:        authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				idpID:      "",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
+			},
+			res{
+				err: errors.ThrowInternal(nil, "", "error id"),
+			},
+		},
+		{
 			"error no idpID",
 			fields{
 				eventstore:  eventstoreExpect(t),
@@ -218,6 +234,50 @@ func TestCommands_AuthURLFromProvider(t *testing.T) {
 			},
 			res{
 				err: errors.ThrowPreconditionFailed(nil, "", ""),
+			},
+		},
+		{
+			"idp removed",
+			fields{
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								"auth",
+								"token",
+								"user",
+								"idAttribute",
+								nil,
+								idp.Options{},
+							)),
+						eventFromEventPusherWithInstanceID(
+							"instance",
+							instance.NewIDPRemovedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:         authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				idpID:       "idp",
+				state:       "state",
+				callbackURL: "url",
+			},
+			res{
+				err: errors.ThrowInternal(nil, "COMMAND-xw921211", "Errors.IDPConfig.NotExisting"),
 			},
 		},
 		{
