@@ -321,7 +321,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 }
 
 func createProvider(t *testing.T) string {
-	id, _, err := Tester.Commands.AddOrgGenericOAuthProvider(CTX, Tester.Organisation.ID, command.GenericOAuthProvider{
+	ctx := authz.WithInstance(context.Background(), Tester.Instance)
+	id, _, err := Tester.Commands.AddOrgGenericOAuthProvider(ctx, Tester.Organisation.ID, command.GenericOAuthProvider{
 		"idp",
 		"clientID",
 		"clientSecret",
