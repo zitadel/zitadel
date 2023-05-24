@@ -10,7 +10,7 @@ export type SessionCookie = {
 };
 
 function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
-    // @ts-ignore
+  // @ts-ignore
   return cookiesList.set({
     name: "sessions",
     value: JSON.stringify(sessions),
@@ -36,7 +36,7 @@ export async function addSessionToCookie(session: SessionCookie): Promise<any> {
     currentSessions = [...currentSessions, session];
   }
 
-  setSessionHttpOnlyCookie(value: string);
+  setSessionHttpOnlyCookie(currentSessions);
 }
 
 export async function updateSessionCookie(
