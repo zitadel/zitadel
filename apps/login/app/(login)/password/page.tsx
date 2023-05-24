@@ -4,11 +4,15 @@ import PasswordForm from "#/ui/PasswordForm";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
 
-export default async function Page({ searchParams }: { searchParams: any }) {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string | number | symbol, string | undefined>;
+}) {
   const { loginName } = searchParams;
   const sessionFactors = await loadSession(loginName);
 
-  async function loadSession(loginName: string) {
+  async function loadSession(loginName?: string) {
     try {
       const recent = await getMostRecentCookieWithLoginname(loginName);
 

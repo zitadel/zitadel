@@ -13,7 +13,7 @@ type Inputs = {
 };
 
 type Props = {
-  loginName: string;
+  loginName?: string;
 };
 
 export default function PasswordForm({ loginName }: Props) {
