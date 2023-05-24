@@ -339,7 +339,17 @@ Please refer to the [README](./docs/README.md) for more information and local te
 - **Don't repeat yourself**: When using the same content in multiple places, save and manage the content as separate file and make use of embedded files to import it into other docs pages.
 - **Embedded code**: You can embed code snippets from a repository. See the [plugin](https://github.com/saucelabs/docusaurus-theme-github-codeblock#usage) for usage.
 
+Following the [Google style guide](https://developers.google.com/style) is highly recommended. Its clear and concise guidelines ensure consistency and effective communication within the wider developer community.
+
+The style guide covers a lot of material, so their [highlights](https://developers.google.com/style/highlights) page provides an overview of its most important points. Some of the points stated in the highlights that we care about most are given below: 
+
+- Be conversational and friendly without being frivolous.
+- Use sentence case for document titles and section headings.
+- Use active voice: make clear who's performing the action.
+- Use descriptive link text.
+
 ### Docs pull request
+
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
 Scope can be left empty (omit the brackets) or refer to the top navigation sections.
 
@@ -412,7 +422,7 @@ Everything that is higher than 8 should be split in smaller parts.
 
 **1**, **2**, **3**, **5**, **8**, **13**
 
-### About the Labels
+### About the labels
 
 There are a few general labels that don't belong to a specific category.
 
