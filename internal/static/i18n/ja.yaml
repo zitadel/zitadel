@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: ユーザーが選択した組織内で見つかりません
     NotAllowedOrg: ユーザーが必要な組織のメンバーでありません
     UserIDMissing: ユーザーIDがありません
+    UserIDWrong: "リクエストユーザーが認証されたユーザーと等しくない"
     DomainPolicyNil: 組織ポリシーが空です
     EmailAsUsernameNotAllowed: メールアドレスはユーザー名として使用できません
     Invalid: 無効なユーザーデータです

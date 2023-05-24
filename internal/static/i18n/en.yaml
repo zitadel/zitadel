@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: User could not be found on chosen organization
     NotAllowedOrg: User is no member of the required organization
     UserIDMissing: User ID missing
+    UserIDWrong: "Request user not equal to authenticated user"
     DomainPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid

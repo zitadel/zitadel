@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     UserIDMissing: User ID fehlt
+    UserIDWrong: "Der Anforderungsbenutzer ist nicht gleich dem authentifizierten Benutzer"
     DomainPolicyNil: Organisation Policy ist leer
     EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
     Invalid: Benutzerdaten sind ungültig

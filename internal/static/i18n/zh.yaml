@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: 在所选组织中找不到用户
     NotAllowedOrg: 用户不是所需组织的成员
     UserIDMissing: 缺少用户 ID
+    UserIDWrong: "请求用户不等于经过身份验证的用户"
     DomainPolicyNil: 组织策略为空
     EmailAsUsernameNotAllowed: 电子邮件不允许作为用户名
     Invalid: 用户数据无效
