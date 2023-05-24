@@ -66,6 +66,22 @@ func createProvider(t *testing.T) string {
 	return id
 }
 
+func createIntent(t *testing.T, idpID string) string {
+	ctx := authz.WithInstance(context.Background(), Tester.Instance)
+	id, _, err := Tester.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", Tester.Organisation.ID)
+	require.NoError(t, err)
+	return id
+}
+
+func createIntentSuccess(t *testing.T, intentID string) string {
+	ctx := authz.WithInstance(context.Background(), Tester.Instance)
+	writeModel, err := Tester.Commands.GetIntentWriteModel(ctx, intentID, Tester.Organisation.ID)
+	require.NoError(t, err)
+	token, err := Tester.Commands.SucceedIDPIntent(ctx, writeModel, nil, nil, "")
+	require.NoError(t, err)
+	return token
+}
+
 func TestServer_AddHumanUser(t *testing.T) {
 	idpID := createProvider(t)
 	type args struct {
@@ -582,6 +598,70 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 					assert.Failf(t, "auth url does not match", "expected: %s, but got: %s", tt.want.GetAuthUrl(), got.GetAuthUrl())
 				}
 			}
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
+	idpID := createProvider(t)
+	intentID := createIntent(t, idpID)
+	token := createIntentSuccess(t, intentID)
+	failedIntentID := createIntent(t, idpID)
+	type args struct {
+		ctx context.Context
+		req *user.RetrieveIdentityProviderInformationRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.RetrieveIdentityProviderInformationResponse
+		wantErr bool
+	}{
+		{
+			name: "failed intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderInformationRequest{
+					IntentId: failedIntentID,
+					Token:    "",
+				},
+			},
+			want: &user.RetrieveIdentityProviderInformationResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "retrieve successful intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderInformationRequest{
+					IntentId: intentID,
+					Token:    token,
+				},
+			},
+			want: &user.RetrieveIdentityProviderInformationResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.RetrieveIdentityProviderInformation(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}

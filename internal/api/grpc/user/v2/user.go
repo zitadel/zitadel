@@ -136,7 +136,7 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 }
 
 func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
-	id, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetSuccessUrl(), req.GetFailureUrl())
+	id, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetSuccessUrl(), req.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartI
 }
 
 func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *user.RetrieveIdentityProviderInformationRequest) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIntentId(), "")
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIntentId(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
