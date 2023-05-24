@@ -33,7 +33,7 @@ const (
 		" FROM eventstore.events"
 )
 
-func buildQuery(ctx context.Context, db dialect.Database, queryFactory *es_models.SearchQueryFactory) (query string, limit uint64, values []interface{}, rowScanner func(s scan, dest interface{}) error) {
+func (sql *SQL) buildQuery(ctx context.Context, db dialect.Database, queryFactory *es_models.SearchQueryFactory) (query string, limit uint64, values []interface{}, rowScanner func(s scan, dest interface{}) error) {
 	searchQuery, err := queryFactory.Build()
 	if err != nil {
 		logging.New().WithError(err).Warn("search query factory invalid")
@@ -51,10 +51,19 @@ func buildQuery(ctx context.Context, db dialect.Database, queryFactory *es_model
 	query += where
 
 	if searchQuery.Columns == es_models.Columns_Event {
-		query += " ORDER BY event_sequence"
-		if searchQuery.Desc {
-			query += " DESC"
+		var order string
+		if sql.allowOrderByCreationDate {
+			order = " ORDER BY creation_date, event_sequence"
+			if searchQuery.Desc {
+				order = " ORDER BY creation_date DESC, event_sequence DESC"
+			}
+		} else {
+			order = " ORDER BY event_sequence"
+			if searchQuery.Desc {
+				order = " ORDER BY event_sequence DESC"
+			}
 		}
+		query += order
 	}
 
 	if searchQuery.Limit > 0 {

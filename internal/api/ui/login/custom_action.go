@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/dop251/goja"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
@@ -14,58 +15,83 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 func (l *Login) runPostExternalAuthenticationActions(
 	user *domain.ExternalUser,
-	tokens *oidc.Tokens,
+	tokens *oidc.Tokens[*oidc.IDTokenClaims],
 	authRequest *domain.AuthRequest,
 	httpRequest *http.Request,
 	idpUser idp.User,
 	authenticationError error,
-) (*domain.ExternalUser, error) {
+) (_ *domain.ExternalUser, userChanged bool, err error) {
 	ctx := httpRequest.Context()
 
+	// use the request org (scopes or domain discovery) as default
 	resourceOwner := authRequest.RequestedOrgID
+	// if the user was already linked to an IDP and redirected to that, the requested org might be empty
+	if resourceOwner == "" {
+		resourceOwner = authRequest.UserOrgID
+	}
+	// if we will have no org (e.g. user clicked directly on the IDP on the login page)
+	if resourceOwner == "" {
+		// in this case the user might nevertheless already be linked to an IDP,
+		// so let's do a workaround and resourceOwnerOfUserIDPLink if there would be a IDP link
+		resourceOwner, err = l.resourceOwnerOfUserIDPLink(ctx, authRequest.SelectedIDPConfigID, user.ExternalUserID)
+		logging.WithFields("authReq", authRequest.ID, "idpID", authRequest.SelectedIDPConfigID).OnError(err).
+			Warn("could not determine resource owner for runPostExternalAuthenticationActions, fall back to default org id")
+	}
+	// fallback to default org id
 	if resourceOwner == "" {
 		resourceOwner = authz.GetInstance(ctx).DefaultOrganisationID()
 	}
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	metadataList := object.MetadataListFromDomain(user.Metadatas)
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("setFirstName", func(firstName string) {
 			user.FirstName = firstName
+			userChanged = true
 		}),
 		actions.SetFields("setLastName", func(lastName string) {
 			user.LastName = lastName
+			userChanged = true
 		}),
 		actions.SetFields("setNickName", func(nickName string) {
 			user.NickName = nickName
+			userChanged = true
 		}),
 		actions.SetFields("setDisplayName", func(displayName string) {
 			user.DisplayName = displayName
+			userChanged = true
 		}),
 		actions.SetFields("setPreferredLanguage", func(preferredLanguage string) {
 			user.PreferredLanguage = language.Make(preferredLanguage)
+			userChanged = true
 		}),
 		actions.SetFields("setPreferredUsername", func(username string) {
 			user.PreferredUsername = username
+			userChanged = true
 		}),
 		actions.SetFields("setEmail", func(email domain.EmailAddress) {
 			user.Email = email
+			userChanged = true
 		}),
 		actions.SetFields("setEmailVerified", func(verified bool) {
 			user.IsEmailVerified = verified
+			userChanged = true
 		}),
 		actions.SetFields("setPhone", func(phone domain.PhoneNumber) {
 			user.Phone = phone
+			userChanged = true
 		}),
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			user.IsPhoneVerified = verified
+			userChanged = true
 		}),
 		actions.SetFields("metadata", func(c *actions.FieldConfig) interface{} {
 			return metadataList.MetadataListFromDomain(c.Runtime)
@@ -111,11 +137,11 @@ func (l *Login) runPostExternalAuthenticationActions(
 		)
 		cancel()
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 	}
 	user.Metadatas = object.MetadataListToDomain(metadataList)
-	return user, err
+	return user, userChanged, err
 }
 
 type authMethod string
@@ -347,7 +373,7 @@ func (l *Login) runPostCreationActions(
 	return object.UserGrantsToDomain(userID, mutableUserGrants.UserGrants), err
 }
 
-func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
+func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOption {
 	var accessToken, idToken string
 	getClaim := func(claim string) interface{} {
 		return nil
@@ -367,7 +393,7 @@ func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
 	idToken = tokens.IDToken
 	if tokens.IDTokenClaims != nil {
 		getClaim = func(claim string) interface{} {
-			return tokens.IDTokenClaims.GetClaim(claim)
+			return tokens.IDTokenClaims.Claims[claim]
 		}
 		claimsJSON = func() (string, error) {
 			c, err := json.Marshal(tokens.IDTokenClaims)
@@ -383,4 +409,26 @@ func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
 		actions.SetFields("getClaim", getClaim),
 		actions.SetFields("claimsJSON", claimsJSON),
 	}
+}
+
+func (l *Login) resourceOwnerOfUserIDPLink(ctx context.Context, idpConfigID string, externalUserID string) (string, error) {
+	idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpConfigID)
+	if err != nil {
+		return "", err
+	}
+	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUserID)
+	if err != nil {
+		return "", err
+	}
+	queries := []query.SearchQuery{
+		idQuery, externalIDQuery,
+	}
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	if err != nil {
+		return "", err
+	}
+	if len(links.Links) != 1 {
+		return "", nil
+	}
+	return links.Links[0].ResourceOwner, nil
 }

@@ -8,8 +8,7 @@ You will find some possible error messages here, what the problem is and what so
 Join or [Chat](https://zitadel.com/chat) or open a [Discussion](https://github.com/zitadel/zitadel/discussions).
 :::
 
-
-## User Agent does not correspond
+## User agent does not correspond
 
 This error appeared for some users as soon as they were redirected to the login page of ZITADEL.
 ZITADEL uses some cookies to identify the browser/user agent of the user, so it is able to store the active user sessions. By blocking the cookies the functions of ZITADEL will be affected.
@@ -34,6 +33,14 @@ Do you still face this issue? Please contact us, and we will help you find out w
 
 `ID=QUERY-n0wng Message=Instance not found`
 
-If you're in an self-hosting scenario with a custom domain, you need to instruct ZITADEL to use the `ExternalDomain`.
-You can find more instruction in our guide about [custom domains](https://zitadel.com/docs/self-hosting/manage/custom-domain).
+If you're self hosting with a custom domain, you need to instruct ZITADEL to use the `ExternalDomain`.
+You can find further instructions in our guide about [custom domains](https://zitadel.com/docs/self-hosting/manage/custom-domain).
 We also provide a guide on how to [configure](https://zitadel.com/docs/self-hosting/manage/configure) ZITADEL with variables from files or environment variables.
+
+## WebFinger requirement for Tailscale
+
+The WebFinger requirement and setup is a step a user has to take outside of their IdP set-up. WebFinger is a protocol which supports the ability for OIDC issuer discovery, and we use it to prove that the user has administrative control over the domain and to retrieve the issuer. This is a requirement we have in place for all users, regardless of their IdP, who use custom OIDC with Tailscale.
+
+On their custom domain, e.g example.com, users need to host a WebFinger endpoint at https://example.com/.well-known/webfinger. When queried, this endpoint returns a JSON response detailing the issuer. Users would need to host the endpoint with the link to the ZITADEL issuer. Tailscale only looks up this endpoint once when a user signs up, and will only look up this endpoint again if the user needs to make a configuration change to their identity provider.
+
+The requirements and a set up guide is detailed in the [Tailscale documentation](https://tailscale.com/kb/1240/sso-custom-oidc/).

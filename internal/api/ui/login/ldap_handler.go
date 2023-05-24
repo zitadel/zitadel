@@ -73,7 +73,7 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
-		if _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), nil, authReq, r, nil, err); actionErr != nil {
+		if _, _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), nil, authReq, r, nil, err); actionErr != nil {
 			logging.WithError(err).Error("both external user authentication and action post authentication failed")
 		}
 		l.renderLDAPLogin(w, r, authReq, err)

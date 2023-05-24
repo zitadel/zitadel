@@ -12,6 +12,13 @@ To add a new site to the already existing structure simply save the `md` file in
 yarn install
 ```
 
+## Generate
+
+```
+yarn generate
+```
+
+
 ## Local Development
 
 ```

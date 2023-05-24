@@ -1,5 +1,6 @@
 ---
 title: Connect with Auth0 through SAML 2.0
+sidebar_label: Auth0 (SAML)
 ---
 
 This guide shows how to enable login with ZITADEL on Auth0.

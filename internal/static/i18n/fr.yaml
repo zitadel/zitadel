@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
     NotAllowedOrg: L'utilisateur n'est pas membre de l'organisation requise
     UserIDMissing: L'ID de l'utilisateur est manquant
+    UserIDWrong: "L'utilisateur de la demande n'est pas égal à l'utilisateur authentifié"
     DomainPolicyNil: La politique de l'organisation est vide
     EmailAsUsernameNotAllowed: L'email n'est pas autorisé comme nom d'utilisateur
     Invalid: Les données de l'utilisateur ne sont pas valides
@@ -67,6 +68,7 @@ Errors:
     NoChanges: Aucun changement trouvé
     InitCodeNotFound: Code d'initialisation non trouvé
     UsernameNotChanged: Nom d'utilisateur non modifié
+    InvalidURLTemplate: Le modèle d'URL n'est pas valide
     Profile:
       NotFound: Profil non trouvé
       NotChanged: Le profil n'a pas changé
@@ -469,6 +471,11 @@ Errors:
     Execution:
       StorageFailed: L'enregistrement du journal d'action dans la base de données a échoué
       ScanFailed: L'interrogation des secondes d'action consommées a échoué
+  Session:
+    NotExisting: La session n'existe pas
+    Terminated: La session est déjà terminée
+    Token:
+      Invalid: Le jeton de session n'est pas valide
 
 AggregateTypes:
   action: Action

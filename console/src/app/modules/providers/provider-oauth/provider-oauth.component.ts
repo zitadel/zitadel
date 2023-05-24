@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import {
   AddGenericOAuthProviderRequest as AdminAddGenericOAuthProviderRequest,
@@ -18,6 +18,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
@@ -44,7 +45,7 @@ export class ProviderOAuthComponent {
   public provider?: Provider.AsObject;
 
   constructor(
-    private router: Router,
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -62,8 +63,25 @@ export class ProviderOAuthComponent {
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
 
+    this.authService
+      .isAllowed(
+        this.serviceType === PolicyComponentServiceType.ADMIN
+          ? ['iam.idp.write']
+          : this.serviceType === PolicyComponentServiceType.MGMT
+          ? ['org.idp.write']
+          : [],
+      )
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        if (allowed) {
+          this.form.enable();
+        } else {
+          this.form.disable();
+        }
+      });
+
     this.route.data.pipe(take(1)).subscribe((data) => {
-      this.serviceType = data.serviceType;
+      this.serviceType = data['serviceType'];
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
@@ -137,6 +155,7 @@ export class ProviderOAuthComponent {
     req.setClientId(this.clientId?.value);
     req.setClientSecret(this.clientSecret?.value);
     req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
 
     this.loading = true;
     this.service
@@ -168,6 +187,7 @@ export class ProviderOAuthComponent {
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       this.service

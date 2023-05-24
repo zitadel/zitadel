@@ -51,6 +51,8 @@ import {
   AddIDPToLoginPolicyResponse,
   AddJWTProviderRequest,
   AddJWTProviderResponse,
+  AddLDAPProviderRequest,
+  AddLDAPProviderResponse,
   AddMachineKeyRequest,
   AddMachineKeyResponse,
   AddMachineUserRequest,
@@ -398,6 +400,8 @@ import {
   SetCustomInitMessageTextResponse,
   SetCustomLoginTextsRequest,
   SetCustomLoginTextsResponse,
+  SetCustomPasswordChangeMessageTextRequest,
+  SetCustomPasswordChangeMessageTextResponse,
   SetCustomPasswordlessRegistrationMessageTextRequest,
   SetCustomPasswordlessRegistrationMessageTextResponse,
   SetCustomPasswordResetMessageTextRequest,
@@ -461,6 +465,8 @@ import {
   UpdateHumanProfileResponse,
   UpdateJWTProviderRequest,
   UpdateJWTProviderResponse,
+  UpdateLDAPProviderRequest,
+  UpdateLDAPProviderResponse,
   UpdateMachineRequest,
   UpdateMachineResponse,
   UpdateOIDCAppConfigRequest,
@@ -684,6 +690,12 @@ export class ManagementService {
     return this.grpcService.mgmt.getCustomPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
   }
 
+  public setCustomPasswordChangeMessageText(
+    req: SetCustomPasswordChangeMessageTextRequest,
+  ): Promise<SetCustomPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomPasswordChangeMessageCustomText(req, null).then((resp) => resp.toObject());
+  }
+
   public resetCustomPasswordChangeMessageTextToDefault(
     lang: string,
   ): Promise<ResetCustomPasswordChangeMessageTextToDefaultResponse.AsObject> {
@@ -885,6 +897,14 @@ export class ManagementService {
     return this.grpcService.mgmt.updateGoogleProvider(req, null).then((resp) => resp.toObject());
   }
 
+  public addLDAPProvider(req: AddLDAPProviderRequest): Promise<AddLDAPProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addLDAPProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateLDAPProvider(req: UpdateLDAPProviderRequest): Promise<UpdateLDAPProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateLDAPProvider(req, null).then((resp) => resp.toObject());
+  }
+
   public addGitLabProvider(req: AddGitLabProviderRequest): Promise<AddGitLabProviderResponse.AsObject> {
     return this.grpcService.mgmt.addGitLabProvider(req, null).then((resp) => resp.toObject());
   }
@@ -965,6 +985,10 @@ export class ManagementService {
 
   public getProviderByID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse.AsObject> {
     return this.grpcService.mgmt.getProviderByID(req, null).then((resp) => resp.toObject());
+  }
+
+  public getProviderID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse> {
+    return this.grpcService.mgmt.getProviderByID(req, null);
   }
 
   public addHumanUser(req: AddHumanUserRequest): Promise<AddHumanUserResponse.AsObject> {

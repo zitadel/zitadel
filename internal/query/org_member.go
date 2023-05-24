@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -124,10 +125,12 @@ func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
+			UserTypeCol.identifier(),
 			countColumn.identifier(),
 		).From(orgMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, OrgMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, OrgMemberUserID)).
+			LeftJoin(join(UserIDCol, OrgMemberUserID)).
 			LeftJoin(join(LoginNameUserIDCol, OrgMemberUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
@@ -147,6 +150,7 @@ func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 					displayName        = sql.NullString{}
 					machineName        = sql.NullString{}
 					avatarURL          = sql.NullString{}
+					userType           = sql.NullInt32{}
 				)
 
 				err := rows.Scan(
@@ -163,6 +167,7 @@ func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 					&displayName,
 					&machineName,
 					&avatarURL,
+					&userType,
 
 					&count,
 				)
@@ -181,6 +186,7 @@ func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				} else {
 					member.DisplayName = machineName.String
 				}
+				member.UserType = domain.UserType(userType.Int32)
 
 				members = append(members, member)
 			}

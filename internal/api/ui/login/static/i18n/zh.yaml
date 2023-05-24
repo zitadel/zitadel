@@ -172,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: 确认密码
   CancelButtonText: 取消
   NextButtonText: 继续
+  Footer: 页脚
 
 PasswordChangeDone:
   Title: 更改密码
@@ -220,6 +221,7 @@ RegistrationUser:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -252,6 +254,7 @@ ExternalRegistrationUserOverview:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -312,12 +315,32 @@ ExternalNotFound:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+
+DeviceAuth:
+  Title: 设备授权
+  UserCode:
+    Label: 用户代码
+    Description: 输入设备上显示的用户代码。
+    ButtonNext: 下一个
+  Action:
+    Description: 授予设备访问权限。
+    GrantDevice: 您即将授予设备
+    AccessToScopes: 访问以下范围
+    Button:
+      Allow: 允许
+      Deny: 否定
+  Done:
+    Description: 完毕。
+    Approved: 设备授权已批准。 您现在可以返回设备。
+    Denied: 设备授权被拒绝。 您现在可以返回设备。
 
 Footer:
   PoweredBy: Powered By
   Tos: 服务条款
   PrivacyPolicy: 隐私政策
   Help: 帮助
+  SupportEmail: 支持邮箱
 
 Errors:
   Internal: 发生了内部错误
@@ -420,5 +443,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: 不允许注册
+  DeviceAuth:
+    NotExisting: 用户代码不存在
 
 optional: (可选)

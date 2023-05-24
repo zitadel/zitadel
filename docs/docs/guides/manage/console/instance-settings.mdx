@@ -57,7 +57,11 @@ At the moment Twilio is available as SMS provider.
 
 You can configure on which changes the users will be notified. The text of the message can be changed in the [Message texts](#message-texts)
 
-<img src="/docs/img/guides/console/notification.png" alt="Notification" width="400px" />
+<img
+  src="/docs/img/guides/console/notification.png"
+  alt="Notification"
+  width="400px"
+/>
 
 ### SMTP
 
@@ -132,14 +136,12 @@ Configure the different lifetimes checks for the login process:
 - **Second Factor Check Lifetime** specifies after which period a user has to revalidate the 2-Factor during the login process
 - **External Login Check Lifetime** specifies after which period a user has to revalidate the Multi Factor during the login process
 
-
 ## Identity Providers
 
 You can configure all kinds of external identity providers for identity brokering, which support OIDC (OpenID Connect).
 Create a new identity provider configuration and enable it in the list afterwards.
 
-For a detailed guide about how to configure a new identity provider for identity brokering have a look at our guide:
-[Identity Brokering](/guides/integrate/identity-providers/introduction.md)
+For a detailed guide about how to configure a new identity provider for identity brokering have a look at our [identity provider guides](/guides/integrate/identity-providers).
 
 ## Password Complexity
 
@@ -173,12 +175,21 @@ If an account is locked, the administrator has to unlock it in the ZITADEL conso
 
 ## Domain settings
 
-In the domain policy you have two different settings.
-One is the "user_login_must_be_domain", by setting this all the users within an organisation will be suffixed with the domain of the organisation.
+### Add organization domain as suffix to loginnames
 
-The second is "validate_org_domains" if this is set to true all created domains on an organisation must be verified per acme challenge.
+If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.
+
+### Validate Org domains
+
+If this is enabled all created domains on an organization must be verified per dns/acme challenge.
+
 More about how to verify a domain [here](/guides/manage/console/organizations#domain-verification-and-primary-domain).
 If it is set to false, all registered domain will automatically be created as verified and the users will be able to use the domain for login.
+
+### SMTP Sender Address matches Instance Domain
+
+If enabled, the SMTP server address must match the instance's primary domain.
+With that you can ensure that users receive notifications from the same domain that is used for login.
 
 ### Use email as username
 
@@ -188,9 +199,11 @@ All usernames will then be globally unique within your instance.
 
 You can either set this attribute on your whole ZITADEL instance or just on some specific organizations.
 
+Please refer to the [configuration guide](/docs/guides/solution-scenarios/configurations#use-email-to-login) for more information.
+
 ## Privacy Policy and TOS
 
-With this setting you are able to configure your privacy policy, terms of service and help links.
+With this setting you are able to configure your privacy policy, terms of service, help links and help/support email address.
 On register each user has to accept these policies.
 
 This policy can be also be overriden by your organizations.
@@ -231,7 +244,11 @@ You can set the locale of the translations on the right.
 
 These are the texts for the login. Just like for message texts, you can select the locale on the right.
 
-<img src="/docs/img/guides/console/logintexts.png" alt="Login texts" width="600px" />
+<img
+  src="/docs/img/guides/console/logintexts.png"
+  alt="Login texts"
+  width="600px"
+/>
 
 ## OIDC token lifetimes and expiration
 

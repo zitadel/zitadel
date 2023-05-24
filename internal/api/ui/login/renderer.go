@@ -25,7 +25,8 @@ import (
 )
 
 const (
-	tmplError = "error"
+	tmplError   = "error"
+	tmplSuccess = "success"
 )
 
 type Renderer struct {
@@ -45,6 +46,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 	}
 	tmplMapping := map[string]string{
 		tmplError:                        "error.html",
+		tmplSuccess:                      "success.html",
 		tmplLogin:                        "login.html",
 		tmplUserSelection:                "select_user.html",
 		tmplPassword:                     "password.html",
@@ -77,6 +79,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplExternalNotFoundOption:       "external_not_found_option.html",
 		tmplLoginSuccess:                 "login_success.html",
 		tmplLDAPLogin:                    "ldap_login.html",
+		tmplDeviceAuthUserCode:           "device_usercode.html",
+		tmplDeviceAuthAction:             "device_action.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -161,7 +165,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return path.Join(r.pathPrefix, EndpointMFAPrompt)
 		},
 		"mfaPromptChangeUrl": func(id string, provider domain.MFAType) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, QueryAuthRequestID, id, "provider", provider))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v", EndpointMFAPrompt, QueryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAInitVerify)
@@ -323,6 +327,12 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var msg string
 	if err != nil {
+		log := logging.WithError(err)
+		if authReq != nil {
+			log = log.WithField("auth_req_id", authReq.ID)
+		}
+		log.Error()
+
 		_, msg = l.getErrorMessage(r, err)
 	}
 	data := l.getBaseData(r, authReq, "Errors.Internal", "", "Internal", msg)
@@ -441,6 +451,9 @@ func (l *Login) setLinksOnBaseData(baseData baseData, privacyPolicy *domain.Priv
 	}
 	if link, err := templates.ParseTemplateText(privacyPolicy.HelpLink, lang); err == nil {
 		baseData.HelpLink = link
+	}
+	if link, err := templates.ParseTemplateText(string(privacyPolicy.SupportEmail), lang); err == nil {
+		baseData.SupportEmail = link
 	}
 	return baseData
 }
@@ -602,6 +615,7 @@ type baseData struct {
 	TOSLink                string
 	PrivacyLink            string
 	HelpLink               string
+	SupportEmail           string
 	AuthReqID              string
 	CSRF                   template.HTML
 	Nonce                  string

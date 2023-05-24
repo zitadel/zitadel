@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import {
   AddAzureADProviderRequest as AdminAddAzureADProviderRequest,
@@ -18,6 +18,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
@@ -43,14 +44,17 @@ export class ProviderAzureADComponent {
 
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
+
+  public AzureTenantIDType: number = 3;
   public tenantTypes = [
+    this.AzureTenantIDType,
     AzureADTenantType.AZURE_AD_TENANT_TYPE_COMMON,
     AzureADTenantType.AZURE_AD_TENANT_TYPE_ORGANISATIONS,
     AzureADTenantType.AZURE_AD_TENANT_TYPE_CONSUMERS,
   ];
 
   constructor(
-    private router: Router,
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
@@ -67,8 +71,25 @@ export class ProviderAzureADComponent {
       emailVerified: new FormControl(false),
     });
 
+    this.authService
+      .isAllowed(
+        this.serviceType === PolicyComponentServiceType.ADMIN
+          ? ['iam.idp.write']
+          : this.serviceType === PolicyComponentServiceType.MGMT
+          ? ['org.idp.write']
+          : [],
+      )
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        if (allowed) {
+          this.form.enable();
+        } else {
+          this.form.disable();
+        }
+      });
+
     this.route.data.pipe(take(1)).subscribe((data) => {
-      this.serviceType = data.serviceType;
+      this.serviceType = data['serviceType'];
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
@@ -108,15 +129,34 @@ export class ProviderAzureADComponent {
         : new MgmtGetProviderByIDRequest();
     req.setId(id);
     this.service
-      .getProviderByID(req)
+      .getProviderID(req)
       .then((resp) => {
-        this.provider = resp.idp;
+        const object = resp.toObject();
+        this.provider = object.idp;
         this.loading = false;
         if (this.provider?.config?.azureAd) {
           this.form.patchValue(this.provider.config.azureAd);
           this.name?.setValue(this.provider.name);
           this.tenantId?.setValue(this.provider.config.azureAd.tenant?.tenantId);
           this.tenantType?.setValue(this.provider.config.azureAd.tenant?.tenantType);
+
+          const tenant = resp.getIdp()?.getConfig()?.getAzureAd()?.getTenant();
+
+          if (tenant) {
+            switch (tenant.getTypeCase()) {
+              case AzureADTenant.TypeCase.TENANT_ID:
+                this.tenantId?.setValue(tenant.getTenantId());
+                this.tenantType?.setValue(this.AzureTenantIDType);
+                break;
+              case AzureADTenant.TypeCase.TENANT_TYPE:
+                this.tenantType?.setValue(tenant.getTenantType());
+                this.tenantId?.setValue('');
+                break;
+              case AzureADTenant.TypeCase.TYPE_NOT_SET:
+                this.tenantType?.setValue(this.AzureTenantIDType);
+                break;
+            }
+          }
         }
       })
       .catch((error) => {
@@ -141,8 +181,11 @@ export class ProviderAzureADComponent {
     req.setEmailVerified(this.emailVerified?.value);
 
     const tenant = new AzureADTenant();
-    tenant.setTenantId(this.tenantId?.value);
-    tenant.setTenantType(this.tenantType?.value);
+    if (this.tenantType?.value === this.AzureTenantIDType) {
+      tenant.setTenantId(this.tenantId?.value);
+    } else {
+      tenant.setTenantType(this.tenantType?.value);
+    }
     req.setTenant(tenant);
 
     req.setScopesList(this.scopesList?.value);
@@ -176,9 +219,11 @@ export class ProviderAzureADComponent {
       req.setEmailVerified(this.emailVerified?.value);
 
       const tenant = new AzureADTenant();
-
-      tenant.setTenantId(this.tenantId?.value);
-      tenant.setTenantType(this.tenantType?.value);
+      if (this.tenantType?.value === this.AzureTenantIDType) {
+        tenant.setTenantId(this.tenantId?.value);
+      } else {
+        tenant.setTenantType(this.tenantType?.value);
+      }
       req.setTenant(tenant);
 
       req.setScopesList(this.scopesList?.value);

@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "オンボーディングの手順",
+    "MOREDESCRIPTION": "より多くのショートカット",
     "COMPLETED": "完了",
     "DISMISS": "いいえ、私はプロです。",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "ブランドをセットアップする",
-        "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。"
+        "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。",
+        "action": "ブランディングの設定"
       },
       "instance.smtp.config.added": {
         "title": "SMTP設定をセットアップする",
-        "description": "独自のメールサーバーを設定します。"
+        "description": "独自のメールサーバーを設定します。",
+        "action": "SMTP 設定を設定する"
       },
       "project.added": {
         "title": "最初のプロジェクトを作成する",
-        "description": "最初のプロジェクトを追加し、ロールと認証を定義します。"
+        "description": "最初のプロジェクトを追加し、ロールと認証を定義します。",
+        "action": "プロジェクトを作成"
       },
       "project.application.added": {
         "title": "最初のアプリケーションを作成する",
-        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。"
+        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。",
+        "action": "アプリケーションを作成"
       },
       "user.human.added": {
         "title": "ユーザーを追加する",
-        "description": "アプリケーションユーザーを追加します。"
+        "description": "アプリケーションユーザーを追加します。",
+        "action": "ユーザーを作成"
       },
       "user.grant.added": {
         "title": "ユーザーにグラントする",
-        "description": "ユーザーがアプリケーションにアクセスし、ロールをセットアップできるようにします。"
+        "description": "ユーザーがアプリケーションにアクセスし、ロールをセットアップできるようにします。",
+        "action": "承認の作成"
       }
     }
   },
@@ -241,9 +248,14 @@
   },
   "ERRORS": {
     "REQUIRED": "一部の必須項目が不足しています。",
+    "ATLEASTONE": "少なくとも 1 つの値を指定してください。",
     "TOKENINVALID": {
       "TITLE": "トークンが期限切れになりました。",
       "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
+    },
+    "EXHAUSTED": {
+      "TITLE": "認証されたリクエストのクォータを使い果たしました",
+      "DESCRIPTION": "このZITADELインスタンスの制限を削除または増加させる"
     },
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
@@ -1013,6 +1025,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1206,6 +1219,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1653,6 +1667,10 @@
       "AZUREAD": {
         "TITLE": "Microsoftプロバイダー",
         "DESCRIPTION": "Microsoftプロバイダーのクレデンシャルを入力してください。"
+      },
+      "LDAP": {
+        "TITLE": "LDAPプロバイダー",
+        "DESCRIPTION": "LDAPプロバイダーのクレデンシャルを入力してください。"
       }
     },
     "DETAIL": {
@@ -1681,15 +1699,18 @@
       "2": "非アクティブ"
     },
     "AZUREADTENANTTYPES": {
-      "0": "共通",
-      "1": "組織",
-      "2": "顧客"
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "テナントタイプ",
     "AZUREADTENANTID": "テナントID",
     "EMAILVERIFIED": "検証済みメールアドレス",
     "NAMEHINT": "指定されている場合、ログイン画面に表示されます。",
     "OPTIONAL": "オプション",
+    "LDAPATTRIBUTES": "LDAP 属性",
+    "UPDATEBINDPASSWORD": "バインドパスワードの更新",
     "UPDATECLIENTSECRET": "クライアントシークレットを更新する",
     "ADD": "IDプロバイダーを追加する",
     "TYPE": "タイプ",
@@ -1711,6 +1732,31 @@
     "SCOPESLIST": "スコープリスト",
     "CLIENTID": "クライアントID",
     "CLIENTSECRET": "クライアントシークレット",
+    "LDAPCONNECTION": "繋がり",
+    "LDAPUSERBINDING": "ユーザーバインディング",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "必要",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP表示名マッピング",
     "USERNAMEMAPPING": "ユーザー名マッピング",
     "DATES": "日付",
@@ -1891,6 +1937,8 @@
       "REGENERATESECRET": "クライアントシークレットを再生成する",
       "DEVMODE": "開発モード",
       "DEVMODEDESC": "注意：開発モードを有効にすると、URIが認証されません。",
+      "SKIPNATIVEAPPSUCCESSPAGE": "ログイン後に成功ページをスキップする",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "このネイティブアプリのログイン後に成功ページをスキップする",
       "REDIRECT": "リダイレクトURI",
       "REDIRECTSECTION": "リダイレクトURI",
       "POSTLOGOUTREDIRECT": "ログアウトURI",
@@ -1913,7 +1961,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2004,6 +2053,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "認証エンドポイントから直接トークンを取得します。"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "コンピューターまたはスマートフォンでデバイスを認証します。"
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "設定は他のオプションに対応していません。"
@@ -2030,6 +2083,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

@@ -1,5 +1,6 @@
 <cnsl-create-layout
   title="{{ 'APP.PAGES.CREATE' | translate }}"
+  class="app-create-wrapper"
   [createSteps]="
     appType?.value?.createType === AppCreateType.OIDC
       ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
@@ -22,7 +23,7 @@
   </mat-checkbox>
 
   <mat-horizontal-stepper
-    class="stepper"
+    class="stepper {{ 'last-edited-step-' + stepper.selectedIndex }}"
     *ngIf="!devmode"
     linear
     #stepper
@@ -57,13 +58,9 @@
       </form>
     </mat-step>
 
-    <!-- skip for native OIDC and SAML applications -->
+    <!-- skip for SAML applications -->
     <mat-step
-      *ngIf="
-        (appType?.value?.createType === AppCreateType.OIDC &&
-          appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE) ||
-        appType?.value?.createType === AppCreateType.API
-      "
+      *ngIf="appType?.value?.createType === AppCreateType.OIDC || appType?.value?.createType === AppCreateType.API"
       [stepControl]="secondFormGroup"
       [editable]="true"
     >
@@ -92,9 +89,11 @@
         </div>
       </form>
     </mat-step>
-
     <!-- show redirect step only for OIDC apps -->
-    <mat-step *ngIf="appType?.value?.createType === AppCreateType.OIDC" [editable]="true">
+    <mat-step
+      *ngIf="appType?.value?.createType === AppCreateType.OIDC && authMethod?.value !== 'DEVICECODE'"
+      [editable]="true"
+    >
       <ng-template matStepLabel>{{ 'APP.OIDC.REDIRECTSECTION' | translate }}</ng-template>
 
       <p class="step-title">{{ 'APP.OIDC.REDIRECTTITLE' | translate }}</p>
@@ -110,10 +109,9 @@
 
       <cnsl-redirect-uris
         class="redirect-section"
-        [canWrite]="true"
+        [disabled]="false"
         [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
-        (changedUris)="oidcAppRequest.setRedirectUrisList($any($event))"
-        [urisList]="oidcAppRequest.toObject().redirectUrisList"
+        [(ngModel)]="redirectUris"
         [getValues]="requestRedirectValuesSubject$"
         title="{{ 'APP.OIDC.REDIRECT' | translate }}"
         data-e2e="redirect-uris"
@@ -139,11 +137,10 @@
 
       <cnsl-redirect-uris
         class="redirect-section"
-        [canWrite]="true"
-        (changedUris)="oidcAppRequest.setPostLogoutRedirectUrisList($any($event))"
-        [urisList]="oidcAppRequest.toObject().postLogoutRedirectUrisList"
-        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+        [disabled]="false"
+        [(ngModel)]="postLogoutUrisList"
         [getValues]="requestRedirectValuesSubject$"
+        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
         [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
         data-e2e="postlogout-uris"
       >
@@ -307,7 +304,7 @@
           </span>
           <span class="right">
             <span>
-              {{ 'APP.API.AUTHMETHOD.' + authMethodType?.value | translate }}
+              {{ 'APP.API.AUTHMETHOD.' + apiAppRequest.toObject().authMethodType | translate }}
             </span>
           </span>
         </div>
@@ -336,6 +333,11 @@
         </button>
       </div>
     </mat-step>
+
+    <!-- Icon override -->
+    <ng-template matStepperIcon="edit">
+      <mat-icon>check</mat-icon>
+    </ng-template>
   </mat-horizontal-stepper>
 
   <div *ngIf="devmode" class="dev">
@@ -427,24 +429,30 @@
         </ng-container>
       </div>
 
-      <div class="content" *ngIf="formappType?.value?.createType === AppCreateType.OIDC">
+      <div
+        class="content"
+        *ngIf="
+          formappType?.value?.createType === AppCreateType.OIDC &&
+          !(oidcAppRequest.toObject().appType === OIDCAppType.OIDC_APP_TYPE_NATIVE && grantTypesListContainsOnlyDeviceCode)
+        "
+      >
         <div class="formfield full-width">
           <cnsl-redirect-uris
             class="redirect-section"
-            [canWrite]="true"
-            (changedUris)="oidcAppRequest.setRedirectUrisList($any($event))"
-            [urisList]="oidcAppRequest.toObject().redirectUrisList"
-            title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+            [disabled]="false"
+            [(ngModel)]="redirectUris"
+            [ngModelOptions]="{ standalone: true }"
             [getValues]="requestRedirectValuesSubject$"
+            title="{{ 'APP.OIDC.REDIRECT' | translate }}"
             [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
           >
           </cnsl-redirect-uris>
 
           <cnsl-redirect-uris
             class="redirect-section"
-            [canWrite]="true"
-            (changedUris)="oidcAppRequest.setPostLogoutRedirectUrisList($any($event))"
-            [urisList]="oidcAppRequest.toObject().postLogoutRedirectUrisList"
+            [disabled]="false"
+            [(ngModel)]="postLogoutUrisList"
+            [ngModelOptions]="{ standalone: true }"
             title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
             [getValues]="requestRedirectValuesSubject$"
             [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"

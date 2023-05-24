@@ -63,6 +63,9 @@ var (
 	SecurityPolicyProjection            *securityPolicyProjection
 	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
+	NotificationsQuotaProjection        interface{}
+	DeviceAuthProjection                *deviceAuthProjection
+	SessionProjection                   *sessionProjection
 )
 
 type projection interface {
@@ -80,11 +83,11 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 			HandlerConfig: handler.HandlerConfig{
 				Eventstore: es,
 			},
-			RequeueEvery:            config.RequeueEvery,
-			RetryFailedAfter:        config.RetryFailedAfter,
-			Retries:                 config.MaxFailureCount,
-			ConcurrentInstances:     config.ConcurrentInstances,
-			HandleInactiveInstances: config.HandleInactiveInstances,
+			RequeueEvery:          config.RequeueEvery,
+			RetryFailedAfter:      config.RetryFailedAfter,
+			Retries:               config.MaxFailureCount,
+			ConcurrentInstances:   config.ConcurrentInstances,
+			HandleActiveInstances: config.HandleActiveInstances,
 		},
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,
@@ -138,6 +141,8 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 	KeyProjection = newKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	SecurityPolicyProjection = newSecurityPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["security_policies"]))
 	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
+	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
+	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
 	newProjectionsList()
 	return nil
 }
@@ -174,8 +179,8 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 	if customConfig.RetryFailedAfter != nil {
 		config.RetryFailedAfter = *customConfig.RetryFailedAfter
 	}
-	if customConfig.HandleInactiveInstances != nil {
-		config.HandleInactiveInstances = *customConfig.HandleInactiveInstances
+	if customConfig.HandleActiveInstances != nil {
+		config.HandleActiveInstances = *customConfig.HandleActiveInstances
 	}
 
 	return config
@@ -233,5 +238,7 @@ func newProjectionsList() {
 		KeyProjection,
 		SecurityPolicyProjection,
 		NotificationPolicyProjection,
+		DeviceAuthProjection,
+		SessionProjection,
 	}
 }

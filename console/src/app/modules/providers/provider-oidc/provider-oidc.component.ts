@@ -37,7 +37,7 @@ export class ProviderOIDCComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  public oidcFormGroup!: UntypedFormGroup;
+  public form!: UntypedFormGroup;
 
   public loading: boolean = false;
 
@@ -50,7 +50,7 @@ export class ProviderOIDCComponent {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    this.oidcFormGroup = new UntypedFormGroup({
+    this.form = new UntypedFormGroup({
       name: new UntypedFormControl('', [requiredValidator]),
       clientId: new UntypedFormControl('', [requiredValidator]),
       clientSecret: new UntypedFormControl('', [requiredValidator]),
@@ -59,7 +59,7 @@ export class ProviderOIDCComponent {
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
-      this.serviceType = data.serviceType;
+      this.serviceType = data['serviceType'];
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
@@ -105,7 +105,7 @@ export class ProviderOIDCComponent {
         this.provider = resp.idp;
         this.loading = false;
         if (this.provider?.config?.oidc) {
-          this.oidcFormGroup.patchValue(this.provider.config.oidc);
+          this.form.patchValue(this.provider.config.oidc);
           this.name?.setValue(this.provider.name);
         }
       })
@@ -130,6 +130,7 @@ export class ProviderOIDCComponent {
     req.setClientSecret(this.clientSecret?.value);
     req.setIssuer(this.issuer?.value);
     req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
 
     this.loading = true;
     this.service
@@ -158,6 +159,7 @@ export class ProviderOIDCComponent {
       req.setClientSecret(this.clientSecret?.value);
       req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
 
       this.loading = true;
       this.service
@@ -204,22 +206,22 @@ export class ProviderOIDCComponent {
   }
 
   public get name(): AbstractControl | null {
-    return this.oidcFormGroup.get('name');
+    return this.form.get('name');
   }
 
   public get clientId(): AbstractControl | null {
-    return this.oidcFormGroup.get('clientId');
+    return this.form.get('clientId');
   }
 
   public get clientSecret(): AbstractControl | null {
-    return this.oidcFormGroup.get('clientSecret');
+    return this.form.get('clientSecret');
   }
 
   public get issuer(): AbstractControl | null {
-    return this.oidcFormGroup.get('issuer');
+    return this.form.get('issuer');
   }
 
   public get scopesList(): AbstractControl | null {
-    return this.oidcFormGroup.get('scopesList');
+    return this.form.get('scopesList');
   }
 }

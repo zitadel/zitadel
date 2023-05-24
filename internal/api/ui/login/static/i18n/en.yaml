@@ -7,7 +7,7 @@ Login:
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
   ExternalUserDescription: Login with an external user.
-  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organisation.
+  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
   RegisterButtonText: register
   NextButtonText: next
 
@@ -26,7 +26,7 @@ SelectAccount:
   OtherUser: Other User
   SessionState0: active
   SessionState1: inactive
-  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organisation.
+  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
 
 Password:
   Title: Password
@@ -118,7 +118,7 @@ InitMFADone:
 MFAProvider:
   Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
   Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
-  ChooseOther: or choose an other option
+  ChooseOther: or choose another option
 
 VerifyMFAOTP:
   Title: Verify 2-Factor
@@ -143,7 +143,7 @@ Passwordless:
 
 PasswordlessPrompt:
   Title: Passwordless setup
-  Description: Would you like to setup passwordless login? (Authenticationmethods of your device like FaceID, Windows Hello or Fingerprint)
+  Description: Would you like to setup passwordless login? (Authentication methods of your device like FaceID, Windows Hello or Fingerprint)
   DescriptionInit: You need to set up passwordless login. Use the link you were given to register your device.
   PasswordlessButtonText: Go passwordless
   NextButtonText: next
@@ -172,6 +172,7 @@ PasswordChange:
   NewPasswordConfirmLabel: Password confirmation
   CancelButtonText: cancel
   NextButtonText: next
+  Footer: Footer
 
 PasswordChangeDone:
   Title: Change Password
@@ -220,6 +221,7 @@ RegistrationUser:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -252,6 +254,7 @@ ExternalRegistrationUserOverview:
   Chinese: 简体中文
   Japanese: 日本語
   Polish: Polski
+  Spanish: Español
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -262,9 +265,9 @@ ExternalRegistrationUserOverview:
   NextButtonText: save
 
 RegistrationOrg:
-  Title: Organisation Registration
-  Description: Enter your organisationname and userdata.
-  OrgNameLabel: Organisationname
+  Title: Organization Registration
+  Description: Enter your organization name and userdata.
+  OrgNameLabel: Organization name
   EmailLabel: E-Mail
   UsernameLabel: Username
   FirstnameLabel: First name
@@ -312,12 +315,32 @@ ExternalNotFound:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+
+DeviceAuth:
+  Title: Device Authorization
+  UserCode:
+    Label: User Code
+    Description: Enter the user code presented on the device.
+    ButtonNext: next
+  Action:
+    Description: Grant device access.
+    GrantDevice: you are about to grant device
+    AccessToScopes: access to the following scopes
+    Button:
+      Allow: allow
+      Deny: deny
+  Done:
+    Description: Done.
+    Approved: Device authorization approved. You can now return to the device.
+    Denied: Device authorization denied. You can now return to the device.
 
 Footer:
   PoweredBy: Powered By
   Tos: TOS
   PrivacyPolicy: Privacy policy
   Help: Help
+  SupportEmail: Support E-mail
 
 Errors:
   Internal: An internal error occurred
@@ -332,8 +355,8 @@ Errors:
     NotFound: User could not be found
     AlreadyExists: User already exists
     Inactive: User is inactive
-    NotFoundOnOrg: User could not be found on chosen organisation
-    NotAllowedOrg: User is no member of the required organisation
+    NotFoundOnOrg: User could not be found on chosen organization
+    NotAllowedOrg: User is no member of the required organization
     NotMatchingUserID: User and user in authrequest don't match
     UserIDMissing: UserID is empty
     Invalid: Invalid userdata
@@ -363,11 +386,11 @@ Errors:
       NotFound: Address not found
       NotChanged: Address not changed
     Username:
-      AlreadyExists:  Username already taken
+      AlreadyExists: Username already taken
       Reserved: Username is already taken
       Empty: Username is empty
     Password:
-      ConfirmationWrong: Passwordconfirmation is wrong
+      ConfirmationWrong: Password confirmation is wrong
       Empty: Password is empty
       Invalid: Password is invalid
       InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
@@ -375,7 +398,7 @@ Errors:
       Invalid: Username or Password is invalid
     PasswordComplexityPolicy:
       NotFound: Password policy not found
-      MinLength: Password is to short
+      MinLength: Password is too short
       HasLower: Password must contain lower letter
       HasUpper: Password must contain upper letter
       HasNumber: Password must contain number
@@ -411,7 +434,7 @@ Errors:
       CreationNotAllowed: Creation of a new user is not allowed on this Provider
       LinkingNotAllowed: Linking of a user is not allowed on this Provider
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
-    ProjectRequired: Login not possible. The organisation of the user must be granted to the project. Please contact your administrator.
+    ProjectRequired: Login not possible. The organization of the user must be granted to the project. Please contact your administrator.
   IdentityProvider:
     InvalidConfig: Identity Provider configuration is invalid
   IAM:
@@ -420,5 +443,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: Registration is not allowed
+  DeviceAuth:
+    NotExisting: User Code doesn't exist
 
 optional: (optional)

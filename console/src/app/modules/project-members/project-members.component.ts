@@ -45,13 +45,13 @@ export class ProjectMembersComponent {
     private route: ActivatedRoute,
   ) {
     this.route.data.pipe(take(1)).subscribe((data) => {
-      this.projectType = data.type;
+      this.projectType = data['type'];
 
       this.getRoleOptions();
 
       this.route.params.subscribe((params) => {
-        this.projectId = params.projectid;
-        this.grantId = params.grantid;
+        this.projectId = params['projectid'];
+        this.grantId = params['grantid'];
         this.loadMembers();
       });
     });

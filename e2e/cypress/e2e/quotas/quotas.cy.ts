@@ -2,6 +2,7 @@ import { addQuota, ensureQuotaIsAdded, ensureQuotaIsRemoved, removeQuota, Unit }
 import { createHumanUser, ensureUserDoesntExist } from 'support/api/users';
 import { Context } from 'support/commands';
 import { ZITADELWebhookEvent } from 'support/types';
+import { textChangeRangeIsUnchanged } from 'typescript';
 
 beforeEach(() => {
   cy.context().as('ctx');
@@ -93,7 +94,7 @@ describe('quotas', () => {
         });
       });
 
-      it('authenticated requests are limited', () => {
+      it('only authenticated requests are limited', () => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
             const start = new Date();
@@ -106,16 +107,11 @@ describe('quotas', () => {
                 },
               });
             });
+            expectCookieDoesntExist();
             const expiresMax = new Date();
-            expiresMax.setMinutes(expiresMax.getMinutes() + 2);
-            cy.getCookie('zitadel.quota.limiting').then((cookie) => {
-              expect(cookie.value).to.equal('false');
-              const cookieExpiry = new Date();
-              cookieExpiry.setTime(cookie.expiry * 1000);
-              expect(cookieExpiry).to.be.within(start, expiresMax);
-            });
+            expiresMax.setMinutes(expiresMax.getMinutes() + 20);
             cy.request({
-              url: urls[0],
+              url: urls[1],
               method: 'GET',
               auth: {
                 bearer: ctx.api.token,
@@ -126,12 +122,28 @@ describe('quotas', () => {
             });
             cy.getCookie('zitadel.quota.limiting').then((cookie) => {
               expect(cookie.value).to.equal('true');
+              const cookieExpiry = new Date();
+              cookieExpiry.setTime(cookie.expiry * 1000);
+              expect(cookieExpiry).to.be.within(start, expiresMax);
             });
             createHumanUser(ctx.api, testUserName, false).then((res) => {
               expect(res.status).to.equal(429);
             });
+            // visit limited console
+            cy.visit('/users/me');
+            cy.contains('#authenticated-requests-exhausted-dialog button', 'Continue').click();
+            const upgradeInstancePage = `https://example.com/instances/${ctx.instanceId}`;
+            cy.origin(upgradeInstancePage, { args: { upgradeInstancePage } }, ({ upgradeInstancePage }) => {
+              cy.location('href').should('equal', upgradeInstancePage);
+            });
+            // upgrade instance
             ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests);
+            // visit upgraded console again
+            cy.visit('/users/me');
+            cy.get('[data-e2e="top-view-title"]');
+            expectCookieDoesntExist();
             createHumanUser(ctx.api, testUserName);
+            expectCookieDoesntExist();
           });
         });
       });
@@ -144,7 +156,7 @@ describe('quotas', () => {
 
       const amount = 100;
       const percent = 10;
-      const usage = 25;
+      const usage = 35;
 
       describe('without repetition', () => {
         beforeEach(() => {
@@ -160,7 +172,7 @@ describe('quotas', () => {
           });
         });
 
-        it('fires once with the expected payload', () => {
+        it('fires at least once with the expected payload', () => {
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
             cy.get<Context>('@ctx').then((ctx) => {
               for (let i = 0; i < usage; i++) {
@@ -175,16 +187,68 @@ describe('quotas', () => {
             });
             cy.waitUntil(() =>
               cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-                if (events.length != 1) {
+                if (events.length < 1) {
                   return false;
                 }
                 return Cypress._.matches(<ZITADELWebhookEvent>{
-                  callURL: callURL,
-                  threshold: percent,
-                  unit: 1,
-                  usage: percent,
+                  sentStatus: 200,
+                  payload: {
+                    callURL: callURL,
+                    threshold: percent,
+                    unit: 1,
+                    usage: percent,
+                  },
                 })(events[0]);
               }),
+            );
+          });
+        });
+
+        it('fires until the webhook returns a successful message', () => {
+          cy.task('failWebhookEvents', 8);
+          cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
+            cy.get<Context>('@ctx').then((ctx) => {
+              for (let i = 0; i < usage; i++) {
+                cy.request({
+                  url: urls[0],
+                  method: 'GET',
+                  auth: {
+                    bearer: ctx.api.token,
+                  },
+                });
+              }
+            });
+            cy.waitUntil(
+              () =>
+                cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
+                  if (events.length != 9) {
+                    return false;
+                  }
+                  return events.reduce<boolean>((a, b, i) => {
+                    return !a
+                      ? a
+                      : i < 8
+                      ? Cypress._.matches(<ZITADELWebhookEvent>{
+                          sentStatus: 500,
+                          payload: {
+                            callURL: callURL,
+                            threshold: percent,
+                            unit: 1,
+                            usage: percent,
+                          },
+                        })(b)
+                      : Cypress._.matches(<ZITADELWebhookEvent>{
+                          sentStatus: 200,
+                          payload: {
+                            callURL: callURL,
+                            threshold: percent,
+                            unit: 1,
+                            usage: percent,
+                          },
+                        })(b);
+                  }, true);
+                }),
+              { timeout: 60_000 },
             );
           });
         });
@@ -222,23 +286,25 @@ describe('quotas', () => {
           });
           cy.waitUntil(() =>
             cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-              if (events.length != 1) {
-                return false;
-              }
+              let foundExpected = 0;
               for (let i = 0; i < events.length; i++) {
-                const threshold = percent * (i + 1);
-                if (
-                  !Cypress._.matches(<ZITADELWebhookEvent>{
-                    callURL: callURL,
-                    threshold: threshold,
-                    unit: 1,
-                    usage: threshold,
-                  })(events[i])
-                ) {
-                  return false;
+                for (let expect = 10; expect <= 30; expect += 10) {
+                  if (
+                    Cypress._.matches(<ZITADELWebhookEvent>{
+                      sentStatus: 200,
+                      payload: {
+                        callURL: callURL,
+                        threshold: expect,
+                        unit: 1,
+                        usage: expect,
+                      },
+                    })(events[i])
+                  ) {
+                    foundExpected++;
+                  }
                 }
               }
-              return true;
+              return foundExpected >= 3;
             }),
           );
         });
@@ -246,3 +312,9 @@ describe('quotas', () => {
     });
   });
 });
+
+function expectCookieDoesntExist() {
+  cy.getCookie('zitadel.quota.limiting').then((cookie) => {
+    expect(cookie).to.be.null;
+  });
+}

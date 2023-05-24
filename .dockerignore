@@ -7,6 +7,7 @@
 /k8s/
 /node_modules/
 /console/src/app/proto/generated/
+/console/.angular
 /console/tmp/
 .releaserc.js
 changelog.config.js
@@ -18,3 +19,4 @@ pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
 .goreleaser.yaml
 .artifacts/
+.vscode

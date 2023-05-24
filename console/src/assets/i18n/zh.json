@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "你的入职过程",
+    "MOREDESCRIPTION": "更多捷径",
     "COMPLETED": "已完成",
     "DISMISS": "隐藏",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "设置你的品牌",
-        "description": "定义你的登录的颜色和形状，上传你的标志和图标。"
+        "description": "定义你的登录的颜色和形状，上传你的标志和图标。",
+        "action": "设置品牌"
       },
       "instance.smtp.config.added": {
         "title": "SMTP设置",
-        "description": "设置你自己的邮件服务器设置"
+        "description": "设置你自己的邮件服务器设置",
+        "action": "设置 SMTP 设置"
       },
       "project.added": {
         "title": "创建你的第一个项目",
-        "description": "添加你的第一个项目并定义其角色和授权。"
+        "description": "添加你的第一个项目并定义其角色和授权。",
+        "action": "创建项目"
       },
       "project.application.added": {
         "title": "创建你的第一个应用程序",
-        "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。"
+        "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。",
+        "action": "创建应用程序"
       },
       "user.human.added": {
         "title": "添加用户",
-        "description": "添加你的应用程序用户"
+        "description": "添加你的应用程序用户",
+        "action": "创建用户"
       },
       "user.grant.added": {
         "title": "授予用户",
-        "description": "允许用户访问你的应用程序并设置他们的角色。"
+        "description": "允许用户访问你的应用程序并设置他们的角色。",
+        "action": "创建授权"
       }
     }
   },
@@ -240,9 +247,14 @@
   },
   "ERRORS": {
     "REQUIRED": "请填写此栏",
+    "ATLEASTONE": "P至少提供一个值。",
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
+    },
+    "EXHAUSTED": {
+      "TITLE": "你的认证请求配额已用完.",
+      "DESCRIPTION": "删除或增加这个ZITADEL实例的限制。"
     },
     "INVALID_FORMAT": "格式是无效的。",
     "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
@@ -1012,6 +1024,7 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
@@ -1140,6 +1153,10 @@
       "EMAILNOSVG": "电子邮件不支持 SVG 文件格式。因此建议以 PNG 或其他支持的格式上传您的 Logo。",
       "MAXSIZEEXCEEDED": "文件大小超过了 524kB。",
       "FONTINLOGINONLY": "该字体仅在当前登录界面中显示。",
+      "BACKGROUNDCOLOR": "背景颜色",
+      "PRIMARYCOLOR": "原色",
+      "WARNCOLOR": "警示色",
+      "FONTCOLOR": "字体颜色",
       "VIEWS": {
         "PREVIEW": "预览",
         "CURRENT": "当前配置"
@@ -1184,6 +1201,7 @@
       "TOSLINK": "链接到服务条款",
       "POLICYLINK": "链接到隐私政策",
       "HELPLINK": "链接到帮助",
+      "SUPPORTEMAIL": "支持邮箱",
       "SAVED": "保存成功！",
       "RESET_TITLE": "恢复默认值",
       "RESET_DESCRIPTION": "您即将恢复 TOS 和隐私政策的默认链接。你真的要继续吗？"
@@ -1204,6 +1222,7 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
@@ -1651,6 +1670,10 @@
       "AZUREAD": {
         "TITLE": "Microsoft 身份提供者",
         "DESCRIPTION": "输入您的 Microsoft 身份提供商的凭据"
+      },
+      "LDAP": {
+        "TITLE": "LDAP 身份提供者",
+        "DESCRIPTION": "输入您的 LDAP 身份提供商的凭据"
       }
     },
     "DETAIL": {
@@ -1684,15 +1707,18 @@
       "2": "停用"
     },
     "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
       "0": "Common",
       "1": "Organizations",
-      "2": "Customers"
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "租户类型",
     "AZUREADTENANTID": "租户编号",
     "EMAILVERIFIED": "电子邮件已验证",
     "NAMEHINT": "如果指定，它将显示在登录界面。",
     "OPTIONAL": "可选",
+    "LDAPATTRIBUTES": "LDAP 属性",
+    "UPDATEBINDPASSWORD": "更新绑定密码",
     "UPDATECLIENTSECRET": "更新客户秘密",
     "ADD": "添加身份提供者",
     "TYPE": "类型",
@@ -1714,6 +1740,31 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "联系",
+    "LDAPUSERBINDING": "用户绑定",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "必需的",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "Firstname attribute",
+    "LASTNAMEATTRIBUTE": "Lastname attribute",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
     "IDPDISPLAYNAMMAPPING": "IDP 展示名称映射",
     "USERNAMEMAPPING": "用户名映射",
     "DATES": "日期",
@@ -1894,6 +1945,8 @@
       "REGENERATESECRET": "重新生成客户端密钥",
       "DEVMODE": "开发模式",
       "DEVMODEDESC": "注意：启用开发模式的重定向 URI 将不会被验证。",
+      "SKIPNATIVEAPPSUCCESSPAGE": "登录后跳过成功页面",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "登录后跳过本机应用的成功页面",
       "REDIRECT": "重定向 URLs",
       "REDIRECTSECTION": "重定向 URLs",
       "POSTLOGOUTREDIRECT": "退出登录重定向 URLs",
@@ -1916,7 +1969,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -1995,6 +2049,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "直接从授权端点获取令牌"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "在计算机或智能手机上授权设备。"
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "您的设置与任何其他选项都不对应。"
@@ -2021,6 +2079,7 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",

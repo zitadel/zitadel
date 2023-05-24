@@ -286,7 +286,7 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
-	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
+	externalUser, externalUserChange, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -300,7 +300,7 @@ func (l *Login) handleExternalUserAuthenticated(
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser)
 		return
 	}
-	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 {
+	if provider.IsAutoUpdate || len(externalUser.Metadatas) > 0 || externalUserChange {
 		// read current auth request state (incl. authorized user)
 		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 		if err != nil {
@@ -308,7 +308,7 @@ func (l *Login) handleExternalUserAuthenticated(
 			return
 		}
 	}
-	if provider.IsAutoUpdate {
+	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
@@ -558,7 +558,7 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 	if user.Human == nil {
 		return errors.ThrowPreconditionFailed(nil, "LOGIN-WLTce", "Errors.User.NotHuman")
 	}
-	if externalUser.Email != "" && externalUser.Email != user.Human.Email && externalUser.IsEmailVerified != user.Human.IsEmailVerified {
+	if externalUser.Email != "" && (externalUser.Email != user.Human.Email || externalUser.IsEmailVerified != user.Human.IsEmailVerified) {
 		emailCodeGenerator, err := l.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
 		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update email")
 		if err == nil {
@@ -572,7 +572,7 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 			logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update email")
 		}
 	}
-	if externalUser.Phone != "" && externalUser.Phone != user.Human.Phone && externalUser.IsPhoneVerified != user.Human.IsPhoneVerified {
+	if externalUser.Phone != "" && (externalUser.Phone != user.Human.Phone || externalUser.IsPhoneVerified != user.Human.IsPhoneVerified) {
 		phoneCodeGenerator, err := l.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
 		logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update phone")
 		if err == nil {
@@ -837,15 +837,15 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 	return nil
 }
 
-func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens, user idp.User, err error) {
-	if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, user, err); actionErr != nil {
+func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, tokens *oidc.Tokens[*oidc.IDTokenClaims], user idp.User, err error) {
+	if _, _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, user, err); actionErr != nil {
 		logging.WithError(err).Error("both external user authentication and action post authentication failed")
 	}
 	l.renderLogin(w, r, authReq, err)
 }
 
 // tokens extracts the oidc.Tokens for backwards compatibility of PostExternalAuthenticationActions
-func tokens(session idp.Session) *oidc.Tokens {
+func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 	switch s := session.(type) {
 	case *openid.Session:
 		return s.Tokens

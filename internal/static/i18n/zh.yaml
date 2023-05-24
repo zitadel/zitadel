@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: 在所选组织中找不到用户
     NotAllowedOrg: 用户不是所需组织的成员
     UserIDMissing: 缺少用户 ID
+    UserIDWrong: "请求用户不等于经过身份验证的用户"
     DomainPolicyNil: 组织策略为空
     EmailAsUsernameNotAllowed: 电子邮件不允许作为用户名
     Invalid: 用户数据无效
@@ -67,6 +68,7 @@ Errors:
     NoChanges: 未发现任何更改
     InitCodeNotFound: 未找到初始化验证码
     UsernameNotChanged: 用户名未更改
+    InvalidURLTemplate: URL模板无效
     Profile:
       NotFound: 未找到个人资料
       NotChanged: 个人资料未更改
@@ -469,6 +471,11 @@ Errors:
     Execution:
       StorageFailed: 将行动执行日志存储到数据库失败
       ScanFailed: Q查询动作执行秒数的使用情况失败
+  Session:
+    NotExisting: 会话不存在
+    Terminated: 会话已经终止
+    Token:
+      Invalid: 会话令牌是无效的
 
 AggregateTypes:
   action: 动作

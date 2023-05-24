@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"io"
 	"regexp"
 	"strings"
 	"time"
@@ -35,6 +36,8 @@ type Email struct {
 
 	EmailAddress    EmailAddress
 	IsEmailVerified bool
+	// PlainCode is set by the command and can be used to return it to the caller (API)
+	PlainCode *string
 }
 
 type EmailCode struct {
@@ -51,13 +54,25 @@ func (e *Email) Validate() error {
 	return e.EmailAddress.Validate()
 }
 
-func NewEmailCode(emailGenerator crypto.Generator) (*EmailCode, error) {
-	emailCodeCrypto, _, err := crypto.NewCode(emailGenerator)
+func NewEmailCode(emailGenerator crypto.Generator) (*EmailCode, string, error) {
+	emailCodeCrypto, code, err := crypto.NewCode(emailGenerator)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	return &EmailCode{
 		Code:   emailCodeCrypto,
 		Expiry: emailGenerator.Expiry(),
-	}, nil
+	}, code, nil
+}
+
+type ConfirmURLData struct {
+	UserID string
+	Code   string
+	OrgID  string
+}
+
+// RenderConfirmURLTemplate parses and renders tmpl.
+// userID, code and orgID are passed into the [ConfirmURLData].
+func RenderConfirmURLTemplate(w io.Writer, tmpl, userID, code, orgID string) error {
+	return renderURLTemplate(w, tmpl, &ConfirmURLData{userID, code, orgID})
 }

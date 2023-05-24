@@ -99,15 +99,6 @@ func (a *AuthRequest) GetSubject() string {
 	return a.UserID
 }
 
-func (a *AuthRequest) Done() bool {
-	for _, step := range a.PossibleSteps {
-		if step.Type() == domain.NextStepRedirectToCallback {
-			return true
-		}
-	}
-	return false
-}
-
 func (a *AuthRequest) oidc() *domain.AuthRequestOIDC {
 	return a.Request.(*domain.AuthRequestOIDC)
 }

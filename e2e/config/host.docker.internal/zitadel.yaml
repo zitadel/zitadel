@@ -1,3 +1,6 @@
+Log:
+  Level: info
+
 ExternalDomain: host.docker.internal
 ExternalSecure: false
 
@@ -30,7 +33,15 @@ LogStore:
 Quotas:
   Access:
     ExhaustedCookieKey: "zitadel.quota.limiting"
-    ExhaustedCookieMaxAge: "60s"
+    ExhaustedCookieMaxAge: "600s"
+
+Console:
+  InstanceManagementURL: "https://example.com/instances/{{.InstanceID}}"
+
+Projections:
+  Customizations:
+    NotificationsQuotas:
+      RequeueEvery: 1s
 
 DefaultInstance:
   LoginPolicy:
