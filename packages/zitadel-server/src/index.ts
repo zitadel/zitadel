@@ -11,13 +11,23 @@ export {
   Theme,
 } from "./proto/server/zitadel/settings/v2alpha/branding_settings";
 
+export { Session } from "./proto/server/zitadel/session/v2alpha/session";
+export {
+  ListSessionsResponse,
+  GetSessionResponse,
+  CreateSessionResponse,
+  SetSessionResponse,
+} from "./proto/server/zitadel/session/v2alpha/session_service";
 export {
   GetPasswordComplexitySettingsResponse,
   GetBrandingSettingsResponse,
   GetLegalAndSupportSettingsResponse,
   GetGeneralSettingsResponse,
 } from "./proto/server/zitadel/settings/v2alpha/settings_service";
-export { AddHumanUserResponse } from "./proto/server/zitadel/user/v2alpha/user_service";
+export {
+  AddHumanUserResponse,
+  VerifyEmailResponse,
+} from "./proto/server/zitadel/user/v2alpha/user_service";
 
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2alpha/legal_settings";
 export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2alpha/password_settings";

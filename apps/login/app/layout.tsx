@@ -2,7 +2,6 @@ import "#/styles/globals.scss";
 import { AddressBar } from "#/ui/AddressBar";
 import { GlobalNav } from "#/ui/GlobalNav";
 import { Lato } from "next/font/google";
-import Byline from "#/ui/Byline";
 import { LayoutProviders } from "#/ui/LayoutProviders";
 import { Analytics } from "@vercel/analytics/react";
 import ThemeWrapper from "#/ui/ThemeWrapper";
@@ -25,8 +24,7 @@ export default async function RootLayout({
   // later only shown with dev mode enabled
   const showNav = true;
 
-  //   const general = await getGeneralSettings(server);
-  const branding: BrandingSettings = await getBrandingSettings(server);
+  const branding = await getBrandingSettings(server);
   let partial: Partial<BrandingSettings> | undefined;
   if (branding) {
     partial = {

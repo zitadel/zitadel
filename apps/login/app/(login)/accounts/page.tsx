@@ -1,3 +1,4 @@
+import { Session } from "#/../../packages/zitadel-server/dist";
 import { listSessions, server } from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
 import { Avatar } from "#/ui/Avatar";
@@ -6,21 +7,22 @@ import { UserPlusIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
 
-async function loadSessions() {
+async function loadSessions(): Promise<Session[]> {
   const ids = await getAllSessionIds();
 
   if (ids && ids.length) {
-    return listSessions(
+    const response = await listSessions(
       server,
       ids.filter((id: string | undefined) => !!id)
     );
+    return response?.sessions ?? [];
   } else {
     return [];
   }
 }
 
 export default async function Page() {
-  const { sessions } = await loadSessions();
+  const sessions = await loadSessions();
 
   return (
     <div className="flex flex-col items-center space-y-4">

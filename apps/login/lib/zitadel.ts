@@ -7,10 +7,18 @@ import {
   initializeServer,
   session,
   GetGeneralSettingsResponse,
+  CreateSessionResponse,
   GetBrandingSettingsResponse,
   GetPasswordComplexitySettingsResponse,
   GetLegalAndSupportSettingsResponse,
   AddHumanUserResponse,
+  BrandingSettings,
+  ListSessionsResponse,
+  LegalAndSupportSettings,
+  PasswordComplexitySettings,
+  GetSessionResponse,
+  VerifyEmailResponse,
+  SetSessionResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -28,67 +36,47 @@ if (!getServers().length) {
 
 export function getBrandingSettings(
   server: ZitadelServer
-): Promise<any | undefined> {
-  // settings.branding_settings.BrandingSettings
+): Promise<BrandingSettings | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
-    .getBrandingSettings(
-      {},
-      {
-        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
-      }
-    )
+    .getBrandingSettings({}, {})
     .then((resp: GetBrandingSettingsResponse) => resp.settings);
 }
 
 export function getGeneralSettings(
   server: ZitadelServer
-): Promise<any | undefined> {
-  // settings.branding_settings.BrandingSettings
+): Promise<string[] | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
-    .getGeneralSettings(
-      {},
-      {
-        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
-      }
-    )
+    .getGeneralSettings({}, {})
     .then((resp: GetGeneralSettingsResponse) => resp.supportedLanguages);
 }
 
 export function getLegalAndSupportSettings(
   server: ZitadelServer
-): Promise<any | undefined> {
+): Promise<LegalAndSupportSettings | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
-    .getLegalAndSupportSettings(
-      {},
-      {
-        //  metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
-      }
-    )
-    .then((resp: GetLegalAndSupportSettingsResponse) => resp.settings);
+    .getLegalAndSupportSettings({}, {})
+    .then((resp: GetLegalAndSupportSettingsResponse) => {
+      return resp.settings;
+    });
 }
 
 export function getPasswordComplexitySettings(
   server: ZitadelServer
-): Promise<any | undefined> {
+): Promise<PasswordComplexitySettings | undefined> {
   const settingsService = settings.getSettings(server);
 
   return settingsService
-    .getPasswordComplexitySettings(
-      {},
-      {
-        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
-      }
-    )
+    .getPasswordComplexitySettings({}, {})
     .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
 }
 
 export function createSession(
   server: ZitadelServer,
   loginName: string
-): Promise<any | undefined> {
+): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return sessionService.createSession({ checks: { user: { loginName } } }, {});
 }
@@ -98,7 +86,7 @@ export function setSession(
   sessionId: string,
   sessionToken: string,
   password: string
-): Promise<any | undefined> {
+): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return sessionService.setSession(
     { sessionId, sessionToken, checks: { password: { password } } },
@@ -110,7 +98,7 @@ export function getSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string
-): Promise<any | undefined> {
+): Promise<GetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
@@ -118,7 +106,7 @@ export function getSession(
 export function listSessions(
   server: ZitadelServer,
   ids: string[]
-): Promise<any | undefined> {
+): Promise<ListSessionsResponse | undefined> {
   const sessionService = session.getSession(server);
   const query = { offset: 0, limit: 100, asc: true };
   const queries = [{ idsQuery: { ids } }];
@@ -145,9 +133,7 @@ export function addHumanUser(
         profile: { firstName, lastName },
         password: { password },
       },
-      {
-        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
-      }
+      {}
     )
     .then((resp: AddHumanUserResponse) => {
       return resp.userId;
@@ -158,7 +144,7 @@ export function verifyEmail(
   server: ZitadelServer,
   userId: string,
   verificationCode: string
-): Promise<any> {
+): Promise<VerifyEmailResponse> {
   const userservice = user.getUser(server);
   return userservice.verifyEmail(
     {
