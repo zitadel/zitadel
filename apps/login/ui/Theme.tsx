@@ -1,11 +1,9 @@
 "use client";
 
-import { Switch } from "@headlessui/react";
-import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 
-export default function Theme() {
+function Theme() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState<boolean>(false);
 
@@ -21,28 +19,27 @@ export default function Theme() {
   }
 
   return (
-    <Switch
-      checked={isDark}
-      onChange={(checked) => setTheme(checked ? "dark" : "light")}
-      className={`${
-        isDark
-          ? "!bg-gray-800 dark:bg-background-dark-400"
-          : "!bg-gray-200 dark:bg-background-dark-400"
-      }
-      relative inline-flex h-4 w-9 items-center rounded-full`}
+    <div
+      className={`relative grid grid-cols-2 rounded-full border border-divider-light dark:border-divider-dark p-1`}
     >
-      <div
-        aria-hidden="true"
-        className={`${
-          isDark ? "translate-x-5" : "translate-x-0"
-        } flex flex-row items-center justify-center h-4 w-4 transform rounded-full bg-white transition-all shadow dark:bg-background-dark-500 ring-1 ring-[#00000020] dark:ring-[#ffffff20] ring-offset-1 ring-offset-[#ffffff50] dark:ring-offset-[#00000005]`}
+      <button
+        className={`h-8 w-8 rounded-full flex flex-row items-center justify-center hover:opacity-100 transition-all ${
+          isDark ? "bg-black/10 dark:bg-white/10" : "opacity-60"
+        }`}
+        onClick={() => setTheme("dark")}
       >
-        {isDark ? (
-          <MoonIcon className="dark:text-amber-500 h-4 w-4" />
-        ) : (
-          <SunIcon className="text-amber-500 h-4 w-4" />
-        )}
-      </div>
-    </Switch>
+        <i className="flex-shrink-0 text-xl rounded-full las la-moon"></i>
+      </button>
+      <button
+        className={`h-8 w-8 rounded-full flex flex-row items-center justify-center hover:opacity-100 transition-all ${
+          !isDark ? "bg-black/10 dark:bg-white/10" : "opacity-60"
+        }`}
+        onClick={() => setTheme("light")}
+      >
+        <i className="flex-shrink-0 text-xl rounded-full las la-sun"></i>
+      </button>
+    </div>
   );
 }
+
+export default Theme;

@@ -81,9 +81,7 @@ export async function removeSessionFromCookie(
     ? JSON.parse(stringifiedCookie?.value)
     : [session];
 
-  const filteredSessions = sessions.filter(
-    (session) => session.id !== session.id
-  );
+  const filteredSessions = sessions.filter((s) => s.id !== session.id);
 
   // @ts-ignore
   return cookiesList.set({
