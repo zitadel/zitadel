@@ -13,18 +13,6 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
-      {
-        protocol: "https",
-        hostname: "zitadel.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "zitadel.cloud",
-        port: "",
-        pathname: "/**",
-      },
     ],
   },
 };

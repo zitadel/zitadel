@@ -9,17 +9,6 @@ export type SessionCookie = {
   changeDate: string;
 };
 
-async function set(sessions: SessionCookie[]) {
-  const cookiesList = cookies();
-  // @ts-ignore
-  cookiesList.set({
-    name: "sessions",
-    value: JSON.stringify(sessions),
-    httpOnly: true,
-    path: "/",
-  });
-}
-
 export async function addSessionToCookie(session: SessionCookie): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
