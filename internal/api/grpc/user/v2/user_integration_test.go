@@ -562,7 +562,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 				},
 				NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{
-					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
+					AuthUrl: "https://example.com/oauth/v2/authorize?client_id=clientID&prompt=select_account&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=",
 				},
 			},
 			wantErr: false,
@@ -579,7 +579,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 
 			if nextStep := tt.want.GetNextStep(); nextStep != nil {
 				if !strings.HasPrefix(got.GetAuthUrl(), tt.want.GetAuthUrl()) {
-					assert.Failf(t, "expected auth url: %s, but got: %s", tt.want.GetAuthUrl(), got.GetAuthUrl())
+					assert.Failf(t, "auth url does not match", "expected: %s, but got: %s", tt.want.GetAuthUrl(), got.GetAuthUrl())
 				}
 			}
 			integration.AssertDetails(t, tt.want, got)
