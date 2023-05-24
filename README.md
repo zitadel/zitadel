@@ -156,6 +156,7 @@ Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [A
 ## Security
 
 See the policy [here](./SECURITY.md)
+Check out our [Technical Advisories](https://zitadel.com/docs/support/technical_advisory)
 
 ## License
 
