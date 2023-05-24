@@ -10,6 +10,7 @@ export type SessionCookie = {
 };
 
 function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
+  const cookiesList = cookies();
   // @ts-ignore
   return cookiesList.set({
     name: "sessions",
@@ -44,7 +45,6 @@ export async function updateSessionCookie(
   session: SessionCookie
 ): Promise<any> {
   const cookiesList = cookies();
-
   const stringifiedCookie = cookiesList.get("sessions");
 
   const sessions: SessionCookie[] = stringifiedCookie?.value
@@ -113,7 +113,6 @@ export async function getMostRecentCookieWithLoginname(
   loginName?: string
 ): Promise<any> {
   const cookiesList = cookies();
-
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
