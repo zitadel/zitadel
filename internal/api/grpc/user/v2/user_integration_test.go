@@ -13,10 +13,13 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"golang.org/x/oauth2"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
@@ -73,13 +76,27 @@ func createIntent(t *testing.T, idpID string) string {
 	return id
 }
 
-func createIntentSuccess(t *testing.T, intentID string) string {
+func createSuccessfulIntent(t *testing.T, idpID string) (string, string, time.Time) {
 	ctx := authz.WithInstance(context.Background(), Tester.Instance)
+	intentID := createIntent(t, idpID)
 	writeModel, err := Tester.Commands.GetIntentWriteModel(ctx, intentID, Tester.Organisation.ID)
 	require.NoError(t, err)
-	token, err := Tester.Commands.SucceedIDPIntent(ctx, writeModel, nil, nil, "")
+	idpUser := &oauth.UserMapper{
+		RawInfo: map[string]interface{}{
+			"id": "id",
+		},
+	}
+	idpSession := &oauth.Session{
+		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+			Token: &oauth2.Token{
+				AccessToken: "accessToken",
+			},
+			IDToken: "idToken",
+		},
+	}
+	token, err := Tester.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, "")
 	require.NoError(t, err)
-	return token
+	return intentID, token, writeModel.ChangeDate
 }
 
 func TestServer_AddHumanUser(t *testing.T) {
@@ -606,8 +623,7 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 	idpID := createProvider(t)
 	intentID := createIntent(t, idpID)
-	token := createIntentSuccess(t, intentID)
-	failedIntentID := createIntent(t, idpID)
+	successfulID, token, changeDate := createSuccessfulIntent(t, idpID)
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderInformationRequest
@@ -623,14 +639,19 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			args: args{
 				CTX,
 				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: failedIntentID,
+					IntentId: intentID,
 					Token:    "",
 				},
 			},
-			want: &user.RetrieveIdentityProviderInformationResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+			wantErr: true,
+		},
+		{
+			name: "wrong token",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderInformationRequest{
+					IntentId: successfulID,
+					Token:    "wrong token",
 				},
 			},
 			wantErr: true,
@@ -640,14 +661,23 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			args: args{
 				CTX,
 				&user.RetrieveIdentityProviderInformationRequest{
-					IntentId: intentID,
+					IntentId: successfulID,
 					Token:    token,
 				},
 			},
 			want: &user.RetrieveIdentityProviderInformationResponse{
 				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
+					ChangeDate:    timestamppb.New(changeDate),
 					ResourceOwner: Tester.Organisation.ID,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpInformation: []byte(`{"RawInfo":{"id":"id"}}`),
 				},
 			},
 			wantErr: false,
@@ -663,6 +693,7 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 			}
 
 			integration.AssertDetails(t, tt.want, got)
+			require.Equal(t, tt.want.GetIdpInformation(), got.GetIdpInformation())
 		})
 	}
 }
