@@ -44,7 +44,30 @@ func TestMain(m *testing.M) {
 	}())
 }
 
+func createProvider(t *testing.T) string {
+	ctx := authz.WithInstance(context.Background(), Tester.Instance)
+	id, _, err := Tester.Commands.AddOrgGenericOAuthProvider(ctx, Tester.Organisation.ID, command.GenericOAuthProvider{
+		"idp",
+		"clientID",
+		"clientSecret",
+		"https://example.com/oauth/v2/authorize",
+		"https://example.com/oauth/v2/token",
+		"https://api.example.com/user",
+		[]string{"openid", "profile", "email"},
+		"id",
+		idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+		},
+	})
+	require.NoError(t, err)
+	return id
+}
+
 func TestServer_AddHumanUser(t *testing.T) {
+	idpID := createProvider(t)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -292,6 +315,105 @@ func TestServer_AddHumanUser(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "missing idp",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						FirstName:         "Donald",
+						LastName:          "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{
+						Email: "livio@zitadel.com",
+						Verification: &user.SetHumanEmail_IsVerified{
+							IsVerified: true,
+						},
+					},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: false,
+						},
+					},
+					IdpLinks: []*user.IDPLink{
+						{
+							IdpId:         "idpID",
+							IdpExternalId: "externalID",
+							DisplayName:   "displayName",
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "with idp",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						FirstName:         "Donald",
+						LastName:          "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{
+						Email: "livio@zitadel.com",
+						Verification: &user.SetHumanEmail_IsVerified{
+							IsVerified: true,
+						},
+					},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: false,
+						},
+					},
+					IdpLinks: []*user.IDPLink{
+						{
+							IdpId:         idpID,
+							IdpExternalId: "externalID",
+							DisplayName:   "displayName",
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
 	}
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -321,26 +443,84 @@ func TestServer_AddHumanUser(t *testing.T) {
 	}
 }
 
-func createProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), Tester.Instance)
-	id, _, err := Tester.Commands.AddOrgGenericOAuthProvider(ctx, Tester.Organisation.ID, command.GenericOAuthProvider{
-		"idp",
-		"clientID",
-		"clientSecret",
-		"https://example.com/oauth/v2/authorize",
-		"https://example.com/oauth/v2/token",
-		"https://api.example.com/user",
-		[]string{"openid", "profile", "email"},
-		"id",
-		idp.Options{
-			IsLinkingAllowed:  true,
-			IsCreationAllowed: true,
-			IsAutoCreation:    true,
-			IsAutoUpdate:      true,
+func TestServer_AddIDPLink(t *testing.T) {
+	idpID := createProvider(t)
+	type args struct {
+		ctx context.Context
+		req *user.AddIDPLinkRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.AddIDPLinkResponse
+		wantErr bool
+	}{
+		{
+			name: "user does not exist",
+			args: args{
+				CTX,
+				&user.AddIDPLinkRequest{
+					UserId: "userID",
+					IdpLink: &user.IDPLink{
+						IdpId:         idpID,
+						IdpExternalId: "externalID",
+						DisplayName:   "displayName",
+					},
+				},
+			},
+			want:    nil,
+			wantErr: true,
 		},
-	})
-	require.NoError(t, err)
-	return id
+		{
+			name: "idp does not exist",
+			args: args{
+				CTX,
+				&user.AddIDPLinkRequest{
+					UserId: Tester.Users[integration.OrgOwner].ID,
+					IdpLink: &user.IDPLink{
+						IdpId:         "idpID",
+						IdpExternalId: "externalID",
+						DisplayName:   "displayName",
+					},
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "add link",
+			args: args{
+				CTX,
+				&user.AddIDPLinkRequest{
+					UserId: Tester.Users[integration.OrgOwner].ID,
+					IdpLink: &user.IDPLink{
+						IdpId:         idpID,
+						IdpExternalId: "externalID",
+						DisplayName:   "displayName",
+					},
+				},
+			},
+			want: &user.AddIDPLinkResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.AddIDPLink(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
 }
 
 func TestServer_StartIdentityProviderFlow(t *testing.T) {
@@ -398,7 +578,9 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 			}
 
 			if nextStep := tt.want.GetNextStep(); nextStep != nil {
-				assert.True(t, strings.HasPrefix(got.GetAuthUrl(), tt.want.GetAuthUrl()))
+				if !strings.HasPrefix(got.GetAuthUrl(), tt.want.GetAuthUrl()) {
+					assert.Failf(t, "expected auth url: %s, but got: %s", tt.want.GetAuthUrl(), got.GetAuthUrl())
+				}
 			}
 			integration.AssertDetails(t, tt.want, got)
 		})
