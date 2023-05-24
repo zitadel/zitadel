@@ -16,3 +16,7 @@ Logstore:
   Access:
     Stdout:
       Enabled: true
+
+DefaultInstance:
+  LoginPolicy:
+    MfaInitSkipLifetime: 0h
