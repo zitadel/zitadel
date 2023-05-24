@@ -77,7 +77,7 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.configmapConfig.FirstInstance.Org.Machine.MachineKey.Type=1
 
 # Make ZITADEL locally accessible
-kubectl port-forward svc/my-zitadel 8080:8080
+kubectl port-forward svc/my-zitadel 8080
 ```
 
 When Helm is done, you can print your service account key from a Kubernetes secret:
