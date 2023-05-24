@@ -62,16 +62,6 @@ export default async function RootLayout({
                       {children}
                     </div>
                   </div>
-
-                  <div
-                    className={`rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20 ${
-                      showNav ? "" : "max-w-[440px] w-full fixed bottom-4"
-                    }`}
-                  >
-                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
-                      <Byline />
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

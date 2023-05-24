@@ -7,6 +7,7 @@ import { useSelectedLayoutSegment, usePathname } from "next/navigation";
 import clsx from "clsx";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
+import Theme from "./Theme";
 
 export function GlobalNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,27 +30,34 @@ export function GlobalNav() {
           </h2>
         </Link>
       </div>
-      <button
-        type="button"
-        className="group absolute right-0 top-0 flex h-14 items-center space-x-2 px-4 lg:hidden"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <div className="font-medium text-text-light-secondary-500 group-hover:text-text-light-500 dark:text-text-dark-secondary-500 dark:group-hover:text-text-dark-500">
-          Menu
-        </div>
-        {isOpen ? (
-          <XMarkIcon className="block w-6 " />
-        ) : (
-          <Bars3Icon className="block w-6 " />
-        )}
-      </button>
+
+      <div className="absolute right-0 top-0 flex flex-row items-center lg:hidden">
+        <Theme />
+        <button
+          type="button"
+          className="group flex h-14 items-center space-x-2 px-4"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className="font-medium text-text-light-secondary-500 group-hover:text-text-light-500 dark:text-text-dark-secondary-500 dark:group-hover:text-text-dark-500">
+            Menu
+          </div>
+          {isOpen ? (
+            <XMarkIcon className="block w-6 " />
+          ) : (
+            <Bars3Icon className="block w-6 " />
+          )}
+        </button>
+      </div>
 
       <div
-        className={clsx("overflow-y-auto lg:static lg:block", {
-          "fixed inset-x-0 bottom-0 top-14 mt-px bg-white/80 dark:bg-black/80 backdrop-blur-lg":
-            isOpen,
-          hidden: !isOpen,
-        })}
+        className={clsx(
+          "overflow-y-auto lg:static lg:flex lg:flex-col justify-between h-full",
+          {
+            "fixed inset-x-0 bottom-0 top-14 mt-px bg-white/80 dark:bg-black/80 backdrop-blur-lg":
+              isOpen,
+            hidden: !isOpen,
+          }
+        )}
       >
         <nav
           className={`space-y-6 px-4 py-5 ${
@@ -72,6 +80,10 @@ export function GlobalNav() {
             );
           })}
         </nav>
+
+        <div className="flex flex-row p-4">
+          <Theme />
+        </div>
       </div>
     </div>
   );
