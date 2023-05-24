@@ -13,15 +13,13 @@ export default async function Page({
   const sessionFactors = await loadSession(loginName);
 
   async function loadSession(loginName?: string) {
-    try {
-      const recent = await getMostRecentCookieWithLoginname(loginName);
+    const recent = await getMostRecentCookieWithLoginname(loginName);
 
-      return getSession(server, recent.id, recent.token).then(({ session }) => {
-        return session;
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    return getSession(server, recent.id, recent.token).then((response) => {
+      if (response?.session) {
+        return response.session;
+      }
+    });
   }
 
   return (
@@ -40,7 +38,7 @@ export default async function Page({
 
       {sessionFactors && (
         <UserAvatar
-          loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName ?? ""}
           displayName={sessionFactors.factors?.user?.displayName}
           showDropdown
         ></UserAvatar>
