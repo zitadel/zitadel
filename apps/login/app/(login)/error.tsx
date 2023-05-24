@@ -10,9 +10,9 @@ export default function Error({ error, reset }: any) {
   }, [error]);
 
   return (
-    <Boundary labels={["Home page Error UI"]} color="pink">
+    <Boundary labels={["Home page Error UI"]} color="red">
       <div className="space-y-4">
-        <div className="text-sm text-warn-light-500 dark:text-warn-dark-500">
+        <div className="text-sm text-red-500 dark:text-red-500">
           <strong className="font-bold">Error:</strong> {error?.message}
         </div>
         <div>

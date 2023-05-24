@@ -8,15 +8,16 @@ const Label = ({
 }: {
   children: React.ReactNode;
   animateRerendering?: boolean;
-  color?: "default" | "pink" | "blue" | "violet" | "cyan" | "orange";
+  color?: "default" | "pink" | "blue" | "violet" | "cyan" | "orange" | "red";
 }) => {
   return (
     <div
-      className={clsx("rounded-full px-1.5 shadow-[0_0_1px_3px_black]", {
+      className={clsx("rounded-full px-1.5", {
         "bg-gray-800 text-gray-500": color === "default",
         "bg-pink-500 text-pink-100": color === "pink",
         "bg-blue-500 text-blue-100": color === "blue",
         "bg-cyan-500 text-cyan-100": color === "cyan",
+        "bg-red-500 text-red-100": color === "red",
         "bg-violet-500 text-violet-100": color === "violet",
         "bg-orange-500 text-orange-100": color === "orange",
         "animate-[highlight_1s_ease-in-out_1]": animateRerendering,
@@ -36,7 +37,7 @@ export const Boundary = ({
   children: React.ReactNode;
   labels?: string[];
   size?: "small" | "default";
-  color?: "default" | "pink" | "blue" | "violet" | "cyan" | "orange";
+  color?: "default" | "pink" | "blue" | "violet" | "cyan" | "orange" | "red";
   animateRerendering?: boolean;
 }) => {
   return (
@@ -48,6 +49,7 @@ export const Boundary = ({
         "border-pink-500": color === "pink",
         "border-blue-500": color === "blue",
         "border-cyan-500": color === "cyan",
+        "border-red-500": color === "red",
         "border-violet-500": color === "violet",
         "border-orange-500": color === "orange",
         "animate-[rerender_1s_ease-in-out_1] text-pink-500": animateRerendering,
@@ -55,7 +57,7 @@ export const Boundary = ({
     >
       <div
         className={clsx(
-          "absolute -top-2.5 flex space-x-1 text-[9px] uppercase leading-4 tracking-widest",
+          "absolute -top-2 flex space-x-1 text-[9px] uppercase leading-4 tracking-widest",
           {
             "left-3 lg:left-5": size === "small",
             "left-4 lg:left-9": size === "default",
