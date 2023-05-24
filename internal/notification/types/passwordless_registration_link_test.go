@@ -68,7 +68,7 @@ func TestNotify_SendPasswordlessRegistrationLink(t *testing.T) {
 				origin:  "https://example.com",
 				code:    "123",
 				codeID:  "456",
-				urlTmpl: "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.ResourceOwner}}&codeID={{.CodeID}}&code={{.Code}}",
+				urlTmpl: "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}",
 			},
 			want: &notifyResult{
 				url:                                "https://example.com/passkey/register?userID=user1&orgID=org1&codeID=456&code=123",
