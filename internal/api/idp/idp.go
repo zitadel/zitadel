@@ -20,6 +20,8 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
 	"github.com/zitadel/zitadel/internal/idp/providers/google"
+	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
@@ -201,8 +203,10 @@ func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider idp.Provide
 		session = &openid.Session{Provider: provider.Provider, Code: code}
 	case *google.Provider:
 		session = &openid.Session{Provider: provider.Provider, Code: code}
+	case *jwt.Provider, *ldap.Provider:
+		return nil, nil, z_errs.ThrowInvalidArgument(nil, "IDP-52jmn", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	default:
-		return nil, nil, z_errs.ThrowInvalidArgument(nil, "IDP-SSDg", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		return nil, nil, z_errs.ThrowUnimplemented(nil, "IDP-SSDg", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	}
 
 	user, err = session.FetchUser(ctx)

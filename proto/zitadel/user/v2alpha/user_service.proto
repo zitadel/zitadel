@@ -159,7 +159,7 @@ service UserService {
 
   rpc RegisterPasskey (RegisterPasskeyRequest) returns (RegisterPasskeyResponse) {
     option (google.api.http) = {
-      post: "/users/{user_id}/passkeys"
+      post: "/v2alpha/users/{user_id}/passkeys"
       body: "*"
     };
 
@@ -181,7 +181,7 @@ service UserService {
   }
   rpc VerifyPasskeyRegistration (VerifyPasskeyRegistrationRequest) returns (VerifyPasskeyRegistrationResponse) {
     option (google.api.http) = {
-      post: "/users/{user_id}/passkeys/{passkey_id}"
+      post: "/v2alpha/users/{user_id}/passkeys/{passkey_id}"
       body: "*"
     };
 
@@ -203,7 +203,7 @@ service UserService {
   }
   rpc CreatePasskeyRegistrationLink (CreatePasskeyRegistrationLinkRequest) returns (CreatePasskeyRegistrationLinkResponse) {
     option (google.api.http) = {
-      post: "/users/{user_id}/passkeys/registration_link"
+      post: "/v2alpha/users/{user_id}/passkeys/registration_link"
       body: "*"
     };
 
@@ -227,7 +227,7 @@ service UserService {
   // Start an IDP authentication (for external login, registration or linking)
   rpc StartIdentityProviderFlow (StartIdentityProviderFlowRequest) returns (StartIdentityProviderFlowResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/idps/{idp_id}/start"
+      post: "/v2alpha/users/idps/{idp_id}/start"
       body: "*"
     };
 
@@ -251,7 +251,7 @@ service UserService {
 
   rpc RetrieveIdentityProviderInformation (RetrieveIdentityProviderInformationRequest) returns (RetrieveIdentityProviderInformationResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/intents/{intent_id}/information"
+      post: "/v2alpha/users/intents/{intent_id}/information"
       body: "*"
     };
 
@@ -276,7 +276,7 @@ service UserService {
   // Link an IDP to an existing user
   rpc AddIDPLink (AddIDPLinkRequest) returns (AddIDPLinkResponse) {
     option (google.api.http) = {
-      post: "/v2alpha/users/{user_id}/links"
+      post: "/v2alpha/users/users/{user_id}/links"
       body: "*"
     };
 

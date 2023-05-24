@@ -118,7 +118,7 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 		res  res
 	}{
 		{
-			"decryption error",
+			"decryption invalid key id error",
 			args{
 				intent: &command.IDPIntentWriteModel{
 					WriteModel: eventstore.WriteModel{
@@ -148,7 +148,7 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 			},
 		},
 		{
-			"decryption error",
+			"successful",
 			args{
 				intent: &command.IDPIntentWriteModel{
 					WriteModel: eventstore.WriteModel{
