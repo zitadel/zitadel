@@ -13,24 +13,40 @@ export async function POST(request: NextRequest) {
     const { loginName } = body;
 
     const createdSession = await createSession(server, loginName);
-
-    return getSession(
-      server,
-      createdSession.sessionId,
-      createdSession.sessionToken
-    ).then(({ session }) => {
-      const sessionCookie: SessionCookie = {
-        id: createdSession.sessionId,
-        token: createdSession.sessionToken,
-        changeDate: session.changeDate,
-        loginName: session.factors.user.loginName,
-      };
-      return addSessionToCookie(sessionCookie).then(() => {
-        return NextResponse.json({ factors: session.factors });
+    if (createdSession) {
+      return getSession(
+        server,
+        createdSession.sessionId,
+        createdSession.sessionToken
+      ).then((response) => {
+        if (response?.session && response.session?.factors?.user?.loginName) {
+          const sessionCookie: SessionCookie = {
+            id: createdSession.sessionId,
+            token: createdSession.sessionToken,
+            changeDate: response.session.changeDate?.toString() ?? "",
+            loginName: response.session?.factors?.user?.loginName ?? "",
+          };
+          return addSessionToCookie(sessionCookie).then(() => {
+            return NextResponse.json({ factors: response?.session?.factors });
+          });
+        } else {
+          return NextResponse.json(
+            {
+              details:
+                "could not get session or session does not have loginName",
+            },
+            { status: 500 }
+          );
+        }
       });
-    });
+    } else {
+      return NextResponse.error();
+    }
   } else {
-    return NextResponse.error();
+    return NextResponse.json(
+      { details: "Session could not be created" },
+      { status: 500 }
+    );
   }
 }
 
@@ -48,34 +64,55 @@ export async function PUT(request: NextRequest) {
 
     return setSession(server, recent.id, recent.token, password)
       .then((session) => {
-        const sessionCookie: SessionCookie = {
-          id: recent.id,
-          token: session.sessionToken,
-          changeDate: session.details.changeDate,
-          loginName: recent.loginName,
-        };
+        if (session) {
+          const sessionCookie: SessionCookie = {
+            id: recent.id,
+            token: session.sessionToken,
+            changeDate: session.details?.changeDate?.toString() ?? "",
+            loginName: recent.loginName,
+          };
 
-        return getSession(server, sessionCookie.id, sessionCookie.token).then(
-          ({ session }) => {
-            const newCookie: SessionCookie = {
-              id: sessionCookie.id,
-              token: sessionCookie.token,
-              changeDate: session.changeDate,
-              loginName: session.factors.user.loginName,
-            };
+          return getSession(server, sessionCookie.id, sessionCookie.token).then(
+            (response) => {
+              if (
+                response?.session &&
+                response.session.factors?.user?.loginName
+              ) {
+                const { session } = response;
+                const newCookie: SessionCookie = {
+                  id: sessionCookie.id,
+                  token: sessionCookie.token,
+                  changeDate: session.changeDate?.toString() ?? "",
+                  loginName: session.factors?.user?.loginName ?? "",
+                };
 
-            return updateSessionCookie(sessionCookie.id, newCookie)
-              .then(() => {
-                return NextResponse.json({ factors: session.factors });
-              })
-              .catch((error) => {
+                return updateSessionCookie(sessionCookie.id, newCookie)
+                  .then(() => {
+                    return NextResponse.json({ factors: session.factors });
+                  })
+                  .catch((error) => {
+                    return NextResponse.json(
+                      { details: "could not set cookie" },
+                      { status: 500 }
+                    );
+                  });
+              } else {
                 return NextResponse.json(
-                  { details: "could not set cookie" },
+                  {
+                    details:
+                      "could not get session or session does not have loginName",
+                  },
                   { status: 500 }
                 );
-              });
-          }
-        );
+              }
+            }
+          );
+        } else {
+          return NextResponse.json(
+            { details: "Session not be set" },
+            { status: 500 }
+          );
+        }
       })
       .catch((error) => {
         console.error("erasd", error);
