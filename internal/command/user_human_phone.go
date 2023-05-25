@@ -28,7 +28,9 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, re
 
 	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
 	changedEvent, hasChanged := existingPhone.NewChangedEvent(ctx, userAgg, phone.PhoneNumber)
-	if !hasChanged || (existingPhone.IsPhoneVerified && existingPhone.IsPhoneVerified != phone.IsPhoneVerified) {
+
+	// only continue if there were changes or there were no changes and the phone should be set to verified
+	if !hasChanged && !(phone.IsPhoneVerified && existingPhone.IsPhoneVerified != phone.IsPhoneVerified) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-wF94r", "Errors.User.Phone.NotChanged")
 	}
 
