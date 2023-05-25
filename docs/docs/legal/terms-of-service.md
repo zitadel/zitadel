@@ -25,10 +25,6 @@ The following policies complement the TOS. When accepting the TOS, you accept th
 * [**Acceptable Use Policy**](acceptable-use-policy) - What we understand as acceptable and fair use of our Services
 * [**Rate Limit Policy**](rate-limit-policy) - How we avoid overloads of our services
 
-This Agreement is extended with additional terms, in case your Subscription requires a Dedicated Instance. When you enter the Agreement with us, you accept these additional agreements.
-
-* [**Dedicated Instance Terms**](terms-of-service-dedicated) - How we provide our services for a dedicated instance
-
 ### Alterations
 
 Any provisions which deviate from these TOS must be agreed in writing between the Customer and us. Such agreements shall take precedence over the TOS outlined in this document.
@@ -195,7 +191,7 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 These TOS shall enter into force as of 15.07.2022.
 
-Last revised: June 14, 2022
+Last revised: May 12, 2023
 
 ### Amendments
 
