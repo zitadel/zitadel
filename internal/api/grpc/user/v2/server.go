@@ -1,6 +1,8 @@
 package user
 
 import (
+	"context"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -18,15 +20,25 @@ type Server struct {
 	command     *command.Commands
 	query       *query.Queries
 	userCodeAlg crypto.EncryptionAlgorithm
+	idpAlg      crypto.EncryptionAlgorithm
+	idpCallback func(ctx context.Context) string
 }
 
 type Config struct{}
 
-func CreateServer(command *command.Commands, query *query.Queries, userCodeAlg crypto.EncryptionAlgorithm) *Server {
+func CreateServer(
+	command *command.Commands,
+	query *query.Queries,
+	userCodeAlg crypto.EncryptionAlgorithm,
+	idpAlg crypto.EncryptionAlgorithm,
+	idpCallback func(ctx context.Context) string,
+) *Server {
 	return &Server{
 		command:     command,
 		query:       query,
 		userCodeAlg: userCodeAlg,
+		idpAlg:      idpAlg,
+		idpCallback: idpCallback,
 	}
 }
 
