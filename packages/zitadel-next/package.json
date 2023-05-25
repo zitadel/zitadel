@@ -16,11 +16,14 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.1",
     "@zitadel/tsconfig": "workspace:*",
     "eslint": "^7.32.0",
     "eslint-config-zitadel": "workspace:*",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
     "tsup": "^5.10.1",
-    "typescript": "^4.5.3"
+    "typescript": "^4.9.3"
   },
   "peerDependencies": {
     "next": "^13"

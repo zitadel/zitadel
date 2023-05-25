@@ -19,17 +19,20 @@
     "copy-files": "cp -R ./src/public/ ./dist/"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.1",
     "@types/react": "^17.0.13",
     "@types/react-dom": "^17.0.8",
     "@zitadel/tsconfig": "workspace:*",
     "autoprefixer": "10.4.13",
     "eslint": "^7.32.0",
     "eslint-config-zitadel": "workspace:*",
+    "jest": "^29.5.0",
     "postcss": "8.4.21",
     "sass": "^1.62.0",
     "tailwindcss": "3.2.4",
+    "ts-jest": "^29.1.0",
     "tsup": "^5.10.1",
-    "typescript": "^4.5.3",
+    "typescript": "^4.9.3",
     "zitadel-tailwind-config": "workspace:*"
   },
   "publishConfig": {
