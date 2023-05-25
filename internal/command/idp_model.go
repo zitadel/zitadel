@@ -1739,7 +1739,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 type IDP interface {
 	eventstore.QueryReducer
-	ToProvider(string, crypto.EncryptionAlgorithm) (providers.Provider, error)
+	ToProvider(func(domain.IDPType) string, crypto.EncryptionAlgorithm) (providers.Provider, error)
 }
 
 type AllIDPWriteModel struct {
@@ -1829,6 +1829,6 @@ func (wm *AllIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 	wm.model.AppendEvents(events...)
 }
 
-func (wm *AllIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
+func (wm *AllIDPWriteModel) ToProvider(callbackURL func(domain.IDPType) string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
 	return wm.model.ToProvider(callbackURL, idpAlg)
 }

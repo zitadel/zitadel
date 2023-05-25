@@ -28,8 +28,9 @@ import (
 )
 
 const (
-	HandlerPrefix = "/idps"
-	callbackPath  = "/callback"
+	HandlerPrefix    = "/idps"
+	callbackPath     = "/callback"
+	ldapCallbackPath = callbackPath + "/ldap"
 
 	paramIntentID         = "id"
 	paramToken            = "token"
@@ -43,7 +44,7 @@ type Handler struct {
 	queries             *query.Queries
 	parser              *form.Parser
 	encryptionAlgorithm crypto.EncryptionAlgorithm
-	callbackURL         func(ctx context.Context) string
+	callbackURL         func(ctx context.Context) func(idpType domain.IDPType) string
 }
 
 type externalIDPCallbackData struct {
@@ -53,10 +54,34 @@ type externalIDPCallbackData struct {
 	ErrorDescription string `schema:"error_description"`
 }
 
+type externalLDAPCallbackData struct {
+	State            string `schema:"state"`
+	Username         string `schema:"username"`
+	Password         string `schema:"password"`
+	Error            string `schema:"error"`
+	ErrorDescription string `schema:"error_description"`
+}
+
 // CallbackURL generates the instance specific URL to the IDP callback handler
-func CallbackURL(externalSecure bool) func(ctx context.Context) string {
-	return func(ctx context.Context) string {
-		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + callbackPath
+func CallbackURL(externalSecure bool) func(ctx context.Context) func(idpType domain.IDPType) string {
+	return func(ctx context.Context) func(idpType domain.IDPType) string {
+		return func(idpType domain.IDPType) string {
+			switch idpType {
+			case domain.IDPTypeLDAP:
+				return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + ldapCallbackPath
+			case domain.IDPTypeOIDC,
+				domain.IDPTypeOAuth,
+				domain.IDPTypeAzureAD,
+				domain.IDPTypeGitHub,
+				domain.IDPTypeGitHubEnterprise,
+				domain.IDPTypeGitLab,
+				domain.IDPTypeGitLabSelfHosted,
+				domain.IDPTypeGoogle:
+				fallthrough
+			default:
+				return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + callbackPath
+			}
+		}
 	}
 }
 
@@ -78,7 +103,78 @@ func NewHandler(
 	router := mux.NewRouter()
 	router.Use(instanceInterceptor)
 	router.HandleFunc(callbackPath, h.handleCallback)
+	router.HandleFunc(ldapCallbackPath, h.handleLDAPCallback)
 	return router
+}
+
+func (h *Handler) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
+	data, err := h.parseLDAPCallbackRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	intent := h.getActiveIntent(w, r, data.State)
+	if intent == nil {
+		// if we didn't get an active intent the error was already handled (either redirected or display directly)
+		return
+	}
+
+	ctx := r.Context()
+	// the provider might have returned an error
+	if data.Error != "" {
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, reason(data.Error, data.ErrorDescription))
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURL(w, r, intent, data.Error, data.ErrorDescription)
+		return
+	}
+
+	provider, err := h.commands.GetProvider(ctx, intent.IDPID, h.callbackURL(ctx))
+	if err != nil {
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	ldapProvider, ok := provider.(*ldap.Provider)
+	if !ok {
+		err := z_errs.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	session := &ldap.Session{Provider: ldapProvider, User: data.Username, Password: data.Password}
+	user, err := session.FetchUser(ctx)
+	if err != nil {
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	userID, err := h.checkExternalUser(ctx, intent.IDPID, user.GetID())
+	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
+
+	token, err := h.commands.SucceedIDPIntent(ctx, intent, user, session, userID)
+	if err != nil {
+		redirectToFailureURLErr(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
+		return
+	}
+	redirectToSuccessURL(w, r, intent, token, userID)
+}
+
+func (h *Handler) parseLDAPCallbackRequest(r *http.Request) (*externalLDAPCallbackData, error) {
+	data := new(externalLDAPCallbackData)
+	err := h.parser.Parse(r, data)
+	if err != nil {
+		return nil, err
+	}
+	if data.State == "" {
+		return nil, z_errs.ThrowInvalidArgument(nil, "IDP-Hk38e", "Errors.Intent.StateMissing")
+	}
+	return data, nil
 }
 
 func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {

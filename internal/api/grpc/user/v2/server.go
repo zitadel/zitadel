@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -21,7 +22,7 @@ type Server struct {
 	query       *query.Queries
 	userCodeAlg crypto.EncryptionAlgorithm
 	idpAlg      crypto.EncryptionAlgorithm
-	idpCallback func(ctx context.Context) string
+	idpCallback func(ctx context.Context) func(idpType domain.IDPType) string
 }
 
 type Config struct{}
@@ -31,7 +32,7 @@ func CreateServer(
 	query *query.Queries,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpAlg crypto.EncryptionAlgorithm,
-	idpCallback func(ctx context.Context) string,
+	idpCallback func(ctx context.Context) func(idpType domain.IDPType) string,
 ) *Server {
 	return &Server{
 		command:     command,

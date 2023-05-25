@@ -74,7 +74,7 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	return id, writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) GetProvider(ctx context.Context, idpID, callbackURL string) (idp.Provider, error) {
+func (c *Commands) GetProvider(ctx context.Context, idpID string, callbackURL func(domain.IDPType) string) (idp.Provider, error) {
 	writeModel, err := IDPProviderWriteModel(ctx, c.eventstore.Filter, idpID)
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (c *Commands) GetProvider(ctx context.Context, idpID, callbackURL string) (
 	return writeModel.ToProvider(callbackURL, c.idpConfigEncryption)
 }
 
-func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state, callbackURL string) (string, error) {
+func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state string, callbackURL func(domain.IDPType) string) (string, error) {
 	provider, err := c.GetProvider(ctx, idpID, callbackURL)
 	if err != nil {
 		return "", err
