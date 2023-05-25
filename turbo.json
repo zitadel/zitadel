@@ -2,16 +2,25 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "generate": {
-      "outputs": ["src/proto/**"],
+      "outputs": [
+        "src/proto/**"
+      ],
       "cache": true
     },
     "build": {
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
-      "dependsOn": ["generate", "^build"]
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "dependsOn": [
+        "generate",
+        "^build"
+      ]
     },
-    "test": {
-      "outputs": ["coverage/**"],
-      "dependsOn": []
+    "test": {},
+    "test:watch": {
+      "cache": false
     },
     "lint": {},
     "dev": {
@@ -22,6 +31,11 @@
       "cache": false
     }
   },
-  "globalDependencies": ["**/.env.*local"],
-  "globalEnv": ["ZITADEL_API_URL", "ZITADEL_SERVICE_USER_TOKEN"]
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
+  "globalEnv": [
+    "ZITADEL_API_URL",
+    "ZITADEL_SERVICE_USER_TOKEN"
+  ]
 }
