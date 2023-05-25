@@ -9,6 +9,8 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
@@ -20,6 +22,8 @@ import (
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
+
+var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration", "google.protobuf.Struct"}
 
 func Test_hashedPasswordToCommand(t *testing.T) {
 	type args struct {
@@ -190,10 +194,17 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 								IdToken:     gu.Ptr("idToken"),
 							},
 						},
-						IdpId:          "idpID",
-						UserId:         "idpUserID",
-						UserName:       "username",
-						RawInformation: []byte(`{"userID": "idpUserID", "username": "username"}`),
+						IdpId:    "idpID",
+						UserId:   "idpUserID",
+						UserName: "username",
+						RawInformation: func() *structpb.Struct {
+							s, err := structpb.NewStruct(map[string]interface{}{
+								"userID":   "idpUserID",
+								"username": "username",
+							})
+							require.NoError(t, err)
+							return s
+						}(),
 					},
 				},
 				err: nil,
@@ -204,9 +215,9 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := intentToIDPInformationPb(tt.args.intent, tt.args.alg)
 			require.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.resp, got)
+			grpc.AllFieldsEqual(t, got.ProtoReflect(), tt.res.resp.ProtoReflect(), grpc.CustomMappers)
 			if tt.res.resp != nil {
-				grpc.AllFieldsSet(t, got.ProtoReflect())
+				grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
 			}
 		})
 	}

@@ -15,9 +15,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/command"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -681,10 +683,17 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpId:          idpID,
-					UserId:         "id",
-					UserName:       "username",
-					RawInformation: []byte(`{"sub":"id","preferred_username":"username"}`),
+					IdpId:    idpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"sub":                "id",
+							"preferred_username": "username",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
 				},
 			},
 			wantErr: false,
@@ -699,8 +708,7 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			require.Equal(t, tt.want.GetDetails(), got.GetDetails())
-			require.Equal(t, tt.want.GetIdpInformation(), got.GetIdpInformation())
+			grpc.AllFieldsEqual(t, got.ProtoReflect(), tt.want.ProtoReflect(), grpc.CustomMappers)
 		})
 	}
 }

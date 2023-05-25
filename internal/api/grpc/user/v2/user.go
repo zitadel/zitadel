@@ -6,6 +6,8 @@ import (
 	"io"
 
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -176,6 +178,12 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 			return nil, err
 		}
 	}
+	rawInformation := new(structpb.Struct)
+	err = protojson.Unmarshal(intent.IDPUser, rawInformation)
+	if err != nil {
+		return nil, err
+	}
+
 	return &user.RetrieveIdentityProviderInformationResponse{
 		Details: &object_pb.Details{
 			Sequence:      intent.ProcessedSequence,
@@ -192,7 +200,7 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 			IdpId:          intent.IDPID,
 			UserId:         intent.IDPUserID,
 			UserName:       intent.IDPUserName,
-			RawInformation: intent.IDPUser,
+			RawInformation: rawInformation,
 		},
 	}, nil
 }
