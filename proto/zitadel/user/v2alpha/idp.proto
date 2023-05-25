@@ -12,7 +12,10 @@ message IDPInformation{
   oneof access{
     IDPOAuthAccessInformation oauth = 1;
   }
-  bytes idp_information = 2;
+  string idp_id = 2;
+  string user_id = 3;
+  string user_name = 4;
+  bytes raw_information = 5;
 }
 
 message IDPOAuthAccessInformation{
@@ -30,22 +33,22 @@ message IDPLink {
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
-  string idp_external_id = 2 [
+  string user_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of user of the identity provider"
+      description: "ID of the user of the identity provider"
       min_length: 1;
       max_length: 200;
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
-  string display_name = 3 [
+  string user_name = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Display name of user of the identity provider"
+      description: "username of the user of the identity provider"
       min_length: 1;
       max_length: 200;
-      example: "\"Firstname Lastname\"";
+      example: "\"user@external.com\"";
     }
   ];
 }

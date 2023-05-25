@@ -19,7 +19,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
+	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
@@ -81,12 +81,15 @@ func createSuccessfulIntent(t *testing.T, idpID string) (string, string, time.Ti
 	intentID := createIntent(t, idpID)
 	writeModel, err := Tester.Commands.GetIntentWriteModel(ctx, intentID, Tester.Organisation.ID)
 	require.NoError(t, err)
-	idpUser := &oauth.UserMapper{
-		RawInfo: map[string]interface{}{
-			"id": "id",
+	idpUser := openid.NewUser(
+		&oidc.UserInfo{
+			Subject: "id",
+			UserInfoProfile: oidc.UserInfoProfile{
+				PreferredUsername: "username",
+			},
 		},
-	}
-	idpSession := &oauth.Session{
+	)
+	idpSession := &openid.Session{
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 			Token: &oauth2.Token{
 				AccessToken: "accessToken",
@@ -386,9 +389,9 @@ func TestServer_AddHumanUser(t *testing.T) {
 					},
 					IdpLinks: []*user.IDPLink{
 						{
-							IdpId:         "idpID",
-							IdpExternalId: "externalID",
-							DisplayName:   "displayName",
+							IdpId:    "idpID",
+							UserId:   "userID",
+							UserName: "username",
 						},
 					},
 				},
@@ -433,9 +436,9 @@ func TestServer_AddHumanUser(t *testing.T) {
 					},
 					IdpLinks: []*user.IDPLink{
 						{
-							IdpId:         idpID,
-							IdpExternalId: "externalID",
-							DisplayName:   "displayName",
+							IdpId:    idpID,
+							UserId:   "userID",
+							UserName: "username",
 						},
 					},
 				},
@@ -495,9 +498,9 @@ func TestServer_AddIDPLink(t *testing.T) {
 				&user.AddIDPLinkRequest{
 					UserId: "userID",
 					IdpLink: &user.IDPLink{
-						IdpId:         idpID,
-						IdpExternalId: "externalID",
-						DisplayName:   "displayName",
+						IdpId:    idpID,
+						UserId:   "userID",
+						UserName: "username",
 					},
 				},
 			},
@@ -511,9 +514,9 @@ func TestServer_AddIDPLink(t *testing.T) {
 				&user.AddIDPLinkRequest{
 					UserId: Tester.Users[integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
-						IdpId:         "idpID",
-						IdpExternalId: "externalID",
-						DisplayName:   "displayName",
+						IdpId:    "idpID",
+						UserId:   "userID",
+						UserName: "username",
 					},
 				},
 			},
@@ -527,9 +530,9 @@ func TestServer_AddIDPLink(t *testing.T) {
 				&user.AddIDPLinkRequest{
 					UserId: Tester.Users[integration.OrgOwner].ID,
 					IdpLink: &user.IDPLink{
-						IdpId:         idpID,
-						IdpExternalId: "externalID",
-						DisplayName:   "displayName",
+						IdpId:    idpID,
+						UserId:   "userID",
+						UserName: "username",
 					},
 				},
 			},
@@ -678,7 +681,10 @@ func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpInformation: []byte(`{"RawInfo":{"id":"id"}}`),
+					IdpId:          idpID,
+					UserId:         "id",
+					UserName:       "username",
+					RawInformation: []byte(`{"sub":"id","preferred_username":"username"}`),
 				},
 			},
 			wantErr: false,

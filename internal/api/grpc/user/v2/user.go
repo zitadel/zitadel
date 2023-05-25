@@ -64,8 +64,8 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 	for i, link := range req.GetIdpLinks() {
 		links[i] = &command.AddLink{
 			IDPID:         link.GetIdpId(),
-			IDPExternalID: link.GetIdpExternalId(),
-			DisplayName:   link.GetDisplayName(),
+			IDPExternalID: link.GetUserId(),
+			DisplayName:   link.GetUserName(),
 		}
 	}
 	return &command.AddHuman{
@@ -124,8 +124,8 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 	orgID := authz.GetCtxData(ctx).OrgID
 	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &domain.UserIDPLink{
 		IDPConfigID:    req.GetIdpLink().GetIdpId(),
-		ExternalUserID: req.GetIdpLink().GetIdpExternalId(),
-		DisplayName:    req.GetIdpLink().GetDisplayName(),
+		ExternalUserID: req.GetIdpLink().GetUserId(),
+		DisplayName:    req.GetIdpLink().GetUserName(),
 	})
 	if err != nil {
 		return nil, err
@@ -189,7 +189,10 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 					IdToken:     idToken,
 				},
 			},
-			IdpInformation: intent.IDPUser,
+			IdpId:          intent.IDPID,
+			UserId:         intent.IDPUserID,
+			UserName:       intent.IDPUserName,
+			RawInformation: intent.IDPUser,
 		},
 	}, nil
 }
