@@ -3,12 +3,7 @@
   "include": ["src/**/*.ts"],
   "compilerOptions": {
     "baseUrl": ".",
-    "rootDir": "src",
-    "paths": {
-      "#": ["."],
-      "*": ["./*"],
-      "#/*": ["./*"]
-    }
+    "rootDir": "src"
   },
   "exclude": ["dist", "build", "node_modules"]
 }

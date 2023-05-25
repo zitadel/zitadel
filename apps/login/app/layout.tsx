@@ -2,13 +2,12 @@ import "#/styles/globals.scss";
 import { AddressBar } from "#/ui/AddressBar";
 import { GlobalNav } from "#/ui/GlobalNav";
 import { Lato } from "next/font/google";
-import Byline from "#/ui/Byline";
 import { LayoutProviders } from "#/ui/LayoutProviders";
 import { Analytics } from "@vercel/analytics/react";
 import ThemeWrapper from "#/ui/ThemeWrapper";
-import { getBranding } from "#/lib/zitadel";
+import { getBrandingSettings } from "#/lib/zitadel";
 import { server } from "../lib/zitadel";
-import { LabelPolicyColors } from "#/utils/colors";
+import { BrandingSettings } from "@zitadel/server";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
@@ -25,26 +24,23 @@ export default async function RootLayout({
   // later only shown with dev mode enabled
   const showNav = true;
 
-  const branding = await getBranding(server);
-  let partialPolicy: LabelPolicyColors | undefined;
-  console.log(branding);
+  const branding = await getBrandingSettings(server);
+  let partial: Partial<BrandingSettings> | undefined;
   if (branding) {
-    partialPolicy = {
-      backgroundColor: branding?.backgroundColor,
-      backgroundColorDark: branding?.backgroundColorDark,
-      primaryColor: branding?.primaryColor,
-      primaryColorDark: branding?.primaryColorDark,
-      warnColor: branding?.warnColor,
-      warnColorDark: branding?.warnColorDark,
-      fontColor: branding?.fontColor,
-      fontColorDark: branding?.fontColorDark,
+    partial = {
+      lightTheme: branding?.lightTheme,
+      darkTheme: branding?.darkTheme,
     };
   }
+
+  let domain = process.env.ZITADEL_API_URL;
+  domain = domain ? domain.replace("https://", "") : "acme.com";
+
   return (
     <html lang="en" className={`${lato.className}`} suppressHydrationWarning>
       <head />
       <body>
-        <ThemeWrapper branding={partialPolicy}>
+        <ThemeWrapper branding={partial}>
           <LayoutProviders>
             <div className="h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600  bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
               {showNav && <GlobalNav />}
@@ -54,7 +50,7 @@ export default async function RootLayout({
                   {showNav && (
                     <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
                       <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
-                        <AddressBar />
+                        <AddressBar domain={domain} />
                       </div>
                     </div>
                   )}
@@ -62,16 +58,6 @@ export default async function RootLayout({
                   <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20 mb-10">
                     <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500 px-8 py-12">
                       {children}
-                    </div>
-                  </div>
-
-                  <div
-                    className={`rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20 ${
-                      showNav ? "" : "max-w-[440px] w-full fixed bottom-4"
-                    }`}
-                  >
-                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
-                      <Byline />
                     </div>
                   </div>
                 </div>

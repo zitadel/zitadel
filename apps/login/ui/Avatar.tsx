@@ -1,35 +1,27 @@
-import { Color, ColorShade, getColorHash } from "#/utils/colors";
-import { useTheme } from "next-themes";
-import { FC } from "react";
+"use client";
 
-export enum AvatarSize {
-  SMALL = "small",
-  BASE = "base",
-  LARGE = "large",
-}
+import { ColorShade, getColorHash } from "#/utils/colors";
+import { useTheme } from "next-themes";
 
 interface AvatarProps {
   name: string | null | undefined;
   loginName: string;
   imageUrl?: string;
-  size?: AvatarSize;
+  size?: "small" | "base" | "large";
   shadow?: boolean;
 }
 
-export const Avatar: FC<AvatarProps> = ({
-  size = AvatarSize.BASE,
-  name,
-  loginName,
-  imageUrl,
-  shadow,
-}) => {
-  const { resolvedTheme } = useTheme();
+function getInitials(name: string, loginName: string) {
   let credentials = "";
-
   if (name) {
     const split = name.split(" ");
-    const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
-    credentials = initials;
+    if (split) {
+      const initials =
+        split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
+      credentials = initials;
+    } else {
+      credentials = name.charAt(0);
+    }
   } else {
     const username = loginName.split("@")[0];
     let separator = "_";
@@ -43,6 +35,19 @@ export const Avatar: FC<AvatarProps> = ({
     const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
     credentials = initials;
   }
+
+  return credentials;
+}
+
+export function Avatar({
+  size = "base",
+  name,
+  loginName,
+  imageUrl,
+  shadow,
+}: AvatarProps) {
+  const { resolvedTheme } = useTheme();
+  const credentials = getInitials(name ?? loginName, loginName);
 
   const color: ColorShade = getColorHash(loginName);
 
@@ -61,12 +66,12 @@ export const Avatar: FC<AvatarProps> = ({
       className={`w-full h-full flex-shrink-0 flex justify-center items-center cursor-default pointer-events-none group-focus:outline-none group-focus:ring-2 transition-colors duration-200 dark:group-focus:ring-offset-blue bg-primary-light-500 text-primary-light-contrast-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-500 group-focus:ring-primary-light-200 dark:group-focus:ring-primary-dark-400 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 dark:text-blue rounded-full ${
         shadow ? "shadow" : ""
       } ${
-        size === AvatarSize.LARGE
+        size === "large"
           ? "h-20 w-20 font-normal"
-          : size === AvatarSize.BASE
+          : size === "base"
           ? "w-[38px] h-[38px] font-bold"
-          : size === AvatarSize.SMALL
-          ? "w-[32px] h-[32px] font-bold"
+          : size === "small"
+          ? "w-[32px] h-[32px] font-bold text-[13px]"
           : ""
       }`}
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
@@ -78,13 +83,11 @@ export const Avatar: FC<AvatarProps> = ({
         />
       ) : (
         <span
-          className={`uppercase ${
-            size === AvatarSize.LARGE ? "text-xl" : "text-13px"
-          }`}
+          className={`uppercase ${size === "large" ? "text-xl" : "text-13px"}`}
         >
           {credentials}
         </span>
       )}
     </div>
   );
-};
+}

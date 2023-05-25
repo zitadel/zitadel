@@ -1,3 +1,11 @@
+import { createChannel, createClientFactory } from "nice-grpc";
+import {
+  SettingsServiceClient,
+  SettingsServiceDefinition,
+} from "./proto/server/zitadel/settings/v2alpha/settings_service";
+import { authMiddleware } from "./middleware";
+import { CompatServiceDefinition } from "nice-grpc/lib/service-definitions";
+
 let apps: ZitadelServer[] = [];
 
 export interface ZitadelServerProps {
@@ -49,3 +57,18 @@ export function getServer(name?: string): ZitadelServer {
     }
   }
 }
+
+export const createClient = <Client>(
+  definition: CompatServiceDefinition,
+  apiUrl: string,
+  token: string
+) => {
+  if (!apiUrl) {
+    throw Error("ZITADEL_API_URL not set");
+  }
+
+  const channel = createChannel(process.env.ZITADEL_API_URL ?? "");
+  return createClientFactory()
+    .use(authMiddleware(token))
+    .create(definition, channel) as Client;
+};

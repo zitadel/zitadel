@@ -3,7 +3,11 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 
-export function AddressBar() {
+type Props = {
+  domain: string;
+};
+
+export function AddressBar({ domain }: Props) {
   const pathname = usePathname();
 
   return (
@@ -24,7 +28,7 @@ export function AddressBar() {
       </div>
       <div className="flex space-x-1 text-sm font-medium">
         <div>
-          <span className="px-2 text-gray-500">acme.com</span>
+          <span className="px-2 text-gray-500">{domain}</span>
         </div>
         {pathname ? (
           <>

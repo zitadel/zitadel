@@ -1,5 +1,7 @@
 import tinycolor from "tinycolor2";
 
+import { BrandingSettings } from "@zitadel/server";
+
 export interface Color {
   name: string;
   hex: string;
@@ -52,32 +54,36 @@ export type LabelPolicyColors = {
   primaryColorDark: string;
 };
 
-export function setTheme(document: any, policy?: LabelPolicyColors) {
-  const lP = {
-    backgroundColor: BACKGROUND,
-    backgroundColorDark: DARK_BACKGROUND,
-    primaryColor: PRIMARY,
-    primaryColorDark: DARK_PRIMARY,
-    warnColor: WARN,
-    warnColorDark: DARK_WARN,
-    fontColor: TEXT,
-    fontColorDark: DARK_TEXT,
-    linkColor: TEXT,
-    linkColorDark: DARK_TEXT,
+type BrandingColors = {
+  lightTheme: {
+    backgroundColor: string;
+    fontColor: string;
+    primaryColor: string;
+    warnColor: string;
   };
+  darkTheme: {
+    backgroundColor: string;
+    fontColor: string;
+    primaryColor: string;
+    warnColor: string;
+  };
+};
 
-  if (policy) {
-    lP.backgroundColor = policy.backgroundColor;
-    lP.backgroundColorDark = policy.backgroundColorDark;
-    lP.primaryColor = policy.primaryColor;
-    lP.primaryColorDark = policy.primaryColorDark;
-    lP.warnColor = policy.warnColor;
-    lP.warnColorDark = policy.warnColorDark;
-    lP.fontColor = policy.fontColor;
-    lP.fontColorDark = policy.fontColorDark;
-    lP.linkColor = policy.fontColor;
-    lP.linkColorDark = policy.fontColorDark;
-  }
+export function setTheme(document: any, policy?: Partial<BrandingSettings>) {
+  const lP: BrandingColors = {
+    lightTheme: {
+      backgroundColor: policy?.lightTheme?.backgroundColor ?? BACKGROUND,
+      fontColor: policy?.lightTheme?.fontColor ?? TEXT,
+      primaryColor: policy?.lightTheme?.primaryColor ?? PRIMARY,
+      warnColor: policy?.lightTheme?.warnColor ?? WARN,
+    },
+    darkTheme: {
+      backgroundColor: policy?.darkTheme?.backgroundColor ?? DARK_BACKGROUND,
+      fontColor: policy?.darkTheme?.fontColor ?? DARK_TEXT,
+      primaryColor: policy?.darkTheme?.primaryColor ?? DARK_PRIMARY,
+      warnColor: policy?.darkTheme?.warnColor ?? DARK_WARN,
+    },
+  };
 
   const dark = computeMap(lP, true);
   const light = computeMap(lP, false);
@@ -177,25 +183,24 @@ function getContrast(color: string): string {
   }
 }
 
-export function computeMap(
-  labelpolicy: LabelPolicyColors,
-  dark: boolean
-): ColorMap {
+export function computeMap(branding: BrandingColors, dark: boolean): ColorMap {
   return {
     background: computeColors(
-      dark ? labelpolicy.backgroundColorDark : labelpolicy.backgroundColor
+      dark
+        ? branding.darkTheme.backgroundColor
+        : branding.lightTheme.backgroundColor
     ),
     primary: computeColors(
-      dark ? labelpolicy.primaryColorDark : labelpolicy.primaryColor
+      dark ? branding.darkTheme.primaryColor : branding.lightTheme.primaryColor
     ),
     warn: computeColors(
-      dark ? labelpolicy.warnColorDark : labelpolicy.warnColor
+      dark ? branding.darkTheme.warnColor : branding.lightTheme.warnColor
     ),
     text: computeColors(
-      dark ? labelpolicy.fontColorDark : labelpolicy.fontColor
+      dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor
     ),
     link: computeColors(
-      dark ? labelpolicy.fontColorDark : labelpolicy.fontColor
+      dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor
     ),
   };
 }

@@ -1,23 +1,25 @@
 import {
-  getPasswordComplexityPolicy,
-  getPrivacyPolicy,
+  getLegalAndSupportSettings,
+  getPasswordComplexitySettings,
   server,
 } from "#/lib/zitadel";
 import RegisterForm from "#/ui/RegisterForm";
 
 export default async function Page() {
-  const privacyPolicy = await getPrivacyPolicy(server);
-  const passwordComplexityPolicy = await getPasswordComplexityPolicy(server);
+  const legal = await getLegalAndSupportSettings(server);
+  const passwordComplexitySettings = await getPasswordComplexitySettings(
+    server
+  );
 
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1>Register</h1>
       <p className="ztdl-p">Create your ZITADEL account.</p>
 
-      {privacyPolicy && passwordComplexityPolicy && (
+      {legal && passwordComplexitySettings && (
         <RegisterForm
-          privacyPolicy={privacyPolicy}
-          passwordComplexityPolicy={passwordComplexityPolicy}
+          legal={legal}
+          passwordComplexitySettings={passwordComplexitySettings}
         ></RegisterForm>
       )}
     </div>

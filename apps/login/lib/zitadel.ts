@@ -1,17 +1,25 @@
 import {
-  management,
   ZitadelServer,
   ZitadelServerOptions,
-  getManagement,
-  orgMetadata,
-  getServer,
+  user,
+  settings,
   getServers,
-  LabelPolicy,
   initializeServer,
-  PrivacyPolicy,
-  PasswordComplexityPolicy,
+  session,
+  GetGeneralSettingsResponse,
+  CreateSessionResponse,
+  GetBrandingSettingsResponse,
+  GetPasswordComplexitySettingsResponse,
+  GetLegalAndSupportSettingsResponse,
+  AddHumanUserResponse,
+  BrandingSettings,
+  ListSessionsResponse,
+  LegalAndSupportSettings,
+  PasswordComplexitySettings,
+  GetSessionResponse,
+  VerifyEmailResponse,
+  SetSessionResponse,
 } from "@zitadel/server";
-// import { getAuth } from "@zitadel/server/auth";
 
 export const zitadelConfig: ZitadelServerOptions = {
   name: "zitadel login",
@@ -26,46 +34,83 @@ if (!getServers().length) {
   server = initializeServer(zitadelConfig);
 }
 
-export function getBranding(
+export function getBrandingSettings(
   server: ZitadelServer
-): Promise<LabelPolicy | undefined> {
-  const mgmt = getManagement(server);
-  return mgmt
-    .getLabelPolicy(
-      {},
-      {
-        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
-      }
-    )
-    .then((resp) => resp.policy);
+): Promise<BrandingSettings | undefined> {
+  const settingsService = settings.getSettings(server);
+  return settingsService
+    .getBrandingSettings({}, {})
+    .then((resp: GetBrandingSettingsResponse) => resp.settings);
 }
 
-export function getPrivacyPolicy(
+export function getGeneralSettings(
   server: ZitadelServer
-): Promise<PrivacyPolicy | undefined> {
-  const mgmt = getManagement(server);
-  return mgmt
-    .getPrivacyPolicy(
-      {},
-      {
-        //  metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
-      }
-    )
-    .then((resp) => resp.policy);
+): Promise<string[] | undefined> {
+  const settingsService = settings.getSettings(server);
+  return settingsService
+    .getGeneralSettings({}, {})
+    .then((resp: GetGeneralSettingsResponse) => resp.supportedLanguages);
 }
 
-export function getPasswordComplexityPolicy(
+export function getLegalAndSupportSettings(
   server: ZitadelServer
-): Promise<PasswordComplexityPolicy | undefined> {
-  const mgmt = getManagement(server);
-  return mgmt
-    .getPasswordComplexityPolicy(
-      {},
-      {
-        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
-      }
-    )
-    .then((resp) => resp.policy);
+): Promise<LegalAndSupportSettings | undefined> {
+  const settingsService = settings.getSettings(server);
+  return settingsService
+    .getLegalAndSupportSettings({}, {})
+    .then((resp: GetLegalAndSupportSettingsResponse) => {
+      return resp.settings;
+    });
+}
+
+export function getPasswordComplexitySettings(
+  server: ZitadelServer
+): Promise<PasswordComplexitySettings | undefined> {
+  const settingsService = settings.getSettings(server);
+
+  return settingsService
+    .getPasswordComplexitySettings({}, {})
+    .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
+}
+
+export function createSession(
+  server: ZitadelServer,
+  loginName: string
+): Promise<CreateSessionResponse | undefined> {
+  const sessionService = session.getSession(server);
+  return sessionService.createSession({ checks: { user: { loginName } } }, {});
+}
+
+export function setSession(
+  server: ZitadelServer,
+  sessionId: string,
+  sessionToken: string,
+  password: string
+): Promise<SetSessionResponse | undefined> {
+  const sessionService = session.getSession(server);
+  return sessionService.setSession(
+    { sessionId, sessionToken, checks: { password: { password } } },
+    {}
+  );
+}
+
+export function getSession(
+  server: ZitadelServer,
+  sessionId: string,
+  sessionToken: string
+): Promise<GetSessionResponse | undefined> {
+  const sessionService = session.getSession(server);
+  return sessionService.getSession({ sessionId, sessionToken }, {});
+}
+
+export function listSessions(
+  server: ZitadelServer,
+  ids: string[]
+): Promise<ListSessionsResponse | undefined> {
+  const sessionService = session.getSession(server);
+  const query = { offset: 0, limit: 100, asc: true };
+  const queries = [{ idsQuery: { ids } }];
+  return sessionService.listSessions({ queries: queries }, {});
 }
 
 export type AddHumanUserData = {
@@ -74,27 +119,56 @@ export type AddHumanUserData = {
   email: string;
   password: string;
 };
+
 export function addHumanUser(
   server: ZitadelServer,
   { email, firstName, lastName, password }: AddHumanUserData
 ): Promise<string> {
-  const mgmt = getManagement(server);
+  const mgmt = user.getUser(server);
   return mgmt
     .addHumanUser(
       {
-        email: { email, isEmailVerified: false },
-        userName: email,
+        email: { email },
+        username: email,
         profile: { firstName, lastName },
-        initialPassword: password,
+        password: { password },
       },
-      {
-        // metadata: orgMetadata(process.env.ZITADEL_ORG_ID ?? "")
-      }
+      {}
     )
-    .then((resp) => {
-      console.log("added user", resp.userId);
+    .then((resp: AddHumanUserResponse) => {
       return resp.userId;
     });
+}
+
+export function verifyEmail(
+  server: ZitadelServer,
+  userId: string,
+  verificationCode: string
+): Promise<VerifyEmailResponse> {
+  const userservice = user.getUser(server);
+  return userservice.verifyEmail(
+    {
+      userId,
+      verificationCode,
+    },
+    {}
+  );
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @returns the newly set email
+ */
+export function setEmail(server: ZitadelServer, userId: string): Promise<any> {
+  const userservice = user.getUser(server);
+  return userservice.setEmail(
+    {
+      userId,
+    },
+    {}
+  );
 }
 
 export { server };

@@ -1,32 +1,50 @@
-"use client";
-import { Button, ButtonVariants } from "#/ui/Button";
-import { TextInput } from "#/ui/Input";
+import { getSession, server } from "#/lib/zitadel";
+import Alert from "#/ui/Alert";
+import PasswordForm from "#/ui/PasswordForm";
 import UserAvatar from "#/ui/UserAvatar";
-import { useRouter } from "next/navigation";
+import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
 
-export default function Page() {
-  const router = useRouter();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string | number | symbol, string | undefined>;
+}) {
+  const { loginName } = searchParams;
+  const sessionFactors = await loadSession(loginName);
+
+  async function loadSession(loginName?: string) {
+    const recent = await getMostRecentCookieWithLoginname(loginName);
+
+    return getSession(server, recent.id, recent.token).then((response) => {
+      if (response?.session) {
+        return response.session;
+      }
+    });
+  }
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1>Password</h1>
+      <h1>{sessionFactors?.factors?.user?.displayName ?? "Password"}</h1>
       <p className="ztdl-p mb-6 block">Enter your password.</p>
 
-      <UserAvatar name="max@zitadel.com"></UserAvatar>
+      {!sessionFactors && (
+        <div className="py-4">
+          <Alert>
+            Could not get the context of the user. Make sure to enter the
+            username first or provide a loginName as searchParam.
+          </Alert>
+        </div>
+      )}
 
-      <div className="w-full">
-        <TextInput type="password" label="Password" />
-      </div>
+      {sessionFactors && (
+        <UserAvatar
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName ?? ""}
+          displayName={sessionFactors.factors?.user?.displayName}
+          showDropdown
+        ></UserAvatar>
+      )}
 
-      <div className="flex w-full flex-row items-center justify-between">
-        <Button
-          onClick={() => router.back()}
-          variant={ButtonVariants.Secondary}
-        >
-          back
-        </Button>
-        <Button variant={ButtonVariants.Primary}>continue</Button>
-      </div>
+      <PasswordForm loginName={loginName} />
     </div>
   );
 }

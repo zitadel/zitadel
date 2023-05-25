@@ -3,20 +3,13 @@ const nextConfig = {
   reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
   swcMinify: true,
   experimental: {
-    // Required:
-    appDir: true,
+    serverActions: true,
   },
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "zitadel.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "zitadel.cloud",
+        hostname: process.env.ZITADEL_API_URL.replace("https://", ""),
         port: "",
         pathname: "/**",
       },

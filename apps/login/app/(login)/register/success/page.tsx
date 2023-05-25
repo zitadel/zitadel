@@ -1,7 +1,5 @@
 import { Button, ButtonVariants } from "#/ui/Button";
-import { NextPage, NextPageContext } from "next";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 type Props = {
   searchParams: { [key: string]: string | string[] | undefined };

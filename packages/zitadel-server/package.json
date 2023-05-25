@@ -4,14 +4,15 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "type": "commonjs",
   "sideEffects": false,
   "license": "MIT",
   "files": [
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/*/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts src/*/index.ts --format esm,cjs --watch --dts",
+    "build": "tsup --dts",
+    "dev": "tsup --dts --watch",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "prebuild": "pnpm run generate",

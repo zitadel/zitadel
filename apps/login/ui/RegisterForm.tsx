@@ -1,6 +1,9 @@
 "use client";
 
-import { PasswordComplexityPolicy, PrivacyPolicy } from "@zitadel/server";
+import {
+  LegalAndSupportSettings,
+  PasswordComplexitySettings,
+} from "@zitadel/server";
 import PasswordComplexity from "./PasswordComplexity";
 import { useState } from "react";
 import { Button, ButtonVariants } from "./Button";
@@ -27,13 +30,13 @@ type Inputs =
   | FieldValues;
 
 type Props = {
-  privacyPolicy: PrivacyPolicy;
-  passwordComplexityPolicy: PasswordComplexityPolicy;
+  legal: LegalAndSupportSettings;
+  passwordComplexitySettings: PasswordComplexitySettings;
 };
 
 export default function RegisterForm({
-  privacyPolicy,
-  passwordComplexityPolicy,
+  legal,
+  passwordComplexitySettings,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -69,7 +72,7 @@ export default function RegisterForm({
 
   function submitAndLink(value: Inputs): Promise<boolean | void> {
     return submitRegister(value).then((resp: any) => {
-      return router.push(`/register/success?userid=${resp.userId}`);
+      return router.push(`/verify?userID=${resp.userId}`);
     });
   }
 
@@ -81,19 +84,19 @@ export default function RegisterForm({
   const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
 
   const hasMinLength =
-    passwordComplexityPolicy &&
-    watchPassword?.length >= passwordComplexityPolicy.minLength;
+    passwordComplexitySettings &&
+    watchPassword?.length >= passwordComplexitySettings.minLength;
   const hasSymbol = symbolValidator(watchPassword);
   const hasNumber = numberValidator(watchPassword);
   const hasUppercase = upperCaseValidator(watchPassword);
   const hasLowercase = lowerCaseValidator(watchPassword);
 
   const policyIsValid =
-    passwordComplexityPolicy &&
-    (passwordComplexityPolicy.hasLowercase ? hasLowercase : true) &&
-    (passwordComplexityPolicy.hasNumber ? hasNumber : true) &&
-    (passwordComplexityPolicy.hasUppercase ? hasUppercase : true) &&
-    (passwordComplexityPolicy.hasSymbol ? hasSymbol : true) &&
+    passwordComplexitySettings &&
+    (passwordComplexitySettings.requiresLowercase ? hasLowercase : true) &&
+    (passwordComplexitySettings.requiresNumber ? hasNumber : true) &&
+    (passwordComplexitySettings.requiresUppercase ? hasUppercase : true) &&
+    (passwordComplexitySettings.requiresSymbol ? hasSymbol : true) &&
     hasMinLength;
 
   return (
@@ -155,17 +158,17 @@ export default function RegisterForm({
         </div>
       </div>
 
-      {passwordComplexityPolicy && (
+      {passwordComplexitySettings && (
         <PasswordComplexity
-          passwordComplexityPolicy={passwordComplexityPolicy}
+          passwordComplexitySettings={passwordComplexitySettings}
           password={watchPassword}
           equals={!!watchPassword && watchPassword === watchConfirmPassword}
         />
       )}
 
-      {privacyPolicy && (
+      {legal && (
         <PrivacyPolicyCheckboxes
-          privacyPolicy={privacyPolicy}
+          legal={legal}
           onChange={setTosAndPolicyAccepted}
         />
       )}

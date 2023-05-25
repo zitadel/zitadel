@@ -1,10 +1,11 @@
 "use client";
 
-import { setTheme, LabelPolicyColors } from "#/utils/colors";
+import { BrandingSettings } from "@zitadel/server";
+import { setTheme } from "#/utils/colors";
 import { useEffect } from "react";
 
 type Props = {
-  branding: LabelPolicyColors | undefined;
+  branding: Partial<BrandingSettings> | undefined;
   children: React.ReactNode;
 };
 
