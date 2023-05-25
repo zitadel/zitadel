@@ -8,6 +8,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyRequest) (resp *user.RegisterPasskeyResponse, err error) {
@@ -42,16 +44,24 @@ func passkeyRegistrationDetailsToPb(details *domain.PasskeyRegistrationDetails, 
 	if err != nil {
 		return nil, err
 	}
+	options := new(structpb.Struct)
+	if err := protojson.Unmarshal(details.PublicKeyCredentialCreationOptions, options); err != nil {
+		return nil, caos_errs.ThrowInternal(err, "USERv2-Dohr6", "todo")
+	}
 	return &user.RegisterPasskeyResponse{
 		Details:                            object.DomainToDetailsPb(details.ObjectDetails),
 		PasskeyId:                          details.PasskeyID,
-		PublicKeyCredentialCreationOptions: details.PublicKeyCredentialCreationOptions,
+		PublicKeyCredentialCreationOptions: options,
 	}, nil
 }
 
 func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *user.VerifyPasskeyRegistrationRequest) (*user.VerifyPasskeyRegistrationResponse, error) {
 	resourceOwner := authz.GetCtxData(ctx).ResourceOwner
-	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, req.GetUserId(), resourceOwner, req.GetPasskeyName(), "", req.GetPublicKeyCredential())
+	pkc, err := protojson.Marshal(req.GetPublicKeyCredential())
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "USERv2-Dohr6", "todo")
+	}
+	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, req.GetUserId(), resourceOwner, req.GetPasskeyName(), "", pkc)
 	if err != nil {
 		return nil, err
 	}

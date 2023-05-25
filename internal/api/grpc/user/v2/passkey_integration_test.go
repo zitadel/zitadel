@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/webauthn"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestServer_RegisterPasskey(t *testing.T) {
@@ -125,7 +126,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			if tt.want != nil {
 				assert.NotEmpty(t, got.GetPasskeyId())
 				assert.NotEmpty(t, got.GetPublicKeyCredentialCreationOptions())
-				_, err := client.CreateAttestationResponse(got.GetPublicKeyCredentialCreationOptions())
+				_, err = client.CreateAttestationResponse(got.GetPublicKeyCredentialCreationOptions())
 				require.NoError(t, err)
 			}
 		})
@@ -167,7 +168,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 				ctx: CTX,
 				req: &user.VerifyPasskeyRegistrationRequest{
 					PasskeyId:           pkr.GetPasskeyId(),
-					PublicKeyCredential: []byte(attestationResponse),
+					PublicKeyCredential: attestationResponse,
 					PasskeyName:         "nice name",
 				},
 			},
@@ -195,10 +196,12 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.VerifyPasskeyRegistrationRequest{
-					UserId:              userID,
-					PasskeyId:           pkr.GetPasskeyId(),
-					PublicKeyCredential: []byte("attestationResponseattestationResponseattestationResponse"),
-					PasskeyName:         "nice name",
+					UserId:    userID,
+					PasskeyId: pkr.GetPasskeyId(),
+					PublicKeyCredential: &structpb.Struct{
+						Fields: map[string]*structpb.Value{"foo": {Kind: &structpb.Value_StringValue{StringValue: "bar"}}},
+					},
+					PasskeyName: "nice name",
 				},
 			},
 			wantErr: true,
