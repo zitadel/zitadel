@@ -17,6 +17,7 @@ async function loadSessions(): Promise<Session[]> {
     );
     return response?.sessions ?? [];
   } else {
+    console.info("No session cookie found.");
     return [];
   }
 }
