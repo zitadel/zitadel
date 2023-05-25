@@ -433,7 +433,7 @@ message RegisterPasskeyResponse{
   google.protobuf.Struct public_key_credential_creation_options = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "json representation of public key credential creation options used by the passkey client"
-      example: "\"eyJwdWJsaWNLZXkiOnsiY2hhbGxlbmdlIoplfZm4vM21qSzBPdjltN2x6VWhnclYyejFJSlVzZnpLd0Z1TytWTWtzRW1Icz0iLCJycCI6eyJuYW1lIjoiWklUQURFTCIsImlkIjoiYWNtZS1nem9lNHgueml0YWRlbC5jbG91ZCJ9LCJ1c2VyIjp7Im5hbWUiOiJ0ZXN0dXNlcjU1QGFjbWUueml0YWRlbC5jbG91ZCIsImRpc3BsYXlOYW1lIjoiVGVzdCBUZXN0IiwiaWQiOiJNVGd5TVRVMk1qWTBNakk1TXpBMk5qSTEifSwicHViS2V5Q3JlZFBhcmFtcyI6W3sidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi03fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzV9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zNn0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1N30seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OH0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTM3fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzh9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zOX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTh9XSwiYXV0aGVudGljYXRvclNlbGVjdGlvbiI6eyJ1c2VyVmVyaWZpY2F0aW9uIjoiZGlzY291cmFnZWQifn2ilGltZW91dCI6NjAwMDAsImF0dGVzdGF0aW9uIjoibm9uZSJ9fQ==\""
+      example: "{\"publicKey\":{\"attestation\":\"none\",\"authenticatorSelection\":{\"userVerification\":\"required\"},\"challenge\":\"XaMYwWOZ5hj6pwtwJJlpcI-ExkO5TxevBMG4R8DoKQQ\",\"excludeCredentials\":[{\"id\":\"tVp1QfYhT8DkyEHVrv7blnpAo2YJzbZgZNBf7zPs6CI\",\"type\":\"public-key\"}],\"pubKeyCredParams\":[{\"alg\":-7,\"type\":\"public-key\"}],\"rp\":{\"id\":\"localhost\",\"name\":\"ZITADEL\"},\"timeout\":300000,\"user\":{\"displayName\":\"Tim Mohlmann\",\"id\":\"MjE1NTk4MDAwNDY0OTk4OTQw\",\"name\":\"tim\"}}}"
     }
   ];
 }
