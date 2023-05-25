@@ -100,7 +100,7 @@ export async function getAllSessionIds(): Promise<any> {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
     return sessions.map((session) => session.id);
   } else {
-    return Promise.reject();
+    return [];
   }
 }
 
