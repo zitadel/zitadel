@@ -11,10 +11,11 @@ const docdata = [
     desc: `In case that UserLoginMustBeDomain is false (default) and you don't overwrite the username with an email, it will be suffixed by the org domain (org-name + domain from config). for example: zitadel-admin in org ZITADEL on domain.tld -> zitadel-admin@zitadel.domain.tld`,
     type: undefined,
     shortlist: true,
-}]
+  }
+]
 
 
-let doc = YAML.parseDocument(steps)
+let doc = YAML.parseDocument(defaults)
 
 let json = doc.toJSON()
 // console.log(JSON.stringify(json, null, 2))
@@ -38,10 +39,6 @@ const keys2env =  function(parts) {
   return "ZITADEL_" + parts.join("_").toUpperCase()
 }
 
-function getKeyByValue(object, value) {
-  return Object.keys(object).find(key => object[key] === value);
-}
-
 function getDocData(key, data) {
   let result = data.filter(obj => obj.key === key)
   if (result.length === 0) {
@@ -60,3 +57,13 @@ let output = keys.map(parts => [
 ])
 
 console.log(output)
+
+console.log(doc.contents.items[4].commentBefore)
+
+console.log(doc.get('ExternalPort').toString())
+console.log(doc.get('ExternalPort'))
+console.log(doc.get('ExternalPort', true).comment)
+console.log(doc.get('ExternalPort', true))
+
+// Metrics
+console.log(doc.contents.items)
