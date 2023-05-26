@@ -1,11 +1,21 @@
 package login
 
 import (
+	"reflect"
 	"testing"
+	"time"
+
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"golang.org/x/oauth2"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
 )
+
+var testNow = time.Now()
 
 func Test_hasEmailChanged(t *testing.T) {
 	type args struct {
@@ -95,6 +105,22 @@ func Test_hasEmailChanged(t *testing.T) {
 				},
 				externalUser: &domain.ExternalUser{
 					Email: domain.EmailAddress("new-email@test.com"),
+				},
+			},
+			true,
+		},
+		{
+			"email changed and verified",
+			args{
+				user: &query.User{
+					Human: &query.Human{
+						Email:           domain.EmailAddress("email@test.com"),
+						IsEmailVerified: false,
+					},
+				},
+				externalUser: &domain.ExternalUser{
+					Email:           domain.EmailAddress("new-email@test.com"),
+					IsEmailVerified: true,
 				},
 			},
 			true,
@@ -224,6 +250,22 @@ func Test_hasPhoneChanged(t *testing.T) {
 			false,
 		},
 		{
+			"phone changed",
+			args{
+				user: &query.User{
+					Human: &query.Human{
+						Phone: domain.PhoneNumber("+41791234567"),
+					},
+				},
+				externalUser: &domain.ExternalUser{
+					Phone:           domain.PhoneNumber("+4179654321"),
+					IsPhoneVerified: true,
+				},
+			},
+			true,
+			false,
+		},
+		{
 			"normalized phone unchanged",
 			args{
 				user: &query.User{
@@ -248,6 +290,75 @@ func Test_hasPhoneChanged(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("hasPhoneChanged() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_tokens(t *testing.T) {
+	type args struct {
+		session idp.Session
+	}
+	tests := []struct {
+		name string
+		args args
+		want *oidc.Tokens[*oidc.IDTokenClaims]
+	}{
+		{
+			"oidc",
+			args{
+				&openid.Session{
+					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+						Token: &oauth2.Token{
+							AccessToken:  "accessToken",
+							TokenType:    oidc.BearerToken,
+							RefreshToken: "refreshToken",
+							Expiry:       testNow,
+						},
+						IDToken: "idToken",
+					},
+				},
+			},
+			&oidc.Tokens[*oidc.IDTokenClaims]{
+				Token: &oauth2.Token{
+					AccessToken:  "accessToken",
+					TokenType:    oidc.BearerToken,
+					RefreshToken: "refreshToken",
+					Expiry:       testNow,
+				},
+				IDToken: "idToken",
+			},
+		},
+		{
+			"jwt",
+			args{
+				&jwt.Session{
+					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+						Token: &oauth2.Token{
+							AccessToken:  "accessToken",
+							TokenType:    oidc.BearerToken,
+							RefreshToken: "refreshToken",
+							Expiry:       testNow,
+						},
+						IDToken: "idToken",
+					},
+				},
+			},
+			&oidc.Tokens[*oidc.IDTokenClaims]{
+				Token: &oauth2.Token{
+					AccessToken:  "accessToken",
+					TokenType:    oidc.BearerToken,
+					RefreshToken: "refreshToken",
+					Expiry:       testNow,
+				},
+				IDToken: "idToken",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tokens(tt.args.session); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("tokens() = %v, want %v", got, tt.want)
 			}
 		})
 	}
