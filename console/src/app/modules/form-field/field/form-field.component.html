@@ -7,7 +7,7 @@
   </label>
 </ng-template>
 
-<div class="cnsl-form-field-wrapper" (click)="_control.onContainerClick && _control.onContainerClick($event)">
+<div class="cnsl-form-field-wrapper" (click)="_control.onContainerClick($event)">
   <ng-template [ngTemplateOutlet]="labelTemplate"></ng-template>
   <div class="cnsl-rel" #inputContainer>
     <ng-content></ng-content>
