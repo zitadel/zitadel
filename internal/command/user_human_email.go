@@ -33,12 +33,16 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, em
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 	changedEvent, hasChanged := existingEmail.NewChangedEvent(ctx, userAgg, email.EmailAddress)
-	if !hasChanged {
+
+	// only continue if there were changes or there were no changes and the email should be set to verified
+	if !hasChanged && !(email.IsEmailVerified && existingEmail.IsEmailVerified != email.IsEmailVerified) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2b7fM", "Errors.User.Email.NotChanged")
 	}
 
-	events := []eventstore.Command{changedEvent}
-
+	events := make([]eventstore.Command, 0)
+	if hasChanged {
+		events = append(events, changedEvent)
+	}
 	if email.IsEmailVerified {
 		events = append(events, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 	} else {
