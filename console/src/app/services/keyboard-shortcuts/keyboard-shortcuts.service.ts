@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy, Renderer2, RendererFactory2 } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, of, pairwise, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, of, pairwise, takeUntil } from 'rxjs';
 
 import { KeyboardShortcutsComponent } from '../../modules/keyboard-shortcuts/keyboard-shortcuts.component';
 import { GrpcAuthService } from '../grpc-auth.service';

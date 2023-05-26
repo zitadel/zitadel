@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import {
-  MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+  MatLegacyDialogRef as MatDialogRef,
 } from '@angular/material/legacy-dialog';
 import { Router } from '@angular/router';
 import { KeyboardShortcut, ORGSHORTCUTS, SIDEWIDESHORTCUTS } from 'src/app/services/keyboard-shortcuts/keyboard-shortcuts';

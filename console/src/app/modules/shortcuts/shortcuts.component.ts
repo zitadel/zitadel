@@ -1,6 +1,6 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy } from '@angular/core';
-import { merge, Subject, takeUntil } from 'rxjs';
+import { Subject, merge, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';

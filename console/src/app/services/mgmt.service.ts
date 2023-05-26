@@ -504,9 +504,9 @@ import {
   AccessTokenType,
   Gender,
   MembershipQuery,
-  SearchQuery as UserSearchQuery,
   UserFieldName,
   UserGrantQuery,
+  SearchQuery as UserSearchQuery,
 } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 

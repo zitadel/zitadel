@@ -1,7 +1,7 @@
 import { Injectable, Injector, OnDestroy, Type } from '@angular/core';
 import { GuardsCheckStart, Router, RouterEvent } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { Observable, of, Subject, throwError } from 'rxjs';
+import { Observable, Subject, of, throwError } from 'rxjs';
 import { filter, map, shareReplay, switchMap, take, takeUntil } from 'rxjs/operators';
 
 import { StatehandlerProcessorService } from './statehandler-processor.service';

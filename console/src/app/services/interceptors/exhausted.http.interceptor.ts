@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { Observable, catchError, switchMap, throwError } from 'rxjs';
 import { EnvironmentService } from '../environment.service';
 import { ExhaustedService } from '../exhausted.service';
 

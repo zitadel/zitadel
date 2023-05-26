@@ -47,12 +47,12 @@ import {
   CODE_METHOD,
   CUSTOM_METHOD,
   DEVICE_CODE_METHOD,
-  getAuthMethodFromPartialConfig,
-  getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
   PKCE_METHOD,
   PK_JWT_METHOD,
   POST_METHOD,
+  getAuthMethodFromPartialConfig,
+  getPartialConfigFromAuthMethod,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
 

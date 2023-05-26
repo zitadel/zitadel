@@ -33,11 +33,11 @@ import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
   DEVICE_CODE_METHOD,
-  getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
   PKCE_METHOD,
   PK_JWT_METHOD,
   POST_METHOD,
+  getPartialConfigFromAuthMethod,
 } from '../authmethods';
 import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, from, lastValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, from, lastValueFrom } from 'rxjs';
 
 import { StatehandlerService } from './statehandler/statehandler.service';
 

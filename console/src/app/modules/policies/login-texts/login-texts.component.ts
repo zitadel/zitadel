@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/co
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription, from, interval, of } from 'rxjs';
 import { map, pairwise, startWith, takeUntil } from 'rxjs/operators';
 import {
   GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,

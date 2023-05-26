@@ -6,7 +6,7 @@ import { SearchQuery as MemberSearchQuery } from 'src/app/proto/generated/zitade
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
 import { ProjectQuery } from 'src/app/proto/generated/zitadel/project_pb';
-import { SearchQuery as UserSearchQuery, UserGrantQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { UserGrantQuery, SearchQuery as UserSearchQuery } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { ActionKeysType } from '../action-keys/action-keys.component';
 

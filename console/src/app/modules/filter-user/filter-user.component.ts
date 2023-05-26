@@ -6,9 +6,9 @@ import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
   DisplayNameQuery,
   EmailQuery,
-  SearchQuery as UserSearchQuery,
   StateQuery,
   UserNameQuery,
+  SearchQuery as UserSearchQuery,
   UserState,
 } from 'src/app/proto/generated/zitadel/user_pb';
 

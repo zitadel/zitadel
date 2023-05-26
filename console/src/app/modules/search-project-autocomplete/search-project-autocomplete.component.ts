@@ -6,7 +6,7 @@ import {
   MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent,
 } from '@angular/material/legacy-autocomplete';
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
-import { forkJoin, from, Subject } from 'rxjs';
+import { Subject, forkJoin, from } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ListProjectGrantsResponse, ListProjectsResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';

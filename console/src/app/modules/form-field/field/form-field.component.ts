@@ -18,9 +18,9 @@ import {
 } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { MatLegacyFormFieldControl as MatFormFieldControl } from '@angular/material/legacy-form-field';
-import { combineLatest, map, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, combineLatest, map, of, startWith, takeUntil } from 'rxjs';
 
-import { CnslErrorDirective, CNSL_ERROR } from '../error/error.directive';
+import { CNSL_ERROR, CnslErrorDirective } from '../error/error.directive';
 import { cnslFormFieldAnimations } from './animations';
 
 export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslFormFieldComponent');

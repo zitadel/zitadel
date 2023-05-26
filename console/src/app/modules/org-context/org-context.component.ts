@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { BehaviorSubject, catchError, debounceTime, finalize, from, map, Observable, of, pipe, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, debounceTime, finalize, from, map, of, pipe, tap } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery, OrgState, OrgStateQuery } from 'src/app/proto/generated/zitadel/org_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';

@@ -1,7 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ListMyUserGrantsResponse, UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
+import { UserGrant as AuthUserGrant, ListMyUserGrantsResponse } from 'src/app/proto/generated/zitadel/auth_pb';
 import { ListUserGrantResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import {
   UserGrant as MgmtUserGrant,

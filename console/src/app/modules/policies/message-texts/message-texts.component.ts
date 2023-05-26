@@ -1,20 +1,20 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacySelectChange as MatSelectChange } from '@angular/material/legacy-select';
-import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, from, of } from 'rxjs';
 import {
   GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,
   GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
   GetDefaultPasswordChangeMessageTextRequest as AdminGetDefaultPasswordChangeMessageTextRequest,
-  GetDefaultPasswordlessRegistrationMessageTextRequest as AdminGetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultPasswordResetMessageTextRequest as AdminGetDefaultPasswordResetMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextRequest as AdminGetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
   GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
   SetDefaultDomainClaimedMessageTextRequest,
   SetDefaultInitMessageTextRequest,
   SetDefaultPasswordChangeMessageTextRequest,
-  SetDefaultPasswordlessRegistrationMessageTextRequest,
   SetDefaultPasswordResetMessageTextRequest,
+  SetDefaultPasswordlessRegistrationMessageTextRequest,
   SetDefaultVerifyEmailMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
@@ -22,22 +22,22 @@ import {
   GetCustomDomainClaimedMessageTextRequest,
   GetCustomInitMessageTextRequest,
   GetCustomPasswordChangeMessageTextRequest,
-  GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordResetMessageTextRequest,
+  GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomVerifyEmailMessageTextRequest,
   GetCustomVerifyPhoneMessageTextRequest,
   GetDefaultDomainClaimedMessageTextRequest,
   GetDefaultInitMessageTextRequest,
   GetDefaultPasswordChangeMessageTextRequest,
-  GetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultPasswordResetMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextRequest,
   GetDefaultVerifyEmailMessageTextRequest,
   GetDefaultVerifyPhoneMessageTextRequest,
   SetCustomDomainClaimedMessageTextRequest,
   SetCustomInitMessageTextRequest,
   SetCustomPasswordChangeMessageTextRequest,
-  SetCustomPasswordlessRegistrationMessageTextRequest,
   SetCustomPasswordResetMessageTextRequest,
+  SetCustomPasswordlessRegistrationMessageTextRequest,
   SetCustomVerifyEmailMessageTextRequest,
   SetCustomVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';

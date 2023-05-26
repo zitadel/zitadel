@@ -1,6 +1,6 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable, of, Subject, switchMap, take, takeUntil, zip } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, of, switchMap, take, takeUntil, zip } from 'rxjs';
 
 import { GrpcAuthService } from '../grpc-auth.service';
 import { CnslOverlayRef } from './overlay-ref';

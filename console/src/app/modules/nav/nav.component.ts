@@ -4,7 +4,7 @@ import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay'
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, combineLatest, map } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';

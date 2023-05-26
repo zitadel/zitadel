@@ -1,5 +1,5 @@
 import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
-import { getSupportedInputTypes, Platform } from '@angular/cdk/platform';
+import { Platform, getSupportedInputTypes } from '@angular/cdk/platform';
 import { AutofillMonitor } from '@angular/cdk/text-field';
 import {
   AfterViewInit,
@@ -18,13 +18,13 @@ import {
 import { FormGroupDirective, NgControl, NgForm } from '@angular/forms';
 import { CanUpdateErrorState, ErrorStateMatcher, mixinErrorState } from '@angular/material/core';
 import {
+  MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD,
   MatLegacyFormField as MatFormField,
   MatLegacyFormFieldControl as MatFormFieldControl,
-  MAT_LEGACY_FORM_FIELD as MAT_FORM_FIELD,
 } from '@angular/material/legacy-form-field';
 import {
-  getMatLegacyInputUnsupportedTypeError as getMatInputUnsupportedTypeError,
   MAT_LEGACY_INPUT_VALUE_ACCESSOR as MAT_INPUT_VALUE_ACCESSOR,
+  getMatLegacyInputUnsupportedTypeError as getMatInputUnsupportedTypeError,
 } from '@angular/material/legacy-input';
 import { Subject } from 'rxjs';
 

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 

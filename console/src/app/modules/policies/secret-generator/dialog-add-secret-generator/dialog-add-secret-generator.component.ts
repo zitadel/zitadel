@@ -1,8 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import {
-  MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+  MatLegacyDialogRef as MatDialogRef,
 } from '@angular/material/legacy-dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
