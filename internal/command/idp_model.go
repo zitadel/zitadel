@@ -189,6 +189,10 @@ func (wm *OAuthIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encry
 	)
 }
 
+func (wm *OAuthIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
+}
+
 type OIDCIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -304,7 +308,10 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 // reduceIDPConfigAddedEvent handles old idpConfig events
 func (wm *OIDCIDPWriteModel) reduceIDPConfigAddedEvent(e *idpconfig.IDPConfigAddedEvent) {
 	wm.Name = e.Name
+	wm.Options.IsCreationAllowed = true
+	wm.Options.IsLinkingAllowed = true
 	wm.Options.IsAutoCreation = e.AutoRegister
+	wm.Options.IsAutoUpdate = false
 	wm.State = domain.IDPStateActive
 }
 
@@ -374,6 +381,10 @@ func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 		oidc.DefaultMapper,
 		opts...,
 	)
+}
+
+func (wm *OIDCIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
 }
 
 type JWTIDPWriteModel struct {
@@ -475,7 +486,10 @@ func (wm *JWTIDPWriteModel) NewChanges(
 // reduceIDPConfigAddedEvent handles old idpConfig events
 func (wm *JWTIDPWriteModel) reduceIDPConfigAddedEvent(e *idpconfig.IDPConfigAddedEvent) {
 	wm.Name = e.Name
+	wm.Options.IsCreationAllowed = true
+	wm.Options.IsLinkingAllowed = true
 	wm.Options.IsAutoCreation = e.AutoRegister
+	wm.Options.IsAutoUpdate = false
 	wm.State = domain.IDPStateActive
 }
 
@@ -536,6 +550,10 @@ func (wm *JWTIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encrypt
 		idpAlg,
 		opts...,
 	)
+}
+
+func (wm *JWTIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
 }
 
 type AzureADIDPWriteModel struct {
@@ -680,6 +698,10 @@ func (wm *AzureADIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Enc
 	)
 }
 
+func (wm *AzureADIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
+}
+
 type GitHubIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -791,6 +813,10 @@ func (wm *GitHubIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encr
 		wm.Scopes,
 		oauthOpts...,
 	)
+}
+
+func (wm *GitHubIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
 }
 
 type GitHubEnterpriseIDPWriteModel struct {
@@ -937,6 +963,10 @@ func (wm *GitHubEnterpriseIDPWriteModel) ToProvider(callbackURL string, idpAlg c
 	)
 }
 
+func (wm *GitHubEnterpriseIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
+}
+
 type GitLabIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -1049,6 +1079,10 @@ func (wm *GitLabIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encr
 		wm.Scopes,
 		opts...,
 	)
+}
+
+func (wm *GitLabIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
 }
 
 type GitLabSelfHostedIDPWriteModel struct {
@@ -1175,6 +1209,10 @@ func (wm *GitLabSelfHostedIDPWriteModel) ToProvider(callbackURL string, idpAlg c
 	)
 }
 
+func (wm *GitLabSelfHostedIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
+}
+
 type GoogleIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -1292,6 +1330,10 @@ func (wm *GoogleIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encr
 		wm.Scopes,
 		opts...,
 	)
+}
+
+func (wm *GoogleIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
 }
 
 type LDAPIDPWriteModel struct {
@@ -1529,6 +1571,10 @@ func (wm *LDAPIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	), nil
 }
 
+func (wm *LDAPIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
+}
+
 type IDPRemoveWriteModel struct {
 	eventstore.WriteModel
 
@@ -1740,6 +1786,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 type IDP interface {
 	eventstore.QueryReducer
 	ToProvider(string, crypto.EncryptionAlgorithm) (providers.Provider, error)
+	GetProviderOptions() idp.Options
 }
 
 type AllIDPWriteModel struct {
@@ -1831,4 +1878,8 @@ func (wm *AllIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 
 func (wm *AllIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
 	return wm.model.ToProvider(callbackURL, idpAlg)
+}
+
+func (wm *AllIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.model.GetProviderOptions()
 }
