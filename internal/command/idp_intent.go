@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
@@ -49,6 +50,30 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID st
 	}
 }
 
+func (c *Commands) LoginWithLDAP(ctx context.Context, intentID string, username string, password string, callbackURL string) (*IDPIntentWriteModel, idp.User, error) {
+	intent, err := c.GetActiveIntent(ctx, intentID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	provider, err := c.GetProvider(ctx, intent.IDPID, callbackURL)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ldapProvider, ok := provider.(*ldap.Provider)
+	if !ok {
+		return nil, nil, errors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	}
+
+	session := &ldap.Session{Provider: ldapProvider, User: username, Password: password}
+	user, err := session.FetchUser(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return intent, user, nil
+}
+
 func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (string, *domain.ObjectDetails, error) {
 	id, err := c.idGenerator.Next()
 	if err != nil {
@@ -74,7 +99,7 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	return id, writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) GetProvider(ctx context.Context, idpID string, callbackURL func(domain.IDPType) string) (idp.Provider, error) {
+func (c *Commands) GetProvider(ctx context.Context, idpID string, callbackURL string) (idp.Provider, error) {
 	writeModel, err := IDPProviderWriteModel(ctx, c.eventstore.Filter, idpID)
 	if err != nil {
 		return nil, err
@@ -82,7 +107,21 @@ func (c *Commands) GetProvider(ctx context.Context, idpID string, callbackURL fu
 	return writeModel.ToProvider(callbackURL, c.idpConfigEncryption)
 }
 
-func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state string, callbackURL func(domain.IDPType) string) (string, error) {
+func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIntentWriteModel, error) {
+	intent, err := c.GetIntentWriteModel(ctx, intentID, "")
+	if err != nil {
+		return nil, err
+	}
+	if intent.State == domain.IDPIntentStateUnspecified {
+		return nil, errors.ThrowNotFound(nil, "IDP-Hk38e", "Errors.Intent.NotStarted")
+	}
+	if intent.State != domain.IDPIntentStateStarted {
+		return nil, errors.ThrowInvalidArgument(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted")
+	}
+	return intent, nil
+}
+
+func (c *Commands) AuthURLFromProvider(ctx context.Context, idpID, state string, callbackURL string) (string, error) {
 	provider, err := c.GetProvider(ctx, idpID, callbackURL)
 	if err != nil {
 		return "", err
@@ -126,6 +165,33 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 		userID,
 		accessToken,
 		idToken,
+	)
+	if err != nil {
+		return "", err
+	}
+	err = c.pushAppendAndReduce(ctx, writeModel, cmd)
+	if err != nil {
+		return "", err
+	}
+	return base64.RawURLEncoding.EncodeToString(token), nil
+}
+
+func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string) (string, error) {
+	token, err := c.idpConfigEncryption.Encrypt([]byte(writeModel.AggregateID))
+	if err != nil {
+		return "", err
+	}
+	idpInfo, err := json.Marshal(idpUser)
+	if err != nil {
+		return "", err
+	}
+	cmd, err := idpintent.NewSucceededEvent(
+		ctx,
+		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		idpInfo,
+		userID,
+		nil,
+		"",
 	)
 	if err != nil {
 		return "", err

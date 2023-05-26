@@ -535,6 +535,30 @@ message StartIdentityProviderFlowRequest{
       example: "\"https://custom.com/login/idp/fail\"";
     }
   ];
+  oneof credentials {
+    LDAPCredentials ldap = 4;
+  }
+}
+
+message LDAPCredentials {
+  string username = 1[
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Username used to login through LDAP"
+      min_length: 1;
+      max_length: 200;
+      example: "\"username\"";
+    }
+  ];
+  string password = 2[
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Password used to login through LDAP"
+      min_length: 1;
+      max_length: 200;
+      example: "\"Password1!\"";
+    }
+  ];
 }
 
 message StartIdentityProviderFlowResponse{
@@ -544,6 +568,14 @@ message StartIdentityProviderFlowResponse{
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "URL to which the client should redirect"
         example: "\"https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&callback=https%3A%2F%2Fzitadel.cloud%2Fidps%2Fcallback\"";
+      }
+    ];
+    string token = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "token of the intent"
+        min_length: 1;
+        max_length: 200;
+        example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
       }
     ];
   }

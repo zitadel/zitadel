@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -140,14 +141,48 @@ func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartI
 	if err != nil {
 		return nil, err
 	}
-	authURL, err := s.command.AuthURLFromProvider(ctx, req.GetIdpId(), id, s.idpCallback(ctx))
-	if err != nil {
-		return nil, err
+	if req.GetLdap() != nil {
+		intent, externalUser, err := s.command.LoginWithLDAP(ctx, id, req.GetLdap().GetUsername(), req.GetLdap().GetPassword(), s.idpCallback(ctx)) //TODO callback is irrelevant
+		if err != nil {
+			return nil, err
+		}
+		idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(intent.IDPID)
+		if err != nil {
+			return nil, err
+		}
+		externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUser.GetID())
+		if err != nil {
+			return nil, err
+		}
+		queries := []query.SearchQuery{
+			idQuery, externalIDQuery,
+		}
+		links, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+		if err != nil {
+			return nil, err
+		}
+		userID := ""
+		if len(links.Links) == 1 {
+			userID = links.Links[0].UserID
+		}
+		token, err := s.command.SucceedLDAPIDPIntent(ctx, intent, externalUser, userID)
+		if err != nil {
+			return nil, err
+		}
+		return &user.StartIdentityProviderFlowResponse{
+			Details:  object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderFlowResponse_Token{Token: token},
+		}, nil
+	} else {
+		authURL, err := s.command.AuthURLFromProvider(ctx, req.GetIdpId(), id, s.idpCallback(ctx))
+		if err != nil {
+			return nil, err
+		}
+		return &user.StartIdentityProviderFlowResponse{
+			Details:  object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
+		}, nil
 	}
-	return &user.StartIdentityProviderFlowResponse{
-		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
-	}, nil
 }
 
 func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *user.RetrieveIdentityProviderInformationRequest) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
