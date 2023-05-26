@@ -204,6 +204,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attenzione! L'organizzazione è appena stata cambiata."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "La visualizzazione è appena stata modificata in istanza!"
     }
   },
   "FILTER": {
