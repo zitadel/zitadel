@@ -54,14 +54,6 @@ type externalIDPCallbackData struct {
 	ErrorDescription string `schema:"error_description"`
 }
 
-type externalLDAPCallbackData struct {
-	State            string `schema:"state"`
-	Username         string `schema:"username"`
-	Password         string `schema:"password"`
-	Error            string `schema:"error"`
-	ErrorDescription string `schema:"error_description"`
-}
-
 // CallbackURL generates the instance specific URL to the IDP callback handler
 func CallbackURL(externalSecure bool) func(ctx context.Context) string {
 	return func(ctx context.Context) string {
