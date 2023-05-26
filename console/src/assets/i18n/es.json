@@ -205,6 +205,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "¡Atención! El contexto de la organización ha cambiado."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "¡La vista acaba de cambiar a instancia!"
     }
   },
   "FILTER": {
