@@ -179,7 +179,8 @@
     "webpack-dev-middleware": "5.3.1",
     "webpack-dev-server": "4.9.0",
     "widest-line": "4.0.1",
-    "wrap-ansi": "8.0.1"
+    "wrap-ansi": "8.0.1",
+    "yaml": "2.3.1"
   },
   "resolutions": {
     "@docusaurus/theme-common": "2.2.0",
