@@ -40,12 +40,6 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	return es
 }
 
-func expectFilter(events ...eventstore.Event) expect {
-	return func(m *mock.MockRepository) {
-		m.ExpectFilterEvents(events...)
-	}
-}
-
 func eventFromEventPusher(event eventstore.Command) *repository.Event {
 	data, _ := eventstore.EventData(event)
 	return &repository.Event{

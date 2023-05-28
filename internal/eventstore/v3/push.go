@@ -99,5 +99,9 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 		}
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return events, nil
 }

@@ -74,7 +74,16 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-22H8f", "Errors.Internal")
 	}
-	return scan(rows)
+	states, err := scan(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return states, nil
 }
 
 func (q *Queries) latestState(ctx context.Context, projections ...table) (_ *LatestState, err error) {
@@ -185,6 +194,11 @@ func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) (tab
 		}
 		tables = append(tables, schema+"."+tableName)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return tables, nil
 }
 
