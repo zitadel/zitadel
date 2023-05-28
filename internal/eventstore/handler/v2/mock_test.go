@@ -1,7 +1,5 @@
 package handler
 
-import "github.com/zitadel/zitadel/internal/eventstore"
-
 var _ Projection = (*projection)(nil)
 
 type projection struct {
