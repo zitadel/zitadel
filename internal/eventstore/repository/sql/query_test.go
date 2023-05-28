@@ -187,10 +187,10 @@ func Test_prepareColumns(t *testing.T) {
 			}
 			if equaler, ok := tt.res.expected.(interface{ Equal(time.Time) bool }); ok {
 				equaler.Equal(tt.args.dest.(*sql.NullTime).Time)
-			} else {
-				if !reflect.DeepEqual(reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface(), tt.res.expected) {
-					t.Errorf("unexpected result from rowScanner \nwant: %+v \ngot: %+v", tt.fields.dbRow, reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface())
-				}
+				return
+			}
+			if !reflect.DeepEqual(reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface(), tt.res.expected) {
+				t.Errorf("unexpected result from rowScanner \nwant: %+v \ngot: %+v", tt.fields.dbRow, reflect.Indirect(reflect.ValueOf(tt.args.dest)).Interface())
 			}
 		})
 	}

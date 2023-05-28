@@ -103,7 +103,7 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 			InstanceID:    event.InstanceID,
 			Version:       eventstore.Version(event.Version),
 		},
-		EventType:                     EventType(event.Typ),
+		EventType:                     event.Typ,
 		creationDate:                  event.CreationDate,
 		sequence:                      event.Seq,
 		previousAggregateSequence:     event.PreviousAggregateSequence,

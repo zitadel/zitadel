@@ -36,8 +36,7 @@ func (t *Token) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (t *Token) AppendEvent(event *es_models.Event) error {
-	switch eventstore.EventType(event.Typ) {
-	case user_repo.UserTokenAddedType:
+	if event.Typ == user_repo.UserTokenAddedType {
 		err := t.setData(event)
 		if err != nil {
 			return err

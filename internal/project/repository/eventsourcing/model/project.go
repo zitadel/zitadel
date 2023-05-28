@@ -59,7 +59,7 @@ func (p *Project) AppendEvents(events ...eventstore.Event) error {
 func (p *Project) AppendEvent(event eventstore.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case project.ProjectAddedType, project.ProjectChangedType:
 		return p.AppendAddProjectEvent(event)
 	case project.ProjectDeactivatedType:

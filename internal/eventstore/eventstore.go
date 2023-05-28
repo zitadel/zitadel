@@ -9,7 +9,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 // Eventstore abstracts all functions needed to store valid events
@@ -51,7 +50,7 @@ func (es *Eventstore) Health(ctx context.Context) error {
 
 // Push pushes the events in a single transaction
 // an event needs at least an aggregate
-func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]eventstore.Event, error) {
+func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
 	if es.PushTimeout > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
@@ -141,7 +140,7 @@ func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Even
 }
 
 func (es *Eventstore) mapEvent(event *repository.Event) (Event, error) {
-	interceptors, ok := es.eventInterceptors[EventType(event.Typ)]
+	interceptors, ok := es.eventInterceptors[event.Typ]
 	if !ok || interceptors.eventMapper == nil {
 		return BaseEventFromRepo(event), nil
 	}
