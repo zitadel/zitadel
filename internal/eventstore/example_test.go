@@ -287,13 +287,13 @@ func (rm *UserReadModel) Reduce() error {
 // ------------------------------------------------------------
 
 func TestUserReadModel(t *testing.T) {
-	config := eventstore.TestConfig(query_repo.NewCRDB(testCRDBClient, true), v3.NewEventstore(testCRDBClient))
-	es, err := eventstore.Start(config)
-	if err != nil {
-		t.Errorf("unable to start eventstore: %v", err)
-		t.FailNow()
-	}
-	// es := eventstore.NewEventstore(&eventstore.Config{re})
+	es := eventstore.NewEventstore(
+		&eventstore.Config{
+			Querier: query_repo.NewCRDB(testCRDBClient, true),
+			Pusher:  v3.NewEventstore(testCRDBClient),
+		},
+	)
+
 	es.RegisterFilterEventMapper(UserAddedEventMapper()).
 		RegisterFilterEventMapper(UserFirstNameChangedMapper()).
 		RegisterFilterEventMapper(UserPasswordCheckedMapper()).

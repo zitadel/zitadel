@@ -9,6 +9,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
+	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/migration"
 )
 
@@ -32,9 +34,9 @@ func Cleanup(config *Config) {
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	config.Eventstore.Client = dbClient
-	es, err := eventstore.Start(config.Eventstore)
-	logging.OnError(err).Fatal("unable to start eventstore")
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
+	config.Eventstore.Querier = old_es.NewCRDB(dbClient, config.Eventstore.AllowOrderByCreationDate)
+	es := eventstore.NewEventstore(config.Eventstore)
 	migration.RegisterMappers(es)
 
 	step, err := migration.LatestStep(ctx, es)

@@ -24,7 +24,12 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	for _, e := range expects {
 		e(m)
 	}
-	es := eventstore.NewEventstore(eventstore.TestConfig(m.MockQuerier, m.MockPusher))
+	es := eventstore.NewEventstore(
+		&eventstore.Config{
+			Querier: m.MockQuerier,
+			Pusher:  m.MockPusher,
+		},
+	)
 	iam_repo.RegisterEventMappers(es)
 	org.RegisterEventMappers(es)
 	usr_repo.RegisterEventMappers(es)

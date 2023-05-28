@@ -30,8 +30,8 @@ func NewEventstore(config *Config) *Eventstore {
 		interceptorMutex:  sync.Mutex{},
 		PushTimeout:       config.PushTimeout,
 
-		pusher:  config.pusher,
-		querier: config.querier,
+		pusher:  config.Pusher,
+		querier: config.Querier,
 	}
 }
 

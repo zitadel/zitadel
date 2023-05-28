@@ -53,6 +53,8 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
+	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
@@ -125,11 +127,9 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return err
 	}
 
-	config.Eventstore.Client = dbClient
-	eventstoreClient, err := eventstore.Start(config.Eventstore)
-	if err != nil {
-		return fmt.Errorf("cannot start eventstore for queries: %w", err)
-	}
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
+	config.Eventstore.Querier = old_es.NewCRDB(dbClient, config.Eventstore.AllowOrderByCreationDate)
+	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
