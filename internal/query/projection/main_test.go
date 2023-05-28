@@ -24,7 +24,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	for _, e := range expects {
 		e(m)
 	}
-	es := eventstore.NewEventstore(eventstore.TestConfig(m))
+	es := eventstore.NewEventstore(eventstore.TestConfig(m.MockQuerier, m.MockPusher))
 	iam_repo.RegisterEventMappers(es)
 	org.RegisterEventMappers(es)
 	usr_repo.RegisterEventMappers(es)
@@ -45,11 +45,11 @@ func eventFromEventPusher(event eventstore.Command) *repository.Event {
 	data, _ := eventstore.EventData(event)
 	return &repository.Event{
 		ID:                            "",
-		Sequence:                      0,
+		Seq:                           0,
 		PreviousAggregateSequence:     0,
 		PreviousAggregateTypeSequence: 0,
 		CreationDate:                  time.Time{},
-		Type:                          repository.EventType(event.Type()),
+		Typ:                           repository.EventType(event.Type()),
 		Data:                          data,
 		EditorService:                 "zitadel",
 		EditorUser:                    event.Creator(),

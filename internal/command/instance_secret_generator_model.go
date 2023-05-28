@@ -28,6 +28,7 @@ func NewInstanceSecretGeneratorConfigWriteModel(ctx context.Context, GeneratorTy
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   authz.GetInstance(ctx).InstanceID(),
 			ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+			InstanceID:    authz.GetInstance(ctx).InstanceID(),
 		},
 		GeneratorType: GeneratorType,
 	}

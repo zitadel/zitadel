@@ -16,11 +16,11 @@ func testEvent(
 	data []byte,
 ) *repository.Event {
 	return &repository.Event{
-		Sequence:                      15,
+		Seq:                           15,
 		PreviousAggregateSequence:     10,
 		PreviousAggregateTypeSequence: 10,
 		CreationDate:                  time.Now(),
-		Type:                          eventType,
+		Typ:                           eventType,
 		AggregateType:                 aggregateType,
 		Data:                          data,
 		Version:                       "v1",

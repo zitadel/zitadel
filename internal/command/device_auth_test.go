@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
@@ -73,16 +72,12 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 			name: "success",
 			fields: fields{
 				eventstore: eventstoreExpect(t, expectPush(
-					[]*repository.Event{
-						eventFromEventPusherWithInstanceID("instance1", deviceauth.NewAddedEvent(
-							ctx,
-							deviceauth.NewAggregate("1999", "instance1"),
-							"client_id", "123", "456", now,
-							[]string{"a", "b", "c"},
-						)),
-					},
-					uniqueConstraintsFromEventConstraintWithInstanceID("instance1", unique[0]),
-					uniqueConstraintsFromEventConstraintWithInstanceID("instance1", unique[1]),
+					deviceauth.NewAddedEvent(
+						ctx,
+						deviceauth.NewAggregate("1999", "instance1"),
+						"client_id", "123", "456", now,
+						[]string{"a", "b", "c"},
+					),
 				)),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "1999"),
 			},
@@ -103,17 +98,13 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 			name: "push error",
 			fields: fields{
 				eventstore: eventstoreExpect(t, expectPushFailed(pushErr,
-					[]*repository.Event{
-						eventFromEventPusherWithInstanceID("instance1", deviceauth.NewAddedEvent(
-							ctx,
-							deviceauth.NewAggregate("1999", "instance1"),
-							"client_id", "123", "456", now,
-							[]string{"a", "b", "c"},
-						)),
-					},
-					uniqueConstraintsFromEventConstraintWithInstanceID("instance1", unique[0]),
-					uniqueConstraintsFromEventConstraintWithInstanceID("instance1", unique[1]),
-				)),
+					deviceauth.NewAddedEvent(
+						ctx,
+						deviceauth.NewAggregate("1999", "instance1"),
+						"client_id", "123", "456", now,
+						[]string{"a", "b", "c"},
+					)),
+				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "1999"),
 			},
 			args: args{
@@ -135,8 +126,8 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 			}
 			gotID, gotDetails, err := c.AddDeviceAuth(tt.args.ctx, tt.args.clientID, tt.args.deviceCode, tt.args.userCode, tt.args.expires, tt.args.scopes)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, gotID, tt.wantID)
-			assert.Equal(t, gotDetails, tt.wantDetails)
+			assert.Equal(t, tt.wantID, gotID)
+			assert.Equal(t, tt.wantDetails, gotDetails)
 		})
 	}
 }
@@ -201,11 +192,9 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 						),
 					)),
 					expectPushFailed(pushErr,
-						[]*repository.Event{eventFromEventPusherWithInstanceID(
-							"instance1", deviceauth.NewApprovedEvent(
-								ctx, deviceauth.NewAggregate("1999", "instance1"), "subj",
-							),
-						)},
+						deviceauth.NewApprovedEvent(
+							ctx, deviceauth.NewAggregate("1999", "instance1"), "subj",
+						),
 					),
 				),
 			},
@@ -225,11 +214,11 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 							[]string{"a", "b", "c"},
 						),
 					)),
-					expectPush([]*repository.Event{eventFromEventPusherWithInstanceID(
-						"instance1", deviceauth.NewApprovedEvent(
+					expectPush(
+						deviceauth.NewApprovedEvent(
 							ctx, deviceauth.NewAggregate("1999", "instance1"), "subj",
 						),
-					)}),
+					),
 				),
 			},
 			args: args{ctx, "1999", "subj"},
@@ -310,12 +299,10 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						),
 					)),
 					expectPushFailed(pushErr,
-						[]*repository.Event{eventFromEventPusherWithInstanceID(
-							"instance1", deviceauth.NewCanceledEvent(
-								ctx, deviceauth.NewAggregate("1999", "instance1"),
-								domain.DeviceAuthCanceledDenied,
-							),
-						)},
+						deviceauth.NewCanceledEvent(
+							ctx, deviceauth.NewAggregate("1999", "instance1"),
+							domain.DeviceAuthCanceledDenied,
+						),
 					),
 				),
 			},
@@ -335,12 +322,12 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 							[]string{"a", "b", "c"},
 						),
 					)),
-					expectPush([]*repository.Event{eventFromEventPusherWithInstanceID(
-						"instance1", deviceauth.NewCanceledEvent(
+					expectPush(
+						deviceauth.NewCanceledEvent(
 							ctx, deviceauth.NewAggregate("1999", "instance1"),
 							domain.DeviceAuthCanceledDenied,
 						),
-					)}),
+					),
 				),
 			},
 			args: args{ctx, "1999", domain.DeviceAuthCanceledDenied},
@@ -361,12 +348,12 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 							[]string{"a", "b", "c"},
 						),
 					)),
-					expectPush([]*repository.Event{eventFromEventPusherWithInstanceID(
-						"instance1", deviceauth.NewCanceledEvent(
+					expectPush(
+						deviceauth.NewCanceledEvent(
 							ctx, deviceauth.NewAggregate("1999", "instance1"),
 							domain.DeviceAuthCanceledExpired,
 						),
-					)}),
+					),
 				),
 			},
 			args: args{ctx, "1999", domain.DeviceAuthCanceledExpired},
@@ -423,14 +410,10 @@ func TestCommands_RemoveDeviceAuth(t *testing.T) {
 						),
 					)),
 					expectPushFailed(pushErr,
-						[]*repository.Event{eventFromEventPusherWithInstanceID(
-							"instance1", deviceauth.NewRemovedEvent(
-								ctx, deviceauth.NewAggregate("1999", "instance1"),
-								"client_id", "123", "456",
-							),
-						)},
-						uniqueConstraintsFromEventConstraintWithInstanceID("instance1", unique[0]),
-						uniqueConstraintsFromEventConstraintWithInstanceID("instance1", unique[1]),
+						deviceauth.NewRemovedEvent(
+							ctx, deviceauth.NewAggregate("1999", "instance1"),
+							"client_id", "123", "456",
+						),
 					),
 				),
 			},
@@ -451,14 +434,10 @@ func TestCommands_RemoveDeviceAuth(t *testing.T) {
 						),
 					)),
 					expectPush(
-						[]*repository.Event{eventFromEventPusherWithInstanceID(
-							"instance1", deviceauth.NewRemovedEvent(
-								ctx, deviceauth.NewAggregate("1999", "instance1"),
-								"client_id", "123", "456",
-							),
-						)},
-						uniqueConstraintsFromEventConstraintWithInstanceID("instance1", unique[0]),
-						uniqueConstraintsFromEventConstraintWithInstanceID("instance1", unique[1]),
+						deviceauth.NewRemovedEvent(
+							ctx, deviceauth.NewAggregate("1999", "instance1"),
+							"client_id", "123", "456",
+						),
 					),
 				),
 			},

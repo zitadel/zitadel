@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -87,15 +86,11 @@ func TestCommandSide_AddPasswordAgePolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewPasswordAgePolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									10,
-									365,
-								),
-							),
-						},
+						org.NewPasswordAgePolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							10,
+							365,
+						),
 					),
 				),
 			},
@@ -238,11 +233,7 @@ func TestCommandSide_ChangePasswordAgePolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newPasswordAgePolicyChangedEvent(context.Background(), "org1", 150, 5),
-							),
-						},
+						newPasswordAgePolicyChangedEvent(context.Background(), "org1", 150, 5),
 					),
 				),
 			},
@@ -348,12 +339,8 @@ func TestCommandSide_RemovePasswordAgePolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewPasswordAgePolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate),
-							),
-						},
+						org.NewPasswordAgePolicyRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate),
 					),
 				),
 			},

@@ -120,7 +120,7 @@ func (db *CRDB) push(ctx context.Context, events []*repository.Event, uniqueCons
 		)
 		for _, event := range events {
 			err := tx.QueryRowContext(ctx, crdbInsert,
-				event.Type,
+				event.Typ,
 				event.AggregateType,
 				event.AggregateID,
 				event.Version,
@@ -129,7 +129,7 @@ func (db *CRDB) push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorService,
 				event.ResourceOwner,
 				event.InstanceID,
-			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner, &event.InstanceID)
+			).Scan(&event.ID, &event.Seq, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner, &event.InstanceID)
 
 			event.PreviousAggregateSequence = uint64(previousAggregateSequence)
 			event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
@@ -139,7 +139,7 @@ func (db *CRDB) push(ctx context.Context, events []*repository.Event, uniqueCons
 					"aggregate", event.AggregateType,
 					"aggregateId", event.AggregateID,
 					"aggregateType", event.AggregateType,
-					"eventType", event.Type,
+					"eventType", event.Typ,
 					"instanceID", event.InstanceID,
 				).WithError(err).Info("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")

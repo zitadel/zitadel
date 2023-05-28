@@ -9,11 +9,9 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
-	"github.com/zitadel/zitadel/internal/repository/member"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -60,24 +58,18 @@ func TestCommandSide_AddProject(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectPushFailed(errors.ThrowAlreadyExists(nil, "ERROR", "internl"),
-						[]*repository.Event{
-							eventFromEventPusher(project.NewProjectAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true,
-								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
-							),
-							),
-							eventFromEventPusher(project.NewProjectMemberAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"user1",
-								[]string{domain.RoleProjectOwner}...,
-							),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectNameUniqueConstraint("project", "org1")),
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("project1", "user1")),
+						project.NewProjectAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project", true, true, true,
+							domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+						),
+						project.NewProjectMemberAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"user1",
+							[]string{domain.RoleProjectOwner}...,
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
@@ -104,24 +96,18 @@ func TestCommandSide_AddProject(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewProjectAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"project", true, true, true,
-								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
-							),
-							),
-							eventFromEventPusher(project.NewProjectMemberAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"user1",
-								[]string{domain.RoleProjectOwner}...,
-							),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectNameUniqueConstraint("project", "org1")),
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("project1", "user1")),
+						project.NewProjectAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project", true, true, true,
+							domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+						),
+						project.NewProjectMemberAddedEvent(
+							context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"user1",
+							[]string{domain.RoleProjectOwner}...,
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
@@ -334,21 +320,16 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newProjectChangedEvent(context.Background(),
-									"project1",
-									"org1",
-									"project",
-									"project-new",
-									false,
-									false,
-									false,
-									domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectNameUniqueConstraint("project", "org1")),
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectNameUniqueConstraint("project-new", "org1")),
+						newProjectChangedEvent(context.Background(),
+							"project1",
+							"org1",
+							"project",
+							"project-new",
+							false,
+							false,
+							false,
+							domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
+						),
 					),
 				),
 			},
@@ -394,19 +375,16 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newProjectChangedEvent(context.Background(),
-									"project1",
-									"org1",
-									"project",
-									"",
-									false,
-									false,
-									false,
-									domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy),
-							),
-						},
+						newProjectChangedEvent(context.Background(),
+							"project1",
+							"org1",
+							"",
+							"",
+							false,
+							false,
+							false,
+							domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
+						),
 					),
 				),
 			},
@@ -598,12 +576,8 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewProjectDeactivatedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate),
-							),
-						},
+						project.NewProjectDeactivatedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate),
 					),
 				),
 			},
@@ -778,12 +752,8 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewProjectReactivatedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate),
-							),
-						},
+						project.NewProjectReactivatedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate),
 					),
 				),
 			},
@@ -932,15 +902,10 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 					// no saml application events
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewProjectRemovedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"project",
-									nil),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectNameUniqueConstraint("project", "org1")),
+						project.NewProjectRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project",
+							nil),
 					),
 				),
 			},
@@ -985,18 +950,13 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewProjectRemovedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"project",
-									[]*eventstore.EventUniqueConstraint{
-										project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata"),
-									}),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectNameUniqueConstraint("project", "org1")),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
+						project.NewProjectRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project",
+							[]*eventstore.EventUniqueConstraint{
+								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata"),
+							},
+						),
 					),
 				),
 			},
@@ -1069,22 +1029,15 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewProjectRemovedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"project",
-									[]*eventstore.EventUniqueConstraint{
-										project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test1.com/saml/metadata"),
-										project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata"),
-										project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test3.com/saml/metadata"),
-									}),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectNameUniqueConstraint("project", "org1")),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test1.com/saml/metadata")),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata")),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test3.com/saml/metadata")),
+						project.NewProjectRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"project",
+							[]*eventstore.EventUniqueConstraint{
+								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test1.com/saml/metadata"),
+								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata"),
+								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test3.com/saml/metadata"),
+							},
+						),
 					),
 				),
 			},

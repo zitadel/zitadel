@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
@@ -120,19 +119,14 @@ func TestCommandSide_AddMachine(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewMachineAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"username",
-									"name",
-									"description",
-									true,
-									domain.OIDCTokenTypeBearer,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						user.NewMachineAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"name",
+							"description",
+							true,
+							domain.OIDCTokenTypeBearer,
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
@@ -309,11 +303,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newMachineChangedEvent(context.Background(), "user1", "org1", "name1", "description1"),
-							),
-						},
+						newMachineChangedEvent(context.Background(), "user1", "org1", "name1", "description1"),
 					),
 				),
 			},

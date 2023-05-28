@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -125,19 +124,15 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newProfileChangedEvent(context.Background(),
-									"user1", "org1",
-									"firstname2",
-									"lastname2",
-									"nickname2",
-									"displayname2",
-									language.English,
-									domain.GenderMale,
-								),
-							),
-						},
+						newProfileChangedEvent(context.Background(),
+							"user1", "org1",
+							"firstname2",
+							"lastname2",
+							"nickname2",
+							"displayname2",
+							language.English,
+							domain.GenderMale,
+						),
 					),
 				),
 			},

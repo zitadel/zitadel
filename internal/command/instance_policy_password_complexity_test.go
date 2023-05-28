@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -92,16 +91,11 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									8,
-									true, true, true, true,
-								),
-							),
-						},
+						instance.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							8,
+							true, true, true, true,
+						),
 					),
 				),
 			},
@@ -245,11 +239,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDefaultPasswordComplexityPolicyChangedEvent(context.Background(), 10, false, false, false, false),
-							),
-						},
+						newDefaultPasswordComplexityPolicyChangedEvent(context.Background(), 10, false, false, false, false),
 					),
 				),
 			},
@@ -268,6 +258,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
+						InstanceID:    "INSTANCE",
 					},
 					MinLength:    10,
 					HasUppercase: false,

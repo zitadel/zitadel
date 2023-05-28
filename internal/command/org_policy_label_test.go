@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -109,24 +108,20 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									true,
-									true,
-									true,
-								),
-							),
-						},
+						org.NewLabelPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							true,
+							true,
+							true,
+						),
 					),
 				),
 			},
@@ -315,24 +310,20 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newLabelPolicyChangedEvent(
-									context.Background(),
-									"org1",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									false,
-									false,
-									false),
-							),
-						},
+						newLabelPolicyChangedEvent(
+							context.Background(),
+							"org1",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							false,
+							false,
+							false),
 					),
 				),
 			},
@@ -464,12 +455,8 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyActivatedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate),
-							),
-						},
+						org.NewLabelPolicyActivatedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate),
 					),
 				),
 			},
@@ -568,12 +555,8 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate),
-							),
-						},
+						org.NewLabelPolicyRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate),
 					),
 				),
 				static: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectsNoError(),
@@ -735,14 +718,10 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyLogoAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"logo",
-								),
-							),
-						},
+						org.NewLabelPolicyLogoAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"logo",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -869,14 +848,10 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyLogoRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyLogoRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -1045,14 +1020,10 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyIconAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"icon",
-								),
-							),
-						},
+						org.NewLabelPolicyIconAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"icon",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -1177,14 +1148,10 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyIconRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyIconRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -1352,14 +1319,10 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"logo",
-								),
-							),
-						},
+						org.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"logo",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -1486,14 +1449,10 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyLogoDarkRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyLogoDarkRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -1662,14 +1621,10 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyIconDarkAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"icon",
-								),
-							),
-						},
+						org.NewLabelPolicyIconDarkAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"icon",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -1792,14 +1747,10 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyIconDarkRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyIconDarkRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -1959,14 +1910,10 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyFontAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"font",
-								),
-							),
-						},
+						org.NewLabelPolicyFontAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"font",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -2089,14 +2036,10 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyFontRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyFontRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},

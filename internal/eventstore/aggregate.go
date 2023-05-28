@@ -18,7 +18,7 @@ func NewAggregate(
 	version eventstore.Version,
 	opts ...eventstore.AggregateOpt,
 ) *Aggregate {
-	return (*Aggregate)(eventstore.NewAggregate(ctx, id, typ, version, opts...))
+	return eventstore.NewAggregate(ctx, id, typ, version, opts...)
 }
 
 // WithResourceOwner overwrites the resource owner of the aggregate
@@ -33,13 +33,13 @@ func AggregateFromWriteModel(
 	typ AggregateType,
 	version eventstore.Version,
 ) *Aggregate {
-	return (*Aggregate)(eventstore.NewAggregate(
+	return eventstore.NewAggregate(
 		authz.WithInstanceID(context.Background(), wm.InstanceID),
 		wm.AggregateID,
 		typ,
 		version,
 		eventstore.WithResourceOwner(wm.ResourceOwner),
-	))
+	)
 }
 
 // Aggregate is the basic implementation of Aggregater

@@ -133,7 +133,7 @@ func Test_prepareColumns(t *testing.T) {
 			res: res{
 				query: "SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
 				expected: []*repository.Event{
-					{AggregateID: "hodor", AggregateType: "user", Sequence: 5, Data: make(Data, 0)},
+					{AggregateID: "hodor", AggregateType: "user", Seq: 5, Data: make(Data, 0)},
 				},
 			},
 			fields: fields{
@@ -509,15 +509,15 @@ func Test_query_events_with_crdb(t *testing.T) {
 			fields: fields{
 				client: testCRDBClient,
 				existingEvents: []*repository.Event{
-					generateEvent(t, "311", func(e *repository.Event) { e.Type = "user.created" }),
-					generateEvent(t, "311", func(e *repository.Event) { e.Type = "user.updated" }),
-					generateEvent(t, "311", func(e *repository.Event) { e.Type = "user.deactivated" }),
-					generateEvent(t, "311", func(e *repository.Event) { e.Type = "user.locked" }),
-					generateEvent(t, "312", func(e *repository.Event) { e.Type = "user.created" }),
-					generateEvent(t, "312", func(e *repository.Event) { e.Type = "user.updated" }),
-					generateEvent(t, "312", func(e *repository.Event) { e.Type = "user.deactivated" }),
-					generateEvent(t, "312", func(e *repository.Event) { e.Type = "user.reactivated" }),
-					generateEvent(t, "313", func(e *repository.Event) { e.Type = "user.locked" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.Typ = "user.created" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.Typ = "user.updated" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.Typ = "user.deactivated" }),
+					generateEvent(t, "311", func(e *repository.Event) { e.Typ = "user.locked" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.Typ = "user.created" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.Typ = "user.updated" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.Typ = "user.deactivated" }),
+					generateEvent(t, "312", func(e *repository.Event) { e.Typ = "user.reactivated" }),
+					generateEvent(t, "313", func(e *repository.Event) { e.Typ = "user.locked" }),
 				},
 			},
 			res: res{
@@ -749,7 +749,7 @@ func Test_query_events_mocked(t *testing.T) {
 				mock: newMockClient(t).expectQuery(t,
 					`SELECT created_at, event_type, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \( aggregate_type = \$1 \) ORDER BY created_at DESC, event_sequence DESC`,
 					[]driver.Value{repository.AggregateType("user")},
-					&repository.Event{Sequence: 100}),
+					&repository.Event{Seq: 100}),
 			},
 			res: res{
 				wantErr: true,
@@ -861,7 +861,7 @@ func (m *dbMock) expectQuery(t *testing.T, expectedQuery string, args []driver.V
 	query := m.mock.ExpectQuery(expectedQuery).WithArgs(args...)
 	rows := sqlmock.NewRows([]string{"event_sequence"})
 	for _, event := range events {
-		rows = rows.AddRow(event.Sequence)
+		rows = rows.AddRow(event.Seq)
 	}
 	query.WillReturnRows(rows).RowsWillBeClosed()
 	return m

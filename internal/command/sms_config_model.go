@@ -28,6 +28,7 @@ func NewIAMSMSConfigWriteModel(instanceID, id string) *IAMSMSConfigWriteModel {
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   instanceID,
 			ResourceOwner: instanceID,
+			InstanceID:    instanceID,
 		},
 		ID: id,
 	}

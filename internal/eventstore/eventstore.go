@@ -2,14 +2,12 @@ package eventstore
 
 import (
 	"context"
-	"encoding/json"
-	"reflect"
+	"database/sql"
 	"sort"
 	"sync"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
@@ -17,14 +15,14 @@ import (
 // Eventstore abstracts all functions needed to store valid events
 // and filters the stored events
 type Eventstore struct {
-	repo              repository.Repository
 	interceptorMutex  sync.Mutex
 	eventInterceptors map[EventType]eventTypeInterceptors
 	eventTypes        []string
 	aggregateTypes    []string
 	PushTimeout       time.Duration
 
-	es eventstore.Eventstore
+	pusher  Pusher
+	querier Querier
 }
 
 type eventTypeInterceptors struct {
@@ -33,22 +31,22 @@ type eventTypeInterceptors struct {
 
 func NewEventstore(config *Config) *Eventstore {
 	return &Eventstore{
-		repo:              config.repo,
 		eventInterceptors: map[EventType]eventTypeInterceptors{},
 		interceptorMutex:  sync.Mutex{},
 		PushTimeout:       config.PushTimeout,
 
-		es: *eventstore.NewEventstore(config.Client),
+		pusher:  config.pusher,
+		querier: config.querier,
 	}
 }
 
 // Health checks if the eventstore can properly work
 // It checks if the repository can serve load
 func (es *Eventstore) Health(ctx context.Context) error {
-	if err := es.repo.Health(ctx); err != nil {
+	if err := es.pusher.Health(ctx); err != nil {
 		return err
 	}
-	return es.es.Health(ctx)
+	return es.querier.Health(ctx)
 }
 
 // Push pushes the events in a single transaction
@@ -59,17 +57,18 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]eventstore.E
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
 		defer cancel()
 	}
-	events, err := es.es.Push(ctx, cmds...)
+	events, err := es.pusher.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
 
 	go es.notify(events)
-	return events, nil
+	return es.mapNewEvents(events)
 }
 
+// TODO(adlerhurst): still needed?
 func (es *Eventstore) NewInstance(ctx context.Context, instanceID string) error {
-	return es.repo.CreateInstance(ctx, instanceID)
+	return es.querier.CreateInstance(ctx, instanceID)
 }
 
 func (es *Eventstore) EventTypes() []string {
@@ -87,12 +86,42 @@ func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuild
 	if err != nil {
 		return nil, err
 	}
-	events, err := es.repo.Filter(ctx, query)
+	events, err := es.querier.Filter(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
 	return es.mapEvents(events)
+}
+
+func (es *Eventstore) mapNewEvents(events []Event) (mappedEvents []Event, err error) {
+	mappedEvents = make([]Event, len(events))
+
+	es.interceptorMutex.Lock()
+	defer es.interceptorMutex.Unlock()
+
+	for i, event := range events {
+		repoEvent := &repository.Event{
+			ID:            "",
+			Seq:           event.Sequence(),
+			CreationDate:  event.CreatedAt(),
+			Typ:           event.Type(),
+			Data:          event.DataAsBytes(),
+			EditorService: "zitadel",
+			EditorUser:    event.Creator(),
+			Version:       repository.Version(event.Aggregate().Version),
+			AggregateID:   event.Aggregate().ID,
+			AggregateType: event.Aggregate().Type,
+			ResourceOwner: sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
+			InstanceID:    event.Aggregate().InstanceID,
+		}
+		mappedEvents[i], err = es.mapEvent(repoEvent)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return mappedEvents, nil
 }
 
 func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Event, err error) {
@@ -102,20 +131,21 @@ func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Even
 	defer es.interceptorMutex.Unlock()
 
 	for i, event := range events {
-		interceptors, ok := es.eventInterceptors[EventType(event.Type)]
-		if !ok || interceptors.eventMapper == nil {
-			mappedEvents[i] = BaseEventFromRepo(event)
-			//TODO: return error if unable to map event
-			continue
-			// return nil, errors.ThrowPreconditionFailed(nil, "V2-usujB", "event mapper not defined")
-		}
-		mappedEvents[i], err = interceptors.eventMapper(event)
+		mappedEvents[i], err = es.mapEvent(event)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return mappedEvents, nil
+}
+
+func (es *Eventstore) mapEvent(event *repository.Event) (Event, error) {
+	interceptors, ok := es.eventInterceptors[EventType(event.Typ)]
+	if !ok || interceptors.eventMapper == nil {
+		return BaseEventFromRepo(event), nil
+	}
+	return interceptors.eventMapper(event)
 }
 
 type reducer interface {
@@ -144,7 +174,7 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 	if err != nil {
 		return time.Time{}, err
 	}
-	return es.repo.LatestSequence(ctx, query)
+	return es.querier.LatestSequence(ctx, query)
 }
 
 // InstanceIDs returns the instance ids found by the search query
@@ -153,7 +183,7 @@ func (es *Eventstore) InstanceIDs(ctx context.Context, queryFactory *SearchQuery
 	if err != nil {
 		return nil, err
 	}
-	return es.repo.InstanceIDs(ctx, query)
+	return es.querier.InstanceIDs(ctx, query)
 }
 
 type QueryReducer interface {
@@ -192,6 +222,26 @@ func (es *Eventstore) RegisterFilterEventMapper(aggregateType AggregateType, eve
 	return es
 }
 
+type Querier interface {
+	// Health checks if the connection to the storage is available
+	Health(ctx context.Context) error
+	// Filter returns all events matching the given search query
+	Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error)
+	// LatestSequence returns the latest sequence found by the search query
+	LatestSequence(ctx context.Context, queryFactory *repository.SearchQuery) (time.Time, error)
+	// InstanceIDs returns the instance ids found by the search query
+	InstanceIDs(ctx context.Context, queryFactory *repository.SearchQuery) ([]string, error)
+	// CreateInstance creates a new sequence for the given instance
+	CreateInstance(ctx context.Context, instanceID string) error
+}
+
+type Pusher interface {
+	// Health checks if the connection to the storage is available
+	Health(ctx context.Context) error
+	// Push stores the actions
+	Push(ctx context.Context, commands ...Command) (_ []Event, err error)
+}
+
 func (es *Eventstore) appendEventType(typ EventType) {
 	i := sort.SearchStrings(es.eventTypes, string(typ))
 	if i < len(es.eventTypes) && es.eventTypes[i] == string(typ) {
@@ -206,59 +256,4 @@ func (es *Eventstore) appendAggregateType(typ AggregateType) {
 		return
 	}
 	es.aggregateTypes = append(es.aggregateTypes[:i], append([]string{string(typ)}, es.aggregateTypes[i:]...)...)
-}
-
-func EventData(event Command) ([]byte, error) {
-	switch data := event.Payload().(type) {
-	case nil:
-		return nil, nil
-	case []byte:
-		if json.Valid(data) {
-			return data, nil
-		}
-		return nil, errors.ThrowInvalidArgument(nil, "V2-6SbbS", "data bytes are not json")
-	}
-	dataType := reflect.TypeOf(event.Payload())
-	if dataType.Kind() == reflect.Ptr {
-		dataType = dataType.Elem()
-	}
-	if dataType.Kind() == reflect.Struct {
-		dataBytes, err := json.Marshal(event.Payload())
-		if err != nil {
-			return nil, errors.ThrowInvalidArgument(err, "V2-xG87M", "could  not marshal data")
-		}
-		return dataBytes, nil
-	}
-	return nil, errors.ThrowInvalidArgument(nil, "V2-91NRm", "wrong type of event data")
-}
-
-func uniqueConstraintActionToRepository(action UniqueConstraintAction) repository.UniqueConstraintAction {
-	switch action {
-	case UniqueConstraintAdd:
-		return repository.UniqueConstraintAdd
-	case UniqueConstraintRemove:
-		return repository.UniqueConstraintRemoved
-	case UniqueConstraintInstanceRemove:
-		return repository.UniqueConstraintInstanceRemoved
-	default:
-		return repository.UniqueConstraintAdd
-	}
-}
-
-type BaseEventSetter[T any] interface {
-	Event
-	SetBaseEvent(*BaseEvent)
-	*T
-}
-
-func GenericEventMapper[T any, PT BaseEventSetter[T]](event *repository.Event) (Event, error) {
-	e := PT(new(T))
-	e.SetBaseEvent(BaseEventFromRepo(event))
-
-	err := json.Unmarshal(event.Data, e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "V2-Thai6", "unable to unmarshal event")
-	}
-
-	return e, nil
 }

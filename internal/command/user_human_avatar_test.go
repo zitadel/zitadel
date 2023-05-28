@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/static/mock"
@@ -151,14 +150,10 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanAvatarAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"avatar?v=test",
-								),
-							),
-						},
+						user.NewHumanAvatarAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"avatar?v=test",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -326,14 +321,10 @@ func TestCommandSide_RemoveHumanAvatar(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanAvatarRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						user.NewHumanAvatarRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},

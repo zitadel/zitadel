@@ -79,11 +79,9 @@ func TestCommands_ClearFlow(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							org.NewFlowClearedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								domain.FlowTypeExternalAuthentication,
-							),
+						org.NewFlowClearedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							domain.FlowTypeExternalAuthentication,
 						),
 					),
 				),
@@ -241,13 +239,11 @@ func TestCommands_SetTriggerActions(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							org.NewTriggerActionsSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								domain.FlowTypeExternalAuthentication,
-								domain.TriggerTypePostAuthentication,
-								[]string{"actionID1"},
-							),
+						org.NewTriggerActionsSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							domain.FlowTypeExternalAuthentication,
+							domain.TriggerTypePostAuthentication,
+							[]string{"actionID1"},
 						),
 					),
 				),

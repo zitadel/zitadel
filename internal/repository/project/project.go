@@ -104,7 +104,7 @@ func (e *ProjectChangeEvent) Payload() interface{} {
 }
 
 func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	if e.oldName != "" {
+	if e.Name != nil {
 		return []*eventstore.EventUniqueConstraint{
 			NewRemoveProjectNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
 			NewAddProjectNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),

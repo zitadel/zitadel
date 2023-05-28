@@ -40,7 +40,7 @@ type Event interface {
 	// Unmarshal returns an error
 	Unmarshal(ptr any) error
 
-	// deprecated: only use for migration
+	// Deprecated: only use for migration
 	DataAsBytes() []byte
 }
 
@@ -65,7 +65,7 @@ type event struct {
 }
 
 func commandToEvent(sequence *latestSequence, command Command) (_ *event, err error) {
-	var payload []byte
+	var payload Payload
 	if command.Payload() != nil {
 		payload, err = json.Marshal(command.Payload())
 		if err != nil {

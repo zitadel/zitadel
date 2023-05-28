@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
@@ -188,27 +187,23 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									"auth",
-									"token",
-									"user",
-									"idAttribute",
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							"auth",
+							"token",
+							"user",
+							"idAttribute",
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -237,32 +232,28 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									"auth",
-									"token",
-									"user",
-									"idAttribute",
-									[]string{"user"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							"auth",
+							"token",
+							"user",
+							"idAttribute",
+							[]string{"user"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -556,39 +547,34 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewOAuthIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.OAuthIDPChanges{
-											idp.ChangeOAuthName("new name"),
-											idp.ChangeOAuthClientID("clientID2"),
-											idp.ChangeOAuthClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeOAuthAuthorizationEndpoint("new auth"),
-											idp.ChangeOAuthTokenEndpoint("new token"),
-											idp.ChangeOAuthUserEndpoint("new user"),
-											idp.ChangeOAuthScopes([]string{"openid", "profile"}),
-											idp.ChangeOAuthIDAttribute("newAttribute"),
-											idp.ChangeOAuthOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewOAuthIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.OAuthIDPChanges{
+									idp.ChangeOAuthName("new name"),
+									idp.ChangeOAuthClientID("clientID2"),
+									idp.ChangeOAuthClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeOAuthAuthorizationEndpoint("new auth"),
+									idp.ChangeOAuthTokenEndpoint("new token"),
+									idp.ChangeOAuthUserEndpoint("new user"),
+									idp.ChangeOAuthScopes([]string{"openid", "profile"}),
+									idp.ChangeOAuthIDAttribute("newAttribute"),
+									idp.ChangeOAuthOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -738,25 +724,21 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"issuer",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									false,
-									idp.Options{},
-								)),
-						},
+						instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							false,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -782,30 +764,26 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"issuer",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{openid.ScopeOpenID},
-									true,
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{openid.ScopeOpenID},
+							true,
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1024,37 +1002,32 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewOIDCIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.OIDCIDPChanges{
-											idp.ChangeOIDCName("new name"),
-											idp.ChangeOIDCIssuer("new issuer"),
-											idp.ChangeOIDCClientID("clientID2"),
-											idp.ChangeOIDCClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeOIDCScopes([]string{"openid", "profile"}),
-											idp.ChangeOIDCIsIDTokenMapping(true),
-											idp.ChangeOIDCOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewOIDCIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.OIDCIDPChanges{
+									idp.ChangeOIDCName("new name"),
+									idp.ChangeOIDCIssuer("new issuer"),
+									idp.ChangeOIDCClientID("clientID2"),
+									idp.ChangeOIDCClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeOIDCScopes([]string{"openid", "profile"}),
+									idp.ChangeOIDCIsIDTokenMapping(true),
+									idp.ChangeOIDCOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -1182,25 +1155,21 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									"",
-									false,
-									idp.Options{},
-								)),
-						},
+						instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							"",
+							false,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1225,30 +1194,26 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									"tenant",
-									true,
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							"tenant",
+							true,
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1446,37 +1411,32 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewAzureADIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.AzureADIDPChanges{
-											idp.ChangeAzureADName("new name"),
-											idp.ChangeAzureADClientID("new clientID"),
-											idp.ChangeAzureADClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("new clientSecret"),
-											}),
-											idp.ChangeAzureADScopes([]string{"openid", "profile"}),
-											idp.ChangeAzureADTenant("new tenant"),
-											idp.ChangeAzureADIsEmailVerified(true),
-											idp.ChangeAzureADOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewAzureADIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.AzureADIDPChanges{
+									idp.ChangeAzureADName("new name"),
+									idp.ChangeAzureADClientID("new clientID"),
+									idp.ChangeAzureADClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("new clientSecret"),
+									}),
+									idp.ChangeAzureADScopes([]string{"openid", "profile"}),
+									idp.ChangeAzureADTenant("new tenant"),
+									idp.ChangeAzureADIsEmailVerified(true),
+									idp.ChangeAzureADOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -1585,23 +1545,19 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1625,28 +1581,24 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1818,35 +1770,30 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGitHubIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GitHubIDPChanges{
-											idp.ChangeGitHubName("new name"),
-											idp.ChangeGitHubClientID("new clientID"),
-											idp.ChangeGitHubClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("new clientSecret"),
-											}),
-											idp.ChangeGitHubScopes([]string{"openid", "profile"}),
-											idp.ChangeGitHubOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGitHubIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GitHubIDPChanges{
+									idp.ChangeGitHubName("new name"),
+									idp.ChangeGitHubClientID("new clientID"),
+									idp.ChangeGitHubClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("new clientSecret"),
+									}),
+									idp.ChangeGitHubScopes([]string{"openid", "profile"}),
+									idp.ChangeGitHubOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -2035,26 +1982,22 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									"auth",
-									"token",
-									"user",
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							"auth",
+							"token",
+							"user",
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -2082,31 +2025,27 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									"auth",
-									"token",
-									"user",
-									[]string{"user"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							"auth",
+							"token",
+							"user",
+							[]string{"user"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -2373,38 +2312,33 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGitHubEnterpriseIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GitHubEnterpriseIDPChanges{
-											idp.ChangeGitHubEnterpriseName("new name"),
-											idp.ChangeGitHubEnterpriseClientID("clientID2"),
-											idp.ChangeGitHubEnterpriseClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeGitHubEnterpriseAuthorizationEndpoint("new auth"),
-											idp.ChangeGitHubEnterpriseTokenEndpoint("new token"),
-											idp.ChangeGitHubEnterpriseUserEndpoint("new user"),
-											idp.ChangeGitHubEnterpriseScopes([]string{"openid", "profile"}),
-											idp.ChangeGitHubEnterpriseOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGitHubEnterpriseIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GitHubEnterpriseIDPChanges{
+									idp.ChangeGitHubEnterpriseName("new name"),
+									idp.ChangeGitHubEnterpriseClientID("clientID2"),
+									idp.ChangeGitHubEnterpriseClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeGitHubEnterpriseAuthorizationEndpoint("new auth"),
+									idp.ChangeGitHubEnterpriseTokenEndpoint("new token"),
+									idp.ChangeGitHubEnterpriseUserEndpoint("new user"),
+									idp.ChangeGitHubEnterpriseScopes([]string{"openid", "profile"}),
+									idp.ChangeGitHubEnterpriseOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -2514,23 +2448,19 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitLabIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGitLabIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -2554,28 +2484,24 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitLabIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGitLabIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -2746,34 +2672,29 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGitLabIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GitLabIDPChanges{
-											idp.ChangeGitLabClientID("clientID2"),
-											idp.ChangeGitLabClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeGitLabScopes([]string{"openid", "profile"}),
-											idp.ChangeGitLabOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGitLabIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GitLabIDPChanges{
+									idp.ChangeGitLabClientID("clientID2"),
+									idp.ChangeGitLabClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeGitLabScopes([]string{"openid", "profile"}),
+									idp.ChangeGitLabOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -2918,24 +2839,20 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"issuer",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -2961,29 +2878,25 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"issuer",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3199,36 +3112,31 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGitLabSelfHostedIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GitLabSelfHostedIDPChanges{
-											idp.ChangeGitLabSelfHostedClientID("clientID2"),
-											idp.ChangeGitLabSelfHostedIssuer("newIssuer"),
-											idp.ChangeGitLabSelfHostedName("newName"),
-											idp.ChangeGitLabSelfHostedClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeGitLabSelfHostedScopes([]string{"openid", "profile"}),
-											idp.ChangeGitLabSelfHostedOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGitLabSelfHostedIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GitLabSelfHostedIDPChanges{
+									idp.ChangeGitLabSelfHostedClientID("clientID2"),
+									idp.ChangeGitLabSelfHostedIssuer("newIssuer"),
+									idp.ChangeGitLabSelfHostedName("newName"),
+									idp.ChangeGitLabSelfHostedClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeGitLabSelfHostedScopes([]string{"openid", "profile"}),
+									idp.ChangeGitLabSelfHostedOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -3336,23 +3244,19 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGoogleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGoogleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3376,28 +3280,24 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGoogleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGoogleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3568,34 +3468,29 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGoogleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GoogleIDPChanges{
-											idp.ChangeGoogleClientID("clientID2"),
-											idp.ChangeGoogleClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeGoogleScopes([]string{"openid", "profile"}),
-											idp.ChangeGoogleOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGoogleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GoogleIDPChanges{
+									idp.ChangeGoogleClientID("clientID2"),
+									idp.ChangeGoogleClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeGoogleScopes([]string{"openid", "profile"}),
+									idp.ChangeGoogleOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -3830,30 +3725,26 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									[]string{"server"},
-									false,
-									"baseDN",
-									"dn",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("password"),
-									},
-									"user",
-									[]string{"object"},
-									[]string{"filter"},
-									time.Second*30,
-									idp.LDAPAttributes{},
-									idp.Options{},
-								)),
-						},
+						instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							[]string{"server"},
+							false,
+							"baseDN",
+							"dn",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("password"),
+							},
+							"user",
+							[]string{"object"},
+							[]string{"filter"},
+							time.Second*30,
+							idp.LDAPAttributes{},
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3885,49 +3776,45 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									[]string{"server"},
-									false,
-									"baseDN",
-									"dn",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("password"),
-									},
-									"user",
-									[]string{"object"},
-									[]string{"filter"},
-									time.Second*30,
-									idp.LDAPAttributes{
-										IDAttribute:                "id",
-										FirstNameAttribute:         "firstName",
-										LastNameAttribute:          "lastName",
-										DisplayNameAttribute:       "displayName",
-										NickNameAttribute:          "nickName",
-										PreferredUsernameAttribute: "preferredUsername",
-										EmailAttribute:             "email",
-										EmailVerifiedAttribute:     "emailVerified",
-										PhoneAttribute:             "phone",
-										PhoneVerifiedAttribute:     "phoneVerified",
-										PreferredLanguageAttribute: "preferredLanguage",
-										AvatarURLAttribute:         "avatarURL",
-										ProfileAttribute:           "profile",
-									},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							[]string{"server"},
+							false,
+							"baseDN",
+							"dn",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("password"),
+							},
+							"user",
+							[]string{"object"},
+							[]string{"filter"},
+							time.Second*30,
+							idp.LDAPAttributes{
+								IDAttribute:                "id",
+								FirstNameAttribute:         "firstName",
+								LastNameAttribute:          "lastName",
+								DisplayNameAttribute:       "displayName",
+								NickNameAttribute:          "nickName",
+								PreferredUsernameAttribute: "preferredUsername",
+								EmailAttribute:             "email",
+								EmailVerifiedAttribute:     "emailVerified",
+								PhoneAttribute:             "phone",
+								PhoneVerifiedAttribute:     "phoneVerified",
+								PreferredLanguageAttribute: "preferredLanguage",
+								AvatarURLAttribute:         "avatarURL",
+								ProfileAttribute:           "profile",
+							},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4274,56 +4161,51 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewLDAPIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.LDAPIDPChanges{
-											idp.ChangeLDAPName("new name"),
-											idp.ChangeLDAPServers([]string{"new server"}),
-											idp.ChangeLDAPStartTLS(true),
-											idp.ChangeLDAPBaseDN("new basedn"),
-											idp.ChangeLDAPBindDN("new binddn"),
-											idp.ChangeLDAPBindPassword(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("new password"),
-											}),
-											idp.ChangeLDAPUserBase("new user"),
-											idp.ChangeLDAPUserObjectClasses([]string{"new object"}),
-											idp.ChangeLDAPUserFilters([]string{"new filter"}),
-											idp.ChangeLDAPTimeout(time.Second * 20),
-											idp.ChangeLDAPAttributes(idp.LDAPAttributeChanges{
-												IDAttribute:                stringPointer("new id"),
-												FirstNameAttribute:         stringPointer("new firstName"),
-												LastNameAttribute:          stringPointer("new lastName"),
-												DisplayNameAttribute:       stringPointer("new displayName"),
-												NickNameAttribute:          stringPointer("new nickName"),
-												PreferredUsernameAttribute: stringPointer("new preferredUsername"),
-												EmailAttribute:             stringPointer("new email"),
-												EmailVerifiedAttribute:     stringPointer("new emailVerified"),
-												PhoneAttribute:             stringPointer("new phone"),
-												PhoneVerifiedAttribute:     stringPointer("new phoneVerified"),
-												PreferredLanguageAttribute: stringPointer("new preferredLanguage"),
-												AvatarURLAttribute:         stringPointer("new avatarURL"),
-												ProfileAttribute:           stringPointer("new profile"),
-											}),
-											idp.ChangeLDAPOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewLDAPIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.LDAPIDPChanges{
+									idp.ChangeLDAPName("new name"),
+									idp.ChangeLDAPServers([]string{"new server"}),
+									idp.ChangeLDAPStartTLS(true),
+									idp.ChangeLDAPBaseDN("new basedn"),
+									idp.ChangeLDAPBindDN("new binddn"),
+									idp.ChangeLDAPBindPassword(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("new password"),
+									}),
+									idp.ChangeLDAPUserBase("new user"),
+									idp.ChangeLDAPUserObjectClasses([]string{"new object"}),
+									idp.ChangeLDAPUserFilters([]string{"new filter"}),
+									idp.ChangeLDAPTimeout(time.Second * 20),
+									idp.ChangeLDAPAttributes(idp.LDAPAttributeChanges{
+										IDAttribute:                stringPointer("new id"),
+										FirstNameAttribute:         stringPointer("new firstName"),
+										LastNameAttribute:          stringPointer("new lastName"),
+										DisplayNameAttribute:       stringPointer("new displayName"),
+										NickNameAttribute:          stringPointer("new nickName"),
+										PreferredUsernameAttribute: stringPointer("new preferredUsername"),
+										EmailAttribute:             stringPointer("new email"),
+										EmailVerifiedAttribute:     stringPointer("new emailVerified"),
+										PhoneAttribute:             stringPointer("new phone"),
+										PhoneVerifiedAttribute:     stringPointer("new phoneVerified"),
+										PreferredLanguageAttribute: stringPointer("new preferredLanguage"),
+										AvatarURLAttribute:         stringPointer("new avatarURL"),
+										ProfileAttribute:           stringPointer("new profile"),
+									}),
+									idp.ChangeLDAPOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),

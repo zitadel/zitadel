@@ -2,18 +2,21 @@ package repository
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
+
+var _ eventstore.Event = (*Event)(nil)
 
 // Event represents all information about a manipulation of an aggregate
 type Event struct {
 	//ID is a generated uuid for this event
 	ID string
 
-	//Sequence is the sequence of the event
-	Sequence uint64
+	// Seq is the sequence of the event
+	Seq uint64
 
 	//PreviousAggregateSequence is the sequence of the previous sequence of the aggregate (e.g. org.250989)
 	// if it's 0 then it's the first event of this aggregate
@@ -29,9 +32,9 @@ type Event struct {
 	// time drifts in different services could cause integrity problems
 	CreationDate time.Time
 
-	//Type describes the cause of the event (e.g. user.added)
+	// Typ describes the cause of the event (e.g. user.added)
 	// it should always be in past-form
-	Type EventType
+	Typ EventType
 
 	//Data describe the changed fields (e.g. userName = "hodor")
 	// data must always a pointer to a struct, a struct or a byte array containing json bytes
@@ -68,3 +71,49 @@ type EventType = eventstore.EventType
 
 // AggregateType is the object name
 type AggregateType = eventstore.AggregateType
+
+// Aggregate implements [eventstore.Event]
+func (e *Event) Aggregate() *eventstore.Aggregate {
+	return &eventstore.Aggregate{
+		ID:            e.AggregateID,
+		Type:          e.AggregateType,
+		ResourceOwner: e.ResourceOwner.String,
+		InstanceID:    e.InstanceID,
+		Version:       eventstore.Version(e.Version),
+	}
+}
+
+// Creator implements [eventstore.Event]
+func (e *Event) Creator() string {
+	return e.EditorUser
+}
+
+// Type implements [eventstore.Event]
+func (e *Event) Type() eventstore.EventType {
+	return e.Typ
+}
+
+// Revision implements [eventstore.Event]
+func (e *Event) Revision() uint16 {
+	return 0
+}
+
+// Sequence implements [eventstore.Event]
+func (e *Event) Sequence() uint64 {
+	return e.Seq
+}
+
+// CreatedAt implements [eventstore.Event]
+func (e *Event) CreatedAt() time.Time {
+	return e.CreationDate
+}
+
+// Unmarshal implements [eventstore.Event]
+func (e *Event) Unmarshal(ptr any) error {
+	return json.Unmarshal(e.Data, ptr)
+}
+
+// DataAsBytes implements [eventstore.Event]
+func (e *Event) DataAsBytes() []byte {
+	return e.Data
+}

@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -299,13 +298,9 @@ func TestCommandSide_RemoveHumanOTP(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanOTPRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanOTPRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},

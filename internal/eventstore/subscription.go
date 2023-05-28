@@ -119,9 +119,9 @@ func mapEventsToRepo(events []eventstore.Event) []*repository.Event {
 	repoEvents := make([]*repository.Event, len(events))
 	for i, event := range events {
 		repoEvents[i] = &repository.Event{
-			Sequence:      event.Sequence(),
+			Seq:           event.Sequence(),
 			CreationDate:  event.CreatedAt(),
-			Type:          event.Type(),
+			Typ:           event.Type(),
 			EditorService: "zitadel",
 			EditorUser:    event.Creator(),
 			Version:       repository.Version(event.Aggregate().Version),
@@ -129,7 +129,7 @@ func mapEventsToRepo(events []eventstore.Event) []*repository.Event {
 			AggregateType: event.Aggregate().Type,
 			ResourceOwner: sql.NullString{
 				String: event.Aggregate().ResourceOwner,
-				Valid:  true,
+				Valid:  event.Aggregate().ResourceOwner != "",
 			},
 			InstanceID: event.Aggregate().InstanceID,
 			Data:       event.DataAsBytes(),

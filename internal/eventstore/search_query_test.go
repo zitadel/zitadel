@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 func testAddQuery(queryFuncs ...func(*SearchQuery) *SearchQuery) func(*SearchQueryBuilder) *SearchQueryBuilder {
@@ -864,6 +865,7 @@ func TestSearchQuery_matches(t *testing.T) {
 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().EventTypes("event.searched.type"),
 			event: &BaseEvent{
 				EventType: "event.actual.type",
+				aggregate: &eventstore.Aggregate{},
 			},
 			want: false,
 		},
@@ -966,7 +968,8 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 				Builder(),
 			args: args{
 				event: &BaseEvent{
-					sequence: 999,
+					sequence:  999,
+					aggregate: &eventstore.Aggregate{},
 				},
 				existingLen: 0,
 			},

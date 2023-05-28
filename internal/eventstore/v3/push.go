@@ -71,7 +71,6 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 			i*argsPerCommand+8,
 			i*argsPerCommand+9,
 		)
-
 		args = append(args,
 			events[i].(*event).aggregate.InstanceID,
 			events[i].(*event).aggregate.ResourceOwner,
@@ -80,7 +79,7 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 			events[i].(*event).aggregate.Version,
 			events[i].(*event).creator,
 			events[i].(*event).typ,
-			events[i].(*event).payload,
+			sql.NullString{String: string(events[i].(*event).payload), Valid: len(events[i].(*event).payload) > 0},
 			events[i].(*event).sequence,
 		)
 	}

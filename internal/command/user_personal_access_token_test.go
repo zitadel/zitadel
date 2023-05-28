@@ -9,20 +9,14 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
-
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
-
-	"github.com/zitadel/zitadel/internal/repository/user"
-
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
+	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommands_AddPersonalAccessToken(t *testing.T) {
@@ -182,16 +176,12 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewPersonalAccessTokenAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"token1",
-									time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-									[]string{"openid"},
-								),
-							),
-						},
+						user.NewPersonalAccessTokenAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"token1",
+							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
+							[]string{"openid"},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "token1"),
@@ -234,16 +224,12 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewPersonalAccessTokenAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"token1",
-									time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-									[]string{"openid"},
-								),
-							),
-						},
+						user.NewPersonalAccessTokenAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"token1",
+							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
+							[]string{"openid"},
+						),
 					),
 				),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -345,14 +331,10 @@ func TestCommands_RemovePersonalAccessToken(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewPersonalAccessTokenRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"token1",
-								),
-							),
-						},
+						user.NewPersonalAccessTokenRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"token1",
+						),
 					),
 				),
 			},

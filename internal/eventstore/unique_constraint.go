@@ -1,6 +1,8 @@
 package eventstore
 
-import "github.com/zitadel/zitadel/internal/eventstore/v3"
+import (
+	"github.com/zitadel/zitadel/internal/eventstore/v3"
+)
 
 type EventUniqueConstraint = eventstore.UniqueConstraint
 

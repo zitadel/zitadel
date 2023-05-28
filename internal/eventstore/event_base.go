@@ -103,9 +103,9 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 			InstanceID:    event.InstanceID,
 			Version:       eventstore.Version(event.Version),
 		},
-		EventType:                     EventType(event.Type),
+		EventType:                     EventType(event.Typ),
 		creationDate:                  event.CreationDate,
-		sequence:                      event.Sequence,
+		sequence:                      event.Seq,
 		previousAggregateSequence:     event.PreviousAggregateSequence,
 		previousAggregateTypeSequence: event.PreviousAggregateTypeSequence,
 		Service:                       event.EditorService,
@@ -119,7 +119,7 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 // afterwards the resource owner of the first previous events is taken
 func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventType) *BaseEvent {
 	return &BaseEvent{
-		aggregate: (*Aggregate)(aggregate),
+		aggregate: aggregate,
 		User:      authz.GetCtxData(ctx).UserID,
 		Service:   service.FromContext(ctx),
 		EventType: typ,

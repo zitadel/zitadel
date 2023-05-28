@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -111,21 +110,17 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									},
-									true,
-									"",
-								),
-							),
-						},
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeHash,
+								Algorithm:  "hash",
+								KeyID:      "",
+								Crypted:    []byte("password"),
+							},
+							true,
+							"",
+						),
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -182,21 +177,17 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									},
-									false,
-									"",
-								),
-							),
-						},
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeHash,
+								Algorithm:  "hash",
+								KeyID:      "",
+								Crypted:    []byte("password"),
+							},
+							false,
+							"",
+						),
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -442,21 +433,17 @@ func TestCommandSide_SetPassword(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password"),
-									},
-									false,
-									"",
-								),
-							),
-						},
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeHash,
+								Algorithm:  "hash",
+								KeyID:      "",
+								Crypted:    []byte("password"),
+							},
+							false,
+							"",
+						),
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -722,21 +709,17 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeHash,
-										Algorithm:  "hash",
-										KeyID:      "",
-										Crypted:    []byte("password1"),
-									},
-									false,
-									"",
-								),
-							),
-						},
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeHash,
+								Algorithm:  "hash",
+								KeyID:      "",
+								Crypted:    []byte("password1"),
+							},
+							false,
+							"",
+						),
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -907,21 +890,17 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 								&user.NewAggregate("user1", "org1").Aggregate)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
-									domain.NotificationTypeEmail,
-								),
-							),
-						},
+						user.NewHumanPasswordCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							domain.NotificationTypeEmail,
+						),
 					),
 				),
 			},
@@ -1035,13 +1014,9 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordCodeSentEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanPasswordCodeSentEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -1341,17 +1316,13 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								"")),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordCheckFailedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&user.AuthRequestInfo{
-										ID:          "request1",
-										UserAgentID: "agent1",
-									},
-								),
-							),
-						},
+						user.NewHumanPasswordCheckFailedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "request1",
+								UserAgentID: "agent1",
+							},
+						),
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -1432,22 +1403,16 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								"")),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordCheckFailedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&user.AuthRequestInfo{
-										ID:          "request1",
-										UserAgentID: "agent1",
-									},
-								),
-							),
-							eventFromEventPusher(
-								user.NewUserLockedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanPasswordCheckFailedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "request1",
+								UserAgentID: "agent1",
+							},
+						),
+						user.NewUserLockedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
@@ -1530,17 +1495,13 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								"")),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanPasswordCheckSucceededEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&user.AuthRequestInfo{
-										ID:          "request1",
-										UserAgentID: "agent1",
-									},
-								),
-							),
-						},
+						user.NewHumanPasswordCheckSucceededEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "request1",
+								UserAgentID: "agent1",
+							},
+						),
 					),
 				),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),

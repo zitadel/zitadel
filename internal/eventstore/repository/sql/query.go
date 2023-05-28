@@ -145,8 +145,8 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 
 	err = scanner(
 		&event.CreationDate,
-		&event.Type,
-		&event.Sequence,
+		&event.Typ,
+		&event.Seq,
 		&previousAggregateSequence,
 		&previousAggregateTypeSequence,
 		&data,

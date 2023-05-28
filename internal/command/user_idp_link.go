@@ -3,10 +3,9 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )

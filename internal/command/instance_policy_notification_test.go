@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
@@ -64,14 +63,10 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								instance.NewNotificationPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									true,
-								),
-							),
-						},
+						instance.NewNotificationPolicyAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							true,
+						),
 					),
 				),
 			},
@@ -93,14 +88,10 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								instance.NewNotificationPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									true,
-								),
-							),
-						},
+						instance.NewNotificationPolicyAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							true,
+						),
 					),
 				),
 			},
@@ -209,12 +200,9 @@ func TestCommandSide_ChangeDefaultNotificationPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDefaultNotificationPolicyChangedEvent(context.Background(),
-									true,
-								)),
-						},
+						newDefaultNotificationPolicyChangedEvent(context.Background(),
+							true,
+						),
 					),
 				),
 			},

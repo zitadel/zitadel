@@ -2,8 +2,10 @@ package eventstore
 
 import (
 	"context"
+	"regexp"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 // Aggregate is the basic implementation of Aggregater
@@ -23,6 +25,15 @@ type Aggregate struct {
 // Version is the old revision of an aggregate
 // TODO(adlerhurst): replace version with event.Revision
 type Version string
+
+var versionRegexp = regexp.MustCompile(`^v[0-9]+(\.[0-9]+){0,2}$`)
+
+func (v Version) Validate() error {
+	if !versionRegexp.MatchString(string(v)) {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-luDuS", "version is not semver")
+	}
+	return nil
+}
 
 // AggregateOpt is currently public because of the migration of evenstore v2 to v3
 type AggregateOpt func(*Aggregate)

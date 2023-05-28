@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	z_sql "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
+	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 type Config struct {
@@ -13,14 +13,16 @@ type Config struct {
 	Client                   *database.DB
 	AllowOrderByCreationDate bool
 
-	repo repository.Repository
+	pusher  Pusher
+	querier Querier
 }
 
-func TestConfig(repo repository.Repository) *Config {
-	return &Config{repo: repo}
+func TestConfig(querier Querier, pusher Pusher) *Config {
+	return &Config{pusher: pusher, querier: querier}
 }
 
 func Start(config *Config) (*Eventstore, error) {
-	config.repo = z_sql.NewCRDB(config.Client, config.AllowOrderByCreationDate)
+	config.querier = z_sql.NewCRDB(config.Client, config.AllowOrderByCreationDate)
+	config.pusher = eventstore.NewEventstore(config.Client)
 	return NewEventstore(config), nil
 }

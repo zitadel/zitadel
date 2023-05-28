@@ -1207,7 +1207,7 @@ func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Ev
 		EditorService: "svc",
 		EditorUser:    "user",
 		ResourceOwner: sql.NullString{String: "ro", Valid: true},
-		Type:          "test.created",
+		Typ:           "test.created",
 		Version:       "v1",
 	}
 

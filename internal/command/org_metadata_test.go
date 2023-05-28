@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -95,15 +94,11 @@ func TestCommandSide_SetOrgMetadata(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewMetadataSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-									[]byte("value"),
-								),
-							),
-						},
+						org.NewMetadataSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+							[]byte("value"),
+						),
 					),
 				),
 			},
@@ -244,22 +239,16 @@ func TestCommandSide_BulkSetOrgMetadata(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewMetadataSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-									[]byte("value"),
-								),
-							),
-							eventFromEventPusher(
-								org.NewMetadataSetEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key1",
-									[]byte("value1"),
-								),
-							),
-						},
+						org.NewMetadataSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+							[]byte("value"),
+						),
+						org.NewMetadataSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key1",
+							[]byte("value1"),
+						),
 					),
 				),
 			},
@@ -399,14 +388,10 @@ func TestCommandSide_OrgRemoveMetadata(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewMetadataRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewMetadataRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -597,20 +582,14 @@ func TestCommandSide_BulkRemoveOrgMetadata(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewMetadataRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-							eventFromEventPusher(
-								org.NewMetadataRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key1",
-								),
-							),
-						},
+						org.NewMetadataRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
+						org.NewMetadataRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key1",
+						),
 					),
 				),
 			},

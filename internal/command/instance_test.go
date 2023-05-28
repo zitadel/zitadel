@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -133,15 +132,10 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewInstanceChangedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									"INSTANCE_CHANGED",
-								),
-							),
-						},
+						instance.NewInstanceChangedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"INSTANCE_CHANGED",
+						),
 					),
 				),
 			},
@@ -271,22 +265,14 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewInstanceRemovedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									"INSTANCE",
-									[]string{
-										"instance.domain",
-										"custom.domain",
-									},
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(instance.NewRemoveInstanceDomainUniqueConstraint("instance.domain")),
-						uniqueConstraintsFromEventConstraint(instance.NewRemoveInstanceDomainUniqueConstraint("custom.domain")),
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", eventstore.NewRemoveInstanceUniqueConstraints()),
+						instance.NewInstanceRemovedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"INSTANCE",
+							[]string{
+								"instance.domain",
+								"custom.domain",
+							},
+						),
 					),
 				),
 			},

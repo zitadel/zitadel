@@ -32,7 +32,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	for _, e := range expects {
 		e(m)
 	}
-	es := eventstore.NewEventstore(eventstore.TestConfig(m))
+	es := eventstore.NewEventstore(eventstore.TestConfig(m.MockQuerier, m.MockPusher))
 	iam_repo.RegisterEventMappers(es)
 	org.RegisterEventMappers(es)
 	usr_repo.RegisterEventMappers(es)
@@ -57,7 +57,7 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 			ResourceOwner: sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 			EditorService: "zitadel",
 			EditorUser:    event.Creator(),
-			Type:          repository.EventType(event.Type()),
+			Typ:           event.Type(),
 			Version:       repository.Version(event.Aggregate().Version),
 			Data:          data,
 		}
@@ -111,15 +111,15 @@ func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *reposito
 	return repo.sequence, nil
 }
 
-func expectPush(events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+func expectPush(commands ...eventstore.Command) expect {
 	return func(m *mock.MockRepository) {
-		m.ExpectPush(events, uniqueConstraints...)
+		m.ExpectPush(commands)
 	}
 }
 
-func expectPushFailed(err error, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) expect {
+func expectPushFailed(err error, commands ...eventstore.Command) expect {
 	return func(m *mock.MockRepository) {
-		m.ExpectPushFailed(err, events, uniqueConstraints...)
+		m.ExpectPushFailed(err, commands)
 	}
 }
 
@@ -149,12 +149,13 @@ func expectFilterOrgMemberNotFound() expect {
 func eventFromEventPusher(event eventstore.Command) *repository.Event {
 	data, _ := eventstore.EventData(event)
 	return &repository.Event{
+		InstanceID:                    event.Aggregate().InstanceID,
 		ID:                            "",
-		Sequence:                      0,
+		Seq:                           0,
 		PreviousAggregateSequence:     0,
 		PreviousAggregateTypeSequence: 0,
 		CreationDate:                  time.Time{},
-		Type:                          repository.EventType(event.Type()),
+		Typ:                           event.Type(),
 		Data:                          data,
 		EditorService:                 "zitadel",
 		EditorUser:                    event.Creator(),
@@ -169,11 +170,11 @@ func eventFromEventPusherWithInstanceID(instanceID string, event eventstore.Comm
 	data, _ := eventstore.EventData(event)
 	return &repository.Event{
 		ID:                            "",
-		Sequence:                      0,
+		Seq:                           0,
 		PreviousAggregateSequence:     0,
 		PreviousAggregateTypeSequence: 0,
 		CreationDate:                  time.Time{},
-		Type:                          repository.EventType(event.Type()),
+		Typ:                           event.Type(),
 		Data:                          data,
 		EditorService:                 "zitadel",
 		EditorUser:                    event.Creator(),
