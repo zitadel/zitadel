@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -121,7 +120,7 @@ func (t *RefreshTokenView) setRootData(event eventstore.Event) {
 
 func (t *RefreshTokenView) appendAddedEvent(event eventstore.Event) error {
 	e := new(user_repo.HumanRefreshTokenAddedEvent)
-	if err := json.Unmarshal(event.DataAsBytes(), e); err != nil {
+	if err := event.Unmarshal(e); err != nil {
 		logging.Log("EVEN-Dbb31").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Bbr42", "could not unmarshal event")
 	}
@@ -141,7 +140,7 @@ func (t *RefreshTokenView) appendAddedEvent(event eventstore.Event) error {
 
 func (t *RefreshTokenView) appendRenewedEvent(event eventstore.Event) error {
 	e := new(user_repo.HumanRefreshTokenRenewedEvent)
-	if err := json.Unmarshal(event.DataAsBytes(), e); err != nil {
+	if err := event.Unmarshal(e); err != nil {
 		logging.Log("EVEN-Vbbn2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Bbrn4", "could not unmarshal event")
 	}

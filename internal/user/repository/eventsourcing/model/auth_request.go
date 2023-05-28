@@ -24,7 +24,7 @@ type BrowserInfo struct {
 }
 
 func (a *AuthRequest) SetData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), a); err != nil {
+	if err := event.Unmarshal(a); err != nil {
 		logging.Log("EVEN-T5df6").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-yGmhh", "could not unmarshal event")
 	}

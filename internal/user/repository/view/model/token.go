@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -132,7 +131,7 @@ func (t *TokenView) setRootData(event eventstore.Event) {
 }
 
 func (t *TokenView) setData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), t); err != nil {
+	if err := event.Unmarshal(t); err != nil {
 		logging.Log("EVEN-3Gm9s").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-5Gms9", "could not unmarshal event")
 	}
@@ -141,7 +140,7 @@ func (t *TokenView) setData(event eventstore.Event) error {
 
 func agentIDFromSession(event eventstore.Event) (string, error) {
 	session := make(map[string]interface{})
-	if err := json.Unmarshal(event.DataAsBytes(), &session); err != nil {
+	if err := event.Unmarshal(&session); err != nil {
 		logging.Log("EVEN-Ghgt3").WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-GBf32", "could not unmarshal data")
 	}
@@ -183,7 +182,7 @@ func (t *TokenView) appendPATRemoved(event eventstore.Event) error {
 
 func eventToMap(event eventstore.Event) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
-	if err := json.Unmarshal(event.DataAsBytes(), &m); err != nil {
+	if err := event.Unmarshal(&m); err != nil {
 		logging.Log("EVEN-Dbffe").WithError(err).Error("could not unmarshal event data")
 		return nil, caos_errs.ThrowInternal(nil, "MODEL-SDAfw", "could not unmarshal data")
 	}

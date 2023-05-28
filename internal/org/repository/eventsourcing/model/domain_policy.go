@@ -11,7 +11,7 @@ func (o *Org) appendAddDomainPolicyEvent(event eventstore.Event) error {
 	if err != nil {
 		return err
 	}
-	o.DomainPolicy.ObjectRoot.CreationDate.Equal(event.CreatedAt())
+	o.DomainPolicy.ObjectRoot.CreationDate = event.CreatedAt()
 	return nil
 }
 

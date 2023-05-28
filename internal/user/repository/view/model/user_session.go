@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -48,7 +47,7 @@ type UserSessionView struct {
 
 func UserSessionFromEvent(event eventstore.Event) (*UserSessionView, error) {
 	v := new(UserSessionView)
-	if err := json.Unmarshal(event.DataAsBytes(), v); err != nil {
+	if err := event.Unmarshal(v); err != nil {
 		logging.Log("EVEN-lso9e").WithError(err).Error("could not unmarshal event data")
 		return nil, caos_errs.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
@@ -191,7 +190,7 @@ func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time
 
 func avatarKeyFromEvent(event eventstore.Event) (string, error) {
 	data := make(map[string]string)
-	if err := json.Unmarshal(event.DataAsBytes(), &data); err != nil {
+	if err := event.Unmarshal(&data); err != nil {
 		logging.Log("EVEN-Sfew2").WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(err, "MODEL-SFw2q", "could not unmarshal event")
 	}

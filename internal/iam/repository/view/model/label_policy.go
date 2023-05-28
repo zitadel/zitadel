@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -178,7 +177,7 @@ func (r *LabelPolicyView) setRootData(event eventstore.Event) {
 }
 
 func (r *LabelPolicyView) SetData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), r); err != nil {
+	if err := event.Unmarshal(r); err != nil {
 		logging.Log("MODEL-Flp9C").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}
@@ -186,7 +185,7 @@ func (r *LabelPolicyView) SetData(event eventstore.Event) error {
 }
 
 func (r *AssetView) SetData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), r); err != nil {
+	if err := event.Unmarshal(r); err != nil {
 		logging.Log("MODEL-Ms8f2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}

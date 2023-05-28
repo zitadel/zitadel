@@ -1,8 +1,6 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -64,7 +62,7 @@ func GetWebauthn(webauthnTokens []*WebAuthNToken, id string) (int, *WebAuthNToke
 }
 
 func (w *WebAuthNVerify) SetData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), w); err != nil {
+	if err := event.Unmarshal(w); err != nil {
 		logging.Log("EVEN-G342rf").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-B6641", "could not unmarshal event")
 	}
@@ -206,7 +204,7 @@ func (u *Human) appendPasswordlessRemovedEvent(event eventstore.Event) error {
 
 func (w *WebAuthNToken) setData(event eventstore.Event) error {
 	w.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.DataAsBytes(), w); err != nil {
+	if err := event.Unmarshal(w); err != nil {
 		logging.Log("EVEN-4M9is").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lo023", "could not unmarshal event")
 	}
@@ -251,7 +249,7 @@ func (u *Human) appendPasswordlessLoginEvent(event eventstore.Event) error {
 
 func (w *WebAuthNLogin) setData(event eventstore.Event) error {
 	w.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.DataAsBytes(), w); err != nil {
+	if err := event.Unmarshal(w); err != nil {
 		logging.Log("EVEN-hmSlo").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lo023", "could not unmarshal event")
 	}

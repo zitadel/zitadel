@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/logging"
 
@@ -118,7 +117,7 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler2.Statement, er
 			}), nil
 	case user.HumanRefreshTokenRenewedType:
 		e := new(user.HumanRefreshTokenRenewedEvent)
-		if err := json.Unmarshal(event.DataAsBytes(), e); err != nil {
+		if err := event.Unmarshal(e); err != nil {
 			logging.WithError(err).Error("could not unmarshal event data")
 			return nil, caos_errs.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
 		}
@@ -136,7 +135,7 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler2.Statement, er
 			}), nil
 	case user.HumanRefreshTokenRemovedType:
 		e := new(user.HumanRefreshTokenRemovedEvent)
-		if err := json.Unmarshal(event.DataAsBytes(), e); err != nil {
+		if err := event.Unmarshal(e); err != nil {
 			logging.WithError(err).Error("could not unmarshal event data")
 			return nil, caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
 		}

@@ -1,8 +1,6 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -93,7 +91,7 @@ func (o *Org) AppendEvent(event eventstore.Event) (err error) {
 }
 
 func (o *Org) SetData(event eventstore.Event) error {
-	err := json.Unmarshal(event.DataAsBytes(), o)
+	err := event.Unmarshal(o)
 	if err != nil {
 		return errors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")
 	}

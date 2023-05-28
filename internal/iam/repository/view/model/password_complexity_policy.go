@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -70,7 +69,7 @@ func (r *PasswordComplexityPolicyView) setRootData(event eventstore.Event) {
 }
 
 func (r *PasswordComplexityPolicyView) SetData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), r); err != nil {
+	if err := event.Unmarshal(r); err != nil {
 		logging.Log("EVEN-Dmi9g").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}

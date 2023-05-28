@@ -1,8 +1,6 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -35,7 +33,7 @@ func (o *Org) appendAddDomainEvent(event eventstore.Event) error {
 	if err != nil {
 		return err
 	}
-	domain.ObjectRoot.CreationDate.Equal(event.CreatedAt())
+	domain.ObjectRoot.CreationDate = event.CreatedAt()
 	o.Domains = append(o.Domains, domain)
 	return nil
 }
@@ -98,7 +96,7 @@ func (o *Org) appendVerificationDomainEvent(event eventstore.Event) error {
 }
 
 func (m *OrgDomain) SetData(event eventstore.Event) error {
-	err := json.Unmarshal(event.DataAsBytes(), m)
+	err := event.Unmarshal(m)
 	if err != nil {
 		return errors.ThrowInternal(err, "EVENT-Hz7Mb", "unable to unmarshal data")
 	}

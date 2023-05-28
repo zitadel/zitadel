@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/logging"
 
@@ -261,7 +260,7 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler2.Statement, err error
 
 func agentIDFromSession(event eventstore.Event) (string, error) {
 	session := make(map[string]interface{})
-	if err := json.Unmarshal(event.DataAsBytes(), &session); err != nil {
+	if err := event.Unmarshal(&session); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
@@ -270,7 +269,7 @@ func agentIDFromSession(event eventstore.Event) (string, error) {
 
 func applicationFromSession(event eventstore.Event) (*project_es_model.Application, error) {
 	application := new(project_es_model.Application)
-	if err := json.Unmarshal(event.DataAsBytes(), &application); err != nil {
+	if err := event.Unmarshal(application); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
 		return nil, caos_errs.ThrowInternal(nil, "MODEL-Hrw1q", "could not unmarshal data")
 	}
@@ -279,7 +278,7 @@ func applicationFromSession(event eventstore.Event) (*project_es_model.Applicati
 
 func tokenIDFromRemovedEvent(event eventstore.Event) (string, error) {
 	removed := make(map[string]interface{})
-	if err := json.Unmarshal(event.DataAsBytes(), &removed); err != nil {
+	if err := event.Unmarshal(&removed); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-Sff32", "could not unmarshal data")
 	}
@@ -288,7 +287,7 @@ func tokenIDFromRemovedEvent(event eventstore.Event) (string, error) {
 
 func refreshTokenIDFromRemovedEvent(event eventstore.Event) (string, error) {
 	removed := make(map[string]interface{})
-	if err := json.Unmarshal(event.DataAsBytes(), &removed); err != nil {
+	if err := event.Unmarshal(&removed); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-Dfb3w", "could not unmarshal data")
 	}

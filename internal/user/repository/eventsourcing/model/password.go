@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -49,7 +48,7 @@ func (u *Human) appendPasswordSetRequestedEvent(event eventstore.Event) error {
 
 func (pw *Password) setData(event eventstore.Event) error {
 	pw.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.DataAsBytes(), pw); err != nil {
+	if err := event.Unmarshal(pw); err != nil {
 		logging.Log("EVEN-dks93").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-sl9xlo2rsw", "could not unmarshal event")
 	}
@@ -59,7 +58,7 @@ func (pw *Password) setData(event eventstore.Event) error {
 func (c *PasswordCode) SetData(event eventstore.Event) error {
 	c.ObjectRoot.AppendEvent(event)
 	c.CreationDate = event.CreatedAt()
-	if err := json.Unmarshal(event.DataAsBytes(), c); err != nil {
+	if err := event.Unmarshal(c); err != nil {
 		logging.Log("EVEN-lo0y2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-q21dr", "could not unmarshal event")
 	}
@@ -67,7 +66,7 @@ func (c *PasswordCode) SetData(event eventstore.Event) error {
 }
 
 func (pw *PasswordChange) SetData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), pw); err != nil {
+	if err := event.Unmarshal(pw); err != nil {
 		logging.Log("EVEN-ADs31").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-BDd32", "could not unmarshal event")
 	}

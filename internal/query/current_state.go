@@ -74,6 +74,8 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-22H8f", "Errors.Internal")
 	}
+	defer rows.Close()
+
 	states, err := scan(rows)
 	if err != nil {
 		return nil, err

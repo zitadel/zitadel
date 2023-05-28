@@ -366,7 +366,7 @@ func (u *UserView) setRootData(event eventstore.Event) {
 }
 
 func (u *UserView) setData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), u); err != nil {
+	if err := event.Unmarshal(u); err != nil {
 		logging.Log("MODEL-lso9e").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
 	}
@@ -375,7 +375,7 @@ func (u *UserView) setData(event eventstore.Event) error {
 
 func (u *UserView) setPasswordData(event eventstore.Event) error {
 	password := new(es_model.Password)
-	if err := json.Unmarshal(event.DataAsBytes(), password); err != nil {
+	if err := event.Unmarshal(password); err != nil {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
@@ -481,7 +481,7 @@ func (u *UserView) removeU2FToken(event eventstore.Event) error {
 
 func webAuthNViewFromEvent(event eventstore.Event) (*WebAuthNView, error) {
 	token := new(WebAuthNView)
-	err := json.Unmarshal(event.DataAsBytes(), token)
+	err := event.Unmarshal(token)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
 	}

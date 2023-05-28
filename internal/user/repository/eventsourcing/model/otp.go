@@ -1,8 +1,6 @@
 package model
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -40,7 +38,7 @@ func (u *Human) appendOTPRemovedEvent() {
 
 func (o *OTP) setData(event eventstore.Event) error {
 	o.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.DataAsBytes(), o); err != nil {
+	if err := event.Unmarshal(o); err != nil {
 		logging.Log("EVEN-d9soe").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lo023", "could not unmarshal event")
 	}
@@ -48,7 +46,7 @@ func (o *OTP) setData(event eventstore.Event) error {
 }
 
 func (o *OTPVerified) SetData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), o); err != nil {
+	if err := event.Unmarshal(o); err != nil {
 		logging.Log("EVEN-BF421").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-GB6hj", "could not unmarshal event")
 	}

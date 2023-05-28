@@ -1,19 +1,17 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
-
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/org"
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 const (
@@ -116,7 +114,8 @@ func (r *IDPConfigView) setRootData(event eventstore.Event) {
 }
 
 func (r *IDPConfigView) SetData(event eventstore.Event) error {
-	if err := json.Unmarshal(event.DataAsBytes(), r); err != nil {
+	err := event.Unmarshal(r)
+	if err != nil {
 		logging.New().WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lub6s", "Could not unmarshal data")
 	}

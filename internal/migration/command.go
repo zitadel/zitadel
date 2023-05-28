@@ -106,9 +106,6 @@ func SetupMapper(event eventstore.Event) (eventstore.Event, error) {
 	step := &SetupStep{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	if len(event.DataAsBytes()) == 0 {
-		return step, nil
-	}
 	err := event.Unmarshal(step)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-hYp7M", "unable to unmarshal step")
