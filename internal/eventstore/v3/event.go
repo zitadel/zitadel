@@ -3,68 +3,25 @@ package eventstore
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-type action interface {
-	Aggregate() *Aggregate
-
-	// Creator is the userid of the user which created the action
-	Creator() string
-	// Type describes the action
-	Type() EventType
-	// Revision of the action
-	Revision() uint16
-}
-
-type Command interface {
-	action
-	// Payload returns the payload of the event. It represent the changed fields by the event
-	// valid types are:
-	// * nil (no payload),
-	// * struct which can be marshalled to json
-	// * pointer to struct which can be marshalled to json
-	Payload() any
-	// UniqueConstraints should be added for unique attributes of an event, if nil constraints will not be checked
-	UniqueConstraints() []*UniqueConstraint
-}
-
-type Event interface {
-	action
-
-	// Sequence of the event in the aggregate
-	Sequence() uint64
-	CreatedAt() time.Time
-
-	// Unmarshal parses the payload and stores the result
-	// in the value pointed to by ptr. If ptr is nil or not a pointer,
-	// Unmarshal returns an error
-	Unmarshal(ptr any) error
-
-	// Deprecated: only use for migration
-	DataAsBytes() []byte
-}
-
-// AggregateType is the object name
-type AggregateType string
-
-// EventType is the description of the change
-type EventType string
-
 var (
-	_ Event = (*event)(nil)
+	_ eventstore.Event = (*event)(nil)
 )
 
 type event struct {
-	aggregate *Aggregate
+	aggregate *eventstore.Aggregate
 	creator   string
 	revision  uint16
-	typ       EventType
+	typ       eventstore.EventType
 	createdAt time.Time
 	sequence  uint64
 	payload   []byte
 }
 
-func commandToEvent(sequence *latestSequence, command Command) (_ *event, err error) {
+func commandToEvent(sequence *latestSequence, command eventstore.Command) (_ *event, err error) {
 	var payload Payload
 	if command.Payload() != nil {
 		payload, err = json.Marshal(command.Payload())
@@ -92,42 +49,42 @@ func (e *event) EditorUser() string {
 	return e.Creator()
 }
 
-// Aggregate implements [Event]
-func (e *event) Aggregate() *Aggregate {
+// Aggregate implements [eventstore.Event]
+func (e *event) Aggregate() *eventstore.Aggregate {
 	return e.aggregate
 }
 
-// Creator implements [Event]
+// Creator implements [eventstore.Event]
 func (e *event) Creator() string {
 	return e.creator
 }
 
-// Revision implements [Event]
+// Revision implements [eventstore.Event]
 func (e *event) Revision() uint16 {
 	return e.revision
 }
 
-// Type implements [Event]
-func (e *event) Type() EventType {
+// Type implements [eventstore.Event]
+func (e *event) Type() eventstore.EventType {
 	return e.typ
 }
 
-// CreatedAt implements [Event]
+// CreatedAt implements [eventstore.Event]
 func (e *event) CreatedAt() time.Time {
 	return e.createdAt
 }
 
-// Sequence implements [Event]
+// Sequence implements [eventstore.Event]
 func (e *event) Sequence() uint64 {
 	return e.sequence
 }
 
-// Unmarshal implements [Event]
+// Unmarshal implements [eventstore.Event]
 func (e *event) Unmarshal(ptr any) error {
 	return json.Unmarshal(e.payload, ptr)
 }
 
-// DataAsBytes implements [Event]
+// DataAsBytes implements [eventstore.Event]
 func (e *event) DataAsBytes() []byte {
 	return e.payload
 }

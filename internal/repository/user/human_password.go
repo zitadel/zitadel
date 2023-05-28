@@ -2,15 +2,12 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"time"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -35,7 +32,7 @@ func (e *HumanPasswordChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanPasswordChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -58,11 +55,11 @@ func NewHumanPasswordChangedEvent(
 	}
 }
 
-func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	humanAdded := &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, humanAdded)
+	err := event.Unmarshal(humanAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-4M0sd", "unable to unmarshal human password changed")
 	}
@@ -82,7 +79,7 @@ func (e *HumanPasswordCodeAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanPasswordCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordCodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -105,11 +102,11 @@ func NewHumanPasswordCodeAddedEvent(
 	}
 }
 
-func HumanPasswordCodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	humanAdded := &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, humanAdded)
+	err := event.Unmarshal(humanAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Ms90d", "unable to unmarshal human password code added")
 	}
@@ -125,7 +122,7 @@ func (e *HumanPasswordCodeSentEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -139,7 +136,7 @@ func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Ag
 	}
 }
 
-func HumanPasswordCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanPasswordCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -153,7 +150,7 @@ func (e *HumanPasswordChangeSentEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanPasswordChangeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordChangeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -167,7 +164,7 @@ func NewHumanPasswordChangeSentEvent(ctx context.Context, aggregate *eventstore.
 	}
 }
 
-func HumanPasswordChangeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordChangeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanPasswordChangeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -182,7 +179,7 @@ func (e *HumanPasswordCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanPasswordCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -201,11 +198,11 @@ func NewHumanPasswordCheckSucceededEvent(
 	}
 }
 
-func HumanPasswordCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	humanAdded := &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, humanAdded)
+	err := event.Unmarshal(humanAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-5M9sd", "unable to unmarshal human password check succeeded")
 	}
@@ -222,7 +219,7 @@ func (e *HumanPasswordCheckFailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanPasswordCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanPasswordCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -241,11 +238,11 @@ func NewHumanPasswordCheckFailedEvent(
 	}
 }
 
-func HumanPasswordCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanPasswordCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	humanAdded := &HumanPasswordCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, humanAdded)
+	err := event.Unmarshal(humanAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-4m9fs", "unable to unmarshal human password check failed")
 	}

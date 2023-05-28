@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,16 +24,17 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded Title",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextSetEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextSetEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Title",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), org.CustomTextSetEventMapper),
+					), org.CustomTextSetEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
@@ -63,16 +63,17 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded PreHeader",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextSetEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextSetEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "PreHeader",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), org.CustomTextSetEventMapper),
+					), org.CustomTextSetEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
@@ -101,16 +102,17 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded Subject",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextSetEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextSetEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Subject",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), org.CustomTextSetEventMapper),
+					), org.CustomTextSetEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
@@ -139,16 +141,17 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded Greeting",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextSetEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextSetEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Greeting",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), org.CustomTextSetEventMapper),
+					), org.CustomTextSetEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
@@ -177,16 +180,17 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded Text",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextSetEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextSetEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Text",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), org.CustomTextSetEventMapper),
+					), org.CustomTextSetEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
@@ -215,16 +219,17 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded ButtonText",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextSetEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextSetEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "ButtonText",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), org.CustomTextSetEventMapper),
+					), org.CustomTextSetEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
@@ -253,16 +258,17 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded Footer",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextSetEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextSetEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Footer",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), org.CustomTextSetEventMapper),
+					), org.CustomTextSetEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
@@ -291,15 +297,16 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceRemoved Title",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Title",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), org.CustomTextRemovedEventMapper),
+					), org.CustomTextRemovedEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -326,11 +333,12 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(MessageTextInstanceIDCol),
 			want: wantReduce{
@@ -351,15 +359,16 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceRemoved PreHeader",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "PreHeader",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), org.CustomTextRemovedEventMapper),
+					), org.CustomTextRemovedEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -386,15 +395,16 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceRemoved Subject",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Subject",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), org.CustomTextRemovedEventMapper),
+					), org.CustomTextRemovedEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -421,15 +431,16 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceRemoved Greeting",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Greeting",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), org.CustomTextRemovedEventMapper),
+					), org.CustomTextRemovedEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -456,15 +467,16 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceRemoved Text",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Text",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), org.CustomTextRemovedEventMapper),
+					), org.CustomTextRemovedEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -491,15 +503,16 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceRemoved ButtonText",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "ButtonText",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), org.CustomTextRemovedEventMapper),
+					), org.CustomTextRemovedEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -526,15 +539,16 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceRemoved Footer",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Footer",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), org.CustomTextRemovedEventMapper),
+					), org.CustomTextRemovedEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -562,15 +576,16 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			name:   "org reduceRemoved",
 			reduce: (&messageTextProjection{}).reduceTemplateRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.CustomTextTemplateRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.CustomTextTemplateRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "Title", 
 						"language": "en", 
 						"template": "InitCode"
 					}`),
-				), org.CustomTextTemplateRemovedEventMapper),
+					), org.CustomTextTemplateRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),
@@ -594,16 +609,17 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			name:   "instance reduceAdded",
 			reduce: (&messageTextProjection{}).reduceAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.CustomTextSetEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.CustomTextSetEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"key": "Title",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), instance.CustomTextSetEventMapper),
+					), instance.CustomTextSetEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -631,15 +647,16 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceRemoved Title",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.CustomTextRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.CustomTextRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"key": "Title",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), instance.CustomTextRemovedEventMapper),
+					), instance.CustomTextRemovedEventMapper),
 			},
 			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -667,11 +684,12 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&messageTextProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),

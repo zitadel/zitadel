@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,11 +24,12 @@ func TestFlowProjection_reduces(t *testing.T) {
 		{
 			name: "reduceTriggerActionsSetEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.TriggerActionsSetEventType),
-					org.AggregateType,
-					[]byte(`{"flowType": 1, "triggerType": 1, "actionIDs": ["id1", "id2"]}`),
-				), org.TriggerActionsSetEventMapper),
+				event: getEvent(
+					testEvent(
+						org.TriggerActionsSetEventType,
+						org.AggregateType,
+						[]byte(`{"flowType": 1, "triggerType": 1, "actionIDs": ["id1", "id2"]}`),
+					), org.TriggerActionsSetEventMapper),
 			},
 			reduce: (&flowProjection{}).reduceTriggerActionsSetEventType,
 			want: wantReduce{
@@ -79,11 +79,12 @@ func TestFlowProjection_reduces(t *testing.T) {
 		{
 			name: "reduceFlowClearedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.FlowClearedEventType),
-					org.AggregateType,
-					[]byte(`{"flowType": 1}`),
-				), org.FlowClearedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.FlowClearedEventType,
+						org.AggregateType,
+						[]byte(`{"flowType": 1}`),
+					), org.FlowClearedEventMapper),
 			},
 			reduce: (&flowProjection{}).reduceFlowClearedEventType,
 			want: wantReduce{
@@ -107,11 +108,12 @@ func TestFlowProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&flowProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),
@@ -135,11 +137,12 @@ func TestFlowProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(FlowInstanceIDCol),
 			want: wantReduce{

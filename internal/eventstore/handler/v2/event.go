@@ -46,6 +46,6 @@ func (p *ProjectionSucceededEvent) Payload() interface{} {
 	return p
 }
 
-func (p *ProjectionSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (p *ProjectionSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }

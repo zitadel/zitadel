@@ -1,12 +1,8 @@
 package policy
 
 import (
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -29,7 +25,7 @@ func (e *PasswordComplexityPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PasswordComplexityPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PasswordComplexityPolicyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -51,12 +47,12 @@ func NewPasswordComplexityPolicyAddedEvent(
 	}
 }
 
-func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordComplexityPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &PasswordComplexityPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-wYxlM", "unable to unmarshal policy")
 	}
@@ -78,7 +74,7 @@ func (e *PasswordComplexityPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PasswordComplexityPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PasswordComplexityPolicyChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -130,12 +126,12 @@ func ChangeHasSymbol(hasSymbol bool) func(*PasswordComplexityPolicyChangedEvent)
 	}
 }
 
-func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordComplexityPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &PasswordComplexityPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-zBGB0", "unable to unmarshal policy")
 	}
@@ -151,7 +147,7 @@ func (e *PasswordComplexityPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *PasswordComplexityPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PasswordComplexityPolicyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -161,7 +157,7 @@ func NewPasswordComplexityPolicyRemovedEvent(base *eventstore.BaseEvent) *Passwo
 	}
 }
 
-func PasswordComplexityPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordComplexityPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &PasswordComplexityPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,15 +24,16 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.DomainPolicyAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.DomainPolicyAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"userLoginMustBeDomain": true,
 						"validateOrgDomains": true,
 						"smtpSenderAddressMatchesInstanceDomain": true
 }`),
-				), org.DomainPolicyAddedEventMapper),
+					), org.DomainPolicyAddedEventMapper),
 			},
 			reduce: (&domainPolicyProjection{}).reduceAdded,
 			want: wantReduce{
@@ -65,15 +65,16 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceChanged",
 			reduce: (&domainPolicyProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.DomainPolicyChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.DomainPolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"userLoginMustBeDomain": true,
 						"validateOrgDomains": true,
 						"smtpSenderAddressMatchesInstanceDomain": true
 		}`),
-				), org.DomainPolicyChangedEventMapper),
+					), org.DomainPolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),
@@ -100,11 +101,12 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceRemoved",
 			reduce: (&domainPolicyProjection{}).reduceRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.DomainPolicyRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.DomainPolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.DomainPolicyRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.DomainPolicyRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),
@@ -125,11 +127,12 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(DomainPolicyInstanceIDCol),
 			want: wantReduce{
@@ -151,15 +154,16 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceAdded",
 			reduce: (&domainPolicyProjection{}).reduceAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DomainPolicyAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.DomainPolicyAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"userLoginMustBeDomain": true,
 						"validateOrgDomains": true,
 						"smtpSenderAddressMatchesInstanceDomain": true
 					}`),
-				), instance.DomainPolicyAddedEventMapper),
+					), instance.DomainPolicyAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -190,15 +194,16 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceChanged",
 			reduce: (&domainPolicyProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DomainPolicyChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.DomainPolicyChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"userLoginMustBeDomain": true,
 						"validateOrgDomains": true,
 						"smtpSenderAddressMatchesInstanceDomain": true
 					}`),
-				), instance.DomainPolicyChangedEventMapper),
+					), instance.DomainPolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -225,11 +230,12 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&domainPolicyProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),

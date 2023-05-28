@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
@@ -44,7 +42,7 @@ func NewIDPJWTConfigAddedEvent(
 	}
 }
 
-func IDPJWTConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPJWTConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idpconfig.JWTConfigAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -77,7 +75,7 @@ func NewIDPJWTConfigChangedEvent(
 	return &IDPJWTConfigChangedEvent{JWTConfigChangedEvent: *changeEvent}, nil
 }
 
-func IDPJWTConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPJWTConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idpconfig.JWTConfigChangedEventMapper(event)
 	if err != nil {
 		return nil, err

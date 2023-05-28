@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -25,11 +24,12 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectRemovedType),
-					project.AggregateType,
-					nil,
-				), project.ProjectRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectRemovedType,
+						project.AggregateType,
+						nil,
+					), project.ProjectRemovedEventMapper),
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRemoved,
 			want: wantReduce{
@@ -51,11 +51,12 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(ProjectRoleColumnInstanceID),
 			want: wantReduce{
@@ -76,11 +77,12 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectRoleRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.RoleRemovedType),
-					project.AggregateType,
-					[]byte(`{"key": "key"}`),
-				), project.RoleRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.RoleRemovedType,
+						project.AggregateType,
+						[]byte(`{"key": "key"}`),
+					), project.RoleRemovedEventMapper),
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleRemoved,
 			want: wantReduce{
@@ -103,11 +105,12 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectRoleChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.RoleChangedType),
-					project.AggregateType,
-					[]byte(`{"key": "key", "displayName": "New Key", "group": "New Group"}`),
-				), project.RoleChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.RoleChangedType,
+						project.AggregateType,
+						[]byte(`{"key": "key", "displayName": "New Key", "group": "New Group"}`),
+					), project.RoleChangedEventMapper),
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
@@ -134,11 +137,12 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectRoleChanged no changes",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.RoleChangedType),
-					project.AggregateType,
-					[]byte(`{}`),
-				), project.RoleChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.RoleChangedType,
+						project.AggregateType,
+						[]byte(`{}`),
+					), project.RoleChangedEventMapper),
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
@@ -150,11 +154,12 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectRoleAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.RoleAddedType),
-					project.AggregateType,
-					[]byte(`{"key": "key", "displayName": "Key", "group": "Group"}`),
-				), project.RoleAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.RoleAddedType,
+						project.AggregateType,
+						[]byte(`{"key": "key", "displayName": "Key", "group": "Group"}`),
+					), project.RoleAddedEventMapper),
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleAdded,
 			want: wantReduce{
@@ -184,11 +189,12 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&projectRoleProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 type aggregateOpt func(*Aggregate)
@@ -14,38 +13,68 @@ type aggregateOpt func(*Aggregate)
 func NewAggregate(
 	ctx context.Context,
 	id string,
-	typ eventstore.AggregateType,
-	version eventstore.Version,
-	opts ...eventstore.AggregateOpt,
+	typ AggregateType,
+	version Version,
+	opts ...aggregateOpt,
 ) *Aggregate {
-	return eventstore.NewAggregate(ctx, id, typ, version, opts...)
+	a := &Aggregate{
+		ID:            id,
+		Type:          typ,
+		ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		InstanceID:    authz.GetInstance(ctx).InstanceID(),
+		Version:       version,
+	}
+
+	for _, opt := range opts {
+		opt(a)
+	}
+
+	var _ EventType
+
+	return a
 }
 
 // WithResourceOwner overwrites the resource owner of the aggregate
 // by default the resource owner is set by the context
-func WithResourceOwner(resourceOwner string) eventstore.AggregateOpt {
-	return eventstore.WithResourceOwner(resourceOwner)
+func WithResourceOwner(resourceOwner string) aggregateOpt {
+	return func(aggregate *Aggregate) {
+		aggregate.ResourceOwner = resourceOwner
+	}
 }
 
 // AggregateFromWriteModel maps the given WriteModel to an Aggregate
 func AggregateFromWriteModel(
 	wm *WriteModel,
 	typ AggregateType,
-	version eventstore.Version,
+	version Version,
 ) *Aggregate {
-	return eventstore.NewAggregate(
+	return NewAggregate(
 		authz.WithInstanceID(context.Background(), wm.InstanceID),
 		wm.AggregateID,
 		typ,
 		version,
-		eventstore.WithResourceOwner(wm.ResourceOwner),
+		WithResourceOwner(wm.ResourceOwner),
 	)
 }
 
 // Aggregate is the basic implementation of Aggregater
-type Aggregate = eventstore.Aggregate
+type Aggregate struct {
+	// ID is the unique identitfier of this aggregate
+	ID string `json:"-"`
+	// Type is the name of the aggregate.
+	Type AggregateType `json:"-"`
+	// ResourceOwner is the org this aggregates belongs to
+	ResourceOwner string `json:"-"`
+	// InstanceID is the instance this aggregate belongs to
+	InstanceID string `json:"-"`
+	// Version is the semver this aggregate represents
+	Version Version `json:"-"`
+}
 
-func isAggreagteTypes(a *eventstore.Aggregate, types ...AggregateType) bool {
+// AggregateType is the object name
+type AggregateType string
+
+func isAggreagteTypes(a *Aggregate, types ...AggregateType) bool {
 	for _, typ := range types {
 		if a.Type == typ {
 			return true
@@ -54,7 +83,7 @@ func isAggreagteTypes(a *eventstore.Aggregate, types ...AggregateType) bool {
 	return false
 }
 
-func isAggregateIDs(a *eventstore.Aggregate, ids ...string) bool {
+func isAggregateIDs(a *Aggregate, ids ...string) bool {
 	for _, id := range ids {
 		if a.ID == id {
 			return true

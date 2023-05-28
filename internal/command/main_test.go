@@ -55,12 +55,12 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 		}
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
-			AggregateType: repository.AggregateType(event.Aggregate().Type),
+			AggregateType: event.Aggregate().Type,
 			ResourceOwner: sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 			EditorService: "zitadel",
 			EditorUser:    event.Creator(),
 			Typ:           event.Type(),
-			Version:       repository.Version(event.Aggregate().Version),
+			Version:       event.Aggregate().Version,
 			Data:          data,
 		}
 	}
@@ -68,8 +68,8 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 }
 
 type testRepo struct {
-	events            []*repository.Event
-	uniqueConstraints []*repository.UniqueConstraint
+	events            []eventstore.Event
+	uniqueConstraints []*eventstore.UniqueConstraint
 	sequence          uint64
 	err               error
 	t                 *testing.T
@@ -79,19 +79,19 @@ func (repo *testRepo) Health(ctx context.Context) error {
 	return nil
 }
 
-func (repo *testRepo) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+func (repo *testRepo) Push(ctx context.Context, events []eventstore.Event, uniqueConstraints ...*eventstore.UniqueConstraint) error {
 	repo.events = append(repo.events, events...)
 	repo.uniqueConstraints = append(repo.uniqueConstraints, uniqueConstraints...)
 	return nil
 }
 
-func (repo *testRepo) Filter(ctx context.Context, searchQuery *repository.SearchQuery) ([]*repository.Event, error) {
-	events := make([]*repository.Event, 0, len(repo.events))
+func (repo *testRepo) Filter(ctx context.Context, searchQuery *repository.SearchQuery) ([]eventstore.Event, error) {
+	events := make([]eventstore.Event, 0, len(repo.events))
 	for _, event := range repo.events {
 		for _, filter := range searchQuery.Filters {
 			for _, f := range filter {
 				if f.Field == repository.FieldAggregateType {
-					if event.AggregateType != f.Value {
+					if event.Aggregate().Type != f.Value {
 						continue
 					}
 				}
@@ -106,7 +106,7 @@ func filterAggregateType(aggregateType string) {
 
 }
 
-func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *repository.SearchQuery) (uint64, error) {
+func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) (uint64, error) {
 	if repo.err != nil {
 		return 0, repo.err
 	}
@@ -125,7 +125,7 @@ func expectPushFailed(err error, commands ...eventstore.Command) expect {
 	}
 }
 
-func expectFilter(events ...*repository.Event) expect {
+func expectFilter(events ...eventstore.Event) expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectFilterEvents(events...)
 	}
@@ -161,9 +161,9 @@ func eventFromEventPusher(event eventstore.Command) *repository.Event {
 		Data:                          data,
 		EditorService:                 "zitadel",
 		EditorUser:                    event.Creator(),
-		Version:                       repository.Version(event.Aggregate().Version),
+		Version:                       event.Aggregate().Version,
 		AggregateID:                   event.Aggregate().ID,
-		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
+		AggregateType:                 event.Aggregate().Type,
 		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 	}
 }
@@ -180,9 +180,9 @@ func eventFromEventPusherWithInstanceID(instanceID string, event eventstore.Comm
 		Data:                          data,
 		EditorService:                 "zitadel",
 		EditorUser:                    event.Creator(),
-		Version:                       repository.Version(event.Aggregate().Version),
+		Version:                       event.Aggregate().Version,
 		AggregateID:                   event.Aggregate().ID,
-		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
+		AggregateType:                 event.Aggregate().Type,
 		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 		InstanceID:                    instanceID,
 	}
@@ -192,23 +192,6 @@ func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *reposito
 	e := eventFromEventPusher(event)
 	e.CreationDate = time.Now()
 	return e
-}
-
-func uniqueConstraintsFromEventConstraint(constraint *eventstore.EventUniqueConstraint) *repository.UniqueConstraint {
-	return &repository.UniqueConstraint{
-		UniqueType:   constraint.UniqueType,
-		UniqueField:  constraint.UniqueField,
-		ErrorMessage: constraint.ErrorMessage,
-		Action:       repository.UniqueConstraintAction(constraint.Action)}
-}
-
-func uniqueConstraintsFromEventConstraintWithInstanceID(instanceID string, constraint *eventstore.EventUniqueConstraint) *repository.UniqueConstraint {
-	return &repository.UniqueConstraint{
-		InstanceID:   instanceID,
-		UniqueType:   constraint.UniqueType,
-		UniqueField:  constraint.UniqueField,
-		ErrorMessage: constraint.ErrorMessage,
-		Action:       repository.UniqueConstraintAction(constraint.Action)}
 }
 
 func GetMockSecretGenerator(t *testing.T) crypto.Generator {

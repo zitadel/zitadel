@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -38,7 +36,7 @@ func NewDomainPolicyAddedEvent(
 	}
 }
 
-func DomainPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.DomainPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -69,7 +67,7 @@ func NewDomainPolicyChangedEvent(
 	return &DomainPolicyChangedEvent{DomainPolicyChangedEvent: *changedEvent}, nil
 }
 
-func DomainPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.DomainPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err

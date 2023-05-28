@@ -3,38 +3,19 @@ package repository
 import (
 	"database/sql"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 // SearchQuery defines the which and how data are queried
 type SearchQuery struct {
-	Columns         Columns
+	Columns         eventstore.Columns
 	Limit           uint64
 	Desc            bool
 	Filters         [][]*Filter
 	Tx              *sql.Tx
 	AllowTimeTravel bool
-}
-
-// Columns defines which fields of the event are needed for the query
-type Columns int32
-
-const (
-	//ColumnsEvent represents all fields of an event
-	ColumnsEvent = iota + 1
-	//ColumnsMaxSequence represents the latest sequence of the filtered events
-	ColumnsMaxSequence
-	// ColumnsInstanceIDs represents the instance ids of the filtered events
-	ColumnsInstanceIDs
-
-	columnsCount
-)
-
-func (c Columns) Validate() error {
-	if c <= 0 || c >= columnsCount {
-		return errors.ThrowPreconditionFailed(nil, "REPOS-x8R35", "column out of range")
-	}
-	return nil
 }
 
 // Filter represents all fields needed to compare a field of an event with a value
@@ -116,4 +97,179 @@ func (f *Filter) Validate() error {
 		return errors.ThrowPreconditionFailed(nil, "REPO-RrQTy", "operation not definded")
 	}
 	return nil
+}
+
+func QueryFromBuilder(builder *eventstore.SearchQueryBuilder, instanceID string) (*SearchQuery, error) {
+	if builder == nil ||
+		// len(builder.GetQueries()) < 1 ||
+		builder.GetColumns().Validate() != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
+	}
+	// builder.InstanceID(instanceID)
+	filters := make([][]*Filter, len(builder.GetQueries()))
+
+	var builderFilters []*Filter
+	for _, f := range []func(builder *eventstore.SearchQueryBuilder) *Filter{
+		instanceIDFilterFromBuilder,
+		editorUserFilter,
+		resourceOwnerFilter,
+	} {
+		filter := f(builder)
+		if filter == nil {
+			continue
+		}
+		if err := filter.Validate(); err != nil {
+			return nil, err
+		}
+		builderFilters = append(builderFilters, filter)
+	}
+
+	for i, query := range builder.GetQueries() {
+		for _, f := range []func(query *eventstore.SearchQuery) *Filter{
+			aggregateTypeFilter,
+			aggregateIDFilter,
+			eventTypeFilter,
+			eventDataFilter,
+			eventSequenceGreaterFilter,
+			eventSequenceLessFilter,
+			instanceIDFilterFromQuery,
+			excludedInstanceIDFilter,
+			creationDateAfterFilter,
+		} {
+			filter := f(query)
+			if filter == nil {
+				continue
+			}
+			if err := filter.Validate(); err != nil {
+				return nil, err
+			}
+			filters[i] = append(filters[i], filter)
+		}
+		filters[i] = append(filters[i], builderFilters...)
+	}
+
+	if len(filters) == 0 {
+		filters = append(filters, builderFilters)
+	}
+
+	return &SearchQuery{
+		Columns:         builder.GetColumns(),
+		Limit:           builder.GetLimit(),
+		Desc:            builder.GetDesc(),
+		Filters:         filters,
+		Tx:              builder.GetTx(),
+		AllowTimeTravel: builder.GetAllowTimeTravel(),
+	}, nil
+}
+
+func aggregateIDFilter(query *eventstore.SearchQuery) *Filter {
+	if len(query.GetAggregateIDs()) < 1 {
+		return nil
+	}
+	if len(query.GetAggregateIDs()) == 1 {
+		return NewFilter(FieldAggregateID, query.GetAggregateIDs()[0], OperationEquals)
+	}
+	return NewFilter(FieldAggregateID, database.StringArray(query.GetAggregateIDs()), OperationIn)
+}
+
+func eventTypeFilter(query *eventstore.SearchQuery) *Filter {
+	if len(query.GetEventTypes()) < 1 {
+		return nil
+	}
+	if len(query.GetEventTypes()) == 1 {
+		return NewFilter(FieldEventType, query.GetEventTypes()[0], OperationEquals)
+	}
+	eventTypes := make(database.StringArray, len(query.GetEventTypes()))
+	for i, eventType := range query.GetEventTypes() {
+		eventTypes[i] = string(eventType)
+	}
+	return NewFilter(FieldEventType, eventTypes, OperationIn)
+}
+
+func aggregateTypeFilter(query *eventstore.SearchQuery) *Filter {
+	if len(query.GetAggregateTypes()) < 1 {
+		return nil
+	}
+	if len(query.GetAggregateTypes()) == 1 {
+		return NewFilter(FieldAggregateType, query.GetAggregateTypes()[0], OperationEquals)
+	}
+	aggregateTypes := make(database.StringArray, len(query.GetAggregateTypes()))
+	for i, aggregateType := range query.GetAggregateTypes() {
+		aggregateTypes[i] = string(aggregateType)
+	}
+	return NewFilter(FieldAggregateType, aggregateTypes, OperationIn)
+}
+
+func eventSequenceGreaterFilter(query *eventstore.SearchQuery) *Filter {
+	if query.GetEventSequenceGreater() == 0 {
+		return nil
+	}
+	sortOrder := OperationGreater
+	if query.Builder().GetDesc() {
+		sortOrder = OperationLess
+	}
+	return NewFilter(FieldSequence, query.GetEventSequenceGreater(), sortOrder)
+}
+
+func eventSequenceLessFilter(query *eventstore.SearchQuery) *Filter {
+	if query.GetEventSequenceLess() == 0 {
+		return nil
+	}
+	sortOrder := OperationLess
+	if query.Builder().GetDesc() {
+		sortOrder = OperationGreater
+	}
+	return NewFilter(FieldSequence, query.GetEventSequenceLess(), sortOrder)
+}
+
+func instanceIDFilterFromQuery(query *eventstore.SearchQuery) *Filter {
+	if query.GetInstanceID() != "" {
+		return NewFilter(FieldInstanceID, query.GetInstanceID(), OperationEquals)
+	}
+	if query.Builder().GetInstanceID() != "" {
+		NewFilter(FieldInstanceID, query.Builder().GetInstanceID(), OperationEquals)
+	}
+	return nil
+}
+
+func excludedInstanceIDFilter(query *eventstore.SearchQuery) *Filter {
+	if len(query.GetExcludedInstanceIDs()) == 0 {
+		return nil
+	}
+	return NewFilter(FieldInstanceID, database.StringArray(query.GetExcludedInstanceIDs()), OperationNotIn)
+}
+
+func resourceOwnerFilter(builder *eventstore.SearchQueryBuilder) *Filter {
+	if builder.GetResourceOwner() == "" {
+		return nil
+	}
+	return NewFilter(FieldResourceOwner, builder.GetResourceOwner(), OperationEquals)
+}
+
+func editorUserFilter(builder *eventstore.SearchQueryBuilder) *Filter {
+	if builder.GetEditorUser() == "" {
+		return nil
+	}
+	return NewFilter(FieldEditorUser, builder.GetEditorUser(), OperationEquals)
+}
+
+func instanceIDFilterFromBuilder(builder *eventstore.SearchQueryBuilder) *Filter {
+	if builder.GetInstanceID() != "" {
+		NewFilter(FieldInstanceID, builder.GetInstanceID(), OperationEquals)
+	}
+	return nil
+}
+
+func creationDateAfterFilter(query *eventstore.SearchQuery) *Filter {
+	if query.GetCreationDateAfter().IsZero() {
+		return nil
+	}
+	return NewFilter(FieldCreationDate, query.GetCreationDateAfter(), OperationGreater)
+}
+
+func eventDataFilter(query *eventstore.SearchQuery) *Filter {
+	if len(query.GetEventData()) == 0 {
+		return nil
+	}
+	return NewFilter(FieldEventData, query.GetEventData(), OperationJSONContains)
 }

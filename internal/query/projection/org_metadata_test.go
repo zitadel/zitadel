@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -24,14 +23,15 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMetadataSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.MetadataSetType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.MetadataSetType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "key",
 						"value": "dmFsdWU="
 					}`),
-				), org.MetadataSetEventMapper),
+					), org.MetadataSetEventMapper),
 			},
 			reduce: (&orgMetadataProjection{}).reduceMetadataSet,
 			want: wantReduce{
@@ -59,13 +59,14 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMetadataRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.MetadataRemovedType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.MetadataRemovedType,
+						org.AggregateType,
+						[]byte(`{
 						"key": "key"
 					}`),
-				), org.MetadataRemovedEventMapper),
+					), org.MetadataRemovedEventMapper),
 			},
 			reduce: (&orgMetadataProjection{}).reduceMetadataRemoved,
 			want: wantReduce{
@@ -88,11 +89,12 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMetadataRemovedAll",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.MetadataRemovedAllType),
-					org.AggregateType,
-					nil,
-				), org.MetadataRemovedAllEventMapper),
+				event: getEvent(
+					testEvent(
+						org.MetadataRemovedAllType,
+						org.AggregateType,
+						nil,
+					), org.MetadataRemovedAllEventMapper),
 			},
 			reduce: (&orgMetadataProjection{}).reduceMetadataRemovedAll,
 			want: wantReduce{
@@ -114,11 +116,12 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOwnerRemoved(org removed)",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&orgMetadataProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
@@ -143,11 +146,12 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 		{
 			name: "reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{

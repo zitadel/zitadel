@@ -6,9 +6,11 @@ import (
 	_ "embed"
 	"fmt"
 	"strings"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func (es *Eventstore) Push(ctx context.Context, commands ...Command) (_ []Event, err error) {
+func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (_ []eventstore.Event, err error) {
 	tx, err := es.client.Begin()
 	if err != nil {
 		return nil, err
@@ -41,10 +43,10 @@ func (es *Eventstore) Push(ctx context.Context, commands ...Command) (_ []Event,
 //go:embed push.sql
 var pushStmt string
 
-func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []Command) (events []Event, err error) {
+func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) (events []eventstore.Event, err error) {
 	const argsPerCommand = 9
 
-	events = make([]Event, len(commands))
+	events = make([]eventstore.Event, len(commands))
 	args := make([]any, 0, len(commands)*argsPerCommand)
 	placeHolders := make([]string, len(commands))
 

@@ -1,24 +1,39 @@
 package eventstore
 
-import (
-	"github.com/zitadel/zitadel/internal/eventstore/v3"
-)
+import ()
 
-type EventUniqueConstraint = eventstore.UniqueConstraint
+type UniqueConstraint struct {
+	// UniqueType is the table name for the unique constraint
+	UniqueType string
+	// UniqueField is the unique key
+	UniqueField string
+	// Action defines if unique constraint should be added or removed
+	Action UniqueConstraintAction
+	// ErrorMessage defines the translation file key for the error message
+	ErrorMessage string
+	// IsGlobal defines if the unique constraint is globally unique or just within a single instance
+	IsGlobal bool
+}
 
-type UniqueConstraintAction = eventstore.UniqueConstraintAction
+type UniqueConstraintAction int8
 
 const (
-	UniqueConstraintAdd            = eventstore.UniqueConstraintAdd
-	UniqueConstraintRemove         = eventstore.UniqueConstraintRemove
-	UniqueConstraintInstanceRemove = eventstore.UniqueConstraintInstanceRemove
+	UniqueConstraintAdd UniqueConstraintAction = iota
+	UniqueConstraintRemove
+	UniqueConstraintInstanceRemove
+
+	uniqueConstraintActionCount
 )
+
+func (f UniqueConstraintAction) Valid() bool {
+	return f >= 0 && f < uniqueConstraintActionCount
+}
 
 func NewAddEventUniqueConstraint(
 	uniqueType,
 	uniqueField,
-	errMessage string) *EventUniqueConstraint {
-	return &EventUniqueConstraint{
+	errMessage string) *UniqueConstraint {
+	return &UniqueConstraint{
 		UniqueType:   uniqueType,
 		UniqueField:  uniqueField,
 		ErrorMessage: errMessage,
@@ -26,27 +41,27 @@ func NewAddEventUniqueConstraint(
 	}
 }
 
-func NewRemoveEventUniqueConstraint(
+func NewRemoveUniqueConstraint(
 	uniqueType,
-	uniqueField string) *EventUniqueConstraint {
-	return &EventUniqueConstraint{
+	uniqueField string) *UniqueConstraint {
+	return &UniqueConstraint{
 		UniqueType:  uniqueType,
 		UniqueField: uniqueField,
 		Action:      UniqueConstraintRemove,
 	}
 }
 
-func NewRemoveInstanceUniqueConstraints() *EventUniqueConstraint {
-	return &EventUniqueConstraint{
+func NewRemoveInstanceUniqueConstraints() *UniqueConstraint {
+	return &UniqueConstraint{
 		Action: UniqueConstraintInstanceRemove,
 	}
 }
 
-func NewAddGlobalEventUniqueConstraint(
+func NewAddGlobalUniqueConstraint(
 	uniqueType,
 	uniqueField,
-	errMessage string) *EventUniqueConstraint {
-	return &EventUniqueConstraint{
+	errMessage string) *UniqueConstraint {
+	return &UniqueConstraint{
 		UniqueType:   uniqueType,
 		UniqueField:  uniqueField,
 		ErrorMessage: errMessage,
@@ -55,10 +70,10 @@ func NewAddGlobalEventUniqueConstraint(
 	}
 }
 
-func NewRemoveGlobalEventUniqueConstraint(
+func NewRemoveGlobalUniqueConstraint(
 	uniqueType,
-	uniqueField string) *EventUniqueConstraint {
-	return &EventUniqueConstraint{
+	uniqueField string) *UniqueConstraint {
+	return &UniqueConstraint{
 		UniqueType:  uniqueType,
 		UniqueField: uniqueField,
 		IsGlobal:    true,

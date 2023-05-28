@@ -7,20 +7,21 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
-// var _ eventstore.Event = (*BaseEvent)(nil)
+var (
+	_ Event = (*BaseEvent)(nil)
+)
 
 // BaseEvent represents the minimum metadata of an event
 type BaseEvent struct {
+	ID        string
 	EventType EventType `json:"-"`
 
-	aggregate *Aggregate
+	Agg *Aggregate
 
-	sequence                      uint64
-	creationDate                  time.Time
+	Seq                           uint64
+	Creation                      time.Time
 	previousAggregateSequence     uint64
 	previousAggregateTypeSequence uint64
 
@@ -52,12 +53,12 @@ func (e *BaseEvent) Type() EventType {
 
 // Sequence is an upcounting unique number of the event
 func (e *BaseEvent) Sequence() uint64 {
-	return e.sequence
+	return e.Seq
 }
 
 // CreationDate is the the time, the event is inserted into the eventstore
 func (e *BaseEvent) CreationDate() time.Time {
-	return e.creationDate
+	return e.Creation
 }
 
 // CreationDate is the the time, the event is inserted into the eventstore
@@ -67,7 +68,7 @@ func (e *BaseEvent) CreatedAt() time.Time {
 
 // Aggregate represents the metadata of the event's aggregate
 func (e *BaseEvent) Aggregate() *Aggregate {
-	return e.aggregate
+	return e.Agg
 }
 
 // Data returns the payload of the event. It represent the changed fields by the event
@@ -94,23 +95,17 @@ func (e *BaseEvent) Unmarshal(ptr any) error {
 }
 
 // BaseEventFromRepo maps a stored event to a BaseEvent
-func BaseEventFromRepo(event *repository.Event) *BaseEvent {
+func BaseEventFromRepo(event Event) *BaseEvent {
 	return &BaseEvent{
-		aggregate: &Aggregate{
-			ID:            event.AggregateID,
-			Type:          event.AggregateType,
-			ResourceOwner: event.ResourceOwner.String,
-			InstanceID:    event.InstanceID,
-			Version:       eventstore.Version(event.Version),
-		},
-		EventType:                     event.Typ,
-		creationDate:                  event.CreationDate,
-		sequence:                      event.Seq,
-		previousAggregateSequence:     event.PreviousAggregateSequence,
-		previousAggregateTypeSequence: event.PreviousAggregateTypeSequence,
-		Service:                       event.EditorService,
-		User:                          event.EditorUser,
-		Data:                          event.Data,
+		Agg:       event.Aggregate(),
+		EventType: event.Type(),
+		Creation:  event.CreatedAt(),
+		Seq:       event.Sequence(),
+		// previousAggregateSequence:     event.PreviousAggregateSequence,
+		// previousAggregateTypeSequence: event.PreviousAggregateTypeSequence,
+		Service: "zitadel",
+		User:    event.Creator(),
+		Data:    event.DataAsBytes(),
 	}
 }
 
@@ -119,7 +114,7 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 // afterwards the resource owner of the first previous events is taken
 func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventType) *BaseEvent {
 	return &BaseEvent{
-		aggregate: aggregate,
+		Agg:       aggregate,
 		User:      authz.GetCtxData(ctx).UserID,
 		Service:   service.FromContext(ctx),
 		EventType: typ,

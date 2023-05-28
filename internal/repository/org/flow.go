@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/flow"
 )
 
@@ -38,7 +37,7 @@ func NewTriggerActionsSetEvent(
 	}
 }
 
-func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func TriggerActionsSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := flow.TriggerActionsSetEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -68,7 +67,7 @@ func NewTriggerActionsCascadeRemovedEvent(
 	}
 }
 
-func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func TriggerActionsCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := flow.TriggerActionsCascadeRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -96,7 +95,7 @@ func NewFlowClearedEvent(
 	}
 }
 
-func FlowClearedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func FlowClearedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := flow.FlowClearedEventMapper(event)
 	if err != nil {
 		return nil, err

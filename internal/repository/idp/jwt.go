@@ -1,11 +1,8 @@
 package idp
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type JWTIDPAddedEvent struct {
@@ -46,16 +43,16 @@ func (e *JWTIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *JWTIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *JWTIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func JWTIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func JWTIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &JWTIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-Et1dq", "unable to unmarshal event")
 	}
@@ -135,16 +132,16 @@ func (e *JWTIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *JWTIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *JWTIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func JWTIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func JWTIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &JWTIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-D3gjzh", "unable to unmarshal event")
 	}

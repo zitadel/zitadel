@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -31,15 +30,16 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantMemberAddedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantMemberAddedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberAddedType,
+						project.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"roles": ["role"],
 					"grantId": "grant-id"
 				}`),
-				), project.GrantMemberAddedEventMapper),
+					), project.GrantMemberAddedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{
 				es: newMockEventStore().appendFilterResponse(
@@ -97,15 +97,16 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantMemberChangedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantMemberChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberChangedType,
+						project.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"roles": ["role", "changed"],
 					"grantId": "grant-id"
 				}`),
-				), project.GrantMemberChangedEventMapper),
+					), project.GrantMemberChangedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceChanged,
 			want: wantReduce{
@@ -132,14 +133,15 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantMemberCascadeRemovedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantMemberCascadeRemovedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberCascadeRemovedType,
+						project.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"grantId": "grant-id"
 				}`),
-				), project.GrantMemberCascadeRemovedEventMapper),
+					), project.GrantMemberCascadeRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
@@ -163,14 +165,15 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantMemberRemovedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantMemberRemovedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberRemovedType,
+						project.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"grantId": "grant-id"
 				}`),
-				), project.GrantMemberRemovedEventMapper),
+					), project.GrantMemberRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -194,11 +197,12 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "user UserRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
@@ -220,11 +224,12 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project ProjectRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectRemovedType),
-					project.AggregateType,
-					[]byte(`{}`),
-				), project.ProjectRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectRemovedType,
+						project.AggregateType,
+						[]byte(`{}`),
+					), project.ProjectRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceProjectRemoved,
 			want: wantReduce{
@@ -245,11 +250,12 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		}, {
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
@@ -270,11 +276,12 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "project GrantRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantRemovedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grant-id"}`),
-				), project.GrantRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantRemovedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grant-id"}`),
+					), project.GrantRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
@@ -297,11 +304,12 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		{
 			name: "org OrgRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					[]byte(`{}`),
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						[]byte(`{}`),
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&projectGrantMemberProjection{}).reduceOrgRemoved,
 			want: wantReduce{

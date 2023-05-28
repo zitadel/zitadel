@@ -1,12 +1,9 @@
 package idp
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type GitHubIDPAddedEvent struct {
@@ -44,16 +41,16 @@ func (e *GitHubIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GitHubIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GitHubIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GitHubIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitHubIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GitHubIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-sdfs3", "unable to unmarshal event")
 	}
@@ -125,16 +122,16 @@ func (e *GitHubIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GitHubIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GitHubIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GitHubIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitHubIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GitHubIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-Sfrth", "unable to unmarshal event")
 	}
@@ -186,16 +183,16 @@ func (e *GitHubEnterpriseIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GitHubEnterpriseIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GitHubEnterpriseIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GitHubEnterpriseIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitHubEnterpriseIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GitHubEnterpriseIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-sdfs3", "unable to unmarshal event")
 	}
@@ -288,16 +285,16 @@ func (e *GitHubEnterpriseIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GitHubEnterpriseIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GitHubEnterpriseIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GitHubEnterpriseIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitHubEnterpriseIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GitHubEnterpriseIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-ASf3r", "unable to unmarshal event")
 	}

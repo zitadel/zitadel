@@ -6,7 +6,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -38,7 +37,7 @@ func NewCustomTextSetEvent(
 	}
 }
 
-func CustomTextSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func CustomTextSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.CustomTextSetEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -67,7 +66,7 @@ func NewCustomTextRemovedEvent(
 	}
 }
 
-func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func CustomTextRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.CustomTextRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -95,7 +94,7 @@ func NewCustomTextTemplateRemovedEvent(
 	}
 }
 
-func CustomTextTemplateRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func CustomTextTemplateRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.CustomTextTemplateRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

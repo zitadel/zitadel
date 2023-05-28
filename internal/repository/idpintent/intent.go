@@ -2,13 +2,11 @@ package idpintent
 
 import (
 	"context"
-	"encoding/json"
 	"net/url"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -48,16 +46,16 @@ func (e *StartedEvent) Payload() any {
 	return e
 }
 
-func (e *StartedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *StartedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func StartedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func StartedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &StartedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-Sf3f1", "unable to unmarshal event")
 	}
@@ -99,16 +97,16 @@ func (e *SucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
 	}
@@ -141,16 +139,16 @@ func (e *FailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *FailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *FailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func FailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func FailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &FailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-Sfer3", "unable to unmarshal event")
 	}

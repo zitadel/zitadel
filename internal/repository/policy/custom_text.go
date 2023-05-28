@@ -1,13 +1,10 @@
 package policy
 
 import (
-	"encoding/json"
-
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -30,7 +27,7 @@ func (e *CustomTextSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *CustomTextSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *CustomTextSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -50,12 +47,12 @@ func NewCustomTextSetEvent(
 	}
 }
 
-func CustomTextSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func CustomTextSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &CustomTextSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "TEXT-28dwe", "unable to unmarshal custom text")
 	}
@@ -75,7 +72,7 @@ func (e *CustomTextRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *CustomTextRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *CustomTextRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -88,12 +85,12 @@ func NewCustomTextRemovedEvent(base *eventstore.BaseEvent, template, key string,
 	}
 }
 
-func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func CustomTextRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &CustomTextRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "TEXT-28sMf", "unable to unmarshal custom text removed")
 	}
@@ -112,7 +109,7 @@ func (e *CustomTextTemplateRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *CustomTextTemplateRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *CustomTextTemplateRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -124,12 +121,12 @@ func NewCustomTextTemplateRemovedEvent(base *eventstore.BaseEvent, template stri
 	}
 }
 
-func CustomTextTemplateRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func CustomTextTemplateRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &CustomTextTemplateRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "TEXT-mKKRs", "unable to unmarshal custom text message removed")
 	}

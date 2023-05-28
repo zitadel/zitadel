@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,14 +24,15 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "iam reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicyIDPProviderAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LoginPolicyIDPProviderAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
     "idpProviderType": 1
 }`),
-				), instance.IdentityProviderAddedEventMapper),
+					), instance.IdentityProviderAddedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceAdded,
 			want: wantReduce{
@@ -60,14 +60,15 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "iam reduceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicyIDPProviderRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LoginPolicyIDPProviderRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
     "idpProviderType": 1
 }`),
-				), instance.IdentityProviderRemovedEventMapper),
+					), instance.IdentityProviderRemovedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -90,14 +91,15 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "iam reduceCascadeRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LoginPolicyIDPProviderCascadeRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LoginPolicyIDPProviderCascadeRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
     "idpProviderType": 1
 }`),
-				), instance.IdentityProviderCascadeRemovedEventMapper),
+					), instance.IdentityProviderCascadeRemovedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
@@ -120,14 +122,15 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyIDPProviderAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LoginPolicyIDPProviderAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
     "idpProviderType": 1
 }`),
-				), org.IdentityProviderAddedEventMapper),
+					), org.IdentityProviderAddedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceAdded,
 			want: wantReduce{
@@ -155,14 +158,15 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyIDPProviderRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LoginPolicyIDPProviderRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
     "idpProviderType": 1
 }`),
-				), org.IdentityProviderRemovedEventMapper),
+					), org.IdentityProviderRemovedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -185,11 +189,12 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
 			want: wantReduce{
@@ -210,14 +215,15 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceCascadeRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyIDPProviderCascadeRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LoginPolicyIDPProviderCascadeRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
     "idpProviderType": 1
 }`),
-				), org.IdentityProviderCascadeRemovedEventMapper),
+					), org.IdentityProviderCascadeRemovedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
@@ -240,11 +246,12 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "reducePolicyRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LoginPolicyRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.LoginPolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LoginPolicyRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.LoginPolicyRemovedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reducePolicyRemoved,
 			want: wantReduce{
@@ -266,13 +273,14 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "org IDPConfigRemovedEvent",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPConfigRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPConfigRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"idpConfigId": "idp-config-id"
 					}`),
-				), org.IDPConfigRemovedEventMapper),
+					), org.IDPConfigRemovedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
@@ -295,13 +303,14 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "iam IDPConfigRemovedEvent",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.IDPConfigRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.IDPConfigRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"idpConfigId": "idp-config-id"
 					}`),
-				), instance.IDPConfigRemovedEventMapper),
+					), instance.IDPConfigRemovedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
@@ -323,13 +332,14 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "org IDPRemovedEvent",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.IDPRemovedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.IDPRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"id": "id"
 					}`),
-				), org.IDPRemovedEventMapper),
+					), org.IDPRemovedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPRemoved,
 			want: wantReduce{
@@ -352,13 +362,14 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		{
 			name: "iam IDPRemovedEvent",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.IDPRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.IDPRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id"
 					}`),
-				), instance.IDPRemovedEventMapper),
+					), instance.IDPRemovedEventMapper),
 			},
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPRemoved,
 			want: wantReduce{
@@ -381,11 +392,12 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&idpLoginPolicyLinkProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),

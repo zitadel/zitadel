@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"regexp"
 	"strconv"
@@ -14,8 +15,10 @@ import (
 	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -111,39 +114,66 @@ func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
 
 // push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
-func (db *CRDB) push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
-	err := crdb.ExecuteTx(ctx, db.DB.DB, nil, func(tx *sql.Tx) error {
+func (db *CRDB) push(ctx context.Context, commands []eventstore.Command) (events []eventstore.Event, err error) {
+	events = make([]eventstore.Event, len(commands))
+
+	err = crdb.ExecuteTx(ctx, db.DB.DB, nil, func(tx *sql.Tx) error {
 
 		var (
 			previousAggregateSequence     Sequence
 			previousAggregateTypeSequence Sequence
 		)
-		for _, event := range events {
-			err := tx.QueryRowContext(ctx, crdbInsert,
-				event.Typ,
-				event.AggregateType,
-				event.AggregateID,
-				event.Version,
-				Data(event.Data),
-				event.EditorUser,
-				event.EditorService,
-				event.ResourceOwner,
-				event.InstanceID,
-			).Scan(&event.ID, &event.Seq, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner, &event.InstanceID)
 
-			event.PreviousAggregateSequence = uint64(previousAggregateSequence)
-			event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
+		var uniqueConstraints []*eventstore.UniqueConstraint
+
+		for i, command := range commands {
+			var data Data
+			if command.Payload() != nil {
+				data, err = json.Marshal(command.Payload())
+				if err != nil {
+					return err
+				}
+			}
+			e := &repository.Event{
+				Typ:           command.Type(),
+				EditorService: "zitadel",
+				Data:          data,
+				EditorUser:    command.Creator(),
+				Version:       command.Aggregate().Version,
+				AggregateID:   command.Aggregate().ID,
+				AggregateType: command.Aggregate().Type,
+				ResourceOwner: sql.NullString{String: command.Aggregate().ResourceOwner, Valid: command.Aggregate().ResourceOwner != ""},
+				InstanceID:    command.Aggregate().InstanceID,
+			}
+
+			err := tx.QueryRowContext(ctx, crdbInsert,
+				e.Type(),
+				e.Aggregate().Type,
+				e.Aggregate().ID,
+				e.Aggregate().Version,
+				data,
+				e.Creator(),
+				"zitadel",
+				e.Aggregate().ResourceOwner,
+				e.Aggregate().InstanceID,
+			).Scan(&e.ID, &e.Seq, &previousAggregateSequence, &previousAggregateTypeSequence, &e.CreationDate, &e.ResourceOwner, &e.InstanceID)
+
+			e.PreviousAggregateSequence = uint64(previousAggregateSequence)
+			e.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
 
 			if err != nil {
 				logging.WithFields(
-					"aggregate", event.AggregateType,
-					"aggregateId", event.AggregateID,
-					"aggregateType", event.AggregateType,
-					"eventType", event.Typ,
-					"instanceID", event.InstanceID,
+					"aggregate", e.Aggregate().Type,
+					"aggregateId", e.Aggregate().ID,
+					"aggregateType", e.Aggregate().Type,
+					"eventType", e.Type(),
+					"instanceID", e.Aggregate().InstanceID,
 				).WithError(err).Info("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
+
+			uniqueConstraints = append(uniqueConstraints, command.UniqueConstraints()...)
+			events[i] = e
 		}
 
 		err := db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
@@ -156,7 +186,7 @@ func (db *CRDB) push(ctx context.Context, events []*repository.Event, uniqueCons
 		err = caos_errs.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
 	}
 
-	return err
+	return events, err
 }
 
 var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
@@ -179,7 +209,7 @@ func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
 }
 
 // handleUniqueConstraints adds or removes unique constraints
-func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*repository.UniqueConstraint) (err error) {
+func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*eventstore.UniqueConstraint) (err error) {
 	if len(uniqueConstraints) == 0 || (len(uniqueConstraints) == 1 && uniqueConstraints[0] == nil) {
 		return nil
 	}
@@ -187,8 +217,8 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 	for _, uniqueConstraint := range uniqueConstraints {
 		uniqueConstraint.UniqueField = strings.ToLower(uniqueConstraint.UniqueField)
 		switch uniqueConstraint.Action {
-		case repository.UniqueConstraintAdd:
-			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
+		case eventstore.UniqueConstraintAdd:
+			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, authz.GetInstance(ctx).InstanceID())
 			if err != nil {
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
@@ -200,19 +230,19 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 
 				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint")
 			}
-		case repository.UniqueConstraintRemoved:
-			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
+		case eventstore.UniqueConstraintRemove:
+			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, authz.GetInstance(ctx).InstanceID())
 			if err != nil {
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
 				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint")
 			}
-		case repository.UniqueConstraintInstanceRemoved:
-			_, err := tx.ExecContext(ctx, uniqueDeleteInstance, uniqueConstraint.InstanceID)
+		case eventstore.UniqueConstraintInstanceRemove:
+			_, err := tx.ExecContext(ctx, uniqueDeleteInstance, authz.GetInstance(ctx).InstanceID())
 			if err != nil {
 				logging.WithFields(
-					"instance_id", uniqueConstraint.InstanceID).WithError(err).Info("delete instance unique constraints failed")
+					"instance_id", authz.GetInstance(ctx).InstanceID()).WithError(err).Info("delete instance unique constraints failed")
 				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraints of instance")
 			}
 		}
@@ -221,8 +251,8 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 }
 
 // Filter returns all events matching the given search query
-func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error) {
-	events = []*repository.Event{}
+func (db *CRDB) Filter(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (events []eventstore.Event, err error) {
+	events = make([]eventstore.Event, 0, searchQuery.GetLimit())
 	err = query(ctx, db, searchQuery, &events)
 	if err != nil {
 		return nil, err
@@ -232,14 +262,14 @@ func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery)
 }
 
 // LatestSequence returns the latest sequence found by the search query
-func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (time.Time, error) {
+func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (time.Time, error) {
 	var createdAt sql.NullTime
 	err := query(ctx, db, searchQuery, &createdAt)
 	return createdAt.Time, err
 }
 
 // InstanceIDs returns the instance ids found by the search query
-func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQuery) ([]string, error) {
+func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) ([]string, error) {
 	var ids []string
 	err := query(ctx, db, searchQuery, &ids)
 	if err != nil {

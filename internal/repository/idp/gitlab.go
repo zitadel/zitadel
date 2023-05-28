@@ -1,12 +1,9 @@
 package idp
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type GitLabIDPAddedEvent struct {
@@ -44,16 +41,16 @@ func (e *GitLabIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GitLabIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GitLabIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GitLabIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitLabIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GitLabIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-KLewio", "unable to unmarshal event")
 	}
@@ -126,16 +123,16 @@ func (e *GitLabIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GitLabIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GitLabIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GitLabIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitLabIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GitLabIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-Sfhjk", "unable to unmarshal event")
 	}
@@ -181,16 +178,16 @@ func (e *GitLabSelfHostedIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GitLabSelfHostedIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GitLabSelfHostedIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GitLabSelfHostedIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitLabSelfHostedIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GitLabSelfHostedIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-S1efv", "unable to unmarshal event")
 	}
@@ -270,16 +267,16 @@ func (e *GitLabSelfHostedIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GitLabSelfHostedIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GitLabSelfHostedIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func GitLabSelfHostedIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitLabSelfHostedIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GitLabSelfHostedIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IDP-SFrhj", "unable to unmarshal event")
 	}

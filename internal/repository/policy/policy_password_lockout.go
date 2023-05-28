@@ -1,12 +1,8 @@
 package policy
 
 import (
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -26,7 +22,7 @@ func (e *LockoutPolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LockoutPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LockoutPolicyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -43,12 +39,12 @@ func NewLockoutPolicyAddedEvent(
 	}
 }
 
-func LockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LockoutPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &LockoutPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-8XiVd", "unable to unmarshal policy")
 	}
@@ -67,7 +63,7 @@ func (e *LockoutPolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *LockoutPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LockoutPolicyChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -101,12 +97,12 @@ func ChangeShowLockOutFailures(showLockOutFailures bool) func(*LockoutPolicyChan
 	}
 }
 
-func LockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LockoutPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &LockoutPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-lWGRc", "unable to unmarshal policy")
 	}
@@ -122,7 +118,7 @@ func (e *LockoutPolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *LockoutPolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *LockoutPolicyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -132,7 +128,7 @@ func NewLockoutPolicyRemovedEvent(base *eventstore.BaseEvent) *LockoutPolicyRemo
 	}
 }
 
-func LockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LockoutPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &LockoutPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

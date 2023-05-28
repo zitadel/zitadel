@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,11 +24,12 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDomainAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainAddedEventType),
-					org.AggregateType,
-					[]byte(`{"domain": "domain.new"}`),
-				), org.DomainAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgDomainAddedEventType,
+						org.AggregateType,
+						[]byte(`{"domain": "domain.new"}`),
+					), org.DomainAddedEventMapper),
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainAdded,
 			want: wantReduce{
@@ -58,11 +58,12 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDomainVerificationAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainVerificationAddedEventType),
-					org.AggregateType,
-					[]byte(`{"domain": "domain.new", "validationType": 2}`),
-				), org.DomainVerificationAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgDomainVerificationAddedEventType,
+						org.AggregateType,
+						[]byte(`{"domain": "domain.new", "validationType": 2}`),
+					), org.DomainVerificationAddedEventMapper),
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainVerificationAdded,
 			want: wantReduce{
@@ -88,11 +89,12 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDomainVerified",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainVerifiedEventType),
-					org.AggregateType,
-					[]byte(`{"domain": "domain.new"}`),
-				), org.DomainVerifiedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgDomainVerifiedEventType,
+						org.AggregateType,
+						[]byte(`{"domain": "domain.new"}`),
+					), org.DomainVerifiedEventMapper),
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainVerified,
 			want: wantReduce{
@@ -118,11 +120,12 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 		{
 			name: "reducePrimaryDomainSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPrimarySetEventType),
-					org.AggregateType,
-					[]byte(`{"domain": "domain.new"}`),
-				), org.DomainPrimarySetEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgDomainPrimarySetEventType,
+						org.AggregateType,
+						[]byte(`{"domain": "domain.new"}`),
+					), org.DomainPrimarySetEventMapper),
 			},
 			reduce: (&orgDomainProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
@@ -159,11 +162,12 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDomainRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainRemovedEventType),
-					org.AggregateType,
-					[]byte(`{"domain": "domain.new"}`),
-				), org.DomainRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgDomainRemovedEventType,
+						org.AggregateType,
+						[]byte(`{"domain": "domain.new"}`),
+					), org.DomainRemovedEventMapper),
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainRemoved,
 			want: wantReduce{
@@ -187,11 +191,12 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&orgDomainProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),
@@ -215,11 +220,12 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(OrgDomainInstanceIDCol),
 			want: wantReduce{

@@ -35,7 +35,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	return es
 }
 
-func expectFilter(events ...*repository.Event) expect {
+func expectFilter(events ...eventstore.Event) expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectFilterEvents(events...)
 	}
@@ -49,13 +49,13 @@ func eventFromEventPusher(event eventstore.Command) *repository.Event {
 		PreviousAggregateSequence:     0,
 		PreviousAggregateTypeSequence: 0,
 		CreationDate:                  time.Time{},
-		Typ:                           repository.EventType(event.Type()),
+		Typ:                           event.Type(),
 		Data:                          data,
 		EditorService:                 "zitadel",
 		EditorUser:                    event.Creator(),
-		Version:                       repository.Version(event.Aggregate().Version),
+		Version:                       event.Aggregate().Version,
 		AggregateID:                   event.Aggregate().ID,
-		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
+		AggregateType:                 eventstore.AggregateType(event.Aggregate().Type),
 		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 	}
 }

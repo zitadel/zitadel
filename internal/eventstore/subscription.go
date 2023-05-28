@@ -1,13 +1,9 @@
 package eventstore
 
 import (
-	"database/sql"
 	"sync"
 
 	"github.com/zitadel/logging"
-
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 var (
@@ -60,9 +56,8 @@ func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventT
 	return sub
 }
 
-func (es *Eventstore) notify(events []eventstore.Event) {
-	repoEvents := mapEventsToRepo(events)
-	eventReaders, err := es.mapEvents(repoEvents)
+func (es *Eventstore) notify(events []Event) {
+	eventReaders, err := es.mapEvents(events)
 	if err != nil {
 		logging.WithError(err).Debug("unable to map events")
 		return
@@ -115,25 +110,25 @@ func (s *Subscription) Unsubscribe() {
 	}
 }
 
-func mapEventsToRepo(events []eventstore.Event) []*repository.Event {
-	repoEvents := make([]*repository.Event, len(events))
-	for i, event := range events {
-		repoEvents[i] = &repository.Event{
-			Seq:           event.Sequence(),
-			CreationDate:  event.CreatedAt(),
-			Typ:           event.Type(),
-			EditorService: "zitadel",
-			EditorUser:    event.Creator(),
-			Version:       repository.Version(event.Aggregate().Version),
-			AggregateID:   event.Aggregate().ID,
-			AggregateType: event.Aggregate().Type,
-			ResourceOwner: sql.NullString{
-				String: event.Aggregate().ResourceOwner,
-				Valid:  event.Aggregate().ResourceOwner != "",
-			},
-			InstanceID: event.Aggregate().InstanceID,
-			Data:       event.DataAsBytes(),
-		}
-	}
-	return repoEvents
-}
+// func mapEventsToRepo(events []Event) []*repository.Event {
+// 	repoEvents := make([]*repository.Event, len(events))
+// 	for i, event := range events {
+// 		repoEvents[i] = &repository.Event{
+// 			Seq:           event.Sequence(),
+// 			CreationDate:  event.CreatedAt(),
+// 			Typ:           event.Type(),
+// 			EditorService: "zitadel",
+// 			EditorUser:    event.Creator(),
+// 			Version:       repository.Version(event.Aggregate().Version),
+// 			AggregateID:   event.Aggregate().ID,
+// 			AggregateType: event.Aggregate().Type,
+// 			ResourceOwner: sql.NullString{
+// 				String: event.Aggregate().ResourceOwner,
+// 				Valid:  event.Aggregate().ResourceOwner != "",
+// 			},
+// 			InstanceID: event.Aggregate().InstanceID,
+// 			Data:       event.DataAsBytes(),
+// 		}
+// 	}
+// 	return repoEvents
+// }

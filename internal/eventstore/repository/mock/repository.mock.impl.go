@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
@@ -35,7 +34,7 @@ func (m *MockRepository) ExpectFilterNoEventsNoError() *MockRepository {
 	return m
 }
 
-func (m *MockRepository) ExpectFilterEvents(events ...*repository.Event) *MockRepository {
+func (m *MockRepository) ExpectFilterEvents(events ...eventstore.Event) *MockRepository {
 	m.MockQuerier.ctrl.T.Helper()
 
 	m.MockQuerier.EXPECT().Filter(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -154,8 +153,14 @@ func (e *mockEvent) DataAsBytes() []byte {
 }
 
 func (e *mockEvent) Unmarshal(ptr any) error {
-	reflect.ValueOf(ptr).Set(reflect.ValueOf(e.Command.Payload()))
-	return nil
+	if e.Payload() == nil {
+		return nil
+	}
+	payload, err := json.Marshal(e.Payload())
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(payload, ptr)
 }
 
 func (e *mockEvent) Sequence() uint64 {

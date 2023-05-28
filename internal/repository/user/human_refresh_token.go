@@ -2,13 +2,10 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -37,7 +34,7 @@ func (e *HumanRefreshTokenAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanRefreshTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanRefreshTokenAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -78,11 +75,11 @@ func NewHumanRefreshTokenAddedEvent(
 	}
 }
 
-func HumanRefreshTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanRefreshTokenAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	refreshTokenAdded := &HumanRefreshTokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, refreshTokenAdded)
+	err := event.Unmarshal(refreshTokenAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-DGr14", "unable to unmarshal refresh token added")
 	}
@@ -102,7 +99,7 @@ func (e *HumanRefreshTokenRenewedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanRefreshTokenRenewedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanRefreshTokenRenewedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -129,11 +126,11 @@ func NewHumanRefreshTokenRenewedEvent(
 	}
 }
 
-func HumanRefreshTokenRenewedEventEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanRefreshTokenRenewedEventEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	tokenAdded := &HumanRefreshTokenRenewedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, tokenAdded)
+	err := event.Unmarshal(tokenAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-GBt21", "unable to unmarshal refresh token renewed")
 	}
@@ -151,7 +148,7 @@ func (e *HumanRefreshTokenRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanRefreshTokenRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanRefreshTokenRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -174,11 +171,11 @@ func NewHumanRefreshTokenRemovedEvent(
 	}
 }
 
-func HumanRefreshTokenRemovedEventEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanRefreshTokenRemovedEventEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	tokenAdded := &HumanRefreshTokenRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, tokenAdded)
+	err := event.Unmarshal(tokenAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Dggs2", "unable to unmarshal refresh token removed")
 	}

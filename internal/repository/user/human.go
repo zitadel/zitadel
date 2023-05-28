@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"golang.org/x/text/language"
@@ -11,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -56,8 +54,8 @@ func (e *HumanAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
+func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
 }
 
 func (e *HumanAddedEvent) AddAddressData(
@@ -120,11 +118,11 @@ func NewHumanAddedEvent(
 	}
 }
 
-func HumanAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	humanAdded := &HumanAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, humanAdded)
+	err := event.Unmarshal(humanAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-5Gm9s", "unable to unmarshal human added")
 	}
@@ -157,8 +155,8 @@ func (e *HumanRegisteredEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
+func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
 }
 
 func (e *HumanRegisteredEvent) AddAddressData(
@@ -221,11 +219,11 @@ func NewHumanRegisteredEvent(
 	}
 }
 
-func HumanRegisteredEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanRegisteredEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	humanRegistered := &HumanRegisteredEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, humanRegistered)
+	err := event.Unmarshal(humanRegistered)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-3Vm9s", "unable to unmarshal human registered")
 	}
@@ -243,7 +241,7 @@ func (e *HumanInitialCodeAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanInitialCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanInitialCodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -264,11 +262,11 @@ func NewHumanInitialCodeAddedEvent(
 	}
 }
 
-func HumanInitialCodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanInitialCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	humanRegistered := &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, humanRegistered)
+	err := event.Unmarshal(humanRegistered)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-bM9se", "unable to unmarshal human initial code added")
 	}
@@ -284,7 +282,7 @@ func (e *HumanInitialCodeSentEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanInitialCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanInitialCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -298,7 +296,7 @@ func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Agg
 	}
 }
 
-func HumanInitialCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanInitialCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -312,7 +310,7 @@ func (e *HumanInitializedCheckSucceededEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanInitializedCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanInitializedCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -326,7 +324,7 @@ func NewHumanInitializedCheckSucceededEvent(ctx context.Context, aggregate *even
 	}
 }
 
-func HumanInitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanInitializedCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanInitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -340,7 +338,7 @@ func (e *HumanInitializedCheckFailedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanInitializedCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanInitializedCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -354,7 +352,7 @@ func NewHumanInitializedCheckFailedEvent(ctx context.Context, aggregate *eventst
 	}
 }
 
-func HumanInitializedCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanInitializedCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -370,7 +368,7 @@ func (e *HumanSignedOutEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanSignedOutEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanSignedOutEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -389,11 +387,11 @@ func NewHumanSignedOutEvent(
 	}
 }
 
-func HumanSignedOutEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanSignedOutEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	signedOut := &HumanSignedOutEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, signedOut)
+	err := event.Unmarshal(signedOut)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-WFS3g", "unable to unmarshal human signed out")
 	}

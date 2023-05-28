@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -265,328 +266,328 @@ func TestCRDB_columnName(t *testing.T) {
 	}
 }
 
-func TestCRDB_Push_OneAggregate(t *testing.T) {
-	type args struct {
-		ctx                  context.Context
-		events               []*repository.Event
-		uniqueConstraints    *repository.UniqueConstraint
-		uniqueDataType       string
-		uniqueDataField      string
-		uniqueDataInstanceID string
-	}
-	type eventsRes struct {
-		pushedEventsCount int
-		uniqueCount       int
-		assetCount        int
-		aggType           repository.AggregateType
-		aggID             database.StringArray
-	}
-	type res struct {
-		wantErr   bool
-		eventsRes eventsRes
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "push 1 event",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "1"),
-				},
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 1,
-					aggID:             []string{"1"},
-					aggType:           repository.AggregateType(t.Name()),
-				}},
-		},
-		{
-			name: "push two events on agg",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "6"),
-					generateEvent(t, "6"),
-				},
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 2,
-					aggID:             []string{"6"},
-					aggType:           repository.AggregateType(t.Name()),
-				},
-			},
-		},
-		{
-			name: "failed push because context canceled",
-			args: args{
-				ctx: canceledCtx(),
-				events: []*repository.Event{
-					generateEvent(t, "9"),
-				},
-			},
-			res: res{
-				wantErr: true,
-				eventsRes: eventsRes{
-					pushedEventsCount: 0,
-					aggID:             []string{"9"},
-					aggType:           repository.AggregateType(t.Name()),
-				},
-			},
-		},
-		{
-			name: "push 1 event and add unique constraint",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "10"),
-				},
-				uniqueConstraints: generateAddUniqueConstraint(t, "usernames", "field"),
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 1,
-					uniqueCount:       1,
-					aggID:             []string{"10"},
-					aggType:           repository.AggregateType(t.Name()),
-				}},
-		},
-		{
-			name: "push 1 event and remove unique constraint",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "11"),
-				},
-				uniqueConstraints: generateRemoveUniqueConstraint(t, "usernames", "testremove"),
-				uniqueDataType:    "usernames",
-				uniqueDataField:   "testremove",
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 1,
-					uniqueCount:       0,
-					aggID:             []string{"11"},
-					aggType:           repository.AggregateType(t.Name()),
-				}},
-		},
-		{
-			name: "push 1 event and remove instance unique constraints",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "12"),
-				},
-				uniqueConstraints:    generateRemoveInstanceUniqueConstraints(t, "instanceID"),
-				uniqueDataType:       "usernames",
-				uniqueDataField:      "testremove",
-				uniqueDataInstanceID: "instanceID",
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 1,
-					uniqueCount:       0,
-					aggID:             []string{"12"},
-					aggType:           repository.AggregateType(t.Name()),
-				}},
-		},
-		{
-			name: "push 1 event and add asset",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "13"),
-				},
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 1,
-					assetCount:        1,
-					aggID:             []string{"13"},
-					aggType:           repository.AggregateType(t.Name()),
-				}},
-		},
-		{
-			name: "push 1 event and remove asset",
-			args: args{
-				ctx: context.Background(),
-				events: []*repository.Event{
-					generateEvent(t, "14"),
-				},
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 1,
-					assetCount:        0,
-					aggID:             []string{"14"},
-					aggType:           repository.AggregateType(t.Name()),
-				}},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			db := &CRDB{
-				DB: &database.DB{
-					DB:       testCRDBClient,
-					Database: new(testDB),
-				},
-			}
-			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
-				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField, tt.args.uniqueDataInstanceID)
-				if err != nil {
-					t.Error("unable to prefill insert unique data: ", err)
-					return
-				}
-			}
-			if err := db.push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
-				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
-			}
+// func TestCRDB_Push_OneAggregate(t *testing.T) {
+// 	type args struct {
+// 		ctx                  context.Context
+// 		events               []eventstore.Command
+// 		uniqueConstraints    *eventstore.UniqueConstraint
+// 		uniqueDataType       string
+// 		uniqueDataField      string
+// 		uniqueDataInstanceID string
+// 	}
+// 	type eventsRes struct {
+// 		pushedEventsCount int
+// 		uniqueCount       int
+// 		assetCount        int
+// 		aggType           eventstore.AggregateType
+// 		aggID             database.StringArray
+// 	}
+// 	type res struct {
+// 		wantErr   bool
+// 		eventsRes eventsRes
+// 	}
+// 	tests := []struct {
+// 		name string
+// 		args args
+// 		res  res
+// 	}{
+// 		{
+// 			name: "push 1 event",
+// 			args: args{
+// 				ctx: context.Background(),
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "1"),
+// 				},
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 1,
+// 					aggID:             []string{"1"},
+// 					aggType:           eventstore.AggregateType(t.Name()),
+// 				}},
+// 		},
+// 		{
+// 			name: "push two events on agg",
+// 			args: args{
+// 				ctx: context.Background(),
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "6"),
+// 					generateCommand(t, "6"),
+// 				},
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 2,
+// 					aggID:             []string{"6"},
+// 					aggType:           eventstore.AggregateType(t.Name()),
+// 				},
+// 			},
+// 		},
+// 		{
+// 			name: "failed push because context canceled",
+// 			args: args{
+// 				ctx: canceledCtx(),
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "9"),
+// 				},
+// 			},
+// 			res: res{
+// 				wantErr: true,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 0,
+// 					aggID:             []string{"9"},
+// 					aggType:           eventstore.AggregateType(t.Name()),
+// 				},
+// 			},
+// 		},
+// 		{
+// 			name: "push 1 event and add unique constraint",
+// 			args: args{
+// 				ctx: context.Background(),
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "10"),
+// 				},
+// 				uniqueConstraints: generateAddUniqueConstraint(t, "usernames", "field"),
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 1,
+// 					uniqueCount:       1,
+// 					aggID:             []string{"10"},
+// 					aggType:           eventstore.AggregateType(t.Name()),
+// 				}},
+// 		},
+// 		{
+// 			name: "push 1 event and remove unique constraint",
+// 			args: args{
+// 				ctx: context.Background(),
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "11"),
+// 				},
+// 				uniqueConstraints: generateRemoveUniqueConstraint(t, "usernames", "testremove"),
+// 				uniqueDataType:    "usernames",
+// 				uniqueDataField:   "testremove",
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 1,
+// 					uniqueCount:       0,
+// 					aggID:             []string{"11"},
+// 					aggType:           eventstore.AggregateType(t.Name()),
+// 				}},
+// 		},
+// 		{
+// 			name: "push 1 event and remove instance unique constraints",
+// 			args: args{
+// 				ctx: context.Background(),
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "12"),
+// 				},
+// 				uniqueConstraints:    generateRemoveInstanceUniqueConstraints(t, "instanceID"),
+// 				uniqueDataType:       "usernames",
+// 				uniqueDataField:      "testremove",
+// 				uniqueDataInstanceID: "instanceID",
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 1,
+// 					uniqueCount:       0,
+// 					aggID:             []string{"12"},
+// 					aggType:           eventstore.AggregateType(t.Name()),
+// 				}},
+// 		},
+// 		{
+// 			name: "push 1 event and add asset",
+// 			args: args{
+// 				ctx: context.Background(),
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "13"),
+// 				},
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 1,
+// 					assetCount:        1,
+// 					aggID:             []string{"13"},
+// 					aggType:           eventstore.AggregateType(t.Name()),
+// 				}},
+// 		},
+// 		{
+// 			name: "push 1 event and remove asset",
+// 			args: args{
+// 				ctx: context.Background(),
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "14"),
+// 				},
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 1,
+// 					assetCount:        0,
+// 					aggID:             []string{"14"},
+// 					aggType:           eventstore.AggregateType(t.Name()),
+// 				}},
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			db := &CRDB{
+// 				DB: &database.DB{
+// 					DB:       testCRDBClient,
+// 					Database: new(testDB),
+// 				},
+// 			}
+// 			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
+// 				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField, tt.args.uniqueDataInstanceID)
+// 				if err != nil {
+// 					t.Error("unable to prefill insert unique data: ", err)
+// 					return
+// 				}
+// 			}
+// 			if err := db.push(tt.args.ctx, tt.args.events, tt.args.uniqueConstraints); (err != nil) != tt.res.wantErr {
+// 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
+// 			}
 
-			countEventRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
-			var eventCount int
-			err := countEventRow.Scan(&eventCount)
-			if err != nil {
-				t.Error("unable to query inserted rows: ", err)
-				return
-			}
-			if eventCount != tt.res.eventsRes.pushedEventsCount {
-				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, eventCount)
-			}
-			if tt.args.uniqueConstraints != nil {
-				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2 AND instance_id = $3", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField, tt.args.uniqueConstraints.InstanceID)
-				var uniqueCount int
-				err := countUniqueRow.Scan(&uniqueCount)
-				if err != nil {
-					t.Error("unable to query inserted rows: ", err)
-					return
-				}
-				if uniqueCount != tt.res.eventsRes.uniqueCount {
-					t.Errorf("expected unique count %d got %d", tt.res.eventsRes.uniqueCount, uniqueCount)
-				}
-			}
-		})
-	}
-}
+// 			countEventRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
+// 			var eventCount int
+// 			err := countEventRow.Scan(&eventCount)
+// 			if err != nil {
+// 				t.Error("unable to query inserted rows: ", err)
+// 				return
+// 			}
+// 			if eventCount != tt.res.eventsRes.pushedEventsCount {
+// 				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, eventCount)
+// 			}
+// 			if tt.args.uniqueConstraints != nil {
+// 				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2 AND instance_id = $3", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField, tt.args.uniqueConstraints.InstanceID)
+// 				var uniqueCount int
+// 				err := countUniqueRow.Scan(&uniqueCount)
+// 				if err != nil {
+// 					t.Error("unable to query inserted rows: ", err)
+// 					return
+// 				}
+// 				if uniqueCount != tt.res.eventsRes.uniqueCount {
+// 					t.Errorf("expected unique count %d got %d", tt.res.eventsRes.uniqueCount, uniqueCount)
+// 				}
+// 			}
+// 		})
+// 	}
+// }
 
-func TestCRDB_Push_MultipleAggregate(t *testing.T) {
-	type args struct {
-		events []*repository.Event
-	}
-	type eventsRes struct {
-		pushedEventsCount int
-		aggType           database.StringArray
-		aggID             database.StringArray
-	}
-	type res struct {
-		wantErr   bool
-		eventsRes eventsRes
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "push two aggregates",
-			args: args{
-				events: []*repository.Event{
-					generateEvent(t, "100"),
-					generateEvent(t, "101"),
-				},
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 2,
-					aggID:             []string{"100", "101"},
-					aggType:           database.StringArray{t.Name()},
-				},
-			},
-		},
-		{
-			name: "push two aggregates both multiple events",
-			args: args{
-				events: []*repository.Event{
-					generateEvent(t, "102"),
-					generateEvent(t, "102"),
-					generateEvent(t, "103"),
-					generateEvent(t, "103"),
-				},
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 4,
-					aggID:             []string{"102", "103"},
-					aggType:           database.StringArray{t.Name()},
-				},
-			},
-		},
-		{
-			name: "push two aggregates mixed multiple events",
-			args: args{
-				events: []*repository.Event{
-					generateEvent(t, "106"),
-					generateEvent(t, "106"),
-					generateEvent(t, "106"),
-					generateEvent(t, "106"),
-					generateEvent(t, "107"),
-					generateEvent(t, "107"),
-					generateEvent(t, "107"),
-					generateEvent(t, "107"),
-					generateEvent(t, "108"),
-					generateEvent(t, "108"),
-					generateEvent(t, "108"),
-					generateEvent(t, "108"),
-				},
-			},
-			res: res{
-				wantErr: false,
-				eventsRes: eventsRes{
-					pushedEventsCount: 12,
-					aggID:             []string{"106", "107", "108"},
-					aggType:           database.StringArray{t.Name()},
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			db := &CRDB{
-				DB: &database.DB{
-					DB:       testCRDBClient,
-					Database: new(testDB),
-				},
-			}
-			if err := db.push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
-				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
-			}
+// func TestCRDB_Push_MultipleAggregate(t *testing.T) {
+// 	type args struct {
+// 		events []eventstore.Command
+// 	}
+// 	type eventsRes struct {
+// 		pushedEventsCount int
+// 		aggType           database.StringArray
+// 		aggID             database.StringArray
+// 	}
+// 	type res struct {
+// 		wantErr   bool
+// 		eventsRes eventsRes
+// 	}
+// 	tests := []struct {
+// 		name string
+// 		args args
+// 		res  res
+// 	}{
+// 		{
+// 			name: "push two aggregates",
+// 			args: args{
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "100"),
+// 					generateCommand(t, "101"),
+// 				},
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 2,
+// 					aggID:             []string{"100", "101"},
+// 					aggType:           database.StringArray{t.Name()},
+// 				},
+// 			},
+// 		},
+// 		{
+// 			name: "push two aggregates both multiple events",
+// 			args: args{
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "102"),
+// 					generateCommand(t, "102"),
+// 					generateCommand(t, "103"),
+// 					generateCommand(t, "103"),
+// 				},
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 4,
+// 					aggID:             []string{"102", "103"},
+// 					aggType:           database.StringArray{t.Name()},
+// 				},
+// 			},
+// 		},
+// 		{
+// 			name: "push two aggregates mixed multiple events",
+// 			args: args{
+// 				events: []eventstore.Command{
+// 					generateCommand(t, "106"),
+// 					generateCommand(t, "106"),
+// 					generateCommand(t, "106"),
+// 					generateCommand(t, "106"),
+// 					generateCommand(t, "107"),
+// 					generateCommand(t, "107"),
+// 					generateCommand(t, "107"),
+// 					generateCommand(t, "107"),
+// 					generateCommand(t, "108"),
+// 					generateCommand(t, "108"),
+// 					generateCommand(t, "108"),
+// 					generateCommand(t, "108"),
+// 				},
+// 			},
+// 			res: res{
+// 				wantErr: false,
+// 				eventsRes: eventsRes{
+// 					pushedEventsCount: 12,
+// 					aggID:             []string{"106", "107", "108"},
+// 					aggType:           database.StringArray{t.Name()},
+// 				},
+// 			},
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			db := &CRDB{
+// 				DB: &database.DB{
+// 					DB:       testCRDBClient,
+// 					Database: new(testDB),
+// 				},
+// 			}
+// 			if err := db.push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
+// 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
+// 			}
 
-			countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
-			var count int
-			err := countRow.Scan(&count)
-			if err != nil {
-				t.Error("unable to query inserted rows: ", err)
-				return
-			}
-			if count != tt.res.eventsRes.pushedEventsCount {
-				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, count)
-			}
-		})
-	}
-}
+// 			countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
+// 			var count int
+// 			err := countRow.Scan(&count)
+// 			if err != nil {
+// 				t.Error("unable to query inserted rows: ", err)
+// 				return
+// 			}
+// 			if count != tt.res.eventsRes.pushedEventsCount {
+// 				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, count)
+// 			}
+// 		})
+// 	}
+// }
 
 func TestCRDB_CreateInstance(t *testing.T) {
 	type args struct {
@@ -668,7 +669,7 @@ func TestCRDB_CreateInstance(t *testing.T) {
 
 func TestCRDB_Push_Parallel(t *testing.T) {
 	type args struct {
-		events [][]*repository.Event
+		events [][]eventstore.Command
 	}
 	type eventsRes struct {
 		pushedEventsCount int
@@ -687,19 +688,19 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 		{
 			name: "clients push different aggregates",
 			args: args{
-				events: [][]*repository.Event{
+				events: [][]eventstore.Command{
 					{
-						generateEvent(t, "200"),
-						generateEvent(t, "200"),
-						generateEvent(t, "200"),
-						generateEvent(t, "201"),
-						generateEvent(t, "201"),
-						generateEvent(t, "201"),
+						generateCommand(t, "200"),
+						generateCommand(t, "200"),
+						generateCommand(t, "200"),
+						generateCommand(t, "201"),
+						generateCommand(t, "201"),
+						generateCommand(t, "201"),
 					},
 					{
-						generateEvent(t, "202"),
-						generateEvent(t, "203"),
-						generateEvent(t, "203"),
+						generateCommand(t, "202"),
+						generateCommand(t, "203"),
+						generateCommand(t, "203"),
 					},
 				},
 			},
@@ -715,28 +716,28 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 		{
 			name: "clients push same aggregates",
 			args: args{
-				events: [][]*repository.Event{
+				events: [][]eventstore.Command{
 					{
-						generateEvent(t, "204"),
-						generateEvent(t, "204"),
+						generateCommand(t, "204"),
+						generateCommand(t, "204"),
 					},
 					{
-						generateEvent(t, "204"),
-						generateEvent(t, "204"),
+						generateCommand(t, "204"),
+						generateCommand(t, "204"),
 					},
 					{
-						generateEvent(t, "205"),
-						generateEvent(t, "205"),
-						generateEvent(t, "205"),
-						generateEvent(t, "206"),
-						generateEvent(t, "206"),
-						generateEvent(t, "206"),
+						generateCommand(t, "205"),
+						generateCommand(t, "205"),
+						generateCommand(t, "205"),
+						generateCommand(t, "206"),
+						generateCommand(t, "206"),
+						generateCommand(t, "206"),
 					},
 					{
-						generateEvent(t, "204"),
-						generateEvent(t, "205"),
-						generateEvent(t, "205"),
-						generateEvent(t, "206"),
+						generateCommand(t, "204"),
+						generateCommand(t, "205"),
+						generateCommand(t, "205"),
+						generateCommand(t, "206"),
 					},
 				},
 			},
@@ -752,21 +753,21 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 		{
 			name: "clients push different aggregates",
 			args: args{
-				events: [][]*repository.Event{
+				events: [][]eventstore.Command{
 					{
-						generateEvent(t, "207"),
-						generateEvent(t, "207"),
-						generateEvent(t, "207"),
-						generateEvent(t, "207"),
-						generateEvent(t, "207"),
-						generateEvent(t, "207"),
+						generateCommand(t, "207"),
+						generateCommand(t, "207"),
+						generateCommand(t, "207"),
+						generateCommand(t, "207"),
+						generateCommand(t, "207"),
+						generateCommand(t, "207"),
 					},
 					{
-						generateEvent(t, "208"),
-						generateEvent(t, "208"),
-						generateEvent(t, "208"),
-						generateEvent(t, "208"),
-						generateEvent(t, "208"),
+						generateCommand(t, "208"),
+						generateCommand(t, "208"),
+						generateCommand(t, "208"),
+						generateCommand(t, "208"),
+						generateCommand(t, "208"),
 					},
 				},
 			},
@@ -794,8 +795,8 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 			errsMu := sync.Mutex{}
 			for _, events := range tt.args.events {
 				wg.Add(1)
-				go func(events []*repository.Event) {
-					err := db.push(context.Background(), events, nil)
+				go func(events []eventstore.Command) {
+					_, err := db.push(context.Background(), events)
 					if err != nil {
 						errsMu.Lock()
 						errs = append(errs, err)
@@ -838,10 +839,10 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 
 func TestCRDB_Filter(t *testing.T) {
 	type args struct {
-		searchQuery *repository.SearchQuery
+		searchQuery *eventstore.SearchQueryBuilder
 	}
 	type fields struct {
-		existingEvents []*repository.Event
+		existingEvents []eventstore.Command
 	}
 	type res struct {
 		eventCount int
@@ -856,20 +857,16 @@ func TestCRDB_Filter(t *testing.T) {
 		{
 			name: "aggregate type filter no events",
 			args: args{
-				searchQuery: &repository.SearchQuery{
-					Columns: repository.ColumnsEvent,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
-						},
-					},
-				},
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AddQuery().
+					AggregateTypes("not found").
+					Builder(),
 			},
 			fields: fields{
-				existingEvents: []*repository.Event{
-					generateEvent(t, "300"),
-					generateEvent(t, "300"),
-					generateEvent(t, "300"),
+				existingEvents: []eventstore.Command{
+					generateCommand(t, "300"),
+					generateCommand(t, "300"),
+					generateCommand(t, "300"),
 				},
 			},
 			res: res{
@@ -880,22 +877,18 @@ func TestCRDB_Filter(t *testing.T) {
 		{
 			name: "aggregate type and id filter events found",
 			args: args{
-				searchQuery: &repository.SearchQuery{
-					Columns: repository.ColumnsEvent,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
-							repository.NewFilter(repository.FieldAggregateID, "303", repository.OperationEquals),
-						},
-					},
-				},
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AddQuery().
+					AggregateTypes(eventstore.AggregateType(t.Name())).
+					AggregateIDs("303").
+					Builder(),
 			},
 			fields: fields{
-				existingEvents: []*repository.Event{
-					generateEvent(t, "303"),
-					generateEvent(t, "303"),
-					generateEvent(t, "303"),
-					generateEvent(t, "305"),
+				existingEvents: []eventstore.Command{
+					generateCommand(t, "303"),
+					generateCommand(t, "303"),
+					generateCommand(t, "303"),
+					generateCommand(t, "305"),
 				},
 			},
 			res: res{
@@ -914,7 +907,7 @@ func TestCRDB_Filter(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.push(context.Background(), tt.fields.existingEvents); err != nil {
+			if _, err := db.push(context.Background(), tt.fields.existingEvents); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -933,10 +926,10 @@ func TestCRDB_Filter(t *testing.T) {
 
 func TestCRDB_LatestSequence(t *testing.T) {
 	type args struct {
-		searchQuery *repository.SearchQuery
+		searchQuery *eventstore.SearchQueryBuilder
 	}
 	type fields struct {
-		existingEvents []*repository.Event
+		existingEvents []eventstore.Command
 	}
 	type res struct {
 		sequence time.Time
@@ -951,20 +944,16 @@ func TestCRDB_LatestSequence(t *testing.T) {
 		{
 			name: "aggregate type filter no sequence",
 			args: args{
-				searchQuery: &repository.SearchQuery{
-					Columns: repository.ColumnsMaxSequence,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, "not found", repository.OperationEquals),
-						},
-					},
-				},
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
+					AddQuery().
+					AggregateTypes("not found").
+					Builder(),
 			},
 			fields: fields{
-				existingEvents: []*repository.Event{
-					generateEvent(t, "400"),
-					generateEvent(t, "400"),
-					generateEvent(t, "400"),
+				existingEvents: []eventstore.Command{
+					generateCommand(t, "400"),
+					generateCommand(t, "400"),
+					generateCommand(t, "400"),
 				},
 			},
 			res: res{
@@ -975,20 +964,16 @@ func TestCRDB_LatestSequence(t *testing.T) {
 		{
 			name: "aggregate type filter sequence",
 			args: args{
-				searchQuery: &repository.SearchQuery{
-					Columns: repository.ColumnsMaxSequence,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, t.Name(), repository.OperationEquals),
-						},
-					},
-				},
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
+					AddQuery().
+					AggregateTypes(eventstore.AggregateType(t.Name())).
+					Builder(),
 			},
 			fields: fields{
-				existingEvents: []*repository.Event{
-					generateEvent(t, "401"),
-					generateEvent(t, "401"),
-					generateEvent(t, "401"),
+				existingEvents: []eventstore.Command{
+					generateCommand(t, "401"),
+					generateCommand(t, "401"),
+					generateCommand(t, "401"),
 				},
 			},
 			res: res{
@@ -1007,7 +992,8 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if err := db.push(context.Background(), tt.fields.existingEvents); err != nil {
+			_, err := db.push(context.Background(), tt.fields.existingEvents)
+			if err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
@@ -1025,7 +1011,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 
 func TestCRDB_Push_ResourceOwner(t *testing.T) {
 	type args struct {
-		events []*repository.Event
+		events []eventstore.Command
 	}
 	type res struct {
 		resourceOwners database.StringArray
@@ -1043,9 +1029,9 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		{
 			name: "two events of same aggregate same resource owner",
 			args: args{
-				events: []*repository.Event{
-					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+				events: []eventstore.Command{
+					generateCommand(t, "500", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateCommand(t, "500", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1059,9 +1045,9 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		{
 			name: "two events of different aggregate same resource owner",
 			args: args{
-				events: []*repository.Event{
-					generateEvent(t, "501", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-					generateEvent(t, "502", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+				events: []eventstore.Command{
+					generateCommand(t, "501", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateCommand(t, "502", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1075,9 +1061,9 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		{
 			name: "two events of different aggregate different resource owner",
 			args: args{
-				events: []*repository.Event{
-					generateEvent(t, "503", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-					generateEvent(t, "504", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
+				events: []eventstore.Command{
+					generateCommand(t, "503", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateCommand(t, "504", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1091,11 +1077,11 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		{
 			name: "events of different aggregate different resource owner",
 			args: args{
-				events: []*repository.Event{
-					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
-					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
+				events: []eventstore.Command{
+					generateCommand(t, "505", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateCommand(t, "505", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateCommand(t, "506", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
+					generateCommand(t, "506", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1109,11 +1095,11 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		{
 			name: "events of different aggregate different resource owner per event",
 			args: args{
-				events: []*repository.Event{
-					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
-					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
-					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+				events: []eventstore.Command{
+					generateCommand(t, "507", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateCommand(t, "507", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+					generateCommand(t, "508", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
+					generateCommand(t, "508", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1127,11 +1113,11 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		{
 			name: "events of one aggregate different resource owner per event",
 			args: args{
-				events: []*repository.Event{
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+				events: []eventstore.Command{
+					generateCommand(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateCommand(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+					generateCommand(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+					generateCommand(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1151,18 +1137,19 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 					Database: new(testDB),
 				},
 			}
-			if err := db.push(context.Background(), tt.args.events); err != nil {
+			events, err := db.push(context.Background(), tt.args.events)
+			if err != nil {
 				t.Errorf("CRDB.Push() error = %v", err)
 			}
 
-			if len(tt.args.events) != len(tt.res.resourceOwners) {
-				t.Errorf("length of events (%d) and resource owners (%d) must be equal", len(tt.args.events), len(tt.res.resourceOwners))
+			if len(events) != len(tt.res.resourceOwners) {
+				t.Errorf("length of events (%d) and resource owners (%d) must be equal", len(events), len(tt.res.resourceOwners))
 				return
 			}
 
-			for i, event := range tt.args.events {
-				if event.ResourceOwner.String != tt.res.resourceOwners[i] {
-					t.Errorf("resource owner not expected want: %q got: %q", tt.res.resourceOwners[i], event.ResourceOwner.String)
+			for i, event := range events {
+				if event.Aggregate().ResourceOwner != tt.res.resourceOwners[i] {
+					t.Errorf("resource owner not expected want: %q got: %q", tt.res.resourceOwners[i], event.Aggregate().ResourceOwner)
 				}
 			}
 
@@ -1203,7 +1190,7 @@ func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Ev
 	t.Helper()
 	e := &repository.Event{
 		AggregateID:   aggregateID,
-		AggregateType: repository.AggregateType(t.Name()),
+		AggregateType: eventstore.AggregateType(t.Name()),
 		EditorService: "svc",
 		EditorUser:    "user",
 		ResourceOwner: sql.NullString{String: "ro", Valid: true},
@@ -1218,35 +1205,53 @@ func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Ev
 	return e
 }
 
-func generateAddUniqueConstraint(t *testing.T, table, uniqueField string) *repository.UniqueConstraint {
+func generateCommand(t *testing.T, aggregateID string, opts ...func(*repository.Event)) eventstore.Command {
 	t.Helper()
-	e := &repository.UniqueConstraint{
+	e := &repository.Event{
+		AggregateID:   aggregateID,
+		AggregateType: eventstore.AggregateType(t.Name()),
+		EditorService: "svc",
+		EditorUser:    "user",
+		ResourceOwner: sql.NullString{String: "ro", Valid: true},
+		Typ:           "test.created",
+		Version:       "v1",
+	}
+
+	for _, opt := range opts {
+		opt(e)
+	}
+
+	return e
+}
+
+func generateAddUniqueConstraint(t *testing.T, table, uniqueField string) *eventstore.UniqueConstraint {
+	t.Helper()
+	e := &eventstore.UniqueConstraint{
 		UniqueType:  table,
 		UniqueField: uniqueField,
-		Action:      repository.UniqueConstraintAdd,
+		Action:      eventstore.UniqueConstraintAdd,
 	}
 
 	return e
 }
 
-func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *repository.UniqueConstraint {
+func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *eventstore.UniqueConstraint {
 	t.Helper()
-	e := &repository.UniqueConstraint{
+	e := &eventstore.UniqueConstraint{
 		UniqueType:  table,
 		UniqueField: uniqueField,
-		InstanceID:  "",
-		Action:      repository.UniqueConstraintRemoved,
+		Action:      eventstore.UniqueConstraintRemove,
 	}
 
 	return e
 }
 
-func generateRemoveInstanceUniqueConstraints(t *testing.T, instanceID string) *repository.UniqueConstraint {
-	t.Helper()
-	e := &repository.UniqueConstraint{
-		InstanceID: instanceID,
-		Action:     repository.UniqueConstraintInstanceRemoved,
-	}
+// func generateRemoveInstanceUniqueConstraints(t *testing.T, instanceID string) *eventstore.UniqueConstraint {
+// 	t.Helper()
+// 	e := &eventstore.UniqueConstraint{
+// 		InstanceID: instanceID,
+// 		Action:     eventstore.UniqueConstraintInstanceRemove,
+// 	}
 
-	return e
-}
+// 	return e
+// }

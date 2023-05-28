@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -27,11 +26,14 @@ func TestActionProjection_reduces(t *testing.T) {
 		{
 			name: "reduceActionAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(action.AddedEventType),
-					action.AggregateType,
-					[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
-				), action.AddedEventMapper),
+				event: getEvent(
+					testEvent(
+						action.AddedEventType,
+						action.AggregateType,
+						[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
+					),
+					action.AddedEventMapper,
+				),
 			},
 			reduce: (&actionProjection{}).reduceActionAdded,
 			want: wantReduce{
@@ -62,11 +64,14 @@ func TestActionProjection_reduces(t *testing.T) {
 		{
 			name: "reduceActionChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(action.ChangedEventType),
-					action.AggregateType,
-					[]byte(`{"name": "name2", "script":"name2(){}"}`),
-				), action.ChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						action.ChangedEventType,
+						action.AggregateType,
+						[]byte(`{"name": "name2", "script":"name2(){}"}`),
+					),
+					action.ChangedEventMapper,
+				),
 			},
 			reduce: (&actionProjection{}).reduceActionChanged,
 			want: wantReduce{
@@ -92,11 +97,14 @@ func TestActionProjection_reduces(t *testing.T) {
 		{
 			name: "reduceActionDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(action.ChangedEventType),
-					action.AggregateType,
-					[]byte(`{}`),
-				), action.DeactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						action.ChangedEventType,
+						action.AggregateType,
+						[]byte(`{}`),
+					),
+					action.DeactivatedEventMapper,
+				),
 			},
 			reduce: (&actionProjection{}).reduceActionDeactivated,
 			want: wantReduce{
@@ -121,11 +129,14 @@ func TestActionProjection_reduces(t *testing.T) {
 		{
 			name: "reduceActionReactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(action.ChangedEventType),
-					action.AggregateType,
-					[]byte(`{}`),
-				), action.ReactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						action.ChangedEventType,
+						action.AggregateType,
+						[]byte(`{}`),
+					),
+					action.ReactivatedEventMapper,
+				),
 			},
 			reduce: (&actionProjection{}).reduceActionReactivated,
 			want: wantReduce{
@@ -150,11 +161,14 @@ func TestActionProjection_reduces(t *testing.T) {
 		{
 			name: "reduceActionRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(action.ChangedEventType),
-					action.AggregateType,
-					[]byte(`{}`),
-				), action.RemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						action.ChangedEventType,
+						action.AggregateType,
+						[]byte(`{}`),
+					),
+					action.RemovedEventMapper,
+				),
 			},
 			reduce: (&actionProjection{}).reduceActionRemoved,
 			want: wantReduce{
@@ -176,11 +190,14 @@ func TestActionProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOwnerRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					),
+					org.OrgRemovedEventMapper,
+				),
 			},
 			reduce: (&actionProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
@@ -205,11 +222,14 @@ func TestActionProjection_reduces(t *testing.T) {
 		{
 			name: "reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					),
+					instance.InstanceRemovedEventMapper,
+				),
 			},
 			reduce: reduceInstanceRemovedHelper(ActionInstanceIDCol),
 			want: wantReduce{

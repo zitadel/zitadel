@@ -11,8 +11,8 @@ import (
 )
 
 func testEvent(
-	eventType repository.EventType,
-	aggregateType repository.AggregateType,
+	eventType eventstore.EventType,
+	aggregateType eventstore.AggregateType,
 	data []byte,
 ) *repository.Event {
 	return &repository.Event{
@@ -37,7 +37,7 @@ func baseEvent(*testing.T) eventstore.Event {
 	return &eventstore.BaseEvent{}
 }
 
-func getEvent(event *repository.Event, mapper func(*repository.Event) (eventstore.Event, error)) func(t *testing.T) eventstore.Event {
+func getEvent(event *repository.Event, mapper func(eventstore.Event) (eventstore.Event, error)) func(t *testing.T) eventstore.Event {
 	return func(t *testing.T) eventstore.Event {
 		e, err := mapper(event)
 		if err != nil {

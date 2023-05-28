@@ -6,27 +6,8 @@ import (
 	_ "embed"
 	"fmt"
 	"strings"
-)
 
-type UniqueConstraint struct {
-	// UniqueType is the table name for the unique constraint
-	UniqueType string
-	// UniqueField is the unique key
-	UniqueField string
-	// Action defines if unique constraint should be added or removed
-	Action UniqueConstraintAction
-	// ErrorMessage defines the translation file key for the error message
-	ErrorMessage string
-	// IsGlobal defines if the unique constraint is globally unique or just within a single instance
-	IsGlobal bool
-}
-
-type UniqueConstraintAction int8
-
-const (
-	UniqueConstraintAdd UniqueConstraintAction = iota
-	UniqueConstraintRemove
-	UniqueConstraintInstanceRemove
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -36,7 +17,7 @@ var (
 	addConstraintStmt string
 )
 
-func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []Command) error {
+func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) error {
 	deletePlaceholders := make([]string, 0)
 	deleteArgs := make([]any, 0)
 
@@ -46,13 +27,13 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []Command
 	for _, command := range commands {
 		for _, constraint := range command.UniqueConstraints() {
 			switch constraint.Action {
-			case UniqueConstraintAdd:
+			case eventstore.UniqueConstraintAdd:
 				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
 				addArgs = append(addArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
-			case UniqueConstraintRemove:
+			case eventstore.UniqueConstraintRemove:
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d AND unique_type = $%d AND unique_field = $%d)", len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
-			case UniqueConstraintInstanceRemove:
+			case eventstore.UniqueConstraintInstanceRemove:
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d)", len(deleteArgs)+1))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID)
 			}

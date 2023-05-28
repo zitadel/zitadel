@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -27,11 +26,12 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectRemovedType),
-					project.AggregateType,
-					nil,
-				), project.ProjectRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectRemovedType,
+						project.AggregateType,
+						nil,
+					), project.ProjectRemovedEventMapper),
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectRemoved,
 			want: wantReduce{
@@ -53,11 +53,12 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(ProjectGrantColumnInstanceID),
 			want: wantReduce{
@@ -78,11 +79,12 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectGrantRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantRemovedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grant-id"}`),
-				), project.GrantRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantRemovedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grant-id"}`),
+					), project.GrantRemovedEventMapper),
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
@@ -105,11 +107,12 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectGrantReactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantReactivatedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grant-id"}`),
-				), project.GrantReactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantReactivatedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grant-id"}`),
+					), project.GrantReactivatedEventMapper),
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantReactivated,
 			want: wantReduce{
@@ -135,11 +138,12 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectGrantDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantDeactivatedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grant-id"}`),
-				), project.GrantDeactivateEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantDeactivatedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grant-id"}`),
+					), project.GrantDeactivateEventMapper),
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantDeactivated,
 			want: wantReduce{
@@ -165,11 +169,12 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectGrantChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantChangedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grant-id", "roleKeys": ["admin", "user"] }`),
-				), project.GrantChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantChangedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grant-id", "roleKeys": ["admin", "user"] }`),
+					), project.GrantChangedEventMapper),
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantChanged,
 			want: wantReduce{
@@ -195,11 +200,12 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectGrantCascadeChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantCascadeChangedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grant-id", "roleKeys": ["admin", "user"] }`),
-				), project.GrantCascadeChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantCascadeChangedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grant-id", "roleKeys": ["admin", "user"] }`),
+					), project.GrantCascadeChangedEventMapper),
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantCascadeChanged,
 			want: wantReduce{
@@ -225,11 +231,12 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectGrantAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantAddedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grant-id", "grantedOrgId": "granted-org-id", "roleKeys": ["admin", "user"] }`),
-				), project.GrantAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantAddedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grant-id", "grantedOrgId": "granted-org-id", "roleKeys": ["admin", "user"] }`),
+					), project.GrantAddedEventMapper),
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantAdded,
 			want: wantReduce{
@@ -260,11 +267,12 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&projectGrantProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),

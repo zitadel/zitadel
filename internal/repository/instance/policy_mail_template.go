@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -29,7 +28,7 @@ func NewMailTemplateAddedEvent(
 	}
 }
 
-func MailTemplateAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTemplateAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.MailTemplateAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -57,7 +56,7 @@ func NewMailTemplateChangedEvent(
 	return &MailTemplateChangedEvent{MailTemplateChangedEvent: *changedEvent}, nil
 }
 
-func MailTemplateChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTemplateChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.MailTemplateChangedEventMapper(event)
 	if err != nil {
 		return nil, err

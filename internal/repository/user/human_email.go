@@ -2,14 +2,12 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -32,7 +30,7 @@ func (e *HumanEmailChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -47,11 +45,11 @@ func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggreg
 	}
 }
 
-func HumanEmailChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanEmailChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	emailChangedEvent := &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, emailChangedEvent)
+	err := event.Unmarshal(emailChangedEvent)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-4M0sd", "unable to unmarshal human password changed")
 	}
@@ -69,7 +67,7 @@ func (e *HumanEmailVerifiedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanEmailVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanEmailVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -83,7 +81,7 @@ func NewHumanEmailVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func HumanEmailVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanEmailVerifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	emailVerified := &HumanEmailVerifiedEvent{
 		BaseEvent:       *eventstore.BaseEventFromRepo(event),
 		IsEmailVerified: true,
@@ -99,7 +97,7 @@ func (e *HumanEmailVerificationFailedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanEmailVerificationFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanEmailVerificationFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -113,7 +111,7 @@ func NewHumanEmailVerificationFailedEvent(ctx context.Context, aggregate *events
 	}
 }
 
-func HumanEmailVerificationFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanEmailVerificationFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanEmailVerificationFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -132,7 +130,7 @@ func (e *HumanEmailCodeAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanEmailCodeAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanEmailCodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -166,11 +164,11 @@ func NewHumanEmailCodeAddedEventV2(
 	}
 }
 
-func HumanEmailCodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanEmailCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	codeAdded := &HumanEmailCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, codeAdded)
+	err := event.Unmarshal(codeAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-3M0sd", "unable to unmarshal human email code added")
 	}
@@ -186,7 +184,7 @@ func (e *HumanEmailCodeSentEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanEmailCodeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanEmailCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -200,7 +198,7 @@ func NewHumanEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func HumanEmailCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanEmailCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanEmailCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

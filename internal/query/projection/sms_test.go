@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -25,10 +24,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSTwilioAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigTwilioAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigTwilioAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id",
 						"sid": "sid",
 						"token": {
@@ -39,7 +39,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 						},
 						"senderNumber": "sender-number"
 					}`),
-				), instance.SMSConfigTwilioAddedEventMapper),
+					), instance.SMSConfigTwilioAddedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioAdded,
 			want: wantReduce{
@@ -82,15 +82,16 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigTwilioChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigTwilioChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigTwilioChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id",
 						"sid": "sid",
 						"senderNumber": "sender-number"
 					}`),
-				), instance.SMSConfigTwilioChangedEventMapper),
+					), instance.SMSConfigTwilioChangedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioChanged,
 			want: wantReduce{
@@ -123,10 +124,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigTwilioTokenChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigTwilioTokenChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigTwilioTokenChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id",
 						"token": {
 							"cryptoType": 0,
@@ -135,7 +137,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 							"crypted": "Y3J5cHRlZA=="
 						}
 					}`),
-				), instance.SMSConfigTwilioTokenChangedEventMapper),
+					), instance.SMSConfigTwilioTokenChangedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioTokenChanged,
 			want: wantReduce{
@@ -172,13 +174,14 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigActivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigActivatedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigActivatedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id"
 					}`),
-				), instance.SMSConfigActivatedEventMapper),
+					), instance.SMSConfigActivatedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigActivated,
 			want: wantReduce{
@@ -203,13 +206,14 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigDeactivatedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigDeactivatedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id"
 					}`),
-				), instance.SMSConfigDeactivatedEventMapper),
+					), instance.SMSConfigDeactivatedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigDeactivated,
 			want: wantReduce{
@@ -234,13 +238,14 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id"
 					}`),
-				), instance.SMSConfigRemovedEventMapper),
+					), instance.SMSConfigRemovedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigRemoved,
 			want: wantReduce{
@@ -262,11 +267,12 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(SMSColumnInstanceID),
 			want: wantReduce{

@@ -2,13 +2,10 @@ package user
 
 import (
 	"context"
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -30,7 +27,7 @@ func (e *HumanOTPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanOTPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanOTPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -49,11 +46,11 @@ func NewHumanOTPAddedEvent(
 	}
 }
 
-func HumanOTPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanOTPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	otpAdded := &HumanOTPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, otpAdded)
+	err := event.Unmarshal(otpAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp added")
 	}
@@ -69,7 +66,7 @@ func (e *HumanOTPVerifiedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanOTPVerifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanOTPVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -88,7 +85,7 @@ func NewHumanOTPVerifiedEvent(
 	}
 }
 
-func HumanOTPVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanOTPVerifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanOTPVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -102,7 +99,7 @@ func (e *HumanOTPRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *HumanOTPRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanOTPRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -119,7 +116,7 @@ func NewHumanOTPRemovedEvent(
 	}
 }
 
-func HumanOTPRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanOTPRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &HumanOTPRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -134,7 +131,7 @@ func (e *HumanOTPCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanOTPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanOTPCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -153,11 +150,11 @@ func NewHumanOTPCheckSucceededEvent(
 	}
 }
 
-func HumanOTPCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanOTPCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	otpAdded := &HumanOTPCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, otpAdded)
+	err := event.Unmarshal(otpAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check succeeded")
 	}
@@ -173,7 +170,7 @@ func (e *HumanOTPCheckFailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanOTPCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanOTPCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -192,11 +189,11 @@ func NewHumanOTPCheckFailedEvent(
 	}
 }
 
-func HumanOTPCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanOTPCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	otpAdded := &HumanOTPCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, otpAdded)
+	err := event.Unmarshal(otpAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check failed")
 	}

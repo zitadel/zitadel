@@ -1,12 +1,9 @@
 package flow
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -29,7 +26,7 @@ func (e *TriggerActionsSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *TriggerActionsSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *TriggerActionsSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -47,12 +44,12 @@ func NewTriggerActionsSetEvent(
 	}
 }
 
-func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func TriggerActionsSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &TriggerActionsSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "FLOW-4n8vs", "unable to unmarshal trigger actions")
 	}
@@ -72,7 +69,7 @@ func (e *TriggerActionsCascadeRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *TriggerActionsCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *TriggerActionsCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -88,12 +85,12 @@ func NewTriggerActionsCascadeRemovedEvent(
 	}
 }
 
-func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func TriggerActionsCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &TriggerActionsCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "FLOW-4n8vs", "unable to unmarshal trigger actions")
 	}
@@ -111,7 +108,7 @@ func (e *FlowClearedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *FlowClearedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *FlowClearedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -125,12 +122,12 @@ func NewFlowClearedEvent(
 	}
 }
 
-func FlowClearedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func FlowClearedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &FlowClearedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "FLOW-BHfg2", "unable to unmarshal flow cleared")
 	}

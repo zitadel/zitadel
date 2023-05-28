@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -30,14 +29,15 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance MemberAddedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.MemberAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.MemberAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"roles": ["role"]
 				}`),
-				), instance.MemberAddedEventMapper),
+					), instance.MemberAddedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{
 				es: newMockEventStore().appendFilterResponse(
@@ -85,14 +85,15 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance MemberChangedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.MemberChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.MemberChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 					"userId": "user-id",
 					"roles": ["role", "changed"]
 				}`),
-				), instance.MemberChangedEventMapper),
+					), instance.MemberChangedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceChanged,
 			want: wantReduce{
@@ -117,13 +118,14 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance MemberCascadeRemovedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.MemberCascadeRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.MemberCascadeRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 					"userId": "user-id"
 				}`),
-				), instance.MemberCascadeRemovedEventMapper),
+					), instance.MemberCascadeRemovedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
@@ -145,13 +147,14 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance MemberRemovedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.MemberRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.MemberRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 					"userId": "user-id"
 				}`),
-				), instance.MemberRemovedEventMapper),
+					), instance.MemberRemovedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -173,11 +176,12 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "user UserRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
@@ -199,11 +203,12 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "org.OrgRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&instanceMemberProjection{}).reduceUserOwnerRemoved,
 			want: wantReduce{
@@ -228,11 +233,12 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{

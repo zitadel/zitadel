@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -23,11 +22,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 		{
 			name: "reduceInstanceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"name": "Name"}`),
-				), instance.InstanceAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"name": "Name"}`),
+					), instance.InstanceAddedEventMapper),
 			},
 			reduce: (&instanceProjection{}).reduceInstanceAdded,
 			want: wantReduce{
@@ -52,11 +52,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 		{
 			name: "reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(InstanceColumnID),
 			want: wantReduce{
@@ -77,11 +78,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDefaultOrgSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DefaultOrgSetEventType),
-					instance.AggregateType,
-					[]byte(`{"orgId": "orgid"}`),
-				), instance.DefaultOrgSetMapper),
+				event: getEvent(
+					testEvent(
+						instance.DefaultOrgSetEventType,
+						instance.AggregateType,
+						[]byte(`{"orgId": "orgid"}`),
+					), instance.DefaultOrgSetMapper),
 			},
 			reduce: (&instanceProjection{}).reduceDefaultOrgSet,
 			want: wantReduce{
@@ -105,11 +107,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectIDSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.ProjectSetEventType),
-					instance.AggregateType,
-					[]byte(`{"iamProjectId": "project-id"}`),
-				), instance.ProjectSetMapper),
+				event: getEvent(
+					testEvent(
+						instance.ProjectSetEventType,
+						instance.AggregateType,
+						[]byte(`{"iamProjectId": "project-id"}`),
+					), instance.ProjectSetMapper),
 			},
 			reduce: (&instanceProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
@@ -133,11 +136,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDefaultLanguageSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DefaultLanguageSetEventType),
-					instance.AggregateType,
-					[]byte(`{"language": "en"}`),
-				), instance.DefaultLanguageSetMapper),
+				event: getEvent(
+					testEvent(
+						instance.DefaultLanguageSetEventType,
+						instance.AggregateType,
+						[]byte(`{"language": "en"}`),
+					), instance.DefaultLanguageSetMapper),
 			},
 			reduce: (&instanceProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{

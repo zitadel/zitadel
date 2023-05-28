@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -32,7 +31,7 @@ func NewNotificationPolicyAddedEvent(
 	}
 }
 
-func NotificationPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func NotificationPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.NotificationPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -63,7 +62,7 @@ func NewNotificationPolicyChangedEvent(
 	return &NotificationPolicyChangedEvent{NotificationPolicyChangedEvent: *changedEvent}, nil
 }
 
-func NotificationPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func NotificationPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.NotificationPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err

@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -42,7 +41,7 @@ func NewHumanU2FAddedEvent(
 	}
 }
 
-func HumanU2FAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanU2FAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -86,7 +85,7 @@ func NewHumanU2FVerifiedEvent(
 	}
 }
 
-func HumanU2FVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanU2FVerifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNVerifiedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -118,7 +117,7 @@ func NewHumanU2FSignCountChangedEvent(
 	}
 }
 
-func HumanU2FSignCountChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanU2FSignCountChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNSignCountChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -154,7 +153,7 @@ func NewHumanU2FRemovedEvent(
 	}
 }
 
-func HumanU2FRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanU2FRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -183,7 +182,7 @@ func NewHumanU2FBeginLoginEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func HumanU2FBeginLoginEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanU2FBeginLoginEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNBeginLoginEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -212,7 +211,7 @@ func NewHumanU2FCheckSucceededEvent(
 	}
 }
 
-func HumanU2FCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanU2FCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNCheckSucceededEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -241,7 +240,7 @@ func NewHumanU2FCheckFailedEvent(
 	}
 }
 
-func HumanU2FCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanU2FCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNCheckFailedEventMapper(event)
 	if err != nil {
 		return nil, err

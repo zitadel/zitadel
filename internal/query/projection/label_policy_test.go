@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,11 +24,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyAddedEventType),
-					org.AggregateType,
-					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
-				), org.LabelPolicyAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyAddedEventType,
+						org.AggregateType,
+						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
+					), org.LabelPolicyAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceAdded,
 			want: wantReduce{
@@ -68,11 +68,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyChangedEventType),
-					org.AggregateType,
-					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
-				), org.LabelPolicyChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
+					), org.LabelPolicyChangedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceChanged,
 			want: wantReduce{
@@ -101,11 +102,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.LabelPolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.LabelPolicyRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -127,11 +129,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(LabelPolicyInstanceIDCol),
 			want: wantReduce{
@@ -152,11 +155,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceActivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyActivatedEventType),
-					org.AggregateType,
-					nil,
-				), org.LabelPolicyActivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyActivatedEventType,
+						org.AggregateType,
+						nil,
+					), org.LabelPolicyActivatedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceActivated,
 			want: wantReduce{
@@ -182,11 +186,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceLogoAdded light",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyLogoAddedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), org.LabelPolicyLogoAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyLogoAddedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					), org.LabelPolicyLogoAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
@@ -212,11 +217,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceLogoAdded dark",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyLogoDarkAddedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), org.LabelPolicyLogoDarkAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyLogoDarkAddedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					), org.LabelPolicyLogoDarkAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
@@ -242,11 +248,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceIconAdded light",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyIconAddedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), org.LabelPolicyIconAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyIconAddedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/icon.png"}`),
+					), org.LabelPolicyIconAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
@@ -272,11 +279,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceIconAdded dark",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyIconDarkAddedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), org.LabelPolicyIconDarkAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyIconDarkAddedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/icon.png"}`),
+					), org.LabelPolicyIconDarkAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
@@ -302,11 +310,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceLogoRemoved light",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyLogoRemovedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), org.LabelPolicyLogoRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyLogoRemovedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					), org.LabelPolicyLogoRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
@@ -332,11 +341,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceLogoRemoved dark",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyLogoDarkRemovedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), org.LabelPolicyLogoDarkRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyLogoDarkRemovedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					), org.LabelPolicyLogoDarkRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
@@ -362,11 +372,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceIconRemoved light",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyIconRemovedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), org.LabelPolicyIconRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyIconRemovedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/icon.png"}`),
+					), org.LabelPolicyIconRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
@@ -392,11 +403,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceIconRemoved dark",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyIconDarkRemovedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), org.LabelPolicyIconDarkRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyIconDarkRemovedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/icon.png"}`),
+					), org.LabelPolicyIconDarkRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
@@ -422,11 +434,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceFontAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyFontAddedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
-				), org.LabelPolicyFontAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyFontAddedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/font.ttf"}`),
+					), org.LabelPolicyFontAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceFontAdded,
 			want: wantReduce{
@@ -452,11 +465,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceFontRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyFontRemovedEventType),
-					org.AggregateType,
-					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
-				), org.LabelPolicyFontRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyFontRemovedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/font.ttf"}`),
+					), org.LabelPolicyFontRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceFontRemoved,
 			want: wantReduce{
@@ -482,11 +496,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAssetsRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LabelPolicyAssetsRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.LabelPolicyAssetsRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyAssetsRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.LabelPolicyAssetsRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceAssetsRemoved,
 			want: wantReduce{
@@ -516,11 +531,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
-				), instance.LabelPolicyAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
+					), instance.LabelPolicyAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceAdded,
 			want: wantReduce{
@@ -559,11 +575,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyChangedEventType),
-					instance.AggregateType,
-					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "primaryColorDark": "#ffffff","backgroundColorDark": "#ffffff", "warnColorDark": "#ffffff", "fontColorDark": "#ffffff", "hideLoginNameSuffix": true, "errorMsgPopup": true, "disableWatermark": true}`),
-				), instance.LabelPolicyChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyChangedEventType,
+						instance.AggregateType,
+						[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "primaryColorDark": "#ffffff","backgroundColorDark": "#ffffff", "warnColorDark": "#ffffff", "fontColorDark": "#ffffff", "hideLoginNameSuffix": true, "errorMsgPopup": true, "disableWatermark": true}`),
+					), instance.LabelPolicyChangedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceChanged,
 			want: wantReduce{
@@ -599,11 +616,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceActivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyActivatedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.LabelPolicyActivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyActivatedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.LabelPolicyActivatedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceActivated,
 			want: wantReduce{
@@ -629,11 +647,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceLogoAdded light",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyLogoAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), instance.LabelPolicyLogoAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyLogoAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					), instance.LabelPolicyLogoAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
@@ -659,11 +678,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceLogoAdded dark",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyLogoDarkAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), instance.LabelPolicyLogoDarkAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyLogoDarkAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					), instance.LabelPolicyLogoDarkAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
@@ -689,11 +709,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceIconAdded light",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyIconAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), instance.LabelPolicyIconAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyIconAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/icon.png"}`),
+					), instance.LabelPolicyIconAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
@@ -719,11 +740,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceIconAdded dark",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyIconDarkAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), instance.LabelPolicyIconDarkAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyIconDarkAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/icon.png"}`),
+					), instance.LabelPolicyIconDarkAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
@@ -749,11 +771,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceLogoRemoved light",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyLogoRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), instance.LabelPolicyLogoRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyLogoRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					), instance.LabelPolicyLogoRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
@@ -779,11 +802,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceLogoRemoved dark",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyLogoDarkRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), instance.LabelPolicyLogoDarkRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyLogoDarkRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/logo.png"}`),
+					), instance.LabelPolicyLogoDarkRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
@@ -809,11 +833,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceIconRemoved light",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyIconRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), instance.LabelPolicyIconRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyIconRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/icon.png"}`),
+					), instance.LabelPolicyIconRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
@@ -839,11 +864,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceIconRemoved dark",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyIconDarkRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), instance.LabelPolicyIconDarkRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyIconDarkRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/icon.png"}`),
+					), instance.LabelPolicyIconDarkRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
@@ -869,11 +895,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceFontAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyFontAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
-				), instance.LabelPolicyFontAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyFontAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/font.ttf"}`),
+					), instance.LabelPolicyFontAddedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceFontAdded,
 			want: wantReduce{
@@ -899,11 +926,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceFontRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyFontRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
-				), instance.LabelPolicyFontRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyFontRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/font.ttf"}`),
+					), instance.LabelPolicyFontRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceFontRemoved,
 			want: wantReduce{
@@ -929,11 +957,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceAssetsRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LabelPolicyAssetsRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.LabelPolicyAssetsRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyAssetsRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.LabelPolicyAssetsRemovedEventMapper),
 			},
 			reduce: (&labelPolicyProjection{}).reduceAssetsRemoved,
 			want: wantReduce{
@@ -964,11 +993,12 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&labelPolicyProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),

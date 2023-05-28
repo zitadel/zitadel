@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 )
@@ -30,11 +29,12 @@ func TestKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceKeyPairAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(keypair.AddedEventType),
-					keypair.AggregateType,
-					keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(time.Hour)),
-				), keypair.AddedEventMapper),
+				event: getEvent(
+					testEvent(
+						keypair.AddedEventType,
+						keypair.AggregateType,
+						keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(time.Hour)),
+					), keypair.AddedEventMapper),
 			},
 			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
 			want: wantReduce{
@@ -85,11 +85,12 @@ func TestKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceKeyPairAdded expired",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(keypair.AddedEventType),
-					keypair.AggregateType,
-					keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(-time.Hour)),
-				), keypair.AddedEventMapper),
+				event: getEvent(
+					testEvent(
+						keypair.AddedEventType,
+						keypair.AggregateType,
+						keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(-time.Hour)),
+					), keypair.AddedEventMapper),
 			},
 			reduce: (&keyProjection{}).reduceKeyPairAdded,
 			want: wantReduce{
@@ -101,11 +102,12 @@ func TestKeyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(KeyColumnInstanceID),
 			want: wantReduce{
@@ -126,11 +128,12 @@ func TestKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceCertificateAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(keypair.AddedCertificateEventType),
-					keypair.AggregateType,
-					certificateAddedEventData(domain.KeyUsageSAMLMetadataSigning, time.Now().Add(time.Hour)),
-				), keypair.AddedCertificateEventMapper),
+				event: getEvent(
+					testEvent(
+						keypair.AddedCertificateEventType,
+						keypair.AggregateType,
+						certificateAddedEventData(domain.KeyUsageSAMLMetadataSigning, time.Now().Add(time.Hour)),
+					), keypair.AddedCertificateEventMapper),
 			},
 			reduce: (&keyProjection{certEncryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceCertificateAdded,
 			want: wantReduce{

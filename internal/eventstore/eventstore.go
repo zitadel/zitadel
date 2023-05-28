@@ -2,13 +2,9 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	"sort"
 	"sync"
 	"time"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 // Eventstore abstracts all functions needed to store valid events
@@ -25,7 +21,7 @@ type Eventstore struct {
 }
 
 type eventTypeInterceptors struct {
-	eventMapper func(*repository.Event) (Event, error)
+	eventMapper func(Event) (Event, error)
 }
 
 func NewEventstore(config *Config) *Eventstore {
@@ -61,8 +57,8 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 		return nil, err
 	}
 
-	go es.notify(events)
-	return es.mapNewEvents(events)
+	es.notify(events)
+	return es.mapEvents(events)
 }
 
 // TODO(adlerhurst): still needed?
@@ -81,11 +77,7 @@ func (es *Eventstore) AggregateTypes() []string {
 // Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
-	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
-	if err != nil {
-		return nil, err
-	}
-	events, err := es.querier.Filter(ctx, query)
+	events, err := es.querier.Filter(ctx, queryFactory)
 	if err != nil {
 		return nil, err
 	}
@@ -93,37 +85,7 @@ func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuild
 	return es.mapEvents(events)
 }
 
-func (es *Eventstore) mapNewEvents(events []Event) (mappedEvents []Event, err error) {
-	mappedEvents = make([]Event, len(events))
-
-	es.interceptorMutex.Lock()
-	defer es.interceptorMutex.Unlock()
-
-	for i, event := range events {
-		repoEvent := &repository.Event{
-			ID:            "",
-			Seq:           event.Sequence(),
-			CreationDate:  event.CreatedAt(),
-			Typ:           event.Type(),
-			Data:          event.DataAsBytes(),
-			EditorService: "zitadel",
-			EditorUser:    event.Creator(),
-			Version:       repository.Version(event.Aggregate().Version),
-			AggregateID:   event.Aggregate().ID,
-			AggregateType: event.Aggregate().Type,
-			ResourceOwner: sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
-			InstanceID:    event.Aggregate().InstanceID,
-		}
-		mappedEvents[i], err = es.mapEvent(repoEvent)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return mappedEvents, nil
-}
-
-func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Event, err error) {
+func (es *Eventstore) mapEvents(events []Event) (mappedEvents []Event, err error) {
 	mappedEvents = make([]Event, len(events))
 
 	es.interceptorMutex.Lock()
@@ -139,8 +101,8 @@ func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Even
 	return mappedEvents, nil
 }
 
-func (es *Eventstore) mapEvent(event *repository.Event) (Event, error) {
-	interceptors, ok := es.eventInterceptors[event.Typ]
+func (es *Eventstore) mapEvent(event Event) (Event, error) {
+	interceptors, ok := es.eventInterceptors[event.Type()]
 	if !ok || interceptors.eventMapper == nil {
 		return BaseEventFromRepo(event), nil
 	}
@@ -169,20 +131,12 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 
 // LatestSequence filters the latest sequence for the given search query
 func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (time.Time, error) {
-	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
-	if err != nil {
-		return time.Time{}, err
-	}
-	return es.querier.LatestSequence(ctx, query)
+	return es.querier.LatestSequence(ctx, queryFactory)
 }
 
 // InstanceIDs returns the instance ids found by the search query
 func (es *Eventstore) InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error) {
-	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
-	if err != nil {
-		return nil, err
-	}
-	return es.querier.InstanceIDs(ctx, query)
+	return es.querier.InstanceIDs(ctx, queryFactory)
 }
 
 type QueryReducer interface {
@@ -204,7 +158,7 @@ func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r QueryReducer) 
 }
 
 // RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
-func (es *Eventstore) RegisterFilterEventMapper(aggregateType AggregateType, eventType EventType, mapper func(*repository.Event) (Event, error)) *Eventstore {
+func (es *Eventstore) RegisterFilterEventMapper(aggregateType AggregateType, eventType EventType, mapper func(Event) (Event, error)) *Eventstore {
 	if mapper == nil || eventType == "" {
 		return es
 	}
@@ -225,11 +179,11 @@ type Querier interface {
 	// Health checks if the connection to the storage is available
 	Health(ctx context.Context) error
 	// Filter returns all events matching the given search query
-	Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error)
+	Filter(ctx context.Context, searchQuery *SearchQueryBuilder) (events []Event, err error)
 	// LatestSequence returns the latest sequence found by the search query
-	LatestSequence(ctx context.Context, queryFactory *repository.SearchQuery) (time.Time, error)
+	LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (time.Time, error)
 	// InstanceIDs returns the instance ids found by the search query
-	InstanceIDs(ctx context.Context, queryFactory *repository.SearchQuery) ([]string, error)
+	InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error)
 	// CreateInstance creates a new sequence for the given instance
 	CreateInstance(ctx context.Context, instanceID string) error
 }

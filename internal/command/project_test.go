@@ -953,7 +953,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						project.NewProjectRemovedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"project",
-							[]*eventstore.EventUniqueConstraint{
+							[]*eventstore.UniqueConstraint{
 								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata"),
 							},
 						),
@@ -1032,7 +1032,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 						project.NewProjectRemovedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"project",
-							[]*eventstore.EventUniqueConstraint{
+							[]*eventstore.UniqueConstraint{
 								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test1.com/saml/metadata"),
 								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata"),
 								project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test3.com/saml/metadata"),

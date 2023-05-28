@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -28,14 +27,17 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAppAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationAddedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.ApplicationAddedType,
+						project.AggregateType,
+						[]byte(`{
 			"appId": "app-id",
 			"name": "my-app"
 		}`),
-				), project.ApplicationAddedEventMapper),
+					),
+					project.ApplicationAddedEventMapper,
+				),
 			},
 			reduce: (&appProjection{}).reduceAppAdded,
 			want: wantReduce{
@@ -64,14 +66,15 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAppChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.ApplicationChangedType,
+						project.AggregateType,
+						[]byte(`{
 			"appId": "app-id",
 			"name": "my-app"
 		}`),
-				), project.ApplicationChangedEventMapper),
+					), project.ApplicationChangedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceAppChanged,
 			want: wantReduce{
@@ -96,13 +99,14 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAppChanged no change",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.ApplicationChangedType,
+						project.AggregateType,
+						[]byte(`{
 			"appId": "app-id"
 		}`),
-				), project.ApplicationChangedEventMapper),
+					), project.ApplicationChangedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceAppChanged,
 			want: wantReduce{
@@ -116,13 +120,14 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAppDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationDeactivatedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.ApplicationDeactivatedType,
+						project.AggregateType,
+						[]byte(`{
 			"appId": "app-id"
 		}`),
-				), project.ApplicationDeactivatedEventMapper),
+					), project.ApplicationDeactivatedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceAppDeactivated,
 			want: wantReduce{
@@ -147,13 +152,14 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAppReactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationReactivatedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.ApplicationReactivatedType,
+						project.AggregateType,
+						[]byte(`{
 			"appId": "app-id"
 		}`),
-				), project.ApplicationReactivatedEventMapper),
+					), project.ApplicationReactivatedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceAppReactivated,
 			want: wantReduce{
@@ -178,13 +184,14 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAppRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationRemovedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.ApplicationRemovedType,
+						project.AggregateType,
+						[]byte(`{
 			"appId": "app-id"
 		}`),
-				), project.ApplicationRemovedEventMapper),
+					), project.ApplicationRemovedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceAppRemoved,
 			want: wantReduce{
@@ -206,11 +213,12 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceProjectRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectRemovedType),
-					project.AggregateType,
-					[]byte(`{}`),
-				), project.ProjectRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectRemovedType,
+						project.AggregateType,
+						[]byte(`{}`),
+					), project.ProjectRemovedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceProjectRemoved,
 			want: wantReduce{
@@ -232,11 +240,12 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(AppColumnInstanceID),
 			want: wantReduce{
@@ -257,16 +266,17 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAPIConfigAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.APIConfigAddedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.APIConfigAddedType,
+						project.AggregateType,
+						[]byte(`{
 		            "appId": "app-id",
 					"clientId": "client-id",
 					"clientSecret": {},
 				    "authMethodType": 1
 				}`),
-				), project.APIConfigAddedEventMapper),
+					), project.APIConfigAddedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceAPIConfigAdded,
 			want: wantReduce{
@@ -300,16 +310,17 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAPIConfigChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.APIConfigChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.APIConfigChangedType,
+						project.AggregateType,
+						[]byte(`{
 		            "appId": "app-id",
 					"clientId": "client-id",
 					"clientSecret": {},
 				    "authMethodType": 1
 				}`),
-				), project.APIConfigChangedEventMapper),
+					), project.APIConfigChangedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceAPIConfigChanged,
 			want: wantReduce{
@@ -342,13 +353,14 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAPIConfigChanged noop",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.APIConfigChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.APIConfigChangedType,
+						project.AggregateType,
+						[]byte(`{
 		            "appId": "app-id"
 				}`),
-				), project.APIConfigChangedEventMapper),
+					), project.APIConfigChangedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceAPIConfigChanged,
 			want: wantReduce{
@@ -362,14 +374,15 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceAPIConfigSecretChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.APIConfigSecretChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.APIConfigSecretChangedType,
+						project.AggregateType,
+						[]byte(`{
                         "appId": "app-id",
                         "client_secret": {}
 		}`),
-				), project.APIConfigSecretChangedEventMapper),
+					), project.APIConfigSecretChangedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceAPIConfigSecretChanged,
 			want: wantReduce{
@@ -401,10 +414,11 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceOIDCConfigAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.OIDCConfigAddedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigAddedType,
+						project.AggregateType,
+						[]byte(`{
                         "oidcVersion": 0,
                         "appId": "app-id",
                         "clientId": "client-id",
@@ -424,7 +438,7 @@ func TestAppProjection_reduces(t *testing.T) {
                         "additionalOrigins": ["origin.one.ch", "origin.two.ch"],
 						"skipNativeAppSuccessPage": true
 		}`),
-				), project.OIDCConfigAddedEventMapper),
+					), project.OIDCConfigAddedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
@@ -472,10 +486,11 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceOIDCConfigChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.OIDCConfigChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigChangedType,
+						project.AggregateType,
+						[]byte(`{
                         "oidcVersion": 0,
                         "appId": "app-id",
                         "redirectUris": ["redirect.one.ch", "redirect.two.ch"],
@@ -494,7 +509,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						"skipNativeAppSuccessPage": true
 
 		}`),
-				), project.OIDCConfigChangedEventMapper),
+					), project.OIDCConfigChangedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
@@ -540,13 +555,14 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceOIDCConfigChanged noop",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.OIDCConfigChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigChangedType,
+						project.AggregateType,
+						[]byte(`{
                         "appId": "app-id"
 		}`),
-				), project.OIDCConfigChangedEventMapper),
+					), project.OIDCConfigChangedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
@@ -560,14 +576,15 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project reduceOIDCConfigSecretChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.OIDCConfigSecretChangedType),
-					project.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigSecretChangedType,
+						project.AggregateType,
+						[]byte(`{
                         "appId": "app-id",
                         "client_secret": {}
 		}`),
-				), project.OIDCConfigSecretChangedEventMapper),
+					), project.OIDCConfigSecretChangedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceOIDCConfigSecretChanged,
 			want: wantReduce{
@@ -599,11 +616,12 @@ func TestAppProjection_reduces(t *testing.T) {
 		{
 			name: "project.reduceOwnerRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&appProjection{}).reduceOwnerRemoved,
 			want: wantReduce{

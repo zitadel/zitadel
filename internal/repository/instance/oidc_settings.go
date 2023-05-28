@@ -2,12 +2,10 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -50,15 +48,15 @@ func (e *OIDCSettingsAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCSettingsAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCSettingsAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func OIDCSettingsAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCSettingsAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	oidcSettingsAdded := &OIDCSettingsAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, oidcSettingsAdded)
+	err := event.Unmarshal(oidcSettingsAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
 	}
@@ -79,7 +77,7 @@ func (e *OIDCSettingsChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCSettingsChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCSettingsChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -130,12 +128,12 @@ func ChangeOIDCSettingsRefreshTokenExpiration(refreshTokenExpiration time.Durati
 	}
 }
 
-func OIDCSettingsChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCSettingsChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCSettingsChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-f98uf", "unable to unmarshal oidc settings changed")
 	}

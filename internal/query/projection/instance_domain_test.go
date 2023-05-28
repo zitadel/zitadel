@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -23,11 +22,12 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDomainAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceDomainAddedEventType),
-					instance.AggregateType,
-					[]byte(`{"domain": "domain.new", "generated": true}`),
-				), instance.DomainAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceDomainAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"domain": "domain.new", "generated": true}`),
+					), instance.DomainAddedEventMapper),
 			},
 			reduce: (&instanceDomainProjection{}).reduceDomainAdded,
 			want: wantReduce{
@@ -54,11 +54,12 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDomainRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceDomainRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{"domain": "domain.new"}`),
-				), instance.DomainRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceDomainRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{"domain": "domain.new"}`),
+					), instance.DomainRemovedEventMapper),
 			},
 			reduce: (&instanceDomainProjection{}).reduceDomainRemoved,
 			want: wantReduce{
@@ -80,11 +81,12 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(InstanceDomainInstanceIDCol),
 			want: wantReduce{

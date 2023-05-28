@@ -2,12 +2,10 @@ package session
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -28,7 +26,7 @@ func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -44,11 +42,12 @@ func NewAddedEvent(ctx context.Context,
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DG4gn", "unable to unmarshal session added")
 	}
@@ -67,7 +66,7 @@ func (e *UserCheckedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -88,11 +87,11 @@ func NewUserCheckedEvent(
 	}
 }
 
-func UserCheckedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserCheckedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &UserCheckedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DSGn5", "unable to unmarshal user checked")
 	}
@@ -110,7 +109,7 @@ func (e *PasswordCheckedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PasswordCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PasswordCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -129,11 +128,11 @@ func NewPasswordCheckedEvent(
 	}
 }
 
-func PasswordCheckedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordCheckedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &PasswordCheckedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DGt21", "unable to unmarshal password checked")
 	}
@@ -151,7 +150,7 @@ func (e *TokenSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *TokenSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *TokenSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -170,11 +169,11 @@ func NewTokenSetEvent(
 	}
 }
 
-func TokenSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func TokenSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &TokenSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-Sf3va", "unable to unmarshal token set")
 	}
@@ -192,7 +191,7 @@ func (e *MetadataSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MetadataSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MetadataSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -211,11 +210,11 @@ func NewMetadataSetEvent(
 	}
 }
 
-func MetadataSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MetadataSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	added := &MetadataSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, added)
+	err := event.Unmarshal(added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-BD21d", "unable to unmarshal metadata set")
 	}
@@ -231,7 +230,7 @@ func (e *TerminateEvent) Payload() interface{} {
 	return e
 }
 
-func (e *TerminateEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *TerminateEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -248,7 +247,7 @@ func NewTerminateEvent(
 	}
 }
 
-func TerminateEventMapper(event *repository.Event) (eventstore.Event, error) {
+func TerminateEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &TerminateEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

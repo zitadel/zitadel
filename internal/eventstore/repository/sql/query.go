@@ -10,9 +10,11 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	z_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -31,25 +33,29 @@ type querier interface {
 
 type scan func(dest ...interface{}) error
 
-func query(ctx context.Context, criteria querier, searchQuery *repository.SearchQuery, dest interface{}) error {
-	query, rowScanner := prepareColumns(criteria, searchQuery.Columns)
-	where, values := prepareCondition(criteria, searchQuery.Filters)
+func query(ctx context.Context, criteria querier, searchQuery *eventstore.SearchQueryBuilder, dest interface{}) error {
+	q, err := repository.QueryFromBuilder(searchQuery, authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return err
+	}
+	query, rowScanner := prepareColumns(criteria, q.Columns)
+	where, values := prepareCondition(criteria, q.Filters)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
-	if searchQuery.Tx == nil {
-		if travel := prepareTimeTravel(ctx, criteria, searchQuery.AllowTimeTravel); travel != "" {
+	if q.Tx == nil {
+		if travel := prepareTimeTravel(ctx, criteria, q.AllowTimeTravel); travel != "" {
 			query += travel
 		}
 	}
 	query += where
 
-	if searchQuery.Columns == repository.ColumnsEvent {
-		query += criteria.orderByEventSequence(searchQuery.Desc)
+	if q.Columns == eventstore.ColumnsEvent {
+		query += criteria.orderByEventSequence(q.Desc)
 	}
 
-	if searchQuery.Limit > 0 {
-		values = append(values, searchQuery.Limit)
+	if q.Limit > 0 {
+		values = append(values, q.Limit)
 		query += " LIMIT ?"
 	}
 
@@ -59,8 +65,8 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 		QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
 	}
 	contextQuerier = criteria.db()
-	if searchQuery.Tx != nil {
-		contextQuerier = searchQuery.Tx
+	if q.Tx != nil {
+		contextQuerier = q.Tx
 	}
 
 	rows, err := contextQuerier.QueryContext(ctx, query, values...)
@@ -80,13 +86,13 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 	return nil
 }
 
-func prepareColumns(criteria querier, columns repository.Columns) (string, func(s scan, dest interface{}) error) {
+func prepareColumns(criteria querier, columns eventstore.Columns) (string, func(s scan, dest interface{}) error) {
 	switch columns {
-	case repository.ColumnsMaxSequence:
+	case eventstore.ColumnsMaxSequence:
 		return criteria.maxSequenceQuery(), maxSequenceScanner
-	case repository.ColumnsInstanceIDs:
+	case eventstore.ColumnsInstanceIDs:
 		return criteria.instanceIDsQuery(), instanceIDsScanner
-	case repository.ColumnsEvent:
+	case eventstore.ColumnsEvent:
 		return criteria.eventQuery(), eventsScanner
 	default:
 		return "", nil
@@ -130,7 +136,7 @@ func instanceIDsScanner(scanner scan, dest interface{}) (err error) {
 }
 
 func eventsScanner(scanner scan, dest interface{}) (err error) {
-	events, ok := dest.(*[]*repository.Event)
+	events, ok := dest.(*[]eventstore.Event)
 	if !ok {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
 	}

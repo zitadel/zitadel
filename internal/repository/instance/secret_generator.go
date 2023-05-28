@@ -2,13 +2,11 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -19,15 +17,15 @@ const (
 	SecretGeneratorRemovedEventType = instanceEventTypePrefix + secretGeneratorPrefix + "removed"
 )
 
-func NewAddSecretGeneratorTypeUniqueConstraint(generatorType domain.SecretGeneratorType) *eventstore.EventUniqueConstraint {
+func NewAddSecretGeneratorTypeUniqueConstraint(generatorType domain.SecretGeneratorType) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueSecretGeneratorType,
 		string(generatorType),
 		"Errors.SecretGenerator.AlreadyExists")
 }
 
-func NewRemoveSecretGeneratorTypeUniqueConstraint(generatorType domain.SecretGeneratorType) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveSecretGeneratorTypeUniqueConstraint(generatorType domain.SecretGeneratorType) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueSecretGeneratorType,
 		string(generatorType))
 }
@@ -75,15 +73,15 @@ func (e *SecretGeneratorAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SecretGeneratorAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddSecretGeneratorTypeUniqueConstraint(e.GeneratorType)}
+func (e *SecretGeneratorAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddSecretGeneratorTypeUniqueConstraint(e.GeneratorType)}
 }
 
-func SecretGeneratorAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SecretGeneratorAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	secretGeneratorAdded := &SecretGeneratorAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, secretGeneratorAdded)
+	err := event.Unmarshal(secretGeneratorAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-en9f4", "unable to unmarshal secret generator added")
 	}
@@ -107,7 +105,7 @@ func (e *SecretGeneratorChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SecretGeneratorChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SecretGeneratorChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -172,12 +170,12 @@ func ChangeSecretGeneratorIncludeSymbols(includeSymbols bool) func(event *Secret
 	}
 }
 
-func SecretGeneratorChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SecretGeneratorChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SecretGeneratorChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-2m09e", "unable to unmarshal secret generator changed")
 	}
@@ -195,8 +193,8 @@ func (e *SecretGeneratorRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SecretGeneratorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveSecretGeneratorTypeUniqueConstraint(e.GeneratorType)}
+func (e *SecretGeneratorRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveSecretGeneratorTypeUniqueConstraint(e.GeneratorType)}
 }
 
 func NewSecretGeneratorRemovedEvent(
@@ -214,12 +212,12 @@ func NewSecretGeneratorRemovedEvent(
 	}
 }
 
-func SecretGeneratorRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SecretGeneratorRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SecretGeneratorRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-m09ke", "unable to unmarshal secret generator removed")
 	}

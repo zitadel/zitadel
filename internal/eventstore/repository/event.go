@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var _ eventstore.Event = (*Event)(nil)
@@ -34,7 +34,7 @@ type Event struct {
 
 	// Typ describes the cause of the event (e.g. user.added)
 	// it should always be in past-form
-	Typ EventType
+	Typ eventstore.EventType
 
 	//Data describe the changed fields (e.g. userName = "hodor")
 	// data must always a pointer to a struct, a struct or a byte array containing json bytes
@@ -50,13 +50,13 @@ type Event struct {
 
 	//Version describes the definition of the aggregate at a certain point in time
 	// it's used in read models to reduce the events in the correct definition
-	Version Version
+	Version eventstore.Version
 	//AggregateID id is the unique identifier of the aggregate
 	// the client must generate it by it's own
 	AggregateID string
 	//AggregateType describes the meaning of the aggregate for this event
 	// it could an object like user
-	AggregateType AggregateType
+	AggregateType eventstore.AggregateType
 	//ResourceOwner is the organisation which owns this aggregate
 	// an aggregate can only be managed by one organisation
 	// use the ID of the org
@@ -65,12 +65,6 @@ type Event struct {
 	// use the ID of the instance
 	InstanceID string
 }
-
-// EventType is the description of the change
-type EventType = eventstore.EventType
-
-// AggregateType is the object name
-type AggregateType = eventstore.AggregateType
 
 // Aggregate implements [eventstore.Event]
 func (e *Event) Aggregate() *eventstore.Aggregate {
@@ -117,3 +111,9 @@ func (e *Event) Unmarshal(ptr any) error {
 func (e *Event) DataAsBytes() []byte {
 	return e.Data
 }
+
+func (e *Event) Payload() any {
+	return e.Data
+}
+
+func (e *Event) UniqueConstraints() []*eventstore.UniqueConstraint { return nil }

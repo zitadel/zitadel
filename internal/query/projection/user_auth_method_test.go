@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -26,13 +25,14 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAddedPasswordless",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanPasswordlessTokenAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanPasswordlessTokenAddedType,
+						user.AggregateType,
+						[]byte(`{
 						"webAuthNTokenId": "token-id"
 					}`),
-				), user.HumanPasswordlessAddedEventMapper),
+					), user.HumanPasswordlessAddedEventMapper),
 			},
 			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
 			want: wantReduce{
@@ -62,13 +62,14 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAddedU2F",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanU2FTokenAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanU2FTokenAddedType,
+						user.AggregateType,
+						[]byte(`{
 						"webAuthNTokenId": "token-id"
 					}`),
-				), user.HumanU2FAddedEventMapper),
+					), user.HumanU2FAddedEventMapper),
 			},
 			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
 			want: wantReduce{
@@ -98,12 +99,13 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAddedOTP",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanMFAOTPAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanMFAOTPAddedType,
+						user.AggregateType,
+						[]byte(`{
 					}`),
-				), user.HumanOTPAddedEventMapper),
+					), user.HumanOTPAddedEventMapper),
 			},
 			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
 			want: wantReduce{
@@ -133,14 +135,15 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 		{
 			name: "reduceVerifiedPasswordless",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanPasswordlessTokenVerifiedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanPasswordlessTokenVerifiedType,
+						user.AggregateType,
+						[]byte(`{
 						"webAuthNTokenId": "token-id",
 						"webAuthNTokenName": "name"
 					}`),
-				), user.HumanPasswordlessVerifiedEventMapper),
+					), user.HumanPasswordlessVerifiedEventMapper),
 			},
 			reduce: (&userAuthMethodProjection{}).reduceActivateEvent,
 			want: wantReduce{
@@ -169,14 +172,15 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 		{
 			name: "reduceVerifiedU2F",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanU2FTokenVerifiedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanU2FTokenVerifiedType,
+						user.AggregateType,
+						[]byte(`{
 						"webAuthNTokenId": "token-id",
 						"webAuthNTokenName": "name"
 					}`),
-				), user.HumanU2FVerifiedEventMapper),
+					), user.HumanU2FVerifiedEventMapper),
 			},
 			reduce: (&userAuthMethodProjection{}).reduceActivateEvent,
 			want: wantReduce{
@@ -205,12 +209,13 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 		{
 			name: "reduceVerifiedOTP",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanMFAOTPVerifiedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanMFAOTPVerifiedType,
+						user.AggregateType,
+						[]byte(`{
 					}`),
-				), user.HumanOTPVerifiedEventMapper),
+					), user.HumanOTPVerifiedEventMapper),
 			},
 			reduce: (&userAuthMethodProjection{}).reduceActivateEvent,
 			want: wantReduce{
@@ -240,11 +245,12 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			name:   "org reduceOwnerRemoved",
 			reduce: (&userAuthMethodProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),
@@ -268,11 +274,12 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(UserAuthMethodInstanceIDCol),
 			want: wantReduce{

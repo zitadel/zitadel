@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -25,13 +24,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "user HumanAddedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanAddedType,
+						user.AggregateType,
+						[]byte(`{
 					"userName": "human-added"
 				}`),
-				), user.HumanAddedEventMapper),
+					), user.HumanAddedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceUserCreated,
 			want: wantReduce{
@@ -55,13 +55,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "user HumanRegisteredType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanRegisteredType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanRegisteredType,
+						user.AggregateType,
+						[]byte(`{
 					"userName": "human-registered"
 				}`),
-				), user.HumanRegisteredEventMapper),
+					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceUserCreated,
 			want: wantReduce{
@@ -85,13 +86,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "user MachineAddedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineAddedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineAddedEventType,
+						user.AggregateType,
+						[]byte(`{
 					"userName": "machine-added"
 				}`),
-				), user.MachineAddedEventMapper),
+					), user.MachineAddedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceUserCreated,
 			want: wantReduce{
@@ -115,11 +117,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "user UserRemovedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceUserRemoved,
 			want: wantReduce{
@@ -141,13 +144,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "user UserUserNameChangedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserUserNameChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserUserNameChangedType,
+						user.AggregateType,
+						[]byte(`{
 					"userName": "changed"
 				}`),
-				), user.UsernameChangedEventMapper),
+					), user.UsernameChangedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceUserNameChanged,
 			want: wantReduce{
@@ -170,13 +174,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "user UserDomainClaimedType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserDomainClaimedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserDomainClaimedType,
+						user.AggregateType,
+						[]byte(`{
 					"userName": "claimed"
 				}`),
-				), user.DomainClaimedEventMapper),
+					), user.DomainClaimedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceUserDomainClaimed,
 			want: wantReduce{
@@ -199,13 +204,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "org OrgDomainPolicyAddedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.DomainPolicyAddedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.DomainPolicyAddedEventType,
+						user.AggregateType,
+						[]byte(`{
 					"userLoginMustBeDomain": true
 				}`),
-				), org.DomainPolicyAddedEventMapper),
+					), org.DomainPolicyAddedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
@@ -229,13 +235,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "org OrgDomainPolicyChangedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.DomainPolicyChangedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.DomainPolicyChangedEventType,
+						user.AggregateType,
+						[]byte(`{
 					"userLoginMustBeDomain": false
 				}`),
-				), org.DomainPolicyChangedEventMapper),
+					), org.DomainPolicyChangedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
@@ -258,11 +265,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "org OrgDomainPolicyChangedEventType no change",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.DomainPolicyChangedEventType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), org.DomainPolicyChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.DomainPolicyChangedEventType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), org.DomainPolicyChangedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
@@ -276,11 +284,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "org OrgDomainPolicyRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.DomainPolicyRemovedEventType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), org.DomainPolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.DomainPolicyRemovedEventType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), org.DomainPolicyRemovedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyRemoved,
 			want: wantReduce{
@@ -302,13 +311,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "org OrgDomainVerifiedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainVerifiedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.OrgDomainVerifiedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"domain": "verified"
 					}`),
-				), org.DomainVerifiedEventMapper),
+					), org.DomainVerifiedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceDomainVerified,
 			want: wantReduce{
@@ -331,13 +341,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "org OrgDomainRemovedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainRemovedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.OrgDomainRemovedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"domain": "remove"
 					}`),
-				), org.DomainRemovedEventMapper),
+					), org.DomainRemovedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceDomainRemoved,
 			want: wantReduce{
@@ -360,13 +371,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "org OrgDomainPrimarySetEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPrimarySetEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.OrgDomainPrimarySetEventType,
+						user.AggregateType,
+						[]byte(`{
 						"domain": "primary"
 					}`),
-				), org.DomainPrimarySetEventMapper),
+					), org.DomainPrimarySetEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
@@ -399,13 +411,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "iam OrgDomainPolicyAddedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DomainPolicyAddedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.DomainPolicyAddedEventType,
+						user.AggregateType,
+						[]byte(`{
 					"userLoginMustBeDomain": true
 				}`),
-				), instance.DomainPolicyAddedEventMapper),
+					), instance.DomainPolicyAddedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
@@ -429,13 +442,14 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "iam OrgDomainPolicyChangedEventType",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DomainPolicyChangedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.DomainPolicyChangedEventType,
+						user.AggregateType,
+						[]byte(`{
 					"userLoginMustBeDomain": false
 				}`),
-				), instance.DomainPolicyChangedEventMapper),
+					), instance.DomainPolicyChangedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
@@ -458,11 +472,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "iam OrgDomainPolicyChangedEventType no change",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DomainPolicyChangedEventType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), instance.DomainPolicyChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.DomainPolicyChangedEventType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), instance.DomainPolicyChangedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
@@ -476,11 +491,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceInstanceRemoved,
 			want: wantReduce{
@@ -513,11 +529,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		{
 			name: "instance.reduceOwnerRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					[]byte(`{"name": "Name"}`),
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						[]byte(`{"name": "Name"}`),
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&loginNameProjection{}).reduceOwnerRemoved,
 			want: wantReduce{

@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -27,11 +26,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyAdded app",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationKeyAddedEventType),
-					project.AggregateType,
-					[]byte(`{"applicationId": "appId", "clientId":"clientId","keyId": "keyId", "type": 1, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
-				), project.ApplicationKeyAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ApplicationKeyAddedEventType,
+						project.AggregateType,
+						[]byte(`{"applicationId": "appId", "clientId":"clientId","keyId": "keyId", "type": 1, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
+					), project.ApplicationKeyAddedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyAdded,
 			want: wantReduce{
@@ -63,11 +63,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyAdded user",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineKeyAddedEventType),
-					user.AggregateType,
-					[]byte(`{"keyId": "keyId", "type": 1, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
-				), user.MachineKeyAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.MachineKeyAddedEventType,
+						user.AggregateType,
+						[]byte(`{"keyId": "keyId", "type": 1, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
+					), user.MachineKeyAddedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyAdded,
 			want: wantReduce{
@@ -99,11 +100,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyRemoved app key",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationKeyRemovedEventType),
-					project.AggregateType,
-					[]byte(`{"keyId": "keyId"}`),
-				), project.ApplicationKeyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ApplicationKeyRemovedEventType,
+						project.AggregateType,
+						[]byte(`{"keyId": "keyId"}`),
+					), project.ApplicationKeyRemovedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
@@ -125,11 +127,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyEnabledChanged api no change",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.APIConfigChangedType),
-					project.AggregateType,
-					[]byte(`{"appId": "appId"}`),
-				), project.APIConfigChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.APIConfigChangedType,
+						project.AggregateType,
+						[]byte(`{"appId": "appId"}`),
+					), project.APIConfigChangedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
@@ -143,11 +146,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyEnabledChanged api config basic",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.APIConfigChangedType),
-					project.AggregateType,
-					[]byte(`{"appId": "appId", "authMethodType": 0}`),
-				), project.APIConfigChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.APIConfigChangedType,
+						project.AggregateType,
+						[]byte(`{"appId": "appId", "authMethodType": 0}`),
+					), project.APIConfigChangedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
@@ -172,11 +176,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyEnabledChanged api config jwt",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.APIConfigChangedType),
-					project.AggregateType,
-					[]byte(`{"appId": "appId", "authMethodType": 1}`),
-				), project.APIConfigChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.APIConfigChangedType,
+						project.AggregateType,
+						[]byte(`{"appId": "appId", "authMethodType": 1}`),
+					), project.APIConfigChangedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
@@ -201,11 +206,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyRemoved app key",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineKeyRemovedEventType),
-					user.AggregateType,
-					[]byte(`{"keyId": "keyId"}`),
-				), user.MachineKeyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.MachineKeyRemovedEventType,
+						user.AggregateType,
+						[]byte(`{"keyId": "keyId"}`),
+					), user.MachineKeyRemovedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
@@ -227,11 +233,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(AuthNKeyInstanceIDCol),
 			want: wantReduce{
@@ -252,11 +259,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyEnabledChanged oidc no change",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.OIDCConfigChangedType),
-					project.AggregateType,
-					[]byte(`{"appId": "appId"}`),
-				), project.OIDCConfigChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigChangedType,
+						project.AggregateType,
+						[]byte(`{"appId": "appId"}`),
+					), project.OIDCConfigChangedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
@@ -270,11 +278,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyEnabledChanged oidc config basic",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.OIDCConfigChangedType),
-					project.AggregateType,
-					[]byte(`{"appId": "appId", "authMethodType": 0}`),
-				), project.OIDCConfigChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigChangedType,
+						project.AggregateType,
+						[]byte(`{"appId": "appId", "authMethodType": 0}`),
+					), project.OIDCConfigChangedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
@@ -299,11 +308,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyEnabledChanged oidc config jwt",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.OIDCConfigChangedType),
-					project.AggregateType,
-					[]byte(`{"appId": "appId", "authMethodType": 3}`),
-				), project.OIDCConfigChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.OIDCConfigChangedType,
+						project.AggregateType,
+						[]byte(`{"appId": "appId", "authMethodType": 3}`),
+					), project.OIDCConfigChangedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
@@ -328,11 +338,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyRemoved app key removed",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationKeyRemovedEventType),
-					project.AggregateType,
-					[]byte(`{"keyId": "keyId"}`),
-				), project.ApplicationKeyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ApplicationKeyRemovedEventType,
+						project.AggregateType,
+						[]byte(`{"keyId": "keyId"}`),
+					), project.ApplicationKeyRemovedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
@@ -354,11 +365,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyRemoved app removed",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationRemovedType),
-					project.AggregateType,
-					[]byte(`{"appId": "appId"}`),
-				), project.ApplicationRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ApplicationRemovedType,
+						project.AggregateType,
+						[]byte(`{"appId": "appId"}`),
+					), project.ApplicationRemovedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
@@ -380,11 +392,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyRemoved project removed",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectRemovedType),
-					project.AggregateType,
-					nil,
-				), project.ProjectRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectRemovedType,
+						project.AggregateType,
+						nil,
+					), project.ProjectRemovedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
@@ -406,11 +419,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyRemoved machine key removed",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineKeyRemovedEventType),
-					user.AggregateType,
-					[]byte(`{"keyId": "keyId"}`),
-				), user.MachineKeyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.MachineKeyRemovedEventType,
+						user.AggregateType,
+						[]byte(`{"keyId": "keyId"}`),
+					), user.MachineKeyRemovedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
@@ -432,11 +446,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAuthNKeyRemoved user removed",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					[]byte(`{"keyId": "keyId"}`),
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						[]byte(`{"keyId": "keyId"}`),
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
@@ -458,11 +473,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOwnerRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&authNKeyProjection{}).reduceOwnerRemoved,
 			want: wantReduce{

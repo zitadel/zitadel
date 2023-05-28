@@ -8,17 +8,18 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type latestSequence struct {
-	aggregate *Aggregate
+	aggregate *eventstore.Aggregate
 	sequence  uint64
 }
 
 //go:embed sequences_query.sql
 var latestSequencesStmt string
 
-func latestSequences(ctx context.Context, tx *sql.Tx, commands []Command) ([]*latestSequence, error) {
+func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) ([]*latestSequence, error) {
 	sequences := make([]*latestSequence, 0, len(commands))
 
 	for _, command := range commands {
@@ -54,7 +55,7 @@ func latestSequences(ctx context.Context, tx *sql.Tx, commands []Command) ([]*la
 	defer rows.Close()
 
 	for rows.Next() {
-		var aggregateType AggregateType
+		var aggregateType eventstore.AggregateType
 		var aggregateID, instanceID string
 		var currentSequence uint64
 
@@ -73,7 +74,7 @@ func latestSequences(ctx context.Context, tx *sql.Tx, commands []Command) ([]*la
 	return sequences, nil
 }
 
-func searchSequenceByCommand(sequences []*latestSequence, command Command) *latestSequence {
+func searchSequenceByCommand(sequences []*latestSequence, command eventstore.Command) *latestSequence {
 	for _, sequence := range sequences {
 		if sequence.aggregate.Type == command.Aggregate().Type &&
 			sequence.aggregate.ID == command.Aggregate().ID &&
@@ -84,7 +85,7 @@ func searchSequenceByCommand(sequences []*latestSequence, command Command) *late
 	return nil
 }
 
-func searchSequence(sequences []*latestSequence, aggregateType AggregateType, aggregateID, instanceID string) *latestSequence {
+func searchSequence(sequences []*latestSequence, aggregateType eventstore.AggregateType, aggregateID, instanceID string) *latestSequence {
 	for _, sequence := range sequences {
 		if sequence.aggregate.Type == aggregateType &&
 			sequence.aggregate.ID == aggregateID &&

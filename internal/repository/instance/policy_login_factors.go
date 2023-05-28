@@ -3,10 +3,8 @@ package instance
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
@@ -37,7 +35,7 @@ func NewLoginPolicySecondFactorAddedEvent(
 	}
 }
 
-func SecondFactorAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SecondFactorAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.SecondFactorAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -68,7 +66,7 @@ func NewLoginPolicySecondFactorRemovedEvent(
 	}
 }
 
-func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SecondFactorRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.SecondFactorRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -98,7 +96,7 @@ func NewLoginPolicyMultiFactorAddedEvent(
 	}
 }
 
-func MultiFactorAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MultiFactorAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.MultiFactorAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -129,7 +127,7 @@ func NewLoginPolicyMultiFactorRemovedEvent(
 	}
 }
 
-func MultiFactorRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MultiFactorRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := policy.MultiFactorRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

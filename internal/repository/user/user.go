@@ -2,14 +2,11 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -27,7 +24,7 @@ const (
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
 )
 
-func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.EventUniqueConstraint {
+func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.UniqueConstraint {
 	uniqueUserName := userName
 	if userLoginMustBeDomain {
 		uniqueUserName = userName + resourceOwner
@@ -38,12 +35,12 @@ func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMus
 		"Errors.User.AlreadyExists")
 }
 
-func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.EventUniqueConstraint {
+func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.UniqueConstraint {
 	uniqueUserName := userName
 	if userLoginMustBeDomain {
 		uniqueUserName = userName + resourceOwner
 	}
-	return eventstore.NewRemoveEventUniqueConstraint(
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueUsername,
 		uniqueUserName)
 }
@@ -56,7 +53,7 @@ func (e *UserLockedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserLockedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserLockedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -70,7 +67,7 @@ func NewUserLockedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *U
 	}
 }
 
-func UserLockedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserLockedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &UserLockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -84,7 +81,7 @@ func (e *UserUnlockedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserUnlockedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserUnlockedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -98,7 +95,7 @@ func NewUserUnlockedEvent(ctx context.Context, aggregate *eventstore.Aggregate) 
 	}
 }
 
-func UserUnlockedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserUnlockedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &UserUnlockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -112,7 +109,7 @@ func (e *UserDeactivatedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -126,7 +123,7 @@ func NewUserDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregat
 	}
 }
 
-func UserDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &UserDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -140,7 +137,7 @@ func (e *UserReactivatedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -154,7 +151,7 @@ func NewUserReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregat
 	}
 }
 
-func UserReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &UserReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -172,8 +169,8 @@ func (e *UserRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	events := make([]*eventstore.EventUniqueConstraint, 0)
+func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	events := make([]*eventstore.UniqueConstraint, 0)
 	if e.userName != "" {
 		events = append(events, NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.loginMustBeDomain))
 	}
@@ -202,7 +199,7 @@ func NewUserRemovedEvent(
 	}
 }
 
-func UserRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &UserRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -225,7 +222,7 @@ func (e *UserTokenAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserTokenAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -258,11 +255,11 @@ func NewUserTokenAddedEvent(
 	}
 }
 
-func UserTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserTokenAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	tokenAdded := &UserTokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, tokenAdded)
+	err := event.Unmarshal(tokenAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-7M9sd", "unable to unmarshal token added")
 	}
@@ -280,7 +277,7 @@ func (e *UserTokenRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UserTokenRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserTokenRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -299,11 +296,11 @@ func NewUserTokenRemovedEvent(
 	}
 }
 
-func UserTokenRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UserTokenRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	tokenRemoved := &UserTokenRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, tokenRemoved)
+	err := event.Unmarshal(tokenRemoved)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-7M9sd", "unable to unmarshal token added")
 	}
@@ -323,8 +320,8 @@ func (e *DomainClaimedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{
+func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{
 		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
@@ -349,11 +346,11 @@ func NewDomainClaimedEvent(
 	}
 }
 
-func DomainClaimedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainClaimedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	domainClaimed := &DomainClaimedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, domainClaimed)
+	err := event.Unmarshal(domainClaimed)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-aR8jc", "unable to unmarshal domain claimed")
 	}
@@ -369,7 +366,7 @@ func (e *DomainClaimedSentEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *DomainClaimedSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DomainClaimedSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -386,7 +383,7 @@ func NewDomainClaimedSentEvent(
 	}
 }
 
-func DomainClaimedSentEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainClaimedSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &DomainClaimedSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -405,8 +402,8 @@ func (e *UsernameChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{
+func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{
 		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.oldUserLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
@@ -447,11 +444,11 @@ func UsernameChangedEventWithPolicyChange() UsernameChangedEventOption {
 	}
 }
 
-func UsernameChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func UsernameChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	domainClaimed := &UsernameChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, domainClaimed)
+	err := event.Unmarshal(domainClaimed)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-4Bm9s", "unable to unmarshal username changed")
 	}

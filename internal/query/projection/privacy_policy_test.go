@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
@@ -25,15 +24,16 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.PrivacyPolicyAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.PrivacyPolicyAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"tosLink": "http://tos.link",
 						"privacyLink": "http://privacy.link",
 						"helpLink": "http://help.link",
 						"supportEmail": "support@example.com"}`),
-				), org.PrivacyPolicyAddedEventMapper),
+					), org.PrivacyPolicyAddedEventMapper),
 			},
 			reduce: (&privacyPolicyProjection{}).reduceAdded,
 			want: wantReduce{
@@ -66,15 +66,16 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceChanged",
 			reduce: (&privacyPolicyProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.PrivacyPolicyChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.PrivacyPolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"tosLink": "http://tos.link",
 						"privacyLink": "http://privacy.link",
 						"helpLink": "http://help.link",
 						"supportEmail": "support@example.com"}`),
-				), org.PrivacyPolicyChangedEventMapper),
+					), org.PrivacyPolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),
@@ -102,11 +103,12 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceRemoved",
 			reduce: (&privacyPolicyProjection{}).reduceRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.PrivacyPolicyRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.PrivacyPolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.PrivacyPolicyRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.PrivacyPolicyRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),
@@ -126,11 +128,12 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 		}, {
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(PrivacyPolicyInstanceIDCol),
 			want: wantReduce{
@@ -152,15 +155,16 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceAdded",
 			reduce: (&privacyPolicyProjection{}).reduceAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.PrivacyPolicyAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.PrivacyPolicyAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"tosLink": "http://tos.link",
 						"privacyLink": "http://privacy.link",
 						"helpLink": "http://help.link",
 						"supportEmail": "support@example.com"}`),
-				), instance.PrivacyPolicyAddedEventMapper),
+					), instance.PrivacyPolicyAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -192,15 +196,16 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceChanged",
 			reduce: (&privacyPolicyProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.PrivacyPolicyChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.PrivacyPolicyChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"tosLink": "http://tos.link",
 						"privacyLink": "http://privacy.link",
 						"helpLink": "http://help.link",
 						"supportEmail": "support@example.com"}`),
-				), instance.PrivacyPolicyChangedEventMapper),
+					), instance.PrivacyPolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -228,11 +233,12 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&privacyPolicyProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("org"),

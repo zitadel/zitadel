@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -25,13 +24,14 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			name:   "instance reduceNotificationProviderFileAdded",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DebugNotificationProviderFileAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.DebugNotificationProviderFileAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"compact": true
 			}`),
-				), instance.DebugNotificationProviderFileAddedEventMapper),
+					), instance.DebugNotificationProviderFileAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -60,13 +60,14 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			name:   "instance reduceNotificationProviderFileChanged",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DebugNotificationProviderFileChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.DebugNotificationProviderFileChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 				"compact": true
 			}`),
-				), instance.DebugNotificationProviderFileChangedEventMapper),
+					), instance.DebugNotificationProviderFileChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -92,11 +93,12 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			name:   "instance reduceNotificationProviderFileRemoved",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DebugNotificationProviderFileRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.DebugNotificationProviderFileRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.DebugNotificationProviderFileRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.DebugNotificationProviderFileRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -119,13 +121,14 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			name:   "instance reduceNotificationProviderLogAdded",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DebugNotificationProviderLogAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.DebugNotificationProviderLogAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"compact": true
 			}`),
-				), instance.DebugNotificationProviderLogAddedEventMapper),
+					), instance.DebugNotificationProviderLogAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -154,13 +157,14 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			name:   "instance reduceNotificationProviderLogChanged",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DebugNotificationProviderLogChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.DebugNotificationProviderLogChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 				"compact": true
 			}`),
-				), instance.DebugNotificationProviderLogChangedEventMapper),
+					), instance.DebugNotificationProviderLogChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -186,11 +190,12 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			name:   "instance reduceNotificationProviderLogRemoved",
 			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.DebugNotificationProviderLogRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.DebugNotificationProviderLogRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.DebugNotificationProviderLogRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.DebugNotificationProviderLogRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
@@ -212,11 +217,12 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(DebugNotificationProviderInstanceIDCol),
 			want: wantReduce{

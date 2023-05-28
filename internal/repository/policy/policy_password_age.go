@@ -1,11 +1,8 @@
 package policy
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -25,7 +22,7 @@ func (e *PasswordAgePolicyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PasswordAgePolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PasswordAgePolicyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -42,12 +39,12 @@ func NewPasswordAgePolicyAddedEvent(
 	}
 }
 
-func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordAgePolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &PasswordAgePolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-T3mGp", "unable to unmarshal policy")
 	}
@@ -66,7 +63,7 @@ func (e *PasswordAgePolicyChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *PasswordAgePolicyChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PasswordAgePolicyChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -100,12 +97,12 @@ func ChangeMaxAgeDays(maxAgeDays uint64) func(*PasswordAgePolicyChangedEvent) {
 	}
 }
 
-func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordAgePolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &PasswordAgePolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-PqaVq", "unable to unmarshal policy")
 	}
@@ -121,7 +118,7 @@ func (e *PasswordAgePolicyRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *PasswordAgePolicyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PasswordAgePolicyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -131,7 +128,7 @@ func NewPasswordAgePolicyRemovedEvent(base *eventstore.BaseEvent) *PasswordAgePo
 	}
 }
 
-func PasswordAgePolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func PasswordAgePolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &PasswordAgePolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

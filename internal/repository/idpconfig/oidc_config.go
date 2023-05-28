@@ -1,14 +1,10 @@
 package idpconfig
 
 import (
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -35,7 +31,7 @@ func (e *OIDCConfigAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -66,12 +62,12 @@ func NewOIDCConfigAddedEvent(
 	}
 }
 
-func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
@@ -99,7 +95,7 @@ func (e *OIDCConfigChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -171,12 +167,12 @@ func ChangeScopes(scopes []string) func(*OIDCConfigChangedEvent) {
 	}
 }
 
-func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}

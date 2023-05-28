@@ -2,12 +2,10 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -28,7 +26,7 @@ func (e *MachineSecretSetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MachineSecretSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineSecretSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -47,11 +45,11 @@ func NewMachineSecretSetEvent(
 	}
 }
 
-func MachineSecretSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MachineSecretSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	credentialsSet := &MachineSecretSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, credentialsSet)
+	err := event.Unmarshal(credentialsSet)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-lopbqu", "unable to unmarshal machine secret set")
 	}
@@ -67,7 +65,7 @@ func (e *MachineSecretRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MachineSecretRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineSecretRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -84,11 +82,11 @@ func NewMachineSecretRemovedEvent(
 	}
 }
 
-func MachineSecretRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MachineSecretRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	credentialsRemoved := &MachineSecretRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, credentialsRemoved)
+	err := event.Unmarshal(credentialsRemoved)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-quox9j2", "unable to unmarshal machine secret removed")
 	}
@@ -104,7 +102,7 @@ func (e *MachineSecretCheckSucceededEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MachineSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -121,11 +119,11 @@ func NewMachineSecretCheckSucceededEvent(
 	}
 }
 
-func MachineSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MachineSecretCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	check := &MachineSecretCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, check)
+	err := event.Unmarshal(check)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-x002n1p", "unable to unmarshal machine secret check succeeded")
 	}
@@ -141,7 +139,7 @@ func (e *MachineSecretCheckFailedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MachineSecretCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineSecretCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -158,11 +156,11 @@ func NewMachineSecretCheckFailedEvent(
 	}
 }
 
-func MachineSecretCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MachineSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	check := &MachineSecretCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, check)
+	err := event.Unmarshal(check)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "USER-x7901b1l", "unable to unmarshal machine secret check failed")
 	}

@@ -1,12 +1,10 @@
 package policy
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -17,15 +15,15 @@ const (
 	MailTextPolicyRemovedEventType = mailTextPolicyPrefix + "removed"
 )
 
-func NewAddMailTextUniqueConstraint(aggregateID, mailTextType, langugage string) *eventstore.EventUniqueConstraint {
+func NewAddMailTextUniqueConstraint(aggregateID, mailTextType, langugage string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueMailText,
 		fmt.Sprintf("%v:%v:%v", aggregateID, mailTextType, langugage),
 		"Errors.Org.AlreadyExists")
 }
 
-func NewRemoveMailTextUniqueConstraint(aggregateID, mailTextType, langugage string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveMailTextUniqueConstraint(aggregateID, mailTextType, langugage string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueMailText,
 		fmt.Sprintf("%v:%v:%v", aggregateID, mailTextType, langugage))
 }
@@ -47,8 +45,8 @@ func (e *MailTextAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MailTextAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language)}
+func (e *MailTextAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language)}
 }
 
 func NewMailTextAddedEvent(
@@ -75,12 +73,12 @@ func NewMailTextAddedEvent(
 	}
 }
 
-func MailTextAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTextAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &MailTextAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-5m9if", "unable to unmarshal mail text policy")
 	}
@@ -105,7 +103,7 @@ func (e *MailTextChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MailTextChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MailTextChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -167,12 +165,12 @@ func ChangeButtonText(buttonText string) func(*MailTextChangedEvent) {
 	}
 }
 
-func MailTextChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTextChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &MailTextChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "POLIC-bn88u", "unable to unmarshal mail text policy")
 	}
@@ -191,8 +189,8 @@ func (e *MailTextRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *MailTextRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language)}
+func (e *MailTextRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveMailTextUniqueConstraint(e.Aggregate().ResourceOwner, e.MailTextType, e.Language)}
 }
 
 func NewMailTextRemovedEvent(base *eventstore.BaseEvent, mailTextType, language string) *MailTextRemovedEvent {
@@ -203,7 +201,7 @@ func NewMailTextRemovedEvent(base *eventstore.BaseEvent, mailTextType, language 
 	}
 }
 
-func MailTextRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTextRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &MailTextRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

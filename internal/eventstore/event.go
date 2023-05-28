@@ -3,17 +3,53 @@ package eventstore
 import (
 	"encoding/json"
 	"reflect"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
+type action interface {
+	Aggregate() *Aggregate
+
+	// Creator is the userid of the user which created the action
+	Creator() string
+	// Type describes the action
+	Type() EventType
+	// Revision of the action
+	Revision() uint16
+}
+
 // Command is the intend to store an event into the eventstore
-type Command = eventstore.Command
+type Command interface {
+	action
+	// Payload returns the payload of the event. It represent the changed fields by the event
+	// valid types are:
+	// * nil (no payload),
+	// * struct which can be marshalled to json
+	// * pointer to struct which can be marshalled to json
+	Payload() any
+	// UniqueConstraints should be added for unique attributes of an event, if nil constraints will not be checked
+	UniqueConstraints() []*UniqueConstraint
+}
 
 // Event is a stored activity
-type Event = eventstore.Event
+type Event interface {
+	action
+
+	// Sequence of the event in the aggregate
+	Sequence() uint64
+	CreatedAt() time.Time
+
+	// Unmarshal parses the payload and stores the result
+	// in the value pointed to by ptr. If ptr is nil or not a pointer,
+	// Unmarshal returns an error
+	Unmarshal(ptr any) error
+
+	// Deprecated: only use for migration
+	DataAsBytes() []byte
+}
+
+type EventType string
 
 func EventData(event Command) ([]byte, error) {
 	switch data := event.Payload().(type) {
@@ -45,11 +81,11 @@ type BaseEventSetter[T any] interface {
 	*T
 }
 
-func GenericEventMapper[T any, PT BaseEventSetter[T]](event *repository.Event) (Event, error) {
+func GenericEventMapper[T any, PT BaseEventSetter[T]](event Event) (Event, error) {
 	e := PT(new(T))
 	e.SetBaseEvent(BaseEventFromRepo(event))
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "V2-Thai6", "unable to unmarshal event")
 	}
