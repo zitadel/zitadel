@@ -28,7 +28,7 @@ func (sa *Machine) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (sa *Machine) AppendEvent(event *es_models.Event) (err error) {
-	switch event.Typ {
+	switch event.Type() {
 	case user_repo.MachineAddedEventType, user_repo.MachineChangedEventType:
 		err = sa.setData(event)
 	}
@@ -65,7 +65,7 @@ func (key *MachineKey) AppendEvents(events ...*es_models.Event) error {
 
 func (key *MachineKey) AppendEvent(event *es_models.Event) (err error) {
 	key.ObjectRoot.AppendEvent(event)
-	switch event.Typ {
+	switch event.Type() {
 	case user_repo.MachineKeyAddedEventType:
 		err = json.Unmarshal(event.Data, key)
 		if err != nil {

@@ -49,7 +49,7 @@ func (p *Human) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (h *Human) AppendEvent(event *es_models.Event) (err error) {
-	switch event.Typ {
+	switch event.Type() {
 	case user.UserV1AddedType,
 		user.UserV1RegisteredType,
 		user.UserV1ProfileChangedType,

@@ -67,7 +67,7 @@ func (u *NotifyUser) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mo
 func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 	u.ChangeDate = event.CreationDate
 	u.Sequence = event.Seq
-	switch event.Typ {
+	switch event.Type() {
 	case user.UserV1AddedType,
 		user.UserV1RegisteredType,
 		user.HumanRegisteredType,

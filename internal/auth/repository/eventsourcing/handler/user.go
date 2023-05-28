@@ -362,19 +362,9 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler2.Statement, err e
 			if !errors.IsNotFound(err) {
 				return nil, err
 			}
-			query, err := usr_view.UserByIDQuery(event.Aggregate().ID, event.Aggregate().InstanceID, time.Time{})
+			user, err = u.userFromEventstore(event.Aggregate())
 			if err != nil {
 				return nil, err
-			}
-			events, err := u.es.Filter(context.Background(), query)
-			if err != nil {
-				return nil, err
-			}
-			user = &view_model.UserView{}
-			for _, e := range events {
-				if err = user.AppendEvent(e); err != nil {
-					return nil, err
-				}
 			}
 		}
 		err = user.AppendEvent(event)
@@ -385,19 +375,9 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler2.Statement, err e
 			if !errors.IsNotFound(err) {
 				return nil, err
 			}
-			query, err := usr_view.UserByIDQuery(event.Aggregate().ID, event.Aggregate().InstanceID, time.Time{})
+			user, err = u.userFromEventstore(event.Aggregate())
 			if err != nil {
 				return nil, err
-			}
-			events, err := u.es.Filter(context.Background(), query)
-			if err != nil {
-				return nil, err
-			}
-			user = &view_model.UserView{}
-			for _, e := range events {
-				if err = user.AppendEvent(e); err != nil {
-					return nil, err
-				}
 			}
 		}
 		err = user.AppendEvent(event)
@@ -547,4 +527,22 @@ func (u *User) loginNameInformation(ctx context.Context, orgID string, instanceI
 		return false, "", nil, err
 	}
 	return policy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
+}
+
+func (u *User) userFromEventstore(agg *eventstore.Aggregate) (*view_model.UserView, error) {
+	query, err := usr_view.UserByIDQuery(agg.ID, agg.InstanceID, time.Time{})
+	if err != nil {
+		return nil, err
+	}
+	events, err := u.es.Filter(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+	user := &view_model.UserView{}
+	for _, e := range events {
+		if err = user.AppendEvent(e); err != nil {
+			return nil, err
+		}
+	}
+	return user, nil
 }

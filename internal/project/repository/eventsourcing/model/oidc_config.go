@@ -74,7 +74,7 @@ func (key *ClientKey) AppendEvents(events ...*es_models.Event) error {
 
 func (key *ClientKey) AppendEvent(event *es_models.Event) (err error) {
 	key.ObjectRoot.AppendEvent(event)
-	switch event.Typ {
+	switch event.Type() {
 	case project.ApplicationKeyAddedEventType:
 		err = json.Unmarshal(event.Data, key)
 		if err != nil {

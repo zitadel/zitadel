@@ -39,7 +39,7 @@ func (u *User) AppendEvents(events ...*es_models.Event) error {
 func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
 
-	switch event.Typ {
+	switch event.Type() {
 	case user.UserV1AddedType,
 		user.HumanAddedType,
 		user.MachineAddedEventType,
