@@ -60,7 +60,7 @@ func eventFromEventPusher(event eventstore.Command) *repository.Event {
 		EditorUser:                    event.Creator(),
 		Version:                       event.Aggregate().Version,
 		AggregateID:                   event.Aggregate().ID,
-		AggregateType:                 eventstore.AggregateType(event.Aggregate().Type),
+		AggregateType:                 event.Aggregate().Type,
 		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 	}
 }

@@ -90,7 +90,7 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 	v.Sequence = event.Sequence()
 	v.ChangeDate = event.CreatedAt()
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case user.UserV1PasswordCheckSucceededType,
 		user.HumanPasswordCheckSucceededType:
 		v.PasswordVerification = event.CreatedAt()

@@ -72,52 +72,6 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 	return events
 }
 
-type testRepo struct {
-	events            []eventstore.Event
-	uniqueConstraints []*eventstore.UniqueConstraint
-	sequence          uint64
-	err               error
-	t                 *testing.T
-}
-
-func (repo *testRepo) Health(ctx context.Context) error {
-	return nil
-}
-
-func (repo *testRepo) Push(ctx context.Context, events []eventstore.Event, uniqueConstraints ...*eventstore.UniqueConstraint) error {
-	repo.events = append(repo.events, events...)
-	repo.uniqueConstraints = append(repo.uniqueConstraints, uniqueConstraints...)
-	return nil
-}
-
-func (repo *testRepo) Filter(ctx context.Context, searchQuery *repository.SearchQuery) ([]eventstore.Event, error) {
-	events := make([]eventstore.Event, 0, len(repo.events))
-	for _, event := range repo.events {
-		for _, filter := range searchQuery.Filters {
-			for _, f := range filter {
-				if f.Field == repository.FieldAggregateType {
-					if event.Aggregate().Type != f.Value {
-						continue
-					}
-				}
-			}
-		}
-		events = append(events, event)
-	}
-	return repo.events, nil
-}
-
-func filterAggregateType(aggregateType string) {
-
-}
-
-func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) (uint64, error) {
-	if repo.err != nil {
-		return 0, repo.err
-	}
-	return repo.sequence, nil
-}
-
 func expectPush(commands ...eventstore.Command) expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectPush(commands)

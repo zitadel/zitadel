@@ -64,7 +64,7 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 
 func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
 	view := new(TokenView)
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case user_repo.UserTokenAddedType,
 		user_repo.PersonalAccessTokenAddedType:
 		view.setRootData(event)
@@ -111,7 +111,7 @@ func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
 func (t *TokenView) AppendEvent(event eventstore.Event) error {
 	t.ChangeDate = event.CreatedAt()
 	t.Sequence = event.Sequence()
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case user_repo.UserTokenAddedType,
 		user_repo.PersonalAccessTokenAddedType:
 		t.setRootData(event)

@@ -72,7 +72,7 @@ func RefreshTokenViewToModel(token *RefreshTokenView) *usr_model.RefreshTokenVie
 
 func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event eventstore.Event) (err error) {
 	view := new(RefreshTokenView)
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case user_repo.HumanRefreshTokenAddedType:
 		view.setRootData(event)
 		err = view.appendAddedEvent(event)
@@ -102,7 +102,7 @@ func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event eventstore.Event) (
 func (t *RefreshTokenView) AppendEvent(event eventstore.Event) error {
 	t.ChangeDate = event.CreatedAt()
 	t.Sequence = event.Sequence()
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case user_repo.HumanRefreshTokenAddedType:
 		t.setRootData(event)
 		return t.appendAddedEvent(event)

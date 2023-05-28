@@ -234,7 +234,7 @@ func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mode
 func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 	u.ChangeDate = event.CreatedAt()
 	u.Sequence = event.Sequence()
-	switch eventstore.EventType(event.Type()) {
+	switch event.Type() {
 	case user.MachineAddedEventType:
 		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
