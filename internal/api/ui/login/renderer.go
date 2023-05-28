@@ -332,6 +332,7 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 			log = log.WithField("auth_req_id", authReq.ID)
 		}
 		log.Error()
+
 		_, msg = l.getErrorMessage(r, err)
 	}
 	data := l.getBaseData(r, authReq, "Errors.Internal", "", "Internal", msg)

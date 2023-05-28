@@ -83,7 +83,7 @@
                 </a>
 
                 <a
-                  *ngIf="customerPortalLink"
+                  *ngIf="customerPortalLink$ | async as customerPortalLink"
                   class="nav-item external-link"
                   [href]="customerPortalLink"
                   target="_blank"

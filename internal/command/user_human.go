@@ -58,11 +58,20 @@ type AddHuman struct {
 	Register               bool
 	Metadata               []*AddMetadataEntry
 
+	// Links are optional
+	Links []*AddLink
+
 	// Details are set after a successful execution of the command
 	Details *domain.ObjectDetails
 
 	// EmailCode is set by the command
 	EmailCode *string
+}
+
+type AddLink struct {
+	IDPID         string
+	DisplayName   string
+	IDPExternalID string
 }
 
 func (h *AddHuman) Validate() (err error) {
@@ -226,6 +235,13 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, passwordAlg cr
 					metadataEntry.Value,
 				))
 			}
+			for _, link := range human.Links {
+				cmd, err := addLink(ctx, filter, a, link)
+				if err != nil {
+					return nil, err
+				}
+				cmds = append(cmds, cmd)
+			}
 
 			return cmds, nil
 		}, nil
@@ -260,6 +276,15 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 	}
 	return cmds, nil
 }
+
+func addLink(ctx context.Context, filter preparation.FilterToQueryReducer, a *user.Aggregate, link *AddLink) (eventstore.Command, error) {
+	exists, err := ExistsIDP(ctx, filter, link.IDPID, a.ResourceOwner)
+	if !exists || err != nil {
+		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-39nf2", "Errors.IDPConfig.NotExisting")
+	}
+	return user.NewUserIDPLinkAddedEvent(ctx, &a.Aggregate, link.IDPID, link.DisplayName, link.IDPExternalID), nil
+}
+
 func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.FilterToQueryReducer, cmds []eventstore.Command, a *user.Aggregate, human *AddHuman, codeAlg crypto.EncryptionAlgorithm) ([]eventstore.Command, error) {
 	if human.Phone.Number == "" {
 		return cmds, nil

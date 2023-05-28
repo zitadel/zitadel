@@ -391,6 +391,9 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-EDtjd", "reduce.wrong.event.type %s", user.HumanPasswordlessInitCodeAddedType)
 	}
+	if e.CodeReturned {
+		return handler.NewNoOpStatement(e), nil
+	}
 	ctx := HandlerContext(event.Aggregate())
 	alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, map[string]interface{}{"id": e.ID}, user.HumanPasswordlessInitCodeSentType)
 	if err != nil {
@@ -439,7 +442,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 		e,
 		u.metricSuccessfulDeliveriesEmail,
 		u.metricFailedDeliveriesEmail,
-	).SendPasswordlessRegistrationLink(notifyUser, origin, code, e.ID)
+	).SendPasswordlessRegistrationLink(notifyUser, origin, code, e.ID, e.URLTemplate)
 	if err != nil {
 		return nil, err
 	}

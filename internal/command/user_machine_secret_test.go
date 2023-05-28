@@ -132,7 +132,6 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 					ResourceOwner: "org1",
 				},
 				secret: &GenerateMachineSecret{
-					ClientID:     "user1",
 					ClientSecret: "a",
 				},
 			},
@@ -152,7 +151,6 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
-				assert.Equal(t, tt.args.set.ClientID, tt.res.secret.ClientID)
 				assert.Equal(t, tt.args.set.ClientSecret, tt.res.secret.ClientSecret)
 			}
 		})

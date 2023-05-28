@@ -33,7 +33,7 @@ module.exports = {
     "examples/sdks",
     {
       type: "category",
-      label: "Example Applications",
+      label: "Example applications",
       items: [
         "examples/introduction",
         {
@@ -57,8 +57,14 @@ module.exports = {
         {
           type: "category",
           label: "Cloud",
+          link: {
+            type: "generated-index",
+            title: "Overview",
+            slug: "guides/manage/cloud/overview",
+            description:
+              "Our customer portal is used to manage all your  ZITADEL instances. You can also manage your subscriptions, billing, newsletters and support requests.",
+          },
           items: [
-            "guides/manage/cloud/overview",
             "guides/manage/cloud/start",
             "guides/manage/cloud/instances",
             "guides/manage/cloud/billing",
@@ -136,7 +142,7 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "Authenticate Users",
+          label: "Authenticate users",
           collapsed: true,
           items: [
             "guides/integrate/login-users",
@@ -146,7 +152,24 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Configure Identity Providers",
+          label: "Authenticate service users",
+          link: {
+            type: "generated-index",
+            title: "Authenticate Service Users",
+            slug: "/guides/integrate/serviceusers",
+            description:
+              "How to authenticate service users for machine-to-machine (M2M) communication between services. You also need to authenticate service users to access ZITADEL's APIs.",
+          },
+          collapsed: true,
+          items: [
+            "guides/integrate/private-key-jwt",
+            "guides/integrate/client-credentials",
+            "guides/integrate/pat",
+          ],
+        },
+        {
+          type: "category",
+          label: "Configure identity providers",
           link: {
             type: "generated-index",
             title: "Let users login with their preferred identity provider",
@@ -173,28 +196,16 @@ module.exports = {
           collapsed: true,
           items: [
             {
-              type: "category",
-              label: "Authenticate Service Users",
-              link: {
-                type: "generated-index",
-                title: "Authenticate Service Users",
-                slug: "/guides/integrate/serviceusers",
-                description:
-                  "How to authenticate service users",
-              },
-              collapsed: true,
-              items: [
-                "guides/integrate/private-key-jwt",
-                "guides/integrate/client-credentials",
-                "guides/integrate/pat",
-              ],
+              type: 'link',
+              label: 'Authenticate service users',
+              href: '/guides/integrate/serviceusers',
             },
             "guides/integrate/access-zitadel-apis",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/event-api",
             {
               type: "category",
-              label: "Example Code",
+              label: "Example code",
               items: [
                 "examples/call-zitadel-api/go",
                 "examples/call-zitadel-api/dot-net",
@@ -247,13 +258,13 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Solution Scenarios",
+      label: "Solution scenarios",
       link: {
         type: "generated-index",
-        title: "Solution Scenarios",
+        title: "Solution scenarios",
         slug: "guides/solution-scenarios/introduction",
         description:
-          "Customers of an SaaS Identity and Access Management System usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into Solution Scenarios which aim to help you getting started with ZITADEL.",
+          "Customers of an SaaS Identity and access management system usually have all distinct use cases and requirements. This guide attempts to explain real-world implementations and break them down into solution scenarios which aim to help you getting started with ZITADEL.",
       },
       collapsed: true,
       items: [
@@ -268,8 +279,14 @@ module.exports = {
       type: "category",
       label: "Concepts",
       collapsed: true,
+      link: {
+        type: "generated-index",
+        title: "Concepts and Features",
+        slug: "concepts",
+        description:
+          "This part of our documentation contains ZITADEL specific or general concepts required to understand the system or our guides.",
+      },
       items: [
-        "concepts/introduction",
         "concepts/structure/instance",
         "concepts/structure/organizations",
         "concepts/structure/projects",
@@ -310,10 +327,11 @@ module.exports = {
       label: "Support",
       collapsed: true,
       items: [
+        "support/software-release-cycles-support",
         "support/troubleshooting",
         {
           type: 'category',
-          label: "Technical Advisory",
+          label: "Technical advisory",
           link: {
             type: 'doc',
             id: 'support/technical_advisory',
@@ -349,96 +367,96 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "Authenticated User",
+          label: "Authenticated user",
           link: {
             type: "generated-index",
             title: "Auth API",
-            slug: "/apis/auth",
+            slug: "/apis/resources/auth",
             description:
               "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
 
           },
-          items: require("./docs/apis/auth/sidebar.js"),
+          items: require("./docs/apis/resources/auth/sidebar.js"),
         },
         {
           type: "category",
-          label: "Organization Objects",
+          label: "Organization objects",
           link: {
             type: "generated-index",
             title: "Management API",
-            slug: "/apis/mgmt",
+            slug: "/apis/resources/mgmt",
             description:
               "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
           },
-          items: require("./docs/apis/mgmt/sidebar.js"),
+          items: require("./docs/apis/resources/mgmt/sidebar.js"),
         },
         {
           type: "category",
-          label: "Instance Objects",
+          label: "Instance objects",
           link: {
             type: "generated-index",
             title: "Admin API",
-            slug: "/apis/admin",
+            slug: "/apis/resources/admin",
             description:
               "This API is intended to configure and manage one ZITADEL instance itself.",
           },
-          items: require("./docs/apis/admin/sidebar.js"),
+          items: require("./docs/apis/resources/admin/sidebar.js"),
         },
         {
           type: "category",
-          label: "Instance Lifecycle",
+          label: "Instance lifecycle",
           link: {
             type: "generated-index",
             title: "System API",
-            slug: "/apis/system",
+            slug: "/apis/resources/system",
             description:
               "This API is intended to manage the different ZITADEL instances within the system.\n" +
               "\n" +
               "Checkout the guide how to access the ZITADEL System API.",
           },
-          items: require("./docs/apis/system/sidebar.js"),
+          items: require("./docs/apis/resources/system/sidebar.js"),
         },
         {
           type: "category",
-          label: "User Lifecycle (Alpha)",
+          label: "User lifecycle (alpha)",
           link: {
             type: "generated-index",
-            title: "User Service API (Alpha)",
-            slug: "/apis/user_service",
+            title: "User service API (Alpha)",
+            slug: "/apis/resources/user_service",
             description:
               "This API is intended to manage users in a ZITADEL instance.\n"+
               "\n"+
               "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
-          items: require("./docs/apis/user_service/sidebar.js"),
+          items: require("./docs/apis/resources/user_service/sidebar.js"),
         },
         {
           type: "category",
-          label: "Session Lifecycle (Alpha)",
+          label: "Session lifecycle (Alpha)",
           link: {
             type: "generated-index",
-            title: "Session Service API (Alpha)",
-            slug: "/apis/session_service",
+            title: "Session service API (Alpha)",
+            slug: "/apis/resources/session_service",
             description:
               "This API is intended to manage sessions in a ZITADEL instance.\n"+
               "\n"+
               "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
-          items: require("./docs/apis/session_service/sidebar.js"),
+          items: require("./docs/apis/resources/session_service/sidebar.js"),
         },
         {
           type: "category",
-          label: "Settings Lifecycle (Alpha)",
+          label: "Settings lifecycle (alpha)",
           link: {
             type: "generated-index",
-            title: "Settings Service API (Alpha)",
-            slug: "/apis/settings_service",
+            title: "Settings service API (Alpha)",
+            slug: "/apis/resources/settings_service",
             description:
               "This API is intended to manage settings in a ZITADEL instance.\n"+
               "\n"+
-              "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+              "This project is in alpha state. It can AND will continue to break until the services provide the same functionality as the current login.",
           },
-          items: require("./docs/apis/settings_service/sidebar.js"),
+          items: require("./docs/apis/resources/settings_service/sidebar.js"),
         },
         {
           type: "category",
@@ -489,7 +507,7 @@ module.exports = {
     },
     {
       type: "doc",
-      label: "gRPC Status Codes",
+      label: "gRPC status codes",
       id: "apis/statuscodes"
     },
     {
@@ -500,7 +518,7 @@ module.exports = {
     },
     {
       type: 'link',
-      label: 'Rate Limits (Cloud)', // The link label
+      label: 'Rate limits (cloud)', // The link label
       href: '/legal/rate-limit-policy', // The internal path
     },
   ],
@@ -537,41 +555,51 @@ module.exports = {
       ],
     },
   ],
-  support: [
-  ],
   legal: [
-    "legal/introduction",
-    "legal/terms-of-service",
-    "legal/data-processing-agreement",
     {
       type: "category",
-      label: "Service Description",
+      label: "Legal agreements",
       collapsed: false,
+      link: {
+        type: "generated-index",
+        title: "Legal agreements",
+        slug: "legal",
+        description:
+          "This section contains important agreements, policies and appendices relevant for users of our websites and services. All documents will be provided in English language.",
+      },
       items: [
-        "legal/cloud-service-description",
-        "legal/service-level-description",
-        "legal/support-services",
-      ],
-    },
-    {
-      type: "category",
-      label: "Additional terms",
-      collapsed: true,
-      items: [
-        "legal/terms-support-service",
-        "legal/terms-of-service-dedicated",
-      ],
-    },
-    {
-      type: "category",
-      label: "Policies",
-      collapsed: false,
-      items: [
-        "legal/privacy-policy",
-        "legal/acceptable-use-policy",
-        "legal/rate-limit-policy",
-        "legal/vulnerability-disclosure-policy",
-      ],
+        "legal/terms-of-service",
+        "legal/data-processing-agreement",
+        {
+          type: "category",
+          label: "Service description",
+          collapsed: false,
+          items: [
+            "legal/cloud-service-description",
+            "legal/service-level-description",
+            "legal/support-services",
+          ],
+        },
+        {
+          type: "category",
+          label: "Support program",
+          collapsed: true,
+          items: [
+            "legal/terms-support-service",
+          ],
+        },
+        {
+          type: "category",
+          label: "Policies",
+          collapsed: false,
+          items: [
+            "legal/privacy-policy",
+            "legal/acceptable-use-policy",
+            "legal/rate-limit-policy",
+            "legal/vulnerability-disclosure-policy",
+          ],
+        },
+      ]
     },
   ],
 };

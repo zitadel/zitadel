@@ -91,7 +91,7 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 	return f, nil
 }
 
-func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler, accessInterceptor func(http.Handler) http.Handler, customerPortal string) (http.Handler, error) {
+func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler func(http.Handler) http.Handler, limitingAccessInterceptor *middleware.AccessInterceptor, customerPortal string) (http.Handler, error) {
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
@@ -106,19 +106,26 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 
 	handler := mux.NewRouter()
 
-	handler.Use(callDurationInterceptor, instanceHandler, security, accessInterceptor)
+	handler.Use(callDurationInterceptor, instanceHandler, security, limitingAccessInterceptor.WithoutLimiting().Handle)
 	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
-		instance := authz.GetInstance(r.Context())
+		ctx := r.Context()
+		instance := authz.GetInstance(ctx)
 		instanceMgmtURL, err := templateInstanceManagementURL(config.InstanceManagementURL, instance)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to template instance management url for console: %v", err), http.StatusInternalServerError)
 			return
 		}
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL)
+		exhausted := limitingAccessInterceptor.Limit(ctx)
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL, exhausted)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return
+		}
+		if exhausted {
+			limitingAccessInterceptor.SetExhaustedCookie(w, r)
+		} else {
+			limitingAccessInterceptor.DeleteExhaustedCookie(w)
 		}
 		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
@@ -148,19 +155,21 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createEnvironmentJSON(api, issuer, clientID, customerPortal, instanceMgmtUrl string) ([]byte, error) {
+func createEnvironmentJSON(api, issuer, clientID, customerPortal, instanceMgmtUrl string, exhausted bool) ([]byte, error) {
 	environment := struct {
 		API                   string `json:"api,omitempty"`
 		Issuer                string `json:"issuer,omitempty"`
 		ClientID              string `json:"clientid,omitempty"`
 		CustomerPortal        string `json:"customer_portal,omitempty"`
 		InstanceManagementURL string `json:"instance_management_url,omitempty"`
+		Exhausted             bool   `json:"exhausted,omitempty"`
 	}{
 		API:                   api,
 		Issuer:                issuer,
 		ClientID:              clientID,
 		CustomerPortal:        customerPortal,
 		InstanceManagementURL: instanceMgmtUrl,
+		Exhausted:             exhausted,
 	}
 	return json.Marshal(environment)
 }

@@ -71,6 +71,11 @@ as horizontal scaling is much easier than with PostgreSQL.
 Also, if you are concerned about multi-regional data locality,
 [the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).
 
+The indexes for the database are optimized using load tests from [ZITADEL Cloud](https://zitadel.com), 
+which runs with CockroachDB.
+If you identify problems with your Postgresql during load tests that indicate that the indexes are not optimized,
+please create an issue in our [github repository](https://github.com/zitadel/zitadel).
+
 ### Configure ZITADEL
 
 Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/self-hosting/manage/database).
