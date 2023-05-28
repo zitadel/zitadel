@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"net"
 
 	"github.com/zitadel/logging"

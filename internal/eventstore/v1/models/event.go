@@ -56,7 +56,7 @@ func (e *Event) DataAsBytes() []byte {
 }
 
 func (e *Event) Unmarshal(ptr any) error {
-	return json.Unmarshal(e.DataAsBytes(), ptr)
+	return json.Unmarshal(e.Data, ptr)
 }
 
 // EditorService implements [eventstore.Event]
