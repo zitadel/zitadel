@@ -18,13 +18,3 @@ func (p *projection) Name() string {
 func (p *projection) Reducers() []AggregateReducer {
 	return p.reducers
 }
-
-type mockEventReducer struct {
-	wasCalled bool
-	statement *Statement
-}
-
-func (m *mockEventReducer) reduce(event eventstore.Event) (*Statement, error) {
-	m.wasCalled = true
-	return m.statement, nil
-}

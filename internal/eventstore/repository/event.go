@@ -73,7 +73,7 @@ func (e *Event) Aggregate() *eventstore.Aggregate {
 		Type:          e.AggregateType,
 		ResourceOwner: e.ResourceOwner.String,
 		InstanceID:    e.InstanceID,
-		Version:       eventstore.Version(e.Version),
+		Version:       e.Version,
 	}
 }
 

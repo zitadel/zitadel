@@ -1223,35 +1223,3 @@ func generateCommand(t *testing.T, aggregateID string, opts ...func(*repository.
 
 	return e
 }
-
-func generateAddUniqueConstraint(t *testing.T, table, uniqueField string) *eventstore.UniqueConstraint {
-	t.Helper()
-	e := &eventstore.UniqueConstraint{
-		UniqueType:  table,
-		UniqueField: uniqueField,
-		Action:      eventstore.UniqueConstraintAdd,
-	}
-
-	return e
-}
-
-func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *eventstore.UniqueConstraint {
-	t.Helper()
-	e := &eventstore.UniqueConstraint{
-		UniqueType:  table,
-		UniqueField: uniqueField,
-		Action:      eventstore.UniqueConstraintRemove,
-	}
-
-	return e
-}
-
-// func generateRemoveInstanceUniqueConstraints(t *testing.T, instanceID string) *eventstore.UniqueConstraint {
-// 	t.Helper()
-// 	e := &eventstore.UniqueConstraint{
-// 		InstanceID: instanceID,
-// 		Action:     eventstore.UniqueConstraintInstanceRemove,
-// 	}
-
-// 	return e
-// }

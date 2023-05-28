@@ -8,7 +8,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/errors"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
@@ -40,7 +39,7 @@ func (u *User) AppendEvents(events ...*es_models.Event) error {
 func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
 
-	switch eventstore.EventType(event.Typ) {
+	switch event.Typ {
 	case user.UserV1AddedType,
 		user.HumanAddedType,
 		user.MachineAddedEventType,

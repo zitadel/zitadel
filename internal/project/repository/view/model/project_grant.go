@@ -8,7 +8,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -48,7 +47,7 @@ type ProjectGrant struct {
 func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
 	p.Sequence = event.Seq
-	switch eventstore.EventType(event.Typ) {
+	switch event.Typ {
 	case project.GrantAddedType:
 		p.State = int32(model.ProjectStateActive)
 		p.CreationDate = event.CreationDate
