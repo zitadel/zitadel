@@ -159,11 +159,9 @@ func generateRemoveUniqueConstraint(table, uniqueField string) func(e *testEvent
 	}
 }
 
-// func generateRemoveInstanceUniqueConstraints(instanceID string) *eventstore.UniqueConstraint {
-// 	e := &eventstore.UniqueConstraint{
-// 		InstanceID: instanceID,
-// 		Action:     eventstore.UniqueConstraintInstanceRemove,
-// 	}
-
-// 	return e
-// }
+func cleanupEventstore() {
+	_, err := testCRDBClient.Exec("TRUNCATE eventstore.events")
+	if err != nil {
+		logging.Warnf("unable to truncate events: %v", err)
+	}
+}

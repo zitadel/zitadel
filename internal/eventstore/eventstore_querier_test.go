@@ -71,6 +71,8 @@ func TestCRDB_Filter(t *testing.T) {
 	for _, tt := range tests {
 		for querierName, querier := range queriers {
 			t.Run(querierName+"/"+tt.name, func(t *testing.T) {
+				t.Cleanup(cleanupEventstore)
+
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: querier,
@@ -154,6 +156,8 @@ func TestCRDB_CreateInstance(t *testing.T) {
 	for _, tt := range tests {
 		for querierName, querier := range queriers {
 			t.Run(querierName+"/"+tt.name, func(t *testing.T) {
+				t.Cleanup(cleanupEventstore)
+
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: querier,
@@ -241,6 +245,8 @@ func TestCRDB_LatestSequence(t *testing.T) {
 	for _, tt := range tests {
 		for querierName, querier := range queriers {
 			t.Run(querierName+"/"+tt.name, func(t *testing.T) {
+				t.Cleanup(cleanupEventstore)
+
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: querier,

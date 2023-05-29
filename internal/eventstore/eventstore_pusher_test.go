@@ -5,6 +5,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -186,6 +188,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 	for _, tt := range tests {
 		for pusherName, pusher := range pushers {
 			t.Run(pusherName+"/"+tt.name, func(t *testing.T) {
+				t.Cleanup(cleanupEventstore)
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: queriers["v2"],
@@ -313,6 +316,8 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	for _, tt := range tests {
 		for pusherName, pusher := range pushers {
 			t.Run(pusherName+"/"+tt.name, func(t *testing.T) {
+				t.Cleanup(cleanupEventstore)
+
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: queriers["v2"],
@@ -441,6 +446,8 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 	for _, tt := range tests {
 		for pusherName, pusher := range pushers {
 			t.Run(pusherName+"/"+tt.name, func(t *testing.T) {
+				t.Cleanup(cleanupEventstore)
+
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: queriers["v2"],
@@ -583,6 +590,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 	for _, tt := range tests {
 		for pusherName, pusher := range pushers {
 			t.Run(pusherName+"/"+tt.name, func(t *testing.T) {
+				t.Cleanup(cleanupEventstore)
+
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: queriers["v2"],

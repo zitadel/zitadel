@@ -470,7 +470,7 @@ func Test_query_events_with_crdb(t *testing.T) {
 			}
 
 			// setup initial data for query
-			if _, err := db.push(context.Background(), tt.fields.existingEvents); err != nil {
+			if _, err := db.Push(context.Background(), tt.fields.existingEvents...); err != nil {
 				t.Errorf("error in setup = %v", err)
 				return
 			}
