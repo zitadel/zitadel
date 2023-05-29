@@ -41,7 +41,7 @@
     "libphonenumber-js": "^1.10.30",
     "material-design-icons-iconfont": "^6.1.1",
     "moment": "^2.29.4",
-    "ngx-color": "^8.0.3",
+    "ngx-color": "^9.0.0",
     "rxjs": "~7.8.0",
     "tinycolor2": "^1.6.0",
     "tslib": "^2.4.1",
