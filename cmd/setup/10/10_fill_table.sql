@@ -5,8 +5,8 @@ INSERT INTO wrong_events (
         SELECT
             instance_id
             , event_sequence
-            , created_at AS current_cd
-            , lead(created_at) OVER (
+            , creation_date AS current_cd
+            , lead(creation_date) OVER (
                 PARTITION BY instance_id
                 ORDER BY event_sequence DESC
             ) AS next_cd
