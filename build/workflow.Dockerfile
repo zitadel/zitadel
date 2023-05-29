@@ -12,7 +12,9 @@ WORKDIR /go/src/github.com/zitadel/zitadel
 COPY go.mod .
 COPY go.sum .
 
-RUN go mod download
+RUN \
+    --mount=type=cache,target=~/.cache \
+    go mod download
 
 # #######################################
 # compile custom protoc plugins
@@ -45,7 +47,9 @@ COPY buf.*.yaml .
 COPY Makefile Makefile
 COPY --from=core-api-generator /go/bin /usr/local/bin
 
-RUN make grpc
+RUN \
+    --mount=type=cache,target=~/.cache \
+    make grpc
 
 # #######################################
 # generate code for login ui
@@ -62,7 +66,9 @@ COPY internal/notification/statik internal/notification/statik
 COPY internal/static internal/static
 COPY internal/statik internal/statik
 
-RUN make static
+RUN \
+    --mount=type=cache,target=~/.cache \
+    make static
 
 # #######################################
 # generate code for assets
@@ -79,7 +85,9 @@ COPY internal/config internal/config
 COPY internal/errors internal/errors
 COPY --from=core-api /go/src/github.com/zitadel/zitadel/openapi/v2 openapi/v2
 
-RUN make assets
+RUN \
+    --mount=type=cache,target=~/.cache \
+    make assets
 
 # #######################################
 # Gather all core files
@@ -285,7 +293,9 @@ COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 
 RUN git fetch https://github.com/zitadel/zitadel main:main
 
-RUN golangci-lint run \
+RUN \
+    --mount=type=cache,target=~/.cache \
+    golangci-lint run \
     --timeout 10m \
     --config ./.golangci.yaml \
     --out-format=github-actions:report,colored-line-number \
