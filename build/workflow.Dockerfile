@@ -14,7 +14,6 @@ COPY go.sum .
 
 RUN \
     --mount=type=cache,target=~/.cache \
-    --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
 # #######################################
@@ -31,7 +30,6 @@ COPY pkg/grpc/protoc/v2 pkg/grpc/protoc/v2
 
 RUN \
     --mount=type=cache,target=~/.cache \
-    --mount=type=cache,target=/go/pkg/mod \
     go install internal/protoc/protoc-gen-authoption/main.go \
     && mv $(go env GOPATH)/bin/main $(go env GOPATH)/bin/protoc-gen-authoption \
 	&& go install internal/protoc/protoc-gen-zitadel/main.go \
@@ -53,7 +51,6 @@ COPY --from=core-api-generator /go/bin /usr/local/bin
 
 RUN \
     --mount=type=cache,target=~/.cache \
-    --mount=type=cache,target=/go/pkg/mod \
     make grpc
 
 # #######################################
@@ -73,7 +70,6 @@ COPY internal/statik internal/statik
 
 RUN \
     --mount=type=cache,target=~/.cache \
-    --mount=type=cache,target=/go/pkg/mod \
     make static
 
 # #######################################
@@ -93,7 +89,6 @@ COPY --from=core-api /go/src/github.com/zitadel/zitadel/openapi/v2 openapi/v2
 
 RUN \
     --mount=type=cache,target=~/.cache \
-    --mount=type=cache,target=/go/pkg/mod \
     make assets
 
 # #######################################
@@ -265,7 +260,6 @@ RUN chmod +x /usr/local/bin/run-tests.sh
 
 RUN \
     --mount=type=cache,target=~/.cache \
-    --mount=type=cache,target=/go/pkg/mod \
     run-tests.sh
 
 # #######################################
