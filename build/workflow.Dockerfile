@@ -81,7 +81,6 @@ WORKDIR /go/src/github.com/zitadel/zitadel
 COPY go.mod .
 COPY go.sum .
 COPY Makefile Makefile
-COPY openapi/statik openapi/statik
 COPY internal/api/assets/generator internal/api/assets/generator
 COPY internal/config internal/config
 COPY internal/errors internal/errors
@@ -280,7 +279,9 @@ FROM bufbuild/buf:latest AS lint-api
 COPY proto proto
 COPY buf.*.yaml .
 
-RUN buf lint
+RUN \
+    --mount=type=cache,target=/root/.cache/buf/v2/module/buf.build \
+    buf lint
 
 # #######################################
 # console

@@ -43,10 +43,8 @@ static:
 	go generate internal/statik/generate.go
 
 assets:
-	go install github.com/rakyll/statik@v0.1.7
-	go generate openapi/statik/generate.go && \
-    mkdir -p docs/apis/assets/ && \
-    go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
+	mkdir -p docs/apis/assets
+	go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
 clean:
 	rm -rf .artifacts/grpc
