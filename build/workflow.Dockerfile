@@ -5,7 +5,7 @@
 # #######################################
 # download dependencies
 # #######################################
-FROM golang:alpine AS core-deps
+FROM golang:buster AS core-deps
 
 WORKDIR /go/src/github.com/zitadel/zitadel
 
@@ -17,7 +17,7 @@ RUN go mod download
 # #######################################
 # compile custom protoc plugins
 # #######################################
-FROM golang:alpine AS core-api-generator
+FROM golang:buster AS core-api-generator
 
 WORKDIR /go/src/github.com/zitadel/zitadel
 
@@ -26,30 +26,23 @@ COPY go.sum .
 COPY internal/protoc internal/protoc
 COPY pkg/grpc/protoc/v2 pkg/grpc/protoc/v2
 
-RUN go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption \
-	&& go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-zitadel
+RUN go install internal/protoc/protoc-gen-authoption/main.go \
+    && mv $(go env GOPATH)/bin/main $(go env GOPATH)/bin/protoc-gen-authoption \
+	&& go install internal/protoc/protoc-gen-zitadel/main.go \
+    && mv $(go env GOPATH)/bin/main $(go env GOPATH)/bin/protoc-gen-zitadel
 
 # #######################################
 # build backend stub
 # #######################################
-FROM bufbuild/buf:latest AS core-api
+FROM golang:buster AS core-api
 
 WORKDIR /go/src/github.com/zitadel/zitadel
-
-# install go
-COPY --from=golang:alpine /usr/local/go/ /usr/local/go/
-ENV PATH="/usr/local/go/bin:${PATH}"
-ENV PATH="/root/go/bin:${PATH}"
-
-# install make
-RUN apk add --update make
 
 COPY go.mod .
 COPY go.sum .
 COPY proto proto
 COPY buf.*.yaml .
 COPY Makefile Makefile
-
 COPY --from=core-api-generator /go/bin /usr/local/bin
 
 RUN make grpc
@@ -57,12 +50,9 @@ RUN make grpc
 # #######################################
 # generate code for login ui
 # #######################################
-FROM golang:alpine AS core-login
+FROM golang:buster AS core-login
 
 WORKDIR /go/src/github.com/zitadel/zitadel
-
-# install make
-RUN apk add --update make
 
 COPY Makefile Makefile
 COPY internal/api/ui/login/static internal/api/ui/login/static
@@ -77,11 +67,8 @@ RUN make static
 # #######################################
 # generate code for assets
 # #######################################
-FROM golang:alpine AS core-assets
+FROM golang:buster AS core-assets
 WORKDIR /go/src/github.com/zitadel/zitadel
-
-# install make
-RUN apk add --update make
 
 COPY go.mod .
 COPY go.sum .
@@ -90,7 +77,6 @@ COPY openapi/statik openapi/statik
 COPY internal/api/assets/generator internal/api/assets/generator
 COPY internal/config internal/config
 COPY internal/errors internal/errors
-
 COPY --from=core-api /go/src/github.com/zitadel/zitadel/openapi/v2 openapi/v2
 
 RUN make assets
@@ -103,7 +89,6 @@ FROM core-deps AS core-gathered
 COPY --from=core-api /go/src/github.com/zitadel/zitadel .
 COPY --from=core-login /go/src/github.com/zitadel/zitadel .
 COPY --from=core-assets /go/src/github.com/zitadel/zitadel .
-
 COPY cmd cmd
 COPY internal internal
 COPY pkg pkg
@@ -177,7 +162,7 @@ ARG GOARCH
 
 COPY --from=console /zitadel/console/dist/console internal/api/ui/console/static/
 
-RUN go build -o zitadel -ldflags="-s -w" \
+RUN go build -o zitadel -ldflags="-s -w -race" \
     && chmod +x zitadel
 
 ENTRYPOINT [ "./zitadel" ]
@@ -291,6 +276,7 @@ RUN yarn lint
 FROM golangci/golangci-lint:latest AS lint-core
 
 WORKDIR /go/src/github.com/zitadel/zitadel
+
 COPY .golangci.yaml .
 COPY .git/ .git/
 COPY --from=core-deps /go/pkg/mod /go/pkg/mod

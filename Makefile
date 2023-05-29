@@ -22,19 +22,18 @@
 # 	go install github.com/rakyll/statik@v0.1.7
 
 grpc:
+	go install github.com/bufbuild/buf/cmd/buf@latest
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.30
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2
 	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
-	# go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption
-	# go install github.com/zitadel/zitadel/internal/protoc/protoc-gen-zitadel
-	# go install github.com/rakyll/statik@v0.1.7
 	buf generate
 	mkdir -p pkg/grpc
 	mv .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
 	mkdir -p openapi/v2/zitadel
-	mv .artifacts/grpc/zitadel/*.swagger.json openapi/v2/zitadel
+	mv .artifacts/grpc/zitadel/ openapi/v2/zitadel
+	rm -r .artifacts
 
 static:
 	go install github.com/rakyll/statik@v0.1.7
