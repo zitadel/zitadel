@@ -209,6 +209,8 @@ ENV PGUSER=zitadel
 ENV PGDATABASE=zitadel
 ENV PGPASSWORD=postgres
 
+ENV CGO_ENABLED=1
+
 # copy zitadel files
 COPY --from=core-deps /go/pkg/mod /root/go/pkg/mod
 COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
