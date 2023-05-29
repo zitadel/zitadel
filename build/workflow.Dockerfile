@@ -305,7 +305,9 @@ COPY .git/ .git/
 COPY --from=core-deps /go/pkg/mod /go/pkg/mod
 COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 
-RUN git fetch https://github.com/zitadel/zitadel main:main
+RUN \
+    --mount=type=cache,target=.git \
+    git fetch https://github.com/zitadel/zitadel main:main
 
 RUN \
     --mount=type=cache,target=~/.cache \
