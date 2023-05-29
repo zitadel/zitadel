@@ -88,7 +88,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 								"org2",
 								"",
 								"",
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								domain.UserGrantStateActive,
 							},
 						},
@@ -155,7 +155,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 								"",
 								"grant-id",
 								"org3",
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								domain.UserGrantStateActive,
 							},
 						},
@@ -185,7 +185,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								uint64(15),
 								"agg-id",
 								"instance-id",
@@ -217,7 +217,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								uint64(15),
 								"agg-id",
 								"instance-id",
@@ -495,7 +495,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.user_grants3 SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1::TEXT[]))) WHERE (grant_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
-								database.StringArray{"key"},
+								database.TextArray[string]{"key"},
 								"grantID",
 								"instance-id",
 							},

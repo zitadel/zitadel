@@ -158,7 +158,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			},
 			args: args{
 				lockDuration: 1 * time.Second,
-				instanceIDs:  database.StringArray{"instanceID"},
+				instanceIDs:  database.TextArray[string]{"instanceID"},
 			},
 		},
 		{
@@ -173,7 +173,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			},
 			args: args{
 				lockDuration: 2 * time.Second,
-				instanceIDs:  database.StringArray{"instanceID"},
+				instanceIDs:  database.TextArray[string]{"instanceID"},
 			},
 		},
 		{
@@ -188,7 +188,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			},
 			args: args{
 				lockDuration: 3 * time.Second,
-				instanceIDs:  database.StringArray{"instanceID"},
+				instanceIDs:  database.TextArray[string]{"instanceID"},
 			},
 		},
 		{

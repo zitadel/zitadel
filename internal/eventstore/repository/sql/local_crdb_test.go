@@ -63,11 +63,6 @@ func initDB(db *sql.DB) error {
 	return initialise.VerifyZitadel(db, *config)
 }
 
-func fillUniqueData(unique_type, field, instanceID string) error {
-	_, err := testCRDBClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
-	return err
-}
-
 type testDB struct{}
 
 func (_ *testDB) Timetravel(time.Duration) string { return " AS OF SYSTEM TIME '-1 ms' " }

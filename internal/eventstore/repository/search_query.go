@@ -169,7 +169,7 @@ func aggregateIDFilter(query *eventstore.SearchQuery) *Filter {
 	if len(query.GetAggregateIDs()) == 1 {
 		return NewFilter(FieldAggregateID, query.GetAggregateIDs()[0], OperationEquals)
 	}
-	return NewFilter(FieldAggregateID, database.StringArray(query.GetAggregateIDs()), OperationIn)
+	return NewFilter(FieldAggregateID, database.TextArray[string](query.GetAggregateIDs()), OperationIn)
 }
 
 func eventTypeFilter(query *eventstore.SearchQuery) *Filter {
@@ -179,9 +179,9 @@ func eventTypeFilter(query *eventstore.SearchQuery) *Filter {
 	if len(query.GetEventTypes()) == 1 {
 		return NewFilter(FieldEventType, query.GetEventTypes()[0], OperationEquals)
 	}
-	eventTypes := make(database.StringArray, len(query.GetEventTypes()))
+	eventTypes := make(database.TextArray[eventstore.EventType], len(query.GetEventTypes()))
 	for i, eventType := range query.GetEventTypes() {
-		eventTypes[i] = string(eventType)
+		eventTypes[i] = eventType
 	}
 	return NewFilter(FieldEventType, eventTypes, OperationIn)
 }
@@ -193,9 +193,9 @@ func aggregateTypeFilter(query *eventstore.SearchQuery) *Filter {
 	if len(query.GetAggregateTypes()) == 1 {
 		return NewFilter(FieldAggregateType, query.GetAggregateTypes()[0], OperationEquals)
 	}
-	aggregateTypes := make(database.StringArray, len(query.GetAggregateTypes()))
+	aggregateTypes := make(database.TextArray[eventstore.AggregateType], len(query.GetAggregateTypes()))
 	for i, aggregateType := range query.GetAggregateTypes() {
-		aggregateTypes[i] = string(aggregateType)
+		aggregateTypes[i] = aggregateType
 	}
 	return NewFilter(FieldAggregateType, aggregateTypes, OperationIn)
 }
@@ -236,7 +236,7 @@ func excludedInstanceIDFilter(query *eventstore.SearchQuery) *Filter {
 	if len(query.GetExcludedInstanceIDs()) == 0 {
 		return nil
 	}
-	return NewFilter(FieldInstanceID, database.StringArray(query.GetExcludedInstanceIDs()), OperationNotIn)
+	return NewFilter(FieldInstanceID, database.TextArray[string](query.GetExcludedInstanceIDs()), OperationNotIn)
 }
 
 func resourceOwnerFilter(builder *eventstore.SearchQueryBuilder) *Filter {

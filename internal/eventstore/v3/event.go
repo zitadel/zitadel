@@ -18,7 +18,7 @@ type event struct {
 	typ       eventstore.EventType
 	createdAt time.Time
 	sequence  uint64
-	payload   []byte
+	payload   Payload
 }
 
 func commandToEvent(sequence *latestSequence, command eventstore.Command) (_ *event, err error) {

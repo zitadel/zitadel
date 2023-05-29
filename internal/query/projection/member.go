@@ -66,7 +66,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, userResourceOwner string, opts
 			handler.NewCol(MemberUserIDCol, e.UserID),
 			handler.NewCol(MemberUserResourceOwner, userResourceOwner),
 			handler.NewCol(MemberUserOwnerRemoved, false),
-			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
+			handler.NewCol(MemberRolesCol, database.TextArray[string](e.Roles)),
 			handler.NewCol(MemberCreationDate, e.CreatedAt()),
 			handler.NewCol(MemberChangeDate, e.CreatedAt()),
 			handler.NewCol(MemberSequence, e.Sequence()),
@@ -85,7 +85,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, userResourceOwner string, opts
 func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
 		cols: []handler.Column{
-			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
+			handler.NewCol(MemberRolesCol, database.TextArray[string](e.Roles)),
 			handler.NewCol(MemberChangeDate, e.CreatedAt()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 		},

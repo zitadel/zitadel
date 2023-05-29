@@ -26,8 +26,8 @@ type LoginPolicy struct {
 	AllowUsernamePassword      bool
 	AllowExternalIDPs          bool
 	ForceMFA                   bool
-	SecondFactors              database.EnumArray[domain.SecondFactorType]
-	MultiFactors               database.EnumArray[domain.MultiFactorType]
+	SecondFactors              database.Array[domain.SecondFactorType]
+	MultiFactors               database.Array[domain.MultiFactorType]
 	PasswordlessType           domain.PasswordlessType
 	IsDefault                  bool
 	HidePasswordReset          bool
@@ -46,12 +46,12 @@ type LoginPolicy struct {
 
 type SecondFactors struct {
 	SearchResponse
-	Factors database.EnumArray[domain.SecondFactorType]
+	Factors database.Array[domain.SecondFactorType]
 }
 
 type MultiFactors struct {
 	SearchResponse
-	Factors database.EnumArray[domain.MultiFactorType]
+	Factors database.Array[domain.MultiFactorType]
 }
 
 var (

@@ -24,22 +24,22 @@ const (
 )
 
 type TokenView struct {
-	ID                string               `json:"tokenId" gorm:"column:id;primary_key"`
-	CreationDate      time.Time            `json:"-" gorm:"column:creation_date"`
-	ChangeDate        time.Time            `json:"-" gorm:"column:change_date"`
-	ResourceOwner     string               `json:"-" gorm:"column:resource_owner"`
-	UserID            string               `json:"-" gorm:"column:user_id"`
-	ApplicationID     string               `json:"applicationId" gorm:"column:application_id"`
-	UserAgentID       string               `json:"userAgentId" gorm:"column:user_agent_id"`
-	Audience          database.StringArray `json:"audience" gorm:"column:audience"`
-	Scopes            database.StringArray `json:"scopes" gorm:"column:scopes"`
-	Expiration        time.Time            `json:"expiration" gorm:"column:expiration"`
-	Sequence          uint64               `json:"-" gorm:"column:sequence"`
-	PreferredLanguage string               `json:"preferredLanguage" gorm:"column:preferred_language"`
-	RefreshTokenID    string               `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
-	IsPAT             bool                 `json:"-" gorm:"is_pat"`
-	Deactivated       bool                 `json:"-" gorm:"-"`
-	InstanceID        string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	ID                string                     `json:"tokenId" gorm:"column:id;primary_key"`
+	CreationDate      time.Time                  `json:"-" gorm:"column:creation_date"`
+	ChangeDate        time.Time                  `json:"-" gorm:"column:change_date"`
+	ResourceOwner     string                     `json:"-" gorm:"column:resource_owner"`
+	UserID            string                     `json:"-" gorm:"column:user_id"`
+	ApplicationID     string                     `json:"applicationId" gorm:"column:application_id"`
+	UserAgentID       string                     `json:"userAgentId" gorm:"column:user_agent_id"`
+	Audience          database.TextArray[string] `json:"audience" gorm:"column:audience"`
+	Scopes            database.TextArray[string] `json:"scopes" gorm:"column:scopes"`
+	Expiration        time.Time                  `json:"expiration" gorm:"column:expiration"`
+	Sequence          uint64                     `json:"-" gorm:"column:sequence"`
+	PreferredLanguage string                     `json:"preferredLanguage" gorm:"column:preferred_language"`
+	RefreshTokenID    string                     `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
+	IsPAT             bool                       `json:"-" gorm:"is_pat"`
+	Deactivated       bool                       `json:"-" gorm:"-"`
+	InstanceID        string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func TokenViewToModel(token *TokenView) *usr_model.TokenView {

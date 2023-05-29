@@ -384,7 +384,7 @@ func (p *idpProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(OIDCConfigClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCConfigIssuerCol, idpEvent.Issuer),
-				handler.NewCol(OIDCConfigScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCConfigScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCConfigDisplayNameMappingCol, idpEvent.IDPDisplayNameMapping),
 				handler.NewCol(OIDCConfigUsernameMappingCol, idpEvent.UserNameMapping),
 				handler.NewCol(OIDCConfigAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
@@ -424,7 +424,7 @@ func (p *idpProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(OIDCConfigTokenEndpointCol, *idpEvent.TokenEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, database.StringArray(idpEvent.Scopes)))
+		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	if idpEvent.IDPDisplayNameMapping != nil {
 		cols = append(cols, handler.NewCol(OIDCConfigDisplayNameMappingCol, *idpEvent.IDPDisplayNameMapping))

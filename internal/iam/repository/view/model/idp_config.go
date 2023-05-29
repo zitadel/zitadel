@@ -34,18 +34,18 @@ type IDPConfigView struct {
 	IDPProviderType int32     `json:"-" gorm:"column:idp_provider_type"`
 	AutoRegister    bool      `json:"autoRegister" gorm:"column:auto_register"`
 
-	IsOIDC                     bool                 `json:"-" gorm:"column:is_oidc"`
-	OIDCClientID               string               `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCClientSecret           *crypto.CryptoValue  `json:"clientSecret" gorm:"column:oidc_client_secret"`
-	OIDCIssuer                 string               `json:"issuer" gorm:"column:oidc_issuer"`
-	OIDCScopes                 database.StringArray `json:"scopes" gorm:"column:oidc_scopes"`
-	OIDCIDPDisplayNameMapping  int32                `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
-	OIDCUsernameMapping        int32                `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
-	OAuthAuthorizationEndpoint string               `json:"authorizationEndpoint" gorm:"column:oauth_authorization_endpoint"`
-	OAuthTokenEndpoint         string               `json:"tokenEndpoint" gorm:"column:oauth_token_endpoint"`
-	JWTEndpoint                string               `json:"jwtEndpoint" gorm:"jwt_endpoint"`
-	JWTKeysEndpoint            string               `json:"keysEndpoint" gorm:"jwt_keys_endpoint"`
-	JWTHeaderName              string               `json:"headerName" gorm:"jwt_header_name"`
+	IsOIDC                     bool                       `json:"-" gorm:"column:is_oidc"`
+	OIDCClientID               string                     `json:"clientId" gorm:"column:oidc_client_id"`
+	OIDCClientSecret           *crypto.CryptoValue        `json:"clientSecret" gorm:"column:oidc_client_secret"`
+	OIDCIssuer                 string                     `json:"issuer" gorm:"column:oidc_issuer"`
+	OIDCScopes                 database.TextArray[string] `json:"scopes" gorm:"column:oidc_scopes"`
+	OIDCIDPDisplayNameMapping  int32                      `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
+	OIDCUsernameMapping        int32                      `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
+	OAuthAuthorizationEndpoint string                     `json:"authorizationEndpoint" gorm:"column:oauth_authorization_endpoint"`
+	OAuthTokenEndpoint         string                     `json:"tokenEndpoint" gorm:"column:oauth_token_endpoint"`
+	JWTEndpoint                string                     `json:"jwtEndpoint" gorm:"jwt_endpoint"`
+	JWTKeysEndpoint            string                     `json:"keysEndpoint" gorm:"jwt_keys_endpoint"`
+	JWTHeaderName              string                     `json:"headerName" gorm:"jwt_header_name"`
 
 	Sequence   uint64 `json:"-" gorm:"column:sequence"`
 	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`

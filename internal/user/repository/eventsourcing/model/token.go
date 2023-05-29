@@ -15,13 +15,13 @@ import (
 type Token struct {
 	es_models.ObjectRoot
 
-	TokenID           string               `json:"tokenId" gorm:"column:token_id"`
-	ApplicationID     string               `json:"applicationId" gorm:"column:application_id"`
-	UserAgentID       string               `json:"userAgentId" gorm:"column:user_agent_id"`
-	Audience          database.StringArray `json:"audience" gorm:"column:audience"`
-	Scopes            database.StringArray `json:"scopes" gorm:"column:scopes"`
-	Expiration        time.Time            `json:"expiration" gorm:"column:expiration"`
-	PreferredLanguage string               `json:"preferredLanguage" gorm:"column:preferred_language"`
+	TokenID           string                     `json:"tokenId" gorm:"column:token_id"`
+	ApplicationID     string                     `json:"applicationId" gorm:"column:application_id"`
+	UserAgentID       string                     `json:"userAgentId" gorm:"column:user_agent_id"`
+	Audience          database.TextArray[string] `json:"audience" gorm:"column:audience"`
+	Scopes            database.TextArray[string] `json:"scopes" gorm:"column:scopes"`
+	Expiration        time.Time                  `json:"expiration" gorm:"column:expiration"`
+	PreferredLanguage string                     `json:"preferredLanguage" gorm:"column:preferred_language"`
 }
 
 func (t *Token) AppendEvents(events ...*es_models.Event) error {

@@ -187,7 +187,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								database.StringArray{"admin", "user"},
+								database.TextArray[string]{"admin", "user"},
 								"grant-id",
 								"agg-id",
 								"instance-id",
@@ -218,7 +218,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								database.StringArray{"admin", "user"},
+								database.TextArray[string]{"admin", "user"},
 								"grant-id",
 								"agg-id",
 								"instance-id",
@@ -256,7 +256,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 								domain.ProjectGrantStateActive,
 								uint64(15),
 								"granted-org-id",
-								database.StringArray{"admin", "user"},
+								database.TextArray[string]{"admin", "user"},
 							},
 						},
 					},

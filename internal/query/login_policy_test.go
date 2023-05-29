@@ -126,8 +126,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						true,
-						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
-						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
+						database.Array[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
+						database.Array[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 						domain.PasswordlessTypeAllowed,
 						true,
 						true,
@@ -153,8 +153,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				AllowUsernamePassword:      true,
 				AllowExternalIDPs:          true,
 				ForceMFA:                   true,
-				SecondFactors:              database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
-				MultiFactors:               database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
+				SecondFactors:              database.Array[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
+				MultiFactors:               database.Array[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 				PasswordlessType:           domain.PasswordlessTypeAllowed,
 				IsDefault:                  true,
 				HidePasswordReset:          true,
@@ -213,7 +213,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 					regexp.QuoteMeta(prepareLoginPolicy2FAsStmt),
 					prepareLoginPolicy2FAsCols,
 					[]driver.Value{
-						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
+						database.Array[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 					},
 				),
 			},
@@ -221,7 +221,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Factors: database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
+				Factors: database.Array[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 			},
 		},
 		{
@@ -232,11 +232,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 					regexp.QuoteMeta(prepareLoginPolicy2FAsStmt),
 					prepareLoginPolicy2FAsCols,
 					[]driver.Value{
-						database.EnumArray[domain.SecondFactorType]{},
+						database.Array[domain.SecondFactorType]{},
 					},
 				),
 			},
-			object: &SecondFactors{Factors: database.EnumArray[domain.SecondFactorType]{}},
+			object: &SecondFactors{Factors: database.Array[domain.SecondFactorType]{}},
 		},
 		{
 			name:    "prepareLoginPolicy2FAsQuery sql err",
@@ -281,7 +281,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 					regexp.QuoteMeta(prepareLoginPolicyMFAsStmt),
 					prepareLoginPolicyMFAsCols,
 					[]driver.Value{
-						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
+						database.Array[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 					},
 				),
 			},
@@ -289,7 +289,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Factors: database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
+				Factors: database.Array[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 			},
 		},
 		{
@@ -300,11 +300,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 					regexp.QuoteMeta(prepareLoginPolicyMFAsStmt),
 					prepareLoginPolicyMFAsCols,
 					[]driver.Value{
-						database.EnumArray[domain.MultiFactorType]{},
+						database.Array[domain.MultiFactorType]{},
 					},
 				),
 			},
-			object: &MultiFactors{Factors: database.EnumArray[domain.MultiFactorType]{}},
+			object: &MultiFactors{Factors: database.Array[domain.MultiFactorType]{}},
 		},
 		{
 			name:    "prepareLoginPolicyMFAsQuery sql err",

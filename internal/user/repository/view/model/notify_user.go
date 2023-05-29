@@ -21,27 +21,27 @@ const (
 )
 
 type NotifyUser struct {
-	ID                 string               `json:"-" gorm:"column:id;primary_key"`
-	CreationDate       time.Time            `json:"-" gorm:"column:creation_date"`
-	ChangeDate         time.Time            `json:"-" gorm:"column:change_date"`
-	ResourceOwner      string               `json:"-" gorm:"column:resource_owner"`
-	UserName           string               `json:"userName" gorm:"column:user_name"`
-	LoginNames         database.StringArray `json:"-" gorm:"column:login_names"`
-	PreferredLoginName string               `json:"-" gorm:"column:preferred_login_name"`
-	FirstName          string               `json:"firstName" gorm:"column:first_name"`
-	LastName           string               `json:"lastName" gorm:"column:last_name"`
-	NickName           string               `json:"nickName" gorm:"column:nick_name"`
-	DisplayName        string               `json:"displayName" gorm:"column:display_name"`
-	PreferredLanguage  string               `json:"preferredLanguage" gorm:"column:preferred_language"`
-	Gender             int32                `json:"gender" gorm:"column:gender"`
-	LastEmail          string               `json:"email" gorm:"column:last_email"`
-	VerifiedEmail      string               `json:"-" gorm:"column:verified_email"`
-	LastPhone          string               `json:"phone" gorm:"column:last_phone"`
-	VerifiedPhone      string               `json:"-" gorm:"column:verified_phone"`
-	PasswordSet        bool                 `json:"-" gorm:"column:password_set"`
-	Sequence           uint64               `json:"-" gorm:"column:sequence"`
-	State              int32                `json:"-" gorm:"-"`
-	InstanceID         string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	ID                 string                     `json:"-" gorm:"column:id;primary_key"`
+	CreationDate       time.Time                  `json:"-" gorm:"column:creation_date"`
+	ChangeDate         time.Time                  `json:"-" gorm:"column:change_date"`
+	ResourceOwner      string                     `json:"-" gorm:"column:resource_owner"`
+	UserName           string                     `json:"userName" gorm:"column:user_name"`
+	LoginNames         database.TextArray[string] `json:"-" gorm:"column:login_names"`
+	PreferredLoginName string                     `json:"-" gorm:"column:preferred_login_name"`
+	FirstName          string                     `json:"firstName" gorm:"column:first_name"`
+	LastName           string                     `json:"lastName" gorm:"column:last_name"`
+	NickName           string                     `json:"nickName" gorm:"column:nick_name"`
+	DisplayName        string                     `json:"displayName" gorm:"column:display_name"`
+	PreferredLanguage  string                     `json:"preferredLanguage" gorm:"column:preferred_language"`
+	Gender             int32                      `json:"gender" gorm:"column:gender"`
+	LastEmail          string                     `json:"email" gorm:"column:last_email"`
+	VerifiedEmail      string                     `json:"-" gorm:"column:verified_email"`
+	LastPhone          string                     `json:"phone" gorm:"column:last_phone"`
+	VerifiedPhone      string                     `json:"-" gorm:"column:verified_phone"`
+	PasswordSet        bool                       `json:"-" gorm:"column:password_set"`
+	Sequence           uint64                     `json:"-" gorm:"column:sequence"`
+	State              int32                      `json:"-" gorm:"-"`
+	InstanceID         string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string {

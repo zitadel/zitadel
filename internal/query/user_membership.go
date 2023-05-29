@@ -22,7 +22,7 @@ type Memberships struct {
 
 type Membership struct {
 	UserID        string
-	Roles         database.StringArray
+	Roles         database.TextArray[string]
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	Sequence      uint64

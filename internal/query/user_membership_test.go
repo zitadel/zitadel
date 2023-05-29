@@ -145,7 +145,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -169,7 +169,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -189,7 +189,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -213,7 +213,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -233,7 +233,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -257,7 +257,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -277,7 +277,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -301,7 +301,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -326,7 +326,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -342,7 +342,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -358,7 +358,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -374,7 +374,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -398,7 +398,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -407,7 +407,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -416,7 +416,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -425,7 +425,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,

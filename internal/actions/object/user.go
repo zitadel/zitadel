@@ -143,7 +143,7 @@ type humanUser struct {
 	Sequence           uint64
 	State              domain.UserState
 	Username           string
-	LoginNames         database.StringArray
+	LoginNames         database.TextArray[string]
 	PreferredLoginName string
 	Human              human
 }
@@ -170,7 +170,7 @@ type machineUser struct {
 	Sequence           uint64
 	State              domain.UserState
 	Username           string
-	LoginNames         database.StringArray
+	LoginNames         database.TextArray[string]
 	PreferredLoginName string
 	Machine            machine
 }

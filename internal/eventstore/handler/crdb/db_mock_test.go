@@ -22,7 +22,7 @@ func expectLock(lockTable, workerName string, d time.Duration, instanceID string
 				d,
 				projectionName,
 				instanceID,
-				database.StringArray{instanceID},
+				database.TextArray[string]{instanceID},
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
@@ -43,7 +43,7 @@ func expectLockMultipleInstances(lockTable, workerName string, d time.Duration, 
 				projectionName,
 				instanceID1,
 				instanceID2,
-				database.StringArray{instanceID1, instanceID2},
+				database.TextArray[string]{instanceID1, instanceID2},
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
@@ -63,7 +63,7 @@ func expectLockNoRows(lockTable, workerName string, d time.Duration, instanceID 
 				d,
 				projectionName,
 				instanceID,
-				database.StringArray{instanceID},
+				database.TextArray[string]{instanceID},
 			).
 			WillReturnResult(driver.ResultNoRows)
 	}
@@ -81,7 +81,7 @@ func expectLockErr(lockTable, workerName string, d time.Duration, instanceID str
 				d,
 				projectionName,
 				instanceID,
-				database.StringArray{instanceID},
+				database.TextArray[string]{instanceID},
 			).
 			WillReturnError(err)
 	}

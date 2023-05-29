@@ -116,7 +116,7 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 			handler.NewCol(PersonalAccessTokenColumnSequence, e.Sequence()),
 			handler.NewCol(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
 			handler.NewCol(PersonalAccessTokenColumnExpiration, e.Expiration),
-			handler.NewCol(PersonalAccessTokenColumnScopes, database.StringArray(e.Scopes)),
+			handler.NewCol(PersonalAccessTokenColumnScopes, database.TextArray[string](e.Scopes)),
 		},
 	), nil
 }

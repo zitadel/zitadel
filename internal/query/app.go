@@ -40,23 +40,23 @@ type App struct {
 }
 
 type OIDCApp struct {
-	RedirectURIs             database.StringArray
-	ResponseTypes            database.EnumArray[domain.OIDCResponseType]
-	GrantTypes               database.EnumArray[domain.OIDCGrantType]
+	RedirectURIs             database.TextArray[string]
+	ResponseTypes            database.Array[domain.OIDCResponseType]
+	GrantTypes               database.Array[domain.OIDCGrantType]
 	AppType                  domain.OIDCApplicationType
 	ClientID                 string
 	AuthMethodType           domain.OIDCAuthMethodType
-	PostLogoutRedirectURIs   database.StringArray
+	PostLogoutRedirectURIs   database.TextArray[string]
 	Version                  domain.OIDCVersion
-	ComplianceProblems       database.StringArray
+	ComplianceProblems       database.TextArray[string]
 	IsDevMode                bool
 	AccessTokenType          domain.OIDCTokenType
 	AssertAccessTokenRole    bool
 	AssertIDTokenRole        bool
 	AssertIDTokenUserinfo    bool
 	ClockSkew                time.Duration
-	AdditionalOrigins        database.StringArray
-	AllowedOrigins           database.StringArray
+	AdditionalOrigins        database.TextArray[string]
+	AllowedOrigins           database.TextArray[string]
 	SkipNativeAppSuccessPage bool
 }
 
@@ -601,7 +601,7 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder,
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+				return nil, errors.ThrowInternal(err, "QUERY-4SJlx", "Errors.Internal")
 			}
 
 			apiConfig.set(app)
@@ -773,7 +773,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				)
 
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+					return nil, errors.ThrowInternal(err, "QUERY-XGWAX", "Errors.Internal")
 				}
 
 				apiConfig.set(app)
@@ -795,7 +795,7 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
-			ids := database.StringArray{}
+			ids := database.TextArray[string]{}
 
 			for rows.Next() {
 				var apiID sql.NullString
@@ -821,19 +821,19 @@ type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
 	clientID                 sql.NullString
-	redirectUris             database.StringArray
+	redirectUris             database.TextArray[string]
 	applicationType          sql.NullInt16
 	authMethodType           sql.NullInt16
-	postLogoutRedirectUris   database.StringArray
+	postLogoutRedirectUris   database.TextArray[string]
 	devMode                  sql.NullBool
 	accessTokenType          sql.NullInt16
 	accessTokenRoleAssertion sql.NullBool
 	iDTokenRoleAssertion     sql.NullBool
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
-	additionalOrigins        database.StringArray
-	responseTypes            database.EnumArray[domain.OIDCResponseType]
-	grantTypes               database.EnumArray[domain.OIDCGrantType]
+	additionalOrigins        database.TextArray[string]
+	responseTypes            database.Array[domain.OIDCResponseType]
+	grantTypes               database.Array[domain.OIDCGrantType]
 	skipNativeAppSuccessPage sql.NullBool
 }
 
