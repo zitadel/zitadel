@@ -115,9 +115,19 @@ jobs:
       with:
         context: .
         file: ./build/workflow.Dockerfile
-        target: lint-core
+        target: lint-core-report
+        build-args: |
+          LINT_EXIT_CODE=0
         push: false
         cache-to: ${{inputs.cache_to_params}}
         cache-from: ${{inputs.cache_from_params}}
         github-token: ${{ github.token }}
         tags: ${{inputs.tag_name}}
+        outputs: type=local,dest=/tmp
+    -
+      name: Output coverate
+      run: ls -R /tmp
+    -
+      name: Output coverate
+      run: cat /tmp/lint.report
+      
