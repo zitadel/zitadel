@@ -8,22 +8,28 @@ let file =
     InstanceName: ZITADEL # Default is ZITADEL`
 
 
+const doc = parse_yaml(file)
+
 test('Expect two nodes', () => {
-  expect(parse_yaml(file)).toHaveLength(2);
+  expect(doc).toHaveLength(2);
 });
 
 test('Instance Name variable name', () => {
-    expect(parse_yaml(file)[1].env).toBe("ZITADEL_FIRSTINSTANCE_INSTANCENAME");
+    expect(doc[1].env).toBe("ZITADEL_FIRSTINSTANCE_INSTANCENAME");
 });
 
 test('Instance Name value', () => {
-    expect(parse_yaml(file)[1].value).toBe("ZITADEL");
+    expect(doc[1].value).toBe("ZITADEL");
+});
+
+test('Instance Name comment', () => {
+    expect(doc[1].comment).toBe("Default is ZITADEL");
 });
 
 test('Instance Name description', () => {
-    expect(parse_yaml(file)[1].description).toBe("Name of the first instance created Default is ZITADEL");
+    expect(doc[1].commentBefore).toBe("Name of the first instance created");
 });
 
 test('Comment before map', () => {
-    expect(parse_yaml(file)[0].description).toBe("MachineKeyPath comment before");
+    expect(doc[0].commentBefore).toBe("MachineKeyPath comment before");
 });
