@@ -126,5 +126,5 @@ jobs:
         outputs: type=local,dest=/tmp/lint
     -
       name: Output coverage
-      run: cat /tmp/lint/report
+      run: cat /tmp/lint/report && if [[ -s /tmp/lint/report ]]; then exit 1; fi
       
