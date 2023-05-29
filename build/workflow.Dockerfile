@@ -197,15 +197,14 @@ FROM ubuntu/postgres:latest AS test-core-base
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN \
-    --mount=type=cache,target=/var/cache/apt \
-    apt update; \
-    apt install -y \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
         gcc \
         make \
         ca-certificates \
-        ; \
-    update-ca-certificates;
+        && \
+    update-ca-certificates; \
+    rm -rf /var/lib/apt/lists/*
 
 # install go
 COPY --from=golang:latest /usr/local/go/ /usr/local/go/
