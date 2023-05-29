@@ -5,8 +5,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
