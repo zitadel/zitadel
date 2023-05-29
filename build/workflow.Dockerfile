@@ -12,9 +12,7 @@ WORKDIR /go/src/github.com/zitadel/zitadel
 COPY go.mod .
 COPY go.sum .
 
-RUN \
-    --mount=type=cache,target=~/.cache \
-    go mod download
+RUN go mod download
 
 # #######################################
 # compile custom protoc plugins
@@ -28,9 +26,7 @@ COPY go.sum .
 COPY internal/protoc internal/protoc
 COPY pkg/grpc/protoc/v2 pkg/grpc/protoc/v2
 
-RUN \
-    --mount=type=cache,target=~/.cache \
-    go install internal/protoc/protoc-gen-authoption/main.go \
+RUN go install internal/protoc/protoc-gen-authoption/main.go \
     && mv $(go env GOPATH)/bin/main $(go env GOPATH)/bin/protoc-gen-authoption \
 	&& go install internal/protoc/protoc-gen-zitadel/main.go \
     && mv $(go env GOPATH)/bin/main $(go env GOPATH)/bin/protoc-gen-zitadel
@@ -49,9 +45,7 @@ COPY buf.*.yaml .
 COPY Makefile Makefile
 COPY --from=core-api-generator /go/bin /usr/local/bin
 
-RUN \
-    --mount=type=cache,target=~/.cache \
-    make grpc
+RUN make grpc
 
 # #######################################
 # generate code for login ui
@@ -68,9 +62,7 @@ COPY internal/notification/statik internal/notification/statik
 COPY internal/static internal/static
 COPY internal/statik internal/statik
 
-RUN \
-    --mount=type=cache,target=~/.cache \
-    make static
+RUN make static
 
 # #######################################
 # generate code for assets
@@ -86,9 +78,7 @@ COPY internal/config internal/config
 COPY internal/errors internal/errors
 COPY --from=core-api /go/src/github.com/zitadel/zitadel/openapi/v2 openapi/v2
 
-RUN \
-    --mount=type=cache,target=~/.cache \
-    make assets
+RUN make assets
 
 # #######################################
 # Gather all core files
@@ -120,9 +110,7 @@ WORKDIR /zitadel/console
 COPY console/package.json .
 COPY console/yarn.lock .
 
-RUN \
-    --mount=type=cache,target=/usr/local/share/.cache/yarn \
-    yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile
 
 # #######################################
 # generate console client
@@ -139,10 +127,7 @@ COPY console/package.json .
 COPY console/buf.*.yaml .
 COPY proto ../proto
 
-RUN \
-    --mount=type=cache,target=/usr/local/share/.cache/yarn \
-    --mount=type=cache,target=/root/.cache/buf/v2/module/buf.build \
-    yarn generate
+RUN yarn generate
 
 # #######################################
 # Gather all console files
@@ -231,9 +216,7 @@ COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 # unit test core
 # #######################################
 FROM test-core-base AS test-core-unit
-RUN \
-    --mount=type=cache,target=~/.cache \
-    go test -race -v -coverprofile=profile.cov ./...
+RUN go test -race -v -coverprofile=profile.cov ./...
 
 # #######################################
 # coverage output
@@ -256,9 +239,7 @@ ENV ZITADEL_MASTERKEY=MasterkeyNeedsToHave32Characters
 COPY build/core-integration-test.sh /usr/local/bin/run-tests.sh
 RUN chmod +x /usr/local/bin/run-tests.sh
 
-RUN \
-    --mount=type=cache,target=~/.cache \
-    run-tests.sh
+RUN run-tests.sh
 
 # #######################################
 # coverage output
@@ -278,9 +259,7 @@ FROM bufbuild/buf:latest AS lint-api
 COPY proto proto
 COPY buf.*.yaml .
 
-RUN \
-    --mount=type=cache,target=/root/.cache/buf/v2/module/buf.build \
-    buf lint
+RUN buf lint
 
 # #######################################
 # console
@@ -304,13 +283,9 @@ COPY .git/ .git/
 COPY --from=core-deps /go/pkg/mod /go/pkg/mod
 COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 
-RUN \
-    --mount=type=cache,target=.git \
-    git fetch https://github.com/zitadel/zitadel main:main
+RUN git fetch https://github.com/zitadel/zitadel main:main
 
-RUN \
-    --mount=type=cache,target=~/.cache \
-    golangci-lint run \
+RUN golangci-lint run \
     --timeout 10m \
     --config ./.golangci.yaml \
     --out-format=github-actions:report,colored-line-number \
