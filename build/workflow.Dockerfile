@@ -86,9 +86,6 @@ RUN make assets
 # #######################################
 FROM core-deps AS core-gathered
 
-COPY --from=core-api /go/src/github.com/zitadel/zitadel .
-COPY --from=core-login /go/src/github.com/zitadel/zitadel .
-COPY --from=core-assets /go/src/github.com/zitadel/zitadel .
 COPY cmd cmd
 COPY internal internal
 COPY pkg pkg
@@ -96,6 +93,9 @@ COPY proto proto
 COPY openapi openapi
 COPY statik statik
 COPY main.go main.go
+COPY --from=core-api /go/src/github.com/zitadel/zitadel .
+COPY --from=core-login /go/src/github.com/zitadel/zitadel .
+COPY --from=core-assets /go/src/github.com/zitadel/zitadel/internal ./internal
 
 # ##############################################################################
 # build console
@@ -284,4 +284,4 @@ COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 
 RUN git fetch https://github.com/zitadel/zitadel main:main
 
-RUN golangci-lint run --timeout 10m --config ./.golangci.yaml --out-format=github-actions
+RUN golangci-lint run --timeout 10m --config ./.golangci.yaml --out-format=github-actions --concurrency=$(getconf _NPROCESSORS_ONLN)
