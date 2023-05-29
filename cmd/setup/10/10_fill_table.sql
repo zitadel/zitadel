@@ -14,7 +14,7 @@ INSERT INTO wrong_events (
             eventstore.events
         WHERE 
             creation_date > '2023-05-23 13:00'
-    ) sub AS OF SYSTEM TIME follower_read_timestamp() WHERE
+    ) sub WHERE
         current_cd < next_cd
     ORDER BY
         event_sequence DESC
