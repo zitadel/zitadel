@@ -18,6 +18,10 @@ test('Instance Name variable name', () => {
     expect(doc[1].env).toBe("ZITADEL_FIRSTINSTANCE_INSTANCENAME");
 });
 
+test('MachineKeyPath value should be null', () => {
+    expect(doc[0].value).toBeNull();
+});
+
 test('Instance Name value', () => {
     expect(doc[1].value).toBe("ZITADEL");
 });
