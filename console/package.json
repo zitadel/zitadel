@@ -21,7 +21,7 @@
     "@angular/material": "^16.0.1",
     "@angular/material-moment-adapter": "^16.0.1",
     "@angular/platform-browser": "^16.0.1",
-    "@angular/platform-browser-dynamic": "^16.0.1",
+    "@angular/platform-browser-dynamic": "^16.0.3",
     "@angular/router": "^16.0.1",
     "@angular/service-worker": "^16.0.1",
     "@ctrl/ngx-codemirror": "^6.1.0",
