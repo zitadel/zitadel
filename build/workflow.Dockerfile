@@ -14,6 +14,7 @@ COPY go.sum .
 
 RUN \
     --mount=type=cache,target=~/.cache \
+    --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
 # #######################################
@@ -28,7 +29,10 @@ COPY go.sum .
 COPY internal/protoc internal/protoc
 COPY pkg/grpc/protoc/v2 pkg/grpc/protoc/v2
 
-RUN go install internal/protoc/protoc-gen-authoption/main.go \
+RUN \
+    --mount=type=cache,target=~/.cache \
+    --mount=type=cache,target=/go/pkg/mod \
+    go install internal/protoc/protoc-gen-authoption/main.go \
     && mv $(go env GOPATH)/bin/main $(go env GOPATH)/bin/protoc-gen-authoption \
 	&& go install internal/protoc/protoc-gen-zitadel/main.go \
     && mv $(go env GOPATH)/bin/main $(go env GOPATH)/bin/protoc-gen-zitadel
@@ -49,6 +53,7 @@ COPY --from=core-api-generator /go/bin /usr/local/bin
 
 RUN \
     --mount=type=cache,target=~/.cache \
+    --mount=type=cache,target=/go/pkg/mod \
     make grpc
 
 # #######################################
@@ -68,6 +73,7 @@ COPY internal/statik internal/statik
 
 RUN \
     --mount=type=cache,target=~/.cache \
+    --mount=type=cache,target=/go/pkg/mod \
     make static
 
 # #######################################
@@ -87,6 +93,7 @@ COPY --from=core-api /go/src/github.com/zitadel/zitadel/openapi/v2 openapi/v2
 
 RUN \
     --mount=type=cache,target=~/.cache \
+    --mount=type=cache,target=/go/pkg/mod \
     make assets
 
 # #######################################
@@ -119,7 +126,9 @@ WORKDIR /zitadel/console
 COPY console/package.json .
 COPY console/yarn.lock .
 
-RUN yarn install --frozen-lockfile
+RUN \
+    --mount=type=cache,target=./node_modules \
+    yarn install --frozen-lockfile
 
 # #######################################
 # generate console client
@@ -191,7 +200,9 @@ FROM ubuntu/postgres:latest AS test-core-base
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt update; \
+RUN \
+    --mount=type=cache,target=/var/cache/apt \
+    apt update; \
     apt install -y \
         gcc \
         make \
@@ -224,7 +235,9 @@ COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 # unit test core
 # #######################################
 FROM test-core-base AS test-core-unit
-RUN go test -race -v -coverprofile=profile.cov ./...
+RUN \
+    --mount=type=cache,target=~/.cache \
+    go test -race -v -coverprofile=profile.cov ./...
 
 # #######################################
 # coverage output
@@ -247,7 +260,10 @@ ENV ZITADEL_MASTERKEY=MasterkeyNeedsToHave32Characters
 COPY build/core-integration-test.sh /usr/local/bin/run-tests.sh
 RUN chmod +x /usr/local/bin/run-tests.sh
 
-RUN run-tests.sh
+RUN \
+    --mount=type=cache,target=~/.cache \
+    --mount=type=cache,target=/go/pkg/mod \
+    run-tests.sh
 
 # #######################################
 # coverage output
