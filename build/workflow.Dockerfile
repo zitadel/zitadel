@@ -282,7 +282,7 @@ COPY .git/ .git/
 COPY --from=core-deps /go/pkg/mod /go/pkg/mod
 COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 
-RUN git fetch origin main \
-    && git diff main
+RUN git fetch origin/main \
+    && git diff origin/main
 
 RUN golangci-lint run --timeout 10m --config ./.golangci.yaml --out-format=github-actions --disable-all -E errcheck
