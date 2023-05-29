@@ -33,6 +33,7 @@ function parseZitadelYaml(file) {
       }
     )
 
+    // filter out the nodes without a value assigned (parents)
     let keys = output.filter(nodes => nodes.value !== undefined)
 
     // loop through the envs and add comments
@@ -72,7 +73,7 @@ function parseZitadelYaml(file) {
       }, 
     
     })
-    
+
     return keys // only key nodes
 }
 module.exports = parseZitadelYaml;
