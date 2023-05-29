@@ -21,7 +21,7 @@ test('Instance Name value', () => {
 });
 
 test('Instance Name description', () => {
-    expect(parse_yaml(file)[1].description).toBe("Name of the first instance created\nDefault is ZITADEL");
+    expect(parse_yaml(file)[1].description).toBe("Name of the first instance created Default is ZITADEL");
 });
 
 test('Comment before map', () => {

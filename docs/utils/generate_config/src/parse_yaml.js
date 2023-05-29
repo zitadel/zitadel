@@ -24,12 +24,19 @@ function parseZitadelYaml(file) {
             if (parent.items[0] === path.slice(-1)[0] && parent.commentBefore !== undefined) description += parent.commentBefore // is a first item
             
             if(value.commentBefore !== undefined) description += value.commentBefore
-      
-            output.push({
-              env: keys2env(path_array), 
-              path: path_array,
-              description: description.trim()
-            })
+
+            let keyIndex = output.findIndex(node => node.env === keys2env(path_array))
+            console.log(keys2env(path_array))
+
+            if(keyIndex > 0) {
+              output[keyIndex].description += description
+            } else {
+              output.push({
+                env: keys2env(path_array), 
+                path: path_array,
+                description: description.trim()
+              })
+            }
       
           }
       
@@ -45,8 +52,13 @@ function parseZitadelYaml(file) {
             if(value.comment !== undefined && value.value === null) {
               next_key = parent.items[parent.items.findIndex(n => n === path.slice(-1)[0])+1].key.value
               path_array_next = [ ...path_array.slice(0, -1), next_key]
-              console.log(path_array_next)
-              console.log(keys2env(path_array_next))
+              output_node_next = output.find(node => node.env === keys2env(path_array_next))
+              if (output_node_next !== undefined) output.push({
+                env: keys2env(path_array_next), 
+                path: path_array_next,
+                description: value.comment.trim()
+              })
+              console.log(output)
             }
           }
       
