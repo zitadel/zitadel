@@ -33,3 +33,5 @@ test('Instance Name description', () => {
 test('Comment before map', () => {
     expect(doc[0].commentBefore).toBe("MachineKeyPath comment before");
 });
+
+console.log(doc)
