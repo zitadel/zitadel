@@ -14,7 +14,7 @@ env:
     type=registry,ref=ghcr.io/zitadel/build-cache:console
     type=registry,ref=ghcr.io/zitadel/build-cache:core
     type=registry,ref=ghcr.io/zitadel/build-cache:latest
-  cache_to_params: type=registry,ref=ghcr.io/zitadel/build-cache,mode=max
+  cache_to_params: type=registry,ref=ghcr.io/zitadel/build-cache,mode=max,ignore-error=true
   tag_name: ghcr.io/zitadel/test:${{ github.sha }}
   buildx_driver_opts: |
       image=moby/buildkit:v0.11.6
@@ -239,7 +239,7 @@ jobs:
         type=registry,ref=ghcr.io/zitadel/build-cache:console
         type=registry,ref=ghcr.io/zitadel/build-cache:core
         type=registry,ref=ghcr.io/zitadel/build-cache:latest
-      cache_to_params: type=registry,ref=ghcr.io/zitadel/build-cache,mode=max
+      cache_to_params: type=registry,ref=ghcr.io/zitadel/build-cache,mode=max,ignore-error=true
       tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
   # e2e:
