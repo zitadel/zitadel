@@ -57,7 +57,7 @@
     "@angular-eslint/template-parser": "16.0.1",
     "@angular/cli": "^16.0.1",
     "@angular/compiler-cli": "^16.0.1",
-    "@angular/language-service": "^16.0.1",
+    "@angular/language-service": "^16.0.3",
     "@bufbuild/buf": "^1.18.0-1",
     "@types/file-saver": "^2.0.2",
     "@types/google-protobuf": "^3.15.3",
