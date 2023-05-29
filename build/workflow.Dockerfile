@@ -187,6 +187,7 @@ RUN apt-get update && \
         gcc \
         make \
         ca-certificates \
+        build-essentials \
         && \
     update-ca-certificates; \
     rm -rf /var/lib/apt/lists/*
