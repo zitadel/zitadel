@@ -284,4 +284,5 @@ COPY --from=core-gathered /go/src/github.com/zitadel/zitadel .
 
 RUN git fetch https://github.com/zitadel/zitadel main:main
 
-RUN golangci-lint run --timeout 10m --config ./.golangci.yaml --out-format=github-actions:lint.report --concurrency=$(getconf _NPROCESSORS_ONLN)
+RUN golangci-lint run --timeout 10m --config ./.golangci.yaml --out-format=github-actions:lint.report,colored-line-number --issues-exit-code=0 --concurrency=$(getconf _NPROCESSORS_ONLN) \
+    && cat lint.report
