@@ -127,7 +127,7 @@ COPY console/package.json .
 COPY console/yarn.lock .
 
 RUN \
-    --mount=type=cache,target=./node_modules \
+    --mount=type=cache,target=/usr/local/share/.cache/yarn \
     yarn install --frozen-lockfile
 
 # #######################################
@@ -145,7 +145,10 @@ COPY console/package.json .
 COPY console/buf.*.yaml .
 COPY proto ../proto
 
-RUN yarn generate
+RUN \
+    --mount=type=cache,target=/usr/local/share/.cache/yarn \
+    --mount=type=cache,target=/root/.cache/buf/v2/module/buf.build \
+    yarn generate
 
 # #######################################
 # Gather all console files
