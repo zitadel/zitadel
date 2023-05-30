@@ -18,14 +18,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
       # install node for sass
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node_version }}
+      - run: npm install -g sass
       - uses: actions/setup-go@v4
         with:
           go-version: ${{ env.go_version }}
-      - run: npm install -g sass
       - run: make core_build
     
   console:
