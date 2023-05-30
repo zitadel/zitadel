@@ -6,18 +6,18 @@ on:
       go_version:
         required: true
         type: string
-
-env:
-  core_cache_path: |
-    internal/statik/statik.go
-    internal/notification/statik/statik.go
-    internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
-    internal/api/ui/login/statik/statik.go
-    internal/api/assets/authz.go 
-    internal/api/assets/router.go
-    openapi/v2
-    pkg/grpc/**/*.pb.*
-  console_cache_path: console/dist/console
+      core_cache_key:
+        required: true
+        type: string
+      core_cache_path:
+        required: true
+        type: string
+      console_cache_key:
+        required: true
+        type: string
+      console_cache_path:
+        required: true
+        type: string
 
 jobs:
   executable:
@@ -34,15 +34,15 @@ jobs:
       uses: actions/cache/restore@v3
       name: restore console
       with:
-        path: ${{ env.console_cache_path }}
-        key: console-${{ hashFiles('console') }}
+        path: ${{ inputs.console_cache_path }}
+        key: ${{ inputs.console_cache_key }}
         fail-on-cache-miss: true
     - 
       uses: actions/cache/restore@v3
       name: restore core
       with:
-        path: ${{ env.core_cache_path }}
-        key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'internal') }}
+        path: ${{ inputs.core_cache_path }}
+        key: ${{ inputs.core_cache_key }}
         fail-on-cache-miss: true
     -
       uses: actions/setup-go@v4

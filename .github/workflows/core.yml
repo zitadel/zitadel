@@ -12,6 +12,11 @@ on:
       node_version:
         required: true
         type: string
+    outputs:
+      cache_key:
+        value: ${{ jobs.build.outputs.cache_key }}
+      cache_path:
+        value: ${{ jobs.build.outputs.cache_path }}
 
 env:
   cache_path: |
@@ -27,7 +32,13 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      cache_key: ${{ steps.cache.outputs.cache-primary-key }}
+      cache_path: ${{ steps.cache-path.outputs.CACHE_PATH }}
     steps:
+        -
+          id: cache-path
+          run: echo "CACHE_PATH=${{ env.cache_path }}" >> "$GITHUB_OUTPUT"
         - 
           uses: actions/checkout@v3
         - 
