@@ -41,9 +41,9 @@
 # 	mkdir -p docs/apis/assets
 # 	go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
-
-gen_authopt_path := "$$(go env GOPATH)/bin/protoc-gen-authoption"
-gen_zitadel_path := "$$(go env GOPATH)/bin/protoc-gen-zitadel"
+go_bin := "$$(go env GOPATH)/bin"
+gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
+gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 
 compile: core_build console_build
 	go build -o zitadel-$$(go env GOOS)-$$(go env GOARCH) -ldflags="-s -w"
@@ -77,6 +77,7 @@ core_grpc_dependencies:
 	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
 
 core_api: core_api_generator core_grpc_dependencies
+	ls -la $(go_bin)
 	buf generate
 	mkdir -p pkg/grpc
 	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/

@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: bufbuild/buf-setup-action@v1
       - uses: actions/setup-go@v4
         with:
           go-version: ${{ env.go_version }}
-      - uses: bufbuild/buf-setup-action@v1
       - run: make core_build
     
   console:
