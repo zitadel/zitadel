@@ -14,7 +14,7 @@ on:
         type: string
       core_cache_hit:
         required: true
-        type: boolean
+        type: string
       core_cache_path:
         required: true
         type: string
@@ -26,7 +26,7 @@ on:
         type: string
       console_cache_hit:
         required: true
-        type: boolean
+        type: string
 
 jobs:
 
