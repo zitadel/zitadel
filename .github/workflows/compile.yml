@@ -2,36 +2,47 @@ name: Compile
 
 on:
   workflow_call:
-    inputs:
-      core_hash:
-        required: true
-        type: string
-      console_hash:
-        required: true
-        type: string
+
+env:
+  core_cache_path: |
+    internal/statik/statik.go
+    internal/notification/statik/statik.go
+    internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
+    internal/api/ui/login/statik/statik.go
+    openapi/v2
+    pkg/grpc/**/*.pb.*
+  console_cache_path: console/dist/console
 
 jobs:
   executable:
-    name: core
     runs-on: ubuntu-latest
     strategy:
       matrix:
         goos: [linux, darwin, windows]
         goarch: [amd64, arm64]
+    
     steps:
-    - uses: actions/cache/restore@v3
+    - 
+      uses: actions/checkout@v3
+    - 
+      uses: actions/cache/restore@v3
       name: restore core
       with:
-        path: .
-        key: ${{inputs.core_hash}}
-    - uses: actions/cache/restore@v3
+        path: ${{ env.core_cache_path }}
+        key: core-${{ hashFiles( 'go.*', 'pkg/grpc', 'openapi', 'internal', 'cmd' ) }}
+        fail-on-cache-miss: true
+    - 
+      uses: actions/cache/restore@v3
       name: restore console
       with:
-        path: internal/api/ui/console/static/
-        key: ${{ inputs.console_hash }}
-    - name: build executable
-      run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w"
-    - uses: actions/upload-artifact@v3
-      with:
-        name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: ${{ env.console_cache_path }}
+        key: console-${{ hashFiles('console') }}
+        fail-on-cache-miss: true
+    - 
+      name: compile
+      run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile
+    # - 
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+    #     path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}

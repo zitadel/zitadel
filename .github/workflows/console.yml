@@ -10,6 +10,9 @@ on:
         required: true
         type: string
 
+env:
+  cache_path: console/dist/console
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,7 +26,7 @@ jobs:
             key: console-${{ hashFiles('console') }}
             restore-keys: |
               console-
-            path: console/dist/console
+            path: ${{ env.cache_path }}
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: bufbuild/buf-setup-action@v1
@@ -44,6 +47,6 @@ jobs:
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/cache/save@v3
           with:
-            path: console/dist/console
+            path: ${{ env.cache_path }}
             key: console-${{ hashFiles('console', '!console/dist', '!console/node_modules', '!console/.angular', '!console/src/app/proto') }}
         
