@@ -60,7 +60,7 @@ core_build: core_dependencies core_api core_static core_assets
 .PHONY: console_dependencies
 console_dependencies:
 	cd console && \
-	yarn install --frozen-lockfile
+	yarn install --immutable
 
 .PHONY: console_client
 console_client:

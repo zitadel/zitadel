@@ -21,12 +21,6 @@ on:
       core_cache_path:
         required: true
         type: string
-      console_cache_key:
-        required: true
-        type: string
-      console_cache_path:
-        required: true
-        type: string
       console_cache_hit:
         required: true
         type: string
@@ -62,13 +56,8 @@ jobs:
         node-version: ${{ inputs.node_version }}
         cache: 'yarn'
         cache-dependency-path: console/yarn.lock
-    - 
-      uses: actions/cache/restore@v3
-      name: restore console
-      with:
-        path: ${{ inputs.console_cache_path }}
-        key: ${{ inputs.console_cache_key }}
-        fail-on-cache-miss: true
+    -
+      run: npm install -g ng
     -
       name: lint
       run: make console_lint
