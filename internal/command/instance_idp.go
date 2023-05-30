@@ -97,6 +97,21 @@ func (c *Commands) UpdateInstanceGenericOIDCProvider(ctx context.Context, id str
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+func (c *Commands) MigrateInstanceGenericOIDCToAzureADProvider(ctx context.Context, id, tenant string, emailVerified bool) (*domain.ObjectDetails, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	writeModel := NewOIDCInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateOIDCToAzureADProvider(instanceAgg, writeModel, tenant, emailVerified))
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
 func (c *Commands) AddInstanceJWTProvider(ctx context.Context, provider JWTProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
@@ -665,6 +680,38 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 				return nil, err
 			}
 			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareMigrateOIDCToAzureADProvider(a *instance.Aggregate, writeModel *InstanceOIDCIDPWriteModel, tenant string, emailVerified bool) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				instance.NewOIDCIDPMigratedAzureADEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					writeModel.Name,
+					writeModel.ClientID,
+					writeModel.ClientSecret,
+					writeModel.Scopes,
+					tenant,
+					emailVerified,
+					writeModel.Options,
+				),
+			}, nil
 		}, nil
 	}
 }

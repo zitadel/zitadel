@@ -211,6 +211,10 @@ func (wm *OIDCIDPWriteModel) Reduce() error {
 			wm.reduceAddedEvent(e)
 		case *idp.OIDCIDPChangedEvent:
 			wm.reduceChangedEvent(e)
+		case *idp.OIDCIDPMigratedAzureADEvent:
+			wm.State = domain.IDPStateRemoved
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
 		case *idpconfig.IDPConfigAddedEvent:
 			wm.reduceIDPConfigAddedEvent(e)
 		case *idpconfig.IDPConfigChangedEvent:
@@ -397,6 +401,8 @@ func (wm *JWTIDPWriteModel) Reduce() error {
 			wm.reduceAddedEvent(e)
 		case *idp.JWTIDPChangedEvent:
 			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			wm.State = domain.IDPStateRemoved
 		case *idpconfig.IDPConfigAddedEvent:
 			wm.reduceIDPConfigAddedEvent(e)
 		case *idpconfig.IDPConfigChangedEvent:
@@ -558,6 +564,8 @@ func (wm *AzureADIDPWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *idp.AzureADIDPAddedEvent:
 			wm.reduceAddedEvent(e)
+		case *idp.OIDCIDPMigratedAzureADEvent:
+			wm.reduceAddedEvent(&e.AzureADIDPAddedEvent)
 		case *idp.AzureADIDPChangedEvent:
 			wm.reduceChangedEvent(e)
 		case *idp.RemovedEvent:

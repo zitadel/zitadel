@@ -113,6 +113,8 @@ func (wm *InstanceOIDCIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
 			wm.OIDCIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		case *instance.OIDCIDPMigratedAzureADEvent:
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedAzureADEvent)
 
 			// old events
 		case *instance.IDPConfigAddedEvent:
@@ -141,6 +143,7 @@ func (wm *InstanceOIDCIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.OIDCIDPAddedEventType,
 			instance.OIDCIDPChangedEventType,
 			instance.IDPRemovedEventType,
+			instance.OIDCIDPMigratedAzureADEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
 		Or(). // old events
@@ -305,6 +308,8 @@ func (wm *InstanceAzureADIDPWriteModel) AppendEvents(events ...eventstore.Event)
 			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPAddedEvent)
 		case *instance.AzureADIDPChangedEvent:
 			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPChangedEvent)
+		case *instance.OIDCIDPMigratedAzureADEvent:
+			wm.AzureADIDPWriteModel.AppendEvents(&e.OIDCIDPMigratedAzureADEvent)
 		case *instance.IDPRemovedEvent:
 			wm.AzureADIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:

@@ -348,6 +348,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOIDCIDPChanged,
 				},
 				{
+					Event:  instance.OIDCIDPMigratedAzureADEventType,
+					Reduce: p.reduceOIDCIDPMigratedAzureAD,
+				},
+				{
 					Event:  instance.JWTIDPAddedEventType,
 					Reduce: p.reduceJWTIDPAdded,
 				},
@@ -752,6 +756,40 @@ func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*h
 	return crdb.NewMultiStatement(
 		&idpEvent,
 		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OIDCIDPMigratedAzureADEvent
+	switch e := event.(type) {
+	//case *org.OIDCIDPChangedEvent:
+	//	idpEvent = e.OIDCIDPChangedEvent
+	case *instance.OIDCIDPMigratedAzureADEvent:
+		idpEvent = e.OIDCIDPMigratedAzureADEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{ /*org.OIDCIDPChangedEventType,*/ instance.OIDCIDPMigratedAzureADEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(OIDCIDCol, idpEvent.ID),
+				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(AzureADIDCol, idpEvent.ID),
+				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
+				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
+				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
+			},
+			crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+		),
 	), nil
 }
 

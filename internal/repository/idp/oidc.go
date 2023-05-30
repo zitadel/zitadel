@@ -162,3 +162,54 @@ func OIDCIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error
 
 	return e, nil
 }
+
+type OIDCIDPMigratedAzureADEvent struct {
+	AzureADIDPAddedEvent
+}
+
+func NewOIDCIDPMigratedAzureADEvent(
+	base *eventstore.BaseEvent,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	tenant string,
+	isEmailVerified bool,
+	options Options,
+) *OIDCIDPMigratedAzureADEvent {
+	return &OIDCIDPMigratedAzureADEvent{
+		AzureADIDPAddedEvent: AzureADIDPAddedEvent{
+			BaseEvent:       *base,
+			ID:              id,
+			Name:            name,
+			ClientID:        clientID,
+			ClientSecret:    clientSecret,
+			Scopes:          scopes,
+			Tenant:          tenant,
+			IsEmailVerified: isEmailVerified,
+			Options:         options,
+		},
+	}
+}
+
+func (e *OIDCIDPMigratedAzureADEvent) Data() interface{} {
+	return e
+}
+
+func (e *OIDCIDPMigratedAzureADEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func OIDCIDPMigratedAzureADEventEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &AzureADIDPAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-Grh2g", "unable to unmarshal event")
+	}
+
+	return e, nil
+}

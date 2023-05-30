@@ -220,6 +220,19 @@ func (s *Server) UpdateGenericOIDCProvider(ctx context.Context, req *admin_pb.Up
 	}, nil
 }
 
+func (s *Server) MigrateGenericOIDCToAzureADProvider(ctx context.Context, req *admin_pb.MigrateGenericOIDCProviderRequest) (*admin_pb.MigrateGenericOIDCProviderResponse, error) {
+	if req.GetAzure() != nil {
+		details, err := s.command.MigrateInstanceGenericOIDCToAzureADProvider(ctx, req.GetId(), idp_grpc.AzureADTenantToCommand(req.GetAzure().GetTenant()), req.GetAzure().GetEmailVerified())
+		if err != nil {
+			return nil, err
+		}
+		return &admin_pb.MigrateGenericOIDCProviderResponse{
+			Details: object_pb.DomainToAddDetailsPb(details),
+		}, nil
+	}
+	return &admin_pb.MigrateGenericOIDCProviderResponse{}, nil
+}
+
 func (s *Server) AddJWTProvider(ctx context.Context, req *admin_pb.AddJWTProviderRequest) (*admin_pb.AddJWTProviderResponse, error) {
 	id, details, err := s.command.AddInstanceJWTProvider(ctx, addJWTProviderToCommand(req))
 	if err != nil {
