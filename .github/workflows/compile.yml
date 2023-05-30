@@ -39,7 +39,7 @@ jobs:
         key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'internal') }}
         fail-on-cache-miss: true
     - 
-      name: compile
+      name: compile-pipeline
       run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile
     # - 
     #   uses: actions/upload-artifact@v3
