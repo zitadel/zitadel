@@ -78,6 +78,6 @@ clean:
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
 
-.PHONY: test
-test:
+.PHONY: core_unit_test
+core_unit_test:
 	go test -race -v -coverprofile=profile.cov ./...

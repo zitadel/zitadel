@@ -1,0 +1,55 @@
+name: Build core
+
+on: 
+  workflow_call:
+    inputs:
+      go_version:
+        required: true
+        type: string
+      core_cache_key:
+        required: true
+        type: string
+      core_cache_path:
+        required: true
+        type: string
+      console_cache_key:
+        required: true
+        type: string
+      console_cache_path:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        uses: actions/checkout@v3
+      - 
+        uses: actions/cache/restore@v3
+        name: restore console
+        with:
+          path: ${{ inputs.console_cache_path }}
+          key: ${{ inputs.console_cache_key }}
+          fail-on-cache-miss: true
+      - 
+        uses: actions/cache/restore@v3
+        name: restore core
+        with:
+          path: ${{ inputs.core_cache_path }}
+          key: ${{ inputs.core_cache_key }}
+          fail-on-cache-miss: true
+      -
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go_version }}
+      - 
+        name: test
+        run: make core_unit_test
+      - name: publish coverage
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          file: profile.cov
+          name: core-unit-tests
+          flags: core-unit-tests
+        
