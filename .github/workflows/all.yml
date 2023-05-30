@@ -29,6 +29,8 @@ jobs:
   compile:
     needs: [core, console]
     uses: ./.github/workflows/compile.yml
+    with:
+      go_version: '1.20'
       
     # runs-on: ubuntu-latest
     # strategy:

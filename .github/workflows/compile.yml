@@ -2,6 +2,10 @@ name: Compile
 
 on:
   workflow_call:
+    inputs:
+      go_version:
+        required: true
+        type: string
 
 env:
   core_cache_path: |
@@ -40,6 +44,10 @@ jobs:
         path: ${{ env.core_cache_path }}
         key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'internal') }}
         fail-on-cache-miss: true
+    -
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ inputs.go_version }}
     - 
       name: compile
       run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile_pipeline
