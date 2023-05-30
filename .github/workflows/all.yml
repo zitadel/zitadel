@@ -25,6 +25,7 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: ${{ env.go_version }}
+      - run: npm install -g sass
       - run: make core_build
     
   console:
