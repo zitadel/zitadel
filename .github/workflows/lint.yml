@@ -3,18 +3,30 @@ name: Lint
 on:
   workflow_call:
     inputs:
-      buildx_driver_opts:
+      node_version:
         required: true
         type: string
-      cache_from_params:
+      go_version:
         required: true
         type: string
-      cache_to_params:
+      core_cache_key:
         required: true
         type: string
-      tag_name:
+      core_cache_hit:
+        required: true
+        type: boolean
+      core_cache_path:
         required: true
         type: string
+      console_cache_key:
+        required: true
+        type: string
+      console_cache_path:
+        required: true
+        type: string
+      console_cache_hit:
+        required: true
+        type: boolean
 
 jobs:
 
@@ -23,108 +35,61 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          driver-opts: ${{inputs.buildx_driver_opts}}
-      - 
-        name: Login to Docker registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Lint
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./build/workflow.Dockerfile
-          target: lint-api
-          push: false
-          cache-to: ${{inputs.cache_to_params}}
-          cache-from: ${{inputs.cache_from_params}}
-          github-token: ${{ github.token }}
-          tags: ${{inputs.tag_name}}
+    - 
+      uses: actions/checkout@v2
+    - 
+      uses: bufbuild/buf-setup-action@v1
+    - 
+      name: lint
+      uses: bufbuild/buf-lint-action@v1
 
   console:
+    # if: ${{ inputs.console_cache_hit != 'true' }}
     name: console
     runs-on: ubuntu-latest
     steps:
     -
       name: Checkout
       uses: actions/checkout@v3
-    -
-      name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-      with:
-        driver-opts: ${{inputs.buildx_driver_opts}}
     - 
-      name: Login to Docker registry
-      uses: docker/login-action@v2
+      uses: actions/cache/restore@v3
+      name: restore console
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        path: ${{ inputs.console_cache_path }}
+        key: ${{ inputs.console_cache_key }}
+        fail-on-cache-miss: true
     -
-      name: Lint
-      uses: docker/build-push-action@v4
+      uses: actions/setup-node@v3
       with:
-        context: .
-        file: ./build/workflow.Dockerfile
-        target: lint-console
-        push: false
-        cache-to: ${{inputs.cache_to_params}}
-        cache-from: ${{inputs.cache_from_params}}
-        github-token: ${{ github.token }}
-        tags: ${{inputs.tag_name}}
+        node-version: ${{ inputs.node_version }}
+        cache: 'yarn'
+        cache-dependency-path: console/yarn.lock
+    -
+      name: lint
+      run: make console_lint
 
   core:
+    # if: ${{ inputs.core_cache_hit != 'true' }}
     name: core
     runs-on: ubuntu-latest
     steps:
     -
-      name: Checkout main
+      name: Checkout
       uses: actions/checkout@v3
-      with:
-        ref: main
-    -
-      name: Checkout head
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-    -
-      name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-      with:
-        driver-opts: ${{inputs.buildx_driver_opts}}
     - 
-      name: Login to Docker registry
-      uses: docker/login-action@v2
+      uses: actions/cache/restore@v3
+      name: restore core
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    -
-      name: Lint
-      uses: docker/build-push-action@v4
+        path: ${{ inputs.core_cache_path }}
+        key: ${{ inputs.core_cache_key }}
+        fail-on-cache-miss: true
+    - 
+      uses: actions/setup-go@v4
       with:
-        context: .
-        file: ./build/workflow.Dockerfile
-        target: lint-core-report
-        build-args: |
-          LINT_EXIT_CODE=0
-        push: false
-        cache-to: ${{inputs.cache_to_params}}
-        cache-from: ${{inputs.cache_from_params}}
-        github-token: ${{ github.token }}
-        tags: ${{inputs.tag_name}}
-        outputs: type=local,dest=/tmp/lint
-    -
-      name: Output coverage
-      run: cat /tmp/lint/report && if [[ -s /tmp/lint/report ]]; then exit 1; fi
-      
+        go-version: ${{ inputs.go_version }}
+        cache: false
+    - 
+      uses: golangci/golangci-lint-action@v3
+    # -
+    #   name: lint
+    #   run: make core_lint

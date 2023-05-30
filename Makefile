@@ -84,7 +84,19 @@ core_unit_test:
 
 .PHONY: core_integration_test
 core_integration_test:
-	curl -f http://localhost:9090/health?ready=1
 	go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	go test -tags=integration -race -parallel 1 -v -coverprofile=profile.cov -coverpkg=./... ./internal/integration ./internal/api/grpc/...
+
+.PHONY: console_lint
+console_lint:
+	cd console && \
+	yarn lint
+
+# .PHONE: core_lint
+# core_lint:
+# 	golangci-lint run \
+# 		--timeout 10m \
+# 		--config ./.golangci.yaml \
+# 		--out-format=github-actions \
+# 		--concurrency=$$(getconf _NPROCESSORS_ONLN)

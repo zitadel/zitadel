@@ -59,47 +59,46 @@ jobs:
           name: core-integration-tests-postgres
           flags: core-integration-tests-postgres
 
-  cockroach:
-    runs-on: ubuntu-latest
-    services:
-      cockroach:
-        image: cockroachdb/cockroach-unstable
-        ports:
-          - 26257:26257
-          - 9090:8080
-        
-        env:
-          COCKROACH_ARGS: start-single-node --insecure
-          COCKROACH_USER: root
-    #     options: >-
-    #       --health-cmd shell "curl --fail http://localhost:9090/health?ready=1 || exit 1"
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
-    steps:
-      - 
-        uses: actions/checkout@v3
-      - 
-        uses: actions/cache/restore@v3
-        name: restore core
-        with:
-          path: ${{ inputs.core_cache_path }}
-          key: ${{ inputs.core_cache_key }}
-          fail-on-cache-miss: true
-      -
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ inputs.go_version }}
-      - 
-        name: test
-        env:
-          ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
-          INTEGRATION_DB_FLAVOR: cockroach
-        run: make core_integration_test
-      - 
-        name: publish coverage
-        uses: codecov/codecov-action@v3.1.4
-        with:
-          file: profile.cov
-          name: core-integration-tests-cockroach
-          flags: core-integration-tests-cockroach
+# cockroach doesn't work at the moment because the cluster does not initialise
+  # cockroach:
+  #   runs-on: ubuntu-latest
+  #   services:
+  #     cockroach:
+  #       image: cockroachdb/cockroach
+  #       ports:
+  #         - 26257:26257
+  #         - 9090:8080
+  #       env:
+  #         COCKROACH_ARGS: start-single-node --insecure
+  #   #     options: >-
+  #   #       --health-cmd shell "curl --fail http://localhost:9090/health?ready=1 || exit 1"
+  #   #       --health-interval 10s
+  #   #       --health-timeout 5s
+  #   #       --health-retries 5
+  #   steps:
+  #     - 
+  #       uses: actions/checkout@v3
+  #     - 
+  #       uses: actions/cache/restore@v3
+  #       name: restore core
+  #       with:
+  #         path: ${{ inputs.core_cache_path }}
+  #         key: ${{ inputs.core_cache_key }}
+  #         fail-on-cache-miss: true
+  #     -
+  #       uses: actions/setup-go@v4
+  #       with:
+  #         go-version: ${{ inputs.go_version }}
+  #     - 
+  #       name: test
+  #       env:
+  #         ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+  #         INTEGRATION_DB_FLAVOR: cockroach
+  #       run: make core_integration_test
+  #     - 
+  #       name: publish coverage
+  #       uses: codecov/codecov-action@v3.1.4
+  #       with:
+  #         file: profile.cov
+  #         name: core-integration-tests-cockroach
+  #         flags: core-integration-tests-cockroach

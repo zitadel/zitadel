@@ -46,66 +46,30 @@ jobs:
       core_cache_path: ${{ needs.core.outputs.cache_path }}
       
   core-integration-test:
-    # if: ${{ needs.core.outputs.cache_hit != 'true' }}
+    if: ${{ needs.core.outputs.cache_hit != 'true' }}
     needs: core
     uses: ./.github/workflows/core-integration-test.yml
     with:
       go_version: '1.20'
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
-    # run: echo ""
+  
+  lint:
+    needs: [core, console]
+    uses: ./.github/workflows/lint.yml
+    with:
+      go_version: '1.20'
+      node_version: '18'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      console_cache_key: ${{ needs.console.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      console_cache_path: ${{ needs.console.outputs.cache_path }}
+      core_cache_hit: ${{ needs.core.outputs.cache_hit }}
+      console_cache_hit: ${{ needs.console.outputs.cache_hit }}
 
 
 
-  # core-integration-test:
-  #   runs-on: ubuntu-latest
-  #   needs: [core]
-  #   strategy:
-  #     matrix:
-  #       database: [cockroach, postgres]
-  #   env:
-  #     DB_FLAVOR: ${{ matrix.database }}
-  #     ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
-  #   steps:
-  #     -
-  #       name: Checkout
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: '0'
-  #     -
-  #       name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v2
-  #     -
-  #       name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v2
-  #       with:
-  #         driver-opts: ${{env.buildx_driver_opts}}
-  #     - 
-  #       name: Login to Docker registry
-  #       uses: docker/login-action@v2
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-  #     -
-  #       name: Integration tests
-  #       uses: docker/build-push-action@v4
-  #       with:
-  #         context: .
-  #         file: ./build/workflow.Dockerfile
-  #         target: coverage-core-integration
-  #         push: false
-  #         cache-to:  ${{env.cache_to_params}}
-  #         cache-from: ${{env.cache_from_params}}
-  #         github-token: ${{ github.token }}
-  #         tags: ${{env.tag_name}}
-  #         outputs: type=local,dest=/tmp/zitadel
-  #     - name: Publish coverage
-  #       uses: codecov/codecov-action@v3.1.4
-  #       with:
-  #         file: /tmp/zitadel/coverage/profile.cov
-  #         name: core-integration-tests-${{ matrix.database }}
-  #         flags: core-integration-tests-${{ matrix.database }}
+
 
   # lint:
   #   uses: ./.github/workflows/lint.yml
