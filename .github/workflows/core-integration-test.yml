@@ -49,7 +49,6 @@ jobs:
         name: test
         env:
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
-          DB_FLAVOR: postgres
           INTEGRATION_DB_FLAVOR: postgres
         run: make core_integration_test
       - 
@@ -67,7 +66,6 @@ jobs:
         image: cockroachdb/cockroach
         ports:
           - 26257:26257
-          - 9090:9090
         env:
           COCKROACH_ARGS: start-single-node --insecure
     steps:
@@ -88,7 +86,6 @@ jobs:
         name: test
         env:
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
-          DB_FLAVOR: cockroach
           INTEGRATION_DB_FLAVOR: cockroach
         run: make core_integration_test
       - 
