@@ -13,6 +13,15 @@ on:
         required: true
         type: string
 
+env:
+  cache_path: |
+    internal/statik/statik.go
+    internal/notification/statik/statik.go
+    internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
+    internal/api/ui/login/statik/statik.go
+    openapi/v2
+    pkg/grpc/**/*.pb.*
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,13 +35,7 @@ jobs:
             key: core-${{ hashFiles( 'go.*', 'pkg/grpc', 'openapi', 'internal', 'cmd' ) }}
             restore-keys: |
               core-
-            path: |
-              internal/statik/statik.go
-              internal/notification/statik/statik.go
-              internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
-              internal/api/ui/login/statik/statik.go
-              openapi/v2
-              pkg/grpc/**/*.pb.*
+            path: ${{ env.cache_path }}
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: bufbuild/buf-setup-action@v1
@@ -62,12 +65,6 @@ jobs:
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/cache/save@v3
           with:
-            key: core-${{ hashFiles('go.*', 'pkg/grpc', '!pkg/grpc/**/*.pb.*', 'openapi', '!openapi/v2', 'internal', '!internal/**/statik.go', 'cmd', 'zitadel.css*') }}
-            path: |
-              internal/statik/statik.go
-              internal/notification/statik/statik.go
-              internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
-              internal/api/ui/login/statik/statik.go
-              openapi/v2
-              pkg/grpc/**/*.pb.*
+            key: core-${{ hashFiles('go.*', 'pkg/grpc/**/*.go', '!pkg/grpc/**/*.pb.*', 'openapi', '!openapi/v2', 'internal', '!internal/**/statik.go', 'cmd', 'zitadel.css*', '**/.sass-cache') }}
+            path: ${{ env.cache_path }}
         
