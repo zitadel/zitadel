@@ -51,6 +51,12 @@ jobs:
     -
       name: Checkout
       uses: actions/checkout@v3
+    -
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node_version }}
+        cache: 'yarn'
+        cache-dependency-path: console/yarn.lock
     - 
       uses: actions/cache/restore@v3
       name: restore console
@@ -58,12 +64,6 @@ jobs:
         path: ${{ inputs.console_cache_path }}
         key: ${{ inputs.console_cache_key }}
         fail-on-cache-miss: true
-    -
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ inputs.node_version }}
-        cache: 'yarn'
-        cache-dependency-path: console/yarn.lock
     -
       name: lint
       run: make console_lint
@@ -77,6 +77,11 @@ jobs:
       name: Checkout
       uses: actions/checkout@v3
     - 
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ inputs.go_version }}
+        cache: false
+    - 
       uses: actions/cache/restore@v3
       name: restore core
       with:
@@ -84,12 +89,9 @@ jobs:
         key: ${{ inputs.core_cache_key }}
         fail-on-cache-miss: true
     - 
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ inputs.go_version }}
-        cache: false
-    - 
       uses: golangci/golangci-lint-action@v3
-    # -
-    #   name: lint
-    #   run: make core_lint
+      with:
+        args: --disable-all
+    -
+      name: lint
+      run: make core_lint

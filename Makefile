@@ -93,10 +93,10 @@ console_lint:
 	cd console && \
 	yarn lint
 
-# .PHONE: core_lint
-# core_lint:
-# 	golangci-lint run \
-# 		--timeout 10m \
-# 		--config ./.golangci.yaml \
-# 		--out-format=github-actions \
-# 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
+.PHONE: core_lint
+core_lint:
+	golangci-lint run \
+		--timeout 10m \
+		--config ./.golangci.yaml \
+		--out-format=github-actions \
+		--concurrency=$$(getconf _NPROCESSORS_ONLN)
