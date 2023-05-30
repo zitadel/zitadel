@@ -77,7 +77,6 @@ core_grpc_dependencies:
 	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
 
 core_api: core_api_generator core_grpc_dependencies
-	ls -la $(go_bin)
 	buf generate
 	mkdir -p pkg/grpc
 	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
