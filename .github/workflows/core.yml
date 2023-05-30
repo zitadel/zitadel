@@ -65,6 +65,6 @@ jobs:
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/cache/save@v3
           with:
-            key: core-${{ hashFiles('go.*', 'openapi', '!openapi/v2', 'cmd', 'pkg/grpc/**/*.go', '!pkg/grpc/**/*.pb.*', 'pkg/grpc/protoc/v2/options.pb.go', 'internal', '!internal/**/statik.go', '!**/zitadel.css*', '**/.sass-cache') }}) }}
+            key: core-${{ hashFiles('go.*', 'openapi', '!openapi/v2', 'cmd', 'pkg/grpc/**/*.go', '!pkg/grpc/**/*.pb.*', 'pkg/grpc/protoc/v2/options.pb.go', 'internal', '!internal/**/statik.go', '!**/zitadel.css*', '**/.sass-cache') }}
             path: ${{ env.cache_path }}
         
