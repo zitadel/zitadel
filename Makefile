@@ -6,7 +6,7 @@ compile: core_build console_build
 	cp -r console/dist/console internal/api/ui/console/static/
 	go build -o zitadel-$$(go env GOOS)-$$(go env GOARCH) -ldflags="-s -w"
 
-compile-pipeline:
+compile_pipeline:
 	cp -r console/dist/console internal/api/ui/console/static/
 	go build -o zitadel-$$(go env GOOS)-$$(go env GOARCH) -ldflags="-s -w"
 
@@ -19,6 +19,10 @@ core_static:
 	go generate internal/api/ui/login/static/resources/generate.go
 	go generate internal/notification/statik/generate.go
 	go generate internal/statik/generate.go
+
+core_assets:
+	mkdir -p docs/apis/assets
+	go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
 core_api_generator:
 ifeq (,$(wildcard $(gen_authopt_path)))
@@ -44,7 +48,7 @@ core_api: core_api_generator core_grpc_dependencies
 	mkdir -p openapi/v2/zitadel
 	cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel
 
-core_build: core_dependencies core_api core_static
+core_build: core_dependencies core_api core_static core_assets
 
 console_dependencies:
 	cd console && \
