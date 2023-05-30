@@ -51,7 +51,6 @@ jobs:
         name: test
         env:
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
-          ZITADEL_DATABASE_POSTGRES_HOST: postgres
         run: make core_integration_test
       - 
         name: publish coverage
