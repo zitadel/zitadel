@@ -63,11 +63,16 @@ jobs:
     runs-on: ubuntu-latest
     services:
       cockroach:
-        image: cockroachdb/cockroach
+        image: cockroachdb/cockroach-unstable
         ports:
           - 26257:26257
         env:
-          COCKROACH_ARGS: start-single-node --insecure
+          COCKROACH_ARGS: start-single-node --insecure --background
+    #     options: >-
+    #       --health-cmd shell "curl --fail http://localhost:9090/health?ready=1 || exit 1"
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
     steps:
       - 
         uses: actions/checkout@v3
