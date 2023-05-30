@@ -43,8 +43,8 @@ jobs:
     - 
       name: compile
       run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile_pipeline
-    # - 
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
-    #     path: zitadel-core-${{ matrix.goos }}-${{ matrix.goarch }}
+    - 
+      uses: actions/upload-artifact@v3
+      with:
+        name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
