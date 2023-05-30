@@ -29,6 +29,10 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      cockroach:
+        image: cockroachdb/cockroach
+        env:
+          COCKROACH_ARGS: start-single-node --insecure --listen-addr=localhost:36257 --sql-addr=localhost:26257 --http-addr=localhost:9090 --background
     steps:
       - 
         uses: actions/checkout@v3
@@ -47,6 +51,7 @@ jobs:
         name: test
         env:
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+          ZITADEL_DATABASE_POSTGRES_HOST: postgres
         run: make core_integration_test
       - 
         name: publish coverage
