@@ -34,15 +34,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: check-cached
+        with:
+          lookup-only: true
+          key: console-${{ hashFiles('console') }}
+          path: console/dist/console
       - uses: bufbuild/buf-setup-action@v1
+        if: !steps.check-cached.outputs.cache-hit
         with:
           github_token: ${{ github.token }}
       - uses: actions/setup-node@v3
+        if: !steps.check-cached.outputs.cache-hit
         with:
           node-version: ${{ env.node_version }}
           cache: 'yarn'
           cache-dependency-path: console/yarn.lock
       - run: make console_build
+        if: !steps.check-cached.outputs.cache-hit
+      - uses: actions/cache/save@v3
+        if: !steps.check-cached.outputs.cache-hit
+        with:
+          path: console/dist/console
+          key: console-${{ hashFiles('console', '!console/dist', '!console/node_modules', '!console/.angular') }}
 
   compile:
     needs: [core, console]

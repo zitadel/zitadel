@@ -99,9 +99,9 @@ console_build: console_dependencies console_client
 	yarn build
 
 clean:
-	rm -rf .artifacts/grpc
-	rm $(gen_authopt_path)
-	rm $(gen_zitadel_path)
+	$(RM) .artifacts/grpc
+	$(RM) $(gen_authopt_path)
+	$(RM) $(gen_zitadel_path)
 
 test:
 	go test -race -v -coverprofile=profile.cov ./...
