@@ -35,27 +35,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache/restore@v3
-        id: check-cached
+        id: console-cache
         with:
-          key: console-${{ hashFiles('console') }}
+          key: console-${{ hashFiles('console', '!console/dist', '!console/node_modules', '!console/.angular') }}
           restore-keys: |
             console-
           path: console/dist/console
-      - run: echo ${{ steps.check-cached.outputs.cache-hit }} ${{ steps.check-cached.outputs.cache-hit != 'true' }}
+      - run: echo ${{ steps.console-cache.outputs.cache-hit }} ${{ steps.console-cache.outputs.cache-hit != 'true' }}
       - uses: bufbuild/buf-setup-action@v1
-        if: ${{ steps.check-cached.outputs.cache-hit != 'true' }}
+        if: ${{ steps.console-cache.outputs.cache-hit != 'true' }}
         with:
           github_token: ${{ github.token }}
       - uses: actions/setup-node@v3
-        if: ${{ steps.check-cached.outputs.cache-hit != 'true' }}
+        if: ${{ steps.console-cache.outputs.cache-hit != 'true' }}
         with:
           node-version: ${{ env.node_version }}
           cache: 'yarn'
           cache-dependency-path: console/yarn.lock
       - run: make console_build
-        if: ${{ steps.check-cached.outputs.cache-hit != 'true' }}
+        if: ${{ steps.console-cache.outputs.cache-hit != 'true' }}
       - uses: actions/cache/save@v3
-        if: ${{ steps.check-cached.outputs.cache-hit != 'true' }}
+        if: ${{ steps.console-cache.outputs.cache-hit != 'true' }}
         with:
           path: console/dist/console
           key: console-${{ hashFiles('console', '!console/dist', '!console/node_modules', '!console/.angular') }}
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/cache/restore@v3
         id: restore-console
         with:
-          key: console-${{ hashFiles('console') }}
+          key: console-${{ hashFiles('console', '!console/dist', '!console/node_modules', '!console/.angular') }}
           path: console/dist/console
       - uses: actions/setup-go@v4
         with:
