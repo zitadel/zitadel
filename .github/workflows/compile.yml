@@ -9,6 +9,8 @@ env:
     internal/notification/statik/statik.go
     internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
     internal/api/ui/login/statik/statik.go
+    internal/api/assets/authz.go 
+    internal/api/assets/router.go
     openapi/v2
     pkg/grpc/**/*.pb.*
   console_cache_path: console/dist/console
