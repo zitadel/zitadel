@@ -1,6 +1,6 @@
 Database:
   cockroach:
-    Host: localhost
+    Host: cockroach
     Port: 26257
     Database: zitadel
     Options: ""
