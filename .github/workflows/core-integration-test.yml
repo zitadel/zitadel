@@ -14,7 +14,7 @@ on:
         type: string
 
 jobs:
-  test:
+  postgres:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -31,21 +31,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      cockroach:
-        image: cockroachdb/cockroach
-        ports:
-          - 26257:26257
-          - 9090:9090
-        env:
-          COCKROACH_ARGS: start-single-node --insecure --listen-addr=localhost:36257 --sql-addr=localhost:26257 --http-addr=localhost:9090
-        options: >-
-          --health-cmd curl http://localhost:9090/health?ready=1
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    strategy:
-      matrix:
-        database: [cockroach, postgres]
     steps:
       - 
         uses: actions/checkout@v3
@@ -64,13 +49,55 @@ jobs:
         name: test
         env:
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
-          DB_FLAVOR: ${{ matrix.database }}
+          DB_FLAVOR: postgres
         run: make core_integration_test
       - 
         name: publish coverage
         uses: codecov/codecov-action@v3.1.4
         with:
           file: profile.cov
-          name: core-integration-tests-${{ matrix.database }}
-          flags: core-integration-tests-${{ matrix.database }}
-        
+          name: core-integration-tests-postgres
+          flags: core-integration-tests-postgres
+
+  cockroach:
+    runs-on: ubuntu-latest
+    services:
+      cockroach:
+        image: cockroachdb/cockroach
+        ports:
+          - 26257:26257
+          - 9090:9090
+        env:
+          COCKROACH_ARGS: start-single-node --insecure --listen-addr=localhost:36257 --sql-addr=localhost:26257 --http-addr=localhost:9090
+        options: >-
+          --health-cmd curl http://localhost:9090/health?ready=1
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - 
+        uses: actions/checkout@v3
+      - 
+        uses: actions/cache/restore@v3
+        name: restore core
+        with:
+          path: ${{ inputs.core_cache_path }}
+          key: ${{ inputs.core_cache_key }}
+          fail-on-cache-miss: true
+      -
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go_version }}
+      - 
+        name: test
+        env:
+          ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+          DB_FLAVOR: cockroach
+        run: make core_integration_test
+      - 
+        name: publish coverage
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          file: profile.cov
+          name: core-integration-tests-cockroach
+          flags: core-integration-tests-cockroach
