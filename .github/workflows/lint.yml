@@ -9,6 +9,9 @@ on:
       go_version:
         required: true
         type: string
+      buf_version:
+        required: true
+        type: string
       core_cache_key:
         required: true
         type: string
@@ -39,6 +42,8 @@ jobs:
       uses: actions/checkout@v2
     - 
       uses: bufbuild/buf-setup-action@v1
+      with:
+        version: ${{ inputs.buf_version }}
     - 
       name: lint
       uses: bufbuild/buf-lint-action@v1
@@ -91,7 +96,8 @@ jobs:
     - 
       uses: golangci/golangci-lint-action@v3
       with:
-        args: --disable-all
+        github-token: ${{ github.token }}
+        only-new-issues: true
     -
       name: lint
       run: make core_lint

@@ -7,10 +7,6 @@ permissions:
   contents: write
   packages: write
 
-env:
-  go_version: '1.20'
-  node_version: '16'
-
 jobs:
 
   core:
@@ -60,6 +56,7 @@ jobs:
     with:
       go_version: '1.20'
       node_version: '18'
+      buf_version: laatest
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       console_cache_key: ${{ needs.console.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
