@@ -14,51 +14,17 @@ env:
 jobs:
 
   core:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: bufbuild/buf-setup-action@v1
-        with:
-          github_token: ${{ github.token }}
-      # install node for sass
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.node_version }}
-      - run: npm install -g sass
-      - uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.go_version }}
-      - run: make core_build
+    uses: ./.github/workflows/core.yml
+    with:
+      node_version: '18'
+      buf_version: 'latest'
+      go_version: '1.20'
     
   console:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        id: console-cache
-        with:
-          key: console-${{ hashFiles('console') }}
-          restore-keys: |
-            console-
-          path: console/dist/console
-      - run: echo ${{ steps.console-cache.outputs.cache-hit }} ${{ steps.console-cache.outputs.cache-hit != 'true' }}
-      - uses: bufbuild/buf-setup-action@v1
-        if: ${{ steps.console-cache.outputs.cache-hit != 'true' }}
-        with:
-          github_token: ${{ github.token }}
-      - uses: actions/setup-node@v3
-        if: ${{ steps.console-cache.outputs.cache-hit != 'true' }}
-        with:
-          node-version: ${{ env.node_version }}
-          cache: 'yarn'
-          cache-dependency-path: console/yarn.lock
-      - run: make console_build
-        if: ${{ steps.console-cache.outputs.cache-hit != 'true' }}
-      - uses: actions/cache/save@v3
-        if: ${{ steps.console-cache.outputs.cache-hit != 'true' }}
-        with:
-          path: console/dist/console
-          key: console-${{ hashFiles('console', '!console/dist', '!console/node_modules', '!console/.angular', '!console/src/app/proto') }}
+    uses: ./.github/workflows/console.yml
+    with:
+      node_version: '18'
+      buf_version: 'latest'
 
   compile:
     needs: [core, console]

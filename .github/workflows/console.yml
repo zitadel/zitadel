@@ -1,0 +1,49 @@
+name: Build console
+
+on: 
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      buf_version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        - 
+          uses: actions/checkout@v3
+        - 
+          uses: actions/cache/restore@v3
+          id: cache
+          with:
+            key: console-${{ hashFiles('console') }}
+            restore-keys: |
+              console-
+            path: console/dist/console
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: bufbuild/buf-setup-action@v1
+          with:
+            github_token: ${{ github.token }}
+            version: ${{ inputs.buf_version }}
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ inputs.node_version }}
+            cache: 'yarn'
+            cache-dependency-path: console/yarn.lock
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          run: make console_build
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: actions/cache/save@v3
+          with:
+            path: console/dist/console
+            key: console-${{ hashFiles('console', '!console/dist', '!console/node_modules', '!console/.angular', '!console/src/app/proto') }}
+        
