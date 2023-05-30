@@ -39,7 +39,7 @@ jobs:
           COCKROACH_ARGS: start-single-node --insecure --listen-addr=localhost:36257 --sql-addr=localhost:26257 --http-addr=localhost:9090 --background
     strategy:
       matrix:
-        database: [cockraoch, postgres]
+        database: [cockroach, postgres]
     steps:
       - 
         uses: actions/checkout@v3
@@ -65,6 +65,6 @@ jobs:
         uses: codecov/codecov-action@v3.1.4
         with:
           file: profile.cov
-          name: core-unit-tests
-          flags: core-unit-tests
+          name: core-integration-tests-${{ matrix.database }}
+          flags: core-integration-tests-${{ matrix.database }}
         
