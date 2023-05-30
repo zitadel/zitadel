@@ -69,7 +69,7 @@ jobs:
           - 26257:26257
           - 9090:9090
         env:
-          COCKROACH_ARGS: start-single-node --insecure --listen-addr=localhost:36257 --sql-addr=localhost:26257 --http-addr=localhost:9090
+          COCKROACH_ARGS: start-single-node --insecure --listen-addr=:36257 --sql-addr=:26257 --http-addr=:9090
         options: >-
           --health-cmd shell curl --fail http://localhost:9090/health?ready=1 || exit 1
           --health-interval 10s
