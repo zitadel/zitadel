@@ -2,17 +2,21 @@ go_bin := "$$(go env GOPATH)/bin"
 gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
 gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 
+.PHONY: compile
 compile: core_build console_build
 	cp -r console/dist/console internal/api/ui/console/static/
 	go build -o zitadel-$$(go env GOOS)-$$(go env GOARCH) -ldflags="-s -w"
 
+.PHONY: compile_pipeline
 compile_pipeline:
 	cp -r console/dist/console internal/api/ui/console/static/
 	go build -o zitadel-$$(go env GOOS)-$$(go env GOARCH) -ldflags="-s -w"
 
+.PHONY: core_dependencies
 core_dependencies:
 	go mod download
 
+.PHONY: core_static
 core_static:
 	go install github.com/rakyll/statik@v0.1.7
 	go generate internal/api/ui/login/statik/generate.go
@@ -20,10 +24,12 @@ core_static:
 	go generate internal/notification/statik/generate.go
 	go generate internal/statik/generate.go
 
+.PHONY: core_assets
 core_assets:
 	mkdir -p docs/apis/assets
 	go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
+.PHONY: core_api_generator
 core_api_generator:
 ifeq (,$(wildcard $(gen_authopt_path)))
 	go install internal/protoc/protoc-gen-authoption/main.go \
@@ -34,6 +40,7 @@ ifeq (,$(wildcard $(gen_zitadel_path)))
     && mv $$(go env GOPATH)/bin/main $(gen_zitadel_path)
 endif
 
+.PHONY: core_grpc_dependencies
 core_grpc_dependencies:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.30 
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 
@@ -41,6 +48,7 @@ core_grpc_dependencies:
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2 
 	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
 
+.PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
 	buf generate
 	mkdir -p pkg/grpc
@@ -48,24 +56,30 @@ core_api: core_api_generator core_grpc_dependencies
 	mkdir -p openapi/v2/zitadel
 	cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel
 
+.PHONY: core_build
 core_build: core_dependencies core_api core_static core_assets
 
+.PHONY: console_dependencies
 console_dependencies:
 	cd console && \
 	yarn install --frozen-lockfile
 
+.PHONY: console_client
 console_client:
 	cd console && \
 	yarn generate
 
+.PHONY: console_build
 console_build: console_dependencies console_client
 	cd console && \
 	yarn build
 
+.PHONY: clean
 clean:
 	$(RM) .artifacts/grpc
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
 
+.PHONY: test
 test:
 	go test -race -v -coverprofile=profile.cov ./...

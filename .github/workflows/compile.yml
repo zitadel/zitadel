@@ -40,7 +40,7 @@ jobs:
         fail-on-cache-miss: true
     - 
       name: compile
-      run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile-pipeline
+      run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile_pipeline
     # - 
     #   uses: actions/upload-artifact@v3
     #   with:
