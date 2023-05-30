@@ -49,15 +49,15 @@ compile: core_build console_build
 	cp -r console/dist/console internal/api/ui/console/static/
 	go build -o zitadel-$$(go env GOOS)-$$(go env GOARCH) -ldflags="-s -w"
 
+core_dependencies:
+	go mod download
+
 core_static:
 	go install github.com/rakyll/statik@v0.1.7
 	go generate internal/api/ui/login/statik/generate.go
 	go generate internal/api/ui/login/static/resources/generate.go
 	go generate internal/notification/statik/generate.go
 	go generate internal/statik/generate.go
-
-core_dependencies:
-	go mod download
 
 core_api_generator:
 ifeq (,$(wildcard $(gen_authopt_path)))
