@@ -9,7 +9,7 @@ permissions:
 
 env:
   go_version: '1.20'
-  node_version: '18'
+  node_version: '16'
 
 jobs:
 
@@ -33,7 +33,7 @@ jobs:
           cache-dependency-path: console/package-lock.json
       - run: make console_build
 
-      
+
   # core:
   #   runs-on: ubuntu-latest
   #   steps:
