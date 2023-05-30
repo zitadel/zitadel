@@ -59,12 +59,12 @@ core_dependencies:
 	go mod download
 
 core_api_generator:
-ifneq ("$(wildcard $(gen_authopt_path))", "")
+ifeq ("$(wildcard $(gen_authopt_path))", "")
 	echo $(gen_authopt_path)
 	go install internal/protoc/protoc-gen-authoption/main.go \
     && mv $$(go env GOPATH)/bin/main $(gen_authopt_path)
 endif
-ifneq ("$(wildcard $(gen_zitadel_path))", "")
+ifeq ("$(wildcard $(gen_zitadel_path))", "")
 	go install internal/protoc/protoc-gen-zitadel/main.go \
     && mv $$(go env GOPATH)/bin/main $(gen_zitadel_path)
 endif
