@@ -19,6 +19,8 @@ jobs:
     services:
       postgres:
         image: postgres
+        ports:
+          - 5432:5432
         env:
           POSTGRES_USER: zitadel
           PGUSER: zitadel
@@ -31,6 +33,8 @@ jobs:
           --health-retries 5
       cockroach:
         image: cockroachdb/cockroach
+        ports:
+          - 26257:26257
         env:
           COCKROACH_ARGS: start-single-node --insecure --listen-addr=localhost:36257 --sql-addr=localhost:26257 --http-addr=localhost:9090 --background
     steps:

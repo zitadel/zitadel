@@ -1,6 +1,6 @@
 Database:
   postgres:
-    Host: postgres
+    Host: localhost
     Port: 5432
     Database: zitadel
     MaxOpenConns: 20
