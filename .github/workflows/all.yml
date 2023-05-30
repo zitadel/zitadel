@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: ${{ env.node_version }}
           cache: 'yarn'
-          cache-dependency-path: console/yarn.json
+          cache-dependency-path: console/yarn.lock
       - run: make console_build
 
 
