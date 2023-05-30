@@ -17,6 +17,8 @@ on:
         value: ${{ jobs.build.outputs.cache_key }}
       cache_path:
         value: ${{ jobs.build.outputs.cache_path }}
+      cache_hit:
+        value: ${{ jobs.build.outputs.cache_hit }}
 
 env:
   cache_path: |
@@ -35,6 +37,7 @@ jobs:
     outputs:
       cache_key: ${{ steps.cache.outputs.cache-primary-key }}
       cache_path: ${{ env.cache_path }}
+      cache_hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
         - 
           uses: actions/checkout@v3

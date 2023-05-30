@@ -16,6 +16,19 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: zitadel
+          PGUSER: zitadel
+          POSTGRES_DB: zitadel
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - 
         uses: actions/checkout@v3
@@ -32,7 +45,9 @@ jobs:
           go-version: ${{ inputs.go_version }}
       - 
         name: test
-        run: make core_unit_test
+        env:
+          ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+        run: make core_integration_test
       - 
         name: publish coverage
         uses: codecov/codecov-action@v3.1.4
