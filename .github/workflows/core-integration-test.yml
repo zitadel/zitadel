@@ -66,6 +66,7 @@ jobs:
         image: cockroachdb/cockroach-unstable
         ports:
           - 26257:26257
+          - 9090:8080
         env:
           COCKROACH_ARGS: start-single-node --insecure --background
     #     options: >-

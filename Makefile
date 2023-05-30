@@ -84,6 +84,7 @@ core_unit_test:
 
 .PHONY: core_integration_test
 core_integration_test:
+	curl -f http://localhost:9090/health?ready=1
 	go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	go test -tags=integration -race -parallel 1 -v -coverprofile=profile.cov -coverpkg=./... ./internal/integration ./internal/api/grpc/...
