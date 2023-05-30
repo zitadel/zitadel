@@ -22,12 +22,9 @@ jobs:
   build:
     outputs:
       cache_key: ${{ steps.cache.outputs.cache-primary-key }}
-      cache_path: ${{ steps.cache-path.outputs.CACHE_PATH }}
+      cache_path: ${{ env.cache_path }}
     runs-on: ubuntu-latest
     steps:
-        -
-          id: cache-path
-          run: echo "CACHE_PATH=${{ env.cache_path }}" >> "$GITHUB_OUTPUT"
         - 
           uses: actions/checkout@v3
         - 
