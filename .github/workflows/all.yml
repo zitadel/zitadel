@@ -20,6 +20,7 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: ${{ env.go_version }}
+      - uses: bufbuild/buf-setup-action@v1
       - run: make core_build
     
   console:
