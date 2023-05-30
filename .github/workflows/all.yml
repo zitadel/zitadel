@@ -41,6 +41,7 @@ jobs:
           restore-keys: |
             console-
           path: console/dist/console
+      - run: echo ${{ steps.check-cached.outputs.cache-hit }} ${{ steps.check-cached.outputs.cache-hit != 'true' }}
       - uses: bufbuild/buf-setup-action@v1
         if: ${{ steps.check-cached.outputs.cache-hit != 'true' }}
         with:
