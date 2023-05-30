@@ -46,6 +46,7 @@ gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
 gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 
 compile: core_build console_build
+	cp -r console/dist/console internal/api/ui/console/static/
 	go build -o zitadel-$$(go env GOOS)-$$(go env GOARCH) -ldflags="-s -w"
 
 core_static:
