@@ -37,23 +37,24 @@ jobs:
       - uses: actions/cache/restore@v3
         id: check-cached
         with:
-          lookup-only: true
           key: console-${{ hashFiles('console') }}
+          restore-keys: |
+            console-
           path: console/dist/console
       - uses: bufbuild/buf-setup-action@v1
-        if: !steps.check-cached.outputs.cache-hit
+        if: ${{ steps.check-cached.outputs.cache-hit != 'true' }}
         with:
           github_token: ${{ github.token }}
       - uses: actions/setup-node@v3
-        if: !steps.check-cached.outputs.cache-hit
+        if: ${{ steps.check-cached.outputs.cache-hit != 'true' }}
         with:
           node-version: ${{ env.node_version }}
           cache: 'yarn'
           cache-dependency-path: console/yarn.lock
       - run: make console_build
-        if: !steps.check-cached.outputs.cache-hit
+        if: ${{ steps.check-cached.outputs.cache-hit != 'true' }}
       - uses: actions/cache/save@v3
-        if: !steps.check-cached.outputs.cache-hit
+        if: ${{ steps.check-cached.outputs.cache-hit != 'true' }}
         with:
           path: console/dist/console
           key: console-${{ hashFiles('console', '!console/dist', '!console/node_modules', '!console/.angular') }}
