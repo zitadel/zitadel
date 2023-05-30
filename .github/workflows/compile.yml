@@ -36,7 +36,7 @@ jobs:
       name: restore core
       with:
         path: ${{ env.core_cache_path }}
-        key: core-${{ hashFiles('go.*', 'pkg/grpc/**/*.go', '!pkg/grpc/**/*.pb.*', 'openapi', '!openapi/v2', 'internal', '!internal/**/statik.go', 'cmd', 'zitadel.css*', '**/.sass-cache') }}
+        key: core-${{ hashFiles( 'go.*', 'pkg/grpc', 'openapi', 'internal', 'cmd' ) }}
         fail-on-cache-miss: true
     - 
       name: compile
