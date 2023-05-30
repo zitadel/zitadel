@@ -32,7 +32,7 @@ jobs:
           uses: actions/cache/restore@v3
           id: cache
           with:
-            key: core-${{ hashFiles( 'go.*', 'pkg/grpc', 'openapi', 'internal', 'cmd' ) }}
+            key: core-${{ hashFiles( 'go.*', 'pkg/grpc/**/*.go', 'openapi', 'internal', 'cmd' ) }}
             restore-keys: |
               core-
             path: ${{ env.cache_path }}
