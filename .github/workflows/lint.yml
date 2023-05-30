@@ -57,7 +57,7 @@ jobs:
         cache: 'yarn'
         cache-dependency-path: console/yarn.lock
     -
-      run: npm install -g ng
+      run: npm install -g @angular/cli prettier
     -
       name: lint
       run: make console_lint
@@ -87,6 +87,3 @@ jobs:
       with:
         github-token: ${{ github.token }}
         only-new-issues: true
-    -
-      name: lint
-      run: make core_lint
