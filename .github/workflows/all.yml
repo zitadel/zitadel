@@ -35,6 +35,14 @@ jobs:
       console_cache_key: ${{ needs.console.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
       console_cache_path: ${{ needs.console.outputs.cache_path }}
+
+  core-unit-test:
+    needs: core
+    uses: ./.github/workflows/core-unit-test.yml
+    with:
+      go_version: '1.20'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
       
 
   # core-unit-test:

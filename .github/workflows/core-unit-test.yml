@@ -12,12 +12,6 @@ on:
       core_cache_path:
         required: true
         type: string
-      console_cache_key:
-        required: true
-        type: string
-      console_cache_path:
-        required: true
-        type: string
 
 jobs:
   build:
@@ -25,13 +19,6 @@ jobs:
     steps:
       - 
         uses: actions/checkout@v3
-      - 
-        uses: actions/cache/restore@v3
-        name: restore console
-        with:
-          path: ${{ inputs.console_cache_path }}
-          key: ${{ inputs.console_cache_key }}
-          fail-on-cache-miss: true
       - 
         uses: actions/cache/restore@v3
         name: restore core
