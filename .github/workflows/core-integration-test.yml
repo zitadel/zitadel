@@ -37,6 +37,9 @@ jobs:
           - 26257:26257
         env:
           COCKROACH_ARGS: start-single-node --insecure --listen-addr=localhost:36257 --sql-addr=localhost:26257 --http-addr=localhost:9090 --background
+    strategy:
+      matrix:
+        database: [cockraoch, postgres]
     steps:
       - 
         uses: actions/checkout@v3
@@ -55,6 +58,7 @@ jobs:
         name: test
         env:
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
+          DB_FLAVOR: ${{ matrix.database }}
         run: make core_integration_test
       - 
         name: publish coverage

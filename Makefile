@@ -84,6 +84,6 @@ core_unit_test:
 
 .PHONY: core_integration_test
 core_integration_test:
-	go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml
-	go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml
+	go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${DB_FLAVOR}.yaml
+	go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${DB_FLAVOR}.yaml
 	go test -tags=integration -race -parallel 1 -v -coverprofile=profile.cov -coverpkg=./... ./internal/integration ./internal/api/grpc/...
