@@ -70,6 +70,7 @@ jobs:
         
         env:
           COCKROACH_ARGS: start-single-node --insecure
+          COCKROACH_USER: root
     #     options: >-
     #       --health-cmd shell "curl --fail http://localhost:9090/health?ready=1 || exit 1"
     #       --health-interval 10s
