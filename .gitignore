@@ -59,6 +59,11 @@ docs/docs/apis/auth
 docs/docs/apis/admin
 docs/docs/apis/mgmt
 docs/docs/apis/system
+**/.sass-cache
+/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
+/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
+zitadel
+zitadel-*-*
 
 # local
 build/local/*.env
