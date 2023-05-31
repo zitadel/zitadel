@@ -695,8 +695,8 @@ func (c *Commands) prepareMigrateOIDCToAzureADProvider(a *instance.Aggregate, wr
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			if err != nil {
-				return nil, err
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "INST-Dg29201", "Errors.Instance.IDPConfig.NotExisting")
 			}
 			return []eventstore.Command{
 				instance.NewOIDCIDPMigratedAzureADEvent(

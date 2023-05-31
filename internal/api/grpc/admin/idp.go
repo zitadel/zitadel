@@ -220,7 +220,7 @@ func (s *Server) UpdateGenericOIDCProvider(ctx context.Context, req *admin_pb.Up
 	}, nil
 }
 
-func (s *Server) MigrateGenericOIDCToAzureADProvider(ctx context.Context, req *admin_pb.MigrateGenericOIDCProviderRequest) (*admin_pb.MigrateGenericOIDCProviderResponse, error) {
+func (s *Server) MigrateGenericOIDCProvider(ctx context.Context, req *admin_pb.MigrateGenericOIDCProviderRequest) (*admin_pb.MigrateGenericOIDCProviderResponse, error) {
 	if req.GetAzure() != nil {
 		details, err := s.command.MigrateInstanceGenericOIDCToAzureADProvider(ctx, req.GetId(), idp_grpc.AzureADTenantToCommand(req.GetAzure().GetTenant()), req.GetAzure().GetEmailVerified())
 		if err != nil {

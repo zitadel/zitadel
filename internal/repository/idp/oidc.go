@@ -202,14 +202,10 @@ func (e *OIDCIDPMigratedAzureADEvent) UniqueConstraints() []*eventstore.EventUni
 }
 
 func OIDCIDPMigratedAzureADEventEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e := &AzureADIDPAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := json.Unmarshal(event.Data, e)
+	e, err := AzureADIDPAddedEventMapper(event)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Grh2g", "unable to unmarshal event")
+		return nil, err
 	}
 
-	return e, nil
+	return &OIDCIDPMigratedAzureADEvent{AzureADIDPAddedEvent: *e.(*AzureADIDPAddedEvent)}, nil
 }

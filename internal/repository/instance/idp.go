@@ -235,12 +235,12 @@ func NewOIDCIDPMigratedAzureADEvent(
 }
 
 func OIDCIDPMigratedAzureADEventEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e, err := idp.AzureADIDPAddedEventMapper(event)
+	e, err := idp.OIDCIDPMigratedAzureADEventEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &AzureADIDPAddedEvent{AzureADIDPAddedEvent: *e.(*idp.AzureADIDPAddedEvent)}, nil
+	return &OIDCIDPMigratedAzureADEvent{OIDCIDPMigratedAzureADEvent: *e.(*idp.OIDCIDPMigratedAzureADEvent)}, nil
 }
 
 type JWTIDPAddedEvent struct {

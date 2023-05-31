@@ -777,6 +777,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Ev
 				handler.NewCond(OIDCIDCol, idpEvent.ID),
 				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
+			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
 		crdb.AddCreateStatement(
 			[]handler.Column{
