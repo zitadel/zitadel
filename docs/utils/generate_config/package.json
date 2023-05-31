@@ -1,0 +1,21 @@
+{
+  "name": "generate_config",
+  "version": "0.0.1",
+  "description": "Generates ZITADEL docs from config files",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "yaml": "^2.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0"
+  }
+}
