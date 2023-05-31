@@ -13,8 +13,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "tablemark": "^3.0.0",
     "yaml": "^2.3.1"
   },
+  "type": "module",
   "devDependencies": {
     "jest": "^29.5.0"
   }

@@ -1,4 +1,4 @@
-const parse_yaml = require('../src/parse_yaml');
+import parse_yaml from '../src/parse_yaml.js'
 
 let file = 
 `FirstInstance:
@@ -37,5 +37,3 @@ test('Instance Name description', () => {
 test('Comment before map', () => {
     expect(doc[0].commentBefore).toBe("MachineKeyPath comment before");
 });
-
-console.log(doc)
