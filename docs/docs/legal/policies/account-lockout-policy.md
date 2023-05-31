@@ -3,8 +3,6 @@ title: Account Lockout Policy
 custom_edit_url: null
 ---
 
-## Introduction
-
 This policy is an annex to the [Terms of Service](terms-of-service) that clarifies your obligations and our procedure handling requests where you can't get access to your ZITADEL Cloud services and data. This policy is applicable to situations where we, ZITADEL, need to restore your access for a otherwise available service and not in cases where the services are unavailable.
 
 ## Why to do we have this policy?
