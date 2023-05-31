@@ -203,8 +203,8 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 			break
 		}
 
-		statements, index, err := h.eventsToStatements(tx, events, currentState)
-		if index == -1 {
+		statements, err := h.eventsToStatements(tx, events, currentState)
+		if len(statements) == 0 {
 			return err
 		}
 
