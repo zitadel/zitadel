@@ -38,6 +38,8 @@ jobs:
       uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
+    -
+      run: buf --version
     - 
       name: lint
       uses: bufbuild/buf-lint-action@v1
