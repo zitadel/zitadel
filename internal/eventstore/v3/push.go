@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -43,23 +45,55 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 //go:embed push.sql
 var pushStmt string
 
-func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) (events []eventstore.Event, err error) {
-	const argsPerCommand = 9
+func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
+	events, placeHolders, args, err := mapCommands(commands, sequences)
+	if err != nil {
+		return nil, err
+	}
 
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf(pushStmt, strings.Join(placeHolders, ", ")), args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for i := 0; rows.Next(); i++ {
+		err = rows.Scan(&events[i].(*event).createdAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return events, nil
+}
+
+const argsPerCommand = 9
+
+func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (events []eventstore.Event, placeHolders []string, args []any, err error) {
 	events = make([]eventstore.Event, len(commands))
-	args := make([]any, 0, len(commands)*argsPerCommand)
-	placeHolders := make([]string, len(commands))
+	args = make([]any, 0, len(commands)*argsPerCommand)
+	placeHolders = make([]string, len(commands))
 
 	for i, command := range commands {
 		sequence := searchSequenceByCommand(sequences, command)
 		if sequence == nil {
-			panic("asdf")
+			logging.WithFields(
+				"aggType", command.Aggregate().Type,
+				"aggID", command.Aggregate().ID,
+				"instance", command.Aggregate().InstanceID,
+			).Panic("no sequence found")
+			// added return for linting
+			return nil, nil, nil, nil
 		}
 		sequence.sequence++
 
 		events[i], err = commandToEvent(sequence, command)
 		if err != nil {
-			return nil, err
+			return nil, nil, nil, err
 		}
 
 		placeHolders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
@@ -81,28 +115,10 @@ func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, 
 			events[i].(*event).aggregate.Version,
 			events[i].(*event).creator,
 			events[i].(*event).typ,
-			// sql.NullString{String: string(events[i].(*event).payload), Valid: len(events[i].(*event).payload) > 0},
 			events[i].(*event).payload,
 			events[i].(*event).sequence,
 		)
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf(pushStmt, strings.Join(placeHolders, ", ")), args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for i := 0; rows.Next(); i++ {
-		err = rows.Scan(&events[i].(*event).createdAt)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return events, nil
+	return events, placeHolders, args, nil
 }

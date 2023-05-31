@@ -109,26 +109,3 @@ func (s *Subscription) Unsubscribe() {
 		close(s.Events)
 	}
 }
-
-// func mapEventsToRepo(events []Event) []*repository.Event {
-// 	repoEvents := make([]*repository.Event, len(events))
-// 	for i, event := range events {
-// 		repoEvents[i] = &repository.Event{
-// 			Seq:           event.Sequence(),
-// 			CreationDate:  event.CreatedAt(),
-// 			Typ:           event.Type(),
-// 			EditorService: "zitadel",
-// 			EditorUser:    event.Creator(),
-// 			Version:       repository.Version(event.Aggregate().Version),
-// 			AggregateID:   event.Aggregate().ID,
-// 			AggregateType: event.Aggregate().Type,
-// 			ResourceOwner: sql.NullString{
-// 				String: event.Aggregate().ResourceOwner,
-// 				Valid:  event.Aggregate().ResourceOwner != "",
-// 			},
-// 			InstanceID: event.Aggregate().InstanceID,
-// 			Data:       event.DataAsBytes(),
-// 		}
-// 	}
-// 	return repoEvents
-// }

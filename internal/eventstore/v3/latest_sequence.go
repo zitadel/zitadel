@@ -20,34 +20,9 @@ type latestSequence struct {
 var latestSequencesStmt string
 
 func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) ([]*latestSequence, error) {
-	sequences := make([]*latestSequence, 0, len(commands))
+	sequences := commandsToSequences(ctx, commands)
 
-	for _, command := range commands {
-		if searchSequenceByCommand(sequences, command) != nil {
-			continue
-		}
-
-		if command.Aggregate().InstanceID == "" {
-			command.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
-		}
-		sequences = append(sequences, &latestSequence{
-			aggregate: command.Aggregate(),
-		})
-	}
-
-	const argsPerCondition = 3
-	args := make([]interface{}, 0, len(sequences)*argsPerCondition)
-	conditions := make([]string, len(sequences))
-
-	for i, sequence := range sequences {
-		conditions[i] = fmt.Sprintf("(instance_id = $%d AND aggregate_type = $%d AND aggregate_id = $%d)",
-			i*argsPerCondition+1,
-			i*argsPerCondition+2,
-			i*argsPerCondition+3,
-		)
-		args = append(args, sequence.aggregate.InstanceID, sequence.aggregate.Type, sequence.aggregate.ID)
-	}
-
+	conditions, args := sequencesToSql(sequences)
 	rows, err := tx.QueryContext(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " OR ")), args...)
 	if err != nil {
 		return nil, err
@@ -55,17 +30,9 @@ func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Comm
 	defer rows.Close()
 
 	for rows.Next() {
-		var aggregateType eventstore.AggregateType
-		var aggregateID, instanceID string
-		var currentSequence uint64
-
-		err := rows.Scan(&instanceID, &aggregateType, &aggregateID, &currentSequence)
-		if err != nil {
+		if err := scanToSequence(rows, sequences); err != nil {
 			return nil, err
 		}
-
-		sequence := searchSequence(sequences, aggregateType, aggregateID, instanceID)
-		sequence.sequence = currentSequence
 	}
 
 	if rows.Err() != nil {
@@ -93,5 +60,58 @@ func searchSequence(sequences []*latestSequence, aggregateType eventstore.Aggreg
 			return sequence
 		}
 	}
+	return nil
+}
+
+func commandsToSequences(ctx context.Context, commands []eventstore.Command) []*latestSequence {
+	sequences := make([]*latestSequence, 0, len(commands))
+
+	for _, command := range commands {
+		if searchSequenceByCommand(sequences, command) != nil {
+			continue
+		}
+
+		if command.Aggregate().InstanceID == "" {
+			command.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
+		}
+		sequences = append(sequences, &latestSequence{
+			aggregate: command.Aggregate(),
+		})
+	}
+
+	return sequences
+}
+
+const argsPerCondition = 3
+
+func sequencesToSql(sequences []*latestSequence) (conditions []string, args []any) {
+	args = make([]interface{}, 0, len(sequences)*argsPerCondition)
+	conditions = make([]string, len(sequences))
+
+	for i, sequence := range sequences {
+		conditions[i] = fmt.Sprintf("(instance_id = $%d AND aggregate_type = $%d AND aggregate_id = $%d)",
+			i*argsPerCondition+1,
+			i*argsPerCondition+2,
+			i*argsPerCondition+3,
+		)
+		args = append(args, sequence.aggregate.InstanceID, sequence.aggregate.Type, sequence.aggregate.ID)
+	}
+
+	return conditions, args
+}
+
+func scanToSequence(rows *sql.Rows, sequences []*latestSequence) error {
+	var aggregateType eventstore.AggregateType
+	var aggregateID, instanceID string
+	var currentSequence uint64
+
+	err := rows.Scan(&instanceID, &aggregateType, &aggregateID, &currentSequence)
+	if err != nil {
+		return err
+	}
+
+	sequence := searchSequence(sequences, aggregateType, aggregateID, instanceID)
+	sequence.sequence = currentSequence
+
 	return nil
 }

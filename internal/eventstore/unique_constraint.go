@@ -1,7 +1,5 @@
 package eventstore
 
-import ()
-
 type UniqueConstraint struct {
 	// UniqueType is the table name for the unique constraint
 	UniqueType string
