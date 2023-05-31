@@ -403,6 +403,7 @@ Quotas:
 Eventstore:
   PushTimeout: 15s
   AllowOrderByCreationDate: false
+  UseV2: false
 
 DefaultInstance:
   InstanceName:

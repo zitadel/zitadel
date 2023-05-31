@@ -7,6 +7,7 @@ import (
 type Config struct {
 	PushTimeout              time.Duration
 	AllowOrderByCreationDate bool
+	UseV2                    bool
 
 	Pusher  Pusher
 	Querier Querier
