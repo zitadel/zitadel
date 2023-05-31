@@ -22,7 +22,9 @@ function parseZitadelYaml(file) {
               env: env, 
               path: path_array,
               comment: '',
-              commentBefore: ''
+              commentBefore: '',
+              type: null,
+              mandatory: false
             })
           }
       
