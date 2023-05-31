@@ -12,12 +12,15 @@ enum ChallengeResponseKind {
     CHALLENGE_RESPONSE_KIND_PASSKEY = 1;
 }
 
-message PasskeyChallenge {
-  string passkey_id = 1;
-  google.protobuf.Struct public_key_credential_request_options = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "json representation of public key credential request options used by the passkey client"
-      example: "{\"publicKey\":{\"attestation\":\"none\",\"authenticatorSelection\":{\"userVerification\":\"required\"},\"challenge\":\"XaMYwWOZ5hj6pwtwJJlpcI-ExkO5TxevBMG4R8DoKQQ\",\"excludeCredentials\":[{\"id\":\"tVp1QfYhT8DkyEHVrv7blnpAo2YJzbZgZNBf7zPs6CI\",\"type\":\"public-key\"}],\"pubKeyCredParams\":[{\"alg\":-7,\"type\":\"public-key\"}],\"rp\":{\"id\":\"localhost\",\"name\":\"ZITADEL\"},\"timeout\":300000,\"user\":{\"displayName\":\"Tim Mohlmann\",\"id\":\"MjE1NTk4MDAwNDY0OTk4OTQw\",\"name\":\"tim\"}}}"
-    } // TODO: update example after testing.
-  ];
+message Challenges {
+  message Passkey {
+    google.protobuf.Struct public_key_credential_request_options = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "json representation of public key credential request options used by the passkey client"
+        example: "{\"publicKey\":{\"attestation\":\"none\",\"authenticatorSelection\":{\"userVerification\":\"required\"},\"challenge\":\"XaMYwWOZ5hj6pwtwJJlpcI-ExkO5TxevBMG4R8DoKQQ\",\"excludeCredentials\":[{\"id\":\"tVp1QfYhT8DkyEHVrv7blnpAo2YJzbZgZNBf7zPs6CI\",\"type\":\"public-key\"}],\"pubKeyCredParams\":[{\"alg\":-7,\"type\":\"public-key\"}],\"rp\":{\"id\":\"localhost\",\"name\":\"ZITADEL\"},\"timeout\":300000,\"user\":{\"displayName\":\"Tim Mohlmann\",\"id\":\"MjE1NTk4MDAwNDY0OTk4OTQw\",\"name\":\"tim\"}}}"
+      } // TODO: update example after testing.
+    ];
+  }
+
+  optional Passkey passkey = 1;
 }

@@ -5,19 +5,21 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
-	sessionEventPrefix  = "session."
-	AddedType           = sessionEventPrefix + "added"
-	UserCheckedType     = sessionEventPrefix + "user.checked"
-	PasswordCheckedType = sessionEventPrefix + "password.checked"
-	TokenSetType        = sessionEventPrefix + "token.set"
-	MetadataSetType     = sessionEventPrefix + "metadata.set"
-	TerminateType       = sessionEventPrefix + "terminated"
+	sessionEventPrefix    = "session."
+	AddedType             = sessionEventPrefix + "added"
+	UserCheckedType       = sessionEventPrefix + "user.checked"
+	PasswordCheckedType   = sessionEventPrefix + "password.checked"
+	PasskeyChallengedType = sessionEventPrefix + "passkey.challenged"
+	TokenSetType          = sessionEventPrefix + "token.set"
+	MetadataSetType       = sessionEventPrefix + "metadata.set"
+	TerminateType         = sessionEventPrefix + "terminated"
 )
 
 type AddedEvent struct {
@@ -136,6 +138,53 @@ func PasswordCheckedEventMapper(event *repository.Event) (eventstore.Event, erro
 	err := json.Unmarshal(event.Data, added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-DGt21", "unable to unmarshal password checked")
+	}
+
+	return added, nil
+}
+
+type PasskeyChallengedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Challenge          string                             `json:"challenge,omitempty"`
+	AllowedCrentialIDs [][]byte                           `json:"allowedCrentialIDs,omitempty"`
+	UserVerification   domain.UserVerificationRequirement `json:"userVerification,omitempty"`
+}
+
+func (e *PasskeyChallengedEvent) Data() interface{} {
+	return e
+}
+
+func (e *PasskeyChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewPasskeyChallengedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	challenge string,
+	allowedCrentialIDs [][]byte,
+	userVerification domain.UserVerificationRequirement,
+) *PasskeyChallengedEvent {
+	return &PasskeyChallengedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasswordCheckedType,
+		),
+		Challenge:          challenge,
+		AllowedCrentialIDs: allowedCrentialIDs,
+		UserVerification:   userVerification,
+	}
+}
+
+func PasskeyChallengedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	added := &PasskeyChallengedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, added)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "SESSION-ia9Fo", "unable to unmarshal passkey challenged")
 	}
 
 	return added, nil

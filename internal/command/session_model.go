@@ -10,6 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 )
 
+type PasskeyChallengeModel struct {
+	Challenge          string
+	AllowedCrentialIDs [][]byte
+	UserVerification   domain.UserVerificationRequirement
+}
+
 type SessionWriteModel struct {
 	eventstore.WriteModel
 
@@ -19,6 +25,8 @@ type SessionWriteModel struct {
 	PasswordCheckedAt time.Time
 	Metadata          map[string][]byte
 	State             domain.SessionState
+
+	PasskeyChallenge *PasskeyChallengeModel
 
 	commands  []eventstore.Command
 	aggregate *eventstore.Aggregate
@@ -44,6 +52,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceUserChecked(e)
 		case *session.PasswordCheckedEvent:
 			wm.reducePasswordChecked(e)
+		case *session.PasskeyChallengedEvent:
+			wm.reducePasskeyChallenged(e)
 		case *session.TokenSetEvent:
 			wm.reduceTokenSet(e)
 		case *session.TerminateEvent:
@@ -87,6 +97,14 @@ func (wm *SessionWriteModel) reducePasswordChecked(e *session.PasswordCheckedEve
 	wm.PasswordCheckedAt = e.CheckedAt
 }
 
+func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallengedEvent) {
+	wm.PasskeyChallenge = &PasskeyChallengeModel{
+		Challenge:          e.Challenge,
+		AllowedCrentialIDs: e.AllowedCrentialIDs,
+		UserVerification:   e.UserVerification,
+	}
+}
+
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
 	wm.TokenID = e.TokenID
 }
@@ -108,6 +126,10 @@ func (wm *SessionWriteModel) UserChecked(ctx context.Context, userID string, che
 
 func (wm *SessionWriteModel) PasswordChecked(ctx context.Context, checkedAt time.Time) {
 	wm.commands = append(wm.commands, session.NewPasswordCheckedEvent(ctx, wm.aggregate, checkedAt))
+}
+
+func (wm *SessionWriteModel) PasskeyChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {
+	wm.commands = append(wm.commands, session.NewPasskeyChallengedEvent(ctx, wm.aggregate, challenge, allowedCrentialIDs, userVerification))
 }
 
 func (wm *SessionWriteModel) SetToken(ctx context.Context, tokenID string) {

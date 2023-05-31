@@ -260,7 +260,7 @@ message CreateSessionResponse{
       description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
     }
   ];
-  optional PasskeyChallenge passkey_challenge = 4;
+  Challenges challenges = 4;
 }
 
 message SetSessionRequest{
@@ -301,7 +301,7 @@ message SetSessionResponse{
       description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
     }
   ];
-  optional PasskeyChallenge passkey_challenge = 3;
+   Challenges challenges = 3;
 }
 
 message DeleteSessionRequest{
@@ -376,8 +376,7 @@ message CheckPassword {
 }
 
 message CheckPasskey {
-  string passkey_id = 1;
-  google.protobuf.Struct credential_assertion_data = 2 [
+  google.protobuf.Struct credential_assertion_data = 1 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

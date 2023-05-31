@@ -3,11 +3,13 @@ package session
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
@@ -43,7 +45,9 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	if err != nil {
 		return nil, err
 	}
-	set, err := s.command.CreateSession(ctx, checks, metadata)
+	challengeResponse, cmds := s.beginChallengesToCommand(req.GetBeginChallenges(), checks)
+
+	set, err := s.command.CreateSession(ctx, cmds, metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -51,6 +55,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionId:    set.ID,
 		SessionToken: set.NewToken,
+		Challenges:   challengeResponse,
 	}, nil
 }
 
@@ -59,7 +64,9 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 	if err != nil {
 		return nil, err
 	}
-	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), checks, req.GetMetadata())
+	challengeResponse, cmds := s.beginChallengesToCommand(req.GetBeginChallenges(), checks)
+
+	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata())
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +77,7 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 	return &session.SetSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionToken: set.NewToken,
+		Challenges:   challengeResponse,
 	}, nil
 }
 
@@ -180,7 +188,7 @@ func idsQueryToQuery(q *session.IDsQuery) (query.SearchQuery, error) {
 	return query.NewSessionIDsSearchQuery(q.Ids)
 }
 
-func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCheck, map[string][]byte, error) {
+func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCommand, map[string][]byte, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
 		return nil, nil, err
@@ -188,7 +196,7 @@ func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session
 	return checks, req.GetMetadata(), nil
 }
 
-func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.SetSessionRequest) ([]command.SessionCheck, error) {
+func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.SetSessionRequest) ([]command.SessionCommand, error) {
 	checks, err := s.checksToCommand(ctx, req.Checks)
 	if err != nil {
 		return nil, err
@@ -196,12 +204,12 @@ func (s *Server) setSessionRequestToCommand(ctx context.Context, req *session.Se
 	return checks, nil
 }
 
-func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([]command.SessionCheck, error) {
+func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([]command.SessionCommand, error) {
 	checkUser, err := userCheck(checks.GetUser())
 	if err != nil {
 		return nil, err
 	}
-	sessionChecks := make([]command.SessionCheck, 0, 2)
+	sessionChecks := make([]command.SessionCommand, 0, 3)
 	if checkUser != nil {
 		user, err := checkUser.search(ctx, s.query)
 		if err != nil {
@@ -212,7 +220,34 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if password := checks.GetPassword(); password != nil {
 		sessionChecks = append(sessionChecks, command.CheckPassword(password.GetPassword()))
 	}
+	// TODO: passkey check
+
 	return sessionChecks, nil
+}
+
+func (s *Server) beginChallengesToCommand(challenges []session.ChallengeResponseKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
+	if len(challenges) == 0 {
+		return nil, cmds
+	}
+	resp := new(session.Challenges)
+	for _, c := range challenges {
+		switch c {
+		case session.ChallengeResponseKind_CHALLENGE_RESPONSE_KIND_UNSPECIFIED:
+			continue
+		case session.ChallengeResponseKind_CHALLENGE_RESPONSE_KIND_PASSKEY:
+			passkeyChallenge, cmd := s.createPasskeyChallengeCommand()
+			resp.Passkey = passkeyChallenge
+			cmds = append(cmds, cmd)
+		}
+	}
+	return resp, cmds
+}
+
+func (s *Server) createPasskeyChallengeCommand() (*session.Challenges_Passkey, command.SessionCommand) {
+	challenge := &session.Challenges_Passkey{
+		PublicKeyCredentialRequestOptions: new(structpb.Struct),
+	}
+	return challenge, s.command.CreatePasskeyChallenge(domain.UserVerificationRequirementRequired, challenge.PublicKeyCredentialRequestOptions)
 }
 
 func userCheck(user *session.CheckUser) (userSearch, error) {

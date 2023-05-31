@@ -29,7 +29,7 @@ func TestCommands_CreateSession(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		checks   []SessionCheck
+		checks   []SessionCommand
 		metadata map[string][]byte
 	}
 	type res struct {
@@ -126,7 +126,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 		ctx          context.Context
 		sessionID    string
 		sessionToken string
-		checks       []SessionCheck
+		checks       []SessionCommand
 		metadata     map[string][]byte
 	}
 	type res struct {
@@ -231,7 +231,7 @@ func TestCommands_updateSession(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		checks   *SessionChecks
+		checks   *SessionCommands
 		metadata map[string][]byte
 	}
 	type res struct {
@@ -251,7 +251,7 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				checks: &SessionChecks{
+				checks: &SessionCommands{
 					sessionWriteModel: &SessionWriteModel{State: domain.SessionStateTerminated},
 				},
 			},
@@ -266,10 +266,10 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				checks: &SessionChecks{
+				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					checks: []SessionCheck{
-						func(ctx context.Context, cmd *SessionChecks) error {
+					cmds: []SessionCommand{
+						func(ctx context.Context, cmd *SessionCommands) error {
 							return caos_errs.ThrowInternal(nil, "id", "check failed")
 						},
 					},
@@ -286,9 +286,9 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				checks: &SessionChecks{
+				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					checks:            []SessionCheck{},
+					cmds:              []SessionCommand{},
 				},
 			},
 			res{
@@ -321,9 +321,9 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				checks: &SessionChecks{
+				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
-					checks: []SessionCheck{
+					cmds: []SessionCommand{
 						CheckUser("userID"),
 						CheckPassword("password"),
 					},

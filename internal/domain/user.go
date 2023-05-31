@@ -31,6 +31,10 @@ func (s UserState) NotDisabled() bool {
 	return s == UserStateActive || s == UserStateInitial
 }
 
+func (s UserState) Active() bool {
+	return s.Valid() && s.Exists() && s.NotDisabled()
+}
+
 type UserType int32
 
 const (
