@@ -33,7 +33,7 @@ jobs:
       console_cache_path: ${{ needs.console.outputs.cache_path }}
 
   core-unit-test:
-    if: ${{ needs.core.outputs.cache_hit != 'true' }}
+    # if: ${{ needs.core.outputs.cache_hit != 'true' }}
     needs: core
     uses: ./.github/workflows/core-unit-test.yml
     with:
@@ -42,7 +42,7 @@ jobs:
       core_cache_path: ${{ needs.core.outputs.cache_path }}
       
   core-integration-test:
-    if: ${{ needs.core.outputs.cache_hit != 'true' }}
+    # if: ${{ needs.core.outputs.cache_hit != 'true' }}
     needs: core
     uses: ./.github/workflows/core-integration-test.yml
     with:
