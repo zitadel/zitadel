@@ -38,8 +38,7 @@ jobs:
       uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
-    -
-      run: buf --version
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - 
       name: lint
       uses: bufbuild/buf-lint-action@v1
@@ -59,7 +58,7 @@ jobs:
         cache: 'yarn'
         cache-dependency-path: console/yarn.lock
     -
-      run: npm install -g @angular/cli prettier
+      run: cd console && yarn install
     -
       name: lint
       run: make console_lint
