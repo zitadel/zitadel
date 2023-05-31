@@ -77,7 +77,7 @@ const (
 		" $7::VARCHAR AS editor_service," +
 		" COALESCE((resource_owner), $8::VARCHAR) AS resource_owner," +
 		" $9::VARCHAR AS instance_id," +
-		" NEXTVAL(CONCAT('eventstore.', (CASE WHEN $9 <> '' THEN CONCAT('i_', $9) ELSE 'system' END), '_seq'))," +
+		" COALESCE(aggregate_sequence, 0)+1," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
 		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
 		"FROM previous_data " +
@@ -127,6 +127,10 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 		var uniqueConstraints []*eventstore.UniqueConstraint
 
 		for i, command := range commands {
+			if command.Aggregate().InstanceID == "" {
+				command.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
+			}
+
 			var data Data
 			if command.Payload() != nil {
 				data, err = json.Marshal(command.Payload())
@@ -136,7 +140,7 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 			}
 			e := &repository.Event{
 				Typ:           command.Type(),
-				EditorService: "zitadel",
+				EditorService: "eventstore.v2",
 				Data:          data,
 				EditorUser:    command.Creator(),
 				Version:       command.Aggregate().Version,
