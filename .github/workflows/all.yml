@@ -62,6 +62,12 @@ jobs:
       core_cache_hit: ${{ needs.core.outputs.cache_hit }}
       console_cache_hit: ${{ needs.console.outputs.cache_hit }}
 
+  container:
+    needs: [compile, lint, core-unit-test, core-integration-test]
+    uses: ./.github/workflows/container.yml
+    with:
+      tag_name: ghcr.io/zitadel/test:${{ github.sha }}
+
 
 
 
