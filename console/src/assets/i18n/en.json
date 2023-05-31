@@ -204,7 +204,10 @@
       "TEXT": "This navigation changes based on your selected organization above or your instance"
     },
     "CONTEXTCHANGED": {
-      "TEXT": "Attention! The organization context has changed."
+      "TEXT": "The organization context has changed."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "The view just changed to instance!"
     }
   },
   "FILTER": {

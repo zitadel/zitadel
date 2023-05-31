@@ -476,6 +476,15 @@ Errors:
     Terminated: 会话已经终止
     Token:
       Invalid: 会话令牌是无效的
+  Intent:
+    IDPMissing: 请求中缺少IDP ID
+    SuccessURLMissing: 请求中缺少成功URL
+    FailureURLMissing: 请求中缺少失败的URL
+    StateMissing: 请求中缺少状态参数
+    NotStarted: 意图没有开始或已经结束
+    NotSucceeded: 意图不成功
+    TokenCreationFailed: 令牌创建失败
+    InvalidToken: 意图令牌是无效的
 
 AggregateTypes:
   action: 动作
