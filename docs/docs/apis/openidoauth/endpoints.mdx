@@ -1,5 +1,5 @@
 ---
-title: Endpoints
+title: OpenID Connect Endpoints
 ---
 
 import Tabs from "@theme/Tabs";
@@ -584,7 +584,26 @@ If both parameters are provided, they must be equal.
 
 {your_domain}/oauth/v2/keys
 
-> Be aware that these keys can be rotated without any prior notice. We will however make sure that a proper `kid` is set with each key!
+The endpoint returns a JSON Web Key Set (JWKS) containing the public keys that can be used to locally validate JWTs you received from ZITADEL.
+The alternative would be to validate tokens with the [introspection endpoint](#introspection_endpoint).
+
+### Key rotation
+
+Keys are automatically rotated on a regular basis or on demand, meaning keys can change in irregular intervals.
+ZITADEL ensures that a proper `kid` is set with each key.
+
+:::info Keys rotate without prior notice
+Be aware that these keys can be rotated without any prior notice.
+:::
+
+### Caching
+
+You can optimize performance of your clients by caching the response from the keys endpoint.
+We recommend to regularly update the cached response, since the [keys can be rotated without prior notice](#key-rotation).
+You could also combine caching with a risk-based on-demand refresh when a critical operation is executed.
+
+Without caching you will call this endpoint on each request.
+This might result in being rate limited for a large number of requests that come from the same backend.
 
 ## OAuth 2.0 Metadata
 
