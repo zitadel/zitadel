@@ -35,10 +35,8 @@ export class AuthenticationService {
       Object.assign(this.authConfig, partialConfig);
     }
     this.oauthService.configure(this.authConfig);
-
     this.oauthService.strictDiscoveryDocumentValidation = false;
     await this.oauthService.loadDiscoveryDocumentAndTryLogin();
-
     this._authenticated = this.oauthService.hasValidAccessToken();
     if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {
       const newState = await lastValueFrom(this.statehandler.createState());

@@ -6,7 +6,7 @@ Quotas is an enterprise feature that is relevant if you want to host ZITADEL as 
 It enables you to limit usage and/or register webhooks that trigger on configurable usage levels for certain units.
 For example, you might want to report usage to an external billing tool and notify users when 80 percent of a quota is exhausted.
 Quotas are currently supported [for the instance level only](/concepts/structure/instance).
-Please refer to the [system API docs](/apis/system) for detailed explanations about how to use the quotas feature.
+Please refer to the [system API docs](/apis/resources/system) for detailed explanations about how to use the quotas feature.
 
 ZITADEL supports limiting authenticated requests and action run seconds
 

@@ -94,7 +94,7 @@ Authentication
 - Single Sign On (SSO)
 - Passwordless with FIDO2 support (Including Passkeys)
 - Username / Password
-- Multifactor authentication with OTP, U2F, SMS
+- Multifactor authentication with OTP, U2F
 - LDAP
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)

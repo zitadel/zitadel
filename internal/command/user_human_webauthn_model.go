@@ -512,6 +512,9 @@ func (wm *HumanPasswordlessInitCodeWriteModel) appendRequestedEvent(e *user.Huma
 	wm.CryptoCode = e.Code
 	wm.Expiration = e.Expiry
 	wm.State = domain.PasswordlessInitCodeStateRequested
+	if e.CodeReturned {
+		wm.State = domain.PasswordlessInitCodeStateActive
+	}
 }
 
 func (wm *HumanPasswordlessInitCodeWriteModel) appendCheckFailedEvent(e *user.HumanPasswordlessInitCodeCheckFailedEvent) {
