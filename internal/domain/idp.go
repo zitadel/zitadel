@@ -91,3 +91,22 @@ func (t IDPType) DisplayName() string {
 		return ""
 	}
 }
+
+type IDPIntentState int32
+
+const (
+	IDPIntentStateUnspecified IDPIntentState = iota
+	IDPIntentStateStarted
+	IDPIntentStateSucceeded
+	IDPIntentStateFailed
+
+	idpIntentStateCount
+)
+
+func (s IDPIntentState) Valid() bool {
+	return s >= 0 && s < idpIntentStateCount
+}
+
+func (s IDPIntentState) Exists() bool {
+	return s != IDPIntentStateUnspecified && s != IDPIntentStateFailed //TODO: ?
+}
