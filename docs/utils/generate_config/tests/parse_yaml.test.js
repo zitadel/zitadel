@@ -5,7 +5,20 @@ let file =
     # MachineKeyPath comment before
     MachineKeyPath:
     # Name of the first instance created
-    InstanceName: ZITADEL # Default is ZITADEL`
+    InstanceName: ZITADEL # Default is ZITADEL
+    SMTPConfiguration:
+        # configuration of the host
+        SMTP:
+        # must include the port, like smtp.mailtrap.io:2525. IPv6 is also supported, like [2001:db8::1]:2525
+        Host:
+        User:
+        Password:
+        TLS:
+        # if the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
+        From:
+        FromName:
+    MessageTexts:
+        - MessageTextType: InitCode`
 
 
 const doc = parse_yaml(file)
@@ -37,3 +50,5 @@ test('Instance Name description', () => {
 test('Comment before map', () => {
     expect(doc[0].commentBefore).toBe("MachineKeyPath comment before");
 });
+
+console.log(doc)

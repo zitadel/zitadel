@@ -1,25 +1,35 @@
 import parse_yaml from './src/parse_yaml.js'
 import tablemark from 'tablemark'
+import fs from 'fs'
 
-let file = 
-`FirstInstance:
-    # MachineKeyPath comment before
-    MachineKeyPath:
-    # Name of the first instance created
-    InstanceName: ZITADEL # Default is ZITADEL`
+const files = [
+  {source: "../../../cmd/setup/steps.yaml", target: "_steps.mdx"},
+  {source: "../../../cmd/defaults.yaml", target: "_defaults.mdx"}
+]
 
+files.map(file => {
 
-const doc = parse_yaml(file)
+  const fileContent = fs.readFileSync(file.source, 'utf8')
 
-// drop path variable and combine the comments
-const cleanDoc = doc.map(({path, ...item}) => [item.env, item.commentBefore + "\n" + item.comment, item.value])
+  const doc = parse_yaml(fileContent)
 
-const markdown = tablemark(cleanDoc, {
-    columns: [
-      "Variable Name",
-      "Description",
-      "Default Value"
-    ]
-  })
+  // drop path variable and combine the comments
+  const cleanDoc = doc.map(({path, ...item}) => [item.env, item.commentBefore + "\n" + item.comment, item.value])
 
-console.log(markdown)
+  const markdown = tablemark(cleanDoc, {
+      columns: [
+        "Variable",
+        "Comments",
+        "If absent (default)"
+      ],
+      wrapWidth: 80,
+    })
+
+    try {
+      fs.writeFileSync(file.target, markdown);
+    } catch (err) {
+      console.error(err);
+    }
+
+  console.log(markdown)
+})

@@ -42,9 +42,9 @@ function parseZitadelYaml(file) {
     
       let pair = doc.getIn(variable.path, true)
       let index = keys.findIndex(key => key.env === variable.env)
-      
-      let comment = pair.comment
 
+      let comment = pair.comment
+    
       if(comment !== undefined && variable.value !== null) {
         keys[index].comment = comment.trim()
       }
