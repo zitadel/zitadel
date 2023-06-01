@@ -7,6 +7,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, UserCheckedType, UserCheckedEventMapper).
 		RegisterFilterEventMapper(AggregateType, PasswordCheckedType, PasswordCheckedEventMapper).
 		RegisterFilterEventMapper(AggregateType, PasskeyChallengedType, PasskeyChallengedEventMapper).
+		RegisterFilterEventMapper(AggregateType, PasskeyCheckedType, PasskeyCheckedEventMapper).
 		RegisterFilterEventMapper(AggregateType, TokenSetType, TokenSetEventMapper).
 		RegisterFilterEventMapper(AggregateType, MetadataSetType, MetadataSetEventMapper).
 		RegisterFilterEventMapper(AggregateType, TerminateType, TerminateEventMapper)

@@ -6,14 +6,28 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type PasskeyChallengeModel struct {
 	Challenge          string
 	AllowedCrentialIDs [][]byte
 	UserVerification   domain.UserVerificationRequirement
+}
+
+func (p *PasskeyChallengeModel) WebAuthNLogin(credentialAssertionData []byte) (*domain.WebAuthNLogin, error) {
+	if p == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "todo")
+	}
+	return &domain.WebAuthNLogin{
+		CredentialAssertionData: credentialAssertionData,
+		Challenge:               p.Challenge,
+		AllowedCredentialIDs:    p.AllowedCrentialIDs,
+		UserVerification:        p.UserVerification,
+	}, nil
 }
 
 type SessionWriteModel struct {
@@ -23,6 +37,7 @@ type SessionWriteModel struct {
 	UserID            string
 	UserCheckedAt     time.Time
 	PasswordCheckedAt time.Time
+	PasskeyCheckedAt  time.Time
 	Metadata          map[string][]byte
 	State             domain.SessionState
 
@@ -54,6 +69,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reducePasswordChecked(e)
 		case *session.PasskeyChallengedEvent:
 			wm.reducePasskeyChallenged(e)
+		case *session.PasskeyCheckedEvent:
+			wm.reducePasskeyChecked(e)
 		case *session.TokenSetEvent:
 			wm.reduceTokenSet(e)
 		case *session.TerminateEvent:
@@ -105,6 +122,11 @@ func (wm *SessionWriteModel) reducePasskeyChallenged(e *session.PasskeyChallenge
 	}
 }
 
+func (wm *SessionWriteModel) reducePasskeyChecked(e *session.PasskeyCheckedEvent) {
+	wm.PasskeyChallenge = nil
+	wm.PasskeyCheckedAt = e.CheckedAt
+}
+
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
 	wm.TokenID = e.TokenID
 }
@@ -130,6 +152,13 @@ func (wm *SessionWriteModel) PasswordChecked(ctx context.Context, checkedAt time
 
 func (wm *SessionWriteModel) PasskeyChallenged(ctx context.Context, challenge string, allowedCrentialIDs [][]byte, userVerification domain.UserVerificationRequirement) {
 	wm.commands = append(wm.commands, session.NewPasskeyChallengedEvent(ctx, wm.aggregate, challenge, allowedCrentialIDs, userVerification))
+}
+
+func (wm *SessionWriteModel) PasskeyChecked(ctx context.Context, checkedAt time.Time, tokenID string, signCount uint32) {
+	wm.commands = append(wm.commands,
+		session.NewPasskeyCheckedEvent(ctx, wm.aggregate, checkedAt),
+		usr_repo.NewHumanPasswordlessSignCountChangedEvent(ctx, wm.aggregate, tokenID, signCount),
+	)
 }
 
 func (wm *SessionWriteModel) SetToken(ctx context.Context, tokenID string) {

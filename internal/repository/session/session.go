@@ -17,6 +17,7 @@ const (
 	UserCheckedType       = sessionEventPrefix + "user.checked"
 	PasswordCheckedType   = sessionEventPrefix + "password.checked"
 	PasskeyChallengedType = sessionEventPrefix + "passkey.challenged"
+	PasskeyCheckedType    = sessionEventPrefix + "passkey.checked"
 	TokenSetType          = sessionEventPrefix + "token.set"
 	MetadataSetType       = sessionEventPrefix + "metadata.set"
 	TerminateType         = sessionEventPrefix + "terminated"
@@ -185,6 +186,47 @@ func PasskeyChallengedEventMapper(event *repository.Event) (eventstore.Event, er
 	err := json.Unmarshal(event.Data, added)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "SESSION-ia9Fo", "unable to unmarshal passkey challenged")
+	}
+
+	return added, nil
+}
+
+type PasskeyCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *PasskeyCheckedEvent) Data() interface{} {
+	return e
+}
+
+func (e *PasskeyCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewPasskeyCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *PasswordCheckedEvent {
+	return &PasswordCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasswordCheckedType,
+		),
+		CheckedAt: checkedAt,
+	}
+}
+
+func PasskeyCheckedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	added := &PasskeyCheckedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, added)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "SESSION-Coig6", "unable to unmarshal passkey checked")
 	}
 
 	return added, nil
