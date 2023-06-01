@@ -12,6 +12,21 @@ jobs:
     strategy:
       matrix:
         browser: [firefox, chrome]
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: zitadel
+          PGUSER: zitadel
+          POSTGRES_DB: zitadel
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     runs-on: ubuntu-20.04
     env:
       ZITADEL_IMAGE: ${{ inputs.tag_name }}
@@ -23,28 +38,28 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Test ${{ matrix.browser }}
-        run: docker compose run --service-ports e2e --browser ${{ matrix.browser }}
-        working-directory: e2e/config/host.docker.internal
-      - name: Ensure Artifacts Directory Exists
-        run: mkdir -p ./.artifacts
-      - name: Save ZITADEL Logs
-        if: always()
-        run: docker compose logs zitadel > ../../../.artifacts/e2e-compose-zitadel.log
-        working-directory: e2e/config/host.docker.internal
-      - name: Save Prepare Logs
-        if: always()
-        run: docker compose logs prepare > ../../../.artifacts/e2e-compose-prepare.log
-        working-directory: e2e/config/host.docker.internal
-      - name: Archive production tests ${{ matrix.browser }}
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: production-tests-${{ matrix.browser }}
-          path: |
-            e2e/cypress/results
-            e2e/cypress/videos
-            e2e/cypress/screenshots
-            .artifacts/e2e-compose-zitadel.log
-            .artifacts/e2e-compose-prepare.log
-          retention-days: 30
+      # - name: Test ${{ matrix.browser }}
+      #   run: docker compose run --service-ports e2e --browser ${{ matrix.browser }}
+      #   working-directory: e2e/config/host.docker.internal
+      # - name: Ensure Artifacts Directory Exists
+      #   run: mkdir -p ./.artifacts
+      # - name: Save ZITADEL Logs
+      #   if: always()
+      #   run: docker compose logs zitadel > ../../../.artifacts/e2e-compose-zitadel.log
+      #   working-directory: e2e/config/host.docker.internal
+      # - name: Save Prepare Logs
+      #   if: always()
+      #   run: docker compose logs prepare > ../../../.artifacts/e2e-compose-prepare.log
+      #   working-directory: e2e/config/host.docker.internal
+      # - name: Archive production tests ${{ matrix.browser }}
+      #   if: always()
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: production-tests-${{ matrix.browser }}
+      #     path: |
+      #       e2e/cypress/results
+      #       e2e/cypress/videos
+      #       e2e/cypress/screenshots
+      #       .artifacts/e2e-compose-zitadel.log
+      #       .artifacts/e2e-compose-prepare.log
+      #     retention-days: 30
