@@ -72,7 +72,7 @@ jobs:
     uses: ./.github/workflows/e2e.yml
     needs: [container]
     with:
-      tag_name: ghcr.io/zitadel/test:${{ github.sha }}
+      tag_name: ${{ needs.container.outputs.tag_name }}
 
 
   #release

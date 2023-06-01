@@ -6,6 +6,9 @@ on:
       tag_name:
         required: true
         type: string
+    outputs:
+      tag_name:
+        value: ${{ inputs.tag_name }}
 
 env:
   platforms: linux/amd64,linux/arm64
