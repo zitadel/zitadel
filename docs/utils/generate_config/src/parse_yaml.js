@@ -42,17 +42,19 @@ function parseZitadelYaml(file) {
     
       let pair = doc.getIn(variable.path, true)
       let index = keys.findIndex(key => key.env === variable.env)
+      
+      let comment = pair.comment
 
-      if(pair.comment !== undefined && variable.value !== null) {
-        keys[index].comment = pair.comment.trim()
+      if(comment !== undefined && variable.value !== null) {
+        keys[index].comment = comment.trim()
       }
 
       // this is a case where the comment is treated as inline comment
       // since the value of the Pair is NULL
       // imo this is a bug in the parsing library
 
-      if(pair.comment !== undefined && variable.value === null) {
-        keys[index+1].commentBefore = pair.comment.trim()
+      if(comment !== undefined && variable.value === null) {
+        keys[index+1].commentBefore = comment.trim()
       }
 
     })
