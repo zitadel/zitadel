@@ -1,8 +1,10 @@
 #!/bin/sh
 
-if [[ $@ == sh* ]]; then
+case $@ in 
+    sh*)
+    echo "came in if"
     $@
     exit $?
-fi
+esac
 
 /app/zitadel $(echo $ZITADEL_ARGS)
