@@ -47,7 +47,7 @@ jobs:
           ZITADEL_ExternalDomain: localhost
           ZITADEL_ExternalSecure: false
           ZITADEL_TLS_Enabled: false
-          ZITADEL_Database_postgres_Host: localhost
+          ZITADEL_Database_postgres_Host: postgres
           ZITADEL_Database_postgres_Port: 5432
           ZITADEL_Database_postgres_Database: zitadel
           ZITADEL_Database_postgres_MaxOpenConns: 20

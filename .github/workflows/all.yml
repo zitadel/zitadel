@@ -72,9 +72,10 @@ jobs:
 
   e2e:
     uses: ./.github/workflows/e2e.yml
-    needs: [container]
+    # needs: [container]
     with:
-      tag_name: ${{ needs.container.outputs.tag_name }}
+      # tag_name: ${{ needs.container.outputs.tag_name }}
+      tag_name: ghcr.io/zitadel/test:29e9f7df8da46b0e6a27ba383b9f5d497ba4ac33-alpine
 
 
   #release
