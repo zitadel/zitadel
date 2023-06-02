@@ -16,4 +16,4 @@ RUN adduser -D zitadel && \
 
 USER zitadel
 # HEALTHCHECK NONE
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
