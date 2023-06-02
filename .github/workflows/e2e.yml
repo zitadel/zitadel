@@ -52,15 +52,28 @@ jobs:
     env:
       ZITADEL_IMAGE: ${{ inputs.tag_name }}
     steps:
-      - name: Checkout Repository
+      - 
+        name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Cypress run
+      - 
+        name: Cypress run
         uses: cypress-io/github-action@v5
         with:
           working-directory: e2e
           build: npm run build
           start: npm start
           browser: ${{ matrix.browser }}
+      - 
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: production-tests-${{ matrix.browser }}
+          path: |
+            e2e/cypress/screenshots
+            e2e/cypress/videos
+            e2e/cypress/results
+          retention-days: 30
+
       # - name: Set up Docker Buildx
       #   uses: docker/setup-buildx-action@v2
       #   with:
