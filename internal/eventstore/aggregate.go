@@ -42,6 +42,14 @@ func WithResourceOwner(resourceOwner string) aggregateOpt {
 	}
 }
 
+// WithInstanceID overwrites the instance id of the aggregate
+// by default the instance is set by the context
+func WithInstanceID(id string) aggregateOpt {
+	return func(aggregate *Aggregate) {
+		aggregate.InstanceID = id
+	}
+}
+
 // AggregateFromWriteModel maps the given WriteModel to an Aggregate
 func AggregateFromWriteModel(
 	wm *WriteModel,
@@ -49,11 +57,12 @@ func AggregateFromWriteModel(
 	version Version,
 ) *Aggregate {
 	return NewAggregate(
-		authz.WithInstanceID(context.Background(), wm.InstanceID),
+		context.Background(),
 		wm.AggregateID,
 		typ,
 		version,
 		WithResourceOwner(wm.ResourceOwner),
+		WithInstanceID(wm.InstanceID),
 	)
 }
 
