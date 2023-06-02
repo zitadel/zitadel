@@ -22,7 +22,6 @@ type SessionCommands struct {
 	cmds []SessionCommand
 
 	sessionWriteModel  *SessionWriteModel
-	humanWriteModel    *HumanWriteModel
 	passwordWriteModel *HumanPasswordWriteModel
 	eventstore         *eventstore.Eventstore
 	userPasswordAlg    crypto.HashAlgorithm
@@ -92,21 +91,18 @@ func (s *SessionCommands) Exec(ctx context.Context) error {
 }
 
 func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteModel, error) {
-	if s.humanWriteModel != nil {
-		return s.humanWriteModel, nil
-	}
 	if s.sessionWriteModel.UserID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eeR2e", "Errors.User.UserIDMissing")
 	}
-	s.humanWriteModel = NewHumanWriteModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner)
-	err := s.eventstore.FilterToQueryReducer(ctx, s.humanWriteModel)
+	humanWriteModel := NewHumanWriteModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner)
+	err := s.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
 	if err != nil {
 		return nil, err
 	}
-	if !s.humanWriteModel.UserState.Active() {
+	if humanWriteModel.UserState != domain.UserStateActive {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.ie4Ai.NotFound")
 	}
-	return s.humanWriteModel, nil
+	return humanWriteModel, nil
 }
 
 func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Command, error) {
