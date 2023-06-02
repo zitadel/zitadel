@@ -2,9 +2,8 @@
 
 case $@ in 
     sh*)
-    echo "came in if"
     $@
     exit $?
 esac
 
-/app/zitadel $(echo $ZITADEL_ARGS)
+./zitadel $(echo $ZITADEL_ARGS)

@@ -2,16 +2,18 @@ FROM alpine:3 as artifact
 ARG TARGETOS TARGETARCH
 ENV ZITADEL_ARGS=
 
-COPY build/entrypoint.sh /app/entrypoint.sh
+WORKDIR /app
 
-COPY zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH /app/zitadel
+COPY build/entrypoint.sh .
+
+COPY zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH ./zitadel
 
 RUN adduser -D zitadel && \
-    chown zitadel /app/zitadel && \
-    chmod +x /app/zitadel && \
-    chown zitadel /app/entrypoint.sh && \
-    chmod +x /app/entrypoint.sh
+    chown zitadel zitadel && \
+    chmod +x zitadel && \
+    chown zitadel entrypoint.sh && \
+    chmod +x entrypoint.sh
 
 USER zitadel
 # HEALTHCHECK NONE
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
