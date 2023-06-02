@@ -7,4 +7,4 @@ RUN adduser -D zitadel && \
     chmod +x /app/zitadel
 USER zitadel
 HEALTHCHECK NONE
-ENTRYPOINT ["/app/zitadel", "${ZITADEL_ARGS}"]
+ENTRYPOINT ["/app/zitadel ${ZITADEL_ARGS}"]
