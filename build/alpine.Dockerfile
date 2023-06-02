@@ -1,10 +1,15 @@
 FROM alpine:3 as artifact
-ENV ZITADEL_ARGS="start-from-init --masterkeyFromEnv"
 ARG TARGETOS TARGETARCH
+ENV ZITADEL_ARGS=
+
 COPY zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH /app/zitadel
+COPY build/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 RUN adduser -D zitadel && \
     chown zitadel /app/zitadel && \
     chmod +x /app/zitadel
+
 USER zitadel
-HEALTHCHECK NONE
-ENTRYPOINT ["/app/zitadel ${ZITADEL_ARGS}"]
+# HEALTHCHECK NONE
+ENTRYPOINT ["/app/entrypoint.sh"]
