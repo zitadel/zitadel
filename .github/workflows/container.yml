@@ -50,7 +50,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: build/alpine.Dockerfile
+          file: build/debian.Dockerfile
           platforms: ${{env.platforms}}
           push: true
-          tags: ${{ inputs.tag_name }}-alpine
+          tags: ${{ inputs.tag_name }}-debian

@@ -1,4 +1,4 @@
-FROM debian:3 as artifact
+FROM debian:latest as artifact
 ARG TARGETOS TARGETARCH
 ENV ZITADEL_ARGS=
 
