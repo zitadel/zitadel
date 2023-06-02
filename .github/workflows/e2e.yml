@@ -46,8 +46,16 @@ jobs:
           ZITADEL_Log_Level: debug
           ZITADEL_ExternalDomain: localhost
           ZITADEL_ExternalSecure: false
-          ZITADEL_Database_cockroach_Host: localhost
           ZITADEL_TLS_Enabled: false
+          ZITADEL_Database_postgres_Host: localhost
+          ZITADEL_Database_postgres_Port: 5432
+          ZITADEL_Database_postgres_Database: zitadel
+          ZITADEL_Database_postgres_MaxOpenConns: 20
+          ZITADEL_Database_postgres_MaxIdleConns: 10
+          ZITADEL_Database_postgres_User_Username: zitadel
+          ZITADEL_Database_postgres_User_SSL_Mode: disable
+          ZITADEL_Database_postgres_Admin_Username: zitadel
+          ZITADEL_Database_postgres_Admin_SSL_Mode: disable
           ZITADEL_FirstInstance_Org_Human_PasswordChangeRequired: false
           ZITADEL_LogStore_Access_Database_Enabled: true
           ZITADEL_LogStore_Access_Database_Debounce_MinFrequency: 0s
