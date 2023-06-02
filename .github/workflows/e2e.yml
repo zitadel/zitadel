@@ -41,7 +41,7 @@ jobs:
         ports:
           - 8080:8080
         env:
-          ZITADEL_ARGS: start-from-init --masterkeyFromEnv
+          ZITADEL_ARGS: "start-from-init --masterkeyFromEnv"
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
           ZITADEL_Log_Level: debug
           ZITADEL_ExternalDomain: localhost
