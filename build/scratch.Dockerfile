@@ -12,4 +12,4 @@ COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
 COPY --from=artifact /app /app
 USER zitadel
 HEALTHCHECK NONE
-ENTRYPOINT ["/app/zitadel", ${ZITADEL_ARGS}]
+ENTRYPOINT ["/app/zitadel", "${ZITADEL_ARGS}"]
