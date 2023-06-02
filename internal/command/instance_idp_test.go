@@ -1102,6 +1102,122 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 	}
 }
 
+func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		id            string
+		tenant        string
+		emailVerified bool
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
+				id:            "id1",
+				tenant:        "tenant",
+				emailVerified: false,
+			},
+			res: res{
+				err: caos_errors.IsNotFound,
+			},
+		},
+		{
+			name: "migrate ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								func() eventstore.Command {
+									event := instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+										"id1",
+										"name",
+										"clientID",
+										&crypto.CryptoValue{
+											CryptoType: crypto.TypeEncryption,
+											Algorithm:  "enc",
+											KeyID:      "id",
+											Crypted:    []byte("clientSecret"),
+										},
+										nil,
+										"tenant",
+										false,
+										idp.Options{},
+									)
+									return event
+								}(),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
+				id:            "id1",
+				tenant:        "tenant",
+				emailVerified: false,
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := c.MigrateInstanceGenericOIDCToAzureADProvider(tt.args.ctx, tt.args.id, tt.args.tenant, tt.args.emailVerified)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
 func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore

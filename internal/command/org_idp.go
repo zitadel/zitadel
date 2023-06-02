@@ -92,6 +92,20 @@ func (c *Commands) UpdateOrgGenericOIDCProvider(ctx context.Context, resourceOwn
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+func (c *Commands) MigrateOrgGenericOIDCToAzureADProvider(ctx context.Context, resourceOwner, id, tenant string, emailVerified bool) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateOrgOIDCToAzureADProvider(orgAgg, writeModel, tenant, emailVerified))
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
 func (c *Commands) AddOrgJWTProvider(ctx context.Context, resourceOwner string, provider JWTProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	id, err := c.idGenerator.Next()
@@ -643,6 +657,38 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, writeModel *Or
 				return nil, err
 			}
 			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareMigrateOrgOIDCToAzureADProvider(a *org.Aggregate, writeModel *OrgOIDCIDPWriteModel, tenant string, emailVerified bool) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "INST-Dg239201", "Errors.Instance.IDPConfig.NotExisting")
+			}
+			return []eventstore.Command{
+				org.NewOIDCIDPMigratedAzureADEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					writeModel.Name,
+					writeModel.ClientID,
+					writeModel.ClientSecret,
+					writeModel.Scopes,
+					tenant,
+					emailVerified,
+					writeModel.Options,
+				),
+			}, nil
 		}, nil
 	}
 }

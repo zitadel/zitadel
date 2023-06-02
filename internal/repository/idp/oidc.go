@@ -201,11 +201,54 @@ func (e *OIDCIDPMigratedAzureADEvent) UniqueConstraints() []*eventstore.EventUni
 	return nil
 }
 
-func OIDCIDPMigratedAzureADEventEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPMigratedAzureADEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := AzureADIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
 	return &OIDCIDPMigratedAzureADEvent{AzureADIDPAddedEvent: *e.(*AzureADIDPAddedEvent)}, nil
+}
+
+type OIDCIDPMigratedGoogleEvent struct {
+	GoogleIDPAddedEvent
+}
+
+func NewOIDCIDPMigratedGoogleEvent(
+	base *eventstore.BaseEvent,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	options Options,
+) *OIDCIDPMigratedGoogleEvent {
+	return &OIDCIDPMigratedGoogleEvent{
+		GoogleIDPAddedEvent: GoogleIDPAddedEvent{
+			BaseEvent:    *base,
+			ID:           id,
+			Name:         name,
+			ClientID:     clientID,
+			ClientSecret: clientSecret,
+			Scopes:       scopes,
+			Options:      options,
+		},
+	}
+}
+
+func (e *OIDCIDPMigratedGoogleEvent) Data() interface{} {
+	return e
+}
+
+func (e *OIDCIDPMigratedGoogleEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func OIDCIDPMigratedGoogleEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := GoogleIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OIDCIDPMigratedGoogleEvent{GoogleIDPAddedEvent: *e.(*GoogleIDPAddedEvent)}, nil
 }

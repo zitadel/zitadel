@@ -762,8 +762,8 @@ func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*h
 func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idp.OIDCIDPMigratedAzureADEvent
 	switch e := event.(type) {
-	//case *org.OIDCIDPChangedEvent:
-	//	idpEvent = e.OIDCIDPChangedEvent
+	case *org.OIDCIDPMigratedAzureADEvent:
+		idpEvent = e.OIDCIDPMigratedAzureADEvent
 	case *instance.OIDCIDPMigratedAzureADEvent:
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
 	default:

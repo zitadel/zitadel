@@ -11567,6 +11567,7 @@ message MigrateGenericOIDCProviderRequest{
     ];
     oneof template{
         AzureAD azure = 2;
+        bool google = 3;
     }
 }
 

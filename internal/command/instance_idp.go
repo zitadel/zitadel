@@ -101,7 +101,22 @@ func (c *Commands) MigrateInstanceGenericOIDCToAzureADProvider(ctx context.Conte
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewOIDCInstanceIDPWriteModel(instanceID, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateOIDCToAzureADProvider(instanceAgg, writeModel, tenant, emailVerified))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateInstanceOIDCToAzureADProvider(instanceAgg, writeModel, tenant, emailVerified))
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) MigrateInstanceGenericOIDCToGoogleProvider(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	writeModel := NewOIDCInstanceIDPWriteModel(instanceID, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateInstanceOIDCToGoogleProvider(instanceAgg, writeModel))
 	if err != nil {
 		return nil, err
 	}
@@ -684,7 +699,7 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 	}
 }
 
-func (c *Commands) prepareMigrateOIDCToAzureADProvider(a *instance.Aggregate, writeModel *InstanceOIDCIDPWriteModel, tenant string, emailVerified bool) preparation.Validation {
+func (c *Commands) prepareMigrateInstanceOIDCToAzureADProvider(a *instance.Aggregate, writeModel *InstanceOIDCIDPWriteModel, tenant string, emailVerified bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -709,6 +724,36 @@ func (c *Commands) prepareMigrateOIDCToAzureADProvider(a *instance.Aggregate, wr
 					writeModel.Scopes,
 					tenant,
 					emailVerified,
+					writeModel.Options,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareMigrateInstanceOIDCToGoogleProvider(a *instance.Aggregate, writeModel *InstanceOIDCIDPWriteModel) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "INST-Dg29202", "Errors.Instance.IDPConfig.NotExisting")
+			}
+			return []eventstore.Command{
+				instance.NewOIDCIDPMigratedGoogleEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					writeModel.Name,
+					writeModel.ClientID,
+					writeModel.ClientSecret,
+					writeModel.Scopes,
 					writeModel.Options,
 				),
 			}, nil

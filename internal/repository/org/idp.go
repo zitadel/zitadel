@@ -15,6 +15,7 @@ const (
 	OAuthIDPChangedEventType            eventstore.EventType = "org.idp.oauth.changed"
 	OIDCIDPAddedEventType               eventstore.EventType = "org.idp.oidc.added"
 	OIDCIDPChangedEventType             eventstore.EventType = "org.idp.oidc.changed"
+	OIDCIDPMigratedAzureADEventType     eventstore.EventType = "org.idp.oidc.migrated.azure"
 	JWTIDPAddedEventType                eventstore.EventType = "org.idp.jwt.added"
 	JWTIDPChangedEventType              eventstore.EventType = "org.idp.jwt.changed"
 	AzureADIDPAddedEventType            eventstore.EventType = "org.idp.azure.added"
@@ -196,6 +197,50 @@ func OIDCIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error
 	}
 
 	return &OIDCIDPChangedEvent{OIDCIDPChangedEvent: *e.(*idp.OIDCIDPChangedEvent)}, nil
+}
+
+type OIDCIDPMigratedAzureADEvent struct {
+	idp.OIDCIDPMigratedAzureADEvent
+}
+
+func NewOIDCIDPMigratedAzureADEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	tenant string,
+	isEmailVerified bool,
+	options idp.Options,
+) *OIDCIDPMigratedAzureADEvent {
+	return &OIDCIDPMigratedAzureADEvent{
+		OIDCIDPMigratedAzureADEvent: *idp.NewOIDCIDPMigratedAzureADEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				OIDCIDPMigratedAzureADEventType,
+			),
+			id,
+			name,
+			clientID,
+			clientSecret,
+			scopes,
+			tenant,
+			isEmailVerified,
+			options,
+		),
+	}
+}
+
+func OIDCIDPMigratedAzureADEventEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.OIDCIDPMigratedAzureADEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OIDCIDPMigratedAzureADEvent{OIDCIDPMigratedAzureADEvent: *e.(*idp.OIDCIDPMigratedAzureADEvent)}, nil
 }
 
 type JWTIDPAddedEvent struct {

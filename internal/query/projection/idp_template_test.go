@@ -2686,6 +2686,116 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "instance reduceOIDCIDPMigratedAzureAD",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.OIDCIDPMigratedAzureADEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"tenant": "tenant",
+	"isEmailVerified": true,
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.OIDCIDPMigratedAzureADEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedAzureAD,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_templates5_oidc WHERE (idp_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_azure (idp_id, instance_id, client_id, client_secret, scopes, tenant, is_email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+								"tenant",
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceOIDCIDPMigratedAzureAD",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OIDCIDPMigratedAzureADEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"tenant": "tenant",
+	"isEmailVerified": true,
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.OIDCIDPMigratedAzureADEventEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedAzureAD,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_templates5_oidc WHERE (idp_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_azure (idp_id, instance_id, client_id, client_secret, scopes, tenant, is_email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+								"tenant",
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
