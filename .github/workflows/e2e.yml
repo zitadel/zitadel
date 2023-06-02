@@ -33,6 +33,11 @@ jobs:
         credentials:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+        options: >-
+          --health-cmd curl -f localhost:8080/ready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         env:
           ZITADEL_Log_Level: debug
           ZITADEL_ExternalDomain: localhost
