@@ -34,6 +34,10 @@ jobs:
     steps:
       - 
         uses: actions/checkout@v3
+      -
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go_version }}
       - 
         uses: actions/cache/restore@v3
         name: restore core
@@ -41,10 +45,6 @@ jobs:
           path: ${{ inputs.core_cache_path }}
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
-      -
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ inputs.go_version }}
       - 
         name: test
         env:
