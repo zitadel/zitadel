@@ -1,4 +1,4 @@
-FROM alpine:3 as artifact
+FROM debian:3 as artifact
 ARG TARGETOS TARGETARCH
 ENV ZITADEL_ARGS=
 
