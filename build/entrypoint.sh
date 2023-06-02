@@ -1,7 +1,8 @@
 #!/bin/sh
 
-if [[ $(echo $ZITADEL_ARGS) == sh* ]]; then
-    $ZITADEL_ARGS
+if [[ $@ == sh* ]]; then
+    $@
+    exit $?
 fi
 
 /app/zitadel $(echo $ZITADEL_ARGS)
