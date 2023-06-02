@@ -37,7 +37,7 @@ jobs:
       - 
         uses: actions/download-artifact@v3
       - 
-        name: Build and push
+        name: scratch
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -46,7 +46,7 @@ jobs:
           push: true
           tags: ${{ inputs.tag_name }}
       - 
-        name: Build and push
+        name: alpine
         uses: docker/build-push-action@v4
         with:
           context: .
