@@ -6,4 +6,4 @@ case $@ in
     exit $?
 esac
 
-./zitadel $(echo $ZITADEL_ARGS)
+/app/zitadel $(echo $ZITADEL_ARGS)
