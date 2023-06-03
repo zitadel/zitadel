@@ -38,12 +38,11 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        # --health-start-period 30s
         ports:
           - 8080:8080
-        volumes:
-          - ./e2e/config/github/zitadel.yaml:/app/zitadel.yaml
         env:
-          ZITADEL_ARGS: "start-from-init --masterkeyFromEnv --config /app/zitadel.yaml --steps /app/zitadel.yaml"
+          ZITADEL_ARGS: "start-from-init --masterkeyFromEnv"
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
           ZITADEL_LOG_LEVEL: debug
           ZITADEL_EXTERNALDOMAIN: localhost
