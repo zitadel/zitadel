@@ -1,11 +1,9 @@
 FROM debian:latest as artifact
 ARG TARGETOS TARGETARCH
 COPY zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH /app/zitadel
-# RUN adduser -D zitadel && \
-#     chown zitadel /app/zitadel && \
-#     chmod +x /app/zitadel
-
-RUN chmod +x /app/zitadel
+RUN adduser -disabled-password zitadel && \
+    chown zitadel /app/zitadel && \
+    chmod +x /app/zitadel
 
 FROM scratch as final
 COPY --from=artifact /etc/passwd /etc/passwd
