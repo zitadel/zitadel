@@ -36,17 +36,17 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
         uses: actions/download-artifact@v3
+      # - 
+      #   name: scratch
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     file: build/scratch.Dockerfile
+      #     platforms: ${{env.platforms}}
+      #     push: true
+      #     tags: ${{ inputs.tag_name }}
       - 
-        name: scratch
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: build/scratch.Dockerfile
-          platforms: ${{env.platforms}}
-          push: true
-          tags: ${{ inputs.tag_name }}
-      - 
-        name: alpine
+        name: debian
         uses: docker/build-push-action@v4
         with:
           context: .

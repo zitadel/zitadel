@@ -1,7 +1,7 @@
 #!/bin/sh
 
 case $@ in 
-    sh*)
+    sh* | bash*)
     $@
     exit $?
 esac
