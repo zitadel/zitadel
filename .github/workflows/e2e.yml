@@ -40,8 +40,10 @@ jobs:
           --health-retries 5
         ports:
           - 8080:8080
+        volumes:
+          - e2e/config/github/zitadel.yaml:/app/zitadel.yaml
         env:
-          ZITADEL_ARGS: "start-from-init --masterkeyFromEnv"
+          ZITADEL_ARGS: "start-from-init --masterkeyFromEnv --config /app/zitadel.yaml --steps /app/zitadel.yaml"
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
           ZITADEL_Log_Level: debug
           ZITADEL_ExternalDomain: localhost
