@@ -36,6 +36,16 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
         uses: actions/download-artifact@v3
+      - 
+        name: ubuntu
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: build/Dockerfile
+          target: artifact
+          platforms: ${{env.platforms}}
+          push: true
+          tags: ${{ inputs.tag_name }}-debian
       # - 
       #   name: scratch
       #   uses: docker/build-push-action@v4
@@ -45,12 +55,3 @@ jobs:
       #     platforms: ${{env.platforms}}
       #     push: true
       #     tags: ${{ inputs.tag_name }}
-      - 
-        name: debian
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: build/debian.Dockerfile
-          platforms: ${{env.platforms}}
-          push: true
-          tags: ${{ inputs.tag_name }}-debian

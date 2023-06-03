@@ -11,6 +11,6 @@ RUN adduser --disabled-password zitadel && \
     chown zitadel /app/entrypoint.sh && \
     chmod +x /app/entrypoint.sh
 
-USER zitadel
+# USER zitadel
 # HEALTHCHECK NONE
 ENTRYPOINT ["/app/entrypoint.sh"]
