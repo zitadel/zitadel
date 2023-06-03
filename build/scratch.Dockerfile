@@ -1,4 +1,4 @@
-FROM alpine:3 as artifact
+FROM debian:latest as artifact
 ARG TARGETOS TARGETARCH
 COPY zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH /app/zitadel
 RUN adduser -D zitadel && \

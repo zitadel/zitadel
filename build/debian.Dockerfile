@@ -8,10 +8,13 @@ COPY build/entrypoint.sh .
 
 COPY zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH ./zitadel
 
-RUN adduser -D zitadel && \
-    chown zitadel zitadel && \
-    chmod +x zitadel && \
-    chown zitadel entrypoint.sh && \
+# RUN adduser -D zitadel && \
+#     chown zitadel zitadel && \
+#     chmod +x zitadel && \
+#     chown zitadel entrypoint.sh && \
+#     chmod +x entrypoint.sh
+
+RUN chmod +x zitadel && \
     chmod +x entrypoint.sh
 
 USER zitadel
