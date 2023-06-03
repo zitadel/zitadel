@@ -2,11 +2,8 @@ FROM debian:latest as artifact
 ARG TARGETOS TARGETARCH
 ENV ZITADEL_ARGS=
 
-WORKDIR /app
-
-COPY build/entrypoint.sh .
-
-COPY zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH ./zitadel
+COPY build/entrypoint.sh /app/entrypoint.sh
+COPY zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH /app/zitadel
 
 # RUN adduser -D zitadel && \
 #     chown zitadel zitadel && \
@@ -14,8 +11,8 @@ COPY zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH ./zitadel
 #     chown zitadel entrypoint.sh && \
 #     chmod +x entrypoint.sh
 
-RUN chmod +x zitadel && \
-    chmod +x entrypoint.sh
+RUN chmod +x /app/zitadel && \
+    chmod +x /app/entrypoint.sh
 
 USER zitadel
 # HEALTHCHECK NONE
