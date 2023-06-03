@@ -38,7 +38,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        # --health-start-period 30s
+          --health-start-period 30s
         ports:
           - 8080:8080
         env:
