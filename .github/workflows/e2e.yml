@@ -34,7 +34,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
         options: >-
-          --health-cmd "sh curl http://zitadel:8080/management/v1/healthz || exit 1"
+          --health-cmd "sh curl http://localhost:8080/management/v1/healthz || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
