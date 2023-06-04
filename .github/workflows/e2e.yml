@@ -83,9 +83,9 @@ jobs:
           CYPRESS_BASE_URL: http://localhost:8080/ui/console
           CYPRESS_WEBHOOK_HANDLER_HOST: localhost
           CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://zitadel@db:26257/zitadel'
+          CYPRESS_BACKEND_URL: http://localhost:8080
         with:
           working-directory: e2e
-          # build: npm run build
           browser: ${{ matrix.browser }}
           command: npm run e2e
           config-file: cypress.config.ts
