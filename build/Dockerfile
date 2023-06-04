@@ -20,9 +20,12 @@ USER zitadel
 ENTRYPOINT ["entrypoint.sh"]
 
 FROM scratch as final
-COPY --from=artifact /etc/passwd /etc/passwd
-COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
-COPY --from=artifact /app/zitadel .
+ENV PATH="/app:${PATH}"
 USER zitadel
 HEALTHCHECK NONE
+
+COPY --from=artifact /etc/passwd /etc/passwd
+COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
+COPY --from=artifact /app/zitadel /app/zitadel
+
 ENTRYPOINT ["zitadel"]
