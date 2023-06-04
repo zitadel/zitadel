@@ -81,8 +81,8 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           working-directory: e2e
-          build: npm run build
-          start: npm start
+          # build: npm run build
+          start: npm run e2e:golangangular
           browser: ${{ matrix.browser }}
       - 
         uses: actions/upload-artifact@v3
