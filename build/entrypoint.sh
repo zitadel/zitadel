@@ -1,8 +1,11 @@
 #!/bin/sh
 
 case $@ in 
-    sh* | bash*)
-        $@
+    sh*)
+        ${@:3}
+        ;;
+    bash*)
+        ${@:5}
         ;;
     *)
         /app/zitadel $(echo $ZITADEL_ARGS)
