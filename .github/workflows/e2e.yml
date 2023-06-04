@@ -84,7 +84,7 @@ jobs:
           # build: npm run build
           browser: ${{ matrix.browser }}
           command: npm run e2e:golangangular
-
+          config-file: cypress.config.ts
       - 
         uses: actions/upload-artifact@v3
         if: always()
