@@ -3,6 +3,7 @@ ARG TARGETOS TARGETARCH
 ENV ZITADEL_ARGS=
 
 WORKDIR /app
+ENV PATH="/app:${PATH}"
 
 RUN apt-get update && apt-get install ca-certificates -y
 
@@ -21,7 +22,7 @@ ENTRYPOINT ["entrypoint.sh"]
 FROM scratch as final
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
-COPY --from=artifact /app /app
+COPY --from=artifact /app/zitadel .
 USER zitadel
 HEALTHCHECK NONE
 ENTRYPOINT ["zitadel"]
