@@ -74,7 +74,7 @@ jobs:
     uses: ./.github/workflows/e2e.yml
     needs: [container]
     with:
-      tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
+      tag_name: ${{ needs.container.outputs.tag_name }}
       # tag_name: ghcr.io/zitadel/test:b53b2ab7e0439f99fd6e9b0b85f82d867d1fe5a9-ubuntu
 
 
