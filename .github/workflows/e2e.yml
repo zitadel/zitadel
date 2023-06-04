@@ -82,8 +82,9 @@ jobs:
         with:
           working-directory: e2e
           # build: npm run build
-          start: npm run e2e:golangangular
           browser: ${{ matrix.browser }}
+          command: npm run e2e:golangangular
+
       - 
         uses: actions/upload-artifact@v3
         if: always()
