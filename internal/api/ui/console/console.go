@@ -34,7 +34,7 @@ type spaHandler struct {
 }
 
 var (
-	//go:embed static/*
+	//go:embed static/console
 	static embed.FS
 )
 
@@ -92,7 +92,7 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 }
 
 func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler func(http.Handler) http.Handler, limitingAccessInterceptor *middleware.AccessInterceptor, customerPortal string) (http.Handler, error) {
-	fSys, err := fs.Sub(static, "static")
+	fSys, err := fs.Sub(static, "static/console")
 	if err != nil {
 		return nil, err
 	}
