@@ -2,8 +2,9 @@
 
 case $@ in 
     sh* | bash*)
-    $@
-    exit $?
+        $@
+        ;;
+    *)
+        /app/zitadel $(echo $ZITADEL_ARGS)
+        ;;
 esac
-
-/app/zitadel $(echo $ZITADEL_ARGS)
