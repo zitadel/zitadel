@@ -17,6 +17,6 @@ export default async (): Promise<Config.InitialOptions> => {
     testEnvironment: 'jsdom',
     testRegex: '/__test__/.*\\.test\\.tsx?$',
     modulePathIgnorePatterns: ['cypress'],
-    reporters: [[ 'jest-silent-reporter', { useDots: true, showWarnings: true, showPaths: true } ]]
+    reporters: [[ 'jest-silent-reporter', { useDots: true, showWarnings: true, showPaths: true } ], 'summary']
   };
 };

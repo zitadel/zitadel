@@ -126,9 +126,6 @@ importers:
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
-      '@types/forever-monitor':
-        specifier: ^1.7.6
-        version: 1.7.6
       '@types/jest':
         specifier: ^29.5.1
         version: 29.5.1
@@ -186,9 +183,6 @@ importers:
       jest-environment-jsdom:
         specifier: ^29.5.0
         version: 29.5.0
-      jest-fetch-mock:
-        specifier: ^3.0.3
-        version: 3.0.3
       jest-silent-reporter:
         specifier: ^0.5.0
         version: 0.5.0
@@ -198,9 +192,6 @@ importers:
       make-dir-cli:
         specifier: 3.0.0
         version: 3.0.0
-      next-router-mock:
-        specifier: ^0.9.3
-        version: 0.9.3(next@13.4.2)(react@18.2.0)
       nodemon:
         specifier: ^2.0.22
         version: 2.0.22
@@ -234,9 +225,6 @@ importers:
       typescript:
         specifier: 5.0.4
         version: 5.0.4
-      whatwg-fetch:
-        specifier: ^3.6.2
-        version: 3.6.2
       zitadel-tailwind-config:
         specifier: workspace:*
         version: link:../../packages/zitadel-tailwind-config
@@ -5749,12 +5737,6 @@ packages:
     resolution: {integrity: sha512-frsJrz2t/CeGifcu/6uRo4b+SzAwT4NYCVPu1GN8IB9XTzrpPkGuV0tmh9mN+/L0PklAlsC3u5Fxt0ju00LXIw==}
     dev: true
 
-  /@types/forever-monitor@1.7.6:
-    resolution: {integrity: sha512-QrEuaA2FwV/EKII3ZFy12LtZ1qyjwXYmTd9u4jTZBeF3CaVsjLlk1vmlLdfSL3TXdSdFt8BsGyLcsRQ9QP6e5Q==}
-    dependencies:
-      '@types/node': 18.11.9
-    dev: true
-
   /@types/glob@8.1.0:
     resolution: {integrity: sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==}
     dependencies:
@@ -7880,14 +7862,6 @@ packages:
 
   /create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
-
-  /cross-fetch@3.1.6:
-    resolution: {integrity: sha512-riRvo06crlE8HiqOwIpQhxwdOk4fOeR7FVM/wXoxchFEqMNUjvbs3bfo4OTgMEMHzppd4DxFBDbyySj8Cv781g==}
-    dependencies:
-      node-fetch: 2.6.11
-    transitivePeerDependencies:
-      - encoding
-    dev: true
 
   /cross-spawn@5.1.0:
     resolution: {integrity: sha512-pTgQJ5KC0d2hcY8eyL1IzlBPYjTkyH72XRZPnLyKus2mBfNjQs3klqbJU2VILqZryAZUt9JOb3h/mWMy23/f5A==}
@@ -11223,15 +11197,6 @@ packages:
       jest-util: 29.5.0
     dev: true
 
-  /jest-fetch-mock@3.0.3:
-    resolution: {integrity: sha512-Ux1nWprtLrdrH4XwE7O7InRY6psIi3GOsqNESJgMJ+M5cv4A8Lh7SN9d2V2kKRZ8ebAfcd1LNyZguAOb6JiDqw==}
-    dependencies:
-      cross-fetch: 3.1.6
-      promise-polyfill: 8.3.0
-    transitivePeerDependencies:
-      - encoding
-    dev: true
-
   /jest-get-type@29.4.3:
     resolution: {integrity: sha512-J5Xez4nRRMjk8emnTpWrlkyb9pfRQQanDrvWHhsR1+VUfbwxi30eVcZFlcdGInRibU4G5LwHXpI7IRHU0CY+gg==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
@@ -12466,16 +12431,6 @@ packages:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
     dev: true
 
-  /next-router-mock@0.9.3(next@13.4.2)(react@18.2.0):
-    resolution: {integrity: sha512-jl8eFe71LpMVGeBMpoxILkGfEgGY7IfLy8XPyv05/o61p5oQRNpoMmk46VMxRIpt0fI8XcvznBZKpDK6vbYQcQ==}
-    peerDependencies:
-      next: '>=10.0.0'
-      react: '>=17.0.0'
-    dependencies:
-      next: 13.4.2(@babel/core@7.22.1)(react-dom@18.2.0)(react@18.2.0)(sass@1.62.0)
-      react: 18.2.0
-    dev: true
-
   /next-themes@0.2.1(next@13.4.2)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-B+AKNfYNIzh0vqQQKqQItTS8evEouKD7H5Hj3kmuPERwddR2TxvDSFZuTj6T7Jfn1oyeUyJMydPl1Bkxkh0W7A==}
     peerDependencies:
@@ -13538,10 +13493,6 @@ packages:
   /progress@2.0.3:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
-
-  /promise-polyfill@8.3.0:
-    resolution: {integrity: sha512-H5oELycFml5yto/atYqmjyigJoAo3+OXwolYiH7OfQuYlAqhxNvTfiNMbV9hsC6Yp83yE5r2KTVmtrG6R9i6Pg==}
-    dev: true
 
   /prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
@@ -16155,10 +16106,6 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       iconv-lite: 0.6.3
-    dev: true
-
-  /whatwg-fetch@3.6.2:
-    resolution: {integrity: sha512-bJlen0FcuU/0EMLrdbJ7zOnW6ITZLrZMIarMUVmdKtsGvZna8vxKYaexICWPfZ8qwf9fzNq+UEIZrnSaApt6RA==}
     dev: true
 
   /whatwg-mimetype@3.0.0:
