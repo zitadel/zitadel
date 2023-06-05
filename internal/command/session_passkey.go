@@ -62,11 +62,11 @@ func (c *Commands) CheckPasskey(credentialAssertionData json.Marshaler) SessionC
 		if err != nil {
 			return caos_errs.ThrowInvalidArgument(err, "COMMAND-ohG2o", "todo")
 		}
-		webAuthN, err := cmd.sessionWriteModel.PasskeyChallenge.WebAuthNLogin(credentialAssertionData)
+		humanPasskeys, err := cmd.getHumanPasskeys(ctx)
 		if err != nil {
 			return err
 		}
-		humanPasskeys, err := cmd.getHumanPasskeys(ctx)
+		webAuthN, err := cmd.sessionWriteModel.PasskeyChallenge.WebAuthNLogin(humanPasskeys.human, credentialAssertionData)
 		if err != nil {
 			return err
 		}

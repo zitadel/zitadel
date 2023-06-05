@@ -10,20 +10,18 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/webauthn"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestServer_RegisterPasskey(t *testing.T) {
-	userID := createHumanUser(t).GetUserId()
+	userID := Tester.CreateHumanUser(CTX).GetUserId()
 	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
 	})
 	require.NoError(t, err)
-	client := webauthn.NewClient(Tester.Config.WebAuthNName, Tester.Config.ExternalDomain, "https://"+Tester.Host())
 
 	type args struct {
 		ctx context.Context
@@ -126,7 +124,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			if tt.want != nil {
 				assert.NotEmpty(t, got.GetPasskeyId())
 				assert.NotEmpty(t, got.GetPublicKeyCredentialCreationOptions())
-				_, err = client.CreateAttestationResponse(got.GetPublicKeyCredentialCreationOptions())
+				_, err = Tester.WebAuthN.CreateAttestationResponse(got.GetPublicKeyCredentialCreationOptions())
 				require.NoError(t, err)
 			}
 		})
@@ -134,7 +132,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 }
 
 func TestServer_VerifyPasskeyRegistration(t *testing.T) {
-	userID := createHumanUser(t).GetUserId()
+	userID := Tester.CreateHumanUser(CTX).GetUserId()
 	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
@@ -148,8 +146,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 	require.NotEmpty(t, pkr.GetPasskeyId())
 	require.NotEmpty(t, pkr.GetPublicKeyCredentialCreationOptions())
 
-	client := webauthn.NewClient(Tester.Config.WebAuthNName, Tester.Config.ExternalDomain, "https://"+Tester.Host())
-	attestationResponse, err := client.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
+	attestationResponse, err := Tester.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	require.NoError(t, err)
 
 	type args struct {
@@ -222,7 +219,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 }
 
 func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
-	userID := createHumanUser(t).GetUserId()
+	userID := Tester.CreateHumanUser(CTX).GetUserId()
 
 	type args struct {
 		ctx context.Context

@@ -45,3 +45,22 @@ func (c *Client) CreateAttestationResponse(optionsPb *structpb.Struct) (*structp
 	}
 	return resp, nil
 }
+
+func (c *Client) CreateAssertionResponse(optionsPb *structpb.Struct) (*structpb.Struct, error) {
+	options, err := protojson.Marshal(optionsPb)
+	if err != nil {
+		return nil, fmt.Errorf("webauthn.Client.CreateAssertionResponse: %w", err)
+	}
+	parsedAssertionOptions, err := virtualwebauthn.ParseAssertionOptions(string(options))
+	if err != nil {
+		return nil, fmt.Errorf("webauthn.Client.CreateAssertionResponse: %w", err)
+	}
+	resp := new(structpb.Struct)
+	err = protojson.Unmarshal([]byte(virtualwebauthn.CreateAssertionResponse(
+		c.rp, c.auth, c.credential, *parsedAssertionOptions,
+	)), resp)
+	if err != nil {
+		return nil, fmt.Errorf("webauthn.Client.CreateAssertionResponse: %w", err)
+	}
+	return resp, nil
+}

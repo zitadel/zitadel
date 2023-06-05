@@ -18,11 +18,12 @@ type PasskeyChallengeModel struct {
 	UserVerification   domain.UserVerificationRequirement
 }
 
-func (p *PasskeyChallengeModel) WebAuthNLogin(credentialAssertionData []byte) (*domain.WebAuthNLogin, error) {
+func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) (*domain.WebAuthNLogin, error) {
 	if p == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "todo")
 	}
 	return &domain.WebAuthNLogin{
+		ObjectRoot:              human.ObjectRoot,
 		CredentialAssertionData: credentialAssertionData,
 		Challenge:               p.Challenge,
 		AllowedCredentialIDs:    p.AllowedCrentialIDs,
@@ -89,6 +90,8 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.AddedType,
 			session.UserCheckedType,
 			session.PasswordCheckedType,
+			session.PasskeyChallengedType,
+			session.PasskeyCheckedType,
 			session.TokenSetType,
 			session.MetadataSetType,
 			session.TerminateType,

@@ -171,7 +171,7 @@ func NewPasskeyChallengedEvent(
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			PasswordCheckedType,
+			PasskeyChallengedType,
 		),
 		Challenge:          challenge,
 		AllowedCrentialIDs: allowedCrentialIDs,
@@ -214,7 +214,7 @@ func NewPasskeyCheckedEvent(
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			PasswordCheckedType,
+			PasskeyCheckedType,
 		),
 		CheckedAt: checkedAt,
 	}
