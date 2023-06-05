@@ -28,7 +28,9 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
 
   useEffect(() => {
     if (submit && code && userId) {
-      submitCode({ code });
+      // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
+      // For programmatic verification, the /verifyemail API should be used.
+      submitCodeAndContinue({ code });
     }
   }, []);
 
@@ -53,12 +55,11 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
 
     const response = await res.json();
 
+    setLoading(false);
     if (!res.ok) {
-      setLoading(false);
       setError(response.details);
       return Promise.reject(response);
     } else {
-      setLoading(false);
       return response;
     }
   }
@@ -98,7 +99,7 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
           autoComplete="one-time-code"
           {...register("code", { required: "This field is required" })}
           label="Code"
-          //   error={errors.username?.message as string}
+        //   error={errors.username?.message as string}
         />
       </div>
 

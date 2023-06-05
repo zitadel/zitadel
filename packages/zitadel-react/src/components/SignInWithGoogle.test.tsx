@@ -1,15 +1,15 @@
 import { render, screen } from '@testing-library/react';
-import { SignInWithGoogle } from './SignInWithGoogle';
+import { SignInWithGitlab } from './SignInWithGitlab';
 
-describe('<SignInWithGoogle />', () => {
+describe('<SignInWithGitlab />', () => {
     it('renders without crashing', () => {
-        const { container } = render(<SignInWithGoogle />);
+        const { container } = render(<SignInWithGitlab />);
         expect(container.firstChild).toBeDefined();
     });
 
     it('displays the correct text', () => {
-        render(<SignInWithGoogle />);
-        const signInText = screen.getByText(/Sign in with Google/i);
+        render(<SignInWithGitlab />);
+        const signInText = screen.getByText(/Sign in with Gitlab/i);
         expect(signInText).toBeInTheDocument();
     });
 });

@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.14.0",
+    "@mocks-server/main": "^4.1.0",
     "@types/jest": "^29.5.1",
     "@zitadel/tsconfig": "workspace:*",
     "eslint": "^7.32.0",
