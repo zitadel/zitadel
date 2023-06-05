@@ -31,12 +31,16 @@ function parseZitadelYaml(file) {
           
           if (key === 'value') {
 
-          let grandparent = path.slice(-3, -2)[0] // third to last element (aka. grandparent)
-          if(  YAML.isSeq(grandparent) ) {
-            output.find(node => node.env === keys2env(path_array.slice(0, -1))).value = 'array[...]'
-          } else {
-            output.find(node => node.env === env).value = value.value
-          }
+            // need to escape if we find an array of objects (sequence)
+            // since we're looping through the scalars, the hierarchy is
+            // Scalar -> Pair -> Sequence, where the last is the grandparent
+            let grandparent = path.slice(-3, -2)[0]
+            
+            if(  YAML.isSeq(grandparent) ) {
+              output.find(node => node.env === keys2env(path_array.slice(0, -1))).value = 'array[...]'
+            } else {
+              output.find(node => node.env === env).value = value.value
+            }
 
           }
       
