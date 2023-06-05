@@ -89,7 +89,7 @@ describe('quotas', () => {
           cy.get<Context>('@ctx').then((ctx) => {
             ensureUserDoesntExist(ctx.api, testUserName);
             ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, true, urls.length);
-            cy.task('runSQL', `truncate logstore.access CASCADE;`);
+            cy.task('runSQL', `truncate logstore.access;`);
           });
         });
       });
@@ -156,7 +156,7 @@ describe('quotas', () => {
                 repeat: false,
               },
             ]);
-            cy.task('runSQL', `truncate logstore.access CASCADE;`);
+            cy.task('runSQL', `truncate logstore.access;`);
           });
         });
 
@@ -253,7 +253,7 @@ describe('quotas', () => {
                   repeat: true,
                 },
               ]);
-              cy.task('runSQL', `truncate logstore.access CASCADE;`);
+              cy.task('runSQL', `truncate logstore.access;`);
             });
           });
         });
