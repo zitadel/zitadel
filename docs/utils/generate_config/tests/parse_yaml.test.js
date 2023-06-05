@@ -11,20 +11,17 @@ let file =
         SMTP:
         # must include the port, like smtp.mailtrap.io:2525. IPv6 is also supported, like [2001:db8::1]:2525
         Host:
-        User:
-        Password:
-        TLS:
-        # if the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
-        From:
-        FromName:
     MessageTexts:
-        - MessageTextType: InitCode`
+        - MessageTextType: InitCode
+          Language: de
+          Title: Zitadel - User initialisieren
+          PreHeader: User initialisieren`
 
 
 const doc = parse_yaml(file)
 
 test('Expect two nodes', () => {
-  expect(doc).toHaveLength(2);
+  expect(doc).toHaveLength(5);
 });
 
 test('Instance Name variable name', () => {

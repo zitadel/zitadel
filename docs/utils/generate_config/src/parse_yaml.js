@@ -15,6 +15,7 @@ function parseZitadelYaml(file) {
       
           // put the key names of the path in an array
           let path_array = path.filter(node => YAML.isPair(node)).map(pair => pair.key.value)
+          
           let env = keys2env(path_array)
           
           if (key === 'key') {
@@ -27,8 +28,17 @@ function parseZitadelYaml(file) {
               mandatory: false
             })
           }
-      
-          if (key === 'value') output.find(node => node.env === env).value = value.value
+          
+          if (key === 'value') {
+            
+          let grandparent = path.slice(-3, -2)[0] // third to last element (aka. grandparent)
+          if(  YAML.isSeq(grandparent) ) {
+            output.find(node => node.env === keys2env(path_array.slice(0, -1))).value = 'array[...]'
+          } else {
+            output.find(node => node.env === env).value = value.value
+          }
+
+          }
       
         }, 
       }
@@ -41,22 +51,27 @@ function parseZitadelYaml(file) {
     keys.forEach(variable => {
     
       let pair = doc.getIn(variable.path, true)
+      if (pair === undefined) return
       let index = keys.findIndex(key => key.env === variable.env)
 
-      let comment = pair.comment
+      if (pair.hasOwnProperty('comment')) {
+
+        let comment = pair.comment
+
+        if(comment !== undefined && variable.value !== null) {
+          keys[index].comment = comment.trim()
+        }
+  
+        // this is a case where the comment is treated as inline comment
+        // since the value of the Pair is NULL
+        // imo this is a bug in the parsing library
+        
+        if(comment !== undefined && variable.value === null) {
+          keys[index+1].commentBefore = comment.trim()
+        }
+
+      }
     
-      if(comment !== undefined && variable.value !== null) {
-        keys[index].comment = comment.trim()
-      }
-
-      // this is a case where the comment is treated as inline comment
-      // since the value of the Pair is NULL
-      // imo this is a bug in the parsing library
-
-      if(comment !== undefined && variable.value === null) {
-        keys[index+1].commentBefore = comment.trim()
-      }
-
     })
 
     // In this loop we have to check if the first comment is attached to a Map/Collection
