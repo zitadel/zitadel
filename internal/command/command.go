@@ -141,11 +141,21 @@ func StartCommands(
 	return repo, nil
 }
 
-func AppendAndReduce(object interface {
+type AppendReducer interface {
 	AppendEvents(...eventstore.Event)
 	// TODO: Why is it allowed to return an error here?
 	Reduce() error
-}, events ...eventstore.Event) error {
+}
+
+func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer, cmds ...eventstore.Command) error {
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return err
+	}
+	return AppendAndReduce(object, events...)
+}
+
+func AppendAndReduce(object AppendReducer, events ...eventstore.Event) error {
 	object.AppendEvents(events...)
 	return object.Reduce()
 }
