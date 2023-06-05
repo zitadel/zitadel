@@ -88,9 +88,10 @@ function parseZitadelYaml(file) {
         // that it's attached to the first element instead
         let parent = path.slice(-2, -1)[0] // second to last element (aka. parent)
 
-        console.log(parent)
+        // When a comment can't be mapped (eg, no leaf, only a branch), skip it
+        let node = keys.find(node => node.env === env)
           
-        if (key === 'key' && parent.items[0] === path.slice(-1)[0] && parent.commentBefore !== undefined)keys.find(node => node.env === env).commentBefore = parent.commentBefore.trim()  
+        if (key === 'key' && parent.items[0] === path.slice(-1)[0] && parent.commentBefore !== undefined && node !== undefined) node.commentBefore = parent.commentBefore.trim()  
       }, 
     
     })

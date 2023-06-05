@@ -41,7 +41,7 @@ let file =
 const doc = parse_yaml(file)
 
 test('Expect two nodes', () => {
-  expect(doc).toHaveLength(6);
+  expect(doc).toHaveLength(8);
 });
 
 test('Instance Name variable name', () => {
@@ -69,12 +69,16 @@ test('Comment before map', () => {
 });
 
 test('Array', () => {
-    expect(doc[4].value).toBe("array[...]");
+    expect(doc[6].value).toBe("array[...]");
 });
 
 test('When no first value to map comment to, add as comment after (instead of before first item)', () => {
-    expect(doc[5].comment).toBe(`Items takes a slice of quota configurations, whereas for each unit type and instance, one or zero quotas may exist.
+    expect(doc[7].comment).toBe(`Items takes a slice of quota configurations, whereas for each unit type and instance, one or zero quotas may exist.
  The following unit types are supported`);
+});
+
+test('Array', () => {
+    expect(doc[6].value).toBe("array[...]");
 });
 
 console.log(doc)
