@@ -26,7 +26,7 @@ func New() *cobra.Command {
 }
 
 func ready(config *Config) bool {
-	res, err := http.Get("http://" + net.JoinHostPort("localhost", strconv.Itoa(int(config.Port))) + "/management/v1/healthz")
+	res, err := http.Get("http://" + net.JoinHostPort("localhost", strconv.Itoa(int(config.Port))) + "/debug/ready")
 	if err != nil {
 		logging.WithError(err).Warn("ready check failed")
 		return false
