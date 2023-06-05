@@ -315,11 +315,9 @@ func HumanPasswordlessInitCodeAddedEventMapper(event *repository.Event) (eventst
 type HumanPasswordlessInitCodeRequestedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID           string              `json:"id"`
-	Code         *crypto.CryptoValue `json:"code"`
-	Expiry       time.Duration       `json:"expiry"`
-	URLTemplate  string              `json:"url_template,omitempty"`
-	CodeReturned bool                `json:"code_returned,omitempty"`
+	ID     string              `json:"id"`
+	Code   *crypto.CryptoValue `json:"code"`
+	Expiry time.Duration       `json:"expiry"`
 }
 
 func (e *HumanPasswordlessInitCodeRequestedEvent) Data() interface{} {
@@ -336,8 +334,6 @@ func NewHumanPasswordlessInitCodeRequestedEvent(
 	id string,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
-	urlTmpl string,
-	codeReturned bool,
 ) *HumanPasswordlessInitCodeRequestedEvent {
 	return &HumanPasswordlessInitCodeRequestedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -345,11 +341,9 @@ func NewHumanPasswordlessInitCodeRequestedEvent(
 			aggregate,
 			HumanPasswordlessInitCodeRequestedType,
 		),
-		ID:           id,
-		Code:         code,
-		Expiry:       expiry,
-		URLTemplate:  urlTmpl,
-		CodeReturned: codeReturned,
+		ID:     id,
+		Code:   code,
+		Expiry: expiry,
 	}
 }
 

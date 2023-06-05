@@ -10,8 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
-type cryptoCodeFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCodeWithExpiry, error)
-
 type CryptoCodeWithExpiry struct {
 	Crypted *crypto.CryptoValue
 	Plain   string
@@ -19,50 +17,42 @@ type CryptoCodeWithExpiry struct {
 }
 
 func newCryptoCodeWithExpiry(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCodeWithExpiry, error) {
-	gen, config, err := secretGenerator(ctx, filter, typ, alg)
+	config, err := secretGeneratorConfig(ctx, filter, typ)
 	if err != nil {
 		return nil, err
 	}
-	crypted, plain, err := crypto.NewCode(gen)
-	if err != nil {
-		return nil, err
-	}
-	return &CryptoCodeWithExpiry{
-		Crypted: crypted,
-		Plain:   plain,
-		Expiry:  config.Expiry,
-	}, nil
-}
 
-func verifyCryptoCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto, creation time.Time, expiry time.Duration, crypted *crypto.CryptoValue, plain string) error {
-	gen, _, err := secretGenerator(ctx, filter, typ, alg)
-	if err != nil {
-		return err
+	code := new(CryptoCodeWithExpiry)
+	switch a := alg.(type) {
+	case crypto.HashAlgorithm:
+		code.Crypted, code.Plain, err = crypto.NewCode(crypto.NewHashGenerator(*config, a))
+	case crypto.EncryptionAlgorithm:
+		code.Crypted, code.Plain, err = crypto.NewCode(crypto.NewEncryptionGenerator(*config, a))
+	default:
+		return nil, errors.ThrowInternal(nil, "COMMA-RreV6", "Errors.Internal")
 	}
-	return crypto.VerifyCode(creation, expiry, crypted, plain, gen)
+	if err != nil {
+		return nil, err
+	}
+
+	code.Expiry = config.Expiry
+	return code, nil
 }
 
 func newCryptoCodeWithPlain(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (value *crypto.CryptoValue, plain string, err error) {
-	gen, _, err := secretGenerator(ctx, filter, typ, alg)
+	config, err := secretGeneratorConfig(ctx, filter, typ)
 	if err != nil {
 		return nil, "", err
 	}
-	return crypto.NewCode(gen)
-}
 
-func secretGenerator(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (crypto.Generator, *crypto.GeneratorConfig, error) {
-	config, err := secretGeneratorConfig(ctx, filter, typ)
-	if err != nil {
-		return nil, nil, err
-	}
 	switch a := alg.(type) {
 	case crypto.HashAlgorithm:
-		return crypto.NewHashGenerator(*config, a), config, nil
+		return crypto.NewCode(crypto.NewHashGenerator(*config, a))
 	case crypto.EncryptionAlgorithm:
-		return crypto.NewEncryptionGenerator(*config, a), config, nil
-	default:
-		return nil, nil, errors.ThrowInternalf(nil, "COMMA-RreV6", "Errors.Internal unsupported crypto algorithm type %T", a)
+		return crypto.NewCode(crypto.NewEncryptionGenerator(*config, a))
 	}
+
+	return nil, "", errors.ThrowInvalidArgument(nil, "V2-NGESt", "Errors.Internal")
 }
 
 func secretGeneratorConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType) (*crypto.GeneratorConfig, error) {

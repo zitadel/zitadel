@@ -53,7 +53,6 @@ Errors:
     NotFoundOnOrg: El usuario no pudo encontrarse en la organización elegida
     NotAllowedOrg: El usuario no es miembro de la organización requerida
     UserIDMissing: Falta el ID de usuario
-    UserIDWrong: "Solicitud de usuario no igual al usuario autenticado"
     DomainPolicyNil: Falta la política de la organización
     EmailAsUsernameNotAllowed: La dirección de Email no se permite como nombre de usuario
     Invalid: Los datos de usuario no son válidos
@@ -68,7 +67,6 @@ Errors:
     NoChanges: No se encontraron cambios
     InitCodeNotFound: Código de inicialización no encontrado
     UsernameNotChanged: El nombre de usuario no cambió
-    InvalidURLTemplate: La plantilla URL no es válida
     Profile:
       NotFound: Perfil no encontrado
       NotChanged: El perfil no ha cambiado
@@ -83,6 +81,7 @@ Errors:
       NotChanged: El email no ha cambiado
       Empty: El email no está vacío
       IDMissing: Falta el ID del email
+      InvalidURLTemplate: La plantilla URL no es válida
     Phone:
       NotFound: Teléfono no encontrado
       Invalid: El teléfono no es válido
