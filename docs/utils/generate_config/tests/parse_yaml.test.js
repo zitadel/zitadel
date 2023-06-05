@@ -27,13 +27,16 @@ let file =
           Subject: Passwort zurücksetzen
           Greeting: Hallo {{.DisplayName}},
           Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
-          ButtonText: Passwort zurücksetzen`
+          ButtonText: Passwort zurücksetzen
+    Quotas:
+      # Items takes a slice of quota configurations, whereas for each unit type and instance, one or zero quotas may exist.
+      # The following unit types are supported`
 
 
 const doc = parse_yaml(file)
 
 test('Expect two nodes', () => {
-  expect(doc).toHaveLength(5);
+  expect(doc).toHaveLength(6);
 });
 
 test('Instance Name variable name', () => {
@@ -62,6 +65,11 @@ test('Comment before map', () => {
 
 test('Array', () => {
     expect(doc[4].value).toBe("array[...]");
+});
+
+test('When no first value to map comment to, add as comment after (instead of before first item)', () => {
+    expect(doc[5].comment).toBe(`Items takes a slice of quota configurations, whereas for each unit type and instance, one or zero quotas may exist.
+ The following unit types are supported`);
 });
 
 console.log(doc)

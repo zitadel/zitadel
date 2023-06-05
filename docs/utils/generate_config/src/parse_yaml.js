@@ -30,7 +30,7 @@ function parseZitadelYaml(file) {
           }
           
           if (key === 'value') {
-            
+
           let grandparent = path.slice(-3, -2)[0] // third to last element (aka. grandparent)
           if(  YAML.isSeq(grandparent) ) {
             output.find(node => node.env === keys2env(path_array.slice(0, -1))).value = 'array[...]'
@@ -67,7 +67,8 @@ function parseZitadelYaml(file) {
         // imo this is a bug in the parsing library
         
         if(comment !== undefined && variable.value === null) {
-          keys[index+1].commentBefore = comment.trim()
+          if(keys.length > index + 1) keys[index+1].commentBefore = comment.trim()
+          if(keys.length <= index + 1) keys[index].comment = comment.trim()
         }
 
       }
