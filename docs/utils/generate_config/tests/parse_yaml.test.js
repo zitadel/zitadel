@@ -11,6 +11,11 @@ let file =
         SMTP:
         # must include the port, like smtp.mailtrap.io:2525. IPv6 is also supported, like [2001:db8::1]:2525
         Host:
+    Database:
+        # CockroachDB is the default datbase of ZITADEL
+        cockroach:
+          Host: localhost
+          Port: 26257
     MessageTexts:
         - MessageTextType: InitCode
           Language: de

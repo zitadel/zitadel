@@ -87,6 +87,8 @@ function parseZitadelYaml(file) {
         // we need to treat comments before a collection in such case
         // that it's attached to the first element instead
         let parent = path.slice(-2, -1)[0] // second to last element (aka. parent)
+
+        console.log(parent)
           
         if (key === 'key' && parent.items[0] === path.slice(-1)[0] && parent.commentBefore !== undefined)keys.find(node => node.env === env).commentBefore = parent.commentBefore.trim()  
       }, 
