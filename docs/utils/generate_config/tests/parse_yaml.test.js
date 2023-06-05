@@ -15,7 +15,19 @@ let file =
         - MessageTextType: InitCode
           Language: de
           Title: Zitadel - User initialisieren
-          PreHeader: User initialisieren`
+          PreHeader: User initialisieren
+          Subject: User initialisieren
+          Greeting: Hallo {{.DisplayName}},
+          Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen &lt;br&gt;&lt;strong&gt;{{.PreferredLoginName}}&lt;/strong&gt;&lt;br&gt; kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
+          ButtonText: Initialisierung abschliessen
+        - MessageTextType: PasswordReset
+          Language: de
+          Title: Zitadel - Passwort zurücksetzen
+          PreHeader: Passwort zurücksetzen
+          Subject: Passwort zurücksetzen
+          Greeting: Hallo {{.DisplayName}},
+          Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
+          ButtonText: Passwort zurücksetzen`
 
 
 const doc = parse_yaml(file)
@@ -46,6 +58,10 @@ test('Instance Name description', () => {
 
 test('Comment before map', () => {
     expect(doc[0].commentBefore).toBe("MachineKeyPath comment before");
+});
+
+test('Array', () => {
+    expect(doc[4].value).toBe("array[...]");
 });
 
 console.log(doc)
