@@ -3,8 +3,8 @@ import tablemark from 'tablemark'
 import fs from 'fs'
 
 const files = [
-  {source: "../../../cmd/setup/steps.yaml", target: "_steps.mdx"},
-  {source: "../../../cmd/defaults.yaml", target: "_defaults.mdx"}
+  {source: "../../../cmd/setup/steps.yaml", target: "output/_steps.mdx"},
+  {source: "../../../cmd/defaults.yaml", target: "output/_defaults.mdx"}
 ]
 
 files.map(file => {
