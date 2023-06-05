@@ -28,6 +28,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+          --health-start-period 10s
       zitadel:
         image: ${{ inputs.tag_name }}
         credentials:
@@ -38,7 +39,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          --health-start-period 30s
+          --health-start-period 10s
         ports:
           - 8080:8080
         env:
@@ -82,7 +83,7 @@ jobs:
         env:
           CYPRESS_BASE_URL: http://localhost:8080/ui/console
           CYPRESS_WEBHOOK_HANDLER_HOST: localhost
-          CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://zitadel@postgres:5432/zitadel'
+          CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://zitadel@zitadel:5432/zitadel'
           CYPRESS_BACKEND_URL: http://localhost:8080
         with:
           working-directory: e2e
