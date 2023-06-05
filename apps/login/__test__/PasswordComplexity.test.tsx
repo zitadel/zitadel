@@ -1,5 +1,5 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
-import PasswordComplexity from './PasswordComplexity';
+import PasswordComplexity from '../ui/PasswordComplexity';
 // TODO: Why does this not compile?
 // import { ResourceOwnerType } from '@zitadel/server';
 

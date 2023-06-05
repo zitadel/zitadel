@@ -1,0 +1,11 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "jsx": "react-jsxdev",
+        "types": [
+            "node",
+            "jest",
+            "@testing-library/jest-dom"
+        ]
+    }
+}

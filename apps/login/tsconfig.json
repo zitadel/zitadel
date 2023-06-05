@@ -1,12 +1,29 @@
 {
   "extends": "@zitadel/tsconfig/nextjs.json",
   "compilerOptions": {
+    "jsx": "preserve",
+    "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "#/*": ["./*"]
+      "#/*": [
+        "./*"
+      ]
     },
-    "plugins": [{ "name": "next" }]
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "cypress",
+    "cypress.config.ts",
+    "node_modules"
+  ]
 }
