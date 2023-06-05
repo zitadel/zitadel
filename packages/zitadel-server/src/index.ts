@@ -31,6 +31,7 @@ export {
 
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2alpha/legal_settings";
 export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2alpha/password_settings";
+export { type ResourceOwnerType } from "./proto/server/zitadel/settings/v2alpha/settings";
 
 import {
   getServers,
