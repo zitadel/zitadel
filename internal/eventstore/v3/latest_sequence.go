@@ -105,8 +105,7 @@ func scanToSequence(rows *sql.Rows, sequences []*latestSequence) error {
 	var aggregateID, instanceID string
 	var currentSequence uint64
 
-	err := rows.Scan(&instanceID, &aggregateType, &aggregateID, &currentSequence)
-	if err != nil {
+	if err := rows.Scan(&instanceID, &aggregateType, &aggregateID, &currentSequence); err != nil {
 		return err
 	}
 

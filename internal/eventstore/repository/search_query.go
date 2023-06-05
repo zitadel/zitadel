@@ -105,7 +105,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder, instanceID string)
 		builder.GetColumns().Validate() != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
-	// builder.InstanceID(instanceID)
+
 	filters := make([][]*Filter, len(builder.GetQueries()))
 
 	var builderFilters []*Filter

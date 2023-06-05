@@ -19,7 +19,8 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	}
 	defer func() {
 		if err != nil {
-			_ = tx.Rollback()
+			txErr := tx.Rollback()
+			logging.OnError(txErr).Debug("unable to rollback transaction")
 			return
 		}
 		err = tx.Commit()
@@ -34,8 +35,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 		return nil, err
 	}
 
-	err = handleUniqueConstraints(ctx, tx, commands)
-	if err != nil {
+	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
 		return nil, err
 	}
 
