@@ -135,10 +135,10 @@ const authConfig: AuthConfig = {
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
   ],
   providers: [
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/' + (window.location.pathname.split('/')[1] || ''),
-    },
+    // {
+    //   provide: APP_BASE_HREF,
+    //   useValue: '/' + (window.location.pathname.split('/').splice(2).join("/") || ''),
+    // },
     AuthGuard,
     RoleGuard,
     UserGuard,
