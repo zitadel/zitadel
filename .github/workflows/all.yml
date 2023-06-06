@@ -80,6 +80,6 @@ jobs:
     uses: ./.github/workflows/e2e.yml
     with:
       tag_name: ghcr.io/zitadel/test:c3e64d637cb4e0c5a4bb6e3201a3c366b7b0fa94-ubuntu
-
+  
 
   #release
