@@ -75,7 +75,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          --entrypoint /cockroach/cockroach.sh ${COCKROACH_ARGS}
+          --entrypoint /cockroach/cockroach.sh start-single-node --insecure --http-addr :9090
     steps:
       - 
         uses: actions/checkout@v3
