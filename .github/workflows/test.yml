@@ -19,7 +19,11 @@ jobs:
         with:
           node-version: 16.x
       - name: Install Dependencies
-        run: pnpm i
+        id: deps
+        run: pnpm install
+      - name: Generate Stubs
+        id: grpc
+        run: pnpm generate
       - name: Test
         id: test
         run: pnpm test
