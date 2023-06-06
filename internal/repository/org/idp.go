@@ -16,6 +16,7 @@ const (
 	OIDCIDPAddedEventType               eventstore.EventType = "org.idp.oidc.added"
 	OIDCIDPChangedEventType             eventstore.EventType = "org.idp.oidc.changed"
 	OIDCIDPMigratedAzureADEventType     eventstore.EventType = "org.idp.oidc.migrated.azure"
+	OIDCIDPMigratedGoogleEventType      eventstore.EventType = "org.idp.oidc.migrated.google"
 	JWTIDPAddedEventType                eventstore.EventType = "org.idp.jwt.added"
 	JWTIDPChangedEventType              eventstore.EventType = "org.idp.jwt.changed"
 	AzureADIDPAddedEventType            eventstore.EventType = "org.idp.azure.added"
@@ -234,13 +235,53 @@ func NewOIDCIDPMigratedAzureADEvent(
 	}
 }
 
-func OIDCIDPMigratedAzureADEventEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPMigratedAzureADEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := idp.OIDCIDPMigratedAzureADEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
 	return &OIDCIDPMigratedAzureADEvent{OIDCIDPMigratedAzureADEvent: *e.(*idp.OIDCIDPMigratedAzureADEvent)}, nil
+}
+
+type OIDCIDPMigratedGoogleEvent struct {
+	idp.OIDCIDPMigratedGoogleEvent
+}
+
+func NewOIDCIDPMigratedGoogleEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	options idp.Options,
+) *OIDCIDPMigratedGoogleEvent {
+	return &OIDCIDPMigratedGoogleEvent{
+		OIDCIDPMigratedGoogleEvent: *idp.NewOIDCIDPMigratedGoogleEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				OIDCIDPMigratedGoogleEventType,
+			),
+			id,
+			name,
+			clientID,
+			clientSecret,
+			scopes,
+			options,
+		),
+	}
+}
+
+func OIDCIDPMigratedGoogleEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.OIDCIDPMigratedGoogleEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OIDCIDPMigratedGoogleEvent{OIDCIDPMigratedGoogleEvent: *e.(*idp.OIDCIDPMigratedGoogleEvent)}, nil
 }
 
 type JWTIDPAddedEvent struct {

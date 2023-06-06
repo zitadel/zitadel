@@ -767,11 +767,27 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Ev
 	case *instance.OIDCIDPMigratedAzureADEvent:
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{ /*org.OIDCIDPChangedEventType,*/ instance.OIDCIDPMigratedAzureADEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
 	}
 
 	return crdb.NewMultiStatement(
 		&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzureAD),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
 		crdb.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(OIDCIDCol, idpEvent.ID),
@@ -790,6 +806,55 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Ev
 				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
 			},
 			crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OIDCIDPMigratedGoogleEvent
+	switch e := event.(type) {
+	case *org.OIDCIDPMigratedGoogleEvent:
+		idpEvent = e.OIDCIDPMigratedGoogleEvent
+	case *instance.OIDCIDPMigratedGoogleEvent:
+		idpEvent = e.OIDCIDPMigratedGoogleEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(OIDCIDCol, idpEvent.ID),
+				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(GoogleIDCol, idpEvent.ID),
+				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
+				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
 		),
 	), nil
 }

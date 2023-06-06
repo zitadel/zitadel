@@ -222,7 +222,15 @@ func (s *Server) UpdateGenericOIDCProvider(ctx context.Context, req *admin_pb.Up
 
 func (s *Server) MigrateGenericOIDCProvider(ctx context.Context, req *admin_pb.MigrateGenericOIDCProviderRequest) (*admin_pb.MigrateGenericOIDCProviderResponse, error) {
 	if req.GetAzure() != nil {
-		details, err := s.command.MigrateInstanceGenericOIDCToAzureADProvider(ctx, req.GetId(), idp_grpc.AzureADTenantToCommand(req.GetAzure().GetTenant()), req.GetAzure().GetEmailVerified())
+		details, err := s.command.MigrateInstanceGenericOIDCToAzureADProvider(ctx, req.GetId(), addAzureADProviderToCommand(req.GetAzure()))
+		if err != nil {
+			return nil, err
+		}
+		return &admin_pb.MigrateGenericOIDCProviderResponse{
+			Details: object_pb.DomainToAddDetailsPb(details),
+		}, nil
+	} else if req.GetGoogle() != nil {
+		details, err := s.command.MigrateInstanceGenericOIDCToGoogleProvider(ctx, req.GetId(), addGoogleProviderToCommand(req.GetGoogle()))
 		if err != nil {
 			return nil, err
 		}

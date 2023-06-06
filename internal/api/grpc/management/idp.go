@@ -212,6 +212,27 @@ func (s *Server) UpdateGenericOIDCProvider(ctx context.Context, req *mgmt_pb.Upd
 	}, nil
 }
 
+func (s *Server) MigrateGenericOIDCProvider(ctx context.Context, req *mgmt_pb.MigrateGenericOIDCProviderRequest) (*mgmt_pb.MigrateGenericOIDCProviderResponse, error) {
+	if req.GetAzure() != nil {
+		details, err := s.command.MigrateOrgGenericOIDCToAzureADProvider(ctx, authz.GetCtxData(ctx).OrgID, req.GetId(), addAzureADProviderToCommand(req.GetAzure()))
+		if err != nil {
+			return nil, err
+		}
+		return &mgmt_pb.MigrateGenericOIDCProviderResponse{
+			Details: object_pb.DomainToAddDetailsPb(details),
+		}, nil
+	} else if req.GetGoogle() != nil {
+		details, err := s.command.MigrateOrgGenericOIDCToGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.GetId(), addGoogleProviderToCommand(req.GetGoogle()))
+		if err != nil {
+			return nil, err
+		}
+		return &mgmt_pb.MigrateGenericOIDCProviderResponse{
+			Details: object_pb.DomainToAddDetailsPb(details),
+		}, nil
+	}
+	return &mgmt_pb.MigrateGenericOIDCProviderResponse{}, nil
+}
+
 func (s *Server) AddJWTProvider(ctx context.Context, req *mgmt_pb.AddJWTProviderRequest) (*mgmt_pb.AddJWTProviderResponse, error) {
 	id, details, err := s.command.AddOrgJWTProvider(ctx, authz.GetCtxData(ctx).OrgID, addJWTProviderToCommand(req))
 	if err != nil {

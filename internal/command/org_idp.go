@@ -92,10 +92,24 @@ func (c *Commands) UpdateOrgGenericOIDCProvider(ctx context.Context, resourceOwn
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) MigrateOrgGenericOIDCToAzureADProvider(ctx context.Context, resourceOwner, id, tenant string, emailVerified bool) (*domain.ObjectDetails, error) {
+func (c *Commands) MigrateOrgGenericOIDCToAzureADProvider(ctx context.Context, resourceOwner, id string, provider AzureADProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateOrgOIDCToAzureADProvider(orgAgg, writeModel, tenant, emailVerified))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateOrgOIDCToAzureADProvider(orgAgg, writeModel, provider))
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) MigrateOrgGenericOIDCToGoogleProvider(ctx context.Context, resourceOwner, id string, provider GoogleProvider) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateOrgOIDCToGoogleProvider(orgAgg, writeModel, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -661,8 +675,17 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, writeModel *Or
 	}
 }
 
-func (c *Commands) prepareMigrateOrgOIDCToAzureADProvider(a *org.Aggregate, writeModel *OrgOIDCIDPWriteModel, tenant string, emailVerified bool) preparation.Validation {
+func (c *Commands) prepareMigrateOrgOIDCToAzureADProvider(a *org.Aggregate, writeModel *OrgOIDCIDPWriteModel, provider AzureADProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-sdf3g", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Fhbr2", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dzh3g", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -675,18 +698,62 @@ func (c *Commands) prepareMigrateOrgOIDCToAzureADProvider(a *org.Aggregate, writ
 			if !writeModel.State.Exists() {
 				return nil, caos_errs.ThrowNotFound(nil, "INST-Dg239201", "Errors.Instance.IDPConfig.NotExisting")
 			}
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+			if err != nil {
+				return nil, err
+			}
 			return []eventstore.Command{
 				org.NewOIDCIDPMigratedAzureADEvent(
 					ctx,
 					&a.Aggregate,
 					writeModel.ID,
-					writeModel.Name,
-					writeModel.ClientID,
-					writeModel.ClientSecret,
-					writeModel.Scopes,
-					tenant,
-					emailVerified,
-					writeModel.Options,
+					provider.Name,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.Tenant,
+					provider.EmailVerified,
+					provider.IDPOptions,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareMigrateOrgOIDCToGoogleProvider(a *org.Aggregate, writeModel *OrgOIDCIDPWriteModel, provider GoogleProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D3fvs", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-W2vqs", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "INST-x09981", "Errors.Instance.IDPConfig.NotExisting")
+			}
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				org.NewOIDCIDPMigratedGoogleEvent(
+					ctx,
+					&a.Aggregate,
+					writeModel.ID,
+					provider.Name,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.IDPOptions,
 				),
 			}, nil
 		}, nil

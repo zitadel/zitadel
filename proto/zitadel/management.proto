@@ -11545,29 +11545,15 @@ message UpdateGenericOIDCProviderResponse {
 }
 
 message MigrateGenericOIDCProviderRequest{
-    message AzureAD {
-        // if not provided the `common` tenant will be used
-        zitadel.idp.v1.AzureADTenant tenant = 1 [
-            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "Defines what kind of accounts are allowed to authenticate (Personal, Organizational, All). If not provided the `common` tenant will be used (All accounts)";
-            }
-        ];
-        bool email_verified = 2 [
-            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in ZITADEL (no verification emails will be sent)";
-            }
-        ];
-    }
-
     string id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";
         }
     ];
-    oneof template{
-        AzureAD azure = 2;
-        bool google = 3;
+    oneof template {
+        AddAzureADProviderRequest azure = 2;
+        AddGoogleProviderRequest google = 3;
     }
 }
 
