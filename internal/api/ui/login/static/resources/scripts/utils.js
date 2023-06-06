@@ -1,4 +1,4 @@
-export function coerceToBase64Url(thing, name) {
+function coerceToBase64Url(thing, name) {
   // Array or ArrayBuffer to Uint8Array
   if (Array.isArray(thing)) {
     thing = Uint8Array.from(thing);
@@ -30,7 +30,7 @@ export function coerceToBase64Url(thing, name) {
   return thing;
 }
 
-export function coerceToArrayBuffer(thing, name) {
+function coerceToArrayBuffer(thing, name) {
   if (typeof thing === "string") {
     // base64url to base64
     thing = thing.replace(/-/g, "+").replace(/_/g, "/");
