@@ -13,8 +13,23 @@ files.map(file => {
 
   const doc = parse_yaml(fileContent)
 
+ 
+
+  function combineComments(before, after) {
+    let combined = before.trim() + (after !== '' ? '\n' + after.trim() : '')
+    return combined.replace('\n ', '\n')
+  }
+  // console.log(doc.map(({...item}) => combineComments(item.commentBefore, item.comment)).filter(node => node !== ''))
+
   // drop path variable and combine the comments
-  const cleanDoc = doc.map(({path, ...item}) => [item.env, item.commentBefore + "\n" + item.comment, item.value])
+  const cleanDoc = doc.map(({path, ...item}) => [item.env, combineComments(item.commentBefore, item.comment), String(item.value)])
+
+  function toCellText (v) {
+    return v
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/(?:\r\n|\r|\n)/g, '<br />');
+  }
 
   const markdown = tablemark(cleanDoc, {
       columns: [
@@ -22,7 +37,9 @@ files.map(file => {
         "Comments",
         "If absent (default)"
       ],
-      wrapWidth: 80,
+      // wrapWidth: 80,
+      toCellText,
+      lineEnding: "\n"
     })
 
     try {
@@ -31,5 +48,5 @@ files.map(file => {
       console.error(err);
     }
 
-  console.log(markdown)
+  //console.log(markdown)
 })

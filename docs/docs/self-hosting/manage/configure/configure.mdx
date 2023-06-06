@@ -7,37 +7,50 @@ import TabItem from "@theme/TabItem";
 import LinuxUnix from './_linuxunix.mdx'
 import Compose from './_compose.mdx'
 import Helm from './_helm.mdx'
-
-# Configure ZITADEL
+import Steps from './env/_steps.mdx'
+import Defaults from './env/_defaults.mdx'
 
 This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/docs/self-hosting/deploy/overview).
 
-## Configuration Files
+## Configuration files
 
-### Runtime Configuration File
+### Runtime configuration file
 
 You can configure the runtime using the `--config` flag of the `zitadel` binary.
 For a description of all _runtime configuration options_ and their defaults, read the [ZITADEL source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
 
-### Database Initialization File
+### Database initialization file
 
 ZITADEL uses a [different configuration file](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
 Use the `--steps` flag of the `zitadel` binary to provide this configuration file.
 
-### Multiple Configuration Files
+### Multiple configuration files
 
 ZITADEL merges configuration files when multiple `--config` and `--steps` flags are provided.
 You can use these flags to handle standard configuration files differently from secret configuration files.
 For example, standard configuration files stored in git may contain public information such as a database hostname.
 To use private information — such as a database admin credential — without storing it in git, use an extra `--config` or `--steps` flag that requests the private information from a secret manager.
 
-## Environment Variables
+## Environment variables
 
 All configuration properties are configurable using environment variables.
 ZITADEL environment variable keys are prefixed with `ZITADEL_`.
 For example, to configure the default ZITADEL IAM admin username and password, set the `zitadel` binary runtime environment variables `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME` and `ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD`.
 
-### Proxy Configuration
+<details>
+    <summary>List of environment variables for database initialization </summary>
+    Check the <a href="#database-initialization-file">Database initialization file</a> for a full reference, if default values are omitted.
+    <Steps />
+</details>
+<details>
+    <summary>List of environment variables for runtime configuration</summary>
+    Check the <a href="#runtime-configuration-file">Runtime configuration file</a>for a full reference, if default values are omitted.
+    <Defaults />
+</details>
+
+
+
+### Proxy configuration
 
 A proxy for outgoing connections can be configured using the environment variables: Use `HTTP_PROXY` for outgoing HTTP requests, and `HTTPS_PROXY` for outgoing HTTPS requests.
 These environment variables are used as a proxy URL.
