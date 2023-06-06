@@ -71,7 +71,7 @@ jobs:
         env:
           COCKROACH_ARGS: start-single-node --insecure --http-addr :9090
         options: >-
-          --health-cmd curl -f http://localhost:9090/health?ready=1 || exit 1
+          --health-cmd curl http://localhost:9090/health?ready=1 || exit 1
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
