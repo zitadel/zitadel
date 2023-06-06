@@ -81,7 +81,7 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 				},
 				err: nil,
 			},
-			wantErr: caos_errs.ThrowInternal(nil, "USERv2-Dohr6", "todo"),
+			wantErr: caos_errs.ThrowInternal(nil, "USERv2-Dohr6", "Errors.Internal"),
 		},
 		{
 			name: "ok",

@@ -20,7 +20,7 @@ type PasskeyChallengeModel struct {
 
 func (p *PasskeyChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) (*domain.WebAuthNLogin, error) {
 	if p == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "todo")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "Errors.Session.Passkey.NoChallenge")
 	}
 	return &domain.WebAuthNLogin{
 		ObjectRoot:              human.ObjectRoot,
