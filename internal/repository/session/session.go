@@ -160,6 +160,10 @@ func (e *PasskeyChallengedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 	return nil
 }
 
+func (e *PasskeyChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
 func NewPasskeyChallengedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -179,18 +183,6 @@ func NewPasskeyChallengedEvent(
 	}
 }
 
-func PasskeyChallengedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	added := &PasskeyChallengedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, added)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "SESSION-ia9Fo", "unable to unmarshal passkey challenged")
-	}
-
-	return added, nil
-}
-
 type PasskeyCheckedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
@@ -203,6 +195,10 @@ func (e *PasskeyCheckedEvent) Data() interface{} {
 
 func (e *PasskeyCheckedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
+}
+
+func (e *PasskeyCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
 }
 
 func NewPasskeyCheckedEvent(
@@ -218,18 +214,6 @@ func NewPasskeyCheckedEvent(
 		),
 		CheckedAt: checkedAt,
 	}
-}
-
-func PasskeyCheckedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	added := &PasskeyCheckedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, added)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "SESSION-Coig6", "unable to unmarshal passkey checked")
-	}
-
-	return added, nil
 }
 
 type TokenSetEvent struct {

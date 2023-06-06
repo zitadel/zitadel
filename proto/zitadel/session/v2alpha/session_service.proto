@@ -244,7 +244,7 @@ message CreateSessionRequest{
       description: "\"custom key value list to be stored on the session\"";
     }
   ];
-  repeated ChallengeResponseKind begin_challenges = 3;
+  repeated ChallengeKind challenges = 3;
 }
 
 message CreateSessionResponse{
@@ -291,7 +291,7 @@ message SetSessionRequest{
       description: "\"custom key value list to be stored on the session\"";
     }
   ];
-  repeated ChallengeResponseKind begin_challenges = 5;
+  repeated ChallengeKind challenges = 5;
 }
 
 message SetSessionResponse{
@@ -338,7 +338,7 @@ message Checks {
   ];
   optional CheckPasskey passkey = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"... . Requires that the user is already checked, in the previous request.\"";
+      description: "\"Checks the public key credential issued by the passkey client. Requires that the user is already checked and a passkey challenge to be requested, in any previous request.\"";
     }
   ];
 }

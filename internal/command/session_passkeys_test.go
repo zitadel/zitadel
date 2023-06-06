@@ -128,7 +128,3 @@ func TestSessionCommands_getHumanPasskeys(t *testing.T) {
 		assert.Equal(t, tt.res.want, got)
 	}
 }
-
-func TestCommands_CreatePasskeyChallenge(t *testing.T) {
-
-}

@@ -45,7 +45,7 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 	if err != nil {
 		return nil, err
 	}
-	challengeResponse, cmds := s.beginChallengesToCommand(req.GetBeginChallenges(), checks)
+	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
 
 	set, err := s.command.CreateSession(ctx, cmds, metadata)
 	if err != nil {
@@ -64,7 +64,7 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 	if err != nil {
 		return nil, err
 	}
-	challengeResponse, cmds := s.beginChallengesToCommand(req.GetBeginChallenges(), checks)
+	challengeResponse, cmds := s.challengesToCommand(req.GetChallenges(), checks)
 
 	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata())
 	if err != nil {
@@ -236,16 +236,16 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	return sessionChecks, nil
 }
 
-func (s *Server) beginChallengesToCommand(challenges []session.ChallengeResponseKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
+func (s *Server) challengesToCommand(challenges []session.ChallengeKind, cmds []command.SessionCommand) (*session.Challenges, []command.SessionCommand) {
 	if len(challenges) == 0 {
 		return nil, cmds
 	}
 	resp := new(session.Challenges)
 	for _, c := range challenges {
 		switch c {
-		case session.ChallengeResponseKind_CHALLENGE_RESPONSE_KIND_UNSPECIFIED:
+		case session.ChallengeKind_CHALLENGE_KIND_UNSPECIFIED:
 			continue
-		case session.ChallengeResponseKind_CHALLENGE_RESPONSE_KIND_PASSKEY:
+		case session.ChallengeKind_CHALLENGE_KIND_PASSKEY:
 			passkeyChallenge, cmd := s.createPasskeyChallengeCommand()
 			resp.Passkey = passkeyChallenge
 			cmds = append(cmds, cmd)

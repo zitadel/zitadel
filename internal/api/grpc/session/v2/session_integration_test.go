@@ -156,8 +156,8 @@ func TestServer_CreateSession(t *testing.T) {
 		{
 			name: "passkey without user error",
 			req: &session.CreateSessionRequest{
-				BeginChallenges: []session.ChallengeResponseKind{
-					session.ChallengeResponseKind_CHALLENGE_RESPONSE_KIND_PASSKEY,
+				Challenges: []session.ChallengeKind{
+					session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
 				},
 			},
 			wantErr: true,
@@ -188,8 +188,8 @@ func TestServer_CreateSession_passkey(t *testing.T) {
 				},
 			},
 		},
-		BeginChallenges: []session.ChallengeResponseKind{
-			session.ChallengeResponseKind_CHALLENGE_RESPONSE_KIND_PASSKEY,
+		Challenges: []session.ChallengeKind{
+			session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
 		},
 	})
 	require.NoError(t, err)
@@ -243,8 +243,8 @@ func TestServer_SetSession_flow(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 			SessionId:    createResp.GetSessionId(),
 			SessionToken: sessionToken,
-			BeginChallenges: []session.ChallengeResponseKind{
-				session.ChallengeResponseKind_CHALLENGE_RESPONSE_KIND_PASSKEY,
+			Challenges: []session.ChallengeKind{
+				session.ChallengeKind_CHALLENGE_KIND_PASSKEY,
 			},
 		})
 		require.NoError(t, err)
