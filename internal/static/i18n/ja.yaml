@@ -53,7 +53,6 @@ Errors:
     NotFoundOnOrg: ユーザーが選択した組織内で見つかりません
     NotAllowedOrg: ユーザーが必要な組織のメンバーでありません
     UserIDMissing: ユーザーIDがありません
-    UserIDWrong: "リクエストユーザーが認証されたユーザーと等しくない"
     DomainPolicyNil: 組織ポリシーが空です
     EmailAsUsernameNotAllowed: メールアドレスはユーザー名として使用できません
     Invalid: 無効なユーザーデータです
@@ -68,7 +67,6 @@ Errors:
     NoChanges: 変更は見つかりません
     InitCodeNotFound: 初期化コードが見つかりません
     UsernameNotChanged: ユーザー名は変更されていません
-    InvalidURLTemplate: URLテンプレートが無効です
     Profile:
       NotFound: プロファイルが見つかりません
       NotChanged: プロファイルが変更されていません
@@ -78,6 +76,7 @@ Errors:
       Invalid: 無効なメールアドレスです
       AlreadyVerified: メールアドレスはすでに検証済みです
       NotChanged: メールアドレスが変更されていません
+      InvalidURLTemplate: URLテンプレートが無効です
     Phone:
       NotFound: 電話番号が見つかりません
       Invalid: 無効な電話番号です

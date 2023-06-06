@@ -12,6 +12,27 @@ import (
 )
 
 func TestNotify_SendEmailVerificationCode(t *testing.T) {
+	type res struct {
+		url                                string
+		args                               map[string]interface{}
+		messageType                        string
+		allowUnverifiedNotificationChannel bool
+	}
+	notify := func(dst *res) Notify {
+		return func(
+			url string,
+			args map[string]interface{},
+			messageType string,
+			allowUnverifiedNotificationChannel bool,
+		) error {
+			dst.url = url
+			dst.args = args
+			dst.messageType = messageType
+			dst.allowUnverifiedNotificationChannel = allowUnverifiedNotificationChannel
+			return nil
+		}
+	}
+
 	type args struct {
 		user    *query.NotifyUser
 		origin  string
@@ -21,7 +42,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *notifyResult
+		want    *res
 		wantErr error
 	}{
 		{
@@ -35,7 +56,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				code:    "123",
 				urlTmpl: "",
 			},
-			want: &notifyResult{
+			want: &res{
 				url:                                "https://example.com/ui/login/mail/verification?userID=user1&code=123&orgID=org1",
 				args:                               map[string]interface{}{"Code": "123"},
 				messageType:                        domain.VerifyEmailMessageType,
@@ -53,8 +74,8 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				code:    "123",
 				urlTmpl: "{{",
 			},
-			want:    &notifyResult{},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
+			want:    &res{},
+			wantErr: caos_errs.ThrowInvalidArgument(nil, "USERv2-ooD8p", "Errors.User.Email.InvalidURLTemplate"),
 		},
 		{
 			name: "template success",
@@ -67,7 +88,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				code:    "123",
 				urlTmpl: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
 			},
-			want: &notifyResult{
+			want: &res{
 				url:                                "https://example.com/email/verify?userID=user1&code=123&orgID=org1",
 				args:                               map[string]interface{}{"Code": "123"},
 				messageType:                        domain.VerifyEmailMessageType,
@@ -77,8 +98,8 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, notify := mockNotify()
-			err := notify.SendEmailVerificationCode(tt.args.user, tt.args.origin, tt.args.code, tt.args.urlTmpl)
+			got := new(res)
+			err := notify(got).SendEmailVerificationCode(tt.args.user, tt.args.origin, tt.args.code, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

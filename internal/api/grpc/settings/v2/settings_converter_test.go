@@ -11,13 +11,38 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2alpha"
 )
 
-var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration"}
+var ignoreMessageTypes = map[protoreflect.FullName]bool{
+	"google.protobuf.Duration": true,
+}
+
+// allFieldsSet recusively checks if all values in a message
+// have a non-zero value.
+func allFieldsSet(t testing.TB, msg protoreflect.Message) {
+	md := msg.Descriptor()
+	name := md.FullName()
+	if ignoreMessageTypes[name] {
+		return
+	}
+
+	fields := md.Fields()
+
+	for i := 0; i < fields.Len(); i++ {
+		fd := fields.Get(i)
+		if !msg.Has(fd) {
+			t.Errorf("not all fields set in %q, missing %q", name, fd.Name())
+			continue
+		}
+
+		if fd.Kind() == protoreflect.MessageKind {
+			allFieldsSet(t, msg.Get(fd).Message())
+		}
+	}
+}
 
 func Test_loginSettingsToPb(t *testing.T) {
 	arg := &query.LoginPolicy{
@@ -75,7 +100,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 	}
 
 	got := loginSettingsToPb(arg)
-	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
+	allFieldsSet(t, got.ProtoReflect())
 	if !proto.Equal(got, want) {
 		t.Errorf("loginSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -216,7 +241,7 @@ func Test_passwordSettingsToPb(t *testing.T) {
 	}
 
 	got := passwordSettingsToPb(arg)
-	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
+	allFieldsSet(t, got.ProtoReflect())
 	if !proto.Equal(got, want) {
 		t.Errorf("passwordSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -270,7 +295,7 @@ func Test_brandingSettingsToPb(t *testing.T) {
 	}
 
 	got := brandingSettingsToPb(arg, "http://example.com")
-	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
+	allFieldsSet(t, got.ProtoReflect())
 	if !proto.Equal(got, want) {
 		t.Errorf("brandingSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -290,7 +315,7 @@ func Test_domainSettingsToPb(t *testing.T) {
 		ResourceOwnerType:                      settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 	got := domainSettingsToPb(arg)
-	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
+	allFieldsSet(t, got.ProtoReflect())
 	if !proto.Equal(got, want) {
 		t.Errorf("domainSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -312,7 +337,7 @@ func Test_legalSettingsToPb(t *testing.T) {
 		ResourceOwnerType: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 	got := legalAndSupportSettingsToPb(arg)
-	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
+	allFieldsSet(t, got.ProtoReflect())
 	if !proto.Equal(got, want) {
 		t.Errorf("legalSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -328,7 +353,7 @@ func Test_lockoutSettingsToPb(t *testing.T) {
 		ResourceOwnerType:   settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 	got := lockoutSettingsToPb(arg)
-	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
+	allFieldsSet(t, got.ProtoReflect())
 	if !proto.Equal(got, want) {
 		t.Errorf("lockoutSettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
@@ -362,7 +387,7 @@ func Test_identityProvidersToPb(t *testing.T) {
 	got := identityProvidersToPb(arg)
 	require.Len(t, got, len(got))
 	for i, v := range got {
-		grpc.AllFieldsSet(t, v.ProtoReflect(), ignoreTypes...)
+		allFieldsSet(t, v.ProtoReflect())
 		if !proto.Equal(v, want[i]) {
 			t.Errorf("identityProvidersToPb() =\n%v\nwant\n%v", got, want)
 		}

@@ -539,7 +539,7 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 	}
 	if !direct {
 		codeEventCreator = func(ctx context.Context, agg *eventstore.Aggregate, id string, cryptoCode *crypto.CryptoValue, exp time.Duration) eventstore.Command {
-			return usr_repo.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, id, cryptoCode, exp, "", false)
+			return usr_repo.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, id, cryptoCode, exp)
 		}
 	}
 	codeEvent := codeEventCreator(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID, cryptoCode, passwordlessCodeGenerator.Expiry())

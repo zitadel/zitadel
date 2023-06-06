@@ -32,7 +32,7 @@ type Commands struct {
 	httpClient *http.Client
 
 	checkPermission domain.PermissionCheck
-	newCode         cryptoCodeFunc
+	newEmailCode    func(ctx context.Context, filter preparation.FilterToQueryReducer, codeAlg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error)
 
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
@@ -109,7 +109,7 @@ func StartCommands(
 		webauthnConfig:        webAuthN,
 		httpClient:            httpClient,
 		checkPermission:       permissionCheck,
-		newCode:               newCryptoCodeWithExpiry,
+		newEmailCode:          newEmailCode,
 		sessionTokenCreator:   sessionTokenCreator(idGenerator, sessionAlg),
 		sessionTokenVerifier:  sessionTokenVerifier,
 	}

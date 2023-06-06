@@ -53,7 +53,6 @@ Errors:
     NotFoundOnOrg: User could not be found on chosen organization
     NotAllowedOrg: User is no member of the required organization
     UserIDMissing: User ID missing
-    UserIDWrong: "Request user not equal to authenticated user"
     DomainPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid
@@ -68,7 +67,6 @@ Errors:
     NoChanges: No changes found
     InitCodeNotFound: Initialization Code not found
     UsernameNotChanged: Username not changed
-    InvalidURLTemplate: URL Template is invalid
     Profile:
       NotFound: Profile not found
       NotChanged: Profile not changed
@@ -83,6 +81,7 @@ Errors:
       NotChanged: Email not changed
       Empty: Email is empty
       IDMissing: Email ID is missing
+      InvalidURLTemplate: URL Template is invalid
     Phone:
       NotFound: Phone not found
       Invalid: Phone is invalid
