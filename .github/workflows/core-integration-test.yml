@@ -46,7 +46,7 @@ jobs:
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
       # TODO(adlerhurst): find out why this file is currently not added by checkout
-      - run: mkdir -p internal/api/ui/console/static/console && touch internal/api/ui/console/static/console/.gitkeep
+      # - run: mkdir -p internal/api/ui/console/static/console && touch internal/api/ui/console/static/console/.gitkeep
       - 
         name: test
         env:
