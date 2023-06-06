@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"google.golang.org/grpc"
 
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
