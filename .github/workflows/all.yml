@@ -41,14 +41,13 @@ jobs:
   #     core_cache_key: ${{ needs.core.outputs.cache_key }}
   #     core_cache_path: ${{ needs.core.outputs.cache_path }}
       
-  # core-integration-test:
-  #   # if: ${{ needs.core.outputs.cache_hit != 'true' }}
-  #   needs: core
-  #   uses: ./.github/workflows/core-integration-test.yml
-  #   with:
-  #     go_version: '1.20'
-  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
-  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
+  core-integration-test:
+    needs: core
+    uses: ./.github/workflows/core-integration-test.yml
+    with:
+      go_version: '1.20'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
   
   # lint:
   #   needs: [core, console]
