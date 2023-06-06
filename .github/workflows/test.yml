@@ -1,9 +1,7 @@
 name: Test
 on:
-  push:
-    branches:
-      - main
-      - setup-unit-integration-tests
+  pull_request:
+
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   test:
