@@ -6,6 +6,9 @@ on:
       tag_name:
         required: true
         type: string
+      shoud_push:
+        required: true
+        type: boolean
     outputs:
       tag_name:
         value: ${{ inputs.tag_name }}
@@ -27,6 +30,9 @@ jobs:
       - 
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          driver: docker-container
+
       - 
         name: Login to Docker registry
         uses: docker/login-action@v2
@@ -44,8 +50,10 @@ jobs:
           file: build/Dockerfile
           target: artifact
           platforms: ${{env.platforms}}
-          push: true
+          push: ${{ inputs.shoud_push }}
           tags: ${{ inputs.tag_name }}-ubuntu
+          cache-to: type=gha,mode=max
+          cache-from: type=gha
       - 
         name: scratch
         uses: docker/build-push-action@v4
@@ -54,5 +62,7 @@ jobs:
           file: build/Dockerfile
           target: final
           platforms: ${{env.platforms}}
-          push: true
+          push: ${{ inputs.shoud_push }}
           tags: ${{ inputs.tag_name }}
+          cache-to: type=gha,mode=max
+          cache-from: type=gha
