@@ -7,7 +7,7 @@
     "test:watch": "concurrently --kill-others 'npm:test:unit:watch' 'npm:test:integration:watch'",
     "test:unit": "jest",
     "test:unit:watch": "jest --watch",
-    "test:integration": "start-server-and-test dev http://localhost:3000 \"test:integration:run\"",
+    "test:integration": "ZITADEL_API_URL=none ZITADEL_ORG_ID=none ZITADEL_SERVICE_USER_TOKEN=none start-server-and-test dev http://localhost:3000 \"test:integration:run\"",
     "test:integration:watch": "start-server-and-test dev http://localhost:3000 \"pnpm nodemon -e js,jsx,ts,tsx,css,scss --ignore \\\"__test__/**\\\" --exec \\\"pnpm run test:integration:run\\\"\"",
     "test:integration:run": "cypress run --quiet",
     "test:integration:open": "cypress open",
