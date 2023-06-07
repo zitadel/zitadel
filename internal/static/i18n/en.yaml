@@ -476,6 +476,8 @@ Errors:
     Terminated: Session already terminated
     Token:
       Invalid: Session Token is invalid
+    Passkey:
+      NoChallenge: Session without passkey challenge
   Intent:
     IDPMissing: IDP ID is missing in the request
     SuccessURLMissing: Success URL is missing in the request
