@@ -15,6 +15,7 @@
       ],
       "dependsOn": [
         "generate",
+        "lint",
         "^build"
       ]
     },

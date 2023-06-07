@@ -71,7 +71,9 @@ export default function PasswordComplexity({
             Password length {passwordComplexitySettings.minLength}
           </span>
         </div>
-      ) : <span />}
+      ) : (
+        <span />
+      )}
       <div className="flex flex-row items-center">
         {hasSymbol ? check : cross}
         <span className={desc}>has Symbol</span>

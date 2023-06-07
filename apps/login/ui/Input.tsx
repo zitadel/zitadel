@@ -8,7 +8,7 @@ import React, {
   InputHTMLAttributes,
   ReactNode,
 } from "react";
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from "uuid";
 
 export type TextInputProps = DetailedHTMLProps<
   InputHTMLAttributes<HTMLInputElement>,
@@ -55,12 +55,13 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     },
     ref
   ) => {
-    const id = uuidv4()
+    const id = uuidv4();
     return (
       <label className="flex flex-col text-12px text-input-light-label dark:text-input-dark-label">
         <span
-          className={`leading-3 mb-1 ${error ? "text-warn-light-500 dark:text-warn-dark-500" : ""
-            }`}
+          className={`leading-3 mb-1 ${
+            error ? "text-warn-light-500 dark:text-warn-dark-500" : ""
+          }`}
         >
           {label} {required && "*"}
         </span>

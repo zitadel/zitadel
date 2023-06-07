@@ -99,7 +99,7 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
           autoComplete="one-time-code"
           {...register("code", { required: "This field is required" })}
           label="Code"
-        //   error={errors.username?.message as string}
+          //   error={errors.username?.message as string}
         />
       </div>
 

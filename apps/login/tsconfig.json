@@ -5,9 +5,7 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "#/*": [
-        "./*"
-      ]
+      "#/*": ["./*"]
     },
     "plugins": [
       {
@@ -15,15 +13,6 @@
       }
     ]
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "cypress",
-    "cypress.config.ts",
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["cypress", "cypress.config.ts", "node_modules"]
 }
