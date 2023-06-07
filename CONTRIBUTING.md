@@ -208,7 +208,7 @@ export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave
 docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
 go run main.go init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 go run main.go setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-go test -tags=integration -race -parallel 1 ./internal/integration ./internal/api/grpc/...
+go test -count 1 -tags=integration -race -p 1 ./internal/integration ./internal/api/grpc/...
 docker compose -f internal/integration/config/docker-compose.yaml down
 ```
 
