@@ -592,10 +592,17 @@ module.exports = {
           type: "category",
           label: "Policies",
           collapsed: false,
+          link: {
+            type: "generated-index",
+            title: "Policies",
+            slug: "/legal/policies",
+            description: "Policies and guidelines in addition to our terms of services.",
+          },
           items: [
             "legal/privacy-policy",
             "legal/acceptable-use-policy",
             "legal/rate-limit-policy",
+            "legal/policies/account-lockout-policy",
             "legal/vulnerability-disclosure-policy",
           ],
         },
