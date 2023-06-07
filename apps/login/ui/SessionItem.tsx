@@ -29,12 +29,11 @@ export default function SessionItem({
 
     const response = await res.json();
 
+    setLoading(false);
     if (!res.ok) {
-      setLoading(false);
       //   setError(response.details);
       return Promise.reject(response);
     } else {
-      setLoading(false);
       return response;
     }
   }
