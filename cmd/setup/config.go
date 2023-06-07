@@ -66,7 +66,7 @@ type Steps struct {
 	s8AuthTokens         *AuthTokenIndexes
 	s9EventstoreIndexes2 *EventstoreIndexesNew
 	CorrectCreationDate  *CorrectCreationDate
-	s11AddEventCreatedAt *AddEventCreatedAt
+	AddEventCreatedAt    *AddEventCreatedAt
 }
 
 type encryptionKeyConfig struct {
