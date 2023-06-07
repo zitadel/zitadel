@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { switchMap } from 'rxjs';
 
 import { PolicyComponentServiceType } from '../modules/policies/policy-component-types.enum';
 import { Theme } from '../modules/policies/private-labeling-policy/private-labeling-policy.component';
+import { EnvironmentService } from './environment.service';
 import { StorageService } from './storage.service';
 
 const authorizationKey = 'Authorization';
@@ -69,46 +70,29 @@ export const ENDPOINT = {
   providedIn: 'root',
 })
 export class AssetService {
-  private serviceUrl!: Promise<string>;
   private accessToken: string = '';
-  constructor(private http: HttpClient, private storageService: StorageService) {
+  constructor(private envService: EnvironmentService, private http: HttpClient, private storageService: StorageService) {
     const aT = this.storageService.getItem(accessTokenStorageKey);
-
     if (aT) {
       this.accessToken = aT;
     }
-    this.serviceUrl = this.getServiceUrl();
-  }
-
-  private async getServiceUrl(): Promise<string> {
-    const url = await lastValueFrom(this.http.get('./assets/environment.json'))
-      .then((data: any) => {
-        if (data && data.api) {
-          return data.api;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-    return url;
   }
 
   public upload(endpoint: AssetEndpoint | string, body: any, orgId?: string): Promise<any> {
     const headers: any = {
       [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
     };
-
     if (orgId) {
       headers[orgKey] = `${orgId}`;
     }
-
-    return this.serviceUrl.then((url) =>
-      this.http
-        .post(`${url}/assets/v1/${endpoint}`, body, {
-          headers: headers,
-        })
-        .toPromise(),
-    );
+    return this.envService.env
+      .pipe(
+        switchMap((env) =>
+          this.http.post(`${env.api}/assets/v1/${endpoint}`, body, {
+            headers: headers,
+          }),
+        ),
+      )
+      .toPromise();
   }
 }

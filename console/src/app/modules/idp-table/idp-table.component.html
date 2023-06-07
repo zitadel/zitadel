@@ -13,7 +13,7 @@
         <th class="availability" mat-header-cell *matHeaderCellDef>
           <span>{{ 'IDP.AVAILABILITY' | translate }}</span>
         </th>
-        <td class="availability" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+        <td class="pointer availability" mat-cell *matCellDef="let idp">
           <i
             matTooltip="{{ 'IDP.AVAILABLE' | translate }}"
             *ngIf="isEnabled(idp) && idp.state === IDPState.IDP_STATE_ACTIVE"
@@ -29,14 +29,14 @@
 
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.NAME' | translate }}</th>
-        <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+        <td class="pointer" mat-cell *matCellDef="let idp">
           <span>{{ idp?.name }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.TYPE' | translate }}</th>
-        <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+        <td class="pointer" mat-cell *matCellDef="let idp">
           <div [ngSwitch]="idp.type">
             <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_AZURE_AD">
               <img class="idp-logo" src="./assets/images/idp/ms.svg" alt="azure ad" />
@@ -87,7 +87,7 @@
 
       <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.STATE' | translate }}</th>
-        <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+        <td class="pointer" mat-cell *matCellDef="let idp">
           <span
             class="state"
             [ngClass]="{
@@ -101,21 +101,21 @@
 
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CREATIONDATE' | translate }}</th>
-        <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+        <td class="pointer" mat-cell *matCellDef="let idp">
           <span>{{ idp.details.creationDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="changeDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CHANGEDATE' | translate }}</th>
-        <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+        <td class="pointer" mat-cell *matCellDef="let idp">
           <span>{{ idp.details.changeDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="owner">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.OWNER' | translate }}</th>
-        <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+        <td class="pointer" mat-cell *matCellDef="let idp">
           {{ 'IDP.OWNERTYPES.' + idp.owner | translate }}
         </td>
       </ng-container>
@@ -140,7 +140,7 @@
               "
               mat-icon-button
               matTooltip="{{ 'IDP.SETAVAILABLE' | translate }}"
-              (click)="addIdp(idp)"
+              (click)="addIdp(idp); $event.stopPropagation()"
             >
               <i class="las la-check-circle"></i>
             </button>
@@ -160,7 +160,7 @@
               "
               mat-icon-button
               matTooltip="{{ 'IDP.SETUNAVAILABLE' | translate }}"
-              (click)="removeIdp(idp)"
+              (click)="removeIdp(idp); $event.stopPropagation()"
             >
               <i class="las la-times-circle"></i>
             </button>
@@ -185,7 +185,7 @@
               mat-icon-button
               color="warn"
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
-              (click)="deleteIdp(idp)"
+              (click)="deleteIdp(idp); $event.stopPropagation()"
             >
               <i class="las la-trash"></i>
             </button>
@@ -194,7 +194,7 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr class="highlight" (click)="navigateToIDP(row)" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </div>
 

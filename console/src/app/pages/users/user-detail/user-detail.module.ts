@@ -8,7 +8,6 @@ import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/lega
 import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
-import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -87,7 +86,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     ChangesModule,
     CommonModule,
     SidenavModule,
-    MatTabsModule,
     FormsModule,
     ReactiveFormsModule,
     MembershipsTableModule,

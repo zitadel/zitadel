@@ -2,16 +2,20 @@ package user
 
 import (
 	"context"
+	"encoding/base64"
 	"io"
 
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
 
 func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
@@ -19,10 +23,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 	if err != nil {
 		return nil, err
 	}
-	orgID := req.GetOrganisation().GetOrgId()
-	if orgID == "" {
-		orgID = authz.GetCtxData(ctx).OrgID
-	}
+	orgID := authz.GetCtxData(ctx).OrgID
 	err = s.command.AddHuman(ctx, orgID, human, false)
 	if err != nil {
 		return nil, err
@@ -59,6 +60,14 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			Value: metadataEntry.GetValue(),
 		}
 	}
+	links := make([]*command.AddLink, len(req.GetIdpLinks()))
+	for i, link := range req.GetIdpLinks() {
+		links[i] = &command.AddLink{
+			IDPID:         link.GetIdpId(),
+			IDPExternalID: link.GetIdpExternalId(),
+			DisplayName:   link.GetDisplayName(),
+		}
+	}
 	return &command.AddHuman{
 		ID:          req.GetUserId(),
 		Username:    username,
@@ -79,9 +88,9 @@ func addUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		BcryptedPassword:       bcryptedPassword,
 		PasswordChangeRequired: passwordChangeRequired,
 		Passwordless:           false,
-		ExternalIDP:            false,
 		Register:               false,
 		Metadata:               metadata,
+		Links:                  links,
 	}, nil
 }
 
@@ -109,4 +118,96 @@ func hashedPasswordToCommand(hashed *user.HashedPassword) (string, error) {
 		return "", errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.InvalidArgument")
 	}
 	return hashed.GetHash(), nil
+}
+
+func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
+	orgID := authz.GetCtxData(ctx).OrgID
+	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &domain.UserIDPLink{
+		IDPConfigID:    req.GetIdpLink().GetIdpId(),
+		ExternalUserID: req.GetIdpLink().GetIdpExternalId(),
+		DisplayName:    req.GetIdpLink().GetDisplayName(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &user.AddIDPLinkResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
+	id, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetSuccessUrl(), req.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	authURL, err := s.command.AuthURLFromProvider(ctx, req.GetIdpId(), id, s.idpCallback(ctx))
+	if err != nil {
+		return nil, err
+	}
+	return &user.StartIdentityProviderFlowResponse{
+		Details:  object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
+	}, nil
+}
+
+func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *user.RetrieveIdentityProviderInformationRequest) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIntentId(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.checkIntentToken(req.GetToken(), intent.AggregateID); err != nil {
+		return nil, err
+	}
+	if intent.State != domain.IDPIntentStateSucceeded {
+		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
+	}
+	return intentToIDPInformationPb(intent, s.idpAlg)
+}
+
+func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
+	var idToken *string
+	if intent.IDPIDToken != "" {
+		idToken = &intent.IDPIDToken
+	}
+	var accessToken string
+	if intent.IDPAccessToken != nil {
+		accessToken, err = crypto.DecryptString(intent.IDPAccessToken, alg)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &user.RetrieveIdentityProviderInformationResponse{
+		Details: &object_pb.Details{
+			Sequence:      intent.ProcessedSequence,
+			ChangeDate:    timestamppb.New(intent.ChangeDate),
+			ResourceOwner: intent.ResourceOwner,
+		},
+		IdpInformation: &user.IDPInformation{
+			Access: &user.IDPInformation_Oauth{
+				Oauth: &user.IDPOAuthAccessInformation{
+					AccessToken: accessToken,
+					IdToken:     idToken,
+				},
+			},
+			IdpInformation: intent.IDPUser,
+		},
+	}, nil
+}
+
+func (s *Server) checkIntentToken(token string, intentID string) error {
+	if token == "" {
+		return errors.ThrowPermissionDenied(nil, "IDP-Sfefs", "Errors.Intent.InvalidToken")
+	}
+	data, err := base64.RawURLEncoding.DecodeString(token)
+	if err != nil {
+		return errors.ThrowPermissionDenied(err, "IDP-Swg31", "Errors.Intent.InvalidToken")
+	}
+	decryptedToken, err := s.idpAlg.Decrypt(data, s.idpAlg.EncryptionKeyID())
+	if err != nil {
+		return errors.ThrowPermissionDenied(err, "IDP-Sf4gt", "Errors.Intent.InvalidToken")
+	}
+	if string(decryptedToken) != intentID {
+		return errors.ThrowPermissionDenied(nil, "IDP-dkje3", "Errors.Intent.InvalidToken")
+	}
+	return nil
 }

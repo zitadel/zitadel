@@ -212,7 +212,10 @@
       "TEXT": "This navigation changes based on your selected organization above or your instance"
     },
     "CONTEXTCHANGED": {
-      "TEXT": "Attention! The organization context has changed."
+      "TEXT": "The organization context has changed."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "The view just changed to instance!"
     }
   },
   "FILTER": {
@@ -260,6 +263,10 @@
     "TOKENINVALID": {
       "TITLE": "Your authorization token has expired.",
       "DESCRIPTION": "Click the button below to log in again."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Your quota for authenticated requests is exhausted.",
+      "DESCRIPTION": "Remove or increase the quota limit for this ZITADEL instance."
     },
     "INVALID_FORMAT": "The formatting is invalid.",
     "NOTANEMAIL": "The given value is not an e-mail address.",
@@ -1970,7 +1977,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2060,6 +2068,10 @@
       "IMPLICIT": {
         "TITLE": "Implicit",
         "DESCRIPTION": "Get the tokens directly from the authorization endpoint"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Authorize the device on a computer or smartphone."
       },
       "CUSTOM": {
         "TITLE": "Custom",

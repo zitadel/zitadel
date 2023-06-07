@@ -213,6 +213,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "注意！ 組織のコンテキストが変更されました。"
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "ビューがインスタンスに変更されました。"
     }
   },
   "FILTER": {
@@ -260,6 +263,10 @@
     "TOKENINVALID": {
       "TITLE": "トークンが期限切れになりました。",
       "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
+    },
+    "EXHAUSTED": {
+      "TITLE": "認証されたリクエストのクォータを使い果たしました",
+      "DESCRIPTION": "このZITADELインスタンスの制限を削除または増加させる"
     },
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
@@ -1965,7 +1972,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2055,6 +2063,10 @@
       "IMPLICIT": {
         "TITLE": "Implicit",
         "DESCRIPTION": "認証エンドポイントから直接トークンを取得します。"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "コンピューターまたはスマートフォンでデバイスを認証します。"
       },
       "CUSTOM": {
         "TITLE": "Custom",

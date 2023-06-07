@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	_ "embed"
 	"fmt"
-	"net"
+	"math"
 	"net/http"
 	"os"
 	"os/signal"
@@ -33,11 +33,14 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
+	"github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/idp"
 	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/robots_txt"
 	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -45,8 +48,10 @@ import (
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
@@ -60,7 +65,7 @@ import (
 	"github.com/zitadel/zitadel/openapi"
 )
 
-func New() *cobra.Command {
+func New(server chan<- *Server) *cobra.Command {
 	start := &cobra.Command{
 		Use:   "start",
 		Short: "starts ZITADEL instance",
@@ -78,7 +83,7 @@ Requirements:
 				return err
 			}
 
-			return startZitadel(config, masterKey)
+			return startZitadel(config, masterKey, server)
 		},
 	}
 
@@ -87,7 +92,23 @@ Requirements:
 	return start
 }
 
-func startZitadel(config *Config, masterKey string) error {
+type Server struct {
+	Config     *Config
+	DB         *database.DB
+	KeyStorage crypto.KeyStorage
+	Keys       *encryptionKeys
+	Eventstore *eventstore.Eventstore
+	Queries    *query.Queries
+	AuthzRepo  authz_repo.Repository
+	Storage    static.Storage
+	Commands   *command.Commands
+	LogStore   *logstore.Service
+	Router     *mux.Router
+	TLSConfig  *tls.Config
+	Shutdown   chan<- os.Signal
+}
+
+func startZitadel(config *Config, masterKey string, server chan<- *Server) error {
 	ctx := context.Background()
 
 	dbClient, err := database.Connect(config.Database, false)
@@ -110,7 +131,21 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
 
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, config.SystemDefaults, keys.IDPConfig, keys.OTP, keys.OIDC, keys.SAML, config.InternalAuthZ.RolePermissionMappings)
+	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+
+	queries, err := query.StartQueries(
+		ctx,
+		eventstoreClient,
+		dbClient,
+		config.Projections,
+		config.SystemDefaults,
+		keys.IDPConfig,
+		keys.OTP,
+		keys.OIDC,
+		keys.SAML,
+		config.InternalAuthZ.RolePermissionMappings,
+		sessionTokenVerifier,
+	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
@@ -118,6 +153,9 @@ func startZitadel(config *Config, masterKey string) error {
 	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC, config.ExternalSecure, config.Eventstore.AllowOrderByCreationDate)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
+	}
+	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
 
 	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
@@ -146,7 +184,8 @@ func startZitadel(config *Config, masterKey string) error {
 		keys.OIDC,
 		keys.SAML,
 		&http.Client{},
-		authZRepo,
+		permissionCheck,
+		sessionTokenVerifier,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -176,11 +215,49 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, queries, usageReporter)
+	err = startAPIs(
+		ctx,
+		clock,
+		router,
+		commands,
+		queries,
+		eventstoreClient,
+		dbClient,
+		config,
+		storage,
+		authZRepo,
+		keys,
+		queries,
+		usageReporter,
+		permissionCheck,
+	)
 	if err != nil {
 		return err
 	}
-	return listen(ctx, router, config.Port, tlsConfig)
+
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+
+	if server != nil {
+		server <- &Server{
+			Config:     config,
+			DB:         dbClient,
+			KeyStorage: keyStorage,
+			Keys:       keys,
+			Eventstore: eventstoreClient,
+			Queries:    queries,
+			AuthzRepo:  authZRepo,
+			Storage:    storage,
+			Commands:   commands,
+			LogStore:   actionsLogstoreSvc,
+			Router:     router,
+			TLSConfig:  tlsConfig,
+			Shutdown:   shutdown,
+		}
+		close(server)
+	}
+
+	return listen(ctx, router, config.Port, tlsConfig, shutdown)
 }
 
 func startAPIs(
@@ -197,6 +274,7 @@ func startAPIs(
 	keys *encryptionKeys,
 	quotaQuerier logstore.QuotaQuerier,
 	usageReporter logstore.UsageReporter,
+	permissionCheck domain.PermissionCheck,
 ) error {
 	repo := struct {
 		authz_repo.Repository
@@ -224,8 +302,13 @@ func startAPIs(
 	if accessSvc.Enabled() {
 		logging.Warn("access logs are currently in beta")
 	}
-	accessInterceptor := middleware.NewAccessInterceptor(accessSvc, config.Quotas.Access)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
+	exhaustedCookieHandler := http_util.NewCookieHandler(
+		http_util.WithUnsecure(),
+		http_util.WithNonHttpOnly(),
+		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
+	)
+	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, config.Quotas.Access)
+	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, limitingAccessInterceptor)
 	if err != nil {
 		return fmt.Errorf("error creating api %w", err)
 	}
@@ -249,20 +332,32 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, user.CreateServer(commands, queries, keys.User)); err != nil {
+	if err := apis.RegisterService(ctx, user.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure))); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
+		return err
+	}
+	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
 		return err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
-	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle))
+	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
+
+	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, config.ExternalSecure, instanceInterceptor.Handler))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources)
 	if err != nil {
 		return err
 	}
+
+	// robots.txt handler
+	robotsTxtHandler, err := robots_txt.Start()
+	if err != nil {
+		return fmt.Errorf("unable to start robots txt handler: %w", err)
+	}
+	apis.RegisterHandlerOnPrefix(robots_txt.HandlerPrefix, robotsTxtHandler)
 
 	// TODO: Record openapi access logs?
 	openAPIHandler, err := openapi.Start()
@@ -271,25 +366,25 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(openapi.HandlerPrefix, openAPIHandler)
 
-	oidcProvider, err := oidc.NewProvider(config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, accessInterceptor.Handle)
+	oidcProvider, err := oidc.NewProvider(config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, limitingAccessInterceptor.Handle)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
 	apis.RegisterHandlerPrefixes(oidcProvider.HttpHandler(), "/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2")
 
-	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, accessInterceptor.Handle)
+	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor.Handle)
 	if err != nil {
 		return fmt.Errorf("unable to start saml provider: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(saml.HandlerPrefix, samlProvider.HttpHandler())
 
-	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, accessInterceptor.Handle, config.CustomerPortal)
+	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, accessInterceptor.Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
@@ -301,10 +396,12 @@ func startAPIs(
 	return nil
 }
 
-func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config) error {
+func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, shutdown <-chan os.Signal) error {
 	http2Server := &http2.Server{}
 	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig}
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+
+	lc := listenConfig()
+	lis, err := lc.Listen(ctx, "tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return fmt.Errorf("tcp listener on %d failed: %w", port, err)
 	}
@@ -320,9 +417,6 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 			errCh <- http1Server.Serve(lis)
 		}
 	}()
-
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
 	select {
 	case err := <-errCh:

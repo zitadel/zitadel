@@ -267,6 +267,7 @@ Console:
   LongCache:
     MaxAge: 12h
     SharedMaxAge: 168h #7d
+  InstanceManagementURL: ""
 
 Notification:
   Repository:
@@ -734,6 +735,7 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.credential.write"
+        - "user.passkey.write"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -810,6 +812,7 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.credential.write"
+        - "user.passkey.write"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -846,6 +849,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "user.passkey.write"
         - "project.read"
         - "project.member.read"
         - "project.role.read"
@@ -881,6 +885,7 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.credential.write"
+        - "user.passkey.write"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
