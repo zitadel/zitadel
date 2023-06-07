@@ -19,6 +19,7 @@ import {
   GetSessionResponse,
   VerifyEmailResponse,
   SetSessionResponse,
+  DeleteSessionResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -101,6 +102,15 @@ export function getSession(
 ): Promise<GetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return sessionService.getSession({ sessionId, sessionToken }, {});
+}
+
+export function deleteSession(
+  server: ZitadelServer,
+  sessionId: string,
+  sessionToken: string
+): Promise<DeleteSessionResponse | undefined> {
+  const sessionService = session.getSession(server);
+  return sessionService.deleteSession({ sessionId, sessionToken }, {});
 }
 
 export function listSessions(

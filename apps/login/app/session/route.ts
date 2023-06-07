@@ -1,8 +1,16 @@
-import { createSession, getSession, server, setSession } from "#/lib/zitadel";
+import {
+  createSession,
+  getSession,
+  server,
+  setSession,
+  deleteSession,
+} from "#/lib/zitadel";
 import {
   SessionCookie,
   addSessionToCookie,
   getMostRecentSessionCookie,
+  getSessionCookieById,
+  removeSessionFromCookie,
   updateSessionCookie,
 } from "#/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
@@ -115,8 +123,41 @@ export async function PUT(request: NextRequest) {
         }
       })
       .catch((error) => {
-        console.error("erasd", error);
         return NextResponse.json(error, { status: 500 });
+      });
+  } else {
+    return NextResponse.error();
+  }
+}
+
+/**
+ *
+ * @param request id of the session to be deleted
+ */
+export async function DELETE(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  if (id) {
+    const session = await getSessionCookieById(id);
+
+    return deleteSession(server, session.id, session.token)
+      .then(() => {
+        return removeSessionFromCookie(session)
+          .then(() => {
+            return NextResponse.json({ factors: session.factors });
+          })
+          .catch((error) => {
+            return NextResponse.json(
+              { details: "could not set cookie" },
+              { status: 500 }
+            );
+          });
+      })
+      .catch((error) => {
+        return NextResponse.json(
+          { details: "could not delete session" },
+          { status: 500 }
+        );
       });
   } else {
     return NextResponse.error();
