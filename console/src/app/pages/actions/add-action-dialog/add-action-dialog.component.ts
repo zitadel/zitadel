@@ -60,6 +60,7 @@ export class AddActionDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // prevent unsaved changes get lost if backdrop is clicked
     this.dialogRef.backdropClick().subscribe(() => {
       if (this.form.dirty) {
         this.showUnsavedDialog();
@@ -68,6 +69,7 @@ export class AddActionDialogComponent implements OnInit {
       }
     });
 
+    // prevent unsaved changes get lost if escape key is pressed
     this.dialogRef.keydownEvents().subscribe((event) => {
       if (event.key === 'Escape') {
         if (this.form.dirty) {
