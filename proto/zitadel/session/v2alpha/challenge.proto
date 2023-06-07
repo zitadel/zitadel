@@ -16,7 +16,7 @@ message Challenges {
   message Passkey {
     google.protobuf.Struct public_key_credential_request_options = 1 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "json representation of public key credential request options used by the passkey client"
+        description: "Options for Assertion Generaration (dictionary PublicKeyCredentialRequestOptions). Generated helper methods transform the field to JSON, for use in a WebauthN client. See also: https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialrequestoptions"
         example: "{\"publicKey\":{\"allowCredentials\":[{\"id\":\"ATmqBg-99qyOZk2zloPdJQyS2R7IkFT7v9Hoos_B_nM\",\"type\":\"public-key\"}],\"challenge\":\"GAOHYz2jE69kJMYo6Laij8yWw9-dKKgbViNhfuy0StA\",\"rpId\":\"localhost\",\"timeout\":300000,\"userVerification\":\"required\"}}"
       }
     ];
