@@ -465,6 +465,8 @@ Errors:
     Terminated: セッションはすでに終了しています
     Token:
       Invalid: セッショントークンが無効です
+    Passkey:
+      NoChallenge: パスキーチャレンジなしのセッション
   Intent:
     IDPMissing: リクエストにIDP IDが含まれていません
     SuccessURLMissing: リクエストに成功時の URL がありません

@@ -5,9 +5,11 @@ package zitadel.session.v2alpha;
 
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/session/v2alpha/challenge.proto";
 import "zitadel/session/v2alpha/session.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -242,6 +244,7 @@ message CreateSessionRequest{
       description: "\"custom key value list to be stored on the session\"";
     }
   ];
+  repeated ChallengeKind challenges = 3;
 }
 
 message CreateSessionResponse{
@@ -257,6 +260,7 @@ message CreateSessionResponse{
       description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
     }
   ];
+  Challenges challenges = 4;
 }
 
 message SetSessionRequest{
@@ -287,6 +291,7 @@ message SetSessionRequest{
       description: "\"custom key value list to be stored on the session\"";
     }
   ];
+  repeated ChallengeKind challenges = 5;
 }
 
 message SetSessionResponse{
@@ -296,6 +301,7 @@ message SetSessionResponse{
       description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
     }
   ];
+   Challenges challenges = 3;
 }
 
 message DeleteSessionRequest{
@@ -330,6 +336,11 @@ message Checks {
       description: "\"Checks the password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
     }
   ];
+  optional CheckPasskey passkey = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the public key credential issued by the passkey client. Requires that the user is already checked and a passkey challenge to be requested, in any previous request.\"";
+    }
+  ];
 }
 
 message CheckUser {
@@ -360,6 +371,18 @@ message CheckPassword {
       min_length: 1;
       max_length: 200;
       example: "\"V3ryS3cure!\"";
+    }
+  ];
+}
+
+message CheckPasskey {
+  google.protobuf.Struct credential_assertion_data = 1 [
+    (validate.rules).message.required = true,
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "JSON representation of public key credential issued by the passkey client";
+      min_length: 55;
+      max_length: 1048576; //1 MB
     }
   ];
 }
