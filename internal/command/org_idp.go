@@ -93,23 +93,28 @@ func (c *Commands) UpdateOrgGenericOIDCProvider(ctx context.Context, resourceOwn
 }
 
 func (c *Commands) MigrateOrgGenericOIDCToAzureADProvider(ctx context.Context, resourceOwner, id string, provider AzureADProvider) (*domain.ObjectDetails, error) {
-	orgAgg := org.NewAggregate(resourceOwner)
-	writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateOrgOIDCToAzureADProvider(orgAgg, writeModel, provider))
-	if err != nil {
-		return nil, err
-	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return pushedEventsToObjectDetails(pushedEvents), nil
+	return c.migrateOrgGenericOIDC(ctx, resourceOwner, id, provider)
 }
 
 func (c *Commands) MigrateOrgGenericOIDCToGoogleProvider(ctx context.Context, resourceOwner, id string, provider GoogleProvider) (*domain.ObjectDetails, error) {
+	return c.migrateOrgGenericOIDC(ctx, resourceOwner, id, provider)
+}
+
+func (c *Commands) migrateOrgGenericOIDC(ctx context.Context, resourceOwner, id string, provider interface{}) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareMigrateOrgOIDCToGoogleProvider(orgAgg, writeModel, provider))
+
+	var validation preparation.Validation
+	switch p := provider.(type) {
+	case AzureADProvider:
+		validation = c.prepareMigrateOrgOIDCToAzureADProvider(orgAgg, writeModel, p)
+	case GoogleProvider:
+		validation = c.prepareMigrateOrgOIDCToGoogleProvider(orgAgg, writeModel, p)
+	default:
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-s9s2919", "Errors.IDPConfig.NotExisting")
+	}
+
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
