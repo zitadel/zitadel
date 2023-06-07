@@ -7,10 +7,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -51,9 +54,10 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 		err     error
 	}
 	tests := []struct {
-		name string
-		args args
-		want *user.RegisterPasskeyResponse
+		name    string
+		args    args
+		want    *user.RegisterPasskeyResponse
+		wantErr error
 	}{
 		{
 			name: "an error",
@@ -61,6 +65,23 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 				details: nil,
 				err:     io.ErrClosedPipe,
 			},
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "unmarshall error",
+			args: args{
+				details: &domain.PasskeyRegistrationDetails{
+					ObjectDetails: &domain.ObjectDetails{
+						Sequence:      22,
+						EventDate:     time.Unix(3000, 22),
+						ResourceOwner: "me",
+					},
+					PasskeyID:                          "123",
+					PublicKeyCredentialCreationOptions: []byte(`\\`),
+				},
+				err: nil,
+			},
+			wantErr: caos_errs.ThrowInternal(nil, "USERv2-Dohr6", "Errors.Internal"),
 		},
 		{
 			name: "ok",
@@ -72,7 +93,7 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 						ResourceOwner: "me",
 					},
 					PasskeyID:                          "123",
-					PublicKeyCredentialCreationOptions: []byte{1, 2, 3},
+					PublicKeyCredentialCreationOptions: []byte(`{"foo": "bar"}`),
 				},
 				err: nil,
 			},
@@ -85,16 +106,20 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 					},
 					ResourceOwner: "me",
 				},
-				PasskeyId:                          "123",
-				PublicKeyCredentialCreationOptions: []byte{1, 2, 3},
+				PasskeyId: "123",
+				PublicKeyCredentialCreationOptions: &structpb.Struct{
+					Fields: map[string]*structpb.Value{"foo": {Kind: &structpb.Value_StringValue{StringValue: "bar"}}},
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := passkeyRegistrationDetailsToPb(tt.args.details, tt.args.err)
-			require.ErrorIs(t, err, tt.args.err)
-			assert.Equal(t, tt.want, got)
+			require.ErrorIs(t, err, tt.wantErr)
+			if !proto.Equal(tt.want, got) {
+				t.Errorf("Not equal:\nExpected\n%s\nActual:%s", tt.want, got)
+			}
 			if tt.want != nil {
 				grpc.AllFieldsSet(t, got.ProtoReflect())
 			}

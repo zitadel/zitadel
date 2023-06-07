@@ -3,9 +3,7 @@
 package user_test
 
 import (
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
@@ -16,31 +14,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func createHumanUser(t *testing.T) *user.AddHumanUserResponse {
-	resp, err := Client.AddHumanUser(CTX, &user.AddHumanUserRequest{
-		Organisation: &object.Organisation{
-			Org: &object.Organisation_OrgId{
-				OrgId: Tester.Organisation.ID,
-			},
-		},
-		Profile: &user.SetHumanProfile{
-			FirstName: "Mickey",
-			LastName:  "Mouse",
-		},
-		Email: &user.SetHumanEmail{
-			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
-			Verification: &user.SetHumanEmail_ReturnCode{
-				ReturnCode: &user.ReturnEmailVerificationCode{},
-			},
-		},
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, resp.GetUserId())
-	return resp
-}
-
 func TestServer_SetEmail(t *testing.T) {
-	userID := createHumanUser(t).GetUserId()
+	userID := Tester.CreateHumanUser(CTX).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -158,7 +133,7 @@ func TestServer_SetEmail(t *testing.T) {
 }
 
 func TestServer_VerifyEmail(t *testing.T) {
-	userResp := createHumanUser(t)
+	userResp := Tester.CreateHumanUser(CTX)
 	tests := []struct {
 		name    string
 		req     *user.VerifyEmailRequest
