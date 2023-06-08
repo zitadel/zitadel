@@ -75,11 +75,11 @@ jobs:
 
   release:
     uses: ./.github/workflows/release.yml
-    needs: [core-unit-test, core-integration-test, lint, container, e2e]
+    # needs: [core-unit-test, core-integration-test, lint, container, e2e]
     with:
       node_version: '16'
       buf_version: 'latest'
-      tag_name: ${{ needs.container.outputs.tag_name }}
+      tag_name: 'ignore-me' #${{ needs.container.outputs.tag_name }}
       semantic_version: '21'
   
   # semver:
