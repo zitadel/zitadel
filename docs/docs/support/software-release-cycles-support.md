@@ -73,7 +73,7 @@ Features in General Availability are not marked explicitly.
 
 ## Maintenance
 
-On ZITADEL Cloud we follow a regular deployment cycle to ensure our product remains up-to-date, secure, and provides new features. 
+ZITADEL Cloud follows a regular deployment cycle to ensure our product remains up-to-date, secure, and provides new features. 
 Our standard deployment cycle occurs every two weeks, during which we implement updates, bug fixes, and enhancements to improve the functionality and performance of our product.
 In certain circumstances, we may require additional deployments beyond the regular two-week cycle.
 This can occur for example when we have substantial updates or feature releases that require additional time for thorough testing and implementation or security fixes.
