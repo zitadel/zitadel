@@ -80,7 +80,7 @@ jobs:
       node_version: '16'
       buf_version: 'latest'
       tag_name: 'ignore-me' #${{ needs.container.outputs.tag_name }}
-      semantic_version: '21'
+      semantic_version: '19.0.5'
   
   # semver:
   #   uses: ./.github/workflows/semrel.yml

@@ -26,12 +26,14 @@ jobs:
       uses: actions/checkout@v3
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         dry_run: true
-        # semantic_version: ${{ inputs.semantic_version }}
+        semantic_version: ${{ inputs.semantic_version }}
         extra_plugins: |
           @semantic-release/exec@6
-          @semantic-release/git
+        # @semantic-release/git
   # api:
   #   name: api
   #   runs-on: ubuntu-latest
