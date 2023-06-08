@@ -16,6 +16,7 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
 	}
 	if err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
+		return nil, err
 	}
 	if userID != authz.GetCtxData(ctx).UserID {
 		if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {

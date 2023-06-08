@@ -10,8 +10,6 @@ INSERT INTO wrong_events (
             ) AS next_cd
         FROM
             eventstore.events
-        WHERE 
-            creation_date > '2023-05-23 13:00'
     ) sub WHERE
         current_cd < next_cd
     ORDER BY
