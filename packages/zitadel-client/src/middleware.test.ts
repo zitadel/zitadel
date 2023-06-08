@@ -27,7 +27,7 @@ describe('authMiddleware', () => {
       it(name, async () => {
 
         const mockNext = jest.fn().mockImplementation(async function*() { });
-        const mockRequest = {}; // Ersetze dies mit einem geeigneten Mock Request-Objekt
+        const mockRequest = {};
 
         const mockMethodDescriptor: MethodDescriptor = {
             options: {idempotencyLevel: undefined},
@@ -38,7 +38,7 @@ describe('authMiddleware', () => {
 
         const mockCall: ClientMiddlewareCall<unknown, unknown> = {
             method: mockMethodDescriptor,
-            requestStream: false, // Setze diese Werte entsprechend deiner Testbedingungen
+            requestStream: false,
             responseStream: false,
             request: mockRequest,
             next: mockNext,

@@ -50,11 +50,11 @@ You can execute the following commands in the following directories:
 - The projects root directory: all tests in the project are executed
 
 ```sh
-# Run unit and integration tests once
-pnpm run test -- --passWithNoTests
+# Run all once
+pnpm test
 
-# Rerun unit and integration tests on file changes
-pnpm run test:watch -- --passWithNoTests
+# Rerun tests on file changes
+pnpm test:watch
 ```
 
 ### Developing Against Your Local ZITADEL Instance
