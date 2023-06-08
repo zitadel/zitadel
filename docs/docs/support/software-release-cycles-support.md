@@ -83,7 +83,7 @@ During deployments, we strive to minimize any disruptions and do not expect any 
 
 In rare situations where deploying releases that may  carry a risk of increased latency or short downtime, we have a well-defined procedure in place to ensure transparent communication. 
 Prior to such deployments, we publish information on our status page, which can be accessed by visiting [https://status.zitadel.com/](https://status.zitadel.com/).
-We also recommend subscribing to those updates on the [status page](https://status.zitadel.com/).
+We also recommend that you subscribe to those updates on the [status page](https://status.zitadel.com/).
 
 We make it a priority to inform you of any potential impact well in advance.
 In adherence to our commitment to transparency, we provide a minimum notice period of five working days before deploying a release that poses a risk of downtime. 
