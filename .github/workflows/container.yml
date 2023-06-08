@@ -6,13 +6,6 @@ on:
       tag_name:
         required: true
         type: string
-      shoud_push:
-        required: true
-        type: boolean
-      platforms:
-        # required: true
-        type: string
-        default: linux/amd64
     outputs:
       tag_name:
         value: ${{ inputs.tag_name }}
@@ -49,9 +42,8 @@ jobs:
           context: .
           file: build/Dockerfile
           target: artifact
-          platforms: ${{ inputs.platforms }}
-          push: ${{ inputs.shoud_push }}
-          load: ${{ inputs.shoud_push != 'true' }}
+          platforms: linux/amd64,linux/arm64
+          push: true
           tags: ${{ inputs.tag_name }}-ubuntu
           cache-to: type=gha,mode=max
           cache-from: type=gha
@@ -62,9 +54,8 @@ jobs:
           context: .
           file: build/Dockerfile
           target: final
-          platforms: ${{ inputs.platforms }}
-          push: ${{ inputs.shoud_push }}
-          load: ${{ inputs.shoud_push != 'true' }}
+          platforms: linux/amd64,linux/arm64
+          push: true
           tags: ${{ inputs.tag_name }}
           cache-to: type=gha,mode=max
           cache-from: type=gha
