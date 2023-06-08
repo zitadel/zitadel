@@ -14,8 +14,8 @@
         "!.next/cache/**"
       ],
       "dependsOn": [
-        "generate",
         "lint",
+        "generate",
         "^build"
       ]
     },

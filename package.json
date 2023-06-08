@@ -2,7 +2,6 @@
   "private": true,
   "scripts": {
     "generate": "turbo run generate",
-    "prebuild": "turbo run generate",
     "build": "turbo run build",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
