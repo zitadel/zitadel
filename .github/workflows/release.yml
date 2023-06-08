@@ -18,6 +18,9 @@ on:
       tag_name:
         required: true
         type: string
+      image_name:
+        required: true
+        type: string
   workflow_dispatch:
 
 jobs:
@@ -25,6 +28,9 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      release: ${{ steps.semantic.outputs.new_release_version }}
+      published: ${{ steps.semantic.outputs.new_release_published }}
     steps:
     - name: Source checkout
       uses: actions/checkout@v3
@@ -38,26 +44,46 @@ jobs:
         semantic_version: ${{ inputs.semantic_version }}
         extra_plugins: |
           @semantic-release/exec@6.0.3
-    - name: Publish docker version
-      if: ${{ steps.semantic.outputs.new_release_published == 'true' }}
-      run: echo "push docker image ${{ steps.semantic.outputs.new_release_version }}"
-    - run: echo "${{github.ref_name}}"
-    - name: Publish docker latest
-      if: ${{ github.ref_name == 'main' && steps.semantic.outputs.new_release_published == 'true' }}
-      run: echo "push docker image latest"
-    # - run: |
-    #     echo "${{ steps.semantic.outputs.new_release_published }}"
-    #     echo "${{ steps.semantic.outputs.new_release_version }}"
-    #     echo "${{ steps.semantic.outputs.new_release_major_version }}"
-    #     echo "${{ steps.semantic.outputs.new_release_minor_version }}"
-    #     echo "${{ steps.semantic.outputs.new_release_patch_version }}"
-    #     echo "${{ steps.semantic.outputs.new_release_channel }}"
-    #     echo "${{ steps.semantic.outputs.new_release_notes }}"
-    #     echo "${{ steps.semantic.outputs.new_release_git_head }}"
-    #     echo "${{ steps.semantic.outputs.new_release_git_tag }}"
-    #     echo "${{ steps.semantic.outputs.last_release_version }}"
-    #     echo "${{ steps.semantic.outputs.last_release_git_head }}"
-    #     echo "${{ steps.semantic.outputs.last_release_git_tag }}"
+    
+  docker:
+    runs-on: ubuntu-22.04
+    needs: [release]
+    steps:
+    -
+      name: Checkout
+      uses: actions/checkout@v3
+    -
+      name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    -
+      name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - 
+      name: Login to Docker registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    -
+      name: Publish semver
+      if: ${{ needs.release.outputs.published == 'true' }}
+      run: |
+        docker buildx imagetools create \
+          --tag ${{ inputs.tag_name }}:${{ needs.release.outputs.release }}" \
+          ${{ inputs.tag_name }}
+
+
+
+
+
+      
+    # - name: Publish docker version
+    #   if: ${{ steps.semantic.outputs.new_release_published == 'true' }}
+    #   run: echo "push docker image ${{ steps.semantic.outputs.new_release_version }}"
+    # - name: Publish docker latest
+    #   if: ${{ github.ref_name == 'main' && steps.semantic.outputs.new_release_published == 'true' }}
+    #   run: echo "push docker image latest"
     
   # api:
   #   name: api
