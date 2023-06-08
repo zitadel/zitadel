@@ -60,10 +60,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     -
-      name: Publish ${{ needs.release.outputs.release }}
+      name: Publish v${{ needs.release.outputs.release }}
       run: |
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:${{ needs.release.outputs.release }} \
+          --tag ${{ inputs.image_name }}:v${{ needs.release.outputs.release }} \
           ${{ inputs.tag_name }}
     -
       name: Publish latest
