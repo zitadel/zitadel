@@ -30,6 +30,17 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ${{ inputs.go_version }}
+      -
+        id: go-cache-path
+        name: set cache path
+        run: echo "GO_CACHE_PATH=$(go env GOCACHE)\n" >> $GITHUB_OUTPUT
+      - 
+        uses: actions/cache/restore@v3
+        with:
+          key: core-unit-test-${{ hashFiles(steps.go-cache-path.outputs.GO_CACHE_PATH) }}
+          restore-keys: |
+            core-unit-test-
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
       - 
         name: test
         run: make core_unit_test
@@ -40,4 +51,9 @@ jobs:
           file: profile.cov
           name: core-unit-tests
           flags: core-unit-tests
+      - 
+        uses: actions/cache/save@v3
+        with:
+          key: core-unit-test-${{ hashFiles(steps.go-cache-path.outputs.GO_CACHE_PATH) }}
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
         
