@@ -81,7 +81,7 @@ During these deployments, we strive to minimize any disruptions and do not expec
 
 ### Release Deployment with Risk of Downtime
 
-In rare situations where deploying a release carries a risk of downtime, we have a well-defined procedure in place to ensure transparent communication. 
+In rare situations where deploying releases that may  carry a risk of increased latency or short downtime, we have a well-defined procedure in place to ensure transparent communication. 
 Prior to such deployments, we publish information on our status page, which can be accessed by visiting [https://status.zitadel.com/](https://status.zitadel.com/).
 We also recommend subscribing to those updates on the [status page](https://status.zitadel.com/).
 
