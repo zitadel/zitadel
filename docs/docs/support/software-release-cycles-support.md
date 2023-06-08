@@ -77,7 +77,7 @@ ZITADEL Cloud follows a regular deployment cycle to ensure our product remains u
 Our standard deployment cycle occurs every two weeks, during which we implement updates, bug fixes, and enhancements to improve the functionality and performance of our product.
 In certain circumstances, we may require additional deployments beyond the regular two-week cycle.
 This can occur for example when we have substantial updates or feature releases that require additional time for thorough testing and implementation or security fixes.
-During these deployments, we strive to minimize any disruptions and do not expect any downtime.
+During deployments, we strive to minimize any disruptions and do not expect any downtime.
 
 ### Release Deployment with Risk of Downtime
 
