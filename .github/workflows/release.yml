@@ -6,31 +6,48 @@ on:
       node_version:
         required: true
         type: string
-      go_version:
+      buf_version:
         required: true
         type: string
-      buf_version:
+      semantic_version:
+        required: true
+        type: string
+      tag_name:
         required: true
         type: string
 
 jobs:
-
-  api:
-    name: api
-    runs-on: ubuntu-latest
-    # needs: [lint, breaking]
+  release:
+    runs-on: ubuntu-22.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: bufbuild/buf-setup-action@v1
+    - name: Source checkout
+      uses: actions/checkout@v3
+    - name: Semantic Release
+      uses: cycjimmy/semantic-release-action@v2
       with:
-        version: ${{ inputs.buf_version }}
-        github_token: ${{ github.token }}
-    - uses: bufbuild/buf-push-action@v1
-      with:
-        buf_token: ${{ secrets.buf_token }}
-        input: proto
-        ## Currently no tags are supported in the action https://github.com/bufbuild/buf-push-action/issues/20
-        draft: ${{ github.ref_name != 'main'}}
+        dry_run: true
+        semantic_version: ${{ inputs.semantic_version }}
+        extra_plugins: |
+          @semantic-release/exec@5.0.0
+          @semantic-release/git
+  # api:
+  #   name: api
+  #   runs-on: ubuntu-latest
+  #   needs: [release]
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - uses: bufbuild/buf-setup-action@v1
+  #     with:
+  #       version: ${{ inputs.buf_version }}
+  #       github_token: ${{ github.token }}
+  #   - uses: bufbuild/buf-push-action@v1
+  #     with:
+  #       buf_token: ${{ secrets.buf_token }}
+  #       # input: proto
+  #       ## Currently no tags are supported in the action https://github.com/bufbuild/buf-push-action/issues/20
+  #       draft: ${{ github.ref_name != 'main'}}
 
   #console:
 

@@ -63,7 +63,6 @@ jobs:
 
   container:
     needs: [compile]
-    # needs: [compile, lint, core-unit-test, core-integration-test]
     uses: ./.github/workflows/container.yml
     with:
       tag_name: ghcr.io/zitadel/test:${{ github.sha }}
@@ -73,11 +72,17 @@ jobs:
     needs: [container]
     with:
       tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
-
-  # e2e-tag:
-  #   uses: ./.github/workflows/e2e.yml
-  #   with:
-  #     tag_name: ghcr.io/zitadel/test:691728bbdcb99ba52aec928f7a008d847279387d-ubuntu
   
+  # semver:
+  #   uses: ./.github/workflows/semrel.yml
+  #   with:
 
-  #release
+
+  release:
+    uses: ./.github/workflows/release.yml
+    needs: [core-unit-test, core-integration-test, lint, container, e2e]
+    with:
+      node_version: '16'
+      buf_version: 'latest'
+      tag_name: ${{ needs.container.outputs.tag_name }}
+      semantic_version: '21'
