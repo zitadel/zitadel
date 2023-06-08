@@ -20,7 +20,9 @@ const check = (
     strokeWidth={1.5}
     stroke="currentColor"
     className="w-6 h-6 las la-check text-green-500 dark:text-green-500 mr-2 text-lg"
+    role="img"
   >
+    <title>Matches</title>
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -36,7 +38,9 @@ const cross = (
     viewBox="0 0 24 24"
     strokeWidth={1.5}
     stroke="currentColor"
+    role="img"
   >
+    <title>Doesn't match</title>
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -60,12 +64,16 @@ export default function PasswordComplexity({
 
   return (
     <div className="mb-4 grid grid-cols-2 gap-x-8 gap-y-2">
-      <div className="flex flex-row items-center">
-        {hasMinLength ? check : cross}
-        <span className={desc}>
-          Password length {passwordComplexitySettings.minLength}
-        </span>
-      </div>
+      {passwordComplexitySettings.minLength != undefined ? (
+        <div className="flex flex-row items-center">
+          {hasMinLength ? check : cross}
+          <span className={desc}>
+            Password length {passwordComplexitySettings.minLength}
+          </span>
+        </div>
+      ) : (
+        <span />
+      )}
       <div className="flex flex-row items-center">
         {hasSymbol ? check : cross}
         <span className={desc}>has Symbol</span>

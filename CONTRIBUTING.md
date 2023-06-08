@@ -38,6 +38,25 @@ However, it might be easier to develop against your ZITADEL Cloud instance
 if you don't have docker installed
 or have limited resources on your local machine.
 
+### Testing
+
+You can execute the following commands in the following directories:
+
+- apps/login
+- packages/zitadel-client
+- packages/zitadel-server
+- packages/zitadel-react
+- packages/zitadel-next
+- The projects root directory: all tests in the project are executed
+
+```sh
+# Run all once
+pnpm test
+
+# Rerun tests on file changes
+pnpm test:watch
+```
+
 ### Developing Against Your Local ZITADEL Instance
 
 ```sh
