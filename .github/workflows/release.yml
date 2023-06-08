@@ -67,7 +67,7 @@ jobs:
           ${{ inputs.tag_name }}
     -
       name: Publish latest
-      if: ${{ github.ref_name == 'main' && needs.release.outputs.published == 'true' }}
+      if: ${{ github.ref_name == 'main' }}
       run: |
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:latest \
