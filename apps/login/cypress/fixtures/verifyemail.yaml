@@ -1,0 +1,13 @@
+- key: verify_email_custom
+  expect:
+    grpc:
+      service: zitadel.user.v2alpha.UserService
+      method: VerifyEmail
+  actions:
+    - reply_grpc:
+        payload: >
+          {
+            "details": {
+              "resourceOwner": "dinigrossmueter"
+            }
+          }

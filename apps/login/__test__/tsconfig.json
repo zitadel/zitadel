@@ -2,6 +2,15 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsxdev",
-    "types": ["node", "jest", "@testing-library/jest-dom"]
-  }
+    "types": [
+      "node",
+      "jest",
+      "@testing-library/jest-dom"
+    ]
+  },
+  "exclude": [
+    "../cypress",
+    "../cypress.config.ts",
+    "../node_modules"
+  ]
 }
