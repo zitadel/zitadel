@@ -20,6 +20,7 @@ import {
   VerifyEmailResponse,
   SetSessionResponse,
   DeleteSessionResponse,
+  VerifyPasskeyRegistrationResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -35,7 +36,7 @@ if (!getServers().length) {
   server = initializeServer(zitadelConfig);
 }
 
-export function getBrandingSettings(
+export async function getBrandingSettings(
   server: ZitadelServer
 ): Promise<BrandingSettings | undefined> {
   const settingsService = settings.getSettings(server);
@@ -44,7 +45,7 @@ export function getBrandingSettings(
     .then((resp: GetBrandingSettingsResponse) => resp.settings);
 }
 
-export function getGeneralSettings(
+export async function getGeneralSettings(
   server: ZitadelServer
 ): Promise<string[] | undefined> {
   const settingsService = settings.getSettings(server);
@@ -53,7 +54,7 @@ export function getGeneralSettings(
     .then((resp: GetGeneralSettingsResponse) => resp.supportedLanguages);
 }
 
-export function getLegalAndSupportSettings(
+export async function getLegalAndSupportSettings(
   server: ZitadelServer
 ): Promise<LegalAndSupportSettings | undefined> {
   const settingsService = settings.getSettings(server);
@@ -64,7 +65,7 @@ export function getLegalAndSupportSettings(
     });
 }
 
-export function getPasswordComplexitySettings(
+export async function getPasswordComplexitySettings(
   server: ZitadelServer
 ): Promise<PasswordComplexitySettings | undefined> {
   const settingsService = settings.getSettings(server);
@@ -74,7 +75,7 @@ export function getPasswordComplexitySettings(
     .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
 }
 
-export function createSession(
+export async function createSession(
   server: ZitadelServer,
   loginName: string
 ): Promise<CreateSessionResponse | undefined> {
@@ -82,7 +83,7 @@ export function createSession(
   return sessionService.createSession({ checks: { user: { loginName } } }, {});
 }
 
-export function setSession(
+export async function setSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string,
@@ -95,7 +96,7 @@ export function setSession(
   );
 }
 
-export function getSession(
+export async function getSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string
@@ -104,7 +105,7 @@ export function getSession(
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
 
-export function deleteSession(
+export async function deleteSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string
@@ -113,7 +114,7 @@ export function deleteSession(
   return sessionService.deleteSession({ sessionId, sessionToken }, {});
 }
 
-export function listSessions(
+export async function listSessions(
   server: ZitadelServer,
   ids: string[]
 ): Promise<ListSessionsResponse | undefined> {
@@ -130,7 +131,7 @@ export type AddHumanUserData = {
   password: string;
 };
 
-export function addHumanUser(
+export async function addHumanUser(
   server: ZitadelServer,
   { email, firstName, lastName, password }: AddHumanUserData
 ): Promise<string> {
@@ -150,7 +151,7 @@ export function addHumanUser(
     });
 }
 
-export function verifyEmail(
+export async function verifyEmail(
   server: ZitadelServer,
   userId: string,
   verificationCode: string
@@ -171,7 +172,10 @@ export function verifyEmail(
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export function setEmail(server: ZitadelServer, userId: string): Promise<any> {
+export async function setEmail(
+  server: ZitadelServer,
+  userId: string
+): Promise<any> {
   const userservice = user.getUser(server);
   return userservice.setEmail(
     {
@@ -181,4 +185,67 @@ export function setEmail(server: ZitadelServer, userId: string): Promise<any> {
   );
 }
 
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @returns the newly set email
+ */
+export async function registerPasskey(
+  server: ZitadelServer,
+  userId: string
+): Promise<any> {
+  const userservice = user.getUser(server);
+  return userservice.registerPasskey(
+    {
+      userId,
+    },
+    {}
+  );
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @returns the newly set email
+ */
+export async function createPasskeyRegistrationLink(
+  server: ZitadelServer,
+  userId: string
+): Promise<any> {
+  const userservice = user.getUser(server);
+  return userservice.createPasskeyRegistrationLink(
+    {
+      userId,
+      //   returnCode: new ReturnPasskeyRegistrationCode(),
+    },
+    {}
+  );
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @returns the newly set email
+ */
+export async function verifyPasskeyRegistration(
+  server: ZitadelServer,
+  passkeyId: string,
+  passkeyName: string,
+  publicKeyCredential: any,
+  userId: string
+): Promise<VerifyPasskeyRegistrationResponse> {
+  const userservice = user.getUser(server);
+  return userservice.verifyPasskeyRegistration(
+    {
+      passkeyId,
+      passkeyName,
+      publicKeyCredential,
+      userId,
+    },
+    {}
+  );
+}
 export { server };

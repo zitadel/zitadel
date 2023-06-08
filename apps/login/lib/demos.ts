@@ -48,11 +48,11 @@ export const demos: { name: string; items: Item[] }[] = [
       //     slug: "passwordless",
       //     description: "The page to login a user with his passwordless device",
       //   },
-      //   {
-      //     name: "Passwordless Create",
-      //     slug: "passwordless/create",
-      //     description: "The page to add a users passwordless device",
-      //   },
+      {
+        name: "Passkey Registration",
+        slug: "passkey/add",
+        description: "The page to add a users passkey device",
+      },
     ],
   },
   {
