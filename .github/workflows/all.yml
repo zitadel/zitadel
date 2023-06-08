@@ -33,7 +33,6 @@ jobs:
       console_cache_path: ${{ needs.console.outputs.cache_path }}
 
   core-unit-test:
-    # if: ${{ needs.core.outputs.cache_hit != 'true' }}
     needs: core
     uses: ./.github/workflows/core-unit-test.yml
     with:
@@ -74,7 +73,7 @@ jobs:
     uses: ./.github/workflows/e2e.yml
     needs: [build-container]
     with:
-      tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
+      tag_name: ${{ needs.build-container.outputs.tag_name }}-ubuntu
 
   push-container:
     needs: [build-container, lint, core-unit-test, core-integration-test, e2e]
