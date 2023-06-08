@@ -33,7 +33,7 @@ jobs:
       -
         id: go-cache-path
         name: set cache path
-        run: echo "GO_CACHE_PATH=$(go env GOCACHE)\n" >> $GITHUB_OUTPUT
+        run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
       - 
         uses: actions/cache/restore@v3
         with:
