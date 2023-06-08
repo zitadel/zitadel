@@ -15,6 +15,7 @@ on:
       tag_name:
         required: true
         type: string
+  workflow_dispatch:
 
 jobs:
   release:
