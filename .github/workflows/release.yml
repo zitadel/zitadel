@@ -1,9 +1,6 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - ci/improve-no-pr
   workflow_call:
     inputs:
       node_version:
@@ -21,7 +18,6 @@ on:
       image_name:
         required: true
         type: string
-  workflow_dispatch:
 
 jobs:
   release:
