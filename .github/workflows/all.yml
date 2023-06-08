@@ -61,28 +61,28 @@ jobs:
       core_cache_hit: ${{ needs.core.outputs.cache_hit }}
       console_cache_hit: ${{ needs.console.outputs.cache_hit }}
 
-  build-container:
+  container:
     needs: [compile]
     # needs: [compile, lint, core-unit-test, core-integration-test]
     uses: ./.github/workflows/container.yml
     with:
       tag_name: ghcr.io/zitadel/test:${{ github.sha }}
-      shoud_push: false
-      platforms: linux/amd64
+      shoud_push: true
+      platforms: linux/amd64,linux/arm64
 
   e2e:
     uses: ./.github/workflows/e2e.yml
-    needs: [build-container]
+    needs: [container]
     with:
-      tag_name: ${{ needs.build-container.outputs.tag_name }}-ubuntu
+      tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
 
-  push-container:
-    needs: [build-container, lint, core-unit-test, core-integration-test, e2e]
-    uses: ./.github/workflows/container.yml
-    with:
-      tag_name: ghcr.io/zitadel/test:${{ github.sha }}
-      shoud_push: true
-      platforms: linux/amd64,linux/arm64
+  # push-container:
+  #   needs: [container, lint, core-unit-test, core-integration-test, e2e]
+  #   uses: ./.github/workflows/container.yml
+  #   with:
+  #     tag_name: ghcr.io/zitadel/test:${{ github.sha }}
+  #     shoud_push: true
+  #     platforms: linux/amd64,linux/arm64
 
   # e2e-tag:
   #   uses: ./.github/workflows/e2e.yml
