@@ -42,7 +42,7 @@ func TestMain(m *testing.M) {
 		defer Tester.Done()
 
 		CTX, ErrCTX = Tester.WithSystemAuthorization(ctx, integration.OrgOwner), errCtx
-		Client = user.NewUserServiceClient(Tester.GRPCClientConn)
+		Client = Tester.Client.UserV2
 		return m.Run()
 	}())
 }
