@@ -476,6 +476,8 @@ Errors:
     Terminated: 会话已经终止
     Token:
       Invalid: 会话令牌是无效的
+    Passkey:
+      NoChallenge: 没有密码挑战的会话
   Intent:
     IDPMissing: 请求中缺少IDP ID
     SuccessURLMissing: 请求中缺少成功URL

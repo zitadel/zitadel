@@ -2686,6 +2686,278 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "instance reduceOIDCIDPMigratedAzureAD",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.OIDCIDPMigratedAzureADEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"tenant": "tenant",
+	"isEmailVerified": true,
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.OIDCIDPMigratedAzureADEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedAzureAD,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates5 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (id = $9) AND (instance_id = $10)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"name",
+								domain.IDPTypeAzureAD,
+								true,
+								true,
+								true,
+								true,
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.idp_templates5_oidc WHERE (idp_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_azure (idp_id, instance_id, client_id, client_secret, scopes, tenant, is_email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+								"tenant",
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceOIDCIDPMigratedAzureAD",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OIDCIDPMigratedAzureADEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"tenant": "tenant",
+	"isEmailVerified": true,
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.OIDCIDPMigratedAzureADEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedAzureAD,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates5 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (id = $9) AND (instance_id = $10)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"name",
+								domain.IDPTypeAzureAD,
+								true,
+								true,
+								true,
+								true,
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.idp_templates5_oidc WHERE (idp_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_azure (idp_id, instance_id, client_id, client_secret, scopes, tenant, is_email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+								"tenant",
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceOIDCIDPMigratedGoogle",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.OIDCIDPMigratedGoogleEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.OIDCIDPMigratedGoogleEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedGoogle,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates5 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (id = $9) AND (instance_id = $10)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"name",
+								domain.IDPTypeGoogle,
+								true,
+								true,
+								true,
+								true,
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.idp_templates5_oidc WHERE (idp_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_google (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceOIDCIDPMigratedGoogle",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OIDCIDPMigratedGoogleEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.OIDCIDPMigratedGoogleEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceOIDCIDPMigratedGoogle,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates5 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (id = $9) AND (instance_id = $10)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"name",
+								domain.IDPTypeGoogle,
+								true,
+								true,
+								true,
+								true,
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.idp_templates5_oidc WHERE (idp_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates5_google (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
