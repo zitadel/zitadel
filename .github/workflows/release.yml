@@ -30,7 +30,7 @@ jobs:
         dry_run: true
         semantic_version: ${{ inputs.semantic_version }}
         extra_plugins: |
-          @semantic-release/exec@5.0.0
+          @semantic-release/exec@6
           @semantic-release/git
   # api:
   #   name: api

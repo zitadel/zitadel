@@ -72,11 +72,6 @@ jobs:
     needs: [container]
     with:
       tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
-  
-  # semver:
-  #   uses: ./.github/workflows/semrel.yml
-  #   with:
-
 
   release:
     uses: ./.github/workflows/release.yml
@@ -86,3 +81,7 @@ jobs:
       buf_version: 'latest'
       tag_name: ${{ needs.container.outputs.tag_name }}
       semantic_version: '21'
+  
+  # semver:
+  #   uses: ./.github/workflows/semrel.yml
+  #   with:
