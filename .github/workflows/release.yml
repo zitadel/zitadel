@@ -38,7 +38,7 @@ jobs:
         semantic_version: ${{ inputs.semantic_version }}
         extra_plugins: |
           @semantic-release/exec@6.0.3
-    - run: echo ${{steps.semantic.outputs.*}}
+    - run: echo ${{join(steps.semantic.outputs.*, '\n')}}
     
   # api:
   #   name: api
