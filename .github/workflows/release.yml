@@ -61,14 +61,14 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - run: echo "would create ${{ inputs.image_name }}:${{ needs.release.outputs.release }} from ${{ inputs.tag_name }}"
-    # -
-    #   name: Publish semver
-    #   if: ${{ needs.release.outputs.published == 'true' }}
-    #   run: |
-    #     docker buildx imagetools create \
-    #       --tag ${{ inputs.image_name }}:${{ needs.release.outputs.release }} \
-    #       ${{ inputs.tag_name }}
+    # - run: echo "would create ${{ inputs.image_name }}:${{ needs.release.outputs.release }} from ${{ inputs.tag_name }}"
+    -
+      name: Publish semver
+      if: ${{ needs.release.outputs.published == 'true' }}
+      run: |
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name }}:${{ needs.release.outputs.release }} \
+          ${{ inputs.tag_name }}
 
 
 
