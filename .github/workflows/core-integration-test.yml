@@ -47,10 +47,6 @@ jobs:
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
       -
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ inputs.go_version }}
-      -
         id: go-cache-path
         name: set cache path
         run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
@@ -61,7 +57,6 @@ jobs:
           key: integration-test-postgres-${{ inputs.core_cache_key }}
           restore-keys: |
             integration-test-postgres-core-
-            integration-test-core-
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
       - 
         name: test

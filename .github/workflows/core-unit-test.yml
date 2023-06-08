@@ -19,17 +19,18 @@ jobs:
     steps:
       - 
         uses: actions/checkout@v3
-      - 
-        uses: actions/cache/restore@v3
-        name: restore core
-        with:
-          path: ${{ inputs.core_cache_path }}
-          key: ${{ inputs.core_cache_key }}
-          fail-on-cache-miss: true
       -
         uses: actions/setup-go@v4
         with:
           go-version: ${{ inputs.go_version }}
+      - 
+        uses: actions/cache/restore@v3
+        name: restore core
+        id: restore-core
+        with:
+          path: ${{ inputs.core_cache_path }}
+          key: ${{ inputs.core_cache_key }}
+          fail-on-cache-miss: true
       -
         id: go-cache-path
         name: set cache path
@@ -54,6 +55,8 @@ jobs:
           flags: core-unit-tests
       - 
         uses: actions/cache/save@v3
+        name: cache results
+        if: ${{ steps.restore-core.outputs.cache-hit != 'true' }}
         with:
           key: unit-test-${{ inputs.core_cache_key }}
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
