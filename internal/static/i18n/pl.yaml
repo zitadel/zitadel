@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: Użytkownik nie został znaleziony w wybranej organizacji
     NotAllowedOrg: Użytkownik nie jest członkiem wymaganej organizacji
     UserIDMissing: Brakuje ID użytkownika
+    UserIDWrong: "Żądanie użytkownika nie jest równe uwierzytelnionemu użytkownikowi"
     DomainPolicyNil: Polityka organizacji jest pusta
     EmailAsUsernameNotAllowed: Adres e-mail nie jest dozwolony jako nazwa użytkownika
     Invalid: Dane użytkownika są nieprawidłowe
@@ -67,6 +68,7 @@ Errors:
     NoChanges: Nie znaleziono zmian
     InitCodeNotFound: Kod inicjalizacji nie znaleziony
     UsernameNotChanged: Nazwa użytkownika nie została zmieniona
+    InvalidURLTemplate: Szablon URL jest nieprawidłowy
     Profile:
       NotFound: Profil nie znaleziony
       NotChanged: Profil nie zmieniony
@@ -81,7 +83,6 @@ Errors:
       NotChanged: Adres e-mail nie zmieniony
       Empty: Adres e-mail jest pusty
       IDMissing: Adres e-mail ID brakuje
-      InvalidURLTemplate: Szablon URL jest nieprawidłowy
     Phone:
       NotFound: Numer telefonu nie znaleziony
       Invalid: Numer telefonu jest nieprawidłowy
