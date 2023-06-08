@@ -152,6 +152,23 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Authenticate service users",
+          link: {
+            type: "generated-index",
+            title: "Authenticate Service Users",
+            slug: "/guides/integrate/serviceusers",
+            description:
+              "How to authenticate service users for machine-to-machine (M2M) communication between services. You also need to authenticate service users to access ZITADEL's APIs.",
+          },
+          collapsed: true,
+          items: [
+            "guides/integrate/private-key-jwt",
+            "guides/integrate/client-credentials",
+            "guides/integrate/pat",
+          ],
+        },
+        {
+          type: "category",
           label: "Configure identity providers",
           link: {
             type: "generated-index",
@@ -179,21 +196,9 @@ module.exports = {
           collapsed: true,
           items: [
             {
-              type: "category",
-              label: "Authenticate service users",
-              link: {
-                type: "generated-index",
-                title: "Authenticate Service Users",
-                slug: "/guides/integrate/serviceusers",
-                description:
-                  "How to authenticate service users",
-              },
-              collapsed: true,
-              items: [
-                "guides/integrate/private-key-jwt",
-                "guides/integrate/client-credentials",
-                "guides/integrate/pat",
-              ],
+              type: 'link',
+              label: 'Authenticate service users',
+              href: '/guides/integrate/serviceusers',
             },
             "guides/integrate/access-zitadel-apis",
             "guides/integrate/access-zitadel-system-api",
@@ -587,10 +592,17 @@ module.exports = {
           type: "category",
           label: "Policies",
           collapsed: false,
+          link: {
+            type: "generated-index",
+            title: "Policies",
+            slug: "/legal/policies",
+            description: "Policies and guidelines in addition to our terms of services.",
+          },
           items: [
             "legal/privacy-policy",
             "legal/acceptable-use-policy",
             "legal/rate-limit-policy",
+            "legal/policies/account-lockout-policy",
             "legal/vulnerability-disclosure-policy",
           ],
         },
