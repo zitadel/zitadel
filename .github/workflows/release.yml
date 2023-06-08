@@ -25,7 +25,7 @@ jobs:
     - name: Source checkout
       uses: actions/checkout@v3
     - name: Semantic Release
-      uses: cycjimmy/semantic-release-action@v2
+      uses: cycjimmy/semantic-release-action@v3
       with:
         dry_run: true
         semantic_version: ${{ inputs.semantic_version }}
