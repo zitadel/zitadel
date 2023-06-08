@@ -40,7 +40,7 @@ jobs:
         with:
           key: unit-test-${{ inputs.core_cache_key }}
           restore-keys: |
-            unit-test-core
+            unit-test-core-
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
       - 
         name: test
