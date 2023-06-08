@@ -45,7 +45,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ inputs.tag_name }}-ubuntu
-          cache-to: type=gha,mode=max
+          cache-to: type=gha
           cache-from: type=gha
       - 
         name: scratch
@@ -57,5 +57,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ inputs.tag_name }}
-          cache-to: type=gha,mode=max
+          cache-to: type=gha
           cache-from: type=gha

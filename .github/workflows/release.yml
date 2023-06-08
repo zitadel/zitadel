@@ -45,9 +45,9 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [release]
     steps:
-    -
-      name: Checkout
-      uses: actions/checkout@v3
+    # -
+    #   name: Checkout
+    #   uses: actions/checkout@v3
     -
       name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -61,7 +61,6 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    # - run: echo "would create ${{ inputs.image_name }}:${{ needs.release.outputs.release }} from ${{ inputs.tag_name }}"
     -
       name: Publish semver
       if: ${{ needs.release.outputs.published == 'true' }}
@@ -69,18 +68,18 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:${{ needs.release.outputs.release }} \
           ${{ inputs.tag_name }}
+    -
+      name: Publish latest
+      if: ${{ github.ref_name == 'main' && needs.release.outputs.published == 'true' }}
+      run: |
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name }}:latest \
+          ${{ inputs.tag_name }}
 
 
 
 
 
-      
-    # - name: Publish docker version
-    #   if: ${{ steps.semantic.outputs.new_release_published == 'true' }}
-    #   run: echo "push docker image ${{ steps.semantic.outputs.new_release_version }}"
-    # - name: Publish docker latest
-    #   if: ${{ github.ref_name == 'main' && steps.semantic.outputs.new_release_published == 'true' }}
-    #   run: echo "push docker image latest"
     
   # api:
   #   name: api
