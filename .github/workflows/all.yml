@@ -83,8 +83,8 @@ jobs:
     with:
       node_version: '16'
       buf_version: 'latest'
-      tag_name: ghcr.io/zitadel/test:910dfc2abd9a5e70c621b24fe29e42c74dc0e5dd
-      # tag_name: ${{ needs.container.outputs.tag_name }}
+      # tag_name: ghcr.io/zitadel/test:910dfc2abd9a5e70c621b24fe29e42c74dc0e5dd
+      tag_name: ${{ needs.container.outputs.tag_name }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/test'
   
