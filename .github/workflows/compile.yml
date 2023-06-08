@@ -48,12 +48,10 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: ${{ inputs.go_version }}
-    - run: ls -la console/dist/console
     - 
       name: compile
       run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile_pipeline
     - run: ls -la internal/api/ui/console/static/
-    - run: ls -la internal/api/ui/console/static/console
     - 
       uses: actions/upload-artifact@v3
       with:
