@@ -55,6 +55,6 @@ jobs:
       - 
         uses: actions/cache/save@v3
         with:
-          key: core-unit-test-${{ hashFiles(steps.go-cache-path.outputs.GO_CACHE_PATH) }}
+          key: unit-test-${{ inputs.core_cache_key }}
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
         
