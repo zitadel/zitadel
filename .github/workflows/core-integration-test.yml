@@ -42,6 +42,7 @@ jobs:
       - 
         uses: actions/cache/restore@v3
         name: restore core
+        id: restore-core
         with:
           path: ${{ inputs.core_cache_path }}
           key: ${{ inputs.core_cache_key }}
@@ -74,6 +75,7 @@ jobs:
       - 
         uses: actions/cache/save@v3
         name: cache results
+        if: ${{ steps.restore-core.outputs.cache-hit != 'true' }}
         with:
           key: integration-test-postgres-${{ inputs.core_cache_key }}
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
