@@ -14,6 +14,6 @@ export default async (): Promise<Config.InitialOptions> => {
     }),
     testEnvironment: "jsdom",
     testRegex: "/__test__/.*\\.test\\.tsx?$",
-    modulePathIgnorePatterns: ["cypress"]
+    modulePathIgnorePatterns: ["cypress"],
   };
 };
