@@ -12,6 +12,7 @@ import "zitadel/user/v2alpha/user.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -429,10 +430,10 @@ message RegisterPasskeyResponse{
       example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\""
     }
   ];
-  bytes public_key_credential_creation_options = 3 [
+  google.protobuf.Struct public_key_credential_creation_options = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "json representation of public key credential creation options used by the passkey client"
-      example: "\"eyJwdWJsaWNLZXkiOnsiY2hhbGxlbmdlIoplfZm4vM21qSzBPdjltN2x6VWhnclYyejFJSlVzZnpLd0Z1TytWTWtzRW1Icz0iLCJycCI6eyJuYW1lIjoiWklUQURFTCIsImlkIjoiYWNtZS1nem9lNHgueml0YWRlbC5jbG91ZCJ9LCJ1c2VyIjp7Im5hbWUiOiJ0ZXN0dXNlcjU1QGFjbWUueml0YWRlbC5jbG91ZCIsImRpc3BsYXlOYW1lIjoiVGVzdCBUZXN0IiwiaWQiOiJNVGd5TVRVMk1qWTBNakk1TXpBMk5qSTEifSwicHViS2V5Q3JlZFBhcmFtcyI6W3sidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi03fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzV9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zNn0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1N30seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OH0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTM3fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzh9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zOX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTh9XSwiYXV0aGVudGljYXRvclNlbGVjdGlvbiI6eyJ1c2VyVmVyaWZpY2F0aW9uIjoiZGlzY291cmFnZWQifn2ilGltZW91dCI6NjAwMDAsImF0dGVzdGF0aW9uIjoibm9uZSJ9fQ==\""
+      description: "Options for Credential Creation (dictionary PublicKeyCredentialCreationOptions). Generated helper methods transform the field to JSON, for use in a WebauthN client. See also:  https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialcreationoptions"
+      example: "{\"publicKey\":{\"attestation\":\"none\",\"authenticatorSelection\":{\"userVerification\":\"required\"},\"challenge\":\"XaMYwWOZ5hj6pwtwJJlpcI-ExkO5TxevBMG4R8DoKQQ\",\"excludeCredentials\":[{\"id\":\"tVp1QfYhT8DkyEHVrv7blnpAo2YJzbZgZNBf7zPs6CI\",\"type\":\"public-key\"}],\"pubKeyCredParams\":[{\"alg\":-7,\"type\":\"public-key\"}],\"rp\":{\"id\":\"localhost\",\"name\":\"ZITADEL\"},\"timeout\":300000,\"user\":{\"displayName\":\"Tim Mohlmann\",\"id\":\"MjE1NTk4MDAwNDY0OTk4OTQw\",\"name\":\"tim\"}}}"
     }
   ];
 }
@@ -456,11 +457,12 @@ message VerifyPasskeyRegistrationRequest{
       example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\"";
     }
   ];
-  bytes public_key_credential = 3 [
-    (validate.rules).bytes = {min_len: 55, max_len: 1048576},
+  google.protobuf.Struct public_key_credential = 3 [
+    (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "JSON representation of public key credential issued by the passkey client";
+      description: "PublicKeyCredential Interface. Generated helper methods populate the field from JSON created by a WebauthN client. See also:  https://www.w3.org/TR/webauthn/#publickeycredential";
+      example: "{\"type\":\"public-key\",\"id\":\"pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00\",\"rawId\":\"pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00\",\"response\":{\"attestationObject\":\"o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIgRKS3VpeE9tfExXRzkoUKnG4rQWPvtSSt4YtDGgTx32oCIQDPey-2YJ4uIg-QCM4jj6aE2U3tgMFM_RP7Efx6xRu3JGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAADju76085Yhmlt1CEOHkwLQAIKWsFWqxeMT8SxZnwp0ZMF1nk6yhs2m3AIvdixCNVgtNpQECAyYgASFYIMGUDSP2FAQn2MIfPMy7cyB_Y30VqixVgGULTBtFjfRiIlggjUGfQo3_-CrMmH3S-ZQkFKWKnNBQEAMkFtG-9A4zqW0\",\"clientDataJSON\":\"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ\"}}";
       min_length: 55;
       max_length: 1048576; //1 MB
     }

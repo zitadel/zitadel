@@ -286,17 +286,19 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
-	externalUser, externalUserChange, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, nil)
+	// check and fill in local linked user
+	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
+	if !errors.IsNotFound(externalErr) {
+		l.renderError(w, r, authReq, externalErr)
+		return
+	}
+	externalUser, externalUserChange, err := l.runPostExternalAuthenticationActions(externalUser, tokens(session), authReq, r, user, externalErr)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
-	if err != nil {
-		if !errors.IsNotFound(err) {
-			l.renderError(w, r, authReq, err)
-			return
-		}
+	// if action is done and no user linked then link or register
+	if errors.IsNotFound(externalErr) {
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser)
 		return
 	}
