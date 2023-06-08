@@ -85,8 +85,8 @@ core_unit_test:
 .PHONY: core_integration_test
 core_integration_test:
 	go build -o zitadel main.go
-	zitadel init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+	./zitadel init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	$(RM) zitadel
 	go test -tags=integration -race -p 1 -v -coverprofile=profile.cov -coverpkg=./... ./internal/integration ./internal/api/grpc/...
 
