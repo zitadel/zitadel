@@ -51,7 +51,6 @@ jobs:
         against: "https://github.com/${{ github.repository }}.git#branch=main"
 
   console:
-    # if: ${{ inputs.console_cache_hit != 'true' }}
     name: console
     runs-on: ubuntu-latest
     steps:
@@ -71,7 +70,6 @@ jobs:
       run: make console_lint
 
   core:
-    # if: ${{ inputs.core_cache_hit != 'true' }}
     name: core
     runs-on: ubuntu-latest
     steps:

@@ -1,4 +1,4 @@
-name: Build core
+name: Unit test core
 
 on: 
   workflow_call:

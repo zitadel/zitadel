@@ -1,4 +1,4 @@
-name: Build core
+name: Integration test core
 
 on: 
   workflow_call:
