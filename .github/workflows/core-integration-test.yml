@@ -46,8 +46,23 @@ jobs:
           path: ${{ inputs.core_cache_path }}
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
-      # TODO(adlerhurst): find out why this file is currently not added by checkout
-      # - run: mkdir -p internal/api/ui/console/static/console && touch internal/api/ui/console/static/console/.gitkeep
+      -
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go_version }}
+      -
+        id: go-cache-path
+        name: set cache path
+        run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+      - 
+        uses: actions/cache/restore@v3
+        name: restore previous results
+        with:
+          key: integration-test-postgres-${{ inputs.core_cache_key }}
+          restore-keys: |
+            integration-test-postgres-core-
+            integration-test-core-
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
       - 
         name: test
         env:
@@ -61,6 +76,12 @@ jobs:
           file: profile.cov
           name: core-integration-tests-postgres
           flags: core-integration-tests-postgres
+      - 
+        uses: actions/cache/save@v3
+        name: cache results
+        with:
+          key: integration-test-postgres-${{ inputs.core_cache_key }}
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
 
 # cockroach doesn't work at the moment because the cluster does not initialise
   # cockroach:
