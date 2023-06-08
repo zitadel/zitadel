@@ -70,3 +70,23 @@ During this phase, support is limited as we focus on testing and bug fixing.
 Generally available features are available to everyone and have the appropriate test coverage to be used for critical tasks.
 The software will be backwards-compatible with previous versions, for exceptions we will publish a [technical advisory](https://zitadel.com/docs/support/technical_advisory).
 Features in General Availability are not marked explicitly.
+
+## Maintenance
+
+On ZITADEL Cloud we follow a regular deployment cycle to ensure our product remains up-to-date, secure, and provides new features. 
+Our standard deployment cycle occurs every two weeks, during which we implement updates, bug fixes, and enhancements to improve the functionality and performance of our product.
+In certain circumstances, we may require additional deployments beyond the regular two-week cycle.
+This can occur for example when we have substantial updates or feature releases that require additional time for thorough testing and implementation or security fixes.
+During these deployments, we strive to minimize any disruptions and do not expect any downtime.
+
+### Release Deployment with Risk of Downtime
+
+In rare situations where deploying a release carries a risk of downtime, we have a well-defined procedure in place to ensure transparent communication. 
+Prior to such deployments, we publish information on our status page, which can be accessed by visiting [https://status.zitadel.com/](https://status.zitadel.com/).
+We also recommend subscribing to those updates on the [status page](https://status.zitadel.com/).
+
+We make it a priority to inform you of any potential impact well in advance.
+In adherence to our commitment to transparency, we provide a minimum notice period of five working days before deploying a release that poses a risk of downtime. 
+This gives you time to plan accordingly, make any necessary adjustments, or reach out to our support team for assistance.
+
+Our team works diligently to minimize the risk of downtime during these releases. We thoroughly test and verify each update before deployment to ensure the highest level of stability and reliability.
