@@ -7,7 +7,7 @@ compile: core_build console_build compile_pipeline
 
 .PHONY: compile_pipeline
 compile_pipeline:
-	cp -r console/dist/console/ internal/api/ui/console/static
+	cp -r console/dist/console/* internal/api/ui/console/static
 	go build -o zitadel-$$(go env GOOS)-$$(go env GOARCH) -ldflags="-s -w"
 
 .PHONY: core_dependencies
