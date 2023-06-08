@@ -43,7 +43,7 @@ export class AuthInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
       .then((response: any) => {
         return response;
       })
-      .catch((error: any) => {
+      .catch(async (error: any) => {
         if (error.code === 16) {
           this.triggerDialog.next(true);
         }

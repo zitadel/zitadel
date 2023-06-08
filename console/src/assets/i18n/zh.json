@@ -204,6 +204,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "注意！组织环境发生了变化。"
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "视图刚刚更改为实例！"
     }
   },
   "FILTER": {
@@ -251,6 +254,10 @@
     "TOKENINVALID": {
       "TITLE": "您的授权令牌已过期。",
       "DESCRIPTION": "点击下方按钮再次登录。"
+    },
+    "EXHAUSTED": {
+      "TITLE": "你的认证请求配额已用完.",
+      "DESCRIPTION": "删除或增加这个ZITADEL实例的限制。"
     },
     "INVALID_FORMAT": "格式是无效的。",
     "NOTANEMAIL": "给定的值不是合法电子邮件地址。",

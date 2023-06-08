@@ -210,7 +210,7 @@ type cookieResponseWriter struct {
 
 func (r *cookieResponseWriter) WriteHeader(status int) {
 	if status >= 200 && status < 300 {
-		r.accessInterceptor.DeleteExhaustedCookie(r.ResponseWriter, r.request)
+		r.accessInterceptor.DeleteExhaustedCookie(r.ResponseWriter)
 	}
 	if status == http.StatusTooManyRequests {
 		r.accessInterceptor.SetExhaustedCookie(r.ResponseWriter, r.request)

@@ -204,6 +204,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attention ! Le contexte de l'organisation a changé."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "La vue vient de changer en instance !"
     }
   },
   "FILTER": {
@@ -251,6 +254,10 @@
     "TOKENINVALID": {
       "TITLE": "Votre jeton d'autorisation a expiré.",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Ton quota de demandes authentifiées est épuisé.",
+      "DESCRIPTION": "Supprimez ou augmentez la limite de cette instance ZITADEL."
     },
     "INVALID_FORMAT": "Le format n'est pas valide",
     "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",

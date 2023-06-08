@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	instance_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -31,7 +32,7 @@ type Commands struct {
 	httpClient *http.Client
 
 	checkPermission domain.PermissionCheck
-	newEmailCode    func(ctx context.Context, filter preparation.FilterToQueryReducer, codeAlg crypto.EncryptionAlgorithm) (*CryptoCodeWithExpiry, error)
+	newCode         cryptoCodeFunc
 
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
@@ -108,7 +109,7 @@ func StartCommands(
 		webauthnConfig:        webAuthN,
 		httpClient:            httpClient,
 		checkPermission:       permissionCheck,
-		newEmailCode:          newEmailCode,
+		newCode:               newCryptoCodeWithExpiry,
 		sessionTokenCreator:   sessionTokenCreator(idGenerator, sessionAlg),
 		sessionTokenVerifier:  sessionTokenVerifier,
 	}
@@ -122,6 +123,7 @@ func StartCommands(
 	action.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
 	session.RegisterEventMappers(repo.eventstore)
+	idpintent.RegisterEventMappers(repo.eventstore)
 
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
@@ -139,11 +141,21 @@ func StartCommands(
 	return repo, nil
 }
 
-func AppendAndReduce(object interface {
+type AppendReducer interface {
 	AppendEvents(...eventstore.Event)
 	// TODO: Why is it allowed to return an error here?
 	Reduce() error
-}, events ...eventstore.Event) error {
+}
+
+func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer, cmds ...eventstore.Command) error {
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return err
+	}
+	return AppendAndReduce(object, events...)
+}
+
+func AppendAndReduce(object AppendReducer, events ...eventstore.Event) error {
 	object.AppendEvents(events...)
 	return object.Reduce()
 }

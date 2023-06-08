@@ -2,7 +2,13 @@
 .codecov
 .github
 .gitignore
-.goreleaser.yaml
+.dockerignore
+**/Dockerfile
+/k8s/
+/node_modules/
+/console/src/app/proto/generated/
+/console/.angular
+/console/tmp/
 .releaserc.js
 changelog.config.js
 CONTRIBUTING.md

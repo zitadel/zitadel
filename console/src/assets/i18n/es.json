@@ -205,6 +205,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "¡Atención! El contexto de la organización ha cambiado."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "¡La vista acaba de cambiar a instancia!"
     }
   },
   "FILTER": {
@@ -252,6 +255,10 @@
     "TOKENINVALID": {
       "TITLE": "Tu token de autorización token ha caducado.",
       "DESCRIPTION": "Haz clic en el botón más abajo para iniciar sesión otra vez."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Su cuota de solicitudes autenticadas se ha agotado.",
+      "DESCRIPTION": "Borrar o aumentar el límite de esta instancia de ZITADEL."
     },
     "INVALID_FORMAT": "El formato no es valido.",
     "NOTANEMAIL": "El valor proporcionado no es una dirección de email.",

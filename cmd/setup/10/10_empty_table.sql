@@ -1,0 +1,1 @@
+TRUNCATE wrong_events

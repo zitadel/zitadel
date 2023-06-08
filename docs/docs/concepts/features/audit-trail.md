@@ -4,7 +4,7 @@ title: Audit Trail
 
 ZITADEL provides you with an built-in audit trail to track all changes and events over an unlimited period of time.
 Most other solutions replace a historic record and track changes in a separate log when information is updated.
-ZITADEL only ever appends data in an [Eventstore](https://zitadel.com/docs/concepts/eventstore), keeping all historic record.
+ZITADEL only ever appends data in an [Eventstore](/docs/concepts/eventstore/overview), keeping all historic record.
 The audit trail itself is identical to the state, since ZITADEL calculates the state from all the past changes.
 
 ![Example of events that happen for a profile change and a login](/img/concepts/audit-trail/audit-log-events.png)
@@ -35,7 +35,7 @@ Go to your instance settings and then click on the Tab **Events** to open the Ev
 Since everything that is available in Console can also be called with our APIs, you can access all events and audit data trough our APIs:
 
 - [Event API Guide](/docs/guides/integrate/event-api)
-- [API Documentation](/docs/category/apis/admin/events)
+- [API Documentation](/docs/category/apis/resources/admin/events)
 
 Access to the API is possible with a [Service User](/docs/guides/integrate/serviceusers) account, allowing you to integrate the events with your own business logic.
 
