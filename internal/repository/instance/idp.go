@@ -263,7 +263,7 @@ func NewOIDCIDPMigratedGoogleEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				OIDCIDPMigratedAzureADEventType,
+				OIDCIDPMigratedGoogleEventType,
 			),
 			id,
 			name,
