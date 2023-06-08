@@ -36,6 +36,7 @@ jobs:
         run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
       - 
         uses: actions/cache/restore@v3
+        name: restore previous results
         with:
           key: unit-test-${{ inputs.core_cache_key }}
           restore-keys: |

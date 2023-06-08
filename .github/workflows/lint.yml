@@ -92,3 +92,4 @@ jobs:
         github-token: ${{ github.token }}
         only-new-issues: true
         skip-build-cache: true
+        skip-pkg-cache: true
