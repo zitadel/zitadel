@@ -20,7 +20,7 @@ message SendPasskeyRegistrationLink {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"https://example.com/passkey/register?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}\"";
+      example: "\"https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}\"";
       description: "\"Optionally set a url_template, which will be used in the mail sent by ZITADEL to guide the user to your passkey registration page. If no template is set, the default ZITADEL url will be used.\""
     }
   ];
