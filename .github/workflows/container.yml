@@ -12,7 +12,7 @@ on:
 
 jobs:
 
-  core:
+  zitadel:
     name: core
     runs-on: ubuntu-latest
     steps:
