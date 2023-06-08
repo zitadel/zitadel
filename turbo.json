@@ -14,13 +14,20 @@
         "!.next/cache/**"
       ],
       "dependsOn": [
-        "lint",
         "generate",
+        "lint",
         "^build"
       ]
     },
-    "test": {},
+    "test": {
+      "dependsOn": [
+        "generate"
+      ]
+    },
     "test:watch": {
+      "dependsOn": [
+        "generate"
+      ],
       "cache": false
     },
     "lint": {},
