@@ -21,12 +21,14 @@
     },
     "test": {
       "dependsOn": [
-        "generate"
+        "generate",
+        "@zitadel/server#build"
       ]
     },
     "test:watch": {
       "dependsOn": [
-        "generate"
+        "generate",
+        "@zitadel/server#build"
       ]
     },
     "lint": {},
