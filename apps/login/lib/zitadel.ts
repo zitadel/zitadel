@@ -211,9 +211,18 @@ export async function registerPasskey(
  * @returns the newly set email
  */
 export async function createPasskeyRegistrationLink(
-  server: ZitadelServer,
-  userId: string
+  userId: string,
+  sessionToken: string
 ): Promise<any> {
+  // this actions will be made from the currently seleected user
+  const zitadelConfig: ZitadelServerOptions = {
+    name: "zitadel login",
+    apiUrl: process.env.ZITADEL_API_URL ?? "",
+    token: `${sessionToken}`,
+  };
+
+  const server: ZitadelServer = initializeServer(zitadelConfig);
+
   const userservice = user.getUser(server);
   return userservice.createPasskeyRegistrationLink(
     {
