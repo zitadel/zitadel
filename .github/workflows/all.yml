@@ -12,28 +12,28 @@ permissions:
 
 jobs:
 
-  # core:
-  #   uses: ./.github/workflows/core.yml
-  #   with:
-  #     node_version: '18'
-  #     buf_version: 'latest'
-  #     go_version: '1.20'
+  core:
+    uses: ./.github/workflows/core.yml
+    with:
+      node_version: '18'
+      buf_version: 'latest'
+      go_version: '1.20'
     
-  # console:
-  #   uses: ./.github/workflows/console.yml
-  #   with:
-  #     node_version: '18'
-  #     buf_version: 'latest'
+  console:
+    uses: ./.github/workflows/console.yml
+    with:
+      node_version: '18'
+      buf_version: 'latest'
 
-  # compile:
-  #   needs: [core, console]
-  #   uses: ./.github/workflows/compile.yml
-  #   with:
-  #     go_version: '1.20'
-  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
-  #     console_cache_key: ${{ needs.console.outputs.cache_key }}
-  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
-  #     console_cache_path: ${{ needs.console.outputs.cache_path }}
+  compile:
+    needs: [core, console]
+    uses: ./.github/workflows/compile.yml
+    with:
+      go_version: '1.20'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      console_cache_key: ${{ needs.console.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      console_cache_path: ${{ needs.console.outputs.cache_path }}
 
   # core-unit-test:
   #   needs: core
@@ -64,11 +64,11 @@ jobs:
   #     core_cache_hit: ${{ needs.core.outputs.cache_hit }}
   #     console_cache_hit: ${{ needs.console.outputs.cache_hit }}
 
-  # container:
-  #   needs: [compile]
-  #   uses: ./.github/workflows/container.yml
-  #   with:
-  #     tag_name: ghcr.io/zitadel/test:${{ github.sha }}
+  container:
+    needs: [compile]
+    uses: ./.github/workflows/container.yml
+    with:
+      tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
   # e2e:
   #   uses: ./.github/workflows/e2e.yml
@@ -78,12 +78,12 @@ jobs:
 
   release:
     uses: ./.github/workflows/release.yml
+    needs: container
     # needs: [core-unit-test, core-integration-test, lint, container, e2e]
     with:
       node_version: '16'
       buf_version: 'latest'
-      tag_name: 'ghcr.io/zitadel/test:99972154?tag=5444a877b239f9b07fa990ae7f69400a450d6c9c'
-    # ${{ needs.container.outputs.tag_name }}
+      tag_name: ${{ needs.container.outputs.tag_name }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/test'
   
