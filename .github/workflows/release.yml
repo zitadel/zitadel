@@ -38,6 +38,12 @@ jobs:
         extra_plugins: |
           @semantic-release/exec@6.0.3
         # @semantic-release/git
+  test:
+    runs-on: ubuntu-22.04
+    needs: release
+    steps:
+      - run: echo ${{needs.release.outputs.*}}
+    
   # api:
   #   name: api
   #   runs-on: ubuntu-latest
