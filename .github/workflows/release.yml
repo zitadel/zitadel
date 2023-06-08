@@ -38,19 +38,26 @@ jobs:
         semantic_version: ${{ inputs.semantic_version }}
         extra_plugins: |
           @semantic-release/exec@6.0.3
-    - run: |
-        echo "${{ steps.semantic.outputs.new_release_published }}"
-        echo "${{ steps.semantic.outputs.new_release_version }}"
-        echo "${{ steps.semantic.outputs.new_release_major_version }}"
-        echo "${{ steps.semantic.outputs.new_release_minor_version }}"
-        echo "${{ steps.semantic.outputs.new_release_patch_version }}"
-        echo "${{ steps.semantic.outputs.new_release_channel }}"
-        echo "${{ steps.semantic.outputs.new_release_notes }}"
-        echo "${{ steps.semantic.outputs.new_release_git_head }}"
-        echo "${{ steps.semantic.outputs.new_release_git_tag }}"
-        echo "${{ steps.semantic.outputs.last_release_version }}"
-        echo "${{ steps.semantic.outputs.last_release_git_head }}"
-        echo "${{ steps.semantic.outputs.last_release_git_tag }}"
+    - name: Publish docker version
+      if: ${{ steps.semantic.outputs.new_release_published == 'true' }}
+      run: echo "push docker image ${{ steps.semantic.outputs.new_release_version }}"
+    - run: echo "${{github.ref_name}}"
+    - name: Publish docker latest
+      if: ${{ github.ref_name == 'main' && steps.semantic.outputs.new_release_published == 'true' }}
+      run: echo "push docker image latest"
+    # - run: |
+    #     echo "${{ steps.semantic.outputs.new_release_published }}"
+    #     echo "${{ steps.semantic.outputs.new_release_version }}"
+    #     echo "${{ steps.semantic.outputs.new_release_major_version }}"
+    #     echo "${{ steps.semantic.outputs.new_release_minor_version }}"
+    #     echo "${{ steps.semantic.outputs.new_release_patch_version }}"
+    #     echo "${{ steps.semantic.outputs.new_release_channel }}"
+    #     echo "${{ steps.semantic.outputs.new_release_notes }}"
+    #     echo "${{ steps.semantic.outputs.new_release_git_head }}"
+    #     echo "${{ steps.semantic.outputs.new_release_git_tag }}"
+    #     echo "${{ steps.semantic.outputs.last_release_version }}"
+    #     echo "${{ steps.semantic.outputs.last_release_git_head }}"
+    #     echo "${{ steps.semantic.outputs.last_release_git_tag }}"
     
   # api:
   #   name: api
