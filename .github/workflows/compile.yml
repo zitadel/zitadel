@@ -51,7 +51,6 @@ jobs:
     - 
       name: compile
       run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile_pipeline
-    - run: ls -la internal/api/ui/console/static/
     - 
       uses: actions/upload-artifact@v3
       with:
