@@ -54,9 +54,8 @@ console/src/app/proto/generated/
 openapi/**/*.json
 internal/api/assets/authz.go
 internal/api/assets/router.go
-internal/api/ui/console/static/console/*
+internal/api/ui/console/static/console
 !internal/api/ui/console/static/console/.gitkeep
-!internal/api/ui/console/static/.gitkeep
 docs/docs/apis/auth
 docs/docs/apis/admin
 docs/docs/apis/mgmt
