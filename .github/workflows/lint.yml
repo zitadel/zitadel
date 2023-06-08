@@ -45,6 +45,10 @@ jobs:
     - 
       name: lint
       uses: bufbuild/buf-lint-action@v1
+    - 
+      uses: bufbuild/buf-breaking-action@v1
+      with:
+        against: "https://github.com/${{ github.repository }}.git#branch=main"
 
   console:
     # if: ${{ inputs.console_cache_hit != 'true' }}
