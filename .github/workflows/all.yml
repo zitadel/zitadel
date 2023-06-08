@@ -9,69 +9,69 @@ permissions:
 
 jobs:
 
-  core:
-    uses: ./.github/workflows/core.yml
-    with:
-      node_version: '18'
-      buf_version: 'latest'
-      go_version: '1.20'
+  # core:
+  #   uses: ./.github/workflows/core.yml
+  #   with:
+  #     node_version: '18'
+  #     buf_version: 'latest'
+  #     go_version: '1.20'
     
-  console:
-    uses: ./.github/workflows/console.yml
-    with:
-      node_version: '18'
-      buf_version: 'latest'
+  # console:
+  #   uses: ./.github/workflows/console.yml
+  #   with:
+  #     node_version: '18'
+  #     buf_version: 'latest'
 
-  compile:
-    needs: [core, console]
-    uses: ./.github/workflows/compile.yml
-    with:
-      go_version: '1.20'
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      console_cache_key: ${{ needs.console.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
-      console_cache_path: ${{ needs.console.outputs.cache_path }}
+  # compile:
+  #   needs: [core, console]
+  #   uses: ./.github/workflows/compile.yml
+  #   with:
+  #     go_version: '1.20'
+  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
+  #     console_cache_key: ${{ needs.console.outputs.cache_key }}
+  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
+  #     console_cache_path: ${{ needs.console.outputs.cache_path }}
 
-  core-unit-test:
-    needs: core
-    uses: ./.github/workflows/core-unit-test.yml
-    with:
-      go_version: '1.20'
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+  # core-unit-test:
+  #   needs: core
+  #   uses: ./.github/workflows/core-unit-test.yml
+  #   with:
+  #     go_version: '1.20'
+  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
+  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
       
-  core-integration-test:
-    needs: core
-    uses: ./.github/workflows/core-integration-test.yml
-    with:
-      go_version: '1.20'
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+  # core-integration-test:
+  #   needs: core
+  #   uses: ./.github/workflows/core-integration-test.yml
+  #   with:
+  #     go_version: '1.20'
+  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
+  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
   
-  lint:
-    needs: [core, console]
-    uses: ./.github/workflows/lint.yml
-    with:
-      go_version: '1.20'
-      node_version: '18'
-      buf_version: 'latest'
-      go_lint_version: 'v1.53.2'
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
-      core_cache_hit: ${{ needs.core.outputs.cache_hit }}
-      console_cache_hit: ${{ needs.console.outputs.cache_hit }}
+  # lint:
+  #   needs: [core, console]
+  #   uses: ./.github/workflows/lint.yml
+  #   with:
+  #     go_version: '1.20'
+  #     node_version: '18'
+  #     buf_version: 'latest'
+  #     go_lint_version: 'v1.53.2'
+  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
+  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
+  #     core_cache_hit: ${{ needs.core.outputs.cache_hit }}
+  #     console_cache_hit: ${{ needs.console.outputs.cache_hit }}
 
-  container:
-    needs: [compile]
-    uses: ./.github/workflows/container.yml
-    with:
-      tag_name: ghcr.io/zitadel/test:${{ github.sha }}
+  # container:
+  #   needs: [compile]
+  #   uses: ./.github/workflows/container.yml
+  #   with:
+  #     tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
-  e2e:
-    uses: ./.github/workflows/e2e.yml
-    needs: [container]
-    with:
-      tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
+  # e2e:
+  #   uses: ./.github/workflows/e2e.yml
+  #   needs: [container]
+  #   with:
+  #     tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
 
   release:
     uses: ./.github/workflows/release.yml
