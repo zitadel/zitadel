@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package zitadel.session.v2alpha;
 
-import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
@@ -45,6 +44,7 @@ message Session {
 message Factors {
   UserFactor user = 1;
   PasswordFactor password = 2;
+  PasskeyFactor passkey = 3;
 }
 
 message UserFactor {
@@ -74,6 +74,14 @@ message PasswordFactor {
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"time when the password was last checked\"";
+    }
+  ];
+}
+
+message PasskeyFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the passkey challenge was last checked\"";
     }
   ];
 }

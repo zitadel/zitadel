@@ -476,6 +476,17 @@ Errors:
     Terminated: Sesja już zakończona
     Token:
       Invalid: Token sesji jest nieprawidłowy
+    Passkey:
+      NoChallenge: Sesja bez wyzwania klucza
+  Intent:
+    IDPMissing: Brak identyfikatora IDP w żądaniu
+    SuccessURLMissing: Brak adresu URL powodzenia w żądaniu
+    FailureURLMissing: Brak adresu URL niepowodzenia w żądaniu
+    StateMissing: Brak parametru stanu w żądaniu
+    NotStarted: Intencja nie została rozpoczęta lub już się zakończyła
+    NotSucceeded: intencja nie powiodła się
+    TokenCreationFailed: Tworzenie tokena nie powiodło się
+    InvalidToken: Token intencji jest nieprawidłowy
 
 AggregateTypes:
   action: Działanie

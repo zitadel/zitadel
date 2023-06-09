@@ -205,6 +205,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "注意！ 組織のコンテキストが変更されました。"
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "ビューがインスタンスに変更されました。"
     }
   },
   "FILTER": {

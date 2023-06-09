@@ -476,6 +476,17 @@ Errors:
     Terminated: Sessione già terminata
     Token:
       Invalid: Il token della sessione non è valido
+    Passkey:
+      NoChallenge: Sessione senza sfida passkey
+  Intent:
+    IDPMissing: IDP mancante nella richiesta
+    SuccessURLMissing: URL di successo mancante nella richiesta
+    FailureURLMissing: URL di errore mancante nella richiesta
+    StateMissing: parametro di stato mancante nella richiesta
+    NotStarted: l'intento non è stato avviato o è già stato terminato
+    NotSucceeded: l'intento non è andato a buon fine
+    TokenCreationFailed: creazione del token fallita
+    InvalidToken: Il token dell'intento non è valido
 
 AggregateTypes:
   action: Azione

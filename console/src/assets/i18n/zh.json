@@ -204,6 +204,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "注意！组织环境发生了变化。"
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "视图刚刚更改为实例！"
     }
   },
   "FILTER": {
