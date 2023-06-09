@@ -18,6 +18,9 @@ on:
       console_cache_path:
         required: true
         type: string
+      version:
+        required: true
+        type: string
 
 jobs:
   executable:
@@ -50,7 +53,12 @@ jobs:
         go-version: ${{ inputs.go_version }}
     - 
       name: compile
-      run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile_pipeline
+      run: |
+        GOOS=${{matrix.goos}} \
+        GOARCH=${{matrix.goarch}} \
+        VERSION=${{ inputs.version }} \
+        COMMIT_SHA=${{ github.sha }} \
+        make compile_pipeline
     -
       name: create folder
       run: |
