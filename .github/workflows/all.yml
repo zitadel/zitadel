@@ -39,6 +39,7 @@ jobs:
       console_cache_key: ${{ needs.console.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
       console_cache_path: ${{ needs.console.outputs.cache_path }}
+      version: ${{ needs.version.outputs.version }}
 
   core-unit-test:
     needs: core
