@@ -59,12 +59,12 @@ jobs:
         mv zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
         cp LICENSE zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
         cp README.md zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
-        tar -czvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+        tar -cvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
     - 
       uses: actions/upload-artifact@v3
       with:
         name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar
   
   checksums:
     runs-on: ubuntu-latest
