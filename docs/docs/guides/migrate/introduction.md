@@ -56,8 +56,8 @@ We provide some more information on migrating users and secrets in [this guide](
 
 ### Migrating clients / applications
 
-After you have set up or imported your applications to ZITADEL, you need to update your client's configurations, such as issuer, clientID, or credentials.
-It is not possible to create an application with a pre-defined clientId or import existing credentials.
+After you have set up or imported your applications to ZITADEL, you need to update your client's configurations, such as issuer, clientID or credentials.
+It is not possible to create an application with a pre-defined clientID or import existing credentials.
 
 ## Technical considerations
 
