@@ -8,7 +8,8 @@ case $@ in
         ${@:5}
         ;;
     *)
-        if [[ ! -z  "$@" ]];then
+        if [ ! -z  "$@" ]
+        then
             ZITADEL_ARGS=$@
         fi
         /app/zitadel ${ZITADEL_ARGS}
