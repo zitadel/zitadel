@@ -15,14 +15,6 @@ jobs:
   zitadel:
     name: zitadel
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        target: ['final', 'artifact']
-        include:
-          - suffix: ''
-            target: final
-          - suffix: '-ubuntu'
-            target: artifact
     steps:
       - 
         uses: actions/checkout@v3
@@ -50,22 +42,18 @@ jobs:
         with:
           context: .
           file: build/Dockerfile
-          target: ${{ matrix.target }}
+          target: artifact
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ inputs.tag_name }}${{ matrix.suffix }}
-          # cache-to: type=registry,ref=${{ inputs.tag_name }}
-          # cache-from: type=registry,ref=${{ inputs.tag_name }}
-      # - 
-      #   name: scratch
-      #   uses: docker/build-push-action@v4
-      #   timeout-minutes: 4
-      #   with:
-      #     context: .
-      #     file: build/Dockerfile
-      #     target: final
-      #     platforms: linux/amd64,linux/arm64
-      #     push: true
-      #     tags: ${{ inputs.tag_name }}
-      #     # cache-to: type=registry,ref=${{ inputs.tag_name }}
-      #     # cache-from: type=registry,ref=${{ inputs.tag_name }}
+          tags: ${{ inputs.tag_name }}-ubuntu
+      - 
+        name: scratch
+        uses: docker/build-push-action@v4
+        timeout-minutes: 4
+        with:
+          context: .
+          file: build/Dockerfile
+          target: final
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ inputs.tag_name }}

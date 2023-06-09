@@ -44,7 +44,6 @@ jobs:
       name: Publish v${{ inputs.version }}
       run: |
         docker buildx imagetools create \
-          --append \
           --tag ${{ inputs.image_name }}:v${{ inputs.version }} \
           ${{ inputs.tag_name }}
     -
@@ -52,7 +51,6 @@ jobs:
       if: ${{ github.ref_name == 'main' }}
       run: |
         docker buildx imagetools create \
-          --append \
           --tag ${{ inputs.image_name }}:latest \
           ${{ inputs.tag_name }}
 
