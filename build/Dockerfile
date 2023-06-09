@@ -8,7 +8,7 @@ ENV PATH="/app:${PATH}"
 RUN apt-get update && apt-get install ca-certificates -y
 
 COPY build/entrypoint.sh /app/entrypoint.sh
-ADD zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH.tar /app/
+ADD zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH.tar/* /app/
 
 RUN ls -R /app
 
