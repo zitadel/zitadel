@@ -27,7 +27,7 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(time.Hour)
+		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
 		defer cancel()
 
 		Tester = integration.NewTester(ctx)
@@ -55,7 +55,7 @@ retry:
 			s = resp.GetSession()
 			break retry
 		}
-		if status.Convert(err).Code() == codes.NotFound {
+		if code := status.Convert(err).Code(); code == codes.NotFound || code == codes.PermissionDenied {
 			select {
 			case <-CTX.Done():
 				t.Fatal(CTX.Err(), err)
