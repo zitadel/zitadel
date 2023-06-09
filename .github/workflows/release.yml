@@ -60,6 +60,8 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     -
+      run: sha256sum -h
+    -
       name: Publish v${{ needs.release.outputs.release }}
       run: |
         docker buildx imagetools create \
