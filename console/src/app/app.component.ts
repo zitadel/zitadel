@@ -19,7 +19,6 @@ import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
-import { fallbackLanguage, supportedLanguages, supportedLanguagesRegexp } from './utils/language';
 
 @Component({
   selector: 'cnsl-root',
