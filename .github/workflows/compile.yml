@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [linux, darwin, windows]
+        goos: [linux, darwin]
         goarch: [amd64, arm64]
     
     steps:
@@ -51,8 +51,37 @@ jobs:
     - 
       name: compile
       run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile_pipeline
+    -
+      name: create folder
+      run: |
+        mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+        mv zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+        cp LICENSE zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+        cp README.md zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+        tar -cvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
     - 
       uses: actions/upload-artifact@v3
       with:
         name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar
+  
+  checksums:
+    runs-on: ubuntu-latest
+    needs: executable
+    steps:
+    - 
+      uses: actions/download-artifact@v3
+      with:
+        path: executables
+    - 
+      name: move files one folder up
+      run: mv */*.tar . && find . -type d -empty -delete
+      working-directory: executables
+    -
+      run: sha256sum * > checksums.txt
+      working-directory: executables
+    - 
+      uses: actions/upload-artifact@v3
+      with:
+        name: checksums.txt
+        path: executables/checksums.txt

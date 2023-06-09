@@ -13,7 +13,7 @@ on:
 jobs:
 
   zitadel:
-    name: core
+    name: zitadel
     runs-on: ubuntu-latest
     steps:
       - 
@@ -38,6 +38,7 @@ jobs:
       - 
         name: ubuntu
         uses: docker/build-push-action@v4
+        timeout-minutes: 3
         with:
           context: .
           file: build/Dockerfile
@@ -45,11 +46,12 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ inputs.tag_name }}-ubuntu
-          cache-to: type=gha,mode=max
-          cache-from: type=gha
+          cache-to: type=registry,ref=${{ inputs.tag_name }}
+          cache-from: type=registry,ref=${{ inputs.tag_name }}
       - 
         name: scratch
         uses: docker/build-push-action@v4
+        timeout-minutes: 2
         with:
           context: .
           file: build/Dockerfile
@@ -57,5 +59,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ inputs.tag_name }}
-          cache-to: type=gha,mode=max
-          cache-from: type=gha
+          cache-to: type=registry,ref=${{ inputs.tag_name }}
+          cache-from: type=registry,ref=${{ inputs.tag_name }}
