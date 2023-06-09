@@ -53,7 +53,6 @@ jobs:
       run: GOOS=${{matrix.goos}} GOARCH=${{matrix.goarch}} make compile_pipeline
     -
       name: create folder
-
       run: |
         mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
         mv zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
@@ -75,6 +74,8 @@ jobs:
       with:
         path: executables
     - run: ls -R
+      working-directory: executables
+    - run: mv */*.tar . && find . -type d -empty -delete
       working-directory: executables
     -
       run: sha256sum * > checksums.txt
