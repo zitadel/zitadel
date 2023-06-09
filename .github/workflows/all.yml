@@ -31,7 +31,7 @@ jobs:
       semantic_version: '19.0.2'
 
   compile:
-    needs: [core, console]
+    needs: [core, console, version]
     uses: ./.github/workflows/compile.yml
     with:
       go_version: '1.20'
@@ -93,3 +93,4 @@ jobs:
       tag_name: ${{ needs.container.outputs.tag_name }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/test'
+      version: ${{ needs.version.outputs.version }}
