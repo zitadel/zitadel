@@ -35,34 +35,34 @@ jobs:
       core_cache_path: ${{ needs.core.outputs.cache_path }}
       console_cache_path: ${{ needs.console.outputs.cache_path }}
 
-  # core-unit-test:
-  #   needs: core
-  #   uses: ./.github/workflows/core-unit-test.yml
-  #   with:
-  #     go_version: '1.20'
-  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
-  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
+  core-unit-test:
+    needs: core
+    uses: ./.github/workflows/core-unit-test.yml
+    with:
+      go_version: '1.20'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
       
-  # core-integration-test:
-  #   needs: core
-  #   uses: ./.github/workflows/core-integration-test.yml
-  #   with:
-  #     go_version: '1.20'
-  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
-  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
+  core-integration-test:
+    needs: core
+    uses: ./.github/workflows/core-integration-test.yml
+    with:
+      go_version: '1.20'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
   
-  # lint:
-  #   needs: [core, console]
-  #   uses: ./.github/workflows/lint.yml
-  #   with:
-  #     go_version: '1.20'
-  #     node_version: '18'
-  #     buf_version: 'latest'
-  #     go_lint_version: 'v1.53.2'
-  #     core_cache_key: ${{ needs.core.outputs.cache_key }}
-  #     core_cache_path: ${{ needs.core.outputs.cache_path }}
-  #     core_cache_hit: ${{ needs.core.outputs.cache_hit }}
-  #     console_cache_hit: ${{ needs.console.outputs.cache_hit }}
+  lint:
+    needs: [core, console]
+    uses: ./.github/workflows/lint.yml
+    with:
+      go_version: '1.20'
+      node_version: '18'
+      buf_version: 'latest'
+      go_lint_version: 'v1.53.2'
+      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      core_cache_hit: ${{ needs.core.outputs.cache_hit }}
+      console_cache_hit: ${{ needs.console.outputs.cache_hit }}
 
   container:
     needs: [compile]
@@ -70,23 +70,23 @@ jobs:
     with:
       tag_name: ghcr.io/zitadel/test:${{ github.sha }}
 
-  # e2e:
-  #   uses: ./.github/workflows/e2e.yml
-  #   needs: [container]
-  #   with:
-  #     tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
+  e2e:
+    uses: ./.github/workflows/e2e.yml
+    needs: [container]
+    with:
+      tag_name: ${{ needs.container.outputs.tag_name }}-ubuntu
 
-  # release:
-  #   uses: ./.github/workflows/release.yml
-  #   # needs: container
-  #   # needs: [core-unit-test, core-integration-test, lint, container, e2e]
-  #   with:
-  #     node_version: '16'
-  #     buf_version: 'latest'
-  #     tag_name: ghcr.io/zitadel/test:d2021f68a732839d18f2ff9ca78fc018dbe91320
-  #     # tag_name: ${{ needs.container.outputs.tag_name }}
-  #     semantic_version: '19.0.2'
-  #     image_name: 'ghcr.io/zitadel/test'
+  release:
+    uses: ./.github/workflows/release.yml
+    # needs: container
+    needs: [core-unit-test, core-integration-test, lint, container, e2e]
+    with:
+      node_version: '16'
+      buf_version: 'latest'
+      # tag_name: ghcr.io/zitadel/test:d2021f68a732839d18f2ff9ca78fc018dbe91320
+      tag_name: ${{ needs.container.outputs.tag_name }}
+      semantic_version: '19.0.2'
+      image_name: 'ghcr.io/zitadel/test'
   
   # semver:
   #   uses: ./.github/workflows/semrel.yml
