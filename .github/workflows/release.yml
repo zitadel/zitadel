@@ -18,33 +18,14 @@ on:
       image_name:
         required: true
         type: string
+      version:
+        required: true
+        type: string
+
 
 jobs:
-  release:
-    runs-on: ubuntu-22.04
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    outputs:
-      release: ${{ steps.semantic.outputs.new_release_version }}
-      published: ${{ steps.semantic.outputs.new_release_published }}
-    steps:
-    - name: Source checkout
-      uses: actions/checkout@v3
-    - name: Semantic Release
-      uses: cycjimmy/semantic-release-action@v3
-      id: semantic
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        dry_run: true
-        semantic_version: ${{ inputs.semantic_version }}
-        extra_plugins: |
-          @semantic-release/exec@6.0.3
-    
   docker:
     runs-on: ubuntu-22.04
-    needs: [release]
-    if: ${{ needs.release.outputs.published == 'true' }}
     steps:
     -
       name: Set up QEMU
@@ -60,10 +41,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     -
-      name: Publish v${{ needs.release.outputs.release }}
+      name: Publish v${{ inputs.version }}
       run: |
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:v${{ needs.release.outputs.release }} \
+          --tag ${{ inputs.image_name }}:v${{ inputs.version }} \
           ${{ inputs.tag_name }}
     -
       name: Publish latest
