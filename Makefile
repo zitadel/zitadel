@@ -3,8 +3,8 @@ gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
 gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 
 now := "$(shell date --rfc-3339=seconds | sed 's/ /T/')"
-VERSION ?= "development"
-COMMIT_SHA ?= "$(shell git rev-parse HEAD)"
+VERSION ?= development
+COMMIT_SHA ?= $(shell git rev-parse HEAD)
 
 .PHONY: compile
 compile: core_build console_build compile_pipeline
@@ -12,7 +12,7 @@ compile: core_build console_build compile_pipeline
 .PHONY: compile_pipeline
 compile_pipeline:
 	cp -r console/dist/console/* internal/api/ui/console/static
-	go build -o zitadel -ldflags="-s -w -X 'cmd/build.version=$(VERSION)' -X 'cmd/build.commit=$(COMMIT_SHA)' -X 'cmd/build.date=$(now)'"
+	go build -o zitadel -ldflags="-s -w -X 'cmd/build.version="$(VERSION)"' -X 'cmd/build.commit="$(COMMIT_SHA)"' -X 'cmd/build.date=$(now)'"
 	chmod +x zitadel
 
 .PHONY: core_dependencies
