@@ -38,6 +38,7 @@ jobs:
       - 
         name: ubuntu
         uses: docker/build-push-action@v4
+        timeout-minutes: 2
         with:
           context: .
           file: build/Dockerfile
@@ -50,6 +51,7 @@ jobs:
       - 
         name: scratch
         uses: docker/build-push-action@v4
+        timeout-minutes: 2
         with:
           context: .
           file: build/Dockerfile
