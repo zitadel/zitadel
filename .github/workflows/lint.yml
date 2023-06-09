@@ -80,9 +80,6 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: ${{ inputs.go_version }}
-        # caching should be done by linter
-        cache-dependency-path: false
-        cache: false
     - 
       uses: actions/cache/restore@v3
       name: restore core
@@ -96,6 +93,5 @@ jobs:
         version: ${{ inputs.go_lint_version }}
         github-token: ${{ github.token }}
         only-new-issues: true
-        
-        # skip-build-cache: true
-        # skip-pkg-cache: true
+        skip-pkg-cache: true
+        skip-build-cache: true

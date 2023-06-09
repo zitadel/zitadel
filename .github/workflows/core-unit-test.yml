@@ -56,7 +56,7 @@ jobs:
       - 
         uses: actions/cache/save@v3
         name: cache results
-        if: ${{ steps.restore-core.outputs.cache-hit != 'true' }}
+        if: always()
         with:
           key: unit-test-${{ inputs.core_cache_key }}
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
