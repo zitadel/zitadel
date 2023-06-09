@@ -71,6 +71,40 @@ Generally available features are available to everyone and have the appropriate 
 The software will be backwards-compatible with previous versions, for exceptions we will publish a [technical advisory](https://zitadel.com/docs/support/technical_advisory).
 Features in General Availability are not marked explicitly.
 
+## Release Types
+
+All release channels receive regular updates and bug fixes. 
+However, the timing and frequency of updates may differ between the channels. 
+The choice between the "release client", "latest" and "stable" release channels depends on the specific requirements, preferences, and risk tolerance of the users.
+
+[List of all releases](https://github.com/zitadel/zitadel/pkgs/container/zitadel/versions)
+
+### Release Client
+
+A release client refers to a pre-release version of software that is distributed to a limited group of users or customers for testing and evaluation purposes before a wider release.
+It allows a selected group, such as beta testers or early adopters, to provide valuable feedback, identify potential issues, and help refine the software.
+Please note that since it is not the final version, the release client may still contain some bugs or issues that are addressed before the official release.
+
+Release clients are accessible for our opensource community, but will not be deployed to the ZITADEL Cloud Platform.
+
+### Latest
+The "latest" release channel is designed for users who prefer to access the most recent updates, features, and enhancements as soon as they become available.
+It provides early access to new functionalities and improvements but may involve a higher degree of risk as it is the most actively developed version.
+Users opting for the latest release channel should be aware that occasional bugs or issues may arise due to the ongoing development process.
+
+Latest releases will be deployed to the ZITADEL Cloud service.
+
+Have a look at the latest release [here](https://github.com/zitadel/zitadel/pkgs/container/zitadel/99040301?tag=latest)
+
+### Stable
+
+The "stable" release channel is intended for users seeking a more reliable and production-ready version of the software.
+It offers a well-tested and validated release with fewer known issues and a higher level of stability.
+The stable release channel undergoes rigorous quality assurance and testing processes to ensure that it meets the highest standards of reliability and performance.
+It is recommended for users who prioritize stability over immediate access to the latest features.
+
+Stable releases are tagged with "stable" and ou can find the stable release [here](https://github.com/zitadel/zitadel/pkgs/container/zitadel/79772723?tag=stable)
+
 ## Maintenance
 
 ZITADEL Cloud follows a regular deployment cycle to ensure our product remains up-to-date, secure, and provides new features. 
