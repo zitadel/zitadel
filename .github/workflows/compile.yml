@@ -78,7 +78,7 @@ jobs:
     - run: mv */*.tar . && find . -type d -empty -delete
       working-directory: executables
     -
-      run: sha256sum * > checksums.txt && cat checksums.txt
+      run: sha256sum * > checksums.txt
       working-directory: executables
     - 
       uses: actions/upload-artifact@v3

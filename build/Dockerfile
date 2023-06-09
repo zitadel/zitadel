@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install ca-certificates -y
 COPY build/entrypoint.sh /app/entrypoint.sh
 ADD zitadel-$TARGETOS-$TARGETARCH/zitadel-$TARGETOS-$TARGETARCH.tar /app/
 
+RUN ls -R /app
+
 RUN useradd -s "" --home / zitadel && \
     chown zitadel /app/zitadel && \
     chmod +x /app/zitadel && \
