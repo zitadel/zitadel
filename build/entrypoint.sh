@@ -8,6 +8,6 @@ case $@ in
         ${@:5}
         ;;
     *)
-        /app/zitadel $(echo $ZITADEL_ARGS)
+        /app/zitadel $([[ ! -z $@ ]] && echo $@ || echo ${ZITADEL_ARGS})
         ;;
 esac
