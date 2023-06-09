@@ -38,7 +38,7 @@ jobs:
       - 
         name: ubuntu
         uses: docker/build-push-action@v4
-        timeout-minutes: 2
+        timeout-minutes: 3
         with:
           context: .
           file: build/Dockerfile

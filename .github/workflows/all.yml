@@ -1,7 +1,7 @@
 name: All in one build
 
 on:
-  pull_request:
+  # pull_request:
   push:
     branches:
       - ci/improve-no-pr
