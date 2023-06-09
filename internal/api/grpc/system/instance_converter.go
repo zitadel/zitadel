@@ -114,9 +114,9 @@ func createInstancePbToAddMachine(req *system_pb.CreateInstanceRequest_Machine, 
 			Scopes: []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
 		}
 
-		if !defaultMachine.Pat.ExpirationDate.IsZero() {
+		if defaultMachine.Pat != nil && !defaultMachine.Pat.ExpirationDate.IsZero() {
 			pat.ExpirationDate = defaultMachine.Pat.ExpirationDate
-		} else if req.PersonalAccessToken.ExpirationDate.IsValid() {
+		} else if req.PersonalAccessToken != nil && req.PersonalAccessToken.ExpirationDate.IsValid() {
 			pat.ExpirationDate = req.PersonalAccessToken.ExpirationDate.AsTime()
 		}
 
