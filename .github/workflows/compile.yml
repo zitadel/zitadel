@@ -65,7 +65,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: executables
-    - run: ls -R
+    - run: mv */* . && find . -type d -empty -delete
       working-directory: executables
     -
       run: sha256sum * > checksums.txt
