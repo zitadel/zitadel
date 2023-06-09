@@ -63,7 +63,7 @@ jobs:
     - 
       uses: actions/upload-artifact@v3
       with:
-        name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+        name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
         path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
   
   checksums:
