@@ -82,7 +82,7 @@ The choice between the "release client", "latest" and "stable" release channels 
 ### Release Client
 
 A release client refers to a pre-release version that is distributed to a limited group of users or customers for testing and evaluation purposes before a wider release.
-It allows a selected group, such as beta testers or early adopters, to provide valuable feedback, identify potential issues, and help refine the software.
+It allows a selected group, such as our opensource community or early adopters, to provide valuable feedback, identify potential issues, and help refine the software.
 Please note that since it is not the final version, the release client may still contain some bugs or issues that are addressed before the official release.
 
 Release clients are accessible for our opensource community, but will not be deployed to the ZITADEL Cloud Platform.
