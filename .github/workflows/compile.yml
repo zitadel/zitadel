@@ -56,3 +56,20 @@ jobs:
       with:
         name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
         path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+  
+  checksums:
+    runs-on: ubuntu-latest
+    needs: executable
+    steps:
+    - 
+      uses: actions/download-artifact@v3
+      with:
+        path: /executables/
+    -
+      run: sha256sum * > checksums.txt
+      working-directory: /executables
+    - 
+      uses: actions/upload-artifact@v3
+      with:
+        name: checksums.txt
+        path: /executables/checksums.txt
