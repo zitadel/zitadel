@@ -75,17 +75,17 @@ Features in General Availability are not marked explicitly.
 
 All release channels receive regular updates and bug fixes. 
 However, the timing and frequency of updates may differ between the channels. 
-The choice between the "release client", "latest" and "stable" release channels depends on the specific requirements, preferences, and risk tolerance of the users.
+The choice between the "release candidate", "latest" and "stable" release channels depends on the specific requirements, preferences, and risk tolerance of the users.
 
 [List of all releases](https://github.com/zitadel/zitadel/releases)
 
-### Release Client
+### Release Candidate
 
-A release client refers to a pre-release version that is distributed to a limited group of users or customers for testing and evaluation purposes before a wider release.
+A release candidate refers to a pre-release version that is distributed to a limited group of users or customers for testing and evaluation purposes before a wider release.
 It allows a selected group, such as our opensource community or early adopters, to provide valuable feedback, identify potential issues, and help refine the software.
-Please note that since it is not the final version, the release client may still contain some bugs or issues that are addressed before the official release.
+Please note that since it is not the final version, the release candidate may still contain some bugs or issues that are addressed before the official release.
 
-Release clients are accessible for our opensource community, but will not be deployed to the ZITADEL Cloud Platform.
+Release candidates are accessible for our opensource community, but will not be deployed to the ZITADEL Cloud Platform.
 
 ### Latest
 The "latest" release channel is designed for users who prefer to access the most recent updates, features, and enhancements as soon as they become available.
