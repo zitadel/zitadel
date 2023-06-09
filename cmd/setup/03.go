@@ -23,10 +23,12 @@ type FirstInstance struct {
 	DefaultLanguage language.Tag
 	Org             command.OrgSetup
 	MachineKeyPath  string
+	PatPath         string
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
 	smtpEncryptionKey *crypto.KeyConfig
+	oidcEncryptionKey *crypto.KeyConfig
 	masterKey         string
 	db                *sql.DB
 	es                *eventstore.Eventstore
@@ -59,6 +61,14 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		return err
 	}
 
+	if err = verifyKey(mig.oidcEncryptionKey, keyStorage); err != nil {
+		return err
+	}
+	oidcEncryption, err := crypto.NewAESCrypto(mig.oidcEncryptionKey, keyStorage)
+	if err != nil {
+		return err
+	}
+
 	cmd, err := command.StartCommands(mig.es,
 		mig.defaults,
 		mig.zitadelRoles,
@@ -73,7 +83,7 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		nil,
 		userAlg,
 		nil,
-		nil,
+		oidcEncryption,
 		nil,
 		nil,
 		nil,
@@ -101,25 +111,41 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		}
 	}
 
-	_, _, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
-	if key == nil {
+	_, token, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
+	if mig.instanceSetup.Org.Machine != nil &&
+		((mig.instanceSetup.Org.Machine.Pat != nil && token == "") ||
+			(mig.instanceSetup.Org.Machine.MachineKey != nil && key == nil)) {
 		return err
 	}
 
-	f := os.Stdout
-	if mig.MachineKeyPath != "" {
+	if mig.MachineKeyPath != "" && key != nil {
+		f := os.Stdout
+		defer f.Close()
 		f, err = os.OpenFile(mig.MachineKeyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
 			return err
 		}
+
+		keyDetails, err := key.Detail()
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintln(f, string(keyDetails))
+	}
+	if mig.PatPath != "" && token != "" {
+		f := os.Stdout
 		defer f.Close()
+		f, err = os.OpenFile(mig.PatPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		if err != nil {
+			return err
+		}
+
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintln(f, token)
 	}
 
-	keyDetails, err := key.Detail()
-	if err != nil {
-		return err
-	}
-	_, err = fmt.Fprintln(f, string(keyDetails))
 	return err
 }
 

@@ -433,6 +433,7 @@ DefaultInstance:
         Type:
       Pat:
         ExpirationDate:
+        Scopes:
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecret:
