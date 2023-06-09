@@ -267,7 +267,7 @@ export class AppComponent implements OnDestroy {
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh','bg']);
+    this.translate.addLangs(['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh', 'bg']);
     this.translate.setDefaultLang('en');
 
     this.authService.user.subscribe((userprofile) => {
