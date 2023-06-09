@@ -1033,7 +1033,8 @@
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български"
     },
     "SMTP": {
       "TITLE": "SMTP設定",
@@ -1227,7 +1228,8 @@
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -2091,7 +2093,8 @@
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",
