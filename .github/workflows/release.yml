@@ -49,6 +49,9 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }} \
           ${{ inputs.tag_name }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }}-ubuntu \
+          ${{ inputs.tag_name }}-ubuntu
     -
       name: Publish latest
       if: ${{ github.ref_name == 'main' }}
@@ -56,6 +59,9 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:latest \
           ${{ inputs.tag_name }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name }}:latest-ubuntu \
+          ${{ inputs.tag_name }}-ubuntu
 
 
 
