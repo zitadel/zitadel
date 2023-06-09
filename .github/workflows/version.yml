@@ -6,6 +6,9 @@ on:
       semantic_version:
         required: true
         type: string
+      dry_run:
+        required: true
+        type: boolean
     outputs:
         version: 
             value: ${{ jobs.generate.outputs.version }}
@@ -29,7 +32,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        dry_run: true
+        dry_run: ${{ inputs.dry_run }}
         semantic_version: ${{ inputs.semantic_version }}
         extra_plugins: |
           @semantic-release/exec@6.0.3

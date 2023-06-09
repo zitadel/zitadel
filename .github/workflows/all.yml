@@ -29,6 +29,7 @@ jobs:
     uses: ./.github/workflows/version.yml
     with:
       semantic_version: '19.0.2'
+      dry_run: true
 
   compile:
     needs: [core, console, version]
@@ -94,4 +95,3 @@ jobs:
       tag_name: ${{ needs.container.outputs.tag_name }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/test'
-      version: ${{ needs.version.outputs.version }}

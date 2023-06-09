@@ -18,14 +18,17 @@ on:
       image_name:
         required: true
         type: string
-      version:
-        required: true
-        type: string
-
 
 jobs:
+  version:
+    uses: ./.github/workflows/version.yml
+    with:
+      semantic_version: '19.0.2'
+      dry_run: true
+
   docker:
     runs-on: ubuntu-22.04
+    needs: [ version ]
     steps:
     -
       name: Set up QEMU
@@ -41,10 +44,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     -
-      name: Publish ${{ inputs.version }}
+      name: Publish ${{ needs.version.outputs.version }}
       run: |
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:${{ inputs.version }} \
+          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }} \
           ${{ inputs.tag_name }}
     -
       name: Publish latest
