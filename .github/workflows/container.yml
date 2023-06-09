@@ -43,7 +43,7 @@ jobs:
           context: .
           file: build/Dockerfile
           target: artifact
-          platforms: linux/amd64,linux/arm64,linux/arm64/v8
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ inputs.tag_name }}-ubuntu
           cache-to: type=registry,ref=${{ inputs.tag_name }}
@@ -56,7 +56,7 @@ jobs:
           context: .
           file: build/Dockerfile
           target: final
-          platforms: linux/amd64,linux/arm64,linux/arm64/v8
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ inputs.tag_name }}
           cache-to: type=registry,ref=${{ inputs.tag_name }}
