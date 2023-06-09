@@ -3,7 +3,7 @@ gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
 gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 
 now := "$(shell date --rfc-3339=seconds | sed 's/ /T/')"
-VERSION ?= local
+VERSION ?= development
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
 
 .PHONY: compile

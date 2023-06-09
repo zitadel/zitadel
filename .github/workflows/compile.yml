@@ -55,10 +55,10 @@ jobs:
     - 
       name: compile
       run: |
-        GOOS=${{matrix.goos}} \
-        GOARCH=${{matrix.goarch}} \
-        VERSION=${{ inputs.version }} \
-        COMMIT_SHA=${{ github.sha }} \
+        GOOS="${{matrix.goos}}" \
+        GOARCH="${{matrix.goarch}}" \
+        VERSION="${{ inputs.version }}" \
+        COMMIT_SHA="${{ github.sha }}" \
         make compile_pipeline
     -
       name: create folder
