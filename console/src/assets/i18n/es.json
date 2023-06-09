@@ -1775,6 +1775,8 @@
     "DELETE": "Borrar",
     "DELETE_TITLE": "Borrar IDP",
     "DELETE_DESCRIPTION": "Estás a punto de borrar un proveedor de identidad. Los cambios son irrevocables. ¿Estás seguro de que quieres hacer esto?",
+    "REMOVE_WARN_TITLE": "Quitar desplazado interno",
+    "REMOVE_WARN_DESCRIPTION": "Está a punto de eliminar un proveedor de identidad. Esto eliminará la selección del IDP disponible para sus usuarios y los usuarios ya registrados no podrán volver a iniciar sesión. ¿Estás seguro de continuar?",
     "DELETE_SELECTION_TITLE": "Borrar IDP",
     "DELETE_SELECTION_DESCRIPTION": "Estás a punto de borrar un proveedor de identidad. Los cambios resultantes son irrevocables. ¿Estás seguro de que quieres hacer esto?",
     "EMPTY": "No hay IDP disponible",

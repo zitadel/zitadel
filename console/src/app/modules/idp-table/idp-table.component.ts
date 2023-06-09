@@ -385,14 +385,49 @@ export class IdpTableComponent implements OnInit {
     }
   }
 
-  public removeIdp(idp: Provider.AsObject): Promise<any> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        if (this.isDefault) {
-          return this.addLoginPolicy()
-            .then(() => {
-              this.loginPolicy.isDefault = false;
-              return (this.service as ManagementService)
+  public removeIdp(idp: Provider.AsObject): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.CONTINUE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'IDP.REMOVE_WARN_TITLE',
+        descriptionKey: 'IDP.REMOVE_WARN_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        switch (this.serviceType) {
+          case PolicyComponentServiceType.MGMT:
+            if (this.isDefault) {
+              this.addLoginPolicy()
+                .then(() => {
+                  this.loginPolicy.isDefault = false;
+                  return (this.service as ManagementService)
+                    .removeIDPFromLoginPolicy(idp.id)
+                    .then(() => {
+                      this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                      setTimeout(() => {
+                        this.getIdps()
+                          .then((resp) => {
+                            this.idps = resp;
+                          })
+                          .catch((error) => {
+                            this.toast.showError(error);
+                          });
+                      }, 2000);
+                    })
+                    .catch((error) => {
+                      this.toast.showError(error);
+                    });
+                })
+                .catch((error) => {
+                  this.toast.showError(error);
+                });
+              break;
+            } else {
+              (this.service as ManagementService)
                 .removeIDPFromLoginPolicy(idp.id)
                 .then(() => {
                   this.toast.showInfo('IDP.TOAST.REMOVED', true);
@@ -409,48 +444,30 @@ export class IdpTableComponent implements OnInit {
                 .catch((error) => {
                   this.toast.showError(error);
                 });
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        } else {
-          return (this.service as ManagementService)
-            .removeIDPFromLoginPolicy(idp.id)
-            .then(() => {
-              this.toast.showInfo('IDP.TOAST.REMOVED', true);
-              setTimeout(() => {
-                this.getIdps()
-                  .then((resp) => {
-                    this.idps = resp;
-                  })
-                  .catch((error) => {
-                    this.toast.showError(error);
-                  });
-              }, 2000);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
+              break;
+            }
+          case PolicyComponentServiceType.ADMIN:
+            (this.service as AdminService)
+              .removeIDPFromLoginPolicy(idp.id)
+              .then(() => {
+                this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                setTimeout(() => {
+                  this.getIdps()
+                    .then((resp) => {
+                      this.idps = resp;
+                    })
+                    .catch((error) => {
+                      this.toast.showError(error);
+                    });
+                }, 2000);
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
+            break;
         }
-      case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService)
-          .removeIDPFromLoginPolicy(idp.id)
-          .then(() => {
-            this.toast.showInfo('IDP.TOAST.REMOVED', true);
-            setTimeout(() => {
-              this.getIdps()
-                .then((resp) => {
-                  this.idps = resp;
-                })
-                .catch((error) => {
-                  this.toast.showError(error);
-                });
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-    }
+      }
+    });
   }
 
   public isEnabled(idp: Provider.AsObject): boolean {

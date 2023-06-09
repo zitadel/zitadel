@@ -1775,6 +1775,8 @@
     "DELETE": "Delete",
     "DELETE_TITLE": "Delete IDP",
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "REMOVE_WARN_TITLE": "Remove IDP",
+    "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IDP for your users and already registered users won't be able to login again. Are you sure to continue?",
     "DELETE_SELECTION_TITLE": "Delete IDP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "EMPTY": "No IDP available",
