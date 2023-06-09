@@ -41,10 +41,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     -
-      name: Publish v${{ inputs.version }}
+      name: Publish ${{ inputs.version }}
       run: |
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:v${{ inputs.version }} \
+          --tag ${{ inputs.image_name }}:${{ inputs.version }} \
           ${{ inputs.tag_name }}
     -
       name: Publish latest
