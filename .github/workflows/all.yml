@@ -79,7 +79,8 @@ jobs:
   release:
     uses: ./.github/workflows/release.yml
     # needs: container
-    needs: [core-unit-test, core-integration-test, lint, container, e2e]
+    # needs: [core-unit-test, core-integration-test, lint, container, e2e]
+    needs: [core-unit-test, core-integration-test, container, e2e]
     with:
       node_version: '16'
       buf_version: 'latest'
@@ -87,7 +88,3 @@ jobs:
       tag_name: ${{ needs.container.outputs.tag_name }}
       semantic_version: '19.0.2'
       image_name: 'ghcr.io/zitadel/test'
-  
-  # semver:
-  #   uses: ./.github/workflows/semrel.yml
-  #   with:
