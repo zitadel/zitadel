@@ -1,11 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import {
   MatLegacyDialog as MatDialog,
   MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
 } from '@angular/material/legacy-dialog';
-import { Router } from '@angular/router';
 
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { mapTo } from 'rxjs';
@@ -21,42 +20,33 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./add-action-dialog.component.scss'],
 })
 export class AddActionDialogComponent implements OnInit {
-  public name: string = '';
-  public script: string = '';
-  public durationInSec: number = 10;
-  public allowedToFail: boolean = false;
-
   public id: string = '';
 
   public opened$ = this.dialogRef.afterOpened().pipe(mapTo(true));
-  public form!: UntypedFormGroup;
+  public form: FormGroup = new FormGroup({
+    name: new FormControl<string>('', []),
+    script: new FormControl<string>('', []),
+    durationInSec: new FormControl<number>(10, []),
+    allowedToFail: new FormControl<boolean>(false, []),
+  });
   constructor(
     private toast: ToastService,
     private mgmtService: ManagementService,
     private dialog: MatDialog,
     private unsavedChangesDialog: MatDialog,
     public dialogRef: MatDialogRef<AddActionDialogComponent>,
-    private fb: UntypedFormBuilder,
-    private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
     if (data && data.action) {
       const action: Action.AsObject = data.action;
-      this.name = action.name;
-      this.script = action.script;
-      if (action.timeout?.seconds) {
-        this.durationInSec = action.timeout?.seconds;
-      }
-      this.allowedToFail = action.allowedToFail;
+      this.form.setValue({
+        name: action.name,
+        script: action.script,
+        durationInSec: action.timeout?.seconds ?? 10,
+        allowedToFail: action.allowedToFail,
+      });
       this.id = action.id;
     }
-
-    this.form = this.fb.group({
-      name: this.name,
-      script: this.script,
-      durationInSec: this.durationInSec,
-      allowedToFail: this.allowedToFail,
-    });
   }
 
   ngOnInit(): void {
@@ -106,7 +96,7 @@ export class AddActionDialogComponent implements OnInit {
   public closeDialogWithSuccess(): void {
     if (this.id) {
       const req = new UpdateActionRequest();
-      req.setId(this.form.value.id);
+      req.setId(this.id);
       req.setName(this.form.value.name);
       req.setScript(this.form.value.script);
 
