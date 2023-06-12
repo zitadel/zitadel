@@ -659,7 +659,7 @@ message RegisterOTPRequest {
 
 message RegisterOTPResponse {
   zitadel.object.v2alpha.Details details = 1;
-  string url = 2 [
+  string uri = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"otpauth://totp/ZITADEL:gigi@acme.zitadel.cloud?algorithm=SHA1&digits=6&issuer=ZITADEL&period=30&secret=TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
     }
