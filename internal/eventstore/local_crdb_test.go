@@ -3,6 +3,7 @@ package eventstore_test
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"os"
 	"testing"
 	"time"
@@ -44,9 +45,11 @@ func TestMain(m *testing.M) {
 		logging.WithFields("error", err).Fatal("unable to ping db")
 	}
 
-	queriers["v2"] = &es_sql.CRDB{DB: testCRDBClient}
+	v2 := &es_sql.CRDB{DB: testCRDBClient}
+	queriers["v2"] = v2
 
 	pushers["v3"] = new_es.NewEventstore(testCRDBClient)
+	pushers["v2"] = v2
 
 	defer func() {
 		testCRDBClient.Close()
@@ -89,13 +92,12 @@ func (*testDB) Username() string { return "user" }
 
 func (*testDB) Type() string { return "type" }
 
-func generateCommand(t *testing.T, aggregateID string, opts ...func(*testEvent)) eventstore.Command {
-	t.Helper()
+func generateCommand(aggregateType eventstore.AggregateType, aggregateID string, opts ...func(*testEvent)) eventstore.Command {
 	e := &testEvent{
 		BaseEvent: eventstore.BaseEvent{
 			Agg: &eventstore.Aggregate{
 				ID:            aggregateID,
-				Type:          eventstore.AggregateType(t.Name()),
+				Type:          aggregateType,
 				ResourceOwner: "ro",
 				Version:       "v1",
 			},
@@ -156,6 +158,16 @@ func generateRemoveUniqueConstraint(table, uniqueField string) func(e *testEvent
 				Action:      eventstore.UniqueConstraintRemove,
 			},
 		)
+	}
+}
+
+func withTestData(data any) func(e *testEvent) {
+	return func(e *testEvent) {
+		d, err := json.Marshal(data)
+		if err != nil {
+			panic("marshal data failed")
+		}
+		e.Data = d
 	}
 }
 

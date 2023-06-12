@@ -35,9 +35,9 @@ func TestCRDB_Filter(t *testing.T) {
 			},
 			fields: fields{
 				existingEvents: []eventstore.Command{
-					generateCommand(t, "300"),
-					generateCommand(t, "300"),
-					generateCommand(t, "300"),
+					generateCommand(eventstore.AggregateType(t.Name()), "300"),
+					generateCommand(eventstore.AggregateType(t.Name()), "300"),
+					generateCommand(eventstore.AggregateType(t.Name()), "300"),
 				},
 			},
 			res: res{
@@ -56,10 +56,10 @@ func TestCRDB_Filter(t *testing.T) {
 			},
 			fields: fields{
 				existingEvents: []eventstore.Command{
-					generateCommand(t, "303"),
-					generateCommand(t, "303"),
-					generateCommand(t, "303"),
-					generateCommand(t, "305"),
+					generateCommand(eventstore.AggregateType(t.Name()), "303"),
+					generateCommand(eventstore.AggregateType(t.Name()), "303"),
+					generateCommand(eventstore.AggregateType(t.Name()), "303"),
+					generateCommand(eventstore.AggregateType(t.Name()), "305"),
 				},
 			},
 			res: res{
@@ -211,9 +211,9 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			},
 			fields: fields{
 				existingEvents: []eventstore.Command{
-					generateCommand(t, "400"),
-					generateCommand(t, "400"),
-					generateCommand(t, "400"),
+					generateCommand(eventstore.AggregateType(t.Name()), "400"),
+					generateCommand(eventstore.AggregateType(t.Name()), "400"),
+					generateCommand(eventstore.AggregateType(t.Name()), "400"),
 				},
 			},
 			res: res{
@@ -231,9 +231,9 @@ func TestCRDB_LatestSequence(t *testing.T) {
 			},
 			fields: fields{
 				existingEvents: []eventstore.Command{
-					generateCommand(t, "401"),
-					generateCommand(t, "401"),
-					generateCommand(t, "401"),
+					generateCommand(eventstore.AggregateType(t.Name()), "401"),
+					generateCommand(eventstore.AggregateType(t.Name()), "401"),
+					generateCommand(eventstore.AggregateType(t.Name()), "401"),
 				},
 			},
 			res: res{
