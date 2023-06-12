@@ -10,6 +10,7 @@ export class BackDirective {
   @HostListener('click')
   onClick(): void {
     this.navigation.back();
+    // Go back again to avoid create dialog starts again
     if (this.new) {
       this.navigation.back();
     }
@@ -21,6 +22,7 @@ export class BackDirective {
     private renderer2: Renderer2,
     private route: ActivatedRoute,
   ) {
+    // Check if a new element was created using a create dialog
     this.route.queryParams.subscribe((params) => {
       this.new = params['new'];
     });
