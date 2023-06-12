@@ -93,8 +93,6 @@ The "latest" release channel is designed for users who prefer to access the most
 It provides early access to new functionalities and improvements but may involve a higher degree of risk as it is the most actively developed version.
 Users opting for the latest release channel should be aware that occasional bugs or issues may arise due to the ongoing development process.
 
-Latest releases will be deployed to the ZITADEL Cloud service.
-
 ### Stable
 
 The "stable" release channel is intended for users seeking a more reliable and production-ready version of the software.
