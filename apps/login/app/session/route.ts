@@ -94,6 +94,8 @@ export async function PUT(request: NextRequest) {
                   loginName: session.factors?.user?.loginName ?? "",
                 };
 
+                console.log("new token", recent.token, newCookie.token);
+
                 return updateSessionCookie(sessionCookie.id, newCookie)
                   .then(() => {
                     return NextResponse.json({ factors: session.factors });

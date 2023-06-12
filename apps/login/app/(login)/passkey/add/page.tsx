@@ -1,9 +1,8 @@
 import { getSession, server } from "#/lib/zitadel";
-import Alert from "#/ui/Alert";
+import Alert, { AlertType } from "#/ui/Alert";
 import RegisterPasskey from "#/ui/RegisterPasskey";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
-import { useRouter } from "next/navigation";
 
 export default async function Page({
   searchParams,
@@ -15,7 +14,6 @@ export default async function Page({
 
   async function loadSession(loginName?: string) {
     const recent = await getMostRecentCookieWithLoginname(loginName);
-
     return getSession(server, recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
@@ -27,7 +25,14 @@ export default async function Page({
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1>Register Passkey</h1>
-      <p className="ztdl-p mb-6 block">Setup your device for passkeys.</p>
+      <p className="ztdl-p mb-6 block">
+        Setup your user to authenticate with passkeys.
+      </p>
+
+      <Alert type={AlertType.INFO}>
+        A passkey is an authentication method on a device like your fingerprint,
+        Apple FaceID or similar.
+      </Alert>
 
       {!sessionFactors && (
         <div className="py-4">

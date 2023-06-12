@@ -22,6 +22,7 @@ import {
   DeleteSessionResponse,
   VerifyPasskeyRegistrationResponse,
 } from "@zitadel/server";
+import { Metadata } from "nice-grpc";
 
 export const zitadelConfig: ZitadelServerOptions = {
   name: "zitadel login",
@@ -185,24 +186,8 @@ export async function setEmail(
   );
 }
 
-/**
- *
- * @param server
- * @param userId the id of the user where the email should be set
- * @returns the newly set email
- */
-export async function registerPasskey(
-  server: ZitadelServer,
-  userId: string
-): Promise<any> {
-  const userservice = user.getUser(server);
-  return userservice.registerPasskey(
-    {
-      userId,
-    },
-    {}
-  );
-}
+const bearerTokenMetadata = (token: string) =>
+  new Metadata({ authorization: `Bearer ${token}` });
 
 /**
  *
@@ -214,22 +199,22 @@ export async function createPasskeyRegistrationLink(
   userId: string,
   sessionToken: string
 ): Promise<any> {
-  // this actions will be made from the currently seleected user
-  const zitadelConfig: ZitadelServerOptions = {
-    name: "zitadel login",
-    apiUrl: process.env.ZITADEL_API_URL ?? "",
-    token: `${sessionToken}`,
-  };
+  //   this actions will be made from the currently seleected user
+  //   const zitadelConfig: ZitadelServerOptions = {
+  //     name: "zitadel login",
+  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
+  //     token: "",
+  //   };
 
-  const server: ZitadelServer = initializeServer(zitadelConfig);
-
+  //   const authserver: ZitadelServer = initializeServer(zitadelConfig);
+  //   console.log("server", authserver);
   const userservice = user.getUser(server);
   return userservice.createPasskeyRegistrationLink(
     {
       userId,
-      //   returnCode: new ReturnPasskeyRegistrationCode(),
-    },
-    {}
+      returnCode: {},
+    }
+    // { metadata: bearerTokenMetadata(sessionToken) }
   );
 }
 
@@ -257,4 +242,34 @@ export async function verifyPasskeyRegistration(
     {}
   );
 }
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @returns the newly set email
+ */
+export async function registerPasskey(
+  userId: string,
+  sessionToken: string
+): Promise<any> {
+  //   this actions will be made from the currently seleected user
+  const zitadelConfig: ZitadelServerOptions = {
+    name: "zitadel login",
+    apiUrl: process.env.ZITADEL_API_URL ?? "",
+    token: "",
+  };
+
+  const authserver: ZitadelServer = initializeServer(zitadelConfig);
+  console.log("server", authserver);
+  const userservice = user.getUser(server);
+  return userservice.registerPasskey(
+    {
+      userId,
+      //   returnCode: new ReturnPasskeyRegistrationCode(),
+    },
+    { metadata: bearerTokenMetadata(sessionToken) }
+  );
+}
+
 export { server };
