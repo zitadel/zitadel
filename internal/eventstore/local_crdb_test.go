@@ -38,9 +38,6 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to connect to db")
 	}
-	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to connect to db")
-	}
 	if err = testCRDBClient.Ping(); err != nil {
 		logging.WithFields("error", err).Fatal("unable to ping db")
 	}
@@ -49,7 +46,15 @@ func TestMain(m *testing.M) {
 	queriers["v2"] = v2
 
 	pushers["v3"] = new_es.NewEventstore(testCRDBClient)
-	pushers["v2"] = v2
+
+	if localDB, err := connectLocalhost(); err == nil {
+		if err = initDB(localDB.DB); err != nil {
+			logging.WithFields("error", err).Fatal("migrations failed")
+		}
+		pushers["localhost"] = new_es.NewEventstore(localDB)
+	}
+
+	// pushers["v2"] = v2
 
 	defer func() {
 		testCRDBClient.Close()
@@ -80,6 +85,20 @@ func initDB(db *sql.DB) error {
 		return err
 	}
 	return initialise.VerifyZitadel(db, *config)
+}
+
+func connectLocalhost() (*database.DB, error) {
+	client, err := sql.Open("pgx", "postgresql://root@localhost:26257/defaultdb?sslmode=disable")
+	if err != nil {
+		return nil, err
+	}
+	if err = testCRDBClient.Ping(); err != nil {
+		return nil, err
+	}
+
+	return &database.DB{
+		DB: client,
+	}, nil
 }
 
 type testDB struct{}
