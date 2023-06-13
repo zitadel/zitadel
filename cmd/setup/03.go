@@ -89,7 +89,6 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		nil,
 		nil,
 	)
-
 	if err != nil {
 		return err
 	}
@@ -112,40 +111,42 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 	}
 
 	_, token, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
+	if err != nil {
+		return err
+	}
 	if mig.instanceSetup.Org.Machine != nil &&
 		((mig.instanceSetup.Org.Machine.Pat != nil && token == "") ||
 			(mig.instanceSetup.Org.Machine.MachineKey != nil && key == nil)) {
 		return err
 	}
 
-	if mig.MachineKeyPath != "" && key != nil {
-		f := os.Stdout
-		defer f.Close()
-		f, err = os.OpenFile(mig.MachineKeyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-		if err != nil {
-			return err
-		}
-
+	if key != nil {
 		keyDetails, err := key.Detail()
 		if err != nil {
 			return err
 		}
-		_, err = fmt.Fprintln(f, string(keyDetails))
+		if err := outputStdoutOrPath(mig.MachineKeyPath, string(keyDetails)); err != nil {
+			return err
+		}
 	}
-	if mig.PatPath != "" && token != "" {
-		f := os.Stdout
+	if token != "" {
+		if err := outputStdoutOrPath(mig.PatPath, token); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func outputStdoutOrPath(path string, content string) (err error) {
+	f := os.Stdout
+	if path != "" {
+		f, err = os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		if err != nil {
+			return err
+		}
 		defer f.Close()
-		f, err = os.OpenFile(mig.PatPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-		if err != nil {
-			return err
-		}
-
-		if err != nil {
-			return err
-		}
-		_, err = fmt.Fprintln(f, token)
 	}
-
+	_, err = fmt.Fprintln(f, content)
 	return err
 }
 

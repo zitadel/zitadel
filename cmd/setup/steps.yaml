@@ -33,7 +33,6 @@ FirstInstance:
         Type:
       Pat:
         ExpirationDate:
-        Scopes:
 
 CorrectCreationDate:
   FailAfter: 5m
