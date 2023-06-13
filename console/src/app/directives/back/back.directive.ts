@@ -1,5 +1,6 @@
 import { Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { take } from 'rxjs';
 import { NavigationService } from 'src/app/services/navigation.service';
 
 @Directive({
@@ -23,7 +24,7 @@ export class BackDirective {
     private route: ActivatedRoute,
   ) {
     // Check if a new element was created using a create dialog
-    this.route.queryParams.subscribe((params) => {
+    this.route.queryParams.pipe(take(1)).subscribe((params) => {
       this.new = params['new'];
     });
 
