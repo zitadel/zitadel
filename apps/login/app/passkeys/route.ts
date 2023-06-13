@@ -1,6 +1,7 @@
 import {
   createPasskeyRegistrationLink,
   getSession,
+  registerPasskey,
   server,
 } from "#/lib/zitadel";
 import { getSessionCookieById } from "#/utils/cookies";
@@ -12,7 +13,6 @@ export async function POST(request: NextRequest) {
     const { sessionId } = body;
 
     const sessionCookie = await getSessionCookieById(sessionId);
-    console.log(sessionCookie);
 
     const session = await getSession(
       server,
@@ -20,14 +20,15 @@ export async function POST(request: NextRequest) {
       sessionCookie.token
     );
 
-    if (session?.session && session.session?.factors?.user?.id) {
-      console.log(session.session.factors.user.id, sessionCookie.token);
-      return createPasskeyRegistrationLink(
-        session.session.factors.user.id,
-        sessionCookie.token
-      )
+    const userId = session?.session?.factors?.user?.id;
+
+    if (userId) {
+      return createPasskeyRegistrationLink(userId, sessionCookie.token)
         .then((resp) => {
-          return NextResponse.json(resp);
+          const code = resp.code;
+          return registerPasskey(userId, code).then((resp) => {
+            return NextResponse.json(resp);
+          });
         })
         .catch((error) => {
           return NextResponse.json(error, { status: 500 });

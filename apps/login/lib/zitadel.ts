@@ -251,7 +251,7 @@ export async function verifyPasskeyRegistration(
  */
 export async function registerPasskey(
   userId: string,
-  sessionToken: string
+  code: { id: string; code: string }
 ): Promise<any> {
   //   this actions will be made from the currently seleected user
   const zitadelConfig: ZitadelServerOptions = {
@@ -263,13 +263,11 @@ export async function registerPasskey(
   const authserver: ZitadelServer = initializeServer(zitadelConfig);
   console.log("server", authserver);
   const userservice = user.getUser(server);
-  return userservice.registerPasskey(
-    {
-      userId,
-      //   returnCode: new ReturnPasskeyRegistrationCode(),
-    },
-    { metadata: bearerTokenMetadata(sessionToken) }
-  );
+  return userservice.registerPasskey({
+    userId,
+    code,
+    //   returnCode: new ReturnPasskeyRegistrationCode(),
+  });
 }
 
 export { server };
