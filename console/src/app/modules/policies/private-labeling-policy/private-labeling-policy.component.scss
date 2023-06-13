@@ -250,14 +250,7 @@
             margin-bottom: 1rem;
             border: 1px solid map-get($foreground, divider);
             position: relative;
-            padding: 1rem 1rem;
-
-            // .icon {
-            //   position: absolute;
-            //   top: 50%;
-            //   left: 50%;
-            //   transform: translateX(-50%) translateY(-50%);
-            // }
+            padding: 1rem 0.5rem 1rem 0.75rem;
 
             .font-name {
               margin-left: 0.5rem;
@@ -266,12 +259,8 @@
 
             .dl-btn {
               z-index: 2;
-              position: absolute;
-              right: 0;
-              top: 0;
               cursor: pointer;
               visibility: hidden;
-              transform: translateX(50%) translateY(-50%);
             }
 
             &:hover {

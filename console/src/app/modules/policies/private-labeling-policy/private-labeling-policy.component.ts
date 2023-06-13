@@ -31,7 +31,7 @@ import {
 } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import FontName from 'fontname';
+import * as opentype from 'opentype.js';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
@@ -174,29 +174,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         break;
     }
 
-    if (this.previewData?.fontUrl) {
-      fetch(this.previewData.fontUrl)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            if (e.target && e.target.result) {
-              try {
-                const fontMeta = FontName.parse(e.target.result)[0];
-                console.log('Font meta', fontMeta);
-                this.fontName = fontMeta.fullName || '';
-              } catch (e) {
-                // FontName may throw an Error
-                console.log('error parsing font');
-              }
-            }
-          };
-          reader.readAsArrayBuffer(blob);
-        });
-    } else {
-      console.log(this.previewData, this.data);
-    }
-
     this.fetchData();
   }
 
@@ -206,18 +183,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       if (file) {
         const formData = new FormData();
         formData.append('file', file);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target && e.target.result) {
-            try {
-              const fontMeta = FontName.parse(e.target.result)[0];
-              this.fontName = fontMeta.fullName || '';
-            } catch (e) {
-              // FontName may throw an Error
-            }
-          }
-        };
-        reader.readAsArrayBuffer(file);
+        this.getFontName(file);
 
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
@@ -413,6 +379,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       .then((data) => {
         if (data.policy) {
           this.previewData = data.policy;
+          if (this.previewData?.fontUrl) {
+            this.getFont(this.previewData.fontUrl);
+          } else {
+            this.fontName = 'Could not parse font name';
+          }
           this.loading = false;
         }
       })
@@ -424,6 +395,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       .then((data) => {
         if (data.policy) {
           this.data = data.policy;
+          if (this.data?.fontUrl) {
+            this.getFont(this.data?.fontUrl);
+          } else {
+            this.fontName = 'Could not parse font name';
+          }
           this.loading = false;
         }
       })
@@ -715,6 +691,29 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  private getFont(url: string): void {
+    fetch(url)
+      .then((res) => res.blob())
+      .then((blob) => {
+        this.getFontName(blob);
+      });
+  }
+
+  private getFontName(blob: Blob): void {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target && e.target.result) {
+        try {
+          const font = opentype.parse(e.target.result);
+          this.fontName = font.names.fullName['en'];
+        } catch (e) {
+          this.fontName = 'Could not parse font name';
+        }
+      }
+    };
+    reader.readAsArrayBuffer(blob);
   }
 
   // /**
