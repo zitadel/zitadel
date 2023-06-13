@@ -183,7 +183,9 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       if (file) {
         const formData = new FormData();
         formData.append('file', file);
+
         this.getFontName(file);
+        this.previewNewFont(file);
 
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
@@ -204,6 +206,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             this.getPreviewData().then((data) => {
               if (data.policy) {
                 this.previewData = data.policy;
+                this.fontName = '';
               }
             });
           }, 1000);
@@ -380,7 +383,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         if (data.policy) {
           this.previewData = data.policy;
           if (this.previewData?.fontUrl) {
-            this.getFont(this.previewData.fontUrl);
+            this.fetchFontMetadataAndPreview(this.previewData.fontUrl);
           } else {
             this.fontName = 'Could not parse font name';
           }
@@ -396,7 +399,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         if (data.policy) {
           this.data = data.policy;
           if (this.data?.fontUrl) {
-            this.getFont(this.data?.fontUrl);
+            this.fetchFontMetadataAndPreview(this.data?.fontUrl);
           } else {
             this.fontName = 'Could not parse font name';
           }
@@ -693,11 +696,12 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       });
   }
 
-  private getFont(url: string): void {
+  private fetchFontMetadataAndPreview(url: string): void {
     fetch(url)
       .then((res) => res.blob())
       .then((blob) => {
         this.getFontName(blob);
+        this.previewNewFont(blob);
       });
   }
 
@@ -714,6 +718,21 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       }
     };
     reader.readAsArrayBuffer(blob);
+  }
+
+  private previewNewFont(blob: Blob): void {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      if (e.target) {
+        let customFont = new FontFace('brandingFont', `url(${e.target.result})`);
+        // typescript complains that add is not found but
+        // indeed it is https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/add
+        // @ts-ignore
+        document.fonts.add(customFont);
+      }
+    };
+    reader.readAsDataURL(blob);
   }
 
   // /**
