@@ -166,7 +166,14 @@
     "NEXT": "Suivant",
     "MORE": "plus",
     "STEP": "Étape",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Modifications non enregistrées",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Voulez-vous vraiment annuler cette nouvelle action ? Votre action sera perdue",
+        "CANCEL": "Annuler",
+        "DISCARD": "Jeter"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Afficher l'utilisateur{{value}}"
     }

@@ -2,27 +2,29 @@
 <span *ngIf="id" class="action-dialog-title" mat-dialog-title>{{ 'FLOWS.DIALOG.UPDATE.TITLE' | translate }}</span>
 
 <div mat-dialog-content>
-  <cnsl-form-field class="form-field">
-    <cnsl-label>{{ 'FLOWS.NAME' | translate }}</cnsl-label>
-    <input cnslInput [(ngModel)]="name" />
-  </cnsl-form-field>
+  <form [formGroup]="form">
+    <cnsl-form-field class="form-field">
+      <cnsl-label>{{ 'FLOWS.NAME' | translate }}</cnsl-label>
+      <input cnslInput formControlName="name" />
+    </cnsl-form-field>
 
-  <ngx-codemirror
-    *ngIf="opened$ | async"
-    [(ngModel)]="script"
-    [options]="{
-      lineNumbers: true,
-      theme: 'material',
-      mode: 'javascript'
-    }"
-  ></ngx-codemirror>
+    <ngx-codemirror
+      *ngIf="opened$ | async"
+      formControlName="script"
+      [options]="{
+        lineNumbers: true,
+        theme: 'material',
+        mode: 'javascript'
+      }"
+    ></ngx-codemirror>
 
-  <cnsl-form-field class="form-field">
-    <cnsl-label>{{ 'FLOWS.TIMEOUTINSEC' | translate }}</cnsl-label>
-    <input type="number" cnslInput [(ngModel)]="durationInSec" />
-  </cnsl-form-field>
+    <cnsl-form-field class="form-field">
+      <cnsl-label>{{ 'FLOWS.TIMEOUTINSEC' | translate }}</cnsl-label>
+      <input type="number" cnslInput formControlName="durationInSec" />
+    </cnsl-form-field>
 
-  <mat-checkbox [(ngModel)]="allowedToFail">{{ 'FLOWS.ALLOWEDTOFAIL' | translate }}</mat-checkbox>
+    <mat-checkbox formControlName="allowedToFail">{{ 'FLOWS.ALLOWEDTOFAIL' | translate }}</mat-checkbox>
+  </form>
 </div>
 <div mat-dialog-actions class="action">
   <button *ngIf="id" mat-stroked-button color="warn" (click)="deleteAndCloseDialog()">
