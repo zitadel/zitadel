@@ -31,6 +31,7 @@ import {
 } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import FontName from 'fontname';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
@@ -87,6 +88,8 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public View: any = View;
   public ColorType: any = ColorType;
   public AssetType: any = AssetType;
+
+  public fontName = '';
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public org!: Org.AsObject;
@@ -171,6 +174,29 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         break;
     }
 
+    if (this.previewData?.fontUrl) {
+      fetch(this.previewData.fontUrl)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            if (e.target && e.target.result) {
+              try {
+                const fontMeta = FontName.parse(e.target.result)[0];
+                console.log('Font meta', fontMeta);
+                this.fontName = fontMeta.fullName || '';
+              } catch (e) {
+                // FontName may throw an Error
+                console.log('error parsing font');
+              }
+            }
+          };
+          reader.readAsArrayBuffer(blob);
+        });
+    } else {
+      console.log(this.previewData, this.data);
+    }
+
     this.fetchData();
   }
 
@@ -180,6 +206,19 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       if (file) {
         const formData = new FormData();
         formData.append('file', file);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target && e.target.result) {
+            try {
+              const fontMeta = FontName.parse(e.target.result)[0];
+              this.fontName = fontMeta.fullName || '';
+            } catch (e) {
+              // FontName may throw an Error
+            }
+          }
+        };
+        reader.readAsArrayBuffer(file);
+
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
             return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));

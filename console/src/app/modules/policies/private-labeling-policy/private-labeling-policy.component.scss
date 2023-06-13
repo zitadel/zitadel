@@ -243,8 +243,6 @@
           }
 
           .font-preview {
-            height: 70px;
-            width: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -252,12 +250,18 @@
             margin-bottom: 1rem;
             border: 1px solid map-get($foreground, divider);
             position: relative;
+            padding: 1rem 1rem;
 
-            .icon {
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translateX(-50%) translateY(-50%);
+            // .icon {
+            //   position: absolute;
+            //   top: 50%;
+            //   left: 50%;
+            //   transform: translateX(-50%) translateY(-50%);
+            // }
+
+            .font-name {
+              margin-left: 0.5rem;
+              font-size: 16px;
             }
 
             .dl-btn {
@@ -266,7 +270,7 @@
               right: 0;
               top: 0;
               cursor: pointer;
-              visibility: hidden;
+              visibility: visible;
               transform: translateX(50%) translateY(-50%);
             }
 

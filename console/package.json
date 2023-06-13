@@ -34,6 +34,7 @@
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
     "flag-icons": "^6.6.6",
+    "fontname": "^1.0.1",
     "google-proto-files": "^3.0.3",
     "google-protobuf": "^3.21.2",
     "grpc-web": "^1.4.1",
