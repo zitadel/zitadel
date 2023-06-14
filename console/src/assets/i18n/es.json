@@ -167,7 +167,14 @@
     "MORE": "más",
     "STEP": "Paso",
     "SETUP": "Configurar",
-    "COMINGSOON": "Próximamente",
+    "UNSAVEDCHANGES": "Cambios no guardados",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "¿Estás seguro de que quieres descartar esta nueva acción? Tu acción se perderá",
+        "CANCEL": "Cancelar",
+        "DISCARD": "Descartar"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Mostrar usuario {{value}}"
     }

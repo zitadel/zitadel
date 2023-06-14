@@ -166,7 +166,14 @@
     "NEXT": "Weiter",
     "MORE": "mehr",
     "STEP": "Schritt",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Nicht gespeicherte Änderungen",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Möchten Sie diese neue Aktion wirklich verwerfen? Ihre Aktion geht verloren",
+        "CANCEL": "Abbrechen",
+        "DISCARD": "Verwerfen"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     }
