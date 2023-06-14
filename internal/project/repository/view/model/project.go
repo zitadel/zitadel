@@ -69,11 +69,7 @@ func (p *ProjectView) setData(event *models.Event) error {
 
 func (p *ProjectView) setProjectData(event *models.Event) error {
 	project := new(ProjectView)
-	err := project.SetData(event)
-	if err != nil {
-		return err
-	}
-	return nil
+	return project.SetData(event)
 }
 
 func (p *ProjectView) SetData(event *models.Event) error {

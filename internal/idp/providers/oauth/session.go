@@ -56,8 +56,6 @@ func (s *Session) authorize(ctx context.Context) (err error) {
 		return ErrCodeMissing
 	}
 	s.Tokens, err = rp.CodeExchange[*oidc.IDTokenClaims](ctx, s.Code, s.Provider.RelyingParty)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }

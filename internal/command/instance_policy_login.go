@@ -198,11 +198,7 @@ func (c *Commands) defaultLoginPolicyWriteModelByID(ctx context.Context, writeMo
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return err
-	}
-	return nil
+	return c.eventstore.FilterToQueryReducer(ctx, writeModel)
 }
 
 func (c *Commands) getDefaultLoginPolicy(ctx context.Context) (*domain.LoginPolicy, error) {

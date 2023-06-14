@@ -16,10 +16,8 @@ func CheckPermission(ctx context.Context, resolver MembershipsResolver, roleMapp
 	_, userPermissionSpan := tracing.NewNamedSpan(ctx, "checkUserPermissions")
 	err = checkUserResourcePermissions(requestedPermissions, resourceID)
 	userPermissionSpan.EndWithError(err)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 
 // getUserPermissions retrieves the memberships of the authenticated user (on instance and provided organisation level),

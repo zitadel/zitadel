@@ -20,19 +20,11 @@ func (v *View) TokensByUserID(userID, instanceID string) ([]*model.TokenView, er
 }
 
 func (v *View) PutToken(token *model.TokenView) error {
-	err := usr_view.PutToken(v.Db, tokenTable, token)
-	if err != nil {
-		return err
-	}
-	return nil
+	return usr_view.PutToken(v.Db, tokenTable, token)
 }
 
 func (v *View) PutTokens(token []*model.TokenView) error {
-	err := usr_view.PutTokens(v.Db, tokenTable, token...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return usr_view.PutTokens(v.Db, tokenTable, token...)
 }
 
 func (v *View) DeleteToken(tokenID, instanceID string) error {

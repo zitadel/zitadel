@@ -62,7 +62,6 @@ type privacyPolicyProvider interface {
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error)
 	UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error)
-	// GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.LatestState, error)
 }
 
 type userViewProvider interface {

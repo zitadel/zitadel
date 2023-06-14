@@ -137,7 +137,7 @@ func Benchmark_Push_MultipleAggregate_Parallel(b *testing.B) {
 
 	for cmdsKey, commandCreator := range commandCreators {
 		for pusherKey, store := range pushers {
-			b.Run(fmt.Sprintf("Benchmark_Push_SameAggregate-%s-%s", cmdsKey, pusherKey), func(b *testing.B) {
+			b.Run(fmt.Sprintf("Benchmark_Push_DifferentAggregate-%s-%s", cmdsKey, pusherKey), func(b *testing.B) {
 				b.StopTimer()
 				cleanupEventstore()
 

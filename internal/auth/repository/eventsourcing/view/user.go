@@ -129,19 +129,11 @@ func (v *View) UsersByOrgID(orgID, instanceID string) ([]*model.UserView, error)
 }
 
 func (v *View) PutUser(user *model.UserView, event eventstore.Event) error {
-	err := view.PutUser(v.Db, userTable, user)
-	if err != nil {
-		return err
-	}
-	return nil
+	return view.PutUser(v.Db, userTable, user)
 }
 
 func (v *View) PutUsers(users []*model.UserView, event eventstore.Event) error {
-	err := view.PutUsers(v.Db, userTable, users...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return view.PutUsers(v.Db, userTable, users...)
 }
 
 func (v *View) DeleteUser(userID, instanceID string, event eventstore.Event) error {

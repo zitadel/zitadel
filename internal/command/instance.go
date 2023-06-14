@@ -153,10 +153,8 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	}
 
 	s.zitadel.consoleAppID, err = idGenerator.Next()
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 
 func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {

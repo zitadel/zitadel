@@ -30,19 +30,11 @@ func (v *View) SearchRefreshTokens(request *user_model.RefreshTokenSearchRequest
 }
 
 func (v *View) PutRefreshToken(token *model.RefreshTokenView) error {
-	err := usr_view.PutRefreshToken(v.Db, refreshTokenTable, token)
-	if err != nil {
-		return err
-	}
-	return nil
+	return usr_view.PutRefreshToken(v.Db, refreshTokenTable, token)
 }
 
 func (v *View) PutRefreshTokens(token []*model.RefreshTokenView) error {
-	err := usr_view.PutRefreshTokens(v.Db, refreshTokenTable, token...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return usr_view.PutRefreshTokens(v.Db, refreshTokenTable, token...)
 }
 
 func (v *View) DeleteRefreshToken(tokenID, instanceID string) error {
