@@ -15,7 +15,7 @@ import (
 )
 
 // RegisterUserPasskey creates a passkey registration for the current authenticated user.
-// UserID, ussualy taken from the request is compaired against the user ID in the context.
+// UserID, usually taken from the request is compared against the user ID in the context.
 func (c *Commands) RegisterUserPasskey(ctx context.Context, userID, resourceOwner string, authenticator domain.AuthenticatorAttachment) (*domain.WebAuthNRegistrationDetails, error) {
 	if err := authz.UserIDInCTX(ctx, userID); err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ type eventCallback func(context.Context, *eventstore.Aggregate) eventstore.Comma
 // A code can only be used once.
 // Upon success an event callback is returned, which must be called after
 // all other events for the current request are created.
-// This prevent consuming a code when another error occurred after verification.
+// This prevents consuming a code when another error occurred after verification.
 func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOwner, codeID, code string, alg crypto.EncryptionAlgorithm) (eventCallback, error) {
 	wm := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, wm)
@@ -122,7 +122,7 @@ func (c *Commands) AddUserPasskeyCodeURLTemplate(ctx context.Context, userID, re
 }
 
 // AddUserPasskeyCodeReturn generates and returns a Passkey code.
-// No email will be send to the user.
+// No email will be sent to the user.
 func (c *Commands) AddUserPasskeyCodeReturn(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.PasskeyCodeDetails, error) {
 	return c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, "", true)
 }
