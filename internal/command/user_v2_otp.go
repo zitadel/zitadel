@@ -24,3 +24,10 @@ func (c *Commands) AddUserOTP(ctx context.Context, userID, resourceowner string)
 		URI:           prep.key.URL(),
 	}, nil
 }
+
+func (c *Commands) CheckUserOTP(ctx context.Context, userID, code, resourceOwner string) (*domain.ObjectDetails, error) {
+	if err := authz.UserIDInCTX(ctx, userID); err != nil {
+		return nil, err
+	}
+	return c.HumanCheckMFAOTPSetup(ctx, userID, code, "", resourceOwner)
+}
