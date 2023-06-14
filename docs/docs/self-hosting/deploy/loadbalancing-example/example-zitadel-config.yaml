@@ -2,6 +2,11 @@
 Log:
   Level: 'info'
 
+# Help the ZITADEL maintainers improve the products usability by giving them some insights
+Analytics:
+  Push:
+    AllEnabled: true
+
 # Make ZITADEL accessible over HTTP, not HTTPS
 ExternalSecure: true
 ExternalDomain: my.domain

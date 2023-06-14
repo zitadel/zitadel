@@ -14,6 +14,44 @@ Tracing:
   Fraction: 1.0
   MetricPrefix: zitadel
 
+Analytics:
+  # Push analytics data to defined endpoints
+  Push:
+    # Push the data to all these endpoints at least once.
+    # If one endpoint returns an unsuccessful response code or times out,
+    # ZITADEL retries to push the data point to all configured endpoints again until it succeeds.
+    # The endpoints can be reconfigured at runtime.
+    # Three redirects are followed.
+    # Configure delivery guarantees and intervals in the section Projections.Customizations.Analytics
+    Endpoints:
+      # Include https://zitadel.com/usage if you want to help the ZITADEL maintainers improve the product's usability by giving them some insights.
+      # Don't forget to opt in by setting AllEnabled to true.
+      - https://zitadel.com/usage
+    # If AllEnabled is true, all data listed below is pushed, regardless if they have the value true or false
+    AllEnabled: false
+    EnabledMetrics:
+      # InstanceCreated is sent when a new virtual instance is created.
+      # It is also emitted, when the first instance is created during the setup phase.
+      # If InstanceCreated is false and AllEnabled is false, then the data points about created instances are omitted.
+      InstanceCreated: false
+      # FirstInstanceAuthenticationSucceeded is sent when the first authentication to a virtual instance succeeds.
+      # This is the first authentication with the instances automatically setupped admin user, which can be a human or a machine.
+      # If FirstInstanceAuthenticationSucceeded is false and AllEnabled is false, then the data points about first instance logins are omitted.
+      FirstInstanceAuthenticationSucceeded: false
+      # FirstProjectCreated is sent when a first project after the automatically setupped ZITADEL project is created in a virtual instance.
+      # If FirstProjectCreated is false and AllEnabled is false, then the data points about first projects created are omitted.
+      FirstProjectCreated: false
+      # FirstApplicationCreated is sent when a first application after the automatically setupped applications in the ZITADEL project are created in a virtual instance.
+      # If FirstApplicationCreated is false and AllEnabled is false, then the data points about first applications created are omitted.
+      FirstApplicationCreated: false
+      # FirstApplicationAuthenticationSucceeded is sent when the first login to a self-created application succeeds.
+      # This can be a human users login or a machine user authentication.
+      # If FirstApplicationAuthenticationSucceeded is false and AllEnabled is false, then the data points about first application logins are omitted.
+      FirstApplicationAuthenticationSucceeded: false
+      # InstanceDeleted is sent when a virtual instance is deleted.
+      # If InstanceDeleted is false and AllEnabled is false, then the data points about deleted instances are omitted.
+      InstanceDeleted: false
+
 # Port ZITADEL will listen on
 Port: 8080
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
@@ -169,17 +207,25 @@ Projections:
       BulkLimit: 2000
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
-      # As notification projections don't result in database statements, retries don't have an effect
+      # As notification projections don't result in database statements, retries don't have any effects
       MaxFailureCount: 0
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
       # Delivery guarantee requirements are probably higher for quota webhooks
       # Defaults to 45 days
       HandleActiveInstances: 1080h
-      # As quota notification projections don't result in database statements, retries don't have an effect
+      # As quota notification projections don't result in database statements, retries don't have any effects
       MaxFailureCount: 0
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
       RequeueEvery: 300s
+    Analytics:
+      # Analytics delivery guarantee requirements are a bit higher, as they are not interactively retryable
+      # Defaults to 15 days
+      HandleActiveInstances: 360h
+      # As sending analytics data doesn't result in database statements, retries don't have any effects
+      MaxFailureCount: 0
+      # Analytics data synchronization is not time critical. Setting RequeueEvery every 55 minutes doesn't annoy the db too much.
+      RequeueEvery: 3300s
 
 Auth:
   SearchLimit: 1000

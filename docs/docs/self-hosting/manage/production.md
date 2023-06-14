@@ -61,6 +61,16 @@ Instead, your execution environment should provide tooling for managing logs in 
 This includes tasks like rotating files, routing, collecting, archiving and cleaning-up.
 For example, systemd has journald and kubernetes has fluentd and fluentbit.
 
+## Analytics
+
+If you want some usage metrics pushed to external systems, enable the metrics you need in the ZITADEL configuration.
+Include https://zitadel.com/usage in the list of endpoints if you want to help the ZITADEL maintainers improve the product's usability by giving them some insights.
+Don't forget to opt in by setting Analytics.Push.AllEnabled to true.
+
+ZITADEL pushes the metrics by projecting certain events.
+Therefore, you can configure delivery guarantees not in the Analytics section of the ZITADEL configuration,
+but in the Projections.Customizations.Analytics section
+
 ## Database
 
 ### Prefer CockroachDB

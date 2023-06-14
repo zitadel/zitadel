@@ -42,6 +42,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] Configure your privacy policy, terms of service and a help Link if needed
 - [ ] Keep your [masterkey](https://zitadel.com/docs/self-hosting/manage/configure) in a secure storage
 - [ ] Declare and apply zitadel configuration using the zitadel terraform [provider](https://github.com/zitadel/terraform-provider-zitadel) 
+- [ ] Opt in to sending analytics to the ZITADEL maintainers by setting Analytics.Push.AllEnabled to true in the runtime configuration.
 
 ### Security
 

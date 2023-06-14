@@ -38,6 +38,7 @@ helm install my-zitadel zitadel/zitadel \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
+  --set zitadel.configmapConfig.Analytics.Push.AllEnabled=true \
   --set replicaCount=1
 
 # Make ZITADEL locally accessible
@@ -70,6 +71,7 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
+  --set zitadel.configmapConfig.Analytics.Push.AllEnabled=true \
   --set replicaCount=1 \
   --set zitadel.configmapConfig.FirstInstance.MachineKeyPath="/machinekey/zitadel-admin-sa.json" \
   --set zitadel.configmapConfig.FirstInstance.Org.Machine.Machine.Username="zitadel-admin-sa" \
