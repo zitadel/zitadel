@@ -17,6 +17,7 @@ export {
   GetSessionResponse,
   CreateSessionResponse,
   SetSessionResponse,
+  DeleteSessionResponse,
 } from "./proto/server/zitadel/session/v2alpha/session_service";
 export {
   GetPasswordComplexitySettingsResponse,

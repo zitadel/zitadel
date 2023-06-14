@@ -92,6 +92,24 @@ export async function getMostRecentSessionCookie(): Promise<any> {
   }
 }
 
+export async function getSessionCookieById(id: string): Promise<any> {
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
+
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+
+    const found = sessions.find((s) => s.id === id);
+    if (found) {
+      return found;
+    } else {
+      return Promise.reject();
+    }
+  } else {
+    return Promise.reject();
+  }
+}
+
 export async function getAllSessionIds(): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");

@@ -21,9 +21,6 @@ jobs:
       - name: Install Dependencies
         id: deps
         run: pnpm install
-      - name: Generate Stubs
-        id: grpc
-        run: pnpm generate
       - name: Test
         id: test
         run: pnpm test

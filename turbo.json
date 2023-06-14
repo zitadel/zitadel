@@ -19,9 +19,17 @@
         "^build"
       ]
     },
-    "test": {},
+    "test": {
+      "dependsOn": [
+        "generate",
+        "@zitadel/server#build"
+      ]
+    },
     "test:watch": {
-      "cache": false
+      "dependsOn": [
+        "generate",
+        "@zitadel/server#build"
+      ]
     },
     "lint": {},
     "dev": {
@@ -37,6 +45,11 @@
   ],
   "globalEnv": [
     "ZITADEL_API_URL",
-    "ZITADEL_SERVICE_USER_TOKEN"
+    "ZITADEL_SERVICE_USER_TOKEN",
+    "ZITADEL_SYSTEM_API_URL",
+    "ZITADEL_SYSTEM_API_USERID",
+    "ZITADEL_SYSTEM_API_KEY",
+    "ZITADEL_ISSUER",
+    "ZITADEL_ADMIN_TOKEN"
   ]
 }
