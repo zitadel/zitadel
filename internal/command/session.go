@@ -23,6 +23,7 @@ type SessionCommands struct {
 
 	sessionWriteModel  *SessionWriteModel
 	passwordWriteModel *HumanPasswordWriteModel
+	intentWriteModel   *IDPIntentWriteModel
 	eventstore         *eventstore.Eventstore
 	userPasswordAlg    crypto.HashAlgorithm
 	createToken        func(sessionID string) (id string, token string, err error)
@@ -76,6 +77,31 @@ func CheckPassword(password string) SessionCommand {
 			return caos_errs.ThrowInvalidArgument(err, "COMMAND-SAF3g", "Errors.User.Password.Invalid")
 		}
 		cmd.sessionWriteModel.PasswordChecked(ctx, cmd.now())
+		return nil
+	}
+}
+
+// CheckIntent defines a check for a succeeded intent to be executed for a session update
+func CheckIntent(intentID, token string, alg crypto.EncryptionAlgorithm) SessionCommand {
+	return func(ctx context.Context, cmd *SessionCommands) error {
+		if cmd.sessionWriteModel.UserID == "" {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfw3r", "Errors.User.UserIDMissing")
+		}
+		if err := crypto.CheckToken(alg, token, intentID); err != nil {
+			return err
+		}
+		cmd.intentWriteModel = NewIDPIntentWriteModel(intentID, "")
+		err := cmd.eventstore.FilterToQueryReducer(ctx, cmd.intentWriteModel)
+		if err != nil {
+			return err
+		}
+		if cmd.intentWriteModel.State != domain.IDPIntentStateSucceeded {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSuccessful")
+		}
+		if cmd.intentWriteModel.UserID != cmd.sessionWriteModel.UserID {
+			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
+		}
+		cmd.sessionWriteModel.IntentChecked(ctx, cmd.now())
 		return nil
 	}
 }

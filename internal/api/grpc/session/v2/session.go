@@ -229,6 +229,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 	if password := checks.GetPassword(); password != nil {
 		sessionChecks = append(sessionChecks, command.CheckPassword(password.GetPassword()))
 	}
+	if intent := checks.GetIntent(); intent != nil {
+		sessionChecks = append(sessionChecks, command.CheckIntent(intent.GetIntentId(), intent.GetToken(), s.idpAlg))
+	}
 	if passkey := checks.GetPasskey(); passkey != nil {
 		sessionChecks = append(sessionChecks, s.command.CheckPasskey(passkey.GetCredentialAssertionData()))
 	}

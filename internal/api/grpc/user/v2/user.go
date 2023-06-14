@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"encoding/base64"
 	"io"
 
 	"golang.org/x/text/language"
@@ -195,19 +194,5 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 }
 
 func (s *Server) checkIntentToken(token string, intentID string) error {
-	if token == "" {
-		return errors.ThrowPermissionDenied(nil, "IDP-Sfefs", "Errors.Intent.InvalidToken")
-	}
-	data, err := base64.RawURLEncoding.DecodeString(token)
-	if err != nil {
-		return errors.ThrowPermissionDenied(err, "IDP-Swg31", "Errors.Intent.InvalidToken")
-	}
-	decryptedToken, err := s.idpAlg.Decrypt(data, s.idpAlg.EncryptionKeyID())
-	if err != nil {
-		return errors.ThrowPermissionDenied(err, "IDP-Sf4gt", "Errors.Intent.InvalidToken")
-	}
-	if string(decryptedToken) != intentID {
-		return errors.ThrowPermissionDenied(nil, "IDP-dkje3", "Errors.Intent.InvalidToken")
-	}
-	return nil
+	return crypto.CheckToken(s.idpAlg, token, intentID)
 }

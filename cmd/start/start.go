@@ -335,7 +335,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, user.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure))); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck, keys.IDPConfig)); err != nil {
 		return err
 	}
 	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {

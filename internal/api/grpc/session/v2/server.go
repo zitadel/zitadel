@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2alpha"
@@ -18,6 +19,8 @@ type Server struct {
 	command         *command.Commands
 	query           *query.Queries
 	checkPermission domain.PermissionCheck
+
+	idpAlg crypto.EncryptionAlgorithm
 }
 
 type Config struct{}
@@ -26,11 +29,13 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 	checkPermission domain.PermissionCheck,
+	idpAlg crypto.EncryptionAlgorithm,
 ) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		checkPermission: checkPermission,
+		idpAlg:          idpAlg,
 	}
 }
 
