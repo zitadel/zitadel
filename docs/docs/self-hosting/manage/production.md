@@ -191,16 +191,16 @@ you might want to [limit usage and/or execute tasks on certain usage units and l
 
 ## Minimum system requirements
 
-### General Resource Usage
+### General resource usage
 
-ZITADEL consumes around 512MB Ram and can run with less then 1CPU core.
-The database consumes around 2 CPU und normal conditions and 6GB Ram with some caching to it.
+ZITADEL consumes around 512MB RAM and can run with less than 1 CPU core.
+The database consumes around 2 CPU under normal conditions and 6GB RAM with some caching to it.
 
 :::info Password hashing
-Be aware of CPU spikes when hashing passwords. We recommend to have 4CPU cores available for this purpose.
+Be aware of CPU spikes when hashing passwords. We recommend to have 4 CPU cores available for this purpose.
 :::
 
-### Production HA Cluster
+### Production HA cluster
 
-It is recommended to build a minimal high-availability with 3 Nodes with 4CPU and 16GB memory each.
-Excluding non-essential services, sich as log collection, metrics etc, the resources could be reduced to around 4CPU and 8GB memory each.
+It is recommended to build a minimal high-availability with 3 Nodes with 4 CPU and 16GB memory each.
+Excluding non-essential services, such as log collection, metrics etc, the resources could be reduced to around 4 CPU and  8GB memory each.
