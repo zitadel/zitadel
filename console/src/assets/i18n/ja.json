@@ -167,7 +167,14 @@
     "MORE": "さらに",
     "STEP": "ステップ",
     "SETUP": "セットアップ",
-    "COMINGSOON": "近日公開",
+    "UNSAVEDCHANGES": "未保存の変更",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "この新しいアクションを破棄してもよろしいですか?あなたのアクションは失われます",
+        "CANCEL": "キャンセル",
+        "DISCARD": "破棄"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "ユーザー {{value}} を表示する"
     }

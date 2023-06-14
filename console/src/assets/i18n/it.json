@@ -166,7 +166,13 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
-    "COMINGSOON": "Coming soon",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Sei sicuro di voler eliminare questa nuova azione? La tua azione andrà persa",
+        "CANCEL": "Cancella",
+        "DISCARD": "Continua comunque"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     }
