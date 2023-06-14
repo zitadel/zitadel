@@ -183,7 +183,7 @@ export class UserCreateComponent implements OnInit, OnDestroy {
       .then((data) => {
         this.loading = false;
         this.toast.showInfo('USER.TOAST.CREATED', true);
-        this.router.navigate(['users', data.userId]);
+        this.router.navigate(['users', data.userId], { queryParams: { new: true } });
       })
       .catch((error) => {
         this.loading = false;
