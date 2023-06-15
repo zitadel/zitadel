@@ -80,7 +80,10 @@ func (es *Eventstore) notify(events []Event) {
 			//subscription for certain events
 			for _, eventType := range eventTypes {
 				if event.Type() == eventType {
-					sub.Events <- event
+					select {
+					case sub.Events <- event:
+					default:
+					}
 					break
 				}
 			}
