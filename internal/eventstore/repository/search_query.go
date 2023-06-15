@@ -254,10 +254,10 @@ func editorUserFilter(builder *eventstore.SearchQueryBuilder) *Filter {
 }
 
 func instanceIDFilterFromBuilder(builder *eventstore.SearchQueryBuilder) *Filter {
-	if builder.GetInstanceID() != "" {
-		NewFilter(FieldInstanceID, builder.GetInstanceID(), OperationEquals)
+	if builder.GetInstanceID() == "" {
+		return nil
 	}
-	return nil
+	return NewFilter(FieldInstanceID, builder.GetInstanceID(), OperationEquals)
 }
 
 func creationDateAfterFilter(query *eventstore.SearchQuery) *Filter {
