@@ -1342,6 +1342,24 @@ service AdminService {
         };
     }
 
+    // Migrate an existing OIDC identity provider on the instance
+    rpc MigrateGenericOIDCProvider(MigrateGenericOIDCProviderRequest) returns (MigrateGenericOIDCProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/generic_oidc/{id}/_migrate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Migrate Generic OIDC Identity Provider";
+            description: "";
+        };
+    }
+
     // Add a new JWT identity provider on the instance
     rpc AddJWTProvider(AddJWTProviderRequest) returns (AddJWTProviderResponse) {
         option (google.api.http) = {
@@ -4825,6 +4843,23 @@ message UpdateGenericOIDCProviderRequest {
 }
 
 message UpdateGenericOIDCProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message MigrateGenericOIDCProviderRequest{
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    oneof template {
+        AddAzureADProviderRequest azure = 2;
+        AddGoogleProviderRequest google = 3;
+    }
+}
+
+message MigrateGenericOIDCProviderResponse{
     zitadel.v1.ObjectDetails details = 1;
 }
 

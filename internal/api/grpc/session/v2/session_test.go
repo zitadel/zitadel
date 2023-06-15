@@ -49,7 +49,7 @@ func Test_sessionsToPb(t *testing.T) {
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
-		{ // no factor
+		{ // password factor
 			ID:            "999",
 			CreationDate:  now,
 			ChangeDate:    now,
@@ -57,8 +57,33 @@ func Test_sessionsToPb(t *testing.T) {
 			State:         domain.SessionStateActive,
 			ResourceOwner: "me",
 			Creator:       "he",
+			UserFactor: query.SessionUserFactor{
+				UserID:        "345",
+				UserCheckedAt: past,
+				LoginName:     "donald",
+				DisplayName:   "donald duck",
+			},
 			PasswordFactor: query.SessionPasswordFactor{
 				PasswordCheckedAt: past,
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
+		{ // passkey factor
+			ID:            "999",
+			CreationDate:  now,
+			ChangeDate:    now,
+			Sequence:      123,
+			State:         domain.SessionStateActive,
+			ResourceOwner: "me",
+			Creator:       "he",
+			UserFactor: query.SessionUserFactor{
+				UserID:        "345",
+				UserCheckedAt: past,
+				LoginName:     "donald",
+				DisplayName:   "donald duck",
+			},
+			PasskeyFactor: query.SessionPasskeyFactor{
+				PasskeyCheckedAt: past,
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
@@ -94,7 +119,31 @@ func Test_sessionsToPb(t *testing.T) {
 			ChangeDate:   timestamppb.New(now),
 			Sequence:     123,
 			Factors: &session.Factors{
+				User: &session.UserFactor{
+					VerifiedAt:  timestamppb.New(past),
+					Id:          "345",
+					LoginName:   "donald",
+					DisplayName: "donald duck",
+				},
 				Password: &session.PasswordFactor{
+					VerifiedAt: timestamppb.New(past),
+				},
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
+		{ // passkey factor
+			Id:           "999",
+			CreationDate: timestamppb.New(now),
+			ChangeDate:   timestamppb.New(now),
+			Sequence:     123,
+			Factors: &session.Factors{
+				User: &session.UserFactor{
+					VerifiedAt:  timestamppb.New(past),
+					Id:          "345",
+					LoginName:   "donald",
+					DisplayName: "donald duck",
+				},
+				Passkey: &session.PasskeyFactor{
 					VerifiedAt: timestamppb.New(past),
 				},
 			},
@@ -107,7 +156,7 @@ func Test_sessionsToPb(t *testing.T) {
 
 	for i, got := range out {
 		if !proto.Equal(got, want[i]) {
-			t.Errorf("session %d got:\n%v\nwant:\n%v", i, got, want)
+			t.Errorf("session %d got:\n%v\nwant:\n%v", i, got, want[i])
 		}
 	}
 }

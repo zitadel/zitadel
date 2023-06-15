@@ -166,7 +166,14 @@
     "NEXT": "Następny",
     "MORE": "więcej",
     "STEP": "Krok",
-    "COMINGSOON": "Coming soon",
+    "UNSAVEDCHANGES": "Niezapisane zmiany",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Czy na pewno chcesz odrzucić to nowe działanie? Twoje działanie zostanie utracone",
+        "CANCEL": "Anuluj",
+        "DISCARD": "Wyrzucać"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Pokaż użytkownika {{value}}"
     }
@@ -204,6 +211,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "Uwaga! Kontekst organizacji uległ zmianie."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Widok właśnie zmienił się na instancję!"
     }
   },
   "FILTER": {

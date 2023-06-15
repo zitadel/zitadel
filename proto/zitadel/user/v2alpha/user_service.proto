@@ -12,6 +12,7 @@ import "zitadel/user/v2alpha/user.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -215,6 +216,98 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Create a passkey registration link for a user";
       description: "Create a passkey registration link which includes a code and either return it or send it to the user."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc RegisterU2F (RegisterU2FRequest) returns (RegisterU2FResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/users/{user_id}/u2f"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Start the registration of passkey for a user";
+      description: "Start the registration of a u2f token for a user, as a response the public key credential creation options are returned, which are used to verify the u2f token."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc VerifyU2FRegistration (VerifyU2FRegistrationRequest) returns (VerifyU2FRegistrationResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/users/{user_id}/u2f/{u2f_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Verify a u2f token for a user";
+      description: "Verify the u2f token registration with the public key credential."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc RegisterOTP (RegisterOTPRequest) returns (RegisterOTPResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/users/{user_id}/otp"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Start the registration of an OTP generator for a user";
+      description: "Start the registration of a OTP generator for a user, as a response a secret returned, which is used to initialize a TOTP app or device."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc VerifyOTPRegistration (VerifyOTPRegistrationRequest) returns (VerifyOTPRegistrationResponse) {
+    option (google.api.http) = {
+      post: "/v2alpha/users/{user_id}/otp/_verify" // Why underscore here??
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Verify a u2f token for a user";
+      description: "Verify the OTP registration with a generated code."
       responses: {
         key: "200"
         value: {
@@ -429,10 +522,10 @@ message RegisterPasskeyResponse{
       example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\""
     }
   ];
-  bytes public_key_credential_creation_options = 3 [
+  google.protobuf.Struct public_key_credential_creation_options = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "json representation of public key credential creation options used by the passkey client"
-      example: "\"eyJwdWJsaWNLZXkiOnsiY2hhbGxlbmdlIoplfZm4vM21qSzBPdjltN2x6VWhnclYyejFJSlVzZnpLd0Z1TytWTWtzRW1Icz0iLCJycCI6eyJuYW1lIjoiWklUQURFTCIsImlkIjoiYWNtZS1nem9lNHgueml0YWRlbC5jbG91ZCJ9LCJ1c2VyIjp7Im5hbWUiOiJ0ZXN0dXNlcjU1QGFjbWUueml0YWRlbC5jbG91ZCIsImRpc3BsYXlOYW1lIjoiVGVzdCBUZXN0IiwiaWQiOiJNVGd5TVRVMk1qWTBNakk1TXpBMk5qSTEifSwicHViS2V5Q3JlZFBhcmFtcyI6W3sidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi03fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzV9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zNn0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1N30seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OH0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTI1OX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTM3fSx7InR5cGUiOiJwdWJsaWMta2V5IiwiYWxnIjotMzh9LHsidHlwZSI6InB1YmxpYy1rZXkiLCJhbGciOi0zOX0seyJ0eXBlIjoicHVibGljLWtleSIsImFsZyI6LTh9XSwiYXV0aGVudGljYXRvclNlbGVjdGlvbiI6eyJ1c2VyVmVyaWZpY2F0aW9uIjoiZGlzY291cmFnZWQifn2ilGltZW91dCI6NjAwMDAsImF0dGVzdGF0aW9uIjoibm9uZSJ9fQ==\""
+      description: "Options for Credential Creation (dictionary PublicKeyCredentialCreationOptions). Generated helper methods transform the field to JSON, for use in a WebauthN client. See also:  https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialcreationoptions"
+      example: "{\"publicKey\":{\"attestation\":\"none\",\"authenticatorSelection\":{\"userVerification\":\"required\"},\"challenge\":\"XaMYwWOZ5hj6pwtwJJlpcI-ExkO5TxevBMG4R8DoKQQ\",\"excludeCredentials\":[{\"id\":\"tVp1QfYhT8DkyEHVrv7blnpAo2YJzbZgZNBf7zPs6CI\",\"type\":\"public-key\"}],\"pubKeyCredParams\":[{\"alg\":-7,\"type\":\"public-key\"}],\"rp\":{\"id\":\"localhost\",\"name\":\"ZITADEL\"},\"timeout\":300000,\"user\":{\"displayName\":\"Tim Mohlmann\",\"id\":\"MjE1NTk4MDAwNDY0OTk4OTQw\",\"name\":\"tim\"}}}"
     }
   ];
 }
@@ -456,11 +549,12 @@ message VerifyPasskeyRegistrationRequest{
       example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\"";
     }
   ];
-  bytes public_key_credential = 3 [
-    (validate.rules).bytes = {min_len: 55, max_len: 1048576},
+  google.protobuf.Struct public_key_credential = 3 [
+    (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "JSON representation of public key credential issued by the passkey client";
+      description: "PublicKeyCredential Interface. Generated helper methods populate the field from JSON created by a WebauthN client. See also:  https://www.w3.org/TR/webauthn/#publickeycredential";
+      example: "{\"type\":\"public-key\",\"id\":\"pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00\",\"rawId\":\"pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00\",\"response\":{\"attestationObject\":\"o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIgRKS3VpeE9tfExXRzkoUKnG4rQWPvtSSt4YtDGgTx32oCIQDPey-2YJ4uIg-QCM4jj6aE2U3tgMFM_RP7Efx6xRu3JGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAADju76085Yhmlt1CEOHkwLQAIKWsFWqxeMT8SxZnwp0ZMF1nk6yhs2m3AIvdixCNVgtNpQECAyYgASFYIMGUDSP2FAQn2MIfPMy7cyB_Y30VqixVgGULTBtFjfRiIlggjUGfQo3_-CrMmH3S-ZQkFKWKnNBQEAMkFtG-9A4zqW0\",\"clientDataJSON\":\"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ\"}}";
       min_length: 55;
       max_length: 1048576; //1 MB
     }
@@ -477,6 +571,127 @@ message VerifyPasskeyRegistrationRequest{
 }
 
 message VerifyPasskeyRegistrationResponse{
+  zitadel.object.v2alpha.Details details = 1;
+}
+
+message RegisterU2FRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+}
+
+message RegisterU2FResponse{
+  zitadel.object.v2alpha.Details details = 1;
+  string u2f_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\""
+    }
+  ];
+  google.protobuf.Struct public_key_credential_creation_options = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Options for Credential Creation (dictionary PublicKeyCredentialCreationOptions). Generated helper methods transform the field to JSON, for use in a WebauthN client. See also:  https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialcreationoptions"
+      example: "{\"publicKey\":{\"attestation\":\"none\",\"authenticatorSelection\":{\"userVerification\":\"required\"},\"challenge\":\"XaMYwWOZ5hj6pwtwJJlpcI-ExkO5TxevBMG4R8DoKQQ\",\"excludeCredentials\":[{\"id\":\"tVp1QfYhT8DkyEHVrv7blnpAo2YJzbZgZNBf7zPs6CI\",\"type\":\"public-key\"}],\"pubKeyCredParams\":[{\"alg\":-7,\"type\":\"public-key\"}],\"rp\":{\"id\":\"localhost\",\"name\":\"ZITADEL\"},\"timeout\":300000,\"user\":{\"displayName\":\"Tim Mohlmann\",\"id\":\"MjE1NTk4MDAwNDY0OTk4OTQw\",\"name\":\"tim\"}}}"
+    }
+  ];
+}
+
+message VerifyU2FRegistrationRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string u2f_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"fabde5c8-c13f-481d-a90b-5e59a001a076\"";
+    }
+  ];
+  google.protobuf.Struct public_key_credential = 3 [
+    (validate.rules).message.required = true,
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "PublicKeyCredential Interface. Generated helper methods populate the field from JSON created by a WebauthN client. See also:  https://www.w3.org/TR/webauthn/#publickeycredential";
+      example: "{\"type\":\"public-key\",\"id\":\"pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00\",\"rawId\":\"pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00\",\"response\":{\"attestationObject\":\"o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIgRKS3VpeE9tfExXRzkoUKnG4rQWPvtSSt4YtDGgTx32oCIQDPey-2YJ4uIg-QCM4jj6aE2U3tgMFM_RP7Efx6xRu3JGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAADju76085Yhmlt1CEOHkwLQAIKWsFWqxeMT8SxZnwp0ZMF1nk6yhs2m3AIvdixCNVgtNpQECAyYgASFYIMGUDSP2FAQn2MIfPMy7cyB_Y30VqixVgGULTBtFjfRiIlggjUGfQo3_-CrMmH3S-ZQkFKWKnNBQEAMkFtG-9A4zqW0\",\"clientDataJSON\":\"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ\"}}";
+      min_length: 55;
+      max_length: 1048576; //1 MB
+    }
+  ];
+  string token_name = 4 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"fido key\""
+    }
+  ];
+}
+
+message VerifyU2FRegistrationResponse{
+  zitadel.object.v2alpha.Details details = 1;
+}
+
+message RegisterOTPRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+}
+
+message RegisterOTPResponse {
+  zitadel.object.v2alpha.Details details = 1;
+  string uri = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"otpauth://totp/ZITADEL:gigi@acme.zitadel.cloud?algorithm=SHA1&digits=6&issuer=ZITADEL&period=30&secret=TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
+    }
+  ];
+  string secret = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
+    }
+  ];
+}
+
+message VerifyOTPRegistrationRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string code = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Code generated by OTP app or device"
+      example: "\"123456\"";
+    }
+  ];
+}
+
+message VerifyOTPRegistrationResponse {
   zitadel.object.v2alpha.Details details = 1;
 }
 

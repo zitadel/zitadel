@@ -37,6 +37,42 @@ If you're self hosting with a custom domain, you need to instruct ZITADEL to use
 You can find further instructions in our guide about [custom domains](https://zitadel.com/docs/self-hosting/manage/custom-domain).
 We also provide a guide on how to [configure](https://zitadel.com/docs/self-hosting/manage/configure) ZITADEL with variables from files or environment variables.
 
+## Invalid audience
+
+`invalid audience (APP-Zxfako)`
+
+This error message refers to the audience claim (`aud`) of your token.
+This claim identifies the audience, i.e. the resource server, that this token is intended for.
+If a resource server does not identify itself with a value in the "aud" claim when this claim is present, then the must be rejected (see [RFC7519](https://www.rfc-editor.org/rfc/rfc7519#section-4.1.3) for more details).
+
+You might encounter this error message from ZITADEL, typically when you authenticated with a client in one project and trying to access an application in another project.
+You need add a specific [reserved scope](http://localhost:3000/docs/apis/openidoauth/scopes#reserved-scopes) to add the projectID to the audience of the access token.
+
+The two scenarios should help you troubleshoot this issue:
+
+### Frontend to Backend
+
+You have one project for your frontend application and one project for your backend application.
+End-users authenticate to an application in your frontend project.
+The frontend then sends requests to the backend, validates the token with ZITADEL's introspection endpoint, and returns a payload to the frontend.
+The backend returns the error `invalid audience (APP-Zxfako)`.
+
+You must add the scope `urn:zitadel:iam:org:project:id:{projectId}:aud` to the auth request that is send from the front end.
+Replace `projectId` with the projectId of your backend.
+
+### Accessing ZITADEL's APIs
+
+You have a project for a frontend application.
+The application should also access the API of your ZITADEL, for example to pull a list of all users and display them on a user page.
+End-users authenticate to the application in the frontend project, but when calling the management API you get the error `invalid audience (APP-Zxfako)`.
+
+You must add the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to the auth request that is send from the front end.
+
+When accessing your ZITADEL instance's APIs they act as a resource server.
+You can check the Console or via API and see that when you open your default organization there exists a project "ZITADEL" that contains different applications for each API and the Console.
+Like in the scenario above the access token requires to have an `aud` claim that includes the "ZITADEL" project.
+Instead of `urn:zitadel:iam:org:project:id:zitadel:aud` you could also use `urn:zitadel:iam:org:project:id:{projectId}:aud`, where  `projectId` is the projectId of the Project "ZITADEL".
+
 ## WebFinger requirement for Tailscale
 
 The WebFinger requirement and setup is a step a user has to take outside of their IdP set-up. WebFinger is a protocol which supports the ability for OIDC issuer discovery, and we use it to prove that the user has administrative control over the domain and to retrieve the issuer. This is a requirement we have in place for all users, regardless of their IdP, who use custom OIDC with Tailscale.

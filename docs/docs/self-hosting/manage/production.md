@@ -132,7 +132,7 @@ Projections:
       RequeueEvery: 300s
 ```
 
-### Manage your Data
+### Manage your data
 
 When designing your backup strategy,
 it is worth knowing that
@@ -151,7 +151,7 @@ please refer to the corresponding docs
 or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
 
 
-## Data Initialization
+## Data initialization
 
 - You can configure instance defaults in the DefaultInstance section.
   If you plan to eventually create [multiple virtual instances](/concepts/structure/instance#multiple-virtual-instances), these defaults take effect.
@@ -188,3 +188,19 @@ DefaultInstance:
 
 If you host ZITADEL as a service,
 you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/quotas).
+
+## Minimum system requirements
+
+### General resource usage
+
+ZITADEL consumes around 512MB RAM and can run with less than 1 CPU core.
+The database consumes around 2 CPU under normal conditions and 6GB RAM with some caching to it.
+
+:::info Password hashing
+Be aware of CPU spikes when hashing passwords. We recommend to have 4 CPU cores available for this purpose.
+:::
+
+### Production HA cluster
+
+It is recommended to build a minimal high-availability with 3 Nodes with 4 CPU and 16GB memory each.
+Excluding non-essential services, such as log collection, metrics etc, the resources could be reduced to around 4 CPU and  8GB memory each.
