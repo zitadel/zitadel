@@ -98,6 +98,7 @@ export class ActionTableComponent implements OnInit {
     const dialogRef = this.dialog.open(AddActionDialogComponent, {
       data: {},
       width: '500px',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((req: CreateActionRequest) => {
@@ -120,6 +121,7 @@ export class ActionTableComponent implements OnInit {
         action: action,
       },
       width: '500px',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((req: UpdateActionRequest) => {
