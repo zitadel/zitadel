@@ -30,7 +30,9 @@ func AllFieldsSet(t testing.TB, msg protoreflect.Message, ignoreTypes ...protore
 		}
 
 		if fd.Kind() == protoreflect.MessageKind {
-			AllFieldsSet(t, msg.Get(fd).Message(), ignoreTypes...)
+			if m, ok := msg.Get(fd).Interface().(protoreflect.Message); ok {
+				AllFieldsSet(t, m, ignoreTypes...)
+			}
 		}
 	}
 }

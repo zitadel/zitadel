@@ -476,6 +476,8 @@ Errors:
     Terminated: La session est déjà terminée
     Token:
       Invalid: Le jeton de session n'est pas valide
+    Passkey:
+      NoChallenge: Session sans défi de clé d'accès
   Intent:
     IDPMissing: IDP manquant dans la requête
     SuccessURLMissing: Success URL absent de la requête

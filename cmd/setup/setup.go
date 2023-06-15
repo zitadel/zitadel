@@ -98,7 +98,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
 	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
 	steps.CorrectCreationDate.dbClient = dbClient
-	steps.s11AddEventCreatedAt = &AddEventCreatedAt{dbClient: dbClient, step10: steps.CorrectCreationDate}
+	steps.AddEventCreatedAt.dbClient = dbClient
+	steps.AddEventCreatedAt.step10 = steps.CorrectCreationDate
 	steps.s12ChangeEvents = &ChangeEvents{dbClient: dbClient}
 	steps.s13CurrentStates = &CurrentProjectionState{dbClient: dbClient}
 
@@ -120,8 +121,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 
 	err = migration.Migrate(ctx, eventstoreClient, steps.s4EventstoreIndexes)
 	logging.WithFields("name", steps.s4EventstoreIndexes.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s11AddEventCreatedAt)
-	logging.WithFields("name", steps.s11AddEventCreatedAt.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.AddEventCreatedAt)
+	logging.WithFields("name", steps.AddEventCreatedAt.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s12ChangeEvents)
 	logging.WithFields("name", steps.s12ChangeEvents.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)

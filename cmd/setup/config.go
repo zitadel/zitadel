@@ -67,7 +67,7 @@ type Steps struct {
 	s7LogstoreTables     *LogstoreTables
 	s8AuthTokens         *AuthTokenIndexes
 	CorrectCreationDate  *CorrectCreationDate
-	s11AddEventCreatedAt *AddEventCreatedAt
+	AddEventCreatedAt    *AddEventCreatedAt
 	s12ChangeEvents      *ChangeEvents
 	s13CurrentStates     *CurrentProjectionState
 }

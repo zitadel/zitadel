@@ -4,18 +4,21 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
-	sessionEventPrefix  = "session."
-	AddedType           = sessionEventPrefix + "added"
-	UserCheckedType     = sessionEventPrefix + "user.checked"
-	PasswordCheckedType = sessionEventPrefix + "password.checked"
-	TokenSetType        = sessionEventPrefix + "token.set"
-	MetadataSetType     = sessionEventPrefix + "metadata.set"
-	TerminateType       = sessionEventPrefix + "terminated"
+	sessionEventPrefix    = "session."
+	AddedType             = sessionEventPrefix + "added"
+	UserCheckedType       = sessionEventPrefix + "user.checked"
+	PasswordCheckedType   = sessionEventPrefix + "password.checked"
+	PasskeyChallengedType = sessionEventPrefix + "passkey.challenged"
+	PasskeyCheckedType    = sessionEventPrefix + "passkey.checked"
+	TokenSetType          = sessionEventPrefix + "token.set"
+	MetadataSetType       = sessionEventPrefix + "metadata.set"
+	TerminateType         = sessionEventPrefix + "terminated"
 )
 
 type AddedEvent struct {
@@ -138,6 +141,78 @@ func PasswordCheckedEventMapper(event eventstore.Event) (eventstore.Event, error
 	}
 
 	return added, nil
+}
+
+type PasskeyChallengedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Challenge          string                             `json:"challenge,omitempty"`
+	AllowedCrentialIDs [][]byte                           `json:"allowedCrentialIDs,omitempty"`
+	UserVerification   domain.UserVerificationRequirement `json:"userVerification,omitempty"`
+}
+
+func (e *PasskeyChallengedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *PasskeyChallengedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *PasskeyChallengedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewPasskeyChallengedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	challenge string,
+	allowedCrentialIDs [][]byte,
+	userVerification domain.UserVerificationRequirement,
+) *PasskeyChallengedEvent {
+	return &PasskeyChallengedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasskeyChallengedType,
+		),
+		Challenge:          challenge,
+		AllowedCrentialIDs: allowedCrentialIDs,
+		UserVerification:   userVerification,
+	}
+}
+
+type PasskeyCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *PasskeyCheckedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *PasskeyCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *PasskeyCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewPasskeyCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *PasswordCheckedEvent {
+	return &PasswordCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasskeyCheckedType,
+		),
+		CheckedAt: checkedAt,
+	}
 }
 
 type TokenSetEvent struct {

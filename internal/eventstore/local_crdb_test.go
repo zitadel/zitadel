@@ -23,6 +23,7 @@ var (
 	testCRDBClient *database.DB
 	queriers       map[string]eventstore.Querier = make(map[string]eventstore.Querier)
 	pushers        map[string]eventstore.Pusher  = make(map[string]eventstore.Pusher)
+	clients        map[string]*database.DB       = make(map[string]*database.DB)
 )
 
 func TestMain(m *testing.M) {
@@ -43,18 +44,21 @@ func TestMain(m *testing.M) {
 	}
 
 	v2 := &es_sql.CRDB{DB: testCRDBClient}
-	queriers["v2"] = v2
+	queriers["v2(inmemory)"] = v2
+	clients["v2(inmemory)"] = testCRDBClient
 
-	pushers["v3"] = new_es.NewEventstore(testCRDBClient)
+	pushers["v3(inmemory)"] = new_es.NewEventstore(testCRDBClient)
+	clients["v3(inmemory)"] = testCRDBClient
 
 	if localDB, err := connectLocalhost(); err == nil {
 		if err = initDB(localDB.DB); err != nil {
 			logging.WithFields("error", err).Fatal("migrations failed")
 		}
-		pushers["localhost"] = new_es.NewEventstore(localDB)
+		pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
+		clients["v3(singlenode)"] = localDB
 	}
 
-	// pushers["v2"] = v2
+	// pushers["v2(inmemory)"] = v2
 
 	defer func() {
 		testCRDBClient.Close()
@@ -92,7 +96,7 @@ func connectLocalhost() (*database.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err = testCRDBClient.Ping(); err != nil {
+	if err = client.Ping(); err != nil {
 		return nil, err
 	}
 
@@ -190,9 +194,15 @@ func withTestData(data any) func(e *testEvent) {
 	}
 }
 
-func cleanupEventstore() {
-	_, err := testCRDBClient.Exec("TRUNCATE eventstore.events")
-	if err != nil {
-		logging.Warnf("unable to truncate events: %v", err)
+func cleanupEventstore(client *database.DB) func() {
+	return func() {
+		_, err := client.Exec("TRUNCATE eventstore.events")
+		if err != nil {
+			logging.Warnf("unable to truncate events: %v", err)
+		}
+		_, err = client.Exec("TRUNCATE eventstore.unique_constraints")
+		if err != nil {
+			logging.Warnf("unable to truncate unique constraints: %v", err)
+		}
 	}
 }

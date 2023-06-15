@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions"
+	SessionsProjectionTable = "projections.sessions1"
 
 	SessionColumnID                = "id"
 	SessionColumnCreationDate      = "creation_date"
@@ -26,6 +26,7 @@ const (
 	SessionColumnUserID            = "user_id"
 	SessionColumnUserCheckedAt     = "user_checked_at"
 	SessionColumnPasswordCheckedAt = "password_checked_at"
+	SessionColumnPasskeyCheckedAt  = "passkey_checked_at"
 	SessionColumnMetadata          = "metadata"
 	SessionColumnTokenID           = "token_id"
 )
@@ -54,6 +55,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnUserID, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnPasswordCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
+			handler.NewColumn(SessionColumnPasskeyCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnMetadata, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(SessionColumnTokenID, handler.ColumnTypeText, handler.Nullable()),
 		},
@@ -78,6 +80,10 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  session.PasswordCheckedType,
 					Reduce: p.reducePasswordChecked,
+				},
+				{
+					Event:  session.PasskeyCheckedType,
+					Reduce: p.reducePasskeyChecked,
 				},
 				{
 					Event:  session.TokenSetType,
@@ -158,6 +164,26 @@ func (p *sessionProjection) reducePasswordChecked(event eventstore.Event) (*hand
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnPasswordCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reducePasskeyChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*session.PasskeyCheckedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.PasskeyCheckedType)
+	}
+
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnPasskeyCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

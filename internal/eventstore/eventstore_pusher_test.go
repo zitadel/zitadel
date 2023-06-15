@@ -186,10 +186,10 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 	for _, tt := range tests {
 		for pusherName, pusher := range pushers {
 			t.Run(pusherName+"/"+tt.name, func(t *testing.T) {
-				t.Cleanup(cleanupEventstore)
+				t.Cleanup(cleanupEventstore(clients[pusherName]))
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
-						Querier: queriers["v2"],
+						Querier: queriers["v2(inmemory)"],
 						Pusher:  pusher,
 					},
 				)
@@ -206,24 +206,13 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				}
 
 				assertEventCount(t,
+					clients[pusherName],
 					database.TextArray[eventstore.AggregateType]{tt.res.eventsRes.aggType},
 					tt.res.eventsRes.aggIDs,
 					tt.res.eventsRes.pushedEventsCount,
 				)
 
-				assertUniqueConstraint(t, tt.args.commands, tt.res.eventsRes.uniqueCount)
-				// if tt.args.uniqueConstraints != nil {
-				// 	countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2 AND instance_id = $3", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField, tt.args.uniqueConstraints.InstanceID)
-				// 	var uniqueCount int
-				// 	err := countUniqueRow.Scan(&uniqueCount)
-				// 	if err != nil {
-				// 		t.Error("unable to query inserted rows: ", err)
-				// 		return
-				// 	}
-				// 	if uniqueCount != tt.res.eventsRes.uniqueCount {
-				// 		t.Errorf("expected unique count %d got %d", tt.res.eventsRes.uniqueCount, uniqueCount)
-				// 	}
-				// }
+				assertUniqueConstraint(t, clients[pusherName], tt.args.commands, tt.res.eventsRes.uniqueCount)
 			})
 		}
 	}
@@ -314,11 +303,11 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	for _, tt := range tests {
 		for pusherName, pusher := range pushers {
 			t.Run(pusherName+"/"+tt.name, func(t *testing.T) {
-				t.Cleanup(cleanupEventstore)
+				t.Cleanup(cleanupEventstore(clients[pusherName]))
 
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
-						Querier: queriers["v2"],
+						Querier: queriers["v2(inmemory)"],
 						Pusher:  pusher,
 					},
 				)
@@ -326,16 +315,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 					t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 				}
 
-				countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
-				var count int
-				err := countRow.Scan(&count)
-				if err != nil {
-					t.Error("unable to query inserted rows: ", err)
-					return
-				}
-				if count != tt.res.eventsRes.pushedEventsCount {
-					t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, count)
-				}
+				assertEventCount(t, clients[pusherName], tt.res.eventsRes.aggType, tt.res.eventsRes.aggID, tt.res.eventsRes.pushedEventsCount)
 			})
 		}
 	}
@@ -444,11 +424,11 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 	for _, tt := range tests {
 		for pusherName, pusher := range pushers {
 			t.Run(pusherName+"/"+tt.name, func(t *testing.T) {
-				t.Cleanup(cleanupEventstore)
+				t.Cleanup(cleanupEventstore(clients[pusherName]))
 
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
-						Querier: queriers["v2"],
+						Querier: queriers["v2(inmemory)"],
 						Pusher:  pusher,
 					},
 				)
@@ -459,7 +439,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 					t.Errorf("eventstore.Push() error count = %d, wanted err count %d, errs: %v", len(errs), tt.res.errCount, errs)
 				}
 
-				assertEventCount(t, tt.res.eventsRes.aggTypes, tt.res.eventsRes.aggIDs, tt.res.eventsRes.pushedEventsCount)
+				assertEventCount(t, clients[pusherName], tt.res.eventsRes.aggTypes, tt.res.eventsRes.aggIDs, tt.res.eventsRes.pushedEventsCount)
 			})
 		}
 	}
@@ -588,11 +568,11 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 	for _, tt := range tests {
 		for pusherName, pusher := range pushers {
 			t.Run(pusherName+"/"+tt.name, func(t *testing.T) {
-				t.Cleanup(cleanupEventstore)
+				t.Cleanup(cleanupEventstore(clients[pusherName]))
 
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
-						Querier: queriers["v2"],
+						Querier: queriers["v2(inmemory)"],
 						Pusher:  pusher,
 					},
 				)
@@ -613,7 +593,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 					}
 				}
 
-				assertResourceOwners(t, testCRDBClient, tt.res.resourceOwners, tt.fields.aggregateIDs, tt.fields.aggregateType)
+				assertResourceOwners(t, clients[pusherName], tt.res.resourceOwners, tt.fields.aggregateIDs, tt.fields.aggregateType)
 			})
 		}
 	}
@@ -642,7 +622,9 @@ func pushAggregates(pusher eventstore.Pusher, aggregateCommands [][]eventstore.C
 }
 
 func assertResourceOwners(t *testing.T, db *database.DB, resourceOwners, aggregateIDs database.TextArray[string], aggregateType string) {
-	rows, err := testCRDBClient.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY created_at", aggregateType, aggregateIDs)
+	t.Helper()
+
+	rows, err := db.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY created_at", aggregateType, aggregateIDs)
 	if err != nil {
 		t.Error("unable to query inserted rows: ", err)
 		return
@@ -672,8 +654,10 @@ func assertResourceOwners(t *testing.T, db *database.DB, resourceOwners, aggrega
 	}
 }
 
-func assertEventCount(t *testing.T, aggTypes database.TextArray[eventstore.AggregateType], aggIDs database.TextArray[string], pushedEventsCount int) {
-	row := testCRDBClient.QueryRow("SELECT count(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", aggTypes, aggIDs)
+func assertEventCount(t *testing.T, db *database.DB, aggTypes database.TextArray[eventstore.AggregateType], aggIDs database.TextArray[string], pushedEventsCount int) {
+	t.Helper()
+
+	row := db.QueryRow("SELECT count(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", aggTypes, aggIDs)
 
 	var count int
 	if err := row.Scan(&count); err != nil {
@@ -686,7 +670,9 @@ func assertEventCount(t *testing.T, aggTypes database.TextArray[eventstore.Aggre
 	}
 }
 
-func assertUniqueConstraint(t *testing.T, commands []eventstore.Command, expectedCount int) {
+func assertUniqueConstraint(t *testing.T, db *database.DB, commands []eventstore.Command, expectedCount int) {
+	t.Helper()
+
 	var uniqueConstraint *eventstore.UniqueConstraint
 	for _, command := range commands {
 		if e := command.(*testEvent); len(e.uniqueConstraints) > 0 {
@@ -698,7 +684,7 @@ func assertUniqueConstraint(t *testing.T, commands []eventstore.Command, expecte
 		return
 	}
 
-	countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
+	countUniqueRow := db.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
 	var uniqueCount int
 	err := countUniqueRow.Scan(&uniqueCount)
 	if err != nil {

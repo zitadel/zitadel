@@ -71,12 +71,12 @@ func TestCRDB_Filter(t *testing.T) {
 	for _, tt := range tests {
 		for querierName, querier := range queriers {
 			t.Run(querierName+"/"+tt.name, func(t *testing.T) {
-				t.Cleanup(cleanupEventstore)
+				t.Cleanup(cleanupEventstore(clients[querierName]))
 
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: querier,
-						Pusher:  pushers["v3"],
+						Pusher:  pushers["v3(inmemory)"],
 					},
 				)
 
@@ -156,12 +156,12 @@ func TestCRDB_CreateInstance(t *testing.T) {
 	for _, tt := range tests {
 		for querierName, querier := range queriers {
 			t.Run(querierName+"/"+tt.name, func(t *testing.T) {
-				t.Cleanup(cleanupEventstore)
+				t.Cleanup(cleanupEventstore(clients[querierName]))
 
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: querier,
-						Pusher:  pushers["v3"],
+						Pusher:  pushers["v3(inmemory)"],
 					},
 				)
 
@@ -245,12 +245,12 @@ func TestCRDB_LatestSequence(t *testing.T) {
 	for _, tt := range tests {
 		for querierName, querier := range queriers {
 			t.Run(querierName+"/"+tt.name, func(t *testing.T) {
-				t.Cleanup(cleanupEventstore)
+				t.Cleanup(cleanupEventstore(clients[querierName]))
 
 				db := eventstore.NewEventstore(
 					&eventstore.Config{
 						Querier: querier,
-						Pusher:  pushers["v3"],
+						Pusher:  pushers["v3(inmemory)"],
 					},
 				)
 

@@ -32,6 +32,7 @@ type Session struct {
 	Creator        string
 	UserFactor     SessionUserFactor
 	PasswordFactor SessionPasswordFactor
+	PasskeyFactor  SessionPasskeyFactor
 	Metadata       map[string][]byte
 }
 
@@ -44,6 +45,10 @@ type SessionUserFactor struct {
 
 type SessionPasswordFactor struct {
 	PasswordCheckedAt time.Time
+}
+
+type SessionPasskeyFactor struct {
+	PasskeyCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -106,6 +111,10 @@ var (
 	}
 	SessionColumnPasswordCheckedAt = Column{
 		name:  projection.SessionColumnPasswordCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnPasskeyCheckedAt = Column{
+		name:  projection.SessionColumnPasskeyCheckedAt,
 		table: sessionsTable,
 	}
 	SessionColumnMetadata = Column{
@@ -199,6 +208,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
+			SessionColumnPasskeyCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 		).From(sessionsTable.identifier()).
@@ -213,6 +223,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				loginName         sql.NullString
 				displayName       sql.NullString
 				passwordCheckedAt sql.NullTime
+				passkeyCheckedAt  sql.NullTime
 				metadata          database.Map[[]byte]
 				token             sql.NullString
 			)
@@ -230,6 +241,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&loginName,
 				&displayName,
 				&passwordCheckedAt,
+				&passkeyCheckedAt,
 				&metadata,
 				&token,
 			)
@@ -246,6 +258,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.UserFactor.LoginName = loginName.String
 			session.UserFactor.DisplayName = displayName.String
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
+			session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
 			session.Metadata = metadata
 
 			return session, token.String, nil
@@ -266,6 +279,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
+			SessionColumnPasskeyCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -283,6 +297,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					loginName         sql.NullString
 					displayName       sql.NullString
 					passwordCheckedAt sql.NullTime
+					passkeyCheckedAt  sql.NullTime
 					metadata          database.Map[[]byte]
 				)
 
@@ -299,6 +314,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&loginName,
 					&displayName,
 					&passwordCheckedAt,
+					&passkeyCheckedAt,
 					&metadata,
 					&sessions.Count,
 				)
@@ -311,6 +327,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.UserFactor.LoginName = loginName.String
 				session.UserFactor.DisplayName = displayName.String
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
+				session.PasskeyFactor.PasskeyCheckedAt = passkeyCheckedAt.Time
 				session.Metadata = metadata
 
 				sessions.Sessions = append(sessions.Sessions, session)
