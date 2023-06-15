@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"golang.org/x/text/language"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -179,7 +178,7 @@ func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.En
 		}
 	}
 	rawInformation := new(structpb.Struct)
-	err = protojson.Unmarshal(intent.IDPUser, rawInformation)
+	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
 		return nil, err
 	}
