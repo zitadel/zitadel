@@ -340,6 +340,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	if shouldTriggerBulk {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
+		ctx = call.WithTimestamp(ctx)
 	}
 
 	query, scan := prepareUserQuery(ctx, q.client)
