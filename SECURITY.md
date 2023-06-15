@@ -47,7 +47,7 @@ We will not publish this information by default to protect your privacy.
 
 ## Disclosure Process
 
-Our security team will follow the disclosure process: 
+Our security team will follow the disclosure process:
 
 1. We will acknowledge the receipt of your vulnerability report
 2. Our security team will try to verify, reproduce, and determine the impact of your report

@@ -274,6 +274,16 @@ func (repo *AuthRequestRepo) SetExternalUserLogin(ctx context.Context, authReqID
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) SetLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
+	for i, user := range request.LinkingUsers {
+		if user.ExternalUserID == externalUser.ExternalUserID {
+			request.LinkingUsers[i] = externalUser
+			return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+		}
+	}
+	return nil
+}
+
 func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error {
 	request.LinkingUsers = append(request.LinkingUsers, externalUser)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)

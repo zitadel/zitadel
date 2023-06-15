@@ -353,6 +353,10 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOIDCIDPMigratedAzureAD,
 				},
 				{
+					Event:  instance.OIDCIDPMigratedGoogleEventType,
+					Reduce: p.reduceOIDCIDPMigratedGoogle,
+				},
+				{
 					Event:  instance.JWTIDPAddedEventType,
 					Reduce: p.reduceJWTIDPAdded,
 				},
@@ -472,6 +476,14 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  org.OIDCIDPChangedEventType,
 					Reduce: p.reduceOIDCIDPChanged,
+				},
+				{
+					Event:  org.OIDCIDPMigratedAzureADEventType,
+					Reduce: p.reduceOIDCIDPMigratedAzureAD,
+				},
+				{
+					Event:  org.OIDCIDPMigratedGoogleEventType,
+					Reduce: p.reduceOIDCIDPMigratedGoogle,
 				},
 				{
 					Event:  org.JWTIDPAddedEventType,

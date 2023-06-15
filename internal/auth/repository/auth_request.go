@@ -17,6 +17,7 @@ type AuthRequestRepository interface {
 	CheckLoginName(ctx context.Context, id, loginName, userAgentID string) error
 	CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, user *domain.ExternalUser, info *domain.BrowserInfo) error
 	SetExternalUserLogin(ctx context.Context, authReqID, userAgentID string, user *domain.ExternalUser) error
+	SetLinkingUser(ctx context.Context, request *domain.AuthRequest, externalUser *domain.ExternalUser) error
 	SelectUser(ctx context.Context, id, userID, userAgentID string) error
 	SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) error
 	VerifyPassword(ctx context.Context, id, userID, resourceOwner, password, userAgentID string, info *domain.BrowserInfo) error
