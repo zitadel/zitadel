@@ -22,7 +22,7 @@ type params struct {
 	args  []interface{}
 }
 
-var errTestErr = errors.New("some error")
+var errTest = errors.New("some error")
 
 var _ eventstore.Event = &testEvent{}
 
@@ -51,11 +51,12 @@ func (e *testEvent) PreviousAggregateTypeSequence() uint64 {
 
 func (ex *wantExecuter) check(t *testing.T) {
 	t.Helper()
-	if ex.wasExecuted && !ex.shouldExecute {
+	switch {
+	case ex.wasExecuted && !ex.shouldExecute:
 		t.Error("executer should not be executed")
-	} else if !ex.wasExecuted && ex.shouldExecute {
+	case !ex.wasExecuted && ex.shouldExecute:
 		t.Error("executer should be executed")
-	} else if ex.wasExecuted != ex.shouldExecute {
+	case ex.wasExecuted != ex.shouldExecute:
 		t.Errorf("executed missmatched should be %t, but was %t", ex.shouldExecute, ex.wasExecuted)
 	}
 }
@@ -1319,11 +1320,11 @@ func TestStatement_Execute(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			fields: fields{
-				execute: func(ex Executer, projectionName string) error { return errTestErr },
+				execute: func(ex Executer, projectionName string) error { return errTest },
 			},
 			want: want{
 				isErr: func(err error) bool {
-					return errors.Is(err, errTestErr)
+					return errors.Is(err, errTest)
 				},
 			},
 		},
