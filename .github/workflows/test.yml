@@ -6,7 +6,6 @@ jobs:
   quality:
     name: Ensure Quality
     runs-on: ubuntu-latest
-    needs: dependencies
     strategy:
       fail-fast: false
       matrix:
