@@ -189,7 +189,14 @@ func (o *OPStorage) getMaxKeySequence(ctx context.Context) (time.Time, error) {
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AllowTimeTravel().
 			AddQuery().
-			AggregateTypes(keypair.AggregateType, instance.AggregateType).
+			AggregateTypes(keypair.AggregateType).
+			EventTypes(
+				keypair.AddedEventType,
+				keypair.AddedCertificateEventType,
+			).
+			Or().
+			AggregateTypes(instance.AggregateType).
+			EventTypes(instance.InstanceRemovedEventType).
 			Builder(),
 	)
 }

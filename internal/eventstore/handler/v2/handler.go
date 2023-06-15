@@ -3,7 +3,11 @@ package handler
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
+
+	"github.com/cockroachdb/cockroach-go/v2/crdb"
+	"github.com/jackc/pgconn"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -32,7 +36,7 @@ type Handler struct {
 
 	es         EventStore
 	bulkLimit  uint16
-	aggregates []eventstore.AggregateType
+	eventTypes map[eventstore.AggregateType][]eventstore.EventType
 
 	maxFailureCount       uint8
 	requeueEvery          time.Duration
@@ -53,9 +57,13 @@ func NewHandler(
 	config *Config,
 	projection Projection,
 ) *Handler {
-	aggregates := make([]eventstore.AggregateType, len(projection.Reducers()))
-	for i, reducer := range projection.Reducers() {
-		aggregates[i] = reducer.Aggregate
+	aggregates := make(map[eventstore.AggregateType][]eventstore.EventType, len(projection.Reducers()))
+	for _, reducer := range projection.Reducers() {
+		eventTypes := make([]eventstore.EventType, len(reducer.EventRedusers))
+		for i, eventReducer := range reducer.EventRedusers {
+			eventTypes[i] = eventReducer.Event
+		}
+		aggregates[reducer.Aggregate] = eventTypes
 	}
 
 	handler := &Handler{
@@ -63,7 +71,7 @@ func NewHandler(
 		client:                config.Client,
 		es:                    config.Eventstore,
 		bulkLimit:             config.BulkLimit,
-		aggregates:            aggregates,
+		eventTypes:            aggregates,
 		requeueEvery:          config.RequeueEvery,
 		handleActiveInstances: config.HandleActiveInstances,
 		now:                   time.Now,
@@ -115,8 +123,8 @@ func (h *Handler) schedule(ctx context.Context) {
 }
 
 func (h *Handler) subscribe(ctx context.Context) {
-	queue := make(chan eventstore.Event)
-	subscription := eventstore.SubscribeAggregates(queue, h.aggregates...)
+	queue := make(chan eventstore.Event, 100)
+	subscription := eventstore.SubscribeEventTypes(queue, h.eventTypes)
 	for {
 		select {
 		case <-ctx.Done():
@@ -173,34 +181,43 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 }
 
 func (h *Handler) Trigger(ctx context.Context) (err error) {
-	tx, err := h.client.BeginTx(ctx, nil)
-	if err != nil {
-		return err
+	for {
+		additionalIteration, err := h.processEvents(ctx)
+		if !additionalIteration || err != nil {
+			return err
+		}
 	}
+}
 
+func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, err error) {
 	defer func() {
-		commitErr := tx.Commit()
-		h.log().OnError(commitErr).Debug("commit failed")
-		if err == nil {
-			err = commitErr
+		pgErr := new(pgconn.PgError)
+		if errors.As(err, &pgErr) {
+			// error returned if the row is currently locked by another connection
+			if pgErr.Code == "55P03" {
+				h.log().Debug("state already locked")
+				err = nil
+			}
 		}
 	}()
 
-	currentState, shouldSkip, err := h.currentState(ctx, tx)
-	if err != nil || shouldSkip {
-		return err
-	}
+	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {
+		currentState, err := h.currentState(ctx, tx)
+		if err != nil {
+			return err
+		}
 
-	var hasChanged bool
-	for {
 		events, err := h.es.Filter(ctx, h.eventQuery(ctx, tx, currentState))
 		if err != nil {
 			h.log().WithError(err).Debug("filter eventstore failed")
 			return err
 		}
+		eventAmount := len(events)
 		events = skipPreviouslyReduced(events, currentState)
+
 		if len(events) == 0 {
-			break
+			h.updateLastUpdated(ctx, tx, currentState)
+			return nil
 		}
 
 		statements, err := h.eventsToStatements(tx, events, currentState)
@@ -212,28 +229,26 @@ func (h *Handler) Trigger(ctx context.Context) (err error) {
 			return err
 		}
 
-		hasChanged = true
 		currentState.aggregateID = statements[len(statements)-1].AggregateID
 		currentState.aggregateType = statements[len(statements)-1].AggregateType
 		currentState.eventSequence = statements[len(statements)-1].Sequence
 		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
 
-		// retry imediatly if statements failed
+		if err := h.setState(ctx, tx, currentState); err != nil {
+			return err
+		}
+
 		if len(statements) < len(events) {
-			continue
+			// retry imediatly if statements failed
+			additionalIteration = true
+			return nil
 		}
 
-		if len(events) < int(h.bulkLimit) {
-			break
-		}
-	}
-
-	if !hasChanged {
-		h.updateLastUpdated(ctx, tx, currentState)
+		additionalIteration = eventAmount == int(h.bulkLimit)
 		return nil
-	}
+	})
 
-	return h.setState(ctx, tx, currentState)
+	return additionalIteration, err
 }
 
 func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eventstore.Event {
@@ -277,14 +292,21 @@ func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, 
 }
 
 func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *state) *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		Limit(uint64(h.bulkLimit)).
 		AllowTimeTravel().
 		OrderAsc().
 		SetTx(tx).
-		InstanceID(authz.GetInstance(ctx).InstanceID()).
-		AddQuery().
-		AggregateTypes(h.aggregates...).
-		CreationDateAfter(currentState.eventTimestamp.Add(-1 * time.Microsecond)).
-		Builder()
+		InstanceID(currentState.instanceID)
+
+	for aggregateType, eventTypes := range h.eventTypes {
+		builder.
+			AddQuery().
+			AggregateTypes(aggregateType).
+			EventTypes(eventTypes...).
+			CreationDateAfter(currentState.eventTimestamp.Add(-1 * time.Microsecond)).
+			Builder()
+	}
+
+	return builder
 }
