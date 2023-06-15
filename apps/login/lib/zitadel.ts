@@ -20,7 +20,9 @@ import {
   VerifyEmailResponse,
   SetSessionResponse,
   DeleteSessionResponse,
+  VerifyPasskeyRegistrationRequest,
   VerifyPasskeyRegistrationResponse,
+  orgMetadata,
 } from "@zitadel/server";
 import { Metadata } from "nice-grpc";
 
@@ -196,26 +198,14 @@ const bearerTokenMetadata = (token: string) =>
  * @returns the newly set email
  */
 export async function createPasskeyRegistrationLink(
-  userId: string,
-  sessionToken: string
+  userId: string
 ): Promise<any> {
-  //   this actions will be made from the currently seleected user
-  //   const zitadelConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: "",
-  //   };
-
-  //   const authserver: ZitadelServer = initializeServer(zitadelConfig);
-  //   console.log("server", authserver);
   const userservice = user.getUser(server);
-  return userservice.createPasskeyRegistrationLink(
-    {
-      userId,
-      returnCode: {},
-    }
-    // { metadata: bearerTokenMetadata(sessionToken) }
-  );
+
+  return userservice.createPasskeyRegistrationLink({
+    userId,
+    returnCode: {},
+  });
 }
 
 /**
@@ -228,10 +218,15 @@ export async function verifyPasskeyRegistration(
   server: ZitadelServer,
   passkeyId: string,
   passkeyName: string,
-  publicKeyCredential: any,
+  publicKeyCredential:
+    | {
+        [key: string]: any;
+      }
+    | undefined,
   userId: string
 ): Promise<VerifyPasskeyRegistrationResponse> {
   const userservice = user.getUser(server);
+  console.log(passkeyId, passkeyName, publicKeyCredential, userId);
   return userservice.verifyPasskeyRegistration(
     {
       passkeyId,

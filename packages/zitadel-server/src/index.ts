@@ -28,8 +28,12 @@ export {
 export {
   AddHumanUserResponse,
   VerifyEmailResponse,
+  VerifyPasskeyRegistrationRequest,
   VerifyPasskeyRegistrationResponse,
+  RegisterPasskeyRequest,
   RegisterPasskeyResponse,
+  CreatePasskeyRegistrationLinkResponse,
+  CreatePasskeyRegistrationLinkRequest,
 } from "./proto/server/zitadel/user/v2alpha/user_service";
 
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2alpha/legal_settings";

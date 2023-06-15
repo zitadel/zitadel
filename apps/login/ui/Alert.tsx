@@ -1,4 +1,7 @@
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import {
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 
 type Props = {
@@ -29,8 +32,13 @@ export default function Alert({ children, type = AlertType.ALERT }: Props) {
         }
       )}
     >
-      <ExclamationTriangleIcon className="flex-shrink-0 h-5 w-5 mr-2 ml-2" />
-      <span className="text-center text-sm">{children}</span>
+      {type === AlertType.ALERT && (
+        <ExclamationTriangleIcon className="flex-shrink-0 h-5 w-5 mr-2 ml-2" />
+      )}
+      {type === AlertType.INFO && (
+        <InformationCircleIcon className="flex-shrink-0 h-5 w-5 mr-2 ml-2" />
+      )}
+      <span className="text-sm">{children}</span>
     </div>
   );
 }

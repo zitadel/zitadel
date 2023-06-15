@@ -50,9 +50,40 @@ export default function RegisterPasskey({ sessionId }: Props) {
     return response;
   }
 
+  async function submitVerify(
+    passkeyId: string,
+    passkeyName: string,
+    publicKeyCredential: any,
+    sessionId: string
+  ) {
+    setLoading(true);
+    const res = await fetch("/passkeys/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        passkeyId,
+        passkeyName,
+        publicKeyCredential,
+        sessionId,
+      }),
+    });
+
+    const response = await res.json();
+
+    setLoading(false);
+    if (!res.ok) {
+      setError(response.details);
+      return Promise.reject(response.details);
+    }
+    return response;
+  }
+
   function submitRegisterAndContinue(value: Inputs): Promise<boolean | void> {
     return submitRegister().then((resp: RegisterPasskeyResponse) => {
-      console.log(resp.publicKeyCredentialCreationOptions?.publicKey);
+      const passkeyId = resp.passkeyId;
+      console.log("passkeyId", passkeyId);
       if (
         resp.publicKeyCredentialCreationOptions &&
         resp.publicKeyCredentialCreationOptions.publicKey
@@ -96,10 +127,11 @@ export default function RegisterPasskey({ sessionId }: Props) {
               const clientDataJSON = (resp as any).response.clientDataJSON;
               const rawId = (resp as any).rawId;
 
-              const data = JSON.stringify({
+              const data = {
                 id: resp.id,
                 rawId: coerceToBase64Url(rawId, "rawId"),
                 type: resp.type,
+                // response: (resp as any).response,
                 response: {
                   attestationObject: coerceToBase64Url(
                     attestationObject,
@@ -110,11 +142,10 @@ export default function RegisterPasskey({ sessionId }: Props) {
                     "clientDataJSON"
                   ),
                 },
-              });
+              };
+              console.log(data);
 
-              const base64 = btoa(data);
-
-              return base64;
+              return submitVerify(passkeyId, "name", data, sessionId);
               // if (this.type === U2FComponentDestination.MFA) {
               //   this.service
               //     .verifyMyMultiFactorU2F(base64, this.name)

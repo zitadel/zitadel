@@ -24,14 +24,31 @@ export default async function Page({
   console.log(sessionFactors);
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1>Register Passkey</h1>
+      <h1>Use your passkey to confirm it’s really you</h1>
+
+      {sessionFactors && (
+        <UserAvatar
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName ?? ""}
+          displayName={sessionFactors.factors?.user?.displayName}
+          showDropdown
+        ></UserAvatar>
+      )}
       <p className="ztdl-p mb-6 block">
-        Setup your user to authenticate with passkeys.
+        Your device will ask for your fingerprint, face, or screen lock
       </p>
 
       <Alert type={AlertType.INFO}>
-        A passkey is an authentication method on a device like your fingerprint,
-        Apple FaceID or similar.
+        <span>
+          A passkey is an authentication method on a device like your
+          fingerprint, Apple FaceID or similar.{" "}
+          <a
+            className="text-primary-light-500 dark:text-primary-dark-500 hover:text-primary-light-300 hover:dark:text-primary-dark-300"
+            target="_blank"
+            href="https://zitadel.com/docs/guides/manage/user/reg-create-user#with-passwordless"
+          >
+            Passwordless Authentication
+          </a>
+        </span>
       </Alert>
 
       {!sessionFactors && (
@@ -41,14 +58,6 @@ export default async function Page({
             username first or provide a loginName as searchParam.
           </Alert>
         </div>
-      )}
-
-      {sessionFactors && (
-        <UserAvatar
-          loginName={loginName ?? sessionFactors.factors?.user?.loginName ?? ""}
-          displayName={sessionFactors.factors?.user?.displayName}
-          showDropdown
-        ></UserAvatar>
       )}
 
       {sessionFactors?.id && <RegisterPasskey sessionId={sessionFactors.id} />}
