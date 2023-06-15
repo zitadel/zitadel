@@ -165,8 +165,15 @@
     "PREVIOUS": "上一页",
     "NEXT": "下一页",
     "MORE": "更多",
-    "STEP": "Step",
-    "COMINGSOON": "Coming soon",
+    "STEP": "步",
+    "UNSAVEDCHANGES": "未保存的更改",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "您确定要放弃此新操作吗？你的行动将会失败",
+        "CANCEL": "取消",
+        "DISCARD": "丢弃"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }

@@ -94,7 +94,8 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		/* TODO after we are able to obtain a Bearer token for a human user
+		/* TODO: after we are able to obtain a Bearer token for a human user
+		https://github.com/zitadel/zitadel/issues/6022
 		{
 			name: "human user",
 			args: args{

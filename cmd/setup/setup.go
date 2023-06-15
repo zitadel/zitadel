@@ -75,6 +75,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.instanceSetup = config.DefaultInstance
 	steps.FirstInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
+	steps.FirstInstance.oidcEncryptionKey = config.EncryptionKeys.OIDC
 	steps.FirstInstance.masterKey = masterKey
 	steps.FirstInstance.db = dbClient.DB
 	steps.FirstInstance.es = eventstoreClient
