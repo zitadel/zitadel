@@ -7,8 +7,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jackc/pgconn"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -33,7 +31,7 @@ var (
 	updateStateLastRunStmt string
 )
 
-func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *state, shouldSkip bool, err error) {
+func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *state, err error) {
 	currentState = &state{
 		instanceID: authz.GetInstance(ctx).InstanceID(),
 	}
@@ -49,26 +47,19 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		aggregateID,
 		sequence,
 	)
-	pgErr := new(pgconn.PgError)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = h.lockState(ctx, tx, currentState.instanceID)
-	} else if errors.As(err, &pgErr) {
-		// error returned if the row is currently locked by another connection
-		if pgErr.Code == "55P03" {
-			h.log().Debug("state already locked")
-			return nil, true, nil
-		}
 	}
 	if err != nil {
 		h.log().WithError(err).Debug("unable to query current state")
-		return nil, false, err
+		return nil, err
 	}
 
 	currentState.eventTimestamp = timestamp.Time
 	currentState.aggregateType = eventstore.AggregateType(aggregateType.String)
 	currentState.aggregateID = aggregateID.String
 	currentState.eventSequence = uint64(sequence.Int64)
-	return currentState, false, nil
+	return currentState, nil
 }
 
 func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state) error {

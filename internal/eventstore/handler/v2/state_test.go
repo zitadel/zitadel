@@ -272,7 +272,6 @@ func TestHandler_currentState(t *testing.T) {
 	}
 	type want struct {
 		currentState *state
-		shouldSkip   bool
 		isErr        func(t *testing.T, err error)
 	}
 	tests := []struct {
@@ -365,7 +364,16 @@ func TestHandler_currentState(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "instance"),
 			},
 			want: want{
-				shouldSkip: true,
+				isErr: func(t *testing.T, err error) {
+					pgErr := new(pgconn.PgError)
+					if !errors.As(err, &pgErr) {
+						t.Errorf("error should be PgErr but was %T", err)
+						return
+					}
+					if pgErr.Code != "55P03" {
+						t.Errorf("expected code 55P03 got: %s", pgErr.Code)
+					}
+				},
 			},
 		},
 		{
@@ -427,14 +435,11 @@ func TestHandler_currentState(t *testing.T) {
 				t.Fatalf("unable to begin transaction: %v", err)
 			}
 
-			gotCurrentState, gotShouldSkip, err := h.currentState(tt.args.ctx, tx)
+			gotCurrentState, err := h.currentState(tt.args.ctx, tx)
 
 			tt.want.isErr(t, err)
 			if !reflect.DeepEqual(gotCurrentState, tt.want.currentState) {
 				t.Errorf("Handler.currentState() gotCurrentState = %v, want %v", gotCurrentState, tt.want.currentState)
-			}
-			if gotShouldSkip != tt.want.shouldSkip {
-				t.Errorf("Handler.currentState() gotShouldSkip = %v, want %v", gotShouldSkip, tt.want.shouldSkip)
 			}
 			tt.fields.mock.Assert(t)
 		})
