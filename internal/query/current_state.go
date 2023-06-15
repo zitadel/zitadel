@@ -236,16 +236,24 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			From(currentStateTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LatestState, error) {
-			state := new(LatestState)
+			var (
+				creationDate sql.NullTime
+				lastUpdated  sql.NullTime
+				sequence     sql.NullInt64
+			)
 			err := row.Scan(
-				&state.EventTimestamp,
-				&state.Sequence,
-				&state.LastUpdated,
+				&creationDate,
+				&sequence,
+				&lastUpdated,
 			)
 			if err != nil && !errs.Is(err, sql.ErrNoRows) {
 				return nil, errors.ThrowInternal(err, "QUERY-aAZ1D", "Errors.Internal")
 			}
-			return state, nil
+			return &LatestState{
+				EventTimestamp: creationDate.Time,
+				LastUpdated:    lastUpdated.Time,
+				Sequence:       uint64(sequence.Int64),
+			}, nil
 		}
 }
 
