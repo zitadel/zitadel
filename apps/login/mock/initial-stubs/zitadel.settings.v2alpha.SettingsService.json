@@ -1,0 +1,7 @@
+[
+  {
+    "service": "zitadel.settings.v2alpha.SettingsService",
+    "method": "GetBrandingSettings",
+    "out": {}
+  }
+]
