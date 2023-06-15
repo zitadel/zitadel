@@ -99,7 +99,7 @@ func (f *Filter) Validate() error {
 	return nil
 }
 
-func QueryFromBuilder(builder *eventstore.SearchQueryBuilder, instanceID string) (*SearchQuery, error) {
+func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, error) {
 	if builder == nil ||
 		// len(builder.GetQueries()) < 1 ||
 		builder.GetColumns().Validate() != nil {

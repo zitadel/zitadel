@@ -10,7 +10,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	z_errors "github.com/zitadel/zitadel/internal/errors"
@@ -34,7 +33,7 @@ type querier interface {
 type scan func(dest ...interface{}) error
 
 func query(ctx context.Context, criteria querier, searchQuery *eventstore.SearchQueryBuilder, dest interface{}) error {
-	q, err := repository.QueryFromBuilder(searchQuery, authz.GetInstance(ctx).InstanceID())
+	q, err := repository.QueryFromBuilder(searchQuery)
 	if err != nil {
 		return err
 	}

@@ -173,7 +173,7 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 }
 
 func (h *Handler) Trigger(ctx context.Context) (err error) {
-	tx, err := h.client.Begin()
+	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -282,6 +282,7 @@ func (h *Handler) eventQuery(ctx context.Context, tx *sql.Tx, currentState *stat
 		AllowTimeTravel().
 		OrderAsc().
 		SetTx(tx).
+		InstanceID(authz.GetInstance(ctx).InstanceID()).
 		AddQuery().
 		AggregateTypes(h.aggregates...).
 		CreationDateAfter(currentState.eventTimestamp.Add(-1 * time.Microsecond)).

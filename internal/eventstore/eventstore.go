@@ -5,6 +5,8 @@ import (
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 // Eventstore abstracts all functions needed to store valid events
@@ -77,6 +79,9 @@ func (es *Eventstore) AggregateTypes() []string {
 // Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
+	// make sure that the instance id is always set
+	queryFactory.InstanceID(authz.GetInstance(ctx).InstanceID())
+
 	events, err := es.querier.Filter(ctx, queryFactory)
 	if err != nil {
 		return nil, err
@@ -131,6 +136,8 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 
 // LatestSequence filters the latest sequence for the given search query
 func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (time.Time, error) {
+	queryFactory.InstanceID(authz.GetInstance(ctx).InstanceID())
+
 	return es.querier.LatestSequence(ctx, queryFactory)
 }
 

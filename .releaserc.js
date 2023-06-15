@@ -2,7 +2,7 @@ module.exports = {
     branches: [
         { name: 'main' },
         { name: 'next' },
-        { name: 'rc', prerelease: true },
+        { name: 'merge-eventstore', prerelease: 'eventstore-performance'}
     ],
     plugins: [
         "@semantic-release/commit-analyzer"
