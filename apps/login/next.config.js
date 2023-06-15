@@ -9,7 +9,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: process.env.ZITADEL_API_URL.replace("https://", ""),
+        hostname: process.env.ZITADEL_API_URL?.replace("https://", "") || "",
         port: "",
         pathname: "/**",
       },

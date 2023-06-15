@@ -1,44 +1,16 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
-    "generate": {
-      "outputs": [
-        "src/proto/**"
-      ],
-      "cache": true
-    },
-    "build": {
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**"
-      ],
-      "dependsOn": [
-        "lint",
-        "generate",
-        "^build"
-      ]
-    },
-    "test": {
-      "dependsOn": [
-        "generate",
-        "@zitadel/server#build"
-      ]
-    },
-    "test:watch": {
-      "dependsOn": [
-        "generate",
-        "@zitadel/server#build"
-      ]
-    },
+    "generate": {},
+    "build": {},
+    "test": {},
+    "test:unit": {},
+    "test:integration": {},
+    "test:watch": {},
     "lint": {},
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "clean": {
-      "cache": false
-    }
+    "lint:fix": {},
+    "dev": {},
+    "clean": {}
   },
   "globalDependencies": [
     "**/.env.*local"

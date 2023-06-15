@@ -1,19 +1,11 @@
-name: Quality
+name: Install
 on:
   pull_request:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
-  quality:
-    name: Ensure Quality
+  install:
+    name: Install
     runs-on: ubuntu-latest
-    needs: dependencies
-    strategy:
-      fail-fast: false
-      matrix:
-        command:
-        - lint
-        - test:unit
-        - test:integration
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -46,6 +38,3 @@ jobs:
       - name: Install Dependencies
         id: deps
         run: pnpm install
-      - name: Check
-        id: check
-        run: pnpm ${{ matrix.command }}

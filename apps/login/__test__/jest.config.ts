@@ -3,7 +3,7 @@ import { pathsToModuleNameMapper } from "ts-jest";
 import { compilerOptions } from "../tsconfig.json";
 
 // We make these type imports explicit, so IDEs with their own typescript engine understand them, too.
-import type {} from '@testing-library/jest-dom'
+import type {} from "@testing-library/jest-dom";
 
 export default async (): Promise<Config.InitialOptions> => {
   return {
@@ -11,9 +11,7 @@ export default async (): Promise<Config.InitialOptions> => {
     transform: {
       "^.+\\.tsx?$": ["ts-jest", { tsconfig: "<rootDir>/tsconfig.json" }],
     },
-    setupFilesAfterEnv: [
-      "@testing-library/jest-dom/extend-expect",
-    ],
+    setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
       prefix: "<rootDir>/../",
     }),
