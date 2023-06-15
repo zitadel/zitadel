@@ -71,7 +71,7 @@ export class UserCreateMachineComponent implements OnDestroy {
         this.toast.showInfo('USER.TOAST.CREATED', true);
         const id = data.userId;
         if (id) {
-          this.router.navigate(['users', id]);
+          this.router.navigate(['users', id], { queryParams: { new: true } });
         }
       })
       .catch((error: any) => {
