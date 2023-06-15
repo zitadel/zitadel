@@ -11,12 +11,35 @@ import "validate/validate.proto";
 
 message IDPInformation{
   oneof access{
-    IDPOAuthAccessInformation oauth = 1;
+    IDPOAuthAccessInformation oauth = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "OAuth/OIDC access (and id_token) returned by the identity provider"
+      }
+    ];
   }
-  string idp_id = 2;
-  string user_id = 3;
-  string user_name = 4;
-  google.protobuf.Struct raw_information = 5;
+  string idp_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the identity provider"
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string user_id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the user of the identity provider"
+      example: "\"6516849804890468048461403518\"";
+    }
+  ];
+  string user_name = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "username of the user of the identity provider"
+      example: "\"user@external.com\"";
+    }
+  ];
+  google.protobuf.Struct raw_information = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "complete information returned by the identity provider"
+    }
+  ];
 }
 
 message IDPOAuthAccessInformation{
@@ -40,7 +63,7 @@ message IDPLink {
       description: "ID of the user of the identity provider"
       min_length: 1;
       max_length: 200;
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"6516849804890468048461403518\"";
     }
   ];
   string user_name = 3 [
