@@ -130,8 +130,8 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0
       cypress:
-        specifier: ^12.13.0
-        version: 12.13.0
+        specifier: ^12.14.0
+        version: 12.14.0
       del-cli:
         specifier: 5.0.0
         version: 5.0.0
@@ -3021,8 +3021,8 @@ packages:
       stream-transform: 2.1.3
     dev: true
 
-  /cypress@12.13.0:
-    resolution: {integrity: sha512-QJlSmdPk+53Zhy69woJMySZQJoWfEWun3X5OOenGsXjRPVfByVTHorxNehbzhZrEzH9RDUDqVcck0ahtlS+N/Q==}
+  /cypress@12.14.0:
+    resolution: {integrity: sha512-HiLIXKXZaIT1RT7sw1sVPt+qKtis3uYNm6KwC4qoYjabwLKaqZlyS/P+uVvvlBNcHIwL/BC6nQZajpbUd7hOgQ==}
     engines: {node: ^14.0.0 || ^16.0.0 || >=18.0.0}
     hasBin: true
     requiresBuild: true

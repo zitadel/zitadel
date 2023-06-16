@@ -67,7 +67,7 @@
     "@zitadel/tsconfig": "workspace:*",
     "autoprefixer": "10.4.13",
     "concurrently": "^8.1.0",
-    "cypress": "^12.13.0",
+    "cypress": "^12.14.0",
     "del-cli": "5.0.0",
     "eslint-config-zitadel": "workspace:*",
     "grpc-tools": "1.11.3",
