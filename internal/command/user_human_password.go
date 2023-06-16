@@ -82,7 +82,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 	if err != nil {
 		return nil, err
 	}
-	c.pushAppendAndReduce(ctx, existingCode, passwordEvent)
+	err = c.pushAppendAndReduce(ctx, existingCode, passwordEvent)
 	if err != nil {
 		return nil, err
 	}

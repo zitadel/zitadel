@@ -11,17 +11,16 @@ import (
 )
 
 func (s *Server) RequestPasswordReset(ctx context.Context, req *user.RequestPasswordResetRequest) (_ *user.RequestPasswordResetResponse, err error) {
-	var resourceOwner string // TODO: check if still needed
 	var details *domain.ObjectDetails
 	var code *string
 
 	switch m := req.GetMedium().(type) {
 	case *user.RequestPasswordResetRequest_SendLink:
-		details, code, err = s.command.RequestPasswordResetURLTemplate(ctx, req.GetUserId(), resourceOwner, m.SendLink.GetUrlTemplate())
+		details, code, err = s.command.RequestPasswordResetURLTemplate(ctx, req.GetUserId(), m.SendLink.GetUrlTemplate(), notificationTypeToDomain(m.SendLink.GetNotificationType()))
 	case *user.RequestPasswordResetRequest_ReturnCode:
-		details, code, err = s.command.RequestPasswordResetReturnCode(ctx, req.GetUserId(), resourceOwner)
+		details, code, err = s.command.RequestPasswordResetReturnCode(ctx, req.GetUserId())
 	case nil:
-		details, code, err = s.command.RequestPasswordReset(ctx, req.GetUserId(), resourceOwner)
+		details, code, err = s.command.RequestPasswordReset(ctx, req.GetUserId())
 	default:
 		err = caos_errs.ThrowUnimplementedf(nil, "USERv2-SDeeg", "verification oneOf %T in method RequestPasswordReset not implemented", m)
 	}
@@ -33,6 +32,19 @@ func (s *Server) RequestPasswordReset(ctx context.Context, req *user.RequestPass
 		Details:          object.DomainToDetailsPb(details),
 		VerificationCode: code,
 	}, nil
+}
+
+func notificationTypeToDomain(notificationType user.NotificationType) domain.NotificationType {
+	switch notificationType {
+	case user.NotificationType_NOTIFICATION_TYPE_Email:
+		return domain.NotificationTypeEmail
+	case user.NotificationType_NOTIFICATION_TYPE_SMS:
+		return domain.NotificationTypeSms
+	case user.NotificationType_NOTIFICATION_TYPE_Unspecified:
+		return domain.NotificationTypeEmail
+	default:
+		return domain.NotificationTypeEmail
+	}
 }
 
 func (s *Server) SetPassword(ctx context.Context, req *user.SetPasswordRequest) (_ *user.SetPasswordResponse, err error) {

@@ -24,9 +24,8 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 		userEncryption  crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		resourceOwner string
+		ctx    context.Context
+		userID string
 	}
 	tests := []struct {
 		name    string
@@ -40,9 +39,8 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "",
 			},
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
 		},
@@ -54,9 +52,8 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
 		},
@@ -78,9 +75,8 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
 		},
@@ -99,9 +95,8 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
@@ -113,7 +108,7 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				userEncryption:  tt.fields.userEncryption,
 			}
-			_, _, err := c.RequestPasswordReset(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			_, _, err := c.RequestPasswordReset(tt.args.ctx, tt.args.userID)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful cases are tested in TestCommands_requestPasswordReset
 		})
@@ -127,9 +122,8 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 		userEncryption  crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		resourceOwner string
+		ctx    context.Context
+		userID string
 	}
 	tests := []struct {
 		name    string
@@ -143,9 +137,8 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "",
 			},
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
 		},
@@ -157,9 +150,8 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
 		},
@@ -181,9 +173,8 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
 		},
@@ -202,9 +193,8 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
@@ -216,7 +206,7 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				userEncryption:  tt.fields.userEncryption,
 			}
-			_, _, err := c.RequestPasswordResetReturnCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			_, _, err := c.RequestPasswordResetReturnCode(tt.args.ctx, tt.args.userID)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful cases are tested in TestCommands_requestPasswordReset
 		})
@@ -230,10 +220,10 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 		userEncryption  crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		resourceOwner string
-		urlTmpl       string
+		ctx              context.Context
+		userID           string
+		urlTmpl          string
+		notificationType domain.NotificationType
 	}
 	tests := []struct {
 		name    string
@@ -247,9 +237,8 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				urlTmpl:       "{{",
+				userID:  "user1",
+				urlTmpl: "{{",
 			},
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
@@ -260,9 +249,8 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "",
 			},
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
 		},
@@ -274,9 +262,8 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
 		},
@@ -298,9 +285,8 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
 		},
@@ -319,9 +305,8 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
@@ -333,7 +318,7 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				userEncryption:  tt.fields.userEncryption,
 			}
-			_, _, err := c.RequestPasswordResetURLTemplate(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.urlTmpl)
+			_, _, err := c.RequestPasswordResetURLTemplate(tt.args.ctx, tt.args.userID, tt.args.urlTmpl, tt.args.notificationType)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful cases are tested in TestCommands_requestPasswordReset
 		})
@@ -348,11 +333,11 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 		newCode         cryptoCodeFunc
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		resourceOwner string
-		returnCode    bool
-		urlTmpl       string
+		ctx              context.Context
+		userID           string
+		returnCode       bool
+		urlTmpl          string
+		notificationType domain.NotificationType
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -371,9 +356,8 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "",
 			},
 			res: res{
 				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
@@ -387,9 +371,8 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			res: res{
 				err: caos_errs.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
@@ -413,9 +396,8 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			res: res{
 				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
@@ -436,9 +418,8 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			res: res{
 				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
@@ -475,9 +456,8 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				newCode:         mockCode("code", 10*time.Minute),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
+				ctx:    context.Background(),
+				userID: "userID",
 			},
 			res: res{
 				details: &domain.ObjectDetails{
@@ -517,10 +497,52 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				newCode:         mockCode("code", 10*time.Minute),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
-				urlTmpl:       "https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+				ctx:     context.Background(),
+				userID:  "userID",
+				urlTmpl: "https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+			},
+			res: res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				code: nil,
+			},
+		},
+		{
+			name: "code generated template sms",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstname", "lastname", "nickname", "displayname",
+								language.English, domain.GenderUnspecified, "email", false),
+						),
+					),
+					expectPush(
+						eventPusherToEvents(
+							user.NewHumanPasswordCodeAddedEventV2(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								10*time.Minute,
+								domain.NotificationTypeSms,
+								"https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+								false,
+							)),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockCode("code", 10*time.Minute),
+			},
+			args: args{
+				ctx:              context.Background(),
+				userID:           "userID",
+				urlTmpl:          "https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+				notificationType: domain.NotificationTypeSms,
 			},
 			res: res{
 				details: &domain.ObjectDetails{
@@ -560,10 +582,9 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				newCode:         mockCode("code", 10*time.Minute),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "userID",
-				resourceOwner: "",
-				returnCode:    true,
+				ctx:        context.Background(),
+				userID:     "userID",
+				returnCode: true,
 			},
 			res: res{
 				details: &domain.ObjectDetails{
@@ -581,7 +602,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				userEncryption:  tt.fields.userEncryption,
 				newCode:         tt.fields.newCode,
 			}
-			got, gotPlainCode, err := c.requestPasswordReset(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.returnCode, tt.args.urlTmpl)
+			got, gotPlainCode, err := c.requestPasswordReset(tt.args.ctx, tt.args.userID, tt.args.returnCode, tt.args.urlTmpl, tt.args.notificationType)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.details, got)
 			assert.Equal(t, tt.res.code, gotPlainCode)
