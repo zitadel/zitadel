@@ -83,10 +83,16 @@ export async function getPasswordComplexitySettings(
 
 export async function createSession(
   server: ZitadelServer,
-  loginName: string
+  loginName: string,
+  password?: string
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
-  return sessionService.createSession({ checks: { user: { loginName } } }, {});
+  return password
+    ? sessionService.createSession(
+        { checks: { user: { loginName } }, password: { password } },
+        {}
+      )
+    : sessionService.createSession({ checks: { user: { loginName } } }, {});
 }
 
 export async function setSession(

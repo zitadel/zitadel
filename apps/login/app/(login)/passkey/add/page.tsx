@@ -22,7 +22,6 @@ export default async function Page({
     });
   }
 
-  console.log(sessionFactors);
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1>Use your passkey to confirm it’s really you</h1>

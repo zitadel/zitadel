@@ -1,14 +1,10 @@
 "use client";
 
-import {
-  LegalAndSupportSettings,
-  PasswordComplexitySettings,
-} from "@zitadel/server";
+import { PasswordComplexitySettings } from "@zitadel/server";
 import PasswordComplexity from "./PasswordComplexity";
 import { useState } from "react";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
-import { PrivacyPolicyCheckboxes } from "./PrivacyPolicyCheckboxes";
 import { FieldValues, useForm } from "react-hook-form";
 import {
   lowerCaseValidator,
@@ -71,9 +67,36 @@ export default function SetPasswordForm({
     return res.json();
   }
 
+  async function createSessionWithLoginNameAndPassword(
+    loginName: string,
+    password: string
+  ) {
+    setLoading(true);
+    const res = await fetch("/session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        loginName: loginName,
+        password: password,
+      }),
+    });
+
+    setLoading(false);
+    if (!res.ok) {
+      throw new Error("Failed to set user");
+    }
+    return res.json();
+  }
+
   function submitAndLink(value: Inputs): Promise<boolean | void> {
-    return submitRegister(value).then((resp: any) => {
-      return router.push(`/verify?userID=${resp.userId}`);
+    return submitRegister(value).then((humanResponse: any) => {
+      return createSessionWithLoginNameAndPassword(email, value.password).then(
+        () => {
+          return router.push(`/verify?userID=${humanResponse.userId}`);
+        }
+      );
     });
   }
 

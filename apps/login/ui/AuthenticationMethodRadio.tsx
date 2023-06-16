@@ -41,7 +41,7 @@ export default function AuthenticationMethodRadio({
                         ? "bg-background-light-400 dark:bg-background-dark-400"
                         : "bg-background-light-400 dark:bg-background-dark-400"
                     }
-                      relative border boder-divider-light dark:border-divider-dark flex cursor-pointer rounded-lg px-5 py-4 focus:outline-none hover:shadow-md`
+                      relative border boder-divider-light dark:border-divider-dark flex cursor-pointer rounded-lg px-5 py-4 focus:outline-none hover:shadow-lg dark:hover:bg-white/10`
                 }
               >
                 {({ active, checked }) => (

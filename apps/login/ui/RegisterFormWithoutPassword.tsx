@@ -141,7 +141,11 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
         />
       )}
 
-      <div className="py-4">
+      <p className="mt-4 ztdl-p mb-6 block text-text-light-secondary-500 dark:text-text-dark-secondary-500">
+        Select the method you would like to authenticate
+      </p>
+
+      <div className="pb-4">
         <AuthenticationMethodRadio
           selected={selected}
           selectionChanged={setSelected}
