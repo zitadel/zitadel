@@ -35,7 +35,10 @@ export async function POST(request: NextRequest) {
             loginName: response.session?.factors?.user?.loginName ?? "",
           };
           return addSessionToCookie(sessionCookie).then(() => {
-            return NextResponse.json({ factors: response?.session?.factors });
+            return NextResponse.json({
+              sessionId: createdSession.sessionId,
+              factors: response?.session?.factors,
+            });
           });
         } else {
           return NextResponse.json(

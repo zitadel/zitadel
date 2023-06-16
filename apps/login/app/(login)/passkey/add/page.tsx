@@ -10,6 +10,7 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
   const { loginName } = searchParams;
+
   const sessionFactors = await loadSession(loginName);
 
   async function loadSession(loginName?: string) {

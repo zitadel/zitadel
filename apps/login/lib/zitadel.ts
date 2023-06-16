@@ -2,6 +2,7 @@ import {
   ZitadelServer,
   ZitadelServerOptions,
   user,
+  management,
   settings,
   getServers,
   initializeServer,
@@ -23,6 +24,8 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyPasskeyRegistrationResponse,
   orgMetadata,
+  SetUserPassword,
+  SetHumanPasswordResponse,
 } from "@zitadel/server";
 import { Metadata } from "nice-grpc";
 
@@ -131,7 +134,7 @@ export type AddHumanUserData = {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
+  password: string | undefined;
 };
 
 export async function addHumanUser(
@@ -141,15 +144,34 @@ export async function addHumanUser(
   const mgmt = user.getUser(server);
   return mgmt
     .addHumanUser(
-      {
-        email: { email },
-        username: email,
-        profile: { firstName, lastName },
-        password: { password },
-      },
+      password
+        ? {
+            email: { email },
+            username: email,
+            profile: { firstName, lastName },
+            password: { password },
+          }
+        : {
+            email: { email },
+            username: email,
+            profile: { firstName, lastName },
+          },
       {}
     )
     .then((resp: AddHumanUserResponse) => {
+      return resp.userId;
+    });
+}
+
+export async function setHumanPassword(
+  server: ZitadelServer,
+  userId: string,
+  password: string
+): Promise<string> {
+  const mgmt = management.getManagement(server);
+  return mgmt
+    .setHumanPassword({ userId, password }, {})
+    .then((resp: SetHumanPasswordResponse) => {
       return resp.userId;
     });
 }

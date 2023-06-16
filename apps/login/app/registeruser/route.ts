@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       email: email,
       firstName,
       lastName,
-      password: password,
+      password: password ? password : undefined,
     });
     return NextResponse.json({ userId });
   } else {

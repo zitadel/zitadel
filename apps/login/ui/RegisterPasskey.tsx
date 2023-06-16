@@ -146,41 +146,6 @@ export default function RegisterPasskey({ sessionId }: Props) {
               console.log(data);
 
               return submitVerify(passkeyId, "name", data, sessionId);
-              // if (this.type === U2FComponentDestination.MFA) {
-              //   this.service
-              //     .verifyMyMultiFactorU2F(base64, this.name)
-              //     .then(() => {
-              //       this.translate
-              //         .get("USER.MFA.U2F_SUCCESS")
-              //         .pipe(take(1))
-              //         .subscribe((msg) => {
-              //           this.toast.showInfo(msg);
-              //         });
-              //       this.dialogRef.close(true);
-              //       this.loading = false;
-              //     })
-              //     .catch((error) => {
-              //       this.loading = false;
-              //       this.toast.showError(error);
-              //     });
-              // } else if (this.type === U2FComponentDestination.PASSWORDLESS) {
-              //   this.service
-              //     .verifyMyPasswordless(base64, this.name)
-              //     .then(() => {
-              //       this.translate
-              //         .get("USER.PASSWORDLESS.U2F_SUCCESS")
-              //         .pipe(take(1))
-              //         .subscribe((msg) => {
-              //           this.toast.showInfo(msg);
-              //         });
-              //       this.dialogRef.close(true);
-              //       this.loading = false;
-              //     })
-              //     .catch((error) => {
-              //       this.loading = false;
-              //       this.toast.showError(error);
-              //     });
-              // }
             } else {
               setLoading(false);
               setError("An error on registering passkey");
