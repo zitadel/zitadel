@@ -288,7 +288,7 @@ func (l *Login) handleExternalUserAuthenticated(
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
 	// check and fill in local linked user
 	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
-	if !errors.IsNotFound(externalErr) {
+	if externalErr != nil && !errors.IsNotFound(externalErr) {
 		l.renderError(w, r, authReq, externalErr)
 		return
 	}
