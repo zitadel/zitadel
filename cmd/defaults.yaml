@@ -187,7 +187,9 @@ Projections:
       MaxFailureCount: 0
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
-      # Delivery guarantee requirements are probably higher for quota webhooks
+      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
+      # An instance is active, as long as there are events on the instance, that are not older than the HandleActiveInstances duration.
+      # Delivery guarantee requirements are higher for quota webhooks
       # Defaults to 45 days
       HandleActiveInstances: 1080h
       # As quota notification projections don't result in database statements, retries don't have any effects
