@@ -20,7 +20,7 @@ Telemetry:
   # Push telemetry data to all these endpoints at least once.
   # If one endpoint returns an unsuccessful response code or times out,
   # ZITADEL retries to push the data point to all configured endpoints again until it succeeds.
-  # Configure delivery guarantees and intervals in the section Projections.Customizations.Analytics
+  # Configure delivery guarantees and intervals in the section Projections.Customizations.Telemetry
   # The endpoints can be reconfigured at runtime.
   # Three redirects are followed.
   Endpoints:
@@ -195,7 +195,9 @@ Projections:
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the database too much.
       RequeueEvery: 300s
     Telemetry:
-      # Telemetry delivery guarantee requirements are a bit higher, as they are not interactively retryable
+      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
+      # An instance is active, as long as there are events on the instance, that are not older than the HandleActiveInstances duration.
+      # Telemetry delivery guarantee requirements are a bit higher than normal data projections, as they are not interactively retryable.
       # Defaults to 15 days
       HandleActiveInstances: 360h
       # As sending telemetry data doesn't result in database statements, retries don't have any effects
