@@ -14,7 +14,7 @@ services:
       - 'ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa'
       - 'ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin'
       - 'ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1'
-      - 'ZITADEL_ANALYTICS_PUSH_ALLENABLED=true'
+      - 'ZITADEL_TELEMETRY_ENABLED=true'
     depends_on:
       crdb:
         condition: 'service_healthy'

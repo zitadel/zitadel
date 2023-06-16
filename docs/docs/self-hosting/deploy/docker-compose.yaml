@@ -10,7 +10,7 @@ services:
     environment:
       - 'ZITADEL_DATABASE_COCKROACH_HOST=crdb'
       - 'ZITADEL_EXTERNALSECURE=false'
-      - 'ZITADEL_ANALYTICS_PUSH_ALLENABLED=true'
+      - 'ZITADEL_TELEMETRY_ENABLED=true'
     depends_on:
       crdb:
         condition: 'service_healthy'

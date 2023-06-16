@@ -61,15 +61,27 @@ Instead, your execution environment should provide tooling for managing logs in 
 This includes tasks like rotating files, routing, collecting, archiving and cleaning-up.
 For example, systemd has journald and kubernetes has fluentd and fluentbit.
 
-## Analytics
+## Telemetry
 
-If you want some usage metrics pushed to external systems, enable the metrics you need in the ZITADEL configuration.
+If you want to have some usage data pushed to external systems, enable telemetry in the ZITADEL configuration.
 Include https://zitadel.com/usage in the list of endpoints if you want to help the ZITADEL maintainers improve the product's usability by giving them some insights.
-Don't forget to opt in by setting Analytics.Push.AllEnabled to true.
+Don't forget to opt in by setting Telemetry.Enabled to true.
+
+The following table describes the data points that are sent to the endpoints:
+
+| Trigger                                                                           | Description                                                                                                                                        |
+|-----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| A virtual instance is created.                                                    | This data point is also sent when the first instance is automatically created during the ZITADEL binaries setup phase in a self-hosting scenario.  |
+| An authentication succeeded for the first time on an instance.                    | This is the first authentication with the instances automatically created admin user during the instance setup, which can be a human or a machine. |
+| A project is created for the first time in a virtual instance.                    | The ZITADEL project that is automatically created during the instance setup is omitted.                                                            |
+| An application is created for the first time in a virtual instance.               | The applications in the ZITADEL project that are automatically created during the instance setup are omitted.                                      |
+| An authentication succeeded for the first time in a virtal instances application. | This is the first authentication using a ZITADEL application that is not created during the instance setup phase.                                  |
+| A virtual instance is deleted.                                                    | This data point is sent when a virtual instance is deleted via ZITADELs system API                                                                 |
+
 
 ZITADEL pushes the metrics by projecting certain events.
-Therefore, you can configure delivery guarantees not in the Analytics section of the ZITADEL configuration,
-but in the Projections.Customizations.Analytics section
+Therefore, you can configure delivery guarantees not in the Telemetry section of the ZITADEL configuration,
+but in the Projections.Customizations.Telemetry section
 
 ## Database
 
