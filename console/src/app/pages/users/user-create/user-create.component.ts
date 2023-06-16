@@ -13,6 +13,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
+import { supportedLanguages } from 'src/app/utils/language';
 import {
   containsLowerCaseValidator,
   containsNumberValidator,
@@ -33,7 +34,7 @@ import {
 export class UserCreateComponent implements OnInit, OnDestroy {
   public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'zh', 'bg'];
+  public languages: string[] = supportedLanguages;
   public selected: CountryPhoneCode | undefined;
   public countryPhoneCodes: CountryPhoneCode[] = [];
   public userForm!: UntypedFormGroup;
