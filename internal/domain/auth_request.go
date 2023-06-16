@@ -42,7 +42,7 @@ type AuthRequest struct {
 	PrivateLabelingSetting   PrivateLabelingSetting
 	SelectedIDPConfigID      string
 	LinkingUsers             []*ExternalUser
-	PossibleSteps            []NextStep
+	PossibleSteps            []NextStep `json:"-"`
 	PasswordVerified         bool
 	MFAsVerified             []MFAType
 	Audience                 []string
