@@ -2,7 +2,7 @@
 Log:
   Level: 'info'
 
-# Help the ZITADEL maintainers improve the products usability by sending them some usage data
+# Help the ZITADEL maintainers improve the product's usability by sending them some usage data
 Telemetry:
   Enabled: true
 

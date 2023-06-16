@@ -15,14 +15,15 @@ Tracing:
   MetricPrefix: zitadel
 
 Telemetry:
-  # If Enabled is true, usage data is sent to the configured Telemetry.Endponts
+  # As long as Enabled is true, usage data is marked to be sent to the configured Telemetry.Endpoints
   Enabled: false
   # Push telemetry data to all these endpoints at least once.
   # If one endpoint returns an unsuccessful response code or times out,
-  # ZITADEL retries to push the data point to all configured endpoints again until it succeeds.
+  # ZITADEL retries to push the data point to all configured endpoints until it succeeds.
   # Configure delivery guarantees and intervals in the section Projections.Customizations.Telemetry
   # The endpoints can be reconfigured at runtime.
   # Three redirects are followed.
+  # If you change this configuration at runtime, remaining data that is not successfully delivered to the old endpoints is sent to the new endpoints.
   Endpoints:
     # Include https://zitadel.com/usage if you want to help the ZITADEL maintainers improve the product's usability by giving them some insights.
     # Don't forget to opt in by setting Telemetry.Enabled to true.
