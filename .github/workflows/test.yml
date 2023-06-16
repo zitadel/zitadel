@@ -58,6 +58,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - uses: actions/cache@v3
+        name: Setup Cypress binary cache
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-binary-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-cypress-binary-
+        if: ${{ matrix.command }} == "test:integration"
+
       - name: Install Dependencies
         id: deps
         run: pnpm install
