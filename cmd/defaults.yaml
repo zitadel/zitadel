@@ -188,7 +188,7 @@ Projections:
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
-      # An instance is active, as long as there are events on the instance, that are not older than the HandleActiveInstances duration.
+      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
       # Delivery guarantee requirements are higher for quota webhooks
       # Defaults to 45 days
       HandleActiveInstances: 1080h
@@ -198,7 +198,7 @@ Projections:
       RequeueEvery: 300s
     Telemetry:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
-      # An instance is active, as long as there are events on the instance, that are not older than the HandleActiveInstances duration.
+      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
       # Telemetry delivery guarantee requirements are a bit higher than normal data projections, as they are not interactively retryable.
       # Defaults to 15 days
       HandleActiveInstances: 360h
