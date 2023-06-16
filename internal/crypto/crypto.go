@@ -142,11 +142,11 @@ func CheckToken(alg EncryptionAlgorithm, token string, content string) error {
 	if err != nil {
 		return errors.ThrowPermissionDenied(err, "CRYPTO-Swg31", "Errors.Intent.InvalidToken")
 	}
-	decryptedToken, err := alg.Decrypt(data, alg.EncryptionKeyID())
+	decryptedToken, err := alg.DecryptString(data, alg.EncryptionKeyID())
 	if err != nil {
 		return errors.ThrowPermissionDenied(err, "CRYPTO-Sf4gt", "Errors.Intent.InvalidToken")
 	}
-	if string(decryptedToken) != content {
+	if decryptedToken != content {
 		return errors.ThrowPermissionDenied(nil, "CRYPTO-CRYPTO", "Errors.Intent.InvalidToken")
 	}
 	return nil

@@ -13,15 +13,9 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"golang.org/x/oauth2"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/repository/idp"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 )
@@ -47,60 +41,8 @@ func TestMain(m *testing.M) {
 	}())
 }
 
-func createProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), Tester.Instance)
-	id, _, err := Tester.Commands.AddOrgGenericOAuthProvider(ctx, Tester.Organisation.ID, command.GenericOAuthProvider{
-		"idp",
-		"clientID",
-		"clientSecret",
-		"https://example.com/oauth/v2/authorize",
-		"https://example.com/oauth/v2/token",
-		"https://api.example.com/user",
-		[]string{"openid", "profile", "email"},
-		"id",
-		idp.Options{
-			IsLinkingAllowed:  true,
-			IsCreationAllowed: true,
-			IsAutoCreation:    true,
-			IsAutoUpdate:      true,
-		},
-	})
-	require.NoError(t, err)
-	return id
-}
-
-func createIntent(t *testing.T, idpID string) string {
-	ctx := authz.WithInstance(context.Background(), Tester.Instance)
-	id, _, err := Tester.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", Tester.Organisation.ID)
-	require.NoError(t, err)
-	return id
-}
-
-func createSuccessfulIntent(t *testing.T, idpID string) (string, string, time.Time, uint64) {
-	ctx := authz.WithInstance(context.Background(), Tester.Instance)
-	intentID := createIntent(t, idpID)
-	writeModel, err := Tester.Commands.GetIntentWriteModel(ctx, intentID, Tester.Organisation.ID)
-	require.NoError(t, err)
-	idpUser := &oauth.UserMapper{
-		RawInfo: map[string]interface{}{
-			"id": "id",
-		},
-	}
-	idpSession := &oauth.Session{
-		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
-			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-			},
-			IDToken: "idToken",
-		},
-	}
-	token, err := Tester.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, "")
-	require.NoError(t, err)
-	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
-}
-
 func TestServer_AddHumanUser(t *testing.T) {
-	idpID := createProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -477,7 +419,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 }
 
 func TestServer_AddIDPLink(t *testing.T) {
-	idpID := createProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t)
 	type args struct {
 		ctx context.Context
 		req *user.AddIDPLinkRequest
@@ -557,7 +499,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_StartIdentityProviderFlow(t *testing.T) {
-	idpID := createProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t)
 	type args struct {
 		ctx context.Context
 		req *user.StartIdentityProviderFlowRequest
@@ -621,9 +563,9 @@ func TestServer_StartIdentityProviderFlow(t *testing.T) {
 }
 
 func TestServer_RetrieveIdentityProviderInformation(t *testing.T) {
-	idpID := createProvider(t)
-	intentID := createIntent(t, idpID)
-	successfulID, token, changeDate, sequence := createSuccessfulIntent(t, idpID)
+	idpID := Tester.AddGenericOAuthProvider(t)
+	intentID := Tester.CreateIntent(t, idpID)
+	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulIntent(t, idpID)
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderInformationRequest

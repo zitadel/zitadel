@@ -434,23 +434,19 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						eventPusherToEvents(
-							func() eventstore.Command {
-								event, _ := idpintent.NewSucceededEvent(
-									context.Background(),
-									&idpintent.NewAggregate("id", "ro").Aggregate,
-									[]byte(`{"RawInfo":{"id":"id"}}`),
-									"",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("accessToken"),
-									},
-									"",
-								)
-								return event
-							}(),
+						eventPusherToEvents(idpintent.NewSucceededEvent(
+							context.Background(),
+							&idpintent.NewAggregate("id", "ro").Aggregate,
+							[]byte(`{"RawInfo":{"id":"id"}}`),
+							"",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("accessToken"),
+							},
+							"",
+						),
 						),
 					),
 				),

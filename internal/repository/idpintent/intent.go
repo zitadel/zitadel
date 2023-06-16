@@ -81,7 +81,7 @@ func NewSucceededEvent(
 	userID string,
 	idpAccessToken *crypto.CryptoValue,
 	idpIDToken string,
-) (*SucceededEvent, error) {
+) *SucceededEvent {
 	return &SucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -92,7 +92,7 @@ func NewSucceededEvent(
 		UserID:         userID,
 		IDPAccessToken: idpAccessToken,
 		IDPIDToken:     idpIDToken,
-	}, nil
+	}
 }
 
 func (e *SucceededEvent) Data() interface{} {
