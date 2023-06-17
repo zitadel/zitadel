@@ -209,11 +209,8 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "DELETE FROM projections.orgs WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								domain.OrgStateRemoved,
 								"agg-id",
 								"instance-id",
 							},
