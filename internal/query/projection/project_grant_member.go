@@ -48,6 +48,20 @@ func (*projectGrantMemberProjection) Init() *old_handler.Check {
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{MemberOwnerRemoved})),
 			handler.WithIndex(handler.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
 			handler.WithIndex(handler.NewIndex("granted_org_removed", []string{ProjectGrantMemberGrantedOrgRemoved})),
+			handler.WithIndex(
+				handler.NewIndex("pgm_instance", []string{MemberInstanceID},
+					handler.WithInclude(
+						MemberCreationDate,
+						MemberChangeDate,
+						MemberUserOwnerRemoved,
+						MemberRolesCol,
+						MemberSequence,
+						MemberResourceOwner,
+						MemberOwnerRemoved,
+						ProjectGrantMemberGrantedOrgRemoved,
+					),
+				),
+			),
 		),
 	)
 }

@@ -184,36 +184,47 @@ func (*loginNameProjection) Name() string {
 func (*loginNameProjection) Init() *old_handler.Check {
 	return handler.NewViewCheck(
 		viewStmt,
-		handler.NewSuffixedTable([]*handler.InitColumn{
-			handler.NewColumn(LoginNameUserIDCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginNameUserUserNameCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginNameUserResourceOwnerCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginNameUserInstanceIDCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginNameUserOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
-		},
+		handler.NewSuffixedTable(
+			[]*handler.InitColumn{
+				handler.NewColumn(LoginNameUserIDCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameUserUserNameCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameUserResourceOwnerCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameUserInstanceIDCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameUserOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+			},
 			handler.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
 			loginNameUserSuffix,
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{LoginNameUserResourceOwnerCol})),
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{LoginNameUserOwnerRemovedCol})),
+			handler.WithIndex(
+				handler.NewIndex("lnu_instance_ro_id", []string{LoginNameUserInstanceIDCol, LoginNameUserResourceOwnerCol, LoginNameUserIDCol},
+					handler.WithInclude(
+						LoginNameUserUserNameCol,
+						LoginNameUserOwnerRemovedCol,
+					),
+				),
+			),
 		),
-		handler.NewSuffixedTable([]*handler.InitColumn{
-			handler.NewColumn(LoginNameDomainNameCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginNameDomainIsPrimaryCol, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(LoginNameDomainResourceOwnerCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginNameDomainInstanceIDCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginNameDomainOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
-		},
+		handler.NewSuffixedTable(
+			[]*handler.InitColumn{
+				handler.NewColumn(LoginNameDomainNameCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameDomainIsPrimaryCol, handler.ColumnTypeBool, handler.Default(false)),
+				handler.NewColumn(LoginNameDomainResourceOwnerCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameDomainInstanceIDCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameDomainOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+			},
 			handler.NewPrimaryKey(LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
 			loginNameDomainSuffix,
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{LoginNameDomainOwnerRemovedCol})),
 		),
-		handler.NewSuffixedTable([]*handler.InitColumn{
-			handler.NewColumn(LoginNamePoliciesMustBeDomainCol, handler.ColumnTypeBool),
-			handler.NewColumn(LoginNamePoliciesIsDefaultCol, handler.ColumnTypeBool),
-			handler.NewColumn(LoginNamePoliciesResourceOwnerCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginNamePoliciesInstanceIDCol, handler.ColumnTypeText),
-			handler.NewColumn(LoginNamePoliciesOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
-		},
+		handler.NewSuffixedTable(
+			[]*handler.InitColumn{
+				handler.NewColumn(LoginNamePoliciesMustBeDomainCol, handler.ColumnTypeBool),
+				handler.NewColumn(LoginNamePoliciesIsDefaultCol, handler.ColumnTypeBool),
+				handler.NewColumn(LoginNamePoliciesResourceOwnerCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNamePoliciesInstanceIDCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNamePoliciesOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+			},
 			handler.NewPrimaryKey(LoginNamePoliciesInstanceIDCol, LoginNamePoliciesResourceOwnerCol),
 			loginNamePolicySuffix,
 			handler.WithIndex(handler.NewIndex("is_default", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),

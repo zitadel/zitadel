@@ -44,7 +44,11 @@ func (*instanceDomainProjection) Init() *old_handler.Check {
 			handler.NewColumn(InstanceDomainIsPrimaryCol, handler.ColumnTypeBool),
 		},
 			handler.NewPrimaryKey(InstanceDomainInstanceIDCol, InstanceDomainDomainCol),
-			handler.WithIndex(handler.NewIndex("instance_domain", []string{InstanceDomainDomainCol})),
+			handler.WithIndex(
+				handler.NewIndex("instance_domain", []string{InstanceDomainDomainCol},
+					handler.WithInclude(InstanceDomainCreationDateCol, InstanceDomainChangeDateCol, InstanceDomainSequenceCol, InstanceDomainIsGeneratedCol, InstanceDomainIsPrimaryCol),
+				),
+			),
 		),
 	)
 }
