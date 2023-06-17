@@ -197,9 +197,13 @@ func (h *Handler) processEvents(ctx context.Context) (additionalIteration bool, 
 			if pgErr.Code == "55P03" {
 				h.log().Debug("state already locked")
 				err = nil
+				additionalIteration = false
 			}
 		}
 	}()
+
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
 
 	err = crdb.ExecuteTx(ctx, h.client.DB, nil, func(tx *sql.Tx) error {
 		currentState, err := h.currentState(ctx, tx)
@@ -264,6 +268,9 @@ func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eve
 
 func (h *Handler) execute(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) error {
 	for _, statement := range statements {
+		if statement.Execute == nil {
+			continue
+		}
 		_, err := tx.Exec("SAVEPOINT exec")
 		if err != nil {
 			h.log().WithError(err).Debug("create savepoint failed")

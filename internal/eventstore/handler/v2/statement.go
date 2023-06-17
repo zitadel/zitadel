@@ -217,10 +217,8 @@ func NewDeleteStatement(event eventstore.Event, conditions []Condition, opts ...
 }
 
 func NewNoOpStatement(event eventstore.Event) *Statement {
-	return NewStatement(event, noOpExec)
+	return NewStatement(event, nil)
 }
-
-var noOpExec = func(Executer, string) error { return nil }
 
 func NewMultiStatement(event eventstore.Event, opts ...func(eventstore.Event) Exec) *Statement {
 	if len(opts) == 0 {
