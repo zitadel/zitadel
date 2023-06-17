@@ -25,7 +25,15 @@
 
   <div class="btn-container">
     <ng-container *ngIf="currentCreateStep === 1">
-      <button [disabled]="!org" (click)="next()" color="primary" mat-raised-button class="big-button" cdkFocusInitial>
+      <button
+        [disabled]="!org"
+        (click)="next()"
+        color="primary"
+        mat-raised-button
+        class="big-button"
+        cdkFocusInitial
+        data-e2e="project-grant-continue"
+      >
         {{ 'ACTIONS.CONTINUE' | translate }}
       </button>
     </ng-container>
@@ -34,7 +42,15 @@
       <button (click)="previous()" mat-stroked-button class="small-button">
         {{ 'ACTIONS.BACK' | translate }}
       </button>
-      <button color="primary" [disabled]="!org" (click)="addGrant()" mat-raised-button class="big-button" cdkFocusInitial>
+      <button
+        color="primary"
+        [disabled]="!org"
+        (click)="addGrant()"
+        mat-raised-button
+        class="big-button"
+        cdkFocusInitial
+        data-e2e="save-project-grant-button"
+      >
         {{ 'ACTIONS.SAVE' | translate }}
       </button>
     </ng-container>

@@ -8,6 +8,7 @@
       #nameInput
       [formControl]="myControl"
       [matAutocomplete]="auto"
+      data-e2e="add-org-input"
     />
 
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
