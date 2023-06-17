@@ -100,6 +100,10 @@ jobs:
     steps:
       - 
         uses: actions/checkout@v3
+      -
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ inputs.go_version }}
       - 
         uses: actions/cache/restore@v3
         name: restore core
@@ -108,9 +112,17 @@ jobs:
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
       -
-        uses: actions/setup-go@v4
+        id: go-cache-path
+        name: set cache path
+        run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+      - 
+        uses: actions/cache/restore@v3
+        name: restore previous results
         with:
-          go-version: ${{ inputs.go_version }}
+          key: integration-test-crdb-${{ inputs.core_cache_key }}
+          restore-keys: |
+            integration-test-crdb-core-
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
       - 
         name: test
         env:
@@ -124,3 +136,10 @@ jobs:
           file: profile.cov
           name: core-integration-tests-cockroach
           flags: core-integration-tests-cockroach
+      - 
+        uses: actions/cache/save@v3
+        name: cache results
+        if: always()
+        with:
+          key: integration-test-crdb-${{ inputs.core_cache_key }}
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
