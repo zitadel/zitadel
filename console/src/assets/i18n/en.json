@@ -1497,7 +1497,7 @@
     "GRANT": {
       "EMPTY": "No granted organization.",
       "TITLE": "Project Grants",
-      "DESCRIPTION": "Allow an other organization to use your project.",
+      "DESCRIPTION": "Allow another organization to use your project.",
       "EDITTITLE": "Edit roles",
       "CREATE": {
         "TITLE": "Create Organization Grant",
@@ -1505,13 +1505,11 @@
         "SEL_PROJECT": "Search for a project",
         "SEL_ROLES": "Select the roles you want to be added to the grant",
         "SEL_USER": "Select users",
-        "SEL_ORG": "Set the domain",
-        "SEL_ORG_DESC": "Enter the complete domain to specify the organization to grant.",
-        "ORG_TITLE": "Organization",
+        "SEL_ORG": "Search an organization",
+        "SEL_ORG_DESC": "Search the organization to grant.",
         "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
         "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organization.",
-        "SEL_ORG_FORMFIELD": "Complete Domain",
-        "SEL_ORG_BUTTON": "Search Organization",
+        "SEL_ORG_FORMFIELD": "Organization",
         "FOR_ORG": "The grant is created for:"
       },
       "DETAIL": {
