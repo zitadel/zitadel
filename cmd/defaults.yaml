@@ -166,7 +166,7 @@ Projections:
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     Projects:
-      BulkLimit: 2000
+      BulkLimit: 200
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
@@ -184,7 +184,7 @@ Projections:
 Auth:
   SearchLimit: 1000
   Spooler:
-    BulkLimit: 10000
+    BulkLimit: 200
     FailureCountUntilSkip: 5
     # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
     # from HandleActiveInstances duration in the past until the projections current time
@@ -193,7 +193,7 @@ Auth:
 
 Admin:
   Spooler:
-    BulkLimit: 10000
+    BulkLimit: 200
     FailureCountUntilSkip: 5
     # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
     # from HandleActiveInstances duration in the past until the projections current time
@@ -277,7 +277,7 @@ Notification:
     Spooler:
       ConcurrentWorkers: 1
       ConcurrentInstances: 10
-      BulkLimit: 10000
+      BulkLimit: 200
       FailureCountUntilSkip: 5
       Handlers:
 
