@@ -128,9 +128,8 @@ const (
 
 func NewIndex(name string, columns []string, opts ...indexOpts) *Index {
 	i := &Index{
-		Name:        name,
-		Columns:     columns,
-		bucketCount: 0,
+		Name:    name,
+		Columns: columns,
 	}
 	for _, opt := range opts {
 		opt(i)
@@ -139,16 +138,16 @@ func NewIndex(name string, columns []string, opts ...indexOpts) *Index {
 }
 
 type Index struct {
-	Name        string
-	Columns     []string
-	bucketCount uint16
+	Name     string
+	Columns  []string
+	includes []string
 }
 
 type indexOpts func(*Index)
 
-func Hash(bucketsCount uint16) indexOpts {
+func WithInclude(columns ...string) indexOpts {
 	return func(i *Index) {
-		i.bucketCount = bucketsCount
+		i.includes = columns
 	}
 }
 
@@ -333,11 +332,10 @@ func createIndexStatement(index *Index, tableName string) string {
 		tableName,
 		strings.Join(index.Columns, ","),
 	)
-	if index.bucketCount == 0 {
-		return stmt + ";"
+	if len(index.includes) > 0 {
+		stmt += " INCLUDE (" + strings.Join(index.includes, ", ") + ")"
 	}
-	return fmt.Sprintf("SET experimental_enable_hash_sharded_indexes=on; %s USING HASH WITH BUCKET_COUNT = %d;",
-		stmt, index.bucketCount)
+	return stmt + ";"
 }
 
 func foreignKeyName(name, tableName, suffix string) string {

@@ -126,13 +126,13 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 
 	for i, query := range builder.GetQueries() {
 		for _, f := range []func(query *eventstore.SearchQuery) *Filter{
+			instanceIDFilterFromQuery,
 			aggregateTypeFilter,
 			aggregateIDFilter,
 			eventTypeFilter,
 			eventDataFilter,
 			eventSequenceGreaterFilter,
 			eventSequenceLessFilter,
-			instanceIDFilterFromQuery,
 			excludedInstanceIDFilter,
 			creationDateAfterFilter,
 		} {
