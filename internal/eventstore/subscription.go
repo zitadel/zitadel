@@ -40,7 +40,6 @@ func SubscribeAggregates(eventQueue chan Event, aggregates ...AggregateType) *Su
 // SubscribeEventTypes subscribes for the given event types
 // if no event types are provided the subscription is for all events of the aggregate
 func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventType) *Subscription {
-	aggregates := make([]AggregateType, len(types))
 	sub := &Subscription{
 		Events: eventQueue,
 		types:  types,
@@ -49,7 +48,7 @@ func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventT
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
 
-	for _, aggregate := range aggregates {
+	for aggregate := range types {
 		subscriptions[aggregate] = append(subscriptions[aggregate], sub)
 	}
 
