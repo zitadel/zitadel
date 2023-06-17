@@ -210,7 +210,10 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 		}
 		clauses[idx] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
-	return " WHERE " + strings.Join(clauses, " OR "), values
+	// created_at <= now() must be added because clock_timestamp() could be in the future
+	// this could lead to skipped events which are not visible as of system time but have a lower
+	// created_at timestamp
+	return " WHERE (" + strings.Join(clauses, " OR ") + ") AND created_at <= now()", values
 }
 
 func getCondition(cond querier, filter *repository.Filter) (condition string) {
