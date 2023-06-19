@@ -145,7 +145,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 			}
 			filters[i] = append(filters[i], filter)
 		}
-		filters[i] = append(filters[i], builderFilters...)
+		filters[i] = append(builderFilters, filters[i]...)
 	}
 
 	if len(filters) == 0 {
