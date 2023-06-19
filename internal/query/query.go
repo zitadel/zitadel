@@ -34,6 +34,7 @@ type Queries struct {
 
 	idpConfigEncryption  crypto.EncryptionAlgorithm
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
+	checkPermission      domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
 	LoginDir                            http.FileSystem
@@ -106,6 +107,10 @@ func StartQueries(
 
 func (q *Queries) Health(ctx context.Context) error {
 	return q.client.Ping()
+}
+
+func (q *Queries) SetPermissionCheck(permissionCheck func(ctx context.Context, permission string, orgID string, resourceID string) (err error)) {
+	q.checkPermission = permissionCheck
 }
 
 type prepareDatabase interface {

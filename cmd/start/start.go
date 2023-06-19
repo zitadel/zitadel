@@ -157,6 +157,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
+	queries.SetPermissionCheck(permissionCheck)
 
 	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
 	if err != nil {

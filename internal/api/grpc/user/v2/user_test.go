@@ -203,3 +203,75 @@ func Test_intentToIDPInformationPb(t *testing.T) {
 		})
 	}
 }
+
+func Test_authMethodTypesToPb(t *testing.T) {
+	tests := []struct {
+		name        string
+		methodTypes []domain.UserAuthMethodType
+		want        []user.AuthenticationMethodType
+	}{
+		{
+			"empty list",
+			nil,
+			nil,
+		},
+		{
+			"list",
+			[]domain.UserAuthMethodType{
+				domain.UserAuthMethodTypePasswordless,
+			},
+			[]user.AuthenticationMethodType{
+				user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, authMethodTypesToPb(tt.methodTypes), "authMethodTypesToPb(%v)", tt.methodTypes)
+		})
+	}
+}
+
+func Test_authMethodTypeToPb(t *testing.T) {
+	tests := []struct {
+		name       string
+		methodType domain.UserAuthMethodType
+		want       user.AuthenticationMethodType
+	}{
+		{
+			"uspecified",
+			domain.UserAuthMethodTypeUnspecified,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED,
+		},
+		{
+			"(t)otp",
+			domain.UserAuthMethodTypeOTP,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_TOTP,
+		},
+		{
+			"u2f",
+			domain.UserAuthMethodTypeU2F,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_U2F,
+		},
+		{
+			"passkey",
+			domain.UserAuthMethodTypePasswordless,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+		},
+		{
+			"password",
+			domain.UserAuthMethodTypePassword,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSWORD,
+		},
+		{
+			"idp",
+			domain.UserAuthMethodTypeIDP,
+			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, authMethodTypeToPb(tt.methodType), "authMethodTypeToPb(%v)", tt.methodType)
+		})
+	}
+}
