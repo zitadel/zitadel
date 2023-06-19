@@ -56,7 +56,7 @@
     "@angular-eslint/schematics": "16.0.1",
     "@angular-eslint/template-parser": "16.0.1",
     "@angular/cli": "^16.0.1",
-    "@angular/compiler-cli": "^16.0.1",
+    "@angular/compiler-cli": "^16.1.1",
     "@angular/language-service": "^16.0.1",
     "@bufbuild/buf": "^1.18.0-1",
     "@types/file-saver": "^2.0.2",
