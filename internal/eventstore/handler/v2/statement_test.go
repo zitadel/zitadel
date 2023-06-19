@@ -773,9 +773,7 @@ func TestNewNoOpStatement(t *testing.T) {
 				},
 			},
 			want: want{
-				executer: &wantExecuter{
-					shouldExecute: false,
-				},
+				executer: nil,
 				isErr: func(err error) bool {
 					return err == nil
 				},
