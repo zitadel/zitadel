@@ -26,13 +26,12 @@ export async function POST(request: NextRequest) {
       return createPasskeyRegistrationLink(userId)
         .then((resp) => {
           const code = resp.code;
-          console.log("code", code);
           return registerPasskey(userId, code).then((resp) => {
             return NextResponse.json(resp);
           });
         })
         .catch((error) => {
-          console.log("error on creating passkey registration link");
+          console.error("error on creating passkey registration link");
           return NextResponse.json(error, { status: 500 });
         });
     } else {

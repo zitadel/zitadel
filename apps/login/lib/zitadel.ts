@@ -254,7 +254,6 @@ export async function verifyPasskeyRegistration(
   userId: string
 ): Promise<VerifyPasskeyRegistrationResponse> {
   const userservice = user.getUser(server);
-  console.log(passkeyId, passkeyName, publicKeyCredential, userId);
   return userservice.verifyPasskeyRegistration(
     {
       passkeyId,
@@ -276,20 +275,10 @@ export async function registerPasskey(
   userId: string,
   code: { id: string; code: string }
 ): Promise<any> {
-  //   this actions will be made from the currently seleected user
-  const zitadelConfig: ZitadelServerOptions = {
-    name: "zitadel login",
-    apiUrl: process.env.ZITADEL_API_URL ?? "",
-    token: "",
-  };
-
-  const authserver: ZitadelServer = initializeServer(zitadelConfig);
-  console.log("server", authserver);
   const userservice = user.getUser(server);
   return userservice.registerPasskey({
     userId,
     code,
-    //   returnCode: new ReturnPasskeyRegistrationCode(),
   });
 }
 

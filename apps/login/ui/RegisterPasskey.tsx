@@ -26,8 +26,6 @@ export default function RegisterPasskey({ sessionId }: Props) {
   const router = useRouter();
 
   async function submitRegister() {
-    // const link = await createPasskeyRegistrationLink(server, userId);
-    // console.log(link);
     setError("");
     setLoading(true);
     const res = await fetch("/passkeys", {
@@ -83,7 +81,7 @@ export default function RegisterPasskey({ sessionId }: Props) {
   function submitRegisterAndContinue(value: Inputs): Promise<boolean | void> {
     return submitRegister().then((resp: RegisterPasskeyResponse) => {
       const passkeyId = resp.passkeyId;
-      console.log("passkeyId", passkeyId);
+
       if (
         resp.publicKeyCredentialCreationOptions &&
         resp.publicKeyCredentialCreationOptions.publicKey
@@ -131,7 +129,6 @@ export default function RegisterPasskey({ sessionId }: Props) {
                 id: resp.id,
                 rawId: coerceToBase64Url(rawId, "rawId"),
                 type: resp.type,
-                // response: (resp as any).response,
                 response: {
                   attestationObject: coerceToBase64Url(
                     attestationObject,
@@ -145,7 +142,7 @@ export default function RegisterPasskey({ sessionId }: Props) {
               };
               console.log(data);
 
-              return submitVerify(passkeyId, "name", data, sessionId);
+              return submitVerify(passkeyId, "", data, sessionId);
             } else {
               setLoading(false);
               setError("An error on registering passkey");

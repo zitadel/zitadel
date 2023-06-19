@@ -1,18 +1,18 @@
-import {
-  createPasskeyRegistrationLink,
-  getSession,
-  registerPasskey,
-  server,
-  verifyPasskeyRegistration,
-} from "#/lib/zitadel";
+import { getSession, server, verifyPasskeyRegistration } from "#/lib/zitadel";
 import { getSessionCookieById } from "#/utils/cookies";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
-    const { passkeyId, passkeyName, publicKeyCredential, sessionId } = body;
+    let { passkeyId, passkeyName, publicKeyCredential, sessionId } = body;
 
+    if (!!!passkeyName) {
+      const { browser, device, os } = userAgent(request);
+      passkeyName = `${device.vendor ?? ""} ${device.model ?? ""}${
+        device.vendor || device.model ? ", " : ""
+      }${os.name}${os.name ? ", " : ""}${browser.name}`;
+    }
     const sessionCookie = await getSessionCookieById(sessionId);
 
     const session = await getSession(
@@ -32,11 +32,9 @@ export async function POST(request: NextRequest) {
         userId
       )
         .then((resp) => {
-          console.log("verifyresponse", resp);
           return NextResponse.json(resp);
         })
         .catch((error) => {
-          console.log("error on verifying passkey");
           return NextResponse.json(error, { status: 500 });
         });
     } else {

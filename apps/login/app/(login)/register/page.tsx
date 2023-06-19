@@ -15,14 +15,10 @@ export default async function Page({
 
   const setPassword = !!(firstname && lastname && email);
 
-  console.log(setPassword);
-
   const legal = await getLegalAndSupportSettings(server);
   const passwordComplexitySettings = await getPasswordComplexitySettings(
     server
   );
-
-  console.log(legal);
 
   return setPassword ? (
     <div className="flex flex-col items-center space-y-4">
