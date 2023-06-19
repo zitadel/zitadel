@@ -55,7 +55,10 @@ export default function PasswordForm({ loginName }: Props) {
       if (resp.factors && !resp.factors.passwordless) {
         return router.push(
           `/passkey/add?` +
-            new URLSearchParams({ loginName: resp.factors.user.loginName })
+            new URLSearchParams({
+              loginName: resp.factors.user.loginName,
+              prompt: "true",
+            })
         );
       } else {
         return router.push(`/accounts`);

@@ -22,6 +22,7 @@ async function loadSessions(): Promise<Session[]> {
 
 export default async function Page() {
   let sessions = await loadSessions();
+  console.log(sessions);
 
   return (
     <div className="flex flex-col items-center space-y-4">

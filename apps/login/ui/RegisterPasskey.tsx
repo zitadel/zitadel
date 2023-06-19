@@ -12,9 +12,10 @@ type Inputs = {};
 
 type Props = {
   sessionId: string;
+  isPrompt: boolean;
 };
 
-export default function RegisterPasskey({ sessionId }: Props) {
+export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -172,13 +173,24 @@ export default function RegisterPasskey({ sessionId }: Props) {
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
-        <Button
-          type="button"
-          variant={ButtonVariants.Secondary}
-          onClick={() => router.back()}
-        >
-          back
-        </Button>
+        {isPrompt ? (
+          <Button
+            type="button"
+            variant={ButtonVariants.Secondary}
+            onClick={() => router.push("/accounts")}
+          >
+            skip
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            variant={ButtonVariants.Secondary}
+            onClick={() => router.back()}
+          >
+            back
+          </Button>
+        )}
+
         <span className="flex-grow"></span>
         <Button
           type="submit"

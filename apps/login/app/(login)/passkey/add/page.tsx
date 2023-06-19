@@ -9,7 +9,7 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName } = searchParams;
+  const { loginName, prompt } = searchParams;
 
   const sessionFactors = await loadSession(loginName);
 
@@ -21,10 +21,16 @@ export default async function Page({
       }
     });
   }
+  const title = !!prompt
+    ? "Authenticate with a passkey"
+    : "Use your passkey to confirm it’s really you";
+  const description = !!prompt
+    ? "When set up, you will be able to authenticate without a password."
+    : "Your device will ask for your fingerprint, face, or screen lock";
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1>Use your passkey to confirm it’s really you</h1>
+      <h1>{title}</h1>
 
       {sessionFactors && (
         <UserAvatar
@@ -33,9 +39,7 @@ export default async function Page({
           showDropdown
         ></UserAvatar>
       )}
-      <p className="ztdl-p mb-6 block">
-        Your device will ask for your fingerprint, face, or screen lock
-      </p>
+      <p className="ztdl-p mb-6 block">{description}</p>
 
       <Alert type={AlertType.INFO}>
         <span>
@@ -60,7 +64,9 @@ export default async function Page({
         </div>
       )}
 
-      {sessionFactors?.id && <RegisterPasskey sessionId={sessionFactors.id} />}
+      {sessionFactors?.id && (
+        <RegisterPasskey sessionId={sessionFactors.id} isPrompt={!!prompt} />
+      )}
     </div>
   );
 }
