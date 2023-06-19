@@ -181,8 +181,9 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 }
 
 func (h *Handler) Trigger(ctx context.Context) (err error) {
-	for {
+	for i := 0; ; i++ {
 		additionalIteration, err := h.processEvents(ctx)
+		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
 			return err
 		}

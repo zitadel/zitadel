@@ -487,6 +487,9 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 func multiExec(execList []Exec) Exec {
 	return func(ex Executer, projectionName string) error {
 		for _, exec := range execList {
+			if exec == nil {
+				continue
+			}
 			if err := exec(ex, projectionName); err != nil {
 				return err
 			}
