@@ -140,6 +140,9 @@ func (h *Handler) subscribe(ctx context.Context) {
 				ctx := authz.WithInstanceID(ctx, e.Aggregate().InstanceID)
 				err := h.Trigger(ctx)
 				h.log().OnError(err).Debug("trigger of queued event failed")
+				if err == nil {
+					solvedInstances = append(solvedInstances, e.Aggregate().InstanceID)
+				}
 			}
 		}
 	}
