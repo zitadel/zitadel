@@ -44,7 +44,8 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 				UserId: userID,
 				Medium: &user.RequestPasswordResetRequest_SendLink{
 					SendLink: &user.SendPasswordResetLink{
-						UrlTemplate: gu.Ptr("https://example.com/password/change?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+						NotificationType: user.NotificationType_NOTIFICATION_TYPE_Email,
+						UrlTemplate:      gu.Ptr("https://example.com/password/change?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
 					},
 				},
 			},
