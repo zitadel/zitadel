@@ -3,6 +3,8 @@ package start
 import (
 	"time"
 
+	"github.com/zitadel/zitadel/internal/notification/handlers"
+
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -65,6 +67,7 @@ type Config struct {
 	Eventstore        *eventstore.Config
 	LogStore          *logstore.Configs
 	Quotas            *QuotasConfig
+	Telemetry         *handlers.TelemetryPusherConfig
 }
 
 type QuotasConfig struct {

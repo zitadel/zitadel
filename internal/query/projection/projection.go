@@ -64,6 +64,7 @@ var (
 	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
 	NotificationsQuotaProjection        interface{}
+	TelemetryPusherProjection           interface{}
 	DeviceAuthProjection                *deviceAuthProjection
 	SessionProjection                   *sessionProjection
 )

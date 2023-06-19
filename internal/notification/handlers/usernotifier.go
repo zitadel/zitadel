@@ -2,7 +2,12 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/repository/project"
+
+	"github.com/zitadel/zitadel/internal/repository/instance"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -106,9 +111,65 @@ func (u *userNotifier) reducers() []handler.AggregateReducer {
 					Event:  user.HumanPasswordChangedType,
 					Reduce: u.reducePasswordChanged,
 				},
+				{
+					Event:  user.UserTokenAddedType,
+					Reduce: u.reduceUserTokenAdded,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceAddedEventType,
+					Reduce: u.reduceInstanceAdded,
+				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: u.reduceInstanceRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: project.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  project.ProjectAddedType,
+					Reduce: u.reduceProjectAdded,
+				},
+				{
+					Event:  project.ApplicationAddedType,
+					Reduce: u.reduceApplicationAdded,
+				},
 			},
 		},
 	}
+}
+
+func (u *userNotifier) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
+	fmt.Println("reduceInstanceAdded")
+	return crdb.NewNoOpStatement(event), nil
+}
+
+func (u *userNotifier) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
+	// ignore instance.ProjectSetEventType
+	fmt.Println("reduceProjectAdded")
+	return crdb.NewNoOpStatement(event), nil
+}
+
+func (u *userNotifier) reduceApplicationAdded(event eventstore.Event) (*handler.Statement, error) {
+	fmt.Println("reduceApplicationAdded")
+	return crdb.NewNoOpStatement(event), nil
+}
+
+func (u *userNotifier) reduceUserTokenAdded(event eventstore.Event) (*handler.Statement, error) {
+	fmt.Println("reduceUserTokenAdded")
+	return crdb.NewNoOpStatement(event), nil
+}
+
+func (u *userNotifier) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
+	fmt.Println("reduceInstanceRemoved")
+	return crdb.NewNoOpStatement(event), nil
 }
 
 func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -334,7 +395,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Drh5w", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
 	ctx := HandlerContext(event.Aggregate())
-	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil,
+	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.AggregateType,
 		user.UserDomainClaimedType, user.UserDomainClaimedSentType)
 	if err != nil {
 		return nil, err
@@ -462,7 +523,7 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Yko2z8", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
 	ctx := HandlerContext(event.Aggregate())
-	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.HumanPasswordChangeSentType)
+	alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.AggregateType, user.HumanPasswordChangeSentType)
 	if err != nil {
 		return nil, err
 	}
@@ -591,5 +652,5 @@ func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, e
 	if event.CreationDate().Add(expiry).Before(time.Now().UTC()) {
 		return true, nil
 	}
-	return u.queries.IsAlreadyHandled(ctx, event, data, eventTypes...)
+	return u.queries.IsAlreadyHandled(ctx, event, data, user.AggregateType, eventTypes...)
 }

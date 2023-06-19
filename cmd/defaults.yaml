@@ -15,7 +15,9 @@ Tracing:
   MetricPrefix: zitadel
 
 Telemetry:
-  # As long as Enabled is true, usage data is marked to be sent to the configured Telemetry.Endpoints
+  # As long as Enabled is true, usage data that is marked as due is also tried to be sent to the configured Telemetry.Endpoints.
+  # Data is marked as due, even if Enabled is false.
+  # This means that switching this to true makes ZITADEL try to send past data that was marked to send.
   Enabled: false
   # Push telemetry data to all these endpoints at least once.
   # If one endpoint returns an unsuccessful response code or times out,

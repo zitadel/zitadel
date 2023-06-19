@@ -29,6 +29,8 @@ func Start(
 	ctx context.Context,
 	userHandlerCustomConfig projection.CustomConfig,
 	quotaHandlerCustomConfig projection.CustomConfig,
+	telemetryHandlerCustomConfig projection.CustomConfig,
+	telemetryCfg handlers.TelemetryPusherConfig,
 	externalPort uint16,
 	externalSecure bool,
 	commands *command.Commands,
@@ -69,6 +71,15 @@ func Start(
 	handlers.NewQuotaNotifier(
 		ctx,
 		projection.ApplyCustomConfig(quotaHandlerCustomConfig),
+		commands,
+		q,
+		metricSuccessfulDeliveriesJSON,
+		metricFailedDeliveriesJSON,
+	).Start()
+	handlers.NewTelemetryPusher(
+		ctx,
+		telemetryCfg,
+		projection.ApplyCustomConfig(telemetryHandlerCustomConfig),
 		commands,
 		q,
 		metricSuccessfulDeliveriesJSON,
