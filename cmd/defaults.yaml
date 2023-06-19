@@ -184,7 +184,7 @@ Projections:
 Auth:
   SearchLimit: 1000
   Spooler:
-    BulkLimit: 200
+    BulkLimit: 100
     FailureCountUntilSkip: 5
     # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
     # from HandleActiveInstances duration in the past until the projections current time
